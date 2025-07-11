@@ -4,7 +4,19 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import {
+    BookOpen,
+    CalendarSync,
+    CircleDollarSign,
+    CircleUser,
+    CreditCard,
+    DollarSign,
+    Folder,
+    LayoutGrid,
+    LibraryBig,
+    Newspaper,
+    ShoppingCart,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -13,16 +25,62 @@ const mainNavItems: NavItem[] = [
         href: '/dashboard',
         icon: LayoutGrid,
     },
+    {
+        title: 'News',
+        href: '/news',
+        icon: Newspaper,
+    },
+    {
+        title: 'Forums',
+        href: '/forums',
+        icon: LibraryBig,
+    },
+];
+
+const accountNavItems: NavItem[] = [
+    {
+        title: 'My Account',
+        href: '/account',
+        icon: CircleUser,
+    },
+    {
+        title: 'Billing',
+        href: '/billing',
+        icon: DollarSign,
+    },
+    {
+        title: 'Orders',
+        href: '/orders',
+        icon: CircleDollarSign,
+    },
+];
+
+const storeNavItems: NavItem[] = [
+    {
+        title: 'Store',
+        href: '/store',
+        icon: ShoppingCart,
+    },
+    {
+        title: 'Subscriptions',
+        href: '/subscriptions',
+        icon: CalendarSync,
+    },
+    {
+        title: 'Gift Cards',
+        href: '/gift-cards',
+        icon: CreditCard,
+    },
 ];
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
+        title: 'Legal',
         href: 'https://github.com/laravel/react-starter-kit',
         icon: Folder,
     },
     {
-        title: 'Documentation',
+        title: 'Support',
         href: 'https://laravel.com/docs/starter-kits#react',
         icon: BookOpen,
     },
@@ -44,7 +102,9 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain title="Platform" items={mainNavItems} />
+                <NavMain title="Account" items={accountNavItems} />
+                <NavMain title="Store" items={storeNavItems} />
             </SidebarContent>
 
             <SidebarFooter>
