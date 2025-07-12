@@ -1,9 +1,7 @@
+import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
-import AppearanceTabs from '@/components/appearance-tabs';
 import HeadingSmall from '@/components/heading-small';
-import { type BreadcrumbItem } from '@/types';
-
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
@@ -13,20 +11,19 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/settings',
     },
     {
-        title: 'Appearance Settings',
-        href: '/settings/appearance',
+        title: 'Payment Methods',
+        href: '/settings/payment-methods',
     },
 ];
 
-export default function Appearance() {
+export default function Invoices() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Appearance settings" />
+            <Head title="Payment information" />
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Appearance settings" description="Update your account's appearance settings" />
-                    <AppearanceTabs />
+                    <HeadingSmall title="Payment methods" description="Update and manage your account payment methods" />
                 </div>
             </SettingsLayout>
         </AppLayout>

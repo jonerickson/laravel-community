@@ -14,8 +14,12 @@ import SettingsLayout from '@/layouts/settings/layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Profile settings',
-        href: '/settings/profile',
+        title: 'Settings',
+        href: '/settings',
+    },
+    {
+        title: 'Account Information',
+        href: '/settings/account',
     },
 ];
 
@@ -45,7 +49,7 @@ export default function Profile() {
             <Head title="Profile settings" />
 
             <SettingsLayout>
-                <div className="space-y-6">
+                <div className="space-y-6 md:max-w-2xl">
                     <HeadingSmall title="Profile information" description="Update your name and email address" />
 
                     <form onSubmit={submit} className="space-y-6">

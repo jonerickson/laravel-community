@@ -22,6 +22,14 @@ export interface NavItem {
     isActive?: boolean;
 }
 
+export interface Invoice {
+    id: string;
+    amount: number;
+    status: InvoiceStatus;
+}
+
+export type InvoiceStatus = 'draft' | 'open' | 'paid' | 'uncollectible' | 'void';
+
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };

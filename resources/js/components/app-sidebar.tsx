@@ -40,18 +40,23 @@ const mainNavItems: NavItem[] = [
 const accountNavItems: NavItem[] = [
     {
         title: 'My Account',
-        href: '/account',
+        href: '/settings/account',
         icon: CircleUser,
     },
     {
         title: 'Billing',
-        href: '/billing',
+        href: '/settings/billing',
         icon: DollarSign,
     },
     {
         title: 'Orders',
-        href: '/orders',
+        href: '/settings/orders',
         icon: CircleDollarSign,
+    },
+    {
+        title: 'Payment Methods',
+        href: '/settings/payment-methods',
+        icon: CreditCard,
     },
 ];
 
@@ -65,11 +70,6 @@ const storeNavItems: NavItem[] = [
         title: 'Subscriptions',
         href: '/subscriptions',
         icon: CalendarSync,
-    },
-    {
-        title: 'Gift Cards',
-        href: '/gift-cards',
-        icon: CreditCard,
     },
 ];
 
