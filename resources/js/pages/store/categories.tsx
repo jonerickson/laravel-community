@@ -3,45 +3,13 @@ import StoreFeatured from '@/components/store-featured';
 import StoreUserProvided from '@/components/store-user-provided';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
+import { StoreCategoryItem } from '@/components/store-categories-item';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Store',
         href: '/store',
-    },
-];
-
-const categories = [
-    {
-        id: 1,
-        name: 'New Arrivals',
-        href: '#',
-        imageUrl: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-01-category-01.jpg',
-    },
-    {
-        id: 2,
-        name: 'Productivity',
-        href: '#',
-        imageUrl: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-01-category-02.jpg',
-    },
-    {
-        id: 3,
-        name: 'Workspace',
-        href: '#',
-        imageUrl: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-01-category-04.jpg',
-    },
-    {
-        id: 4,
-        name: 'Accessories',
-        href: '#',
-        imageUrl: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-01-category-05.jpg',
-    },
-    {
-        id: 5,
-        name: 'Sale',
-        href: '#',
-        imageUrl: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-01-category-03.jpg',
     },
 ];
 
@@ -72,7 +40,9 @@ const userProvidedProducts = [
     },
 ];
 
-export default function Dashboard() {
+export default function Dashboard({ categories }: { categories: StoreCategoryItem[] }) {
+
+    console.log(categories);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Store" />

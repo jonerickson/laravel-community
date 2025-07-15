@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\Store\CategoryController;
 use App\Http\Controllers\Store\ProductController;
 use App\Http\Controllers\Store\SubscriptionController;
