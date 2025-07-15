@@ -15,6 +15,7 @@ import {
     LayoutGrid,
     LibraryBig,
     Newspaper,
+    ShieldIcon,
     ShoppingCart,
 } from 'lucide-react';
 import AppLogo from './app-logo';
@@ -32,7 +33,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Forums',
-        href: '/forums',
+        href: '/dashboard',
         icon: LibraryBig,
     },
 ];
@@ -70,6 +71,12 @@ const storeNavItems: NavItem[] = [
         title: 'Subscriptions',
         href: '/subscriptions',
         icon: CalendarSync,
+    },
+    {
+        title: 'Marketplace',
+        href: '/marketplace',
+        icon: ShieldIcon,
+        target: '_blank',
     },
 ];
 

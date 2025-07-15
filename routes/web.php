@@ -1,20 +1,21 @@
 <?php
 
+use App\Http\Controllers\News\IndexController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Laravel\WorkOS\Http\Middleware\ValidateSessionWithWorkOS;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
-Route::middleware([
-    'auth',
-    ValidateSessionWithWorkOS::class,
-])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+
+    Route::group(['prefix' => 'news', 'as' => 'news.'], function () {
+        Route::get('/', IndexController::class)->name('index');
+    });
 });
 
 require __DIR__.'/settings.php';

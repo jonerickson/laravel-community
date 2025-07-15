@@ -14,51 +14,59 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const categories = [
     {
+        id: 1,
         name: 'New Arrivals',
         href: '#',
-        imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-01-category-01.jpg',
+        imageUrl: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-01-category-01.jpg',
     },
     {
+        id: 2,
         name: 'Productivity',
         href: '#',
-        imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-01-category-02.jpg',
+        imageUrl: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-01-category-02.jpg',
     },
     {
+        id: 3,
         name: 'Workspace',
         href: '#',
-        imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-01-category-04.jpg',
+        imageUrl: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-01-category-04.jpg',
     },
     {
+        id: 4,
         name: 'Accessories',
         href: '#',
-        imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-01-category-05.jpg',
+        imageUrl: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-01-category-05.jpg',
     },
     {
+        id: 5,
         name: 'Sale',
         href: '#',
-        imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-01-category-03.jpg',
+        imageUrl: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-01-category-03.jpg',
     },
 ];
 
 const userProvidedProducts = [
     {
+        id: 1,
         name: 'Desk and Office',
         description: 'Work from home accessories',
-        imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-02-edition-01.jpg',
+        imageUrl: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-02-edition-01.jpg',
         imageAlt: 'Desk with leather desk pad, walnut desk organizer, wireless keyboard and mouse, and porcelain mug.',
         href: '#',
     },
     {
+        id: 2,
         name: 'Self-Improvement',
         description: 'Journals and note-taking',
-        imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-02-edition-02.jpg',
+        imageUrl: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-02-edition-02.jpg',
         imageAlt: 'Wood table with porcelain mug, leather journal, brass pen, leather key ring, and a houseplant.',
         href: '#',
     },
     {
+        id: 3,
         name: 'Travel',
         description: 'Daily commute essentials',
-        imageSrc: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-02-edition-03.jpg',
+        imageUrl: 'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-02-edition-03.jpg',
         imageAlt: 'Collection of four insulated travel bottles on wooden shelf.',
         href: '#',
     },

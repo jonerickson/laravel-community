@@ -6,12 +6,8 @@ use App\Http\Controllers\Settings\PaymentMethodController;
 use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Laravel\WorkOS\Http\Middleware\ValidateSessionWithWorkOS;
 
-Route::middleware([
-    'auth',
-    ValidateSessionWithWorkOS::class,
-])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::redirect('settings', '/settings/account');
 
     Route::get('settings/account', [ProfileController::class, 'edit'])->name('profile.edit');

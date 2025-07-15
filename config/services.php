@@ -14,6 +14,12 @@ return [
     |
     */
 
+    'discord' => [
+        'client_id' => env('DISCORD_CLIENT_ID'),
+        'client_secret' => env('DISCORD_CLIENT_SECRET'),
+        'redirect' => 'http://example.com/callback-url',
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],
@@ -26,6 +32,12 @@ return [
 
     'resend' => [
         'key' => env('RESEND_KEY'),
+    ],
+
+    'roblox' => [
+        'client_id' => env('ROBLOX_CLIENT_ID'),
+        'client_secret' => env('ROBLOX_CLIENT_SECRET'),
+        'redirect' => 'http://example.com/callback-url',
     ],
 
     'slack' => [
