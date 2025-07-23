@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use BezhanSalleh\FilamentShield\Support\Utils;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -28,6 +29,7 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
+                'isAdmin' => $request->user()->hasRole(Utils::getSuperAdminName()),
             ],
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),

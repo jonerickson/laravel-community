@@ -2,8 +2,8 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { type NavItem, type SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
 import {
     BookOpen,
     CalendarSync,
@@ -17,6 +17,7 @@ import {
     Newspaper,
     ShieldIcon,
     ShoppingCart,
+    TowerControl,
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -80,6 +81,15 @@ const storeNavItems: NavItem[] = [
     },
 ];
 
+const adminNavItems: NavItem[] = [
+    {
+        title: 'Admin Panel',
+        href: '/admin',
+        icon: TowerControl,
+        target: '_blank',
+    }
+]
+
 const footerNavItems: NavItem[] = [
     {
         title: 'Legal',
@@ -94,6 +104,8 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { isAdmin } = usePage<SharedData>().props.auth;
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -112,6 +124,9 @@ export function AppSidebar() {
                 <NavMain title="Platform" items={mainNavItems} />
                 <NavMain title="Account" items={accountNavItems} />
                 <NavMain title="Store" items={storeNavItems} />
+                {isAdmin && (
+                    <NavMain title="Administration" items={adminNavItems} />
+                )}
             </SidebarContent>
 
             <SidebarFooter>
