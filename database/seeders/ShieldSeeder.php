@@ -1,32 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Database\Seeders;
 
-use BezhanSalleh\FilamentShield\Support\Utils;
 use Illuminate\Database\Seeder;
+use BezhanSalleh\FilamentShield\Support\Utils;
 use Spatie\Permission\PermissionRegistrar;
 
 class ShieldSeeder extends Seeder
 {
-    public static function makeDirectPermissions(string $directPermissions): void
-    {
-        if (! blank($permissions = json_decode($directPermissions, true))) {
-            /** @var Model $permissionModel */
-            $permissionModel = Utils::getPermissionModel();
-
-            foreach ($permissions as $permission) {
-                if ($permissionModel::whereName($permission)->doesntExist()) {
-                    $permissionModel::create([
-                        'name' => $permission['name'],
-                        'guard_name' => $permission['guard_name'],
-                    ]);
-                }
-            }
-        }
-    }
-
     public function run(): void
     {
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
@@ -63,6 +44,23 @@ class ShieldSeeder extends Seeder
                         ->all();
 
                     $role->syncPermissions($permissionModels);
+                }
+            }
+        }
+    }
+
+    public static function makeDirectPermissions(string $directPermissions): void
+    {
+        if (! blank($permissions = json_decode($directPermissions, true))) {
+            /** @var Model $permissionModel */
+            $permissionModel = Utils::getPermissionModel();
+
+            foreach ($permissions as $permission) {
+                if ($permissionModel::whereName($permission)->doesntExist()) {
+                    $permissionModel::create([
+                        'name' => $permission['name'],
+                        'guard_name' => $permission['guard_name'],
+                    ]);
                 }
             }
         }

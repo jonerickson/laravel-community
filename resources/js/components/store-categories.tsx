@@ -1,7 +1,7 @@
 import Heading from '@/components/heading';
 import StoreCategoriesItem from '@/components/store-categories-item';
-import { Link } from '@inertiajs/react';
 import { ProductCategory } from '@/types';
+import { Link } from '@inertiajs/react';
 
 export default function StoreCategories({ categories }: { categories: ProductCategory[] }) {
     return (

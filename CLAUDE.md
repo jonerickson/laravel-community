@@ -108,6 +108,17 @@ This is a Laravel + React application built using the Laravel React Starter Kit.
 - Use TypeScript interfaces for proper type safety
 - Follow the existing component structure in `resources/js/components/`
 - Leverage shadcn/ui components as building blocks
+- Always use Lucide React icons instead of Heroicons or other icon libraries
+
+### Laravel Development Guidelines
+- Always use Facades instead of helper functions (e.g., `Auth::id()` not `auth()->id()`)
+- Never use SoftDeletes - use hard deletes only
+- Use enums instead of constants, with title case naming (e.g., `AnnouncementType::Info`)
+- In migrations, use `->string('slug')` never `->slug()`
+- Implement `HasAuthor` trait for models that need creator tracking
+- Use proper Sluggable contract implementation with `HasSlug` trait
+- Use Carbon implementation for date management
+- Always use Attributes instead of Laravel's `getAttributeNameAttribute()` pattern
 
 ## Documentation Maintenance
 

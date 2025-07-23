@@ -39,9 +39,7 @@ const userProvidedProducts = [
     },
 ];
 
-export default function Dashboard({ categories }: { categories: ProductCategory[] }) {
-
-    console.log(categories);
+export default function Categories({ categories }: { categories: ProductCategory[] }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Store" />

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\AnnouncementType;
+use App\Models\Announcement;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\User;
@@ -20,6 +22,13 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ShieldSeeder::class,
         ]);
+
+        Announcement::factory()->state([
+            'title' => 'Test Announcement',
+            'slug' => 'test-announcement',
+            'type' => AnnouncementType::Info,
+            'content' => 'This is a test announcement.',
+        ])->create();
 
         User::factory()->create([
             'name' => 'Test User',

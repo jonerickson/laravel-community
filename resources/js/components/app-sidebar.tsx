@@ -87,8 +87,8 @@ const adminNavItems: NavItem[] = [
         href: '/admin',
         icon: TowerControl,
         target: '_blank',
-    }
-]
+    },
+];
 
 const footerNavItems: NavItem[] = [
     {
@@ -124,9 +124,7 @@ export function AppSidebar() {
                 <NavMain title="Platform" items={mainNavItems} />
                 <NavMain title="Account" items={accountNavItems} />
                 <NavMain title="Store" items={storeNavItems} />
-                {isAdmin && (
-                    <NavMain title="Administration" items={adminNavItems} />
-                )}
+                {isAdmin && <NavMain title="Administration" items={adminNavItems} />}
             </SidebarContent>
 
             <SidebarFooter>

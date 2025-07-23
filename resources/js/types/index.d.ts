@@ -73,3 +73,19 @@ export interface ProductCategory {
     imageUrl: string;
     imageAlt?: string;
 }
+
+export interface Announcement {
+    id: number;
+    title: string;
+    slug: string;
+    content: string;
+    type: 'info' | 'success' | 'warning' | 'error';
+    is_active: boolean;
+    is_dismissible: boolean;
+    starts_at?: string | null;
+    ends_at?: string | null;
+    created_by: number;
+    author?: User;
+    created_at: string;
+    updated_at: string;
+}

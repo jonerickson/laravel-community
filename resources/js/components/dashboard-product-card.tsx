@@ -3,8 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { Product } from '@/types';
-import { StarIcon, TrendingUpIcon, SparklesIcon, NewspaperIcon } from 'lucide-react';
 import { Link } from '@inertiajs/react';
+import { NewspaperIcon, SparklesIcon, StarIcon, TrendingUpIcon } from 'lucide-react';
 
 interface DashboardProductCardProps {
     product: Product;
@@ -44,14 +44,12 @@ export default function DashboardProductCard({ product, type, className }: Dashb
         <Card className={cn('group relative overflow-hidden transition-all hover:shadow-lg', className)}>
             {/* Background gradient */}
             <div className={cn('absolute inset-0 bg-gradient-to-br opacity-50', config.gradient)} />
-            
+
             <CardHeader className="relative pb-2">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <IconComponent className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium text-muted-foreground">
-                            {config.title}
-                        </span>
+                        <span className="text-sm font-medium text-muted-foreground">{config.title}</span>
                     </div>
                     <Badge variant={config.badgeVariant} className="text-xs">
                         {config.badgeText}
@@ -77,27 +75,17 @@ export default function DashboardProductCard({ product, type, className }: Dashb
 
                 {/* Product Info */}
                 <div className="space-y-2">
-                    <h3 className="font-semibold leading-tight line-clamp-2">
-                        {product.name}
-                    </h3>
-                    
-                    {product.description && (
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                            {product.description}
-                        </p>
-                    )}
+                    <h3 className="line-clamp-2 leading-tight font-semibold">{product.name}</h3>
+
+                    {product.description && <p className="line-clamp-2 text-sm text-muted-foreground">{product.description}</p>}
 
                     <div className="flex items-center justify-between">
-                        <span className="text-lg font-bold">
-                            ${product.price.toFixed(2)}
-                        </span>
-                        
+                        <span className="text-lg font-bold">${product.price.toFixed(2)}</span>
+
                         {product.rating && (
                             <div className="flex items-center gap-1">
                                 <StarIcon className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                <span className="text-sm text-muted-foreground">
-                                    {product.rating.toFixed(1)}
-                                </span>
+                                <span className="text-sm text-muted-foreground">{product.rating.toFixed(1)}</span>
                             </div>
                         )}
                     </div>
@@ -112,9 +100,7 @@ export default function DashboardProductCard({ product, type, className }: Dashb
 
             <CardFooter className="relative pt-2">
                 <Button asChild className="w-full" size="sm">
-                    <Link href={`/store/products/${product.id}`}>
-                        View Product
-                    </Link>
+                    <Link href={`/store/products/${product.id}`}>View Product</Link>
                 </Button>
             </CardFooter>
         </Card>
