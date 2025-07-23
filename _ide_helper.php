@@ -23678,6 +23678,323 @@ namespace Livewire {
             }
     }
 
+namespace Mpociot\VatCalculator\Facades {
+    /**
+     * 
+     *
+     */
+    class VatCalculator {
+        /**
+         * Determines if you need to collect VAT for the given country code.
+         *
+         * @param string $countryCode
+         * @return bool 
+         * @static 
+         */
+        public static function shouldCollectVAT($countryCode)
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->shouldCollectVAT($countryCode);
+        }
+
+        /**
+         * Calculate the VAT based on the net price, country code and indication if the
+         * customer is a company or not.
+         *
+         * @param int|float $netPrice The net price to use for the calculation
+         * @param null|string $countryCode The country code to use for the rate lookup
+         * @param null|string $postalCode The postal code to use for the rate exception lookup
+         * @param null|bool $company
+         * @param null|string $type The type can be low or high
+         * @return float 
+         * @static 
+         */
+        public static function calculate($netPrice, $countryCode = null, $postalCode = null, $company = null, $type = null)
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->calculate($netPrice, $countryCode, $postalCode, $company, $type);
+        }
+
+        /**
+         * Calculate the net price on the gross price, country code and indication if the
+         * customer is a company or not.
+         *
+         * @param int|float $gross The gross price to use for the calculation
+         * @param null|string $countryCode The country code to use for the rate lookup
+         * @param null|string $postalCode The postal code to use for the rate exception lookup
+         * @param null|bool $company
+         * @param null|string $type The type can be low or high
+         * @return float 
+         * @static 
+         */
+        public static function calculateNet($gross, $countryCode = null, $postalCode = null, $company = null, $type = null)
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->calculateNet($gross, $countryCode, $postalCode, $company, $type);
+        }
+
+        /**
+         * 
+         *
+         * @return float 
+         * @static 
+         */
+        public static function getNetPrice()
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->getNetPrice();
+        }
+
+        /**
+         * 
+         *
+         * @return string 
+         * @static 
+         */
+        public static function getCountryCode()
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->getCountryCode();
+        }
+
+        /**
+         * 
+         *
+         * @param mixed $countryCode
+         * @static 
+         */
+        public static function setCountryCode($countryCode)
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->setCountryCode($countryCode);
+        }
+
+        /**
+         * 
+         *
+         * @return string 
+         * @static 
+         */
+        public static function getPostalCode()
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->getPostalCode();
+        }
+
+        /**
+         * 
+         *
+         * @param mixed $postalCode
+         * @static 
+         */
+        public static function setPostalCode($postalCode)
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->setPostalCode($postalCode);
+        }
+
+        /**
+         * 
+         *
+         * @return float 
+         * @static 
+         */
+        public static function getTaxRate()
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->getTaxRate();
+        }
+
+        /**
+         * 
+         *
+         * @return bool 
+         * @static 
+         */
+        public static function isCompany()
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->isCompany();
+        }
+
+        /**
+         * 
+         *
+         * @param bool $company
+         * @static 
+         */
+        public static function setCompany($company)
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->setCompany($company);
+        }
+
+        /**
+         * 
+         *
+         * @param string $businessCountryCode
+         * @static 
+         */
+        public static function setBusinessCountryCode($businessCountryCode)
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->setBusinessCountryCode($businessCountryCode);
+        }
+
+        /**
+         * Returns the tax rate for the given country code.
+         * 
+         * This method is used to allow backwards compatibility.
+         *
+         * @param string $countryCode
+         * @param bool $company
+         * @param string|null $type
+         * @return float 
+         * @static 
+         */
+        public static function getTaxRateForCountry($countryCode, $company = false, $type = null)
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->getTaxRateForCountry($countryCode, $company, $type);
+        }
+
+        /**
+         * Returns all tax rates for the given country code.
+         *
+         * @param string $countryCode
+         * @return array 
+         * @static 
+         */
+        public static function getTaxRatesForCountry($countryCode)
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->getTaxRatesForCountry($countryCode);
+        }
+
+        /**
+         * Returns the tax rate for the given country code.
+         * 
+         * If a postal code is provided, it will try to lookup the different
+         * postal code exceptions that are possible.
+         *
+         * @param string $countryCode
+         * @param string|null $postalCode
+         * @param bool $company
+         * @param string|null $type
+         * @return float 
+         * @static 
+         */
+        public static function getTaxRateForLocation($countryCode, $postalCode = null, $company = false, $type = null)
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->getTaxRateForLocation($countryCode, $postalCode, $company, $type);
+        }
+
+        /**
+         * 
+         *
+         * @return float 
+         * @static 
+         */
+        public static function getTaxValue()
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->getTaxValue();
+        }
+
+        /**
+         * Validate a VAT number format without checking if the VAT number was really issued.
+         *
+         * @param string $vatNumber
+         * @return bool 
+         * @static 
+         */
+        public static function isValidVatNumberFormat($vatNumber)
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->isValidVatNumberFormat($vatNumber);
+        }
+
+        /**
+         * 
+         *
+         * @param string $vatNumber
+         * @return bool 
+         * @throws VATCheckUnavailableException
+         * @static 
+         */
+        public static function isValidVATNumber($vatNumber)
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->isValidVATNumber($vatNumber);
+        }
+
+        /**
+         * 
+         *
+         * @param string $vatNumber
+         * @return object|false 
+         * @throws VATCheckUnavailableException
+         * @static 
+         */
+        public static function getVATDetails($vatNumber)
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->getVATDetails($vatNumber);
+        }
+
+        /**
+         * 
+         *
+         * @return void 
+         * @throws VATCheckUnavailableException
+         * @static 
+         */
+        public static function initSoapClient()
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            $instance->initSoapClient();
+        }
+
+        /**
+         * 
+         *
+         * @param \SoapClient $soapClient
+         * @static 
+         */
+        public static function setSoapClient($soapClient)
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->setSoapClient($soapClient);
+        }
+
+        /**
+         * 
+         *
+         * @static 
+         */
+        public static function setupCurlClient($curlClient)
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->setupCurlClient($curlClient);
+        }
+
+        /**
+         * 
+         *
+         * @return \Mpociot\VatCalculator\VatCalculator 
+         * @internal This method is not covered by our BC policy.
+         * @static 
+         */
+        public static function testing($curlClient)
+        {
+            /** @var \Mpociot\VatCalculator\VatCalculator $instance */
+            return $instance->testing($curlClient);
+        }
+
+            }
+    }
+
 namespace Illuminate\Support {
     /**
      * 
@@ -24257,6 +24574,561 @@ namespace Illuminate\Database\Eloquent\Relations {
         public static function getPowerJoinExistenceCompareKey()
         {
             return \Illuminate\Database\Eloquent\Relations\Relation::getPowerJoinExistenceCompareKey();
+        }
+
+            }
+    /**
+     * 
+     *
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+     * @extends \Illuminate\Database\Eloquent\Relations\HasOneOrMany<TRelatedModel, TDeclaringModel, \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>>
+     */
+    class HasMany {
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performJoinForEloquentPowerJoins()
+         * @param mixed $builder
+         * @param mixed $joinType
+         * @param mixed $callback
+         * @param mixed $alias
+         * @param bool $disableExtraConditions
+         * @param string|null $morphable
+         * @param bool $hasCheck
+         * @static 
+         */
+        public static function performJoinForEloquentPowerJoins($builder, $joinType = 'leftJoin', $callback = null, $alias = null, $disableExtraConditions = false, $morphable = null, $hasCheck = false)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::performJoinForEloquentPowerJoins($builder, $joinType, $callback, $alias, $disableExtraConditions, $morphable, $hasCheck);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performJoinForEloquentPowerJoinsForBelongsTo()
+         * @param mixed $query
+         * @param mixed $joinType
+         * @param mixed $callback
+         * @param mixed $alias
+         * @param bool $disableExtraConditions
+         * @static 
+         */
+        public static function performJoinForEloquentPowerJoinsForBelongsTo($query, $joinType, $callback = null, $alias = null, $disableExtraConditions = false)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::performJoinForEloquentPowerJoinsForBelongsTo($query, $joinType, $callback, $alias, $disableExtraConditions);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performJoinForEloquentPowerJoinsForBelongsToMany()
+         * @param mixed $builder
+         * @param mixed $joinType
+         * @param mixed $callback
+         * @param mixed $alias
+         * @param bool $disableExtraConditions
+         * @static 
+         */
+        public static function performJoinForEloquentPowerJoinsForBelongsToMany($builder, $joinType, $callback = null, $alias = null, $disableExtraConditions = false)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::performJoinForEloquentPowerJoinsForBelongsToMany($builder, $joinType, $callback, $alias, $disableExtraConditions);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performJoinForEloquentPowerJoinsForMorphToMany()
+         * @param mixed $builder
+         * @param mixed $joinType
+         * @param mixed $callback
+         * @param mixed $alias
+         * @param bool $disableExtraConditions
+         * @static 
+         */
+        public static function performJoinForEloquentPowerJoinsForMorphToMany($builder, $joinType, $callback = null, $alias = null, $disableExtraConditions = false)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::performJoinForEloquentPowerJoinsForMorphToMany($builder, $joinType, $callback, $alias, $disableExtraConditions);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performJoinForEloquentPowerJoinsForMorph()
+         * @param mixed $builder
+         * @param mixed $joinType
+         * @param mixed $callback
+         * @param mixed $alias
+         * @param bool $disableExtraConditions
+         * @static 
+         */
+        public static function performJoinForEloquentPowerJoinsForMorph($builder, $joinType, $callback = null, $alias = null, $disableExtraConditions = false)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::performJoinForEloquentPowerJoinsForMorph($builder, $joinType, $callback, $alias, $disableExtraConditions);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performJoinForEloquentPowerJoinsForMorphTo()
+         * @param mixed $builder
+         * @param mixed $joinType
+         * @param mixed $callback
+         * @param mixed $alias
+         * @param bool $disableExtraConditions
+         * @param string|null $morphable
+         * @static 
+         */
+        public static function performJoinForEloquentPowerJoinsForMorphTo($builder, $joinType, $callback = null, $alias = null, $disableExtraConditions = false, $morphable = null)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::performJoinForEloquentPowerJoinsForMorphTo($builder, $joinType, $callback, $alias, $disableExtraConditions, $morphable);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performJoinForEloquentPowerJoinsForHasMany()
+         * @param mixed $builder
+         * @param mixed $joinType
+         * @param mixed $callback
+         * @param mixed $alias
+         * @param bool $disableExtraConditions
+         * @param bool $hasCheck
+         * @static 
+         */
+        public static function performJoinForEloquentPowerJoinsForHasMany($builder, $joinType, $callback = null, $alias = null, $disableExtraConditions = false, $hasCheck = false)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::performJoinForEloquentPowerJoinsForHasMany($builder, $joinType, $callback, $alias, $disableExtraConditions, $hasCheck);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performJoinForEloquentPowerJoinsForHasManyThrough()
+         * @param mixed $builder
+         * @param mixed $joinType
+         * @param mixed $callback
+         * @param mixed $alias
+         * @param bool $disableExtraConditions
+         * @static 
+         */
+        public static function performJoinForEloquentPowerJoinsForHasManyThrough($builder, $joinType, $callback = null, $alias = null, $disableExtraConditions = false)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::performJoinForEloquentPowerJoinsForHasManyThrough($builder, $joinType, $callback, $alias, $disableExtraConditions);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performHavingForEloquentPowerJoins()
+         * @param mixed $builder
+         * @param mixed $operator
+         * @param mixed $count
+         * @param string|null $morphable
+         * @static 
+         */
+        public static function performHavingForEloquentPowerJoins($builder, $operator, $count, $morphable = null)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::performHavingForEloquentPowerJoins($builder, $operator, $count, $morphable);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::usesSoftDeletes()
+         * @param mixed $model
+         * @static 
+         */
+        public static function usesSoftDeletes($model)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::usesSoftDeletes($model);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::getThroughParent()
+         * @static 
+         */
+        public static function getThroughParent()
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::getThroughParent();
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::getFarParent()
+         * @static 
+         */
+        public static function getFarParent()
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::getFarParent();
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::applyExtraConditions()
+         * @param \Kirschbaum\PowerJoins\PowerJoinClause $join
+         * @static 
+         */
+        public static function applyExtraConditions($join)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::applyExtraConditions($join);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::applyBasicCondition()
+         * @param mixed $join
+         * @param mixed $condition
+         * @static 
+         */
+        public static function applyBasicCondition($join, $condition)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::applyBasicCondition($join, $condition);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::applyNullCondition()
+         * @param mixed $join
+         * @param mixed $condition
+         * @static 
+         */
+        public static function applyNullCondition($join, $condition)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::applyNullCondition($join, $condition);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::applyNotNullCondition()
+         * @param mixed $join
+         * @param mixed $condition
+         * @static 
+         */
+        public static function applyNotNullCondition($join, $condition)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::applyNotNullCondition($join, $condition);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::applyNestedCondition()
+         * @param mixed $join
+         * @param mixed $condition
+         * @static 
+         */
+        public static function applyNestedCondition($join, $condition)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::applyNestedCondition($join, $condition);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::shouldNotApplyExtraCondition()
+         * @param mixed $condition
+         * @static 
+         */
+        public static function shouldNotApplyExtraCondition($condition)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::shouldNotApplyExtraCondition($condition);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::getPowerJoinExistenceCompareKey()
+         * @static 
+         */
+        public static function getPowerJoinExistenceCompareKey()
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasMany::getPowerJoinExistenceCompareKey();
+        }
+
+            }
+    /**
+     * 
+     *
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+     * @template TResult
+     * @extends \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, TDeclaringModel, TResult>
+     */
+    class HasOneOrMany {
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performJoinForEloquentPowerJoins()
+         * @param mixed $builder
+         * @param mixed $joinType
+         * @param mixed $callback
+         * @param mixed $alias
+         * @param bool $disableExtraConditions
+         * @param string|null $morphable
+         * @param bool $hasCheck
+         * @static 
+         */
+        public static function performJoinForEloquentPowerJoins($builder, $joinType = 'leftJoin', $callback = null, $alias = null, $disableExtraConditions = false, $morphable = null, $hasCheck = false)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::performJoinForEloquentPowerJoins($builder, $joinType, $callback, $alias, $disableExtraConditions, $morphable, $hasCheck);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performJoinForEloquentPowerJoinsForBelongsTo()
+         * @param mixed $query
+         * @param mixed $joinType
+         * @param mixed $callback
+         * @param mixed $alias
+         * @param bool $disableExtraConditions
+         * @static 
+         */
+        public static function performJoinForEloquentPowerJoinsForBelongsTo($query, $joinType, $callback = null, $alias = null, $disableExtraConditions = false)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::performJoinForEloquentPowerJoinsForBelongsTo($query, $joinType, $callback, $alias, $disableExtraConditions);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performJoinForEloquentPowerJoinsForBelongsToMany()
+         * @param mixed $builder
+         * @param mixed $joinType
+         * @param mixed $callback
+         * @param mixed $alias
+         * @param bool $disableExtraConditions
+         * @static 
+         */
+        public static function performJoinForEloquentPowerJoinsForBelongsToMany($builder, $joinType, $callback = null, $alias = null, $disableExtraConditions = false)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::performJoinForEloquentPowerJoinsForBelongsToMany($builder, $joinType, $callback, $alias, $disableExtraConditions);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performJoinForEloquentPowerJoinsForMorphToMany()
+         * @param mixed $builder
+         * @param mixed $joinType
+         * @param mixed $callback
+         * @param mixed $alias
+         * @param bool $disableExtraConditions
+         * @static 
+         */
+        public static function performJoinForEloquentPowerJoinsForMorphToMany($builder, $joinType, $callback = null, $alias = null, $disableExtraConditions = false)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::performJoinForEloquentPowerJoinsForMorphToMany($builder, $joinType, $callback, $alias, $disableExtraConditions);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performJoinForEloquentPowerJoinsForMorph()
+         * @param mixed $builder
+         * @param mixed $joinType
+         * @param mixed $callback
+         * @param mixed $alias
+         * @param bool $disableExtraConditions
+         * @static 
+         */
+        public static function performJoinForEloquentPowerJoinsForMorph($builder, $joinType, $callback = null, $alias = null, $disableExtraConditions = false)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::performJoinForEloquentPowerJoinsForMorph($builder, $joinType, $callback, $alias, $disableExtraConditions);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performJoinForEloquentPowerJoinsForMorphTo()
+         * @param mixed $builder
+         * @param mixed $joinType
+         * @param mixed $callback
+         * @param mixed $alias
+         * @param bool $disableExtraConditions
+         * @param string|null $morphable
+         * @static 
+         */
+        public static function performJoinForEloquentPowerJoinsForMorphTo($builder, $joinType, $callback = null, $alias = null, $disableExtraConditions = false, $morphable = null)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::performJoinForEloquentPowerJoinsForMorphTo($builder, $joinType, $callback, $alias, $disableExtraConditions, $morphable);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performJoinForEloquentPowerJoinsForHasMany()
+         * @param mixed $builder
+         * @param mixed $joinType
+         * @param mixed $callback
+         * @param mixed $alias
+         * @param bool $disableExtraConditions
+         * @param bool $hasCheck
+         * @static 
+         */
+        public static function performJoinForEloquentPowerJoinsForHasMany($builder, $joinType, $callback = null, $alias = null, $disableExtraConditions = false, $hasCheck = false)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::performJoinForEloquentPowerJoinsForHasMany($builder, $joinType, $callback, $alias, $disableExtraConditions, $hasCheck);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performJoinForEloquentPowerJoinsForHasManyThrough()
+         * @param mixed $builder
+         * @param mixed $joinType
+         * @param mixed $callback
+         * @param mixed $alias
+         * @param bool $disableExtraConditions
+         * @static 
+         */
+        public static function performJoinForEloquentPowerJoinsForHasManyThrough($builder, $joinType, $callback = null, $alias = null, $disableExtraConditions = false)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::performJoinForEloquentPowerJoinsForHasManyThrough($builder, $joinType, $callback, $alias, $disableExtraConditions);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::performHavingForEloquentPowerJoins()
+         * @param mixed $builder
+         * @param mixed $operator
+         * @param mixed $count
+         * @param string|null $morphable
+         * @static 
+         */
+        public static function performHavingForEloquentPowerJoins($builder, $operator, $count, $morphable = null)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::performHavingForEloquentPowerJoins($builder, $operator, $count, $morphable);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::usesSoftDeletes()
+         * @param mixed $model
+         * @static 
+         */
+        public static function usesSoftDeletes($model)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::usesSoftDeletes($model);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::getThroughParent()
+         * @static 
+         */
+        public static function getThroughParent()
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::getThroughParent();
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::getFarParent()
+         * @static 
+         */
+        public static function getFarParent()
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::getFarParent();
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::applyExtraConditions()
+         * @param \Kirschbaum\PowerJoins\PowerJoinClause $join
+         * @static 
+         */
+        public static function applyExtraConditions($join)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::applyExtraConditions($join);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::applyBasicCondition()
+         * @param mixed $join
+         * @param mixed $condition
+         * @static 
+         */
+        public static function applyBasicCondition($join, $condition)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::applyBasicCondition($join, $condition);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::applyNullCondition()
+         * @param mixed $join
+         * @param mixed $condition
+         * @static 
+         */
+        public static function applyNullCondition($join, $condition)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::applyNullCondition($join, $condition);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::applyNotNullCondition()
+         * @param mixed $join
+         * @param mixed $condition
+         * @static 
+         */
+        public static function applyNotNullCondition($join, $condition)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::applyNotNullCondition($join, $condition);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::applyNestedCondition()
+         * @param mixed $join
+         * @param mixed $condition
+         * @static 
+         */
+        public static function applyNestedCondition($join, $condition)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::applyNestedCondition($join, $condition);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::shouldNotApplyExtraCondition()
+         * @param mixed $condition
+         * @static 
+         */
+        public static function shouldNotApplyExtraCondition($condition)
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::shouldNotApplyExtraCondition($condition);
+        }
+
+        /**
+         * 
+         *
+         * @see \Kirschbaum\PowerJoins\Mixins\RelationshipsExtraMethods::getPowerJoinExistenceCompareKey()
+         * @static 
+         */
+        public static function getPowerJoinExistenceCompareKey()
+        {
+            return \Illuminate\Database\Eloquent\Relations\HasOneOrMany::getPowerJoinExistenceCompareKey();
         }
 
             }
@@ -32499,6 +33371,7 @@ namespace  {
     class FilamentShield extends \BezhanSalleh\FilamentShield\Facades\FilamentShield {}
     class Socialite extends \Laravel\Socialite\Facades\Socialite {}
     class Livewire extends \Livewire\Livewire {}
+    class VatCalculator extends \Mpociot\VatCalculator\Facades\VatCalculator {}
 }
 
 

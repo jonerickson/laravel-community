@@ -4,21 +4,18 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum AnnouncementType: string
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasIcon;
+use Filament\Support\Contracts\HasLabel;
+
+enum AnnouncementType: string implements HasColor, HasIcon, HasLabel
 {
     case Info = 'info';
     case Success = 'success';
     case Warning = 'warning';
     case Error = 'error';
 
-    public static function options(): array
-    {
-        return collect(self::cases())
-            ->mapWithKeys(fn (self $type) => [$type->value => $type->label()])
-            ->toArray();
-    }
-
-    public function label(): string
+    public function getLabel(): string
     {
         return match ($this) {
             self::Info => 'Info',
@@ -28,7 +25,7 @@ enum AnnouncementType: string
         };
     }
 
-    public function color(): string
+    public function getColor(): string
     {
         return match ($this) {
             self::Info => 'info',
@@ -38,13 +35,13 @@ enum AnnouncementType: string
         };
     }
 
-    public function icon(): string
+    public function getIcon(): string
     {
         return match ($this) {
-            self::Info => 'info',
-            self::Success => 'check-circle',
-            self::Warning => 'triangle-alert',
-            self::Error => 'x-circle',
+            self::Info => 'heroicon-o-information-circle',
+            self::Success => 'heroicon-o-check-circle',
+            self::Warning => 'heroicon-o-triangle-alert',
+            self::Error => 'heroicon-ox-circle',
         };
     }
 }

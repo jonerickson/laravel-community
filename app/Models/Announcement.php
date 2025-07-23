@@ -26,14 +26,27 @@ use Illuminate\Support\Str;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read User $author
- * @property-read string $author_name
+ * @property-read mixed $author_name
+ * @property-read User $creator
  *
- * @method static \Database\Factories\AnnouncementFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement active()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement current()
+ * @method static \Database\Factories\AnnouncementFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereContent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereEndsAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereIsDismissible($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereStartsAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */

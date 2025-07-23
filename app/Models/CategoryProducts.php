@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 /**
  * @property int|null $category_id
  * @property int|null $product_id
+ * @property-read ProductCategory|null $category
+ * @property-read Product|null $product
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryProducts newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryProducts newQuery()

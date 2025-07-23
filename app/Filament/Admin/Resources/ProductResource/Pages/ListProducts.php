@@ -12,6 +12,8 @@ class ListProducts extends ListRecords
 {
     protected static string $resource = ProductResource::class;
 
+    protected ?string $subheading = 'Manage your products and subscriptions.';
+
     protected function getHeaderActions(): array
     {
         return [

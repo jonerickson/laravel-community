@@ -12,6 +12,8 @@ class ListProductCategories extends ListRecords
 {
     protected static string $resource = ProductCategoryResource::class;
 
+    protected ?string $subheading = 'Manage your product categories.';
+
     protected function getHeaderActions(): array
     {
         return [

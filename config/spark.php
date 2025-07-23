@@ -45,10 +45,10 @@ return [
     |
     */
 
-    // 'brand' =>  [
-    //     'logo' => realpath(__DIR__.'/../public/svg/billing-logo.svg'),
-    //     'color' => 'bg-gray-800',
-    // ],
+    'brand' => [
+        'logo' => realpath(__DIR__.'/../public/images/logo.svg'),
+        'color' => '#171717',
+    ],
 
     /*
     |--------------------------------------------------------------------------

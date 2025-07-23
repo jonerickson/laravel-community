@@ -47,8 +47,9 @@ const accountNavItems: NavItem[] = [
     },
     {
         title: 'Billing',
-        href: '/settings/billing',
+        href: '/billing',
         icon: DollarSign,
+        target: '_blank',
     },
     {
         title: 'Orders',
@@ -57,8 +58,9 @@ const accountNavItems: NavItem[] = [
     },
     {
         title: 'Payment Methods',
-        href: '/settings/payment-methods',
+        href: '/billing',
         icon: CreditCard,
+        target: '_blank',
     },
 ];
 

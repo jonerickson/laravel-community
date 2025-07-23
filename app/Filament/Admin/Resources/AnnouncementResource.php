@@ -44,7 +44,7 @@ class AnnouncementResource extends Resource
 
                         Forms\Components\Select::make('type')
                             ->required()
-                            ->options(AnnouncementType::options())
+                            ->options(AnnouncementType::class)
                             ->default(AnnouncementType::Info->value)
                             ->native(false),
 
@@ -105,47 +105,33 @@ class AnnouncementResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
-
-                Tables\Columns\BadgeColumn::make('type')
-                    ->formatStateUsing(fn (AnnouncementType $state): string => $state->label())
-                    ->colors([
-                        'info' => AnnouncementType::Info->value,
-                        'success' => AnnouncementType::Success->value,
-                        'warning' => AnnouncementType::Warning->value,
-                        'danger' => AnnouncementType::Error->value,
-                    ]),
-
+                Tables\Columns\TextColumn::make('type')
+                    ->badge(),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean()
                     ->sortable(),
-
                 Tables\Columns\IconColumn::make('is_dismissible')
                     ->label('Dismissible')
                     ->boolean(),
-
                 Tables\Columns\TextColumn::make('starts_at')
                     ->label('Starts')
                     ->dateTime()
                     ->sortable()
                     ->placeholder('Immediately'),
-
                 Tables\Columns\TextColumn::make('ends_at')
                     ->label('Ends')
                     ->dateTime()
                     ->sortable()
                     ->placeholder('Never'),
-
                 Tables\Columns\TextColumn::make('author.name')
                     ->label('Author')
                     ->sortable()
                     ->searchable(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
@@ -153,7 +139,7 @@ class AnnouncementResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
-                    ->options(AnnouncementType::options()),
+                    ->options(AnnouncementType::class),
 
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label('Active'),

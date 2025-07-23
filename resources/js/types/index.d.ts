@@ -56,11 +56,31 @@ export interface Product {
     id: number;
     name: string;
     description: string;
-    price: number;
+    type: 'product' | 'subscription';
+    stripe_product_id?: string | null;
+    featured_image?: string | null;
     image?: string;
     rating?: number;
     category?: ProductCategory;
     is_featured?: boolean;
+    prices?: ProductPrice[];
+    created_at: string;
+    updated_at: string;
+}
+
+export interface ProductPrice {
+    id: number;
+    product_id: number;
+    name: string;
+    amount: number;
+    currency: string;
+    interval?: string | null;
+    interval_count: number;
+    stripe_price_id?: string | null;
+    is_active: boolean;
+    is_default: boolean;
+    description?: string | null;
+    metadata?: Record<string, any> | null;
     created_at: string;
     updated_at: string;
 }
