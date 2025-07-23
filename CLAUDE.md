@@ -101,3 +101,13 @@ This is a Laravel + React application built using the Laravel React Starter Kit.
 - The app includes subscription/billing functionality via Stripe
 - Uses modern React patterns with hooks and functional components
 - Git hooks in `.githooks/` directory ensure code quality and consistent formatting across the team
+
+## Documentation Maintenance
+
+- Always keep README.md updated when making significant changes to:
+  - Project features or architecture
+  - Installation or setup process
+  - Development workflow or commands
+  - Environment configuration requirements
+  - New integrations or dependencies
+- The README should accurately reflect the current state of Mountain Interactive, not generic Laravel starter kit information
