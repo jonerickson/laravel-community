@@ -1,8 +1,9 @@
 import Heading from '@/components/heading';
-import StoreCategoriesItem, { StoreCategoryItem } from '@/components/store-categories-item';
+import StoreCategoriesItem from '@/components/store-categories-item';
 import { Link } from '@inertiajs/react';
+import { ProductCategory } from '@/types';
 
-export default function StoreCategories({ categories }: { categories: StoreCategoryItem[] }) {
+export default function StoreCategories({ categories }: { categories: ProductCategory[] }) {
     return (
         <div>
             <div className="sm:flex sm:items-baseline sm:justify-between">

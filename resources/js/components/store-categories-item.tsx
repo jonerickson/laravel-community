@@ -1,13 +1,7 @@
 import { Link } from '@inertiajs/react';
+import { ProductCategory } from '@/types';
 
-export interface StoreCategoryItem {
-    id: number;
-    name: string;
-    imageUrl: string;
-    imageAlt?: string;
-}
-
-export default function StoreCategoriesItem({ item }: { item: StoreCategoryItem }) {
+export default function StoreCategoriesItem({ item }: { item: ProductCategory }) {
     return (
         <Link
             key={item.name}

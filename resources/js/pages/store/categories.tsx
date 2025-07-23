@@ -2,9 +2,8 @@ import StoreCategories from '@/components/store-categories';
 import StoreFeatured from '@/components/store-featured';
 import StoreUserProvided from '@/components/store-user-provided';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
-import { StoreCategoryItem } from '@/components/store-categories-item';
+import { type BreadcrumbItem, ProductCategory } from '@/types';
+import { Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -40,7 +39,7 @@ const userProvidedProducts = [
     },
 ];
 
-export default function Dashboard({ categories }: { categories: StoreCategoryItem[] }) {
+export default function Dashboard({ categories }: { categories: ProductCategory[] }) {
 
     console.log(categories);
     return (

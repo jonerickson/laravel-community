@@ -102,6 +102,13 @@ This is a Laravel + React application built using the Laravel React Starter Kit.
 - Uses modern React patterns with hooks and functional components
 - Git hooks in `.githooks/` directory ensure code quality and consistent formatting across the team
 
+### React Component Guidelines
+- Always create individual, reusable components for UI elements rather than inline JSX
+- Focus on composability - components should be easily combined and reused
+- Use TypeScript interfaces for proper type safety
+- Follow the existing component structure in `resources/js/components/`
+- Leverage shadcn/ui components as building blocks
+
 ## Documentation Maintenance
 
 - Always keep README.md updated when making significant changes to:

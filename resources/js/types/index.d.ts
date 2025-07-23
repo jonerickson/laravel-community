@@ -51,3 +51,25 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface Product {
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    image?: string;
+    rating?: number;
+    category?: ProductCategory;
+    is_featured?: boolean;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface ProductCategory {
+    id: number;
+    name: string;
+    slug: string;
+    description?: string;
+    imageUrl: string;
+    imageAlt?: string;
+}
