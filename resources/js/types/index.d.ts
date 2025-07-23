@@ -130,6 +130,21 @@ export interface Post {
     updated_at: string;
 }
 
+export interface PaginatedData {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number;
+    to: number;
+    links: {
+        first: string | null;
+        last: string | null;
+        prev: string | null;
+        next: string | null;
+    };
+}
+
 export interface Comment {
     id: number;
     commentable_type: string;
