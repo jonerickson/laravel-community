@@ -1,0 +1,62 @@
+#!/bin/sh
+
+# Pre-push hook to format code before pushing
+# This hook will run PHP Pint and Prettier to format code
+
+echo "🔍 Running code formatting before push..."
+
+# Check if there are any PHP files that need formatting
+if git diff --cached --name-only --diff-filter=ACM | grep -q '\.php$'; then
+    echo "📝 Formatting PHP files with Pint..."
+    if ! composer cs-fix; then
+        echo "❌ PHP formatting failed. Please fix the issues and try again."
+        exit 1
+    fi
+    echo "✅ PHP files formatted successfully"
+fi
+
+# Check if there are any JS/TS files that need formatting
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '\.(js|jsx|ts|tsx|vue|css|scss|json|md)$'; then
+    echo "📝 Formatting JavaScript/TypeScript files with Prettier..."
+    if ! npm run format; then
+        echo "❌ JavaScript/TypeScript formatting failed. Please fix the issues and try again."
+        exit 1
+    fi
+    echo "✅ JavaScript/TypeScript files formatted successfully"
+fi
+
+# Run linting checks
+echo "🔍 Running linting checks..."
+
+# PHP Static Analysis
+if git diff --cached --name-only --diff-filter=ACM | grep -q '\.php$'; then
+    echo "🔍 Running PHPStan analysis..."
+    if ! composer analyze; then
+        echo "❌ PHPStan analysis failed. Please fix the issues and try again."
+        exit 1
+    fi
+    echo "✅ PHPStan analysis passed"
+fi
+
+# JavaScript/TypeScript linting
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '\.(js|jsx|ts|tsx)$'; then
+    echo "🔍 Running ESLint..."
+    if ! npm run lint; then
+        echo "❌ ESLint failed. Please fix the issues and try again."
+        exit 1
+    fi
+    echo "✅ ESLint passed"
+fi
+
+# TypeScript type checking
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '\.(ts|tsx)$'; then
+    echo "🔍 Running TypeScript type checking..."
+    if ! npm run types; then
+        echo "❌ TypeScript type checking failed. Please fix the issues and try again."
+        exit 1
+    fi
+    echo "✅ TypeScript type checking passed"
+fi
+
+echo "🎉 All formatting and linting checks passed! Proceeding with push..."
+exit 0

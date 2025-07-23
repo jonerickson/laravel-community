@@ -58,6 +58,9 @@
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
         ],
+        "install-hooks": [
+            ".githooks/install.sh"
+        ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "npx concurrently -k -c \"#2563eb,#d4d4d8,#4f46e5\" \"php artisan horizon\" \"php artisan pail\" \"npm run dev\" --names=queue,logs,vite"

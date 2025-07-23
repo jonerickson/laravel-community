@@ -8,6 +8,27 @@ Inertia allows you to build modern, single-page React applications using classic
 
 This React starter kit utilizes React 19, TypeScript, Tailwind, and the [shadcn/ui](https://ui.shadcn.com) and [radix-ui](https://www.radix-ui.com) component libraries.
 
+## Getting Started
+
+### Installing Git Hooks
+
+This project includes git hooks to automatically format code before pushing. To install them:
+
+```bash
+# Install hooks for all developers
+composer install-hooks
+
+# Or run the install script directly
+.githooks/install.sh
+```
+
+The pre-push hook will automatically:
+- Format PHP code with Laravel Pint
+- Format JavaScript/TypeScript code with Prettier
+- Run PHPStan analysis for PHP code
+- Run ESLint for JavaScript/TypeScript code
+- Run TypeScript type checking
+
 ## Official Documentation
 
 Documentation for all Laravel starter kits can be found on the [Laravel website](https://laravel.com/docs/starter-kits).

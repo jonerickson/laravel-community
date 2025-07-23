@@ -37,6 +37,11 @@ This is a Laravel + React application built using the Laravel React Starter Kit.
 - `composer test-filter <pattern>` - Run specific tests
 - Uses Pest testing framework
 
+### Git Hooks
+- `composer install-hooks` - Install shared git hooks for all developers
+- `.githooks/install.sh` - Direct script to install hooks
+- Pre-push hook automatically formats code and runs quality checks
+
 ## Architecture
 
 ### Backend Structure
@@ -95,3 +100,4 @@ This is a Laravel + React application built using the Laravel React Starter Kit.
 - SQLite is used for local development; production likely uses MySQL/PostgreSQL
 - The app includes subscription/billing functionality via Stripe
 - Uses modern React patterns with hooks and functional components
+- Git hooks in `.githooks/` directory ensure code quality and consistent formatting across the team
