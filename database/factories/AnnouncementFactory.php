@@ -10,17 +10,12 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Announcement>
+ * @extends Factory<Announcement>
  */
 class AnnouncementFactory extends Factory
 {
     protected $model = Announcement::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         $startsAt = $this->faker->optional(0.7)->dateTimeBetween('-1 week', '+1 week');
@@ -38,9 +33,6 @@ class AnnouncementFactory extends Factory
         ];
     }
 
-    /**
-     * Indicate that the announcement is active.
-     */
     public function active(): static
     {
         return $this->state(fn (array $attributes) => [
@@ -48,9 +40,6 @@ class AnnouncementFactory extends Factory
         ]);
     }
 
-    /**
-     * Indicate that the announcement is inactive.
-     */
     public function inactive(): static
     {
         return $this->state(fn (array $attributes) => [
@@ -58,9 +47,6 @@ class AnnouncementFactory extends Factory
         ]);
     }
 
-    /**
-     * Indicate that the announcement is current (no start/end dates).
-     */
     public function current(): static
     {
         return $this->state(fn (array $attributes) => [
@@ -69,9 +55,6 @@ class AnnouncementFactory extends Factory
         ]);
     }
 
-    /**
-     * Indicate that the announcement is scheduled for the future.
-     */
     public function scheduled(): static
     {
         return $this->state(fn (array $attributes) => [
@@ -80,9 +63,6 @@ class AnnouncementFactory extends Factory
         ]);
     }
 
-    /**
-     * Indicate that the announcement has expired.
-     */
     public function expired(): static
     {
         return $this->state(fn (array $attributes) => [
@@ -91,9 +71,6 @@ class AnnouncementFactory extends Factory
         ]);
     }
 
-    /**
-     * Create an announcement of a specific type.
-     */
     public function type(AnnouncementType $type): static
     {
         return $this->state(fn (array $attributes) => [
@@ -101,33 +78,21 @@ class AnnouncementFactory extends Factory
         ]);
     }
 
-    /**
-     * Create an info announcement.
-     */
     public function info(): static
     {
         return $this->type(AnnouncementType::Info);
     }
 
-    /**
-     * Create a success announcement.
-     */
     public function success(): static
     {
         return $this->type(AnnouncementType::Success);
     }
 
-    /**
-     * Create a warning announcement.
-     */
     public function warning(): static
     {
         return $this->type(AnnouncementType::Warning);
     }
 
-    /**
-     * Create an error announcement.
-     */
     public function error(): static
     {
         return $this->type(AnnouncementType::Error);

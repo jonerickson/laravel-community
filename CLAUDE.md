@@ -46,7 +46,7 @@ This is a Laravel + React application built using the Laravel React Starter Kit.
 
 ### Backend Structure
 - **Models**: Core models include `User`, `Product`, `ProductCategory`, `Invoice` with Eloquent relationships
-- **Controllers**: Organized by feature (Auth, News, Store, Settings, OAuth)
+- **Controllers**: Organized by feature (Auth, Blog, Store, Settings, OAuth)
 - **Filament Resources**: Admin panel resources for product/category management
 - **Providers**: Custom social auth providers (Discord, Roblox)
 - **Policies**: Authorization logic for resources
@@ -119,6 +119,8 @@ This is a Laravel + React application built using the Laravel React Starter Kit.
 - Use proper Sluggable contract implementation with `HasSlug` trait
 - Use Carbon implementation for date management
 - Always use Attributes instead of Laravel's `getAttributeNameAttribute()` pattern
+- Use built in Laravel helpers such as Collections, Str, Arr, over standard conventions whenever possible
+- Do not add unnecessary doc blocks
 
 ## Documentation Maintenance
 

@@ -29,9 +29,6 @@ class ProductFactory extends Factory
         ];
     }
 
-    /**
-     * Create a product type.
-     */
     public function product(): static
     {
         return $this->state(fn (array $attributes) => [
@@ -39,9 +36,6 @@ class ProductFactory extends Factory
         ]);
     }
 
-    /**
-     * Create a subscription type.
-     */
     public function subscription(): static
     {
         return $this->state(fn (array $attributes) => [
@@ -49,9 +43,6 @@ class ProductFactory extends Factory
         ]);
     }
 
-    /**
-     * Create a product with Stripe integration.
-     */
     public function withStripe(): static
     {
         return $this->state(fn (array $attributes) => [
@@ -59,9 +50,6 @@ class ProductFactory extends Factory
         ]);
     }
 
-    /**
-     * Create a product without Stripe integration.
-     */
     public function withoutStripe(): static
     {
         return $this->state(fn (array $attributes) => [

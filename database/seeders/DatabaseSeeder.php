@@ -6,6 +6,8 @@ namespace Database\Seeders;
 
 use App\Enums\AnnouncementType;
 use App\Models\Announcement;
+use App\Models\Comment;
+use App\Models\Post;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\User;
@@ -30,7 +32,7 @@ class DatabaseSeeder extends Seeder
             'content' => 'This is a test announcement.',
         ])->create();
 
-        User::factory()->create([
+        $user = User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@deschutesdesigngroup.com',
         ])->assignRole(Utils::getSuperAdminName());
@@ -42,5 +44,11 @@ class DatabaseSeeder extends Seeder
             ->recycle($category)
             ->hasAttached($category, relationship: 'categories')
             ->create();
+
+        Post::factory()
+            ->count(5)
+            ->for($user, 'author')
+            ->create()
+            ->each(fn (Post $post) => Comment::factory()->count(3)->for($post, 'commentable')->create());
     }
 }

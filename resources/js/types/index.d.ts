@@ -109,3 +109,38 @@ export interface Announcement {
     created_at: string;
     updated_at: string;
 }
+
+export interface Post {
+    id: number;
+    title: string;
+    slug: string;
+    excerpt?: string | null;
+    content: string;
+    featured_image?: string | null;
+    is_published: boolean;
+    is_featured: boolean;
+    published_at?: string | null;
+    created_by: number;
+    meta?: Record<string, any> | null;
+    reading_time?: number;
+    author?: User;
+    comments?: Comment[];
+    comments_count?: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Comment {
+    id: number;
+    commentable_type: string;
+    commentable_id: number;
+    content: string;
+    is_approved: boolean;
+    user_id: number;
+    parent_id?: number | null;
+    user?: User;
+    parent?: Comment;
+    replies?: Comment[];
+    created_at: string;
+    updated_at: string;
+}

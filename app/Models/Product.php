@@ -31,8 +31,7 @@ use Illuminate\Support\Str;
  * @property-read int|null $active_prices_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductCategory> $categories
  * @property-read int|null $categories_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductPrice> $defaultPrice
- * @property-read int|null $default_price_count
+ * @property-read ProductPrice|null $defaultPrice
  * @property-read File|null $file
  * @property-read \Illuminate\Database\Eloquent\Collection<int, File> $files
  * @property-read int|null $files_count
@@ -40,22 +39,22 @@ use Illuminate\Support\Str;
  * @property-read int|null $prices_count
  *
  * @method static \Database\Factories\ProductFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product products()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product subscriptions()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereFeaturedImage($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereStripeProductId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product withStripeProduct()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Product withoutStripeProduct()
+ * @method static Builder<static>|Product newModelQuery()
+ * @method static Builder<static>|Product newQuery()
+ * @method static Builder<static>|Product products()
+ * @method static Builder<static>|Product query()
+ * @method static Builder<static>|Product subscriptions()
+ * @method static Builder<static>|Product whereCreatedAt($value)
+ * @method static Builder<static>|Product whereDescription($value)
+ * @method static Builder<static>|Product whereFeaturedImage($value)
+ * @method static Builder<static>|Product whereId($value)
+ * @method static Builder<static>|Product whereName($value)
+ * @method static Builder<static>|Product whereSlug($value)
+ * @method static Builder<static>|Product whereStripeProductId($value)
+ * @method static Builder<static>|Product whereType($value)
+ * @method static Builder<static>|Product whereUpdatedAt($value)
+ * @method static Builder<static>|Product withStripeProduct()
+ * @method static Builder<static>|Product withoutStripeProduct()
  *
  * @mixin \Eloquent
  */

@@ -28,8 +28,8 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'News',
-        href: '/news',
+        title: 'Blog',
+        href: '/blog',
         icon: Newspaper,
     },
     {
