@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources\ProductCategoryResource\Pages;
+namespace App\Filament\Admin\Resources\ProductCategoryResource\Pages;
 
-use App\Filament\Resources\ProductCategoryResource;
+use App\Filament\Admin\Resources\ProductCategoryResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateProductCategory extends CreateRecord

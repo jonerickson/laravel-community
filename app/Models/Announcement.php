@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
  * @property string $title
  * @property string $slug
  * @property string $content
- * @property \App\Enums\AnnouncementType $type
+ * @property AnnouncementType $type
  * @property bool $is_active
  * @property bool $is_dismissible
  * @property \Illuminate\Support\Carbon|null $starts_at
@@ -25,7 +25,7 @@ use Illuminate\Support\Str;
  * @property int $created_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User $author
+ * @property-read User $author
  * @property-read string $author_name
  *
  * @method static \Database\Factories\AnnouncementFactory factory($count = null, $state = [])
@@ -67,7 +67,7 @@ class Announcement extends Model implements Sluggable
     public function scopeCurrent($query)
     {
         $now = now();
-        
+
         return $query->active()
             ->where(function ($query) use ($now) {
                 $query->whereNull('starts_at')
@@ -89,7 +89,7 @@ class Announcement extends Model implements Sluggable
         $now = now();
         $start = $this->starts_at ?? $now->copy()->subYear();
         $end = $this->ends_at ?? $now->copy()->addYear();
-        
+
         return $now->isBetween($start, $end);
     }
 

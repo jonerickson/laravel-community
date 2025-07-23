@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\User;
 use App\Providers\Social\DiscordProvider;
 use App\Providers\Social\RobloxProvider;
 use Filament\Support\Colors\Color;
@@ -20,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Cashier::calculateTaxes();
+        Cashier::useCustomerModel(User::class);
 
         DB::prohibitDestructiveCommands(App::isProduction());
 

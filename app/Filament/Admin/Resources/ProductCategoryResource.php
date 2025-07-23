@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources;
+namespace App\Filament\Admin\Resources;
 
-use App\Filament\Resources\ProductCategoryResource\Pages;
+use App\Filament\Admin\Resources\ProductCategoryResource\Pages\CreateProductCategory;
+use App\Filament\Admin\Resources\ProductCategoryResource\Pages\EditProductCategory;
+use App\Filament\Admin\Resources\ProductCategoryResource\Pages\ListProductCategories;
 use App\Models\ProductCategory;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -73,19 +75,12 @@ class ProductCategoryResource extends Resource
             ]);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductCategories::route('/'),
-            'create' => Pages\CreateProductCategory::route('/create'),
-            'edit' => Pages\EditProductCategory::route('/{record}/edit'),
+            'index' => ListProductCategories::route('/'),
+            'create' => CreateProductCategory::route('/create'),
+            'edit' => EditProductCategory::route('/{record}/edit'),
         ];
     }
 }

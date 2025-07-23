@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources\ProductCategoryResource\Pages;
+namespace App\Filament\Admin\Resources\ProductResource\Pages;
 
-use App\Filament\Resources\ProductCategoryResource;
+use App\Filament\Admin\Resources\ProductResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditProductCategory extends EditRecord
+class EditProduct extends EditRecord
 {
-    protected static string $resource = ProductCategoryResource::class;
+    protected static string $resource = ProductResource::class;
 
     protected function getHeaderActions(): array
     {

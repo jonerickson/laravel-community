@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources\AnnouncementResource\Pages;
+namespace App\Filament\Admin\Resources\AnnouncementResource\Pages;
 
-use App\Filament\Resources\AnnouncementResource;
+use App\Filament\Admin\Resources\AnnouncementResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 

@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Resources;
+namespace App\Filament\Admin\Resources;
 
 use App\Enums\AnnouncementType;
-use App\Filament\Resources\AnnouncementResource\Pages;
+use App\Filament\Admin\Resources\AnnouncementResource\Pages\CreateAnnouncement;
+use App\Filament\Admin\Resources\AnnouncementResource\Pages\EditAnnouncement;
+use App\Filament\Admin\Resources\AnnouncementResource\Pages\ListAnnouncements;
+use App\Filament\Admin\Resources\AnnouncementResource\Pages\ViewAnnouncement;
 use App\Models\Announcement;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -30,8 +33,7 @@ class AnnouncementResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $context, $state, Forms\Set $set) =>
-                                $context === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null
+                            ->afterStateUpdated(fn (string $context, $state, Forms\Set $set) => $context === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null
                             ),
 
                         Forms\Components\TextInput::make('slug')
@@ -165,14 +167,12 @@ class AnnouncementResource extends Resource
 
                 Tables\Filters\Filter::make('scheduled')
                     ->label('Scheduled')
-                    ->query(fn (Builder $query): Builder =>
-                        $query->where('starts_at', '>', now())
+                    ->query(fn (Builder $query): Builder => $query->where('starts_at', '>', now())
                     ),
 
                 Tables\Filters\Filter::make('expired')
                     ->label('Expired')
-                    ->query(fn (Builder $query): Builder =>
-                        $query->where('ends_at', '<', now())
+                    ->query(fn (Builder $query): Builder => $query->where('ends_at', '<', now())
                     ),
             ])
             ->actions([
@@ -188,20 +188,13 @@ class AnnouncementResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAnnouncements::route('/'),
-            'create' => Pages\CreateAnnouncement::route('/create'),
-            'view' => Pages\ViewAnnouncement::route('/{record}'),
-            'edit' => Pages\EditAnnouncement::route('/{record}/edit'),
+            'index' => ListAnnouncements::route('/'),
+            'create' => CreateAnnouncement::route('/create'),
+            'view' => ViewAnnouncement::route('/{record}'),
+            'edit' => EditAnnouncement::route('/{record}/edit'),
         ];
     }
 

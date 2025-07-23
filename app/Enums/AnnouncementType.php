@@ -11,6 +11,13 @@ enum AnnouncementType: string
     case Warning = 'warning';
     case Error = 'error';
 
+    public static function options(): array
+    {
+        return collect(self::cases())
+            ->mapWithKeys(fn (self $type) => [$type->value => $type->label()])
+            ->toArray();
+    }
+
     public function label(): string
     {
         return match ($this) {
@@ -39,12 +46,5 @@ enum AnnouncementType: string
             self::Warning => 'triangle-alert',
             self::Error => 'x-circle',
         };
-    }
-
-    public static function options(): array
-    {
-        return collect(self::cases())
-            ->mapWithKeys(fn (self $type) => [$type->value => $type->label()])
-            ->toArray();
     }
 }

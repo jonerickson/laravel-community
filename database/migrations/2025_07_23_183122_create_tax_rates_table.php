@@ -13,16 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('subscription_items', function (Blueprint $table) {
+        Schema::create('tax_rates', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('subscription_id');
-            $table->string('stripe_id')->unique();
-            $table->string('stripe_product');
-            $table->string('stripe_price');
-            $table->integer('quantity')->nullable();
+            $table->string('stripe_id')->index();
+            $table->double('percentage')->index();
             $table->timestamps();
-
-            $table->index(['subscription_id', 'stripe_price']);
         });
     }
 
@@ -31,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('subscription_items');
+        Schema::dropIfExists('tax_rates');
     }
 };
