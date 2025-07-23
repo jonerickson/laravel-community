@@ -13,7 +13,9 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\MaxWidth;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
+use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -60,6 +62,10 @@ class MarketplacePanelProvider extends PanelProvider
             ->maxContentWidth(MaxWidth::Full)
             ->sidebarCollapsibleOnDesktop()
             ->darkMode()
-            ->theme(asset('css/filament/marketplace/theme.css'));
+            ->theme(asset('css/filament/marketplace/theme.css'))
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn (): View => view('filament.components.head'),
+            );
     }
 }
