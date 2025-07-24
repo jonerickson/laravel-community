@@ -6,9 +6,10 @@ import { Pagination } from '@/components/ui/pagination';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Forum, PaginatedData, Post, Topic } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
+import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowDown, ArrowLeft, Clock, Eye, Lock, MessageSquare, Pin, Reply, User } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface TopicShowProps {
     forum: Forum;
@@ -19,6 +20,20 @@ interface TopicShowProps {
 
 export default function TopicShow({ forum, topic, posts, postsPagination }: TopicShowProps) {
     const [showReplyForm, setShowReplyForm] = useState(false);
+
+    useEffect(() => {
+        if (!topic.is_read_by_user) {
+            const markAsRead = async () => {
+                try {
+                    await axios.post(route('forums.topics.read', { forum: forum.slug, topic: topic.slug }));
+                } catch (error) {
+                    console.error('Error marking topic as read:', error);
+                }
+            };
+
+            markAsRead();
+        }
+    }, [topic.slug, topic.is_read_by_user, forum.slug]);
 
     const topicUrl = `/forums/${forum.slug}/${topic.slug}`;
 

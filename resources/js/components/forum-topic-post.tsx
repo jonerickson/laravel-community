@@ -15,11 +15,11 @@ export default function ForumTopicPost({ post, index }: ForumTopicPostProps) {
             <CardContent className="p-6">
                 <div className="flex gap-4">
                     <div className="flex min-w-0 flex-col items-center gap-2">
-                        <div className="px-8 flex flex-col items-center">
+                        <div className="flex flex-col items-center px-8">
                             <Avatar className="h-12 w-12">
                                 <AvatarFallback>{post.author?.name.charAt(0).toUpperCase()}</AvatarFallback>
                             </Avatar>
-                            <div className="text-center mt-2">
+                            <div className="mt-2 text-center">
                                 <div className="text-sm font-medium">{post.author?.name}</div>
                                 <div className="text-xs text-muted-foreground">{index === 0 ? 'Author' : 'Member'}</div>
                             </div>
@@ -36,8 +36,13 @@ export default function ForumTopicPost({ post, index }: ForumTopicPostProps) {
                         <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
 
                         <div className="mt-4 border-t border-muted pt-2">
-                            <div className='mt-2'>
-                                <EmojiReactions post={post} initialReactions={post.likes_summary} userReactions={post.user_reactions} className="mb-2" />
+                            <div className="mt-2">
+                                <EmojiReactions
+                                    post={post}
+                                    initialReactions={post.likes_summary}
+                                    userReactions={post.user_reactions}
+                                    className="mb-2"
+                                />
                             </div>
                         </div>
 

@@ -8,7 +8,7 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Forum, PaginatedData, Topic } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
-import { Eye, Lock, MessageSquare, Pin, Plus } from 'lucide-react';
+import { Circle, Eye, Lock, MessageSquare, Pin, Plus } from 'lucide-react';
 
 interface ForumShowProps {
     forum: Forum;
@@ -71,9 +71,15 @@ export default function ForumShow({ forum, topics, topicsPagination }: ForumShow
                                             </Avatar>
                                             <div className="min-w-0 flex-1">
                                                 <div className="mb-1 flex items-center gap-2">
+                                                    {!topic.is_read_by_user && <Circle className="h-3 w-3 fill-blue-500 text-blue-500" />}
                                                     {topic.is_pinned && <Pin className="h-4 w-4 text-blue-500" />}
                                                     {topic.is_locked && <Lock className="h-4 w-4 text-gray-500" />}
-                                                    <Link href={`/forums/${forum.slug}/${topic.slug}`} className="font-medium hover:underline">
+                                                    <Link
+                                                        href={`/forums/${forum.slug}/${topic.slug}`}
+                                                        className={`hover:underline ${
+                                                            topic.is_read_by_user ? 'font-normal text-muted-foreground' : 'font-medium'
+                                                        }`}
+                                                    >
                                                         {topic.title}
                                                     </Link>
                                                 </div>

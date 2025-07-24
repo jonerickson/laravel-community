@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Contracts\Sluggable;
 use App\Traits\HasAuthor;
+use App\Traits\HasReads;
 use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -32,10 +33,13 @@ use Illuminate\Support\Str;
  * @property-read mixed $author_name
  * @property-read User $creator
  * @property-read Forum $forum
+ * @property-read bool $is_read_by_user
  * @property-read Post|null $lastPost
  * @property-read mixed $last_reply_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Post> $posts
  * @property-read int|null $posts_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Read> $reads
+ * @property-read int $reads_count
  *
  * @method static \Database\Factories\TopicFactory factory($count = null, $state = [])
  * @method static Builder<static>|Topic latestActivity()
@@ -63,6 +67,7 @@ class Topic extends Model implements Sluggable
 {
     use HasAuthor;
     use HasFactory;
+    use HasReads;
     use HasSlug;
 
     protected $fillable = [

@@ -205,6 +205,8 @@ export interface Topic {
     views_count: number;
     posts_count: number;
     last_reply_at?: string | null;
+    is_read_by_user: boolean;
+    reads_count: number;
     forum?: Forum;
     author?: User;
     last_post?: Post;

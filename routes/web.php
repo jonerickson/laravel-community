@@ -7,6 +7,7 @@ use App\Http\Controllers\Blog\CommentController;
 use App\Http\Controllers\Comments\LikeController as CommentLikeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Forums\ForumController;
+use App\Http\Controllers\Forums\ReadController as TopicReadController;
 use App\Http\Controllers\Forums\TopicController;
 use App\Http\Controllers\Posts\LikeController as PostLikeController;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +34,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{forum:slug}/create', [TopicController::class, 'create'])->name('topics.create');
         Route::post('/{forum:slug}/topics', [TopicController::class, 'store'])->name('topics.store');
         Route::post('/{forum:slug}/{topic:slug}/reply', [TopicController::class, 'reply'])->name('topics.reply');
+        Route::post('/{forum:slug}/{topic:slug}/read', TopicReadController::class)->name('topics.read');
     });
 
     Route::post('/{post:slug}/like', PostLikeController::class)->name('posts.like');

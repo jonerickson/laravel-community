@@ -6,7 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Forum } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
-import { Eye, Grid3X3, List, MessageSquare, Pin, Users } from 'lucide-react';
+import { Circle, Eye, Grid3X3, List, MessageSquare, Pin, Users } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -92,10 +92,13 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
                                                 <div key={topic.id} className="flex items-center gap-3">
                                                     <div className="min-w-0 flex-1">
                                                         <div className="flex items-center gap-2">
+                                                            {!topic.is_read_by_user && <Circle className="h-2 w-2 fill-blue-500 text-blue-500" />}
                                                             {topic.is_pinned && <Pin className="h-3 w-3 text-blue-500" />}
                                                             <Link
                                                                 href={`/forums/${forum.slug}/${topic.slug}`}
-                                                                className="truncate text-sm font-medium hover:underline"
+                                                                className={`truncate text-sm hover:underline ${
+                                                                    topic.is_read_by_user ? 'font-normal text-muted-foreground' : 'font-medium'
+                                                                }`}
                                                             >
                                                                 {topic.title}
                                                             </Link>

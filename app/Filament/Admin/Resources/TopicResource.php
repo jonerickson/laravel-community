@@ -78,10 +78,10 @@ class TopicResource extends Resource
                 Tables\Columns\IconColumn::make('is_locked')
                     ->label('Locked')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('last_reply_at')
-                    ->label('Last Reply')
-                    ->dateTime()
-                    ->sortable(),
+//                Tables\Columns\TextColumn::make('last_reply_at')
+//                    ->label('Last Reply')
+//                    ->dateTime()
+//                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -103,8 +103,7 @@ class TopicResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ])
-            ->defaultSort('last_reply_at', 'desc');
+            ]);
     }
 
     public static function getRelations(): array
