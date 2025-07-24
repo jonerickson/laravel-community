@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Traits\HasAuthor;
+use App\Traits\HasLikes;
 use Eloquent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,9 +27,14 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property-read mixed $author_name
  * @property-read Model|Eloquent $commentable
  * @property-read User $creator
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Like> $likes
+ * @property-read int $likes_count
+ * @property-read array $likes_summary
  * @property-read Comment|null $parent
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $replies
  * @property-read int|null $replies_count
+ * @property-read string|null $user_reaction
+ * @property-read array $user_reactions
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment approved()
  * @method static \Database\Factories\CommentFactory factory($count = null, $state = [])
@@ -53,6 +59,7 @@ class Comment extends Model
 {
     use HasAuthor;
     use HasFactory;
+    use HasLikes;
 
     protected $fillable = [
         'commentable_type',

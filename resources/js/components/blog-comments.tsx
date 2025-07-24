@@ -1,3 +1,4 @@
+import EmojiReactions from '@/components/emoji-reactions';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -65,10 +66,18 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
 
                 <div className="mb-3 text-sm text-foreground">{comment.content}</div>
 
-                <Button variant="ghost" size="sm" onClick={() => onReply(comment.id)} className="h-auto p-1 text-xs">
-                    <Reply className="mr-1 h-3 w-3" />
-                    Reply
-                </Button>
+                <div className="flex items-center justify-between">
+                    <Button variant="ghost" size="sm" onClick={() => onReply(comment.id)} className="h-auto p-1 text-xs">
+                        <Reply className="mr-1 h-3 w-3" />
+                        Reply
+                    </Button>
+                    <EmojiReactions
+                        comment={comment}
+                        initialReactions={comment.likes_summary}
+                        userReactions={comment.user_reactions}
+                        className="ml-auto"
+                    />
+                </div>
 
                 {replyingTo === comment.id && (
                     <form onSubmit={handleReplySubmit} className="mt-3 space-y-3">

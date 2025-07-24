@@ -108,6 +108,12 @@ export interface Announcement {
     updated_at: string;
 }
 
+export interface EmojiReaction {
+    emoji: string;
+    count: number;
+    users: string[];
+}
+
 export interface Post {
     id: number;
     type: 'forum' | 'blog';
@@ -119,6 +125,10 @@ export interface Post {
     is_featured: boolean;
     comments_enabled: boolean;
     comments_count: number;
+    likes_count: number;
+    likes_summary: EmojiReaction[];
+    user_reaction?: string | null;
+    user_reactions: string[];
     topic_id?: number;
     featured_image?: string | null;
     featured_image_url?: string | null;
@@ -129,6 +139,7 @@ export interface Post {
     metadata?: Record<string, never> | null;
     created_at: string;
     updated_at: string;
+    comments?: Comment[];
 }
 
 export interface PaginatedData {
@@ -154,6 +165,11 @@ export interface Comment {
     is_approved: boolean;
     created_by: number;
     parent_id?: number | null;
+    likes_count: number;
+    likes_summary: EmojiReaction[];
+    user_reaction?: string | null;
+    user_reactions: string[];
+    user?: User;
     author?: User;
     parent?: Comment;
     replies?: Comment[];

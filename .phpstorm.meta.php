@@ -2838,11 +2838,12 @@ namespace PHPSTORM_META {
 'filament.marketplace.pages.dashboard','cashier.payment','cashier.webhook','spark.invoices.download','spark.portal','livewire.update','livewire.upload-file','livewire.preview-file',
 'home','forums.index','forums.show','forums.topics.show','dashboard',
 'blog.index','blog.show','blog.comments.store','forums.topics.create','forums.topics.store',
-'forums.topics.reply','profile.edit','profile.update','profile.destroy',
-'profile.billing','profile.invoices','profile.payment-methods','appearance','store.categories',
-'store.products.view','store.subscriptions','register','login','password.request','password.email','password.reset','password.store',
-'oauth.redirect','oauth.callback','verification.notice','verification.verify','verification.send',
-'password.confirm','logout','storage.local',);
+'forums.topics.reply','posts.like','comments.like','profile.edit',
+'profile.update','profile.destroy','profile.billing','profile.invoices','profile.payment-methods',
+'appearance','store.categories','store.products.view','store.subscriptions','register','login','password.request','password.email',
+'password.reset','password.store','oauth.redirect','oauth.callback','verification.notice',
+'verification.verify','verification.send','password.confirm','logout',
+'storage.local',);
         registerArgumentsSet('views', 
 'app','filament.admin.pages.dashboard','filament.components.head','filament.components.logo','spark::app',
 'spark::mail.confirm_payment','spark::mail.invoice','vendor.spark.app','vendor.spark.mail.confirm_payment','vendor.spark.mail.invoice',

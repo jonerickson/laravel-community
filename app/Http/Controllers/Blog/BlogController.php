@@ -31,7 +31,7 @@ class BlogController extends Controller
     {
         $perPage = $request->input('per_page', 10);
 
-        $comments = $post->approvedComments()->with(['author', 'replies', 'parent'])->latest()->paginate(
+        $comments = $post->approvedComments()->with(['author', 'replies', 'replies.author', 'parent'])->latest()->paginate(
             perPage: $perPage
         );
 

@@ -1,4 +1,5 @@
 import BlogComments from '@/components/blog-comments';
+import EmojiReactions from '@/components/emoji-reactions';
 import { Spinner } from '@/components/ui/spinner';
 import { UserInfo } from '@/components/user-info';
 import { Comment, Post, type PaginatedData } from '@/types';
@@ -62,8 +63,17 @@ export default function BlogPost({ post, comments, commentsPagination }: BlogPos
                 dangerouslySetInnerHTML={{ __html: post.content }}
             />
 
+            <div className="mt-8">
+                <EmojiReactions
+                    post={post}
+                    initialReactions={post.likes_summary}
+                    userReactions={post.user_reactions}
+                    className="mb-4"
+                />
+            </div>
+
             {post.comments_enabled && (
-                <div className="mt-12 border-t pt-8">
+                <div className="mt-8 border-t pt-6">
                     <Deferred
                         fallback={
                             <div className="flex items-center justify-center">

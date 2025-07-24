@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Blog\BlogController;
 use App\Http\Controllers\Blog\CommentController;
+use App\Http\Controllers\Comments\LikeController as CommentLikeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Forums\ForumController;
 use App\Http\Controllers\Forums\TopicController;
+use App\Http\Controllers\Posts\LikeController as PostLikeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -32,6 +34,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/{forum:slug}/topics', [TopicController::class, 'store'])->name('topics.store');
         Route::post('/{forum:slug}/{topic:slug}/reply', [TopicController::class, 'reply'])->name('topics.reply');
     });
+
+    Route::post('/{post:slug}/like', PostLikeController::class)->name('posts.like');
+    Route::post('/{comment}/like', CommentLikeController::class)->name('comments.like');
 });
 
 require __DIR__.'/settings.php';

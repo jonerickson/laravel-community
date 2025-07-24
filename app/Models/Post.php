@@ -9,6 +9,7 @@ use App\Enums\PostType;
 use App\Traits\HasAuthor;
 use App\Traits\HasComments;
 use App\Traits\HasFeaturedImage;
+use App\Traits\HasLikes;
 use App\Traits\HasMetadata;
 use App\Traits\HasSlug;
 use App\Traits\HasUrl;
@@ -27,6 +28,7 @@ use Illuminate\Support\Str;
  * @property string $content
  * @property bool $is_published
  * @property bool $is_featured
+ * @property bool $comments_enabled
  * @property int|null $topic_id
  * @property string|null $featured_image
  * @property int $created_by
@@ -39,14 +41,19 @@ use Illuminate\Support\Str;
  * @property-read User $author
  * @property-read mixed $author_name
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $comments
- * @property-read int|null $comments_count
+ * @property-read int $comments_count
  * @property-read User $creator
  * @property-read string|null $featured_image_url
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Like> $likes
+ * @property-read int $likes_count
+ * @property-read array $likes_summary
  * @property-read int $reading_time
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $topLevelComments
  * @property-read int|null $top_level_comments_count
  * @property-read Topic|null $topic
  * @property-read string|null $url
+ * @property-read string|null $user_reaction
+ * @property-read array $user_reactions
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post blog()
  * @method static \Database\Factories\PostFactory factory($count = null, $state = [])
@@ -57,6 +64,7 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post recent()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereCommentsEnabled($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereCreatedBy($value)
@@ -81,6 +89,7 @@ class Post extends Model implements Sluggable
     use HasComments;
     use HasFactory;
     use HasFeaturedImage;
+    use HasLikes;
     use HasMetadata;
     use HasSlug;
     use HasUrl;
@@ -152,7 +161,7 @@ class Post extends Model implements Sluggable
     {
         return match ($this->type) {
             PostType::Blog => route('blog.show', $this),
-            PostType::Forum => route('forum.show', $this),
+            PostType::Forum => route('forums.show', $this),
         };
     }
 
