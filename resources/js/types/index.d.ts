@@ -117,6 +117,8 @@ export interface Post {
     content: string;
     is_published: boolean;
     is_featured: boolean;
+    comments_enabled: boolean;
+    comments_count: number;
     topic_id?: number;
     featured_image?: string | null;
     featured_image_url?: string | null;

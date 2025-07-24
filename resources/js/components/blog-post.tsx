@@ -62,18 +62,20 @@ export default function BlogPost({ post, comments, commentsPagination }: BlogPos
                 dangerouslySetInnerHTML={{ __html: post.content }}
             />
 
-            <div className="mt-12 border-t pt-8">
-                <Deferred
-                    fallback={
-                        <div className="flex items-center justify-center">
-                            <Spinner />
-                        </div>
-                    }
-                    data="comments"
-                >
-                    <BlogComments post={post} comments={comments} commentsPagination={commentsPagination} />
-                </Deferred>
-            </div>
+            {post.comments_enabled && (
+                <div className="mt-12 border-t pt-8">
+                    <Deferred
+                        fallback={
+                            <div className="flex items-center justify-center">
+                                <Spinner />
+                            </div>
+                        }
+                        data="comments"
+                    >
+                        <BlogComments post={post} comments={comments} commentsPagination={commentsPagination} />
+                    </Deferred>
+                </div>
+            )}
         </article>
     );
 }

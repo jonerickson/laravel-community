@@ -126,6 +126,21 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
 
     const approvedComments = comments.filter((comment) => comment.is_approved && !comment.parent_id) || [];
 
+    if (!post.comments_enabled) {
+        return (
+            <div className="space-y-6">
+                <div className="flex items-center gap-2">
+                    <MessageCircle className="h-5 w-5" />
+                    <HeadingSmall title="Comments" />
+                </div>
+                <div className="py-8 text-center text-muted-foreground">
+                    <MessageCircle className="mx-auto mb-2 h-8 w-8" />
+                    <p>Comments are disabled for this post.</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-2">
@@ -160,7 +175,7 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
             ) : (
                 <div className="py-8 text-center text-muted-foreground">
                     <MessageCircle className="mx-auto mb-2 h-8 w-8" />
-                    <p>No comments yet. Be the first to share your thoughts!</p>
+                    <p className="text-sm font-medium">No comments yet. Be the first to share your thoughts!</p>
                 </div>
             )}
         </div>

@@ -97,6 +97,9 @@ class PostResource extends Resource
                                 Forms\Components\Toggle::make('is_featured')
                                     ->default(false)
                                     ->helperText('Feature this post on the homepage.'),
+                                Forms\Components\Toggle::make('comments_enabled')
+                                    ->default(true)
+                                    ->helperText('Allow users to comment on this post.'),
                                 Forms\Components\DateTimePicker::make('published_at')
                                     ->columnSpanFull()
                                     ->native(false)
@@ -137,6 +140,9 @@ class PostResource extends Resource
                 Tables\Columns\IconColumn::make('is_featured')
                     ->boolean()
                     ->label('Featured'),
+                Tables\Columns\IconColumn::make('comments_enabled')
+                    ->boolean()
+                    ->label('Comments'),
                 Tables\Columns\TextColumn::make('author.name')
                     ->label('Author')
                     ->sortable()
@@ -163,6 +169,8 @@ class PostResource extends Resource
                     ->label('Publication Status'),
                 Tables\Filters\TernaryFilter::make('is_featured')
                     ->label('Featured Status'),
+                Tables\Filters\TernaryFilter::make('comments_enabled')
+                    ->label('Comments Status'),
                 Tables\Filters\Filter::make('published')
                     ->query(fn (Builder $query): Builder => $query->published()),
                 Tables\Filters\Filter::make('drafts')

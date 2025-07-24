@@ -2,7 +2,7 @@ import HeadingSmall from '@/components/heading-small';
 import { UserInfo } from '@/components/user-info';
 import { Post } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Clock } from 'lucide-react';
+import { Clock, MessageCircle } from 'lucide-react';
 
 interface BlogIndexItemProps {
     post: Post;
@@ -46,6 +46,14 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                                 <Clock className="h-3 w-3" />
                                 <span>{post.reading_time} min read</span>
                             </div>
+                        )}
+                        {post.comments_enabled && post.comments_count ? (
+                            <div className="flex items-center gap-1 text-muted-foreground">
+                                <MessageCircle className="h-3 w-3" />
+                                <span>{post.comments_count} comments</span>
+                            </div>
+                        ) : (
+                            <></>
                         )}
                     </div>
                     <div className="group relative mt-2 grow">
