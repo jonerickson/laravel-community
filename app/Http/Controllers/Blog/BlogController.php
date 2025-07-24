@@ -11,9 +11,9 @@ use Illuminate\Support\Arr;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class IndexController extends Controller
+class BlogController extends Controller
 {
-    public function __invoke(Request $request): Response
+    public function index(Request $request): Response
     {
         $perPage = $request->input('per_page', 9);
 
@@ -24,6 +24,21 @@ class IndexController extends Controller
         return Inertia::render('blog/index', [
             'posts' => Inertia::merge(fn () => $posts->items()),
             'postsPagination' => Arr::except($posts->toArray(), ['data']),
+        ]);
+    }
+
+    public function show(Request $request, Post $post): Response
+    {
+        $perPage = $request->input('per_page', 10);
+
+        $comments = $post->approvedComments()->with(['author', 'replies', 'parent'])->latest()->paginate(
+            perPage: $perPage
+        );
+
+        return Inertia::render('blog/show', [
+            'post' => $post->loadMissing(['author']),
+            'comments' => Inertia::defer(fn () => $comments->items()),
+            'commentsPagination' => Arr::except($comments->toArray(), ['data']),
         ]);
     }
 }

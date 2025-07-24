@@ -9,7 +9,6 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class BlogSeeder extends Seeder
 {

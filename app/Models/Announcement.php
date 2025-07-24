@@ -64,7 +64,6 @@ class Announcement extends Model implements Sluggable
         'is_dismissible',
         'starts_at',
         'ends_at',
-        'created_by',
     ];
 
     public function generateSlug(): string

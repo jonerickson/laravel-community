@@ -69,7 +69,6 @@ class Topic extends Model implements Sluggable
         'title',
         'description',
         'forum_id',
-        'created_by',
         'is_pinned',
         'is_locked',
         'views_count',

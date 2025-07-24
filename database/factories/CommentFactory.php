@@ -21,7 +21,7 @@ class CommentFactory extends Factory
             'commentable_id' => Post::factory(),
             'content' => $this->faker->paragraph(),
             'is_approved' => $this->faker->boolean(80),
-            'user_id' => User::factory(),
+            'created_by' => User::factory(),
             'parent_id' => null,
         ];
     }

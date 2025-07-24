@@ -1,13 +1,17 @@
 import BlogComments from '@/components/blog-comments';
+import { Spinner } from '@/components/ui/spinner';
 import { UserInfo } from '@/components/user-info';
-import { Post } from '@/types';
+import { Comment, Post, type PaginatedData } from '@/types';
+import { Deferred } from '@inertiajs/react';
 import { Calendar, Clock } from 'lucide-react';
 
 interface BlogPostProps {
     post: Post;
+    comments: Comment[];
+    commentsPagination: PaginatedData;
 }
 
-export default function BlogPost({ post }: BlogPostProps) {
+export default function BlogPost({ post, comments, commentsPagination }: BlogPostProps) {
     const publishedDate = new Date(post.published_at || post.created_at);
     const formattedDate = publishedDate.toLocaleDateString('en-US', {
         year: 'numeric',
@@ -59,7 +63,16 @@ export default function BlogPost({ post }: BlogPostProps) {
             />
 
             <div className="mt-12 border-t pt-8">
-                <BlogComments post={post} />
+                <Deferred
+                    fallback={
+                        <div className="flex items-center justify-center">
+                            <Spinner />
+                        </div>
+                    }
+                    data="comments"
+                >
+                    <BlogComments post={post} comments={comments} commentsPagination={commentsPagination} />
+                </Deferred>
             </div>
         </article>
     );

@@ -125,8 +125,6 @@ export interface Post {
     created_by: number;
     author?: User;
     metadata?: Record<string, never> | null;
-    comments?: Comment[];
-    comments_count?: number;
     created_at: string;
     updated_at: string;
 }
@@ -152,9 +150,9 @@ export interface Comment {
     commentable_id: number;
     content: string;
     is_approved: boolean;
-    user_id: number;
+    created_by: number;
     parent_id?: number | null;
-    user?: User;
+    author?: User;
     parent?: Comment;
     replies?: Comment[];
     created_at: string;

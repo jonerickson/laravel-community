@@ -38,8 +38,9 @@ use Illuminate\Support\Str;
  * @property-read User $author
  * @property-read mixed $author_name
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $comments
- * @property-read int $comments_count
+ * @property-read int|null $comments_count
  * @property-read User $creator
+ * @property-read string|null $featured_image_url
  * @property-read int $reading_time
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $topLevelComments
  * @property-read int|null $top_level_comments_count
@@ -90,7 +91,6 @@ class Post extends Model implements Sluggable
         'is_published',
         'is_featured',
         'published_at',
-        'created_by',
     ];
 
     protected $touches = [

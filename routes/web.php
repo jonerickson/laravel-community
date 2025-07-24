@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Blog\IndexController;
-use App\Http\Controllers\Blog\ShowController;
+use App\Http\Controllers\Blog\BlogController;
+use App\Http\Controllers\Blog\CommentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Forums\ForumController;
 use App\Http\Controllers\Forums\TopicController;
@@ -22,8 +22,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 
     Route::group(['prefix' => 'blog', 'as' => 'blog.'], function () {
-        Route::get('/', IndexController::class)->name('index');
-        Route::get('/{post:slug}', ShowController::class)->name('show');
+        Route::get('/', [BlogController::class, 'index'])->name('index');
+        Route::get('/{post:slug}', [BlogController::class, 'show'])->name('show');
+        Route::post('/{post:slug}/comments', [CommentController::class, 'store'])->name('comments.store');
     });
 
     Route::group(['prefix' => 'forums', 'as' => 'forums.'], function () {

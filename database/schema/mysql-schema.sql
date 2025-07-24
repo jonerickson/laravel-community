@@ -68,17 +68,17 @@ CREATE TABLE `comments` (
   `commentable_id` bigint unsigned NOT NULL,
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `is_approved` tinyint(1) NOT NULL DEFAULT '0',
-  `user_id` bigint unsigned NOT NULL,
+  `created_by` bigint unsigned NOT NULL,
   `parent_id` bigint unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `comments_commentable_type_commentable_id_index` (`commentable_type`,`commentable_id`),
-  KEY `comments_user_id_foreign` (`user_id`),
+  KEY `comments_created_by_foreign` (`created_by`),
   KEY `comments_parent_id_foreign` (`parent_id`),
   KEY `comments_is_approved_created_at_index` (`is_approved`,`created_at`),
   CONSTRAINT `comments_parent_id_foreign` FOREIGN KEY (`parent_id`) REFERENCES `comments` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `comments_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+  CONSTRAINT `comments_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `failed_jobs`;

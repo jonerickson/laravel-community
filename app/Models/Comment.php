@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Traits\HasAuthor;
 use Eloquent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,15 +18,17 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property int $commentable_id
  * @property string $content
  * @property bool $is_approved
- * @property int $user_id
+ * @property int $created_by
  * @property int|null $parent_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read User $author
+ * @property-read mixed $author_name
  * @property-read Model|Eloquent $commentable
+ * @property-read User $creator
  * @property-read Comment|null $parent
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $replies
  * @property-read int|null $replies_count
- * @property-read User $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment approved()
  * @method static \Database\Factories\CommentFactory factory($count = null, $state = [])
@@ -38,16 +41,17 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereCommentableType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereCreatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereIsApproved($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereParentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereUserId($value)
  *
  * @mixin Eloquent
  */
 class Comment extends Model
 {
+    use HasAuthor;
     use HasFactory;
 
     protected $fillable = [
@@ -55,18 +59,12 @@ class Comment extends Model
         'commentable_id',
         'content',
         'is_approved',
-        'user_id',
         'parent_id',
     ];
 
     public function commentable(): MorphTo
     {
         return $this->morphTo();
-    }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
     }
 
     public function parent(): BelongsTo

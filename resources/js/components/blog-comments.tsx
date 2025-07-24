@@ -1,23 +1,28 @@
+import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { Pagination } from '@/components/ui/pagination';
 import { Textarea } from '@/components/ui/textarea';
 import { UserInfo } from '@/components/user-info';
-import { Comment, Post } from '@/types';
+import { Comment, type PaginatedData, Post } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { MessageCircle, Reply } from 'lucide-react';
 import { useState } from 'react';
 
 interface BlogCommentsProps {
     post: Post;
+    comments: Comment[];
+    commentsPagination: PaginatedData;
 }
 
 interface CommentItemProps {
+    post: Post;
     comment: Comment;
     onReply: (parentId: number) => void;
     replyingTo: number | null;
 }
 
-function CommentItem({ comment, onReply, replyingTo }: CommentItemProps) {
+function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
     const commentDate = new Date(comment.created_at);
     const formattedDate = commentDate.toLocaleDateString('en-US', {
         year: 'numeric',
@@ -27,19 +32,23 @@ function CommentItem({ comment, onReply, replyingTo }: CommentItemProps) {
         minute: '2-digit',
     });
 
-    const { data, setData, post, processing, reset } = useForm({
+    const {
+        data,
+        setData,
+        post: submitComment,
+        processing,
+        reset,
+    } = useForm({
         content: '',
         parent_id: comment.id,
-        commentable_type: 'App\\Models\\Post',
-        commentable_id: comment.commentable_id,
     });
 
     const handleReplySubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/comments', {
+        submitComment(route('blog.comments.store', { post }), {
             onSuccess: () => {
                 reset();
-                onReply(0); // Close reply form
+                onReply(0);
             },
         });
     };
@@ -48,7 +57,7 @@ function CommentItem({ comment, onReply, replyingTo }: CommentItemProps) {
         <div className="border-l-2 border-muted pl-4">
             <div className="mb-4 rounded-lg bg-muted/50 p-4">
                 <div className="mb-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2">{comment.user && <UserInfo user={comment.user} showEmail={false} />}</div>
+                    <div className="flex items-center gap-2">{comment.author && <UserInfo user={comment.author} showEmail={false} />}</div>
                     <time className="text-xs text-muted-foreground" dateTime={comment.created_at}>
                         {formattedDate}
                     </time>
@@ -85,7 +94,7 @@ function CommentItem({ comment, onReply, replyingTo }: CommentItemProps) {
             {comment.replies && comment.replies.length > 0 && (
                 <div className="ml-4 space-y-4">
                     {comment.replies.map((reply) => (
-                        <CommentItem key={reply.id} comment={reply} onReply={onReply} replyingTo={replyingTo} />
+                        <CommentItem key={reply.id} post={post} comment={reply} onReply={onReply} replyingTo={replyingTo} />
                     ))}
                 </div>
             )}
@@ -93,7 +102,7 @@ function CommentItem({ comment, onReply, replyingTo }: CommentItemProps) {
     );
 }
 
-export default function BlogComments({ post }: BlogCommentsProps) {
+export default function BlogComments({ post, comments, commentsPagination }: BlogCommentsProps) {
     const [replyingTo, setReplyingTo] = useState<number | null>(null);
     const {
         data,
@@ -104,26 +113,24 @@ export default function BlogComments({ post }: BlogCommentsProps) {
         errors,
     } = useForm({
         content: '',
-        commentable_type: 'App\\Models\\Post',
-        commentable_id: post.id,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        submitComment('/comments', {
+        submitComment(route('blog.comments.store', { post }), {
             onSuccess: () => {
                 reset();
             },
         });
     };
 
-    const approvedComments = post.comments?.filter((comment) => comment.is_approved && !comment.parent_id) || [];
+    const approvedComments = comments.filter((comment) => comment.is_approved && !comment.parent_id) || [];
 
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-2">
                 <MessageCircle className="h-5 w-5" />
-                <h3 className="text-lg font-semibold">Comments ({post.comments_count || 0})</h3>
+                <HeadingSmall title={`Comments (${comments.length || 0})`} />
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -145,8 +152,10 @@ export default function BlogComments({ post }: BlogCommentsProps) {
             {approvedComments.length > 0 ? (
                 <div className="space-y-6">
                     {approvedComments.map((comment) => (
-                        <CommentItem key={comment.id} comment={comment} onReply={setReplyingTo} replyingTo={replyingTo} />
+                        <CommentItem key={comment.id} post={post} comment={comment} onReply={setReplyingTo} replyingTo={replyingTo} />
                     ))}
+
+                    <Pagination pagination={commentsPagination} baseUrl={''} entityLabel={'comments'} />
                 </div>
             ) : (
                 <div className="py-8 text-center text-muted-foreground">

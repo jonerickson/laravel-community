@@ -34,6 +34,7 @@ use Illuminate\Support\Str;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductCategory> $categories
  * @property-read int|null $categories_count
  * @property-read ProductPrice|null $defaultPrice
+ * @property-read string|null $featured_image_url
  * @property-read File|null $file
  * @property-read \Illuminate\Database\Eloquent\Collection<int, File> $files
  * @property-read int|null $files_count
