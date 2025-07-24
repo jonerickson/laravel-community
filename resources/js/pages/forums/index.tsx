@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCookie } from '@/hooks/use-cookie';
 import AppLayout from '@/layouts/app-layout';
+import { pluralize } from '@/lib/utils';
 import type { BreadcrumbItem, Forum } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
@@ -72,11 +73,11 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
                                         <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
                                             <div className="flex items-center gap-1">
                                                 <MessageSquare className="h-4 w-4" />
-                                                <span>{forum.topics_count || 0} topics</span>
+                                                <span>{(forum.topics_count || 0) + ' ' + pluralize('topic', forum.topics_count || 0)}</span>
                                             </div>
                                             <div className="flex items-center gap-1">
                                                 <Users className="h-4 w-4" />
-                                                <span>{forum.posts_count || 0} posts</span>
+                                                <span>{(forum.posts_count || 0) + ' ' + pluralize('post', forum.posts_count || 0)}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -93,6 +94,7 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
                                                     <div className="min-w-0 flex-1">
                                                         <div className="flex items-center gap-2">
                                                             {!topic.is_read_by_user && <Circle className="h-2 w-2 fill-blue-500 text-blue-500" />}
+                                                            {topic.is_hot && <span className="text-sm">🔥</span>}
                                                             {topic.is_pinned && <Pin className="h-3 w-3 text-blue-500" />}
                                                             <Link
                                                                 href={`/forums/${forum.slug}/${topic.slug}`}

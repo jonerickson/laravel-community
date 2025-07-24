@@ -44,3 +44,35 @@ export function ucFirst(str: string): string {
     if (!str) return '';
     return str[0].toUpperCase() + str.slice(1);
 }
+
+export function pluralize(word: string, count: number, pluralForm?: string): string {
+    if (count === 1) {
+        return word;
+    }
+
+    if (pluralForm) {
+        return pluralForm;
+    }
+
+    if (word.endsWith('y') && !['a', 'e', 'i', 'o', 'u'].includes(word[word.length - 2])) {
+        return word.slice(0, -1) + 'ies';
+    }
+
+    if (word.endsWith('s') || word.endsWith('sh') || word.endsWith('ch') || word.endsWith('x') || word.endsWith('z')) {
+        return word + 'es';
+    }
+
+    if (word.endsWith('f')) {
+        return word.slice(0, -1) + 'ves';
+    }
+
+    if (word.endsWith('fe')) {
+        return word.slice(0, -2) + 'ves';
+    }
+
+    if (word.endsWith('o') && !['a', 'e', 'i', 'o', 'u'].includes(word[word.length - 2])) {
+        return word + 'es';
+    }
+
+    return word + 's';
+}

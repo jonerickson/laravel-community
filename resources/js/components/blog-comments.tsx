@@ -179,7 +179,7 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
                         <CommentItem key={comment.id} post={post} comment={comment} onReply={setReplyingTo} replyingTo={replyingTo} />
                     ))}
 
-                    <Pagination pagination={commentsPagination} baseUrl={''} entityLabel={'comments'} />
+                    <Pagination pagination={commentsPagination} baseUrl={''} entityLabel="comment" />
                 </div>
             ) : (
                 <div className="py-8 text-center text-muted-foreground">

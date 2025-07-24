@@ -123,7 +123,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                     </div>
                 )}
 
-                <Pagination pagination={postsPagination} baseUrl={topicUrl} entityLabel="posts" className="py-4" />
+                <Pagination pagination={postsPagination} baseUrl={topicUrl} entityLabel="post" className="py-4" />
 
                 {posts.length > 0 && (
                     <div className="grid gap-4">
@@ -154,7 +154,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                     </div>
                 )}
 
-                <Pagination pagination={postsPagination} baseUrl={topicUrl} entityLabel="posts" className="py-4" />
+                <Pagination pagination={postsPagination} baseUrl={topicUrl} entityLabel="post" className="py-4" />
 
                 <div className="flex justify-start py-4">
                     <Link

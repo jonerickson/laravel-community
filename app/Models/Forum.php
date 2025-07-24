@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Str;
 
 /**
@@ -75,6 +76,11 @@ class Forum extends Model implements Sluggable
     public function latestTopics(): HasMany
     {
         return $this->topics()->latest();
+    }
+
+    public function posts(): HasManyThrough
+    {
+        return $this->hasManyThrough(Post::class, Topic::class);
     }
 
     public function scopeActive($query)

@@ -2,6 +2,7 @@ import { Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { PaginatedData } from '@/types';
+import { pluralize } from '@/lib/utils';
 
 interface PaginationProps {
     pagination: PaginatedData;
@@ -58,7 +59,7 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
     return (
         <div className={`flex items-center justify-between ${className}`}>
             <div className="text-sm text-muted-foreground">
-                Showing {((current_page - 1) * per_page) + 1} to {Math.min(current_page * per_page, total)} of {total} {entityLabel}
+                Showing {((current_page - 1) * per_page) + 1} to {Math.min(current_page * per_page, total)} of {total} {pluralize(entityLabel, total)}
             </div>
 
             <div className="flex items-center gap-1">

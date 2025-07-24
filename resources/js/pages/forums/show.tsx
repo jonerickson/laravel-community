@@ -72,6 +72,7 @@ export default function ForumShow({ forum, topics, topicsPagination }: ForumShow
                                             <div className="min-w-0 flex-1">
                                                 <div className="mb-1 flex items-center gap-2">
                                                     {!topic.is_read_by_user && <Circle className="h-3 w-3 fill-blue-500 text-blue-500" />}
+                                                    {topic.is_hot && <span className="text-sm">🔥</span>}
                                                     {topic.is_pinned && <Pin className="h-4 w-4 text-blue-500" />}
                                                     {topic.is_locked && <Lock className="h-4 w-4 text-gray-500" />}
                                                     <Link
@@ -125,7 +126,7 @@ export default function ForumShow({ forum, topics, topicsPagination }: ForumShow
                     </Table>
                 </div>
 
-                <Pagination pagination={topicsPagination} baseUrl={forumUrl} entityLabel="topics" className="py-4" />
+                <Pagination pagination={topicsPagination} baseUrl={forumUrl} entityLabel="topic" className="py-4" />
 
                 {topics.length === 0 && (
                     <Card>
