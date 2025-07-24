@@ -12,6 +12,8 @@ class ListPosts extends ListRecords
 {
     protected static string $resource = PostResource::class;
 
+    protected ?string $subheading = 'Manage your blog posts and news articles.';
+
     protected function getHeaderActions(): array
     {
         return [
