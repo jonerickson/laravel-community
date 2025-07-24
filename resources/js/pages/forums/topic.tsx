@@ -1,14 +1,13 @@
-import HeadingSmall from '@/components/heading-small';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import ForumTopicPost from '@/components/forum-topic-post';
+import ForumTopicReply from '@/components/forum-topic-reply';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
-import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
+import { Pagination } from '@/components/ui/pagination';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Forum, PaginatedData, Post, Topic } from '@/types';
-import { Head, useForm, WhenVisible } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
-import { Clock, Eye, Lock, MessageSquare, Pin, Reply, User } from 'lucide-react';
+import { ArrowDown, ArrowLeft, Clock, Eye, Lock, MessageSquare, Pin, Reply, User } from 'lucide-react';
 import { useState } from 'react';
 
 interface TopicShowProps {
@@ -20,9 +19,20 @@ interface TopicShowProps {
 
 export default function TopicShow({ forum, topic, posts, postsPagination }: TopicShowProps) {
     const [showReplyForm, setShowReplyForm] = useState(false);
-    const { data, setData, post, processing, errors, reset } = useForm({
-        content: '',
-    });
+
+    const topicUrl = `/forums/${forum.slug}/${topic.slug}`;
+
+    const goToLatestPost = () => {
+        router.reload({
+            data: { page: postsPagination.last_page },
+            only: ['posts', 'postsPagination'],
+            onSuccess: () => {
+                setTimeout(() => {
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                }, 100);
+            },
+        });
+    };
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -39,20 +49,10 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
         },
     ];
 
-    const handleReply = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(`/forums/${forum.slug}/${topic.slug}/reply`, {
-            onSuccess: () => {
-                reset();
-                setShowReplyForm(false);
-            },
-        });
-    };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${topic.title} - ${forum.name} - Forums`} />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
                         <div className="mb-2 flex items-center gap-2">
@@ -84,119 +84,38 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                     </div>
 
                     {!topic.is_locked && (
-                        <Button onClick={() => setShowReplyForm(!showReplyForm)} variant={showReplyForm ? 'outline' : 'default'}>
-                            <Reply className="mr-2 h-4 w-4" />
-                            Reply
-                        </Button>
-                    )}
-                </div>
-
-                <div className="grid gap-4">
-                    {posts.map((post, index) => (
-                        <Card key={post.id}>
-                            <CardContent className="p-6">
-                                <div className="flex gap-4">
-                                    <div className="flex min-w-0 flex-col items-center gap-2">
-                                        <Avatar className="h-12 w-12">
-                                            <AvatarFallback>{post.author?.name.charAt(0).toUpperCase()}</AvatarFallback>
-                                        </Avatar>
-                                        <div className="text-center">
-                                            <div className="text-sm font-medium">{post.author?.name}</div>
-                                            <div className="text-xs text-muted-foreground">{index === 0 ? 'Author' : 'Member'}</div>
-                                        </div>
-                                    </div>
-
-                                    <div className="min-w-0 flex-1">
-                                        <div className="mb-4 flex items-center justify-between">
-                                            <div className="text-sm text-muted-foreground">
-                                                Posted {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
-                                            </div>
-                                        </div>
-
-                                        <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
-
-                                        {post.comments && post.comments.length > 0 && (
-                                            <div className="mt-6 border-t pt-4">
-                                                <div className="mb-3 text-sm font-medium">Comments</div>
-                                                <div className="space-y-3">
-                                                    {post.comments.map((comment) => (
-                                                        <div key={comment.id} className="flex gap-3 rounded-lg bg-muted/50 p-3">
-                                                            <Avatar className="h-8 w-8">
-                                                                <AvatarFallback className="text-xs">
-                                                                    {comment.user?.name.charAt(0).toUpperCase()}
-                                                                </AvatarFallback>
-                                                            </Avatar>
-                                                            <div className="flex-1">
-                                                                <div className="mb-1 flex items-center gap-2">
-                                                                    <span className="text-sm font-medium">{comment.user?.name}</span>
-                                                                    <span className="text-xs text-muted-foreground">
-                                                                        {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-                                                                    </span>
-                                                                </div>
-                                                                <p className="text-sm">{comment.content}</p>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
-
-                <WhenVisible
-                    fallback={<></>}
-                    always={postsPagination.current_page < postsPagination.last_page}
-                    params={{
-                        data: {
-                            page: postsPagination.current_page + 1,
-                        },
-                        only: ['posts', 'postsPagination'],
-                    }}
-                >
-                    {postsPagination.current_page >= postsPagination.last_page ? (
-                        <div className="flex items-center justify-center py-8 text-center">
-                            <HeadingSmall title="There are no more posts." description="Check back later." />
-                        </div>
-                    ) : (
-                        <div className="flex items-center justify-center py-8">
-                            <Spinner />
+                        <div className="flex gap-2">
+                            <Button onClick={goToLatestPost} variant="outline">
+                                <ArrowDown className="mr-2 h-4 w-4" />
+                                Latest
+                            </Button>
+                            <Button onClick={() => setShowReplyForm(!showReplyForm)} variant={showReplyForm ? 'outline' : 'default'}>
+                                <Reply className="mr-2 h-4 w-4" />
+                                Reply
+                            </Button>
                         </div>
                     )}
-                </WhenVisible>
+                </div>
 
                 {showReplyForm && (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Reply to Topic</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleReply} className="space-y-4">
-                                <div>
-                                    <Textarea
-                                        placeholder="Write your reply..."
-                                        value={data.content}
-                                        onChange={(e) => setData('content', e.target.value)}
-                                        rows={6}
-                                        required
-                                    />
-                                    {errors.content && <div className="mt-1 text-sm text-red-600">{errors.content}</div>}
-                                </div>
+                    <div className="pt-4">
+                        <ForumTopicReply
+                            forumSlug={forum.slug}
+                            topicSlug={topic.slug}
+                            onCancel={() => setShowReplyForm(false)}
+                            onSuccess={() => setShowReplyForm(false)}
+                        />
+                    </div>
+                )}
 
-                                <div className="flex items-center gap-2">
-                                    <Button type="submit" disabled={processing}>
-                                        {processing ? 'Posting...' : 'Post Reply'}
-                                    </Button>
-                                    <Button type="button" variant="outline" onClick={() => setShowReplyForm(false)}>
-                                        Cancel
-                                    </Button>
-                                </div>
-                            </form>
-                        </CardContent>
-                    </Card>
+                <Pagination pagination={postsPagination} baseUrl={topicUrl} entityLabel="posts" className="py-4" />
+
+                {posts.length > 0 && (
+                    <div className="grid gap-4">
+                        {posts.map((post, index) => (
+                            <ForumTopicPost key={post.id} post={post} index={index} />
+                        ))}
+                    </div>
                 )}
 
                 {posts.length === 0 && (
@@ -208,6 +127,29 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                         </CardContent>
                     </Card>
                 )}
+
+                {!topic.is_locked && posts.length > 0 && (
+                    <div className="pt-4">
+                        <ForumTopicReply
+                            forumSlug={forum.slug}
+                            topicSlug={topic.slug}
+                            onCancel={() => setShowReplyForm(false)}
+                            onSuccess={() => setShowReplyForm(false)}
+                        />
+                    </div>
+                )}
+
+                <Pagination pagination={postsPagination} baseUrl={topicUrl} entityLabel="posts" className="py-4" />
+
+                <div className="flex justify-start py-4">
+                    <Link
+                        href={`/forums/${forum.slug}`}
+                        className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                        <ArrowLeft className="h-4 w-4" />
+                        Back to {forum.name}
+                    </Link>
+                </div>
             </div>
         </AppLayout>
     );

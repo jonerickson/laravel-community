@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
+import { useCookie } from './use-cookie';
 
 export type Appearance = 'light' | 'dark' | 'system';
 
@@ -8,15 +9,6 @@ const prefersDark = () => {
     }
 
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
-};
-
-const setCookie = (name: string, value: string, days = 365) => {
-    if (typeof document === 'undefined') {
-        return;
-    }
-
-    const maxAge = days * 24 * 60 * 60;
-    document.cookie = `${name}=${value};path=/;max-age=${maxAge};SameSite=Lax`;
 };
 
 const applyTheme = (appearance: Appearance) => {
@@ -33,41 +25,39 @@ const mediaQuery = () => {
     return window.matchMedia('(prefers-color-scheme: dark)');
 };
 
+let currentAppearance: Appearance = 'system';
+
 const handleSystemThemeChange = () => {
-    const currentAppearance = localStorage.getItem('appearance') as Appearance;
-    applyTheme(currentAppearance || 'system');
+    applyTheme(currentAppearance);
 };
 
 export function initializeTheme() {
-    const savedAppearance = (localStorage.getItem('appearance') as Appearance) || 'system';
-
-    applyTheme(savedAppearance);
-
-    // Add the event listener for system theme changes...
+    // This will be handled by the hook now
     mediaQuery()?.addEventListener('change', handleSystemThemeChange);
 }
 
 export function useAppearance() {
-    const [appearance, setAppearance] = useState<Appearance>('system');
+    const [appearance, updateAppearance] = useCookie<Appearance>('appearance', 'system', {
+        useLocalStorage: true,
+    });
 
-    const updateAppearance = useCallback((mode: Appearance) => {
-        setAppearance(mode);
+    // Keep track of current appearance for system theme changes
+    currentAppearance = appearance;
 
-        // Store in localStorage for client-side persistence...
-        localStorage.setItem('appearance', mode);
-
-        // Store in cookie for SSR...
-        setCookie('appearance', mode);
-
-        applyTheme(mode);
-    }, []);
+    const setAppearance = useCallback(
+        (mode: Appearance) => {
+            updateAppearance(mode);
+            applyTheme(mode);
+        },
+        [updateAppearance],
+    );
 
     useEffect(() => {
-        const savedAppearance = localStorage.getItem('appearance') as Appearance | null;
-        updateAppearance(savedAppearance || 'system');
+        // Apply theme on mount and when appearance changes
+        applyTheme(appearance);
 
         return () => mediaQuery()?.removeEventListener('change', handleSystemThemeChange);
-    }, [updateAppearance]);
+    }, [appearance]);
 
-    return { appearance, updateAppearance } as const;
+    return { appearance, updateAppearance: setAppearance } as const;
 }

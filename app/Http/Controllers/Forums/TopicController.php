@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Forums;
 use App\Enums\PostType;
 use App\Http\Controllers\Controller;
 use App\Models\Forum;
-use App\Models\Post;
 use App\Models\Topic;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -32,7 +31,7 @@ class TopicController extends Controller
         return Inertia::render('forums/topic', [
             'forum' => $forum,
             'topic' => $topic->load(['author', 'forum']),
-            'posts' => Inertia::merge(fn () => $posts->items()),
+            'posts' => $posts->items(),
             'postsPagination' => Arr::except($posts->toArray(), ['data']),
         ]);
     }
@@ -78,11 +77,12 @@ class TopicController extends Controller
     {
         $validated = $request->validate([
             'content' => 'required|string',
+        ], [
+            'content.required' => 'Please provide a reply before posting.',
         ]);
 
-        Post::create([
+        $topic->posts()->create([
             'type' => PostType::Forum,
-            'topic_id' => $topic->id,
             'title' => 'Re: '.$topic->title,
             'content' => $validated['content'],
             'is_published' => true,

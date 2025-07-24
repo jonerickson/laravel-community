@@ -2,11 +2,11 @@ import Heading from '@/components/heading';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
+import { Pagination } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Forum, PaginatedData, Topic } from '@/types';
-import { Head, Link, WhenVisible } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { Eye, Lock, MessageSquare, Pin, Plus } from 'lucide-react';
 
@@ -17,6 +17,8 @@ interface ForumShowProps {
 }
 
 export default function ForumShow({ forum, topics, topicsPagination }: ForumShowProps) {
+    const forumUrl = `/forums/${forum.slug}`;
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Forums',
@@ -62,7 +64,7 @@ export default function ForumShow({ forum, topics, topicsPagination }: ForumShow
                         <TableBody>
                             {topics.map((topic) => (
                                 <TableRow key={topic.id} className="hover:bg-muted/50">
-                                    <TableCell>
+                                    <TableCell className="p-4">
                                         <div className="flex items-start gap-3">
                                             <Avatar className="h-8 w-8">
                                                 <AvatarFallback className="text-xs">{topic.author?.name.charAt(0).toUpperCase()}</AvatarFallback>
@@ -85,19 +87,19 @@ export default function ForumShow({ forum, topics, topicsPagination }: ForumShow
                                             </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-center">
+                                    <TableCell className="p-4 text-center">
                                         <div className="flex items-center justify-center gap-1">
                                             <MessageSquare className="h-4 w-4" />
                                             <span>{topic.posts_count}</span>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-center">
+                                    <TableCell className="p-4 text-center">
                                         <div className="flex items-center justify-center gap-1">
                                             <Eye className="h-4 w-4" />
                                             <span>{topic.views_count}</span>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="p-4 text-right">
                                         {topic.last_post ? (
                                             <div className="text-sm">
                                                 <div className="font-medium">{topic.last_post.author?.name}</div>
@@ -117,24 +119,7 @@ export default function ForumShow({ forum, topics, topicsPagination }: ForumShow
                     </Table>
                 </div>
 
-                <WhenVisible
-                    fallback={<></>}
-                    always={topicsPagination.current_page < topicsPagination.last_page}
-                    params={{
-                        data: {
-                            page: topicsPagination.current_page + 1,
-                        },
-                        only: ['topics', 'topicsPagination'],
-                    }}
-                >
-                    {topicsPagination.current_page >= topicsPagination.last_page ? (
-                        <></>
-                    ) : (
-                        <div className="flex items-center justify-center py-8">
-                            <Spinner />
-                        </div>
-                    )}
-                </WhenVisible>
+                <Pagination pagination={topicsPagination} baseUrl={forumUrl} entityLabel="topics" className="py-4" />
 
                 {topics.length === 0 && (
                     <Card>

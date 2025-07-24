@@ -1,10 +1,12 @@
 import Heading from '@/components/heading';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useCookie } from '@/hooks/use-cookie';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Forum } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
-import { Eye, MessageSquare, Pin, Users } from 'lucide-react';
+import { Eye, Grid3X3, List, MessageSquare, Pin, Users } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -18,13 +20,36 @@ interface ForumsIndexProps {
 }
 
 export default function ForumsIndex({ forums }: ForumsIndexProps) {
+    const [viewMode, setViewMode] = useCookie<'list' | 'grid'>('forum-view', 'list');
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Forums" />
             <div className="flex h-full flex-1 flex-col overflow-x-auto rounded-xl p-4">
-                <Heading title="Forums" description="Connect with our community and get support" />
+                <div className="flex items-start justify-between">
+                    <Heading title="Forums" description="Connect with our community and get support" />
 
-                <div className="grid gap-8">
+                    <div className="flex items-center gap-1 rounded-lg border p-1">
+                        <Button
+                            variant={viewMode === 'list' ? 'default' : 'ghost'}
+                            size="sm"
+                            onClick={() => setViewMode('list')}
+                            className="h-8 px-3"
+                        >
+                            <List className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                            size="sm"
+                            onClick={() => setViewMode('grid')}
+                            className="h-8 px-3"
+                        >
+                            <Grid3X3 className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+
+                <div className={viewMode === 'grid' ? 'grid gap-6 md:grid-cols-2 lg:grid-cols-3' : 'grid gap-8'}>
                     {forums.map((forum) => (
                         <Card key={forum.id} className="transition-shadow hover:shadow-md">
                             <CardHeader>
