@@ -33,7 +33,6 @@ export default function Show({ post }: BlogShowPageProps) {
                 <meta property="article:published_time" content={post.published_at || post.created_at} />
                 {post.author && <meta property="article:author" content={post.author.name} />}
 
-                {/* JSON-LD structured data */}
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{

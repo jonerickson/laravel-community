@@ -9,6 +9,7 @@ use App\Enums\PostType;
 use App\Traits\HasAuthor;
 use App\Traits\HasComments;
 use App\Traits\HasFeaturedImage;
+use App\Traits\HasMetadata;
 use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,12 +24,12 @@ use Illuminate\Support\Str;
  * @property string $slug
  * @property string|null $excerpt
  * @property string $content
- * @property string|null $featured_image
  * @property bool $is_published
  * @property bool $is_featured
  * @property int|null $topic_id
- * @property array<array-key, mixed>|null $meta
+ * @property string|null $featured_image
  * @property int $created_by
+ * @property array<array-key, mixed>|null $metadata
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -61,7 +62,7 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereIsFeatured($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereIsPublished($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereMeta($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereMetadata($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post wherePublishedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereTitle($value)
@@ -77,6 +78,7 @@ class Post extends Model implements Sluggable
     use HasComments;
     use HasFactory;
     use HasFeaturedImage;
+    use HasMetadata;
     use HasSlug;
 
     protected $fillable = [
@@ -85,16 +87,18 @@ class Post extends Model implements Sluggable
         'title',
         'excerpt',
         'content',
-        'featured_image',
         'is_published',
         'is_featured',
         'published_at',
         'created_by',
-        'meta',
     ];
 
     protected $touches = [
         'topic',
+    ];
+
+    protected $appends = [
+        'reading_time',
     ];
 
     public function generateSlug(): string
@@ -149,7 +153,7 @@ class Post extends Model implements Sluggable
 
                 return max(1, (int) ceil($wordCount / 200));
             }
-        );
+        )->shouldCache();
     }
 
     protected function casts(): array
@@ -159,7 +163,6 @@ class Post extends Model implements Sluggable
             'is_published' => 'boolean',
             'is_featured' => 'boolean',
             'published_at' => 'datetime',
-            'meta' => 'array',
         ];
     }
 }

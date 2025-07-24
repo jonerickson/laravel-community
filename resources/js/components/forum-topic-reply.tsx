@@ -1,3 +1,4 @@
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
@@ -38,7 +39,7 @@ export default function ForumTopicReply({ forumSlug, topicSlug, onCancel, onSucc
                             onChange={(content) => setData('content', content)}
                             placeholder="Write your reply..."
                         />
-                        {errors.content && <div className="mt-1 text-sm text-destructive">{errors.content}</div>}
+                        {errors.content && <InputError message={errors.content} />}
                     </div>
 
                     <div className="flex items-center gap-2">

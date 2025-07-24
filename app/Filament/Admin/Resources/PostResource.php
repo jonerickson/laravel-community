@@ -108,7 +108,7 @@ class PostResource extends Resource
                     ->collapsible()
                     ->collapsed()
                     ->schema([
-                        Forms\Components\KeyValue::make('meta')
+                        Forms\Components\KeyValue::make('metadata')
                             ->keyLabel('Meta Key')
                             ->valueLabel('Meta Value')
                             ->helperText('Additional metadata for the post (SEO, tags, etc.).'),

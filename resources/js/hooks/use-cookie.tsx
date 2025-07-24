@@ -39,19 +39,16 @@ export function useCookie<T extends string>(
         (newValue: T) => {
             setValue(newValue);
 
-            // Store in localStorage if enabled
             if (useLocalStorage && typeof localStorage !== 'undefined') {
                 localStorage.setItem(cookieName, newValue);
             }
 
-            // Store in cookie
             setCookie(cookieName, newValue, days);
         },
         [cookieName, days, useLocalStorage],
     );
 
     useEffect(() => {
-        // Try to get from localStorage first (if enabled), then cookie
         let savedValue: string | null = null;
 
         if (useLocalStorage && typeof localStorage !== 'undefined') {

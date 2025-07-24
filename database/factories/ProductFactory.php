@@ -20,7 +20,7 @@ class ProductFactory extends Factory
         $typeName = $type === ProductType::Product ? 'Product' : 'Subscription';
 
         return [
-            'name' => $name = "{$typeName} {$this->faker->numberBetween(1, 10)}",
+            'name' => $name = "$typeName {$this->faker->numberBetween(1, 10)}",
             'slug' => Str::slug($name),
             'description' => $this->faker->paragraph(),
             'type' => $type,
@@ -32,6 +32,8 @@ class ProductFactory extends Factory
     public function product(): static
     {
         return $this->state(fn (array $attributes) => [
+            'name' => $name = "Product {$this->faker->unique()->numberBetween(1, 10)}",
+            'slug' => Str::slug($name),
             'type' => ProductType::Product,
         ]);
     }
@@ -39,6 +41,8 @@ class ProductFactory extends Factory
     public function subscription(): static
     {
         return $this->state(fn (array $attributes) => [
+            'name' => $name = "Subscription {$this->faker->unique()->numberBetween(1, 10)}",
+            'slug' => Str::slug($name),
             'type' => ProductType::Subscription,
         ]);
     }

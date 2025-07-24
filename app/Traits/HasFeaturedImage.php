@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Facades\Storage;
 
 trait HasFeaturedImage
@@ -13,8 +14,23 @@ trait HasFeaturedImage
         return ! is_null($this->featured_image);
     }
 
-    public function getFeaturedImageUrl(): ?string
+    public function featuredImageUrl(): Attribute
     {
-        return $this->featured_image ? Storage::url($this->featured_image) : null;
+        return Attribute::make(
+            get: fn (): ?string => $this->hasFeaturedImage()
+                ? Storage::disk('public')->url($this->featured_image)
+                : null,
+        )->shouldCache();
+    }
+
+    protected function initializeHasFeaturedImage(): void
+    {
+        $this->setAppends(array_merge($this->getAppends(), [
+            'featured_image_url'
+        ]));
+
+        $this->mergeFillable([
+            'featured_image',
+        ]);
     }
 }

@@ -12,7 +12,6 @@ interface DashboardProductGridProps {
 export default function DashboardProductGrid({ newestProduct, popularProduct, featuredProduct }: DashboardProductGridProps) {
     return (
         <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            {/* Newest Arrival Card */}
             <div className="relative">
                 {newestProduct ? (
                     <DashboardProductCard product={newestProduct} type="newest" className="h-full" />
@@ -28,7 +27,6 @@ export default function DashboardProductGrid({ newestProduct, popularProduct, fe
                 )}
             </div>
 
-            {/* Most Popular Card */}
             <div className="relative">
                 {popularProduct ? (
                     <DashboardProductCard product={popularProduct} type="popular" className="h-full" />
@@ -44,7 +42,6 @@ export default function DashboardProductGrid({ newestProduct, popularProduct, fe
                 )}
             </div>
 
-            {/* Featured Product Card */}
             <div className="relative">
                 {featuredProduct ? (
                     <DashboardProductCard product={featuredProduct} type="featured" className="h-full" />

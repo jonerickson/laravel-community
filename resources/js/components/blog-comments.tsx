@@ -1,3 +1,4 @@
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { UserInfo } from '@/components/user-info';
@@ -81,7 +82,6 @@ function CommentItem({ comment, onReply, replyingTo }: CommentItemProps) {
                 )}
             </div>
 
-            {/* Nested replies */}
             {comment.replies && comment.replies.length > 0 && (
                 <div className="ml-4 space-y-4">
                     {comment.replies.map((reply) => (
@@ -126,7 +126,6 @@ export default function BlogComments({ post }: BlogCommentsProps) {
                 <h3 className="text-lg font-semibold">Comments ({post.comments_count || 0})</h3>
             </div>
 
-            {/* Comment Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <Textarea
@@ -136,14 +135,13 @@ export default function BlogComments({ post }: BlogCommentsProps) {
                         className="min-h-[120px]"
                         required
                     />
-                    {errors.content && <p className="mt-1 text-sm text-destructive">{errors.content}</p>}
+                    {errors.content && <InputError message={errors.content} />}
                 </div>
                 <Button type="submit" disabled={processing}>
                     {processing ? 'Posting...' : 'Post Comment'}
                 </Button>
             </form>
 
-            {/* Comments List */}
             {approvedComments.length > 0 ? (
                 <div className="space-y-6">
                     {approvedComments.map((comment) => (

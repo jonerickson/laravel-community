@@ -17,6 +17,7 @@ class ProductCategoryFactory extends Factory
     {
         return [
             'name' => $name = "Category {$this->faker->numberBetween(1, 10)}",
+            'description' => $this->faker->text(),
             'slug' => Str::slug($name),
         ];
     }

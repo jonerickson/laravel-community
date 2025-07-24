@@ -6,8 +6,6 @@ namespace Database\Seeders;
 
 use App\Enums\AnnouncementType;
 use App\Models\Announcement;
-use App\Models\Product;
-use App\Models\ProductCategory;
 use App\Models\User;
 use BezhanSalleh\FilamentShield\Support\Utils;
 use Illuminate\Database\Seeder;
@@ -32,16 +30,9 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@deschutesdesigngroup.com',
         ])->assignRole(Utils::getSuperAdminName());
 
-        $category = ProductCategory::factory()->create();
-
-        Product::factory()
-            ->count(5)
-            ->recycle($category)
-            ->hasAttached($category, relationship: 'categories')
-            ->create();
-
         $this->call([
-            PostSeeder::class,
+            BlogSeeder::class,
+            ProductSeeder::class,
             ForumSeeder::class,
         ]);
     }

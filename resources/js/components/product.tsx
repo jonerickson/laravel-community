@@ -85,7 +85,6 @@ export default function Product() {
                     </div>
                 </div>
 
-                {/* Image gallery */}
                 <div className="mt-8 lg:col-span-7 lg:col-start-1 lg:row-span-3 lg:row-start-1 lg:mt-0">
                     <h2 className="sr-only">Images</h2>
 

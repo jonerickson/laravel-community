@@ -17,7 +17,6 @@ export default function BlogPost({ post }: BlogPostProps) {
 
     return (
         <article className="mx-auto max-w-4xl">
-            {/* Header */}
             <div className="mb-8">
                 {post.is_featured && (
                     <div className="mb-4">
@@ -48,20 +47,17 @@ export default function BlogPost({ post }: BlogPostProps) {
                 </div>
             </div>
 
-            {/* Featured Image */}
-            {post.featured_image && (
+            {post.featured_image_url && (
                 <div className="mb-8">
-                    <img src={post.featured_image} alt={post.title} className="aspect-video w-full rounded-lg object-cover" />
+                    <img src={post.featured_image_url} alt={post.title} className="aspect-video w-full rounded-lg object-cover" />
                 </div>
             )}
 
-            {/* Content */}
             <div
                 className="prose prose-lg dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground prose-a:text-primary hover:prose-a:text-primary/80 prose-code:text-foreground prose-pre:bg-muted max-w-none"
                 dangerouslySetInnerHTML={{ __html: post.content }}
             />
 
-            {/* Comments Section */}
             <div className="mt-12 border-t pt-8">
                 <BlogComments post={post} />
             </div>

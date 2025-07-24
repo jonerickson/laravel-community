@@ -55,15 +55,13 @@ export interface User {
 export interface Product {
     id: number;
     name: string;
+    slug: string;
     description: string;
     type: 'product' | 'subscription';
-    stripe_product_id?: string | null;
     featured_image?: string | null;
-    image?: string;
-    rating?: number;
-    category?: ProductCategory;
-    is_featured?: boolean;
-    prices?: ProductPrice[];
+    featured_image_url?: string | null;
+    stripe_product_id?: string | null;
+    metadata?: Record<string, never> | null;
     created_at: string;
     updated_at: string;
 }
@@ -72,14 +70,14 @@ export interface ProductPrice {
     id: number;
     product_id: number;
     name: string;
+    description?: string | null;
     amount: number;
     currency: string;
     interval?: string | null;
     interval_count: number;
-    stripe_price_id?: string | null;
     is_active: boolean;
     is_default: boolean;
-    description?: string | null;
+    stripe_price_id?: string | null;
     metadata?: Record<string, never> | null;
     created_at: string;
     updated_at: string;
@@ -102,28 +100,31 @@ export interface Announcement {
     type: 'info' | 'success' | 'warning' | 'error';
     is_active: boolean;
     is_dismissible: boolean;
-    starts_at?: string | null;
-    ends_at?: string | null;
     created_by: number;
     author?: User;
+    starts_at?: string | null;
+    ends_at?: string | null;
     created_at: string;
     updated_at: string;
 }
 
 export interface Post {
     id: number;
+    type: 'forum' | 'blog';
     title: string;
     slug: string;
     excerpt?: string | null;
     content: string;
-    featured_image?: string | null;
     is_published: boolean;
     is_featured: boolean;
+    topic_id?: number;
+    featured_image?: string | null;
+    featured_image_url?: string | null;
+    reading_time?: number;
     published_at?: string | null;
     created_by: number;
-    meta?: Record<string, never> | null;
-    reading_time?: number;
     author?: User;
+    metadata?: Record<string, never> | null;
     comments?: Comment[];
     comments_count?: number;
     created_at: string;

@@ -20,10 +20,10 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
         <Link href={route('blog.show', { post: post.slug })}>
             <article className="flex flex-col items-start justify-between">
                 <div className="relative w-full">
-                    {post.featured_image ? (
+                    {post.featured_image_url ? (
                         <img
                             alt={post.title}
-                            src={post.featured_image}
+                            src={post.featured_image_url}
                             className="aspect-video w-full rounded-2xl bg-muted object-cover sm:aspect-[2/1] lg:aspect-[3/2]"
                         />
                     ) : (

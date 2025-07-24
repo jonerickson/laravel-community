@@ -8,6 +8,7 @@ use App\Contracts\Sluggable;
 use App\Enums\ProductType;
 use App\Traits\HasFeaturedImage;
 use App\Traits\HasFiles;
+use App\Traits\HasMetadata;
 use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,8 +24,9 @@ use Illuminate\Support\Str;
  * @property string $slug
  * @property string $description
  * @property ProductType $type
- * @property string|null $stripe_product_id
  * @property string|null $featured_image
+ * @property string|null $stripe_product_id
+ * @property array<array-key, mixed>|null $metadata
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductPrice> $activePrices
@@ -48,6 +50,7 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|Product whereDescription($value)
  * @method static Builder<static>|Product whereFeaturedImage($value)
  * @method static Builder<static>|Product whereId($value)
+ * @method static Builder<static>|Product whereMetadata($value)
  * @method static Builder<static>|Product whereName($value)
  * @method static Builder<static>|Product whereSlug($value)
  * @method static Builder<static>|Product whereStripeProductId($value)
@@ -63,6 +66,7 @@ class Product extends Model implements Sluggable
     use HasFactory;
     use HasFeaturedImage;
     use HasFiles;
+    use HasMetadata;
     use HasSlug;
 
     protected $fillable = [
@@ -70,7 +74,6 @@ class Product extends Model implements Sluggable
         'description',
         'type',
         'stripe_product_id',
-        'featured_image',
         'files',
     ];
 

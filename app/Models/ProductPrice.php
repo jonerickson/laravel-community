@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Traits\HasMetadata;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,14 +13,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $product_id
  * @property string $name
+ * @property string|null $description
  * @property numeric $amount
  * @property string $currency
  * @property string|null $interval
  * @property int $interval_count
- * @property string|null $stripe_price_id
  * @property bool $is_active
  * @property bool $is_default
- * @property string|null $description
+ * @property string|null $stripe_price_id
  * @property array<array-key, mixed>|null $metadata
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -55,6 +56,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ProductPrice extends Model
 {
     use HasFactory;
+    use HasMetadata;
 
     protected $fillable = [
         'product_id',
@@ -67,7 +69,6 @@ class ProductPrice extends Model
         'is_active',
         'is_default',
         'description',
-        'metadata',
     ];
 
     protected $hidden = [
@@ -148,7 +149,6 @@ class ProductPrice extends Model
             'amount' => 'decimal:2',
             'is_active' => 'boolean',
             'is_default' => 'boolean',
-            'metadata' => 'array',
         ];
     }
 }

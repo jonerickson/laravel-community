@@ -30,7 +30,7 @@ class PostFactory extends Factory
             'is_featured' => $this->faker->boolean(20),
             'published_at' => $publishedAt,
             'created_by' => User::factory(),
-            'meta' => $this->faker->optional(0.3)->randomElements([
+            'metadata' => $this->faker->optional(0.3)->randomElements([
                 'seo_title' => $this->faker->sentence(),
                 'seo_description' => $this->faker->paragraph(),
                 'tags' => $this->faker->words(rand(2, 5)),

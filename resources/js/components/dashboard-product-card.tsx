@@ -42,7 +42,6 @@ export default function DashboardProductCard({ product, type, className }: Dashb
 
     return (
         <Card className={cn('group relative overflow-hidden transition-all hover:shadow-lg', className)}>
-            {/* Background gradient */}
             <div className={cn('absolute inset-0 bg-gradient-to-br opacity-50', config.gradient)} />
 
             <CardHeader className="relative pb-2">
@@ -58,7 +57,6 @@ export default function DashboardProductCard({ product, type, className }: Dashb
             </CardHeader>
 
             <CardContent className="relative space-y-3">
-                {/* Product Image */}
                 <div className="aspect-square overflow-hidden rounded-lg bg-muted">
                     {product.image ? (
                         <img
@@ -73,7 +71,6 @@ export default function DashboardProductCard({ product, type, className }: Dashb
                     )}
                 </div>
 
-                {/* Product Info */}
                 <div className="space-y-2">
                     <h3 className="line-clamp-2 leading-tight font-semibold">{product.name}</h3>
 

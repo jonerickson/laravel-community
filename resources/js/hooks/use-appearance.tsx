@@ -32,7 +32,6 @@ const handleSystemThemeChange = () => {
 };
 
 export function initializeTheme() {
-    // This will be handled by the hook now
     mediaQuery()?.addEventListener('change', handleSystemThemeChange);
 }
 
@@ -41,7 +40,6 @@ export function useAppearance() {
         useLocalStorage: true,
     });
 
-    // Keep track of current appearance for system theme changes
     currentAppearance = appearance;
 
     const setAppearance = useCallback(
@@ -53,7 +51,6 @@ export function useAppearance() {
     );
 
     useEffect(() => {
-        // Apply theme on mount and when appearance changes
         applyTheme(appearance);
 
         return () => mediaQuery()?.removeEventListener('change', handleSystemThemeChange);

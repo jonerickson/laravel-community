@@ -21,7 +21,6 @@ interface DashboardProps {
 
 export default function Dashboard({ newestProduct, popularProduct, featuredProduct, announcements = [] }: DashboardProps) {
     const handleAnnouncementDismiss = (announcementId: number) => {
-        // Handle announcement dismissal logic here
         console.log('Dismissed announcement:', announcementId);
     };
 
@@ -29,13 +28,10 @@ export default function Dashboard({ newestProduct, popularProduct, featuredProdu
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                {/* Announcements */}
                 {announcements.length > 0 && <AnnouncementsList announcements={announcements} onDismiss={handleAnnouncementDismiss} />}
 
-                {/* Product Grid */}
                 <DashboardProductGrid newestProduct={newestProduct} popularProduct={popularProduct} featuredProduct={featuredProduct} />
 
-                {/* Main Content Area */}
                 <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
                     <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                 </div>

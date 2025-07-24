@@ -20,9 +20,9 @@ use Illuminate\Support\Str;
  * @property AnnouncementType $type
  * @property bool $is_active
  * @property bool $is_dismissible
+ * @property int $created_by
  * @property \Illuminate\Support\Carbon|null $starts_at
  * @property \Illuminate\Support\Carbon|null $ends_at
- * @property int $created_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read User $author
