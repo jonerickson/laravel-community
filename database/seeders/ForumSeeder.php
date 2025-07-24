@@ -52,7 +52,7 @@ class ForumSeeder extends Seeder
             ->state(new Sequence(...$forums))
             ->create()
             ->each(function (Forum $forum) use ($user) {
-                Topic::factory(50)
+                Topic::factory(5)
                     ->for($forum)
                     ->for($user, 'author')
                     ->create()
@@ -62,7 +62,7 @@ class ForumSeeder extends Seeder
                             ->forum()
                             ->for($topic)
                             ->for($user, 'author')
-                            ->count(50)
+                            ->count(10)
                             ->create();
                     });
             });
