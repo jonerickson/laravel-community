@@ -69,7 +69,6 @@ class PostResource extends Resource
                                         'codeBlock',
                                     ]),
                             ]),
-
                         Forms\Components\Section::make('Media')
                             ->schema([
                                 Forms\Components\FileUpload::make('featured_image')
@@ -103,11 +102,9 @@ class PostResource extends Resource
                                     ->native(false)
                                     ->helperText('Schedule when this post should be published.')
                                     ->default(now()),
-
                                 Forms\Components\Hidden::make('created_by')
                                     ->default(Auth::id()),
                             ]),
-
                         Forms\Components\Section::make('SEO & Meta')
                             ->collapsible()
                             ->collapsed()
@@ -172,6 +169,8 @@ class PostResource extends Resource
                     ->query(fn (Builder $query): Builder => $query->where('is_published', false)),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make()
+                    ->url(fn (Post $record) => $record->url, shouldOpenInNewTab: true),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

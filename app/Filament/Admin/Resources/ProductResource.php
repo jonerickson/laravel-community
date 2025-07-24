@@ -142,19 +142,15 @@ class ProductResource extends Resource
                 Tables\Filters\SelectFilter::make('type')
                     ->options(ProductType::class)
                     ->native(false),
-
                 Tables\Filters\Filter::make('products')
                     ->label('Products Only')
                     ->query(fn (Builder $query): Builder => $query->products()),
-
                 Tables\Filters\Filter::make('subscriptions')
                     ->label('Subscriptions Only')
                     ->query(fn (Builder $query): Builder => $query->subscriptions()),
-
                 Tables\Filters\Filter::make('with_stripe')
                     ->label('Linked to Stripe')
                     ->query(fn (Builder $query): Builder => $query->withStripeProduct()),
-
                 Tables\Filters\Filter::make('without_stripe')
                     ->label('Not Linked to Stripe')
                     ->query(fn (Builder $query): Builder => $query->withoutStripeProduct()),

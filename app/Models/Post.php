@@ -11,6 +11,7 @@ use App\Traits\HasComments;
 use App\Traits\HasFeaturedImage;
 use App\Traits\HasMetadata;
 use App\Traits\HasSlug;
+use App\Traits\HasUrl;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -45,6 +46,7 @@ use Illuminate\Support\Str;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $topLevelComments
  * @property-read int|null $top_level_comments_count
  * @property-read Topic|null $topic
+ * @property-read string|null $url
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post blog()
  * @method static \Database\Factories\PostFactory factory($count = null, $state = [])
@@ -81,6 +83,7 @@ class Post extends Model implements Sluggable
     use HasFeaturedImage;
     use HasMetadata;
     use HasSlug;
+    use HasUrl;
 
     protected $fillable = [
         'type',
@@ -143,6 +146,14 @@ class Post extends Model implements Sluggable
         return $this->is_published
                && $this->published_at !== null
                && $this->published_at->isPast();
+    }
+
+    public function getUrl(): ?string
+    {
+        return match ($this->type) {
+            PostType::Blog => route('blog.show', $this),
+            PostType::Forum => route('forum.show', $this),
+        };
     }
 
     protected function readingTime(): Attribute

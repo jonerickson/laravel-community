@@ -35,19 +35,16 @@ class AnnouncementResource extends Resource
                             ->live(onBlur: true)
                             ->afterStateUpdated(fn (string $context, $state, Forms\Set $set) => $context === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null
                             ),
-
                         Forms\Components\TextInput::make('slug')
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true)
                             ->rules(['alpha_dash']),
-
                         Forms\Components\Select::make('type')
                             ->required()
                             ->options(AnnouncementType::class)
                             ->default(AnnouncementType::Info->value)
                             ->native(false),
-
                         Forms\Components\RichEditor::make('content')
                             ->required()
                             ->columnSpanFull(),
@@ -60,7 +57,6 @@ class AnnouncementResource extends Resource
                             ->label('Active')
                             ->default(true)
                             ->helperText('Only active announcements will be displayed to users.'),
-
                         Forms\Components\Toggle::make('is_dismissible')
                             ->label('Dismissible')
                             ->default(true)
@@ -74,7 +70,6 @@ class AnnouncementResource extends Resource
                             ->label('Start Date & Time')
                             ->helperText('Leave empty to display immediately.')
                             ->native(false),
-
                         Forms\Components\DateTimePicker::make('ends_at')
                             ->label('End Date & Time')
                             ->helperText('Leave empty to display indefinitely.')
@@ -140,22 +135,17 @@ class AnnouncementResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
                     ->options(AnnouncementType::class),
-
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label('Active'),
-
                 Tables\Filters\TernaryFilter::make('is_dismissible')
                     ->label('Dismissible'),
-
                 Tables\Filters\Filter::make('current')
                     ->label('Currently Active')
                     ->query(fn (Builder $query): Builder => $query->current()),
-
                 Tables\Filters\Filter::make('scheduled')
                     ->label('Scheduled')
                     ->query(fn (Builder $query): Builder => $query->where('starts_at', '>', now())
                     ),
-
                 Tables\Filters\Filter::make('expired')
                     ->label('Expired')
                     ->query(fn (Builder $query): Builder => $query->where('ends_at', '<', now())
