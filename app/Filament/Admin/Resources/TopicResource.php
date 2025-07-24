@@ -46,14 +46,6 @@ class TopicResource extends Resource
                     ->label('Pinned'),
                 Forms\Components\Toggle::make('is_locked')
                     ->label('Locked'),
-                Forms\Components\TextInput::make('views_count')
-                    ->label('Views')
-                    ->numeric()
-                    ->default(0),
-                Forms\Components\TextInput::make('replies_count')
-                    ->label('Replies')
-                    ->numeric()
-                    ->default(0),
             ]);
     }
 
@@ -72,8 +64,8 @@ class TopicResource extends Resource
                     ->label('Author')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('replies_count')
-                    ->label('Replies')
+                Tables\Columns\TextColumn::make('posts_count')
+                    ->label('Posts')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('views_count')

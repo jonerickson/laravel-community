@@ -6,6 +6,8 @@ namespace App\Http\Controllers\Forums;
 
 use App\Http\Controllers\Controller;
 use App\Models\Forum;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -29,6 +31,7 @@ class ForumController extends Controller
 
     public function show(Forum $forum): Response
     {
+        /** @var LengthAwarePaginator $topics */
         $topics = $forum->topics()
             ->with(['author', 'lastPost.author'])
             ->latestActivity()
@@ -36,7 +39,8 @@ class ForumController extends Controller
 
         return Inertia::render('forums/show', [
             'forum' => $forum,
-            'topics' => $topics,
+            'topics' => Inertia::merge(fn () => $topics->items()),
+            'topicsPagination' => Arr::except($topics->toArray(), ['data']),
         ]);
     }
 }

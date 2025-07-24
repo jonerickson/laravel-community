@@ -1,10 +1,12 @@
+import HeadingSmall from '@/components/heading-small';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Forum, PaginatedData, Post, Topic } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, WhenVisible } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { Clock, Eye, Lock, MessageSquare, Pin, Reply, User } from 'lucide-react';
 import { useState } from 'react';
@@ -12,14 +14,11 @@ import { useState } from 'react';
 interface TopicShowProps {
     forum: Forum;
     topic: Topic;
-    posts: {
-        data: Post[];
-        pagination: PaginatedData;
-    };
-    canReply: boolean;
+    posts: Post[];
+    postsPagination: PaginatedData;
 }
 
-export default function TopicShow({ forum, topic, posts, canReply }: TopicShowProps) {
+export default function TopicShow({ forum, topic, posts, postsPagination }: TopicShowProps) {
     const [showReplyForm, setShowReplyForm] = useState(false);
     const { data, setData, post, processing, errors, reset } = useForm({
         content: '',
@@ -75,7 +74,7 @@ export default function TopicShow({ forum, topic, posts, canReply }: TopicShowPr
                             </div>
                             <div className="flex items-center gap-1">
                                 <MessageSquare className="h-4 w-4" />
-                                <span>{topic.replies_count} replies</span>
+                                <span>{topic.posts_count} replies</span>
                             </div>
                             <div className="flex items-center gap-1">
                                 <Clock className="h-4 w-4" />
@@ -84,7 +83,7 @@ export default function TopicShow({ forum, topic, posts, canReply }: TopicShowPr
                         </div>
                     </div>
 
-                    {canReply && !topic.is_locked && (
+                    {!topic.is_locked && (
                         <Button onClick={() => setShowReplyForm(!showReplyForm)} variant={showReplyForm ? 'outline' : 'default'}>
                             <Reply className="mr-2 h-4 w-4" />
                             Reply
@@ -93,7 +92,7 @@ export default function TopicShow({ forum, topic, posts, canReply }: TopicShowPr
                 </div>
 
                 <div className="grid gap-4">
-                    {posts.data.map((post, index) => (
+                    {posts.map((post, index) => (
                         <Card key={post.id}>
                             <CardContent className="p-6">
                                 <div className="flex gap-4">
@@ -103,7 +102,7 @@ export default function TopicShow({ forum, topic, posts, canReply }: TopicShowPr
                                         </Avatar>
                                         <div className="text-center">
                                             <div className="text-sm font-medium">{post.author?.name}</div>
-                                            <div className="text-xs text-muted-foreground">{index === 0 ? 'Topic Starter' : 'Member'}</div>
+                                            <div className="text-xs text-muted-foreground">{index === 0 ? 'Author' : 'Member'}</div>
                                         </div>
                                     </div>
 
@@ -148,7 +147,28 @@ export default function TopicShow({ forum, topic, posts, canReply }: TopicShowPr
                     ))}
                 </div>
 
-                {showReplyForm && canReply && (
+                <WhenVisible
+                    fallback={<></>}
+                    always={postsPagination.current_page < postsPagination.last_page}
+                    params={{
+                        data: {
+                            page: postsPagination.current_page + 1,
+                        },
+                        only: ['posts', 'postsPagination'],
+                    }}
+                >
+                    {postsPagination.current_page >= postsPagination.last_page ? (
+                        <div className="flex items-center justify-center py-8 text-center">
+                            <HeadingSmall title="There are no more posts." description="Check back later." />
+                        </div>
+                    ) : (
+                        <div className="flex items-center justify-center py-8">
+                            <Spinner />
+                        </div>
+                    )}
+                </WhenVisible>
+
+                {showReplyForm && (
                     <Card>
                         <CardHeader>
                             <CardTitle>Reply to Topic</CardTitle>
@@ -179,7 +199,7 @@ export default function TopicShow({ forum, topic, posts, canReply }: TopicShowPr
                     </Card>
                 )}
 
-                {posts.data.length === 0 && (
+                {posts.length === 0 && (
                     <Card>
                         <CardContent className="flex flex-col items-center justify-center py-12">
                             <MessageSquare className="mb-4 h-12 w-12 text-muted-foreground" />
@@ -188,13 +208,6 @@ export default function TopicShow({ forum, topic, posts, canReply }: TopicShowPr
                         </CardContent>
                     </Card>
                 )}
-
-                {/* Pagination can be added here if needed */}
-                {/*{posts.pagination.last_page > 1 && (*/}
-                {/*    <div className="flex justify-center">*/}
-                {/*        /!* Add pagination component here *!/*/}
-                {/*    </div>*/}
-                {/*)}*/}
             </div>
         </AppLayout>
     );

@@ -7,10 +7,13 @@ namespace App\Models;
 use App\Contracts\Sluggable;
 use App\Traits\HasAuthor;
 use App\Traits\HasSlug;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 /**
@@ -23,9 +26,6 @@ use Illuminate\Support\Str;
  * @property bool $is_pinned
  * @property bool $is_locked
  * @property int $views_count
- * @property-read int|null $replies_count
- * @property int|null $last_post_id
- * @property \Illuminate\Support\Carbon|null $last_reply_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read User $author
@@ -33,32 +33,29 @@ use Illuminate\Support\Str;
  * @property-read User $creator
  * @property-read Forum $forum
  * @property-read Post|null $lastPost
+ * @property-read mixed $last_reply_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Post> $posts
  * @property-read int|null $posts_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Post> $replies
  *
  * @method static \Database\Factories\TopicFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic latestActivity()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic notPinned()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic pinned()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic unlocked()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic whereCreatedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic whereForumId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic whereIsLocked($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic whereIsPinned($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic whereLastPostId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic whereLastReplyAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic whereRepliesCount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic whereTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Topic whereViewsCount($value)
+ * @method static Builder<static>|Topic latestActivity()
+ * @method static Builder<static>|Topic newModelQuery()
+ * @method static Builder<static>|Topic newQuery()
+ * @method static Builder<static>|Topic notPinned()
+ * @method static Builder<static>|Topic pinned()
+ * @method static Builder<static>|Topic query()
+ * @method static Builder<static>|Topic unlocked()
+ * @method static Builder<static>|Topic whereCreatedAt($value)
+ * @method static Builder<static>|Topic whereCreatedBy($value)
+ * @method static Builder<static>|Topic whereDescription($value)
+ * @method static Builder<static>|Topic whereForumId($value)
+ * @method static Builder<static>|Topic whereId($value)
+ * @method static Builder<static>|Topic whereIsLocked($value)
+ * @method static Builder<static>|Topic whereIsPinned($value)
+ * @method static Builder<static>|Topic whereSlug($value)
+ * @method static Builder<static>|Topic whereTitle($value)
+ * @method static Builder<static>|Topic whereUpdatedAt($value)
+ * @method static Builder<static>|Topic whereViewsCount($value)
  *
  * @mixin \Eloquent
  */
@@ -76,9 +73,16 @@ class Topic extends Model implements Sluggable
         'is_pinned',
         'is_locked',
         'views_count',
-        'replies_count',
-        'last_post_id',
         'last_reply_at',
+    ];
+
+    protected $appends = [
+        'posts_count',
+        'last_reply_at',
+    ];
+
+    protected $touches = [
+        'forum',
     ];
 
     public function generateSlug(): string
@@ -93,17 +97,24 @@ class Topic extends Model implements Sluggable
 
     public function posts(): HasMany
     {
-        return $this->hasMany(Post::class)->where('post_type', 'forum');
+        return $this->hasMany(Post::class)->where('type', 'forum');
     }
 
-    public function replies(): HasMany
+    public function lastPost(): HasOne
     {
-        return $this->posts()->oldest();
+        return $this->hasOne(Post::class)
+            ->ofMany([
+                'id' => 'max',
+            ], function (Builder $query) {
+                $query->where('type', 'forum');
+            });
     }
 
-    public function lastPost(): BelongsTo
+    public function lastReplyAt(): Attribute
     {
-        return $this->belongsTo(Post::class, 'last_post_id');
+        return Attribute::make(
+            get: fn () => $this->lastPost?->created_at
+        )->shouldCache();
     }
 
     public function scopePinned($query)
@@ -124,7 +135,7 @@ class Topic extends Model implements Sluggable
     public function scopeLatestActivity($query)
     {
         return $query->orderByDesc('is_pinned')
-            ->orderByDesc('last_reply_at')
+            ->orderByDesc('updated_at')
             ->orderByDesc('created_at');
     }
 
@@ -133,13 +144,11 @@ class Topic extends Model implements Sluggable
         $this->increment('views_count');
     }
 
-    public function updateLastReply(Post $post): void
+    public function postsCount(): Attribute
     {
-        $this->update([
-            'last_post_id' => $post->id,
-            'last_reply_at' => $post->created_at,
-            'replies_count' => $this->posts()->count(),
-        ]);
+        return Attribute::make(
+            get: fn () => $this->posts()->count(),
+        )->shouldCache();
     }
 
     protected function casts(): array

@@ -18,7 +18,7 @@ use Illuminate\Support\Str;
 
 /**
  * @property int $id
- * @property PostType $post_type
+ * @property PostType $type
  * @property string $title
  * @property string $slug
  * @property string|null $excerpt
@@ -26,12 +26,12 @@ use Illuminate\Support\Str;
  * @property string|null $featured_image
  * @property bool $is_published
  * @property bool $is_featured
+ * @property int|null $topic_id
  * @property array<array-key, mixed>|null $meta
  * @property int $created_by
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property int|null $topic_id
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $approvedComments
  * @property-read int|null $approved_comments_count
  * @property-read User $author
@@ -62,11 +62,11 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereIsFeatured($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereIsPublished($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereMeta($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post wherePostType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post wherePublishedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereTopicId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereUpdatedAt($value)
  *
  * @mixin \Eloquent
@@ -80,7 +80,7 @@ class Post extends Model implements Sluggable
     use HasSlug;
 
     protected $fillable = [
-        'post_type',
+        'type',
         'topic_id',
         'title',
         'excerpt',
@@ -91,6 +91,10 @@ class Post extends Model implements Sluggable
         'published_at',
         'created_by',
         'meta',
+    ];
+
+    protected $touches = [
+        'topic',
     ];
 
     public function generateSlug(): string
@@ -122,12 +126,12 @@ class Post extends Model implements Sluggable
 
     public function scopeBlog($query)
     {
-        return $query->where('post_type', PostType::Blog);
+        return $query->where('type', PostType::Blog);
     }
 
     public function scopeForum($query)
     {
-        return $query->where('post_type', PostType::Forum);
+        return $query->where('type', PostType::Forum);
     }
 
     public function isPublished(): bool
@@ -151,7 +155,7 @@ class Post extends Model implements Sluggable
     protected function casts(): array
     {
         return [
-            'post_type' => PostType::class,
+            'type' => PostType::class,
             'is_published' => 'boolean',
             'is_featured' => 'boolean',
             'published_at' => 'datetime',

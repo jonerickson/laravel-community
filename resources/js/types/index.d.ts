@@ -186,8 +186,7 @@ export interface Topic {
     is_pinned: boolean;
     is_locked: boolean;
     views_count: number;
-    replies_count: number;
-    last_post_id?: number | null;
+    posts_count: number;
     last_reply_at?: string | null;
     forum?: Forum;
     author?: User;

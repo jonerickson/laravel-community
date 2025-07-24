@@ -23,12 +23,9 @@ return new class extends Migration
             $table->boolean('is_pinned')->default(false);
             $table->boolean('is_locked')->default(false);
             $table->integer('views_count')->default(0);
-            $table->integer('replies_count')->default(0);
-            $table->foreignId('last_post_id')->nullable()->constrained('posts')->nullOnDelete();
-            $table->timestamp('last_reply_at')->nullable();
             $table->timestamps();
 
-            $table->index(['forum_id', 'is_pinned', 'last_reply_at']);
+            $table->index(['forum_id', 'is_pinned']);
             $table->index('created_by');
         });
     }

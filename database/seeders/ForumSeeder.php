@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Forum;
+use App\Models\Post;
 use App\Models\Topic;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Sequence;
@@ -46,11 +47,24 @@ class ForumSeeder extends Seeder
             ]);
         }
 
-        Forum::factory()->count(count($forums))->state(new Sequence(...$forums))->create()->each(function (Forum $forum) use ($user) {
-            Topic::factory(5)->create([
-                'forum_id' => $forum->id,
-                'created_by' => $user->id,
-            ]);
-        });
+        Forum::factory()
+            ->count(count($forums))
+            ->state(new Sequence(...$forums))
+            ->create()
+            ->each(function (Forum $forum) use ($user) {
+                Topic::factory(50)
+                    ->for($forum)
+                    ->for($user, 'author')
+                    ->create()
+                    ->each(function (Topic $topic) use ($user) {
+                        Post::factory()
+                            ->published()
+                            ->forum()
+                            ->for($topic)
+                            ->for($user, 'author')
+                            ->count(50)
+                            ->create();
+                    });
+            });
     }
 }

@@ -11,10 +11,12 @@ use App\Models\Post;
 use App\Models\Topic;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class TopicController extends Controller
 {
@@ -30,8 +32,8 @@ class TopicController extends Controller
         return Inertia::render('forums/topic', [
             'forum' => $forum,
             'topic' => $topic->load(['author', 'forum']),
-            'posts' => $posts,
-            'canReply' => Auth::user()?->can('reply', $topic) ?? false,
+            'posts' => Inertia::merge(fn () => $posts->items()),
+            'postsPagination' => Arr::except($posts->toArray(), ['data']),
         ]);
     }
 
@@ -42,6 +44,9 @@ class TopicController extends Controller
         ]);
     }
 
+    /**
+     * @throws Throwable
+     */
     public function store(Request $request, Forum $forum): RedirectResponse
     {
         $validated = $request->validate([
@@ -51,27 +56,19 @@ class TopicController extends Controller
         ]);
 
         $topic = DB::transaction(function () use ($validated, $forum) {
-            $topic = Topic::create([
+            return Topic::create([
                 'title' => $validated['title'],
                 'description' => $validated['description'],
                 'forum_id' => $forum->id,
                 'created_by' => Auth::id(),
-                'last_reply_at' => now(),
-            ]);
-
-            $post = Post::create([
-                'post_type' => PostType::Forum,
-                'topic_id' => $topic->id,
+            ])->posts()->create([
+                'type' => PostType::Forum,
                 'title' => $validated['title'],
                 'content' => $validated['content'],
                 'is_published' => true,
                 'published_at' => now(),
                 'created_by' => Auth::id(),
             ]);
-
-            $topic->updateLastReply($post);
-
-            return $topic;
         });
 
         return redirect()->route('forums.topics.show', [$forum, $topic]);
@@ -83,8 +80,8 @@ class TopicController extends Controller
             'content' => 'required|string',
         ]);
 
-        $post = Post::create([
-            'post_type' => PostType::Forum,
+        Post::create([
+            'type' => PostType::Forum,
             'topic_id' => $topic->id,
             'title' => 'Re: '.$topic->title,
             'content' => $validated['content'],
@@ -92,8 +89,6 @@ class TopicController extends Controller
             'published_at' => now(),
             'created_by' => Auth::id(),
         ]);
-
-        $topic->updateLastReply($post);
 
         return back();
     }

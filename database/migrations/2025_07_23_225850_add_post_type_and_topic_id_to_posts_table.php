@@ -14,10 +14,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->string('post_type')->default('blog')->after('id');
-            $table->foreignId('topic_id')->nullable()->constrained()->nullOnDelete()->after('post_type');
+            $table->string('type')->default('blog')->after('id');
+            $table->foreignId('topic_id')->nullable()->after('is_featured')->constrained()->nullOnDelete();
 
-            $table->index(['post_type', 'topic_id']);
+            $table->index(['type', 'topic_id']);
         });
     }
 
@@ -28,8 +28,8 @@ return new class extends Migration
     {
         Schema::table('posts', function (Blueprint $table) {
             $table->dropForeign(['topic_id']);
-            $table->dropIndex(['post_type', 'topic_id']);
-            $table->dropColumn(['post_type', 'topic_id']);
+            $table->dropIndex(['type', 'topic_id']);
+            $table->dropColumn(['type', 'topic_id']);
         });
     }
 };

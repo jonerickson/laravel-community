@@ -19,7 +19,7 @@ use Illuminate\Support\Str;
  * @property string|null $description
  * @property string|null $icon
  * @property string $color
- * @property int $sort_order
+ * @property int $order
  * @property bool $is_active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -42,8 +42,8 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Forum whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Forum whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Forum whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Forum whereOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Forum whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Forum whereSortOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Forum whereUpdatedAt($value)
  *
  * @mixin \Eloquent
@@ -74,7 +74,7 @@ class Forum extends Model implements Sluggable
 
     public function latestTopics(): HasMany
     {
-        return $this->topics()->latest('last_reply_at');
+        return $this->topics()->latest();
     }
 
     public function scopeActive($query)

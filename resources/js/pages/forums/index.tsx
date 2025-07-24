@@ -83,7 +83,7 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
                                                             </div>
                                                             <div className="flex items-center gap-1">
                                                                 <MessageSquare className="h-3 w-3" />
-                                                                <span>{topic.replies_count}</span>
+                                                                <span>{topic.posts_count}</span>
                                                             </div>
                                                         </div>
                                                     </div>
