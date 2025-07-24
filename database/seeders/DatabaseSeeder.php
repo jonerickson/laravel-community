@@ -10,13 +10,10 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\User;
 use BezhanSalleh\FilamentShield\Support\Utils;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     public function run(): void
     {
         $this->call([
@@ -45,6 +42,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             PostSeeder::class,
+            ForumSeeder::class,
         ]);
     }
 }

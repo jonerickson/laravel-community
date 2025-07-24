@@ -44,7 +44,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereUserId($value)
  *
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class Comment extends Model
 {

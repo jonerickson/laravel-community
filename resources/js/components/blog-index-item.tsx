@@ -17,7 +17,7 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
     });
 
     return (
-        <Link href={route('blog.show', { post: post.id })}>
+        <Link href={route('blog.show', { post: post.slug })}>
             <article className="flex flex-col items-start justify-between">
                 <div className="relative w-full">
                     {post.featured_image ? (

@@ -34,7 +34,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Forums',
-        href: '/dashboard',
+        href: '/forums',
         icon: LibraryBig,
     },
 ];

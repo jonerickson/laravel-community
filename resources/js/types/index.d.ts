@@ -80,7 +80,7 @@ export interface ProductPrice {
     is_active: boolean;
     is_default: boolean;
     description?: string | null;
-    metadata?: Record<string, any> | null;
+    metadata?: Record<string, never> | null;
     created_at: string;
     updated_at: string;
 }
@@ -121,7 +121,7 @@ export interface Post {
     is_featured: boolean;
     published_at?: string | null;
     created_by: number;
-    meta?: Record<string, any> | null;
+    meta?: Record<string, never> | null;
     reading_time?: number;
     author?: User;
     comments?: Comment[];
@@ -156,6 +156,43 @@ export interface Comment {
     user?: User;
     parent?: Comment;
     replies?: Comment[];
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Forum {
+    id: number;
+    name: string;
+    slug: string;
+    description?: string | null;
+    icon?: string | null;
+    color: string;
+    order: number;
+    is_active: boolean;
+    topics_count?: number;
+    posts_count?: number;
+    latest_topics?: Topic[];
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Topic {
+    id: number;
+    title: string;
+    slug: string;
+    description?: string | null;
+    forum_id: number;
+    created_by: number;
+    is_pinned: boolean;
+    is_locked: boolean;
+    views_count: number;
+    replies_count: number;
+    last_post_id?: number | null;
+    last_reply_at?: string | null;
+    forum?: Forum;
+    author?: User;
+    last_post?: Post;
+    posts?: Post[];
     created_at: string;
     updated_at: string;
 }

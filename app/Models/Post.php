@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\Sluggable;
+use App\Enums\PostType;
 use App\Traits\HasAuthor;
 use App\Traits\HasComments;
 use App\Traits\HasFeaturedImage;
@@ -12,10 +13,12 @@ use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
 /**
  * @property int $id
+ * @property PostType $post_type
  * @property string $title
  * @property string $slug
  * @property string|null $excerpt
@@ -23,11 +26,12 @@ use Illuminate\Support\Str;
  * @property string|null $featured_image
  * @property bool $is_published
  * @property bool $is_featured
- * @property \Illuminate\Support\Carbon|null $published_at
- * @property int $created_by
  * @property array<array-key, mixed>|null $meta
+ * @property int $created_by
+ * @property \Illuminate\Support\Carbon|null $published_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $topic_id
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $approvedComments
  * @property-read int|null $approved_comments_count
  * @property-read User $author
@@ -38,9 +42,12 @@ use Illuminate\Support\Str;
  * @property-read int $reading_time
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $topLevelComments
  * @property-read int|null $top_level_comments_count
+ * @property-read Topic|null $topic
  *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Post blog()
  * @method static \Database\Factories\PostFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post featured()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Post forum()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post published()
@@ -55,9 +62,11 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereIsFeatured($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereIsPublished($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereMeta($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Post wherePostType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post wherePublishedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereTopicId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereUpdatedAt($value)
  *
  * @mixin \Eloquent
@@ -71,6 +80,8 @@ class Post extends Model implements Sluggable
     use HasSlug;
 
     protected $fillable = [
+        'post_type',
+        'topic_id',
         'title',
         'excerpt',
         'content',
@@ -85,6 +96,11 @@ class Post extends Model implements Sluggable
     public function generateSlug(): string
     {
         return Str::slug($this->title);
+    }
+
+    public function topic(): BelongsTo
+    {
+        return $this->belongsTo(Topic::class);
     }
 
     public function scopePublished($query)
@@ -102,6 +118,16 @@ class Post extends Model implements Sluggable
     public function scopeRecent($query)
     {
         return $query->orderBy('published_at', 'desc');
+    }
+
+    public function scopeBlog($query)
+    {
+        return $query->where('post_type', PostType::Blog);
+    }
+
+    public function scopeForum($query)
+    {
+        return $query->where('post_type', PostType::Forum);
     }
 
     public function isPublished(): bool
@@ -125,6 +151,7 @@ class Post extends Model implements Sluggable
     protected function casts(): array
     {
         return [
+            'post_type' => PostType::class,
             'is_published' => 'boolean',
             'is_featured' => 'boolean',
             'published_at' => 'datetime',
