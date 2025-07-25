@@ -298,7 +298,6 @@ export default function PaymentMethods() {
                         </Button>
                     </div>
 
-                    {/* Credit Cards Section */}
                     {cards.length > 0 && (
                         <div className="space-y-4">
                             <h3 className="text-lg font-semibold">Credit & Debit Cards</h3>
@@ -320,7 +319,6 @@ export default function PaymentMethods() {
                         </div>
                     )}
 
-                    {/* Alternative Payment Methods Section */}
                     {alternativeMethods.length > 0 && (
                         <div className="space-y-4">
                             <h3 className="text-lg font-semibold">Digital Wallets & Alternative Methods</h3>
@@ -339,7 +337,6 @@ export default function PaymentMethods() {
                         </div>
                     )}
 
-                    {/* Add New Payment Method Section */}
                     <Card>
                         <CardHeader>
                             <CardTitle>Add a new payment method</CardTitle>
