@@ -23,7 +23,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-// Mock data - replace with actual Stripe data
 const mockPaymentMethods = [
     {
         id: 'pm_1',
