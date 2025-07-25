@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
+use Laravel\Scout\Searchable;
 
 /**
  * @property int $id
@@ -93,6 +94,7 @@ class Post extends Model implements Sluggable
     use HasMetadata;
     use HasSlug;
     use HasUrl;
+    use Searchable;
 
     protected $fillable = [
         'type',
@@ -163,6 +165,31 @@ class Post extends Model implements Sluggable
             PostType::Blog => route('blog.show', $this),
             PostType::Forum => route('forums.show', $this),
         };
+    }
+
+    public function toSearchableArray(): array
+    {
+        $searchable = [
+            'id' => $this->id,
+            'title' => $this->title,
+            'content' => strip_tags($this->content ?? ''),
+            'excerpt' => $this->excerpt,
+            'type' => $this->type->value ?? '',
+            //            'author_name' => $this->author?->name ?? '',
+            'created_at' => $this->created_at?->toDateTimeString() ?? '',
+        ];
+
+        if ($this->type === PostType::Forum && $this->topic) {
+            //            $searchable['topic_title'] = $this->topic->title;
+            //            $searchable['forum_name'] = $this->topic->forum?->name ?? '';
+        }
+
+        return $searchable;
+    }
+
+    public function shouldBeSearchable(): bool
+    {
+        return $this->is_published;
     }
 
     protected function readingTime(): Attribute

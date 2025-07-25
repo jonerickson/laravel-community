@@ -8,10 +8,12 @@ use App\Contracts\Sluggable;
 use App\Traits\HasAuthor;
 use App\Traits\HasOrder;
 use App\Traits\HasSlug;
+use App\Traits\HasUrl;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
+use Laravel\Scout\Searchable;
 
 /**
  * @property int $id
@@ -30,6 +32,7 @@ use Illuminate\Support\Str;
  * @property-read mixed $author_name
  * @property-read PolicyCategory $category
  * @property-read User $creator
+ * @property-read string|null $url
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy active()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy effective()
@@ -59,6 +62,8 @@ class Policy extends Model implements Sluggable
     use HasFactory;
     use HasOrder;
     use HasSlug;
+    use HasUrl;
+    use Searchable;
 
     protected $fillable = [
         'title',
@@ -90,6 +95,30 @@ class Policy extends Model implements Sluggable
             $q->whereNull('effective_date')
                 ->orWhere('effective_date', '<=', now());
         });
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'content' => strip_tags($this->content ?? ''),
+            'version' => $this->version,
+            //            'category_name' => $this->category?->name ?? '',
+            //            'author_name' => $this->author?->name ?? '',
+            'effective_date' => $this->effective_date?->toDateTimeString(),
+            'created_at' => $this->created_at?->toDateTimeString() ?? '',
+        ];
+    }
+
+    public function shouldBeSearchable(): bool
+    {
+        return $this->is_active && ($this->effective_date === null || $this->effective_date->isPast());
+    }
+
+    public function getUrl(): ?string
+    {
+        return route('policies.show', [$this->category->slug, $this->slug]);
     }
 
     protected function casts(): array

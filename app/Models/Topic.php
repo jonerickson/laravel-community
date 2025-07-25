@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
+use Laravel\Scout\Searchable;
 
 /**
  * @property int $id
@@ -70,6 +71,7 @@ class Topic extends Model implements Sluggable
     use HasFactory;
     use HasReads;
     use HasSlug;
+    use Searchable;
 
     protected $fillable = [
         'title',
@@ -192,6 +194,20 @@ class Topic extends Model implements Sluggable
                 return $totalScore >= 10;
             }
         )->shouldCache();
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'description' => $this->description,
+            //            'forum' => [
+            //                'name' => $this->forum?->name ?? ''
+            //            ],
+            //            'author_name' => $this->author?->name ?? '',
+            'created_at' => $this->created_at?->toDateTimeString() ?? '',
+        ];
     }
 
     protected function casts(): array

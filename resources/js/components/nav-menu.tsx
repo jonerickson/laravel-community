@@ -1,9 +1,10 @@
-import ShoppingCart from '@/components/shopping-cart';
+import { GlobalSearch } from '@/components/global-search';
 
 export function NavMenu() {
     return (
         <div className="flex items-center">
-            <ShoppingCart />
+            <GlobalSearch />
+            {/*<ShoppingCart />*/}
         </div>
     );
 }
