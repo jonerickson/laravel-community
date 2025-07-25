@@ -1,7 +1,7 @@
+import { EmptyState } from '@/components/empty-state';
 import ForumTopicPost from '@/components/forum-topic-post';
 import ForumTopicReply from '@/components/forum-topic-reply';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import { Pagination } from '@/components/ui/pagination';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Forum, PaginatedData, Post, Topic } from '@/types';
@@ -134,13 +134,13 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                 )}
 
                 {posts.length === 0 && (
-                    <Card>
-                        <CardContent className="flex flex-col items-center justify-center py-12">
-                            <MessageSquare className="mb-4 h-12 w-12 text-muted-foreground" />
-                            <CardTitle className="mb-2">No Posts Yet</CardTitle>
-                            <CardDescription>This topic doesn't have any posts yet.</CardDescription>
-                        </CardContent>
-                    </Card>
+                    <div className="mt-2">
+                        <EmptyState
+                            icon={<MessageSquare className="h-12 w-12" />}
+                            title="No posts yet"
+                            description="This topic doesn't have any posts yet."
+                        />
+                    </div>
                 )}
 
                 {!topic.is_locked && posts.length > 0 && (
