@@ -9,6 +9,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Forums\ForumController;
 use App\Http\Controllers\Forums\ReadController as TopicReadController;
 use App\Http\Controllers\Forums\TopicController;
+use App\Http\Controllers\Policies\CategoryController as PolicyCategoryController;
+use App\Http\Controllers\Policies\PolicyController;
 use App\Http\Controllers\Posts\LikeController as PostLikeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -20,6 +22,10 @@ Route::get('/', function () {
 Route::get('/forums', [ForumController::class, 'index'])->name('forums.index');
 Route::get('/forums/{forum:slug}', [ForumController::class, 'show'])->name('forums.show');
 Route::get('/forums/{forum:slug}/{topic:slug}', [TopicController::class, 'show'])->name('forums.topics.show');
+
+Route::get('/policies', [PolicyCategoryController::class, 'index'])->name('policies.index');
+Route::get('/policies/{category:slug}', [PolicyCategoryController::class, 'show'])->name('policies.categories.show');
+Route::get('/policies/{category:slug}/{policy:slug}', [PolicyController::class, 'show'])->name('policies.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');

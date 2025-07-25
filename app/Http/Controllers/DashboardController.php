@@ -13,7 +13,7 @@ class DashboardController
     public function __invoke(): Response
     {
         return Inertia::render('dashboard', [
-            'announcements' => Announcement::current()->get(),
+            'announcements' => Announcement::current()->latest()->get(),
         ]);
     }
 }

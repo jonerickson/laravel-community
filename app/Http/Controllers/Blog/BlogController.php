@@ -29,6 +29,8 @@ class BlogController extends Controller
 
     public function show(Request $request, Post $post): Response
     {
+        abort_if(! $post->is_published, 404);
+
         $perPage = $request->input('per_page', 10);
 
         $comments = $post->approvedComments()->with(['author', 'replies', 'replies.author', 'parent'])->latest()->paginate(

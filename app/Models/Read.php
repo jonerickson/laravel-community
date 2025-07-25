@@ -32,7 +32,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Read whereReadableType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Read whereUpdatedAt($value)
  *
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class Read extends Model
 {

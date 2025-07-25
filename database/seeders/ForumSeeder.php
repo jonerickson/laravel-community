@@ -39,29 +39,23 @@ class ForumSeeder extends Seeder
             ],
         ];
 
-        $user = User::first();
-        if (! $user) {
-            $user = User::factory()->create([
-                'name' => 'Forum Admin',
-                'email' => 'admin@example.com',
-            ]);
-        }
+        $author = User::first() ?? User::factory();
 
         Forum::factory()
             ->count(count($forums))
             ->state(new Sequence(...$forums))
             ->create()
-            ->each(function (Forum $forum) use ($user) {
+            ->each(function (Forum $forum) use ($author) {
                 Topic::factory(5)
                     ->for($forum)
-                    ->for($user, 'author')
+                    ->for($author, 'author')
                     ->create()
-                    ->each(function (Topic $topic) use ($user) {
+                    ->each(function (Topic $topic) use ($author) {
                         Post::factory()
                             ->published()
                             ->forum()
                             ->for($topic)
-                            ->for($user, 'author')
+                            ->for($author, 'author')
                             ->count(10)
                             ->create();
                     });

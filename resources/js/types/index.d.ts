@@ -215,3 +215,35 @@ export interface Topic {
     created_at: string;
     updated_at: string;
 }
+
+export interface PolicyCategory {
+    id: number;
+    name: string;
+    slug: string;
+    description?: string | null;
+    is_active: boolean;
+    order: number;
+    active_policies?: Policy[];
+    created_by: number;
+    author?: User;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Policy {
+    id: number;
+    title: string;
+    slug: string;
+    description?: string | null;
+    content: string;
+    version?: string | null;
+    is_active: boolean;
+    effective_date?: string | null;
+    order: number;
+    policy_category_id: number;
+    category?: PolicyCategory;
+    created_by: number;
+    author?: User;
+    created_at: string;
+    updated_at: string;
+}

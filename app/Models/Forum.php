@@ -26,6 +26,7 @@ use Illuminate\Support\Str;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Topic> $latestTopics
  * @property-read int|null $latest_topics_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Post> $posts
  * @property-read int $posts_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Topic> $topics
  * @property-read int $topics_count

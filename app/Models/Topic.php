@@ -33,6 +33,7 @@ use Illuminate\Support\Str;
  * @property-read mixed $author_name
  * @property-read User $creator
  * @property-read Forum $forum
+ * @property-read bool $is_hot
  * @property-read bool $is_read_by_user
  * @property-read Post|null $lastPost
  * @property-read mixed $last_reply_at

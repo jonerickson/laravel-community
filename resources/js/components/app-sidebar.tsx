@@ -94,8 +94,8 @@ const adminNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Legal',
-        href: 'https://github.com/laravel/react-starter-kit',
+        title: 'Policies',
+        href: '/policies',
         icon: Folder,
     },
     {

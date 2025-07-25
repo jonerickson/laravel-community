@@ -14,10 +14,10 @@ class LikeController extends Controller
     public function __invoke(Request $request, Post $post): JsonResponse
     {
         $request->validate([
-            'emoji' => 'required|string|max:10',
+            'emoji' => 'required|string|max:50',
         ]);
 
-        $result = $post->toggleLike($request->emoji);
+        $result = $post->toggleLike($request->input('emoji'));
 
         return response()->json([
             'success' => true,

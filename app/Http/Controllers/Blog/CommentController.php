@@ -13,6 +13,8 @@ class CommentController extends Controller
 {
     public function store(Request $request, Post $post): RedirectResponse
     {
+        abort_if(! $post->is_published, 404);
+
         $validated = $request->validate([
             'content' => 'required|string',
             'parent_id' => 'nullable|int',
