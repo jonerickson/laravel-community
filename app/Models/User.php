@@ -12,7 +12,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spark\Billable;
+use Laravel\Cashier\Billable;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -34,7 +34,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $billing_state
  * @property string|null $billing_postal_code
  * @property string|null $vat_id
- * @property array $invoice_emails
+ * @property string|null $invoice_emails
  * @property string|null $billing_country
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
