@@ -38,6 +38,10 @@ class ProductResource extends Resource
                             ->required()
                             ->options(ProductType::class)
                             ->default(ProductType::Product->value),
+                        Forms\Components\Toggle::make('is_featured')
+                            ->label('Featured Product')
+                            ->helperText('Mark this product as featured to display it prominently on the store page.')
+                            ->columnSpanFull(),
                         Forms\Components\TextInput::make('name')
                             ->helperText('The product name.')
                             ->required()
@@ -110,6 +114,10 @@ class ProductResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type')
                     ->badge(),
+                Tables\Columns\IconColumn::make('is_featured')
+                    ->label('Featured')
+                    ->boolean()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('categories.name')
                     ->badge()
                     ->searchable()
@@ -154,6 +162,9 @@ class ProductResource extends Resource
                 Tables\Filters\Filter::make('without_stripe')
                     ->label('Not Linked to Stripe')
                     ->query(fn (Builder $query): Builder => $query->withoutStripeProduct()),
+                Tables\Filters\Filter::make('featured')
+                    ->label('Featured Products')
+                    ->query(fn (Builder $query): Builder => $query->featured()),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

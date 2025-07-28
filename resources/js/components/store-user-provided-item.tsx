@@ -1,17 +1,10 @@
 import HeadingSmall from '@/components/heading-small';
+import { Product } from '@/types';
 import { Link } from '@inertiajs/react';
 
-export interface StoreUserProvidedItem {
-    id: number;
-    name: string;
-    description: string;
-    imageUrl: string;
-    imageAlt?: string;
-}
-
-export default function StoreUserProvidedItem({ item }: { item: StoreUserProvidedItem }) {
+export default function StoreUserProvidedItem({ item }: { item: Product }) {
     return (
-        <Link href={route('store.products.view', { id: item.id })} key={item.name} className="group relative">
+        <Link href={route('store.products.show', { slug: item.slug })} key={item.name} className="group relative">
             <img
                 alt={item.imageAlt}
                 src={item.imageUrl}

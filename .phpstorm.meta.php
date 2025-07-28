@@ -2661,11 +2661,11 @@ namespace PHPSTORM_META {
     override(\tap(0), type(0));
     override(\optional(0), type(0));
 
-            registerArgumentsSet('auth', 
+            registerArgumentsSet('auth',
 'viewAny','view','create','update','delete',
 'deleteAny','forceDelete','forceDeleteAny','restore','restoreAny',
 'replicate','reorder','denyWithStatus','denyAsNotFound',);
-        registerArgumentsSet('configs', 
+        registerArgumentsSet('configs',
 'app.name','app.env','app.debug','app.url','app.frontend_url',
 'app.asset_url','app.timezone','app.locale','app.fallback_locale','app.faker_locale',
 'app.cipher','app.key','app.previous_keys','app.maintenance.driver','app.maintenance.store',
@@ -2778,11 +2778,11 @@ namespace PHPSTORM_META {
 'ide-helper.type_overrides.integer','ide-helper.type_overrides.boolean','ide-helper.include_class_docblocks','ide-helper.force_fqn','ide-helper.use_generics_annotations',
 'ide-helper.additional_relation_types','ide-helper.additional_relation_return_types','ide-helper.enforce_nullable_relationships','ide-helper.post_migrate','ide-helper.macroable_traits',
 'tinker.commands','tinker.alias','tinker.dont_alias',);
-        registerArgumentsSet('middleware', 
+        registerArgumentsSet('middleware',
 'web','api','auth','auth.basic','auth.session',
 'cache.headers','can','guest','password.confirm','precognitive',
 'signed','throttle','verified',);
-        registerArgumentsSet('routes', 
+        registerArgumentsSet('routes',
 'filament.exports.download','filament.imports.failed-rows.download','filament.admin.auth.logout','filament.admin.pages.dashboard','filament.admin.resources.announcements.index',
 'filament.admin.resources.announcements.create','filament.admin.resources.announcements.view','filament.admin.resources.announcements.edit','filament.admin.resources.policy-categories.index','filament.admin.resources.policy-categories.create',
 'filament.admin.resources.policy-categories.edit','filament.admin.resources.policies.index','filament.admin.resources.policies.create','filament.admin.resources.policies.edit','filament.admin.resources.posts.index',
@@ -2795,11 +2795,11 @@ namespace PHPSTORM_META {
 'blog.show','blog.comments.store','forums.topics.create','forums.topics.store','forums.topics.reply',
 'forums.topics.read','posts.like','comments.like','profile.edit',
 'profile.update','profile.destroy','profile.billing','profile.invoices','profile.payment-methods',
-'appearance','store.categories','store.products.view','store.subscriptions','register','login','password.request','password.email',
+'appearance','store.categories','store.products.show','store.subscriptions','register','login','password.request','password.email',
 'password.reset','password.store','oauth.redirect','oauth.callback','verification.notice',
 'verification.verify','verification.send','password.confirm','logout',
 'storage.local',);
-        registerArgumentsSet('views', 
+        registerArgumentsSet('views',
 'app','filament.admin.pages.dashboard','filament.components.head','filament.components.logo','vendor.spark.app',
 'vendor.spark.mail.confirm_payment','vendor.spark.mail.invoice','cashier::invoice','cashier::payment','filament-actions::badge-action',
 'filament-actions::badge-group','filament-actions::button-action','filament-actions::button-group','filament-actions::components.action','filament-actions::components.actions',
@@ -2858,7 +2858,7 @@ namespace PHPSTORM_META {
 'livewire::simple-bootstrap','livewire::simple-tailwind','livewire::tailwind','notifications::email','pagination::bootstrap-4',
 'pagination::bootstrap-5','pagination::default','pagination::semantic-ui','pagination::simple-bootstrap-4','pagination::simple-bootstrap-5',
 'pagination::simple-default','pagination::simple-tailwind','pagination::tailwind',);
-        registerArgumentsSet('translations', 
+        registerArgumentsSet('translations',
 'auth.failed','auth.password','auth.throttle','pagination.previous','pagination.next',
 'passwords.reset','passwords.sent','passwords.throttled','passwords.token','passwords.user',
 'validation.accepted','validation.accepted_if','validation.active_url','validation.after','validation.after_or_equal',
@@ -2965,7 +2965,7 @@ namespace PHPSTORM_META {
 'filament-tables::table.grouping.fields.group.placeholder','filament-tables::table.grouping.fields.direction.label','filament-tables::table.grouping.fields.direction.options.asc','filament-tables::table.grouping.fields.direction.options.desc','filament-tables::table.reorder_indicator',
 'filament-tables::table.selection_indicator.selected_count','filament-tables::table.selection_indicator.actions.select_all.label','filament-tables::table.selection_indicator.actions.deselect_all.label','filament-tables::table.sorting.fields.column.label','filament-tables::table.sorting.fields.direction.label',
 'filament-tables::table.sorting.fields.direction.options.asc','filament-tables::table.sorting.fields.direction.options.desc',);
-        registerArgumentsSet('env', 
+        registerArgumentsSet('env',
 'APP_NAME','APP_ENV','APP_KEY','APP_DEBUG','APP_URL',
 'APP_LOCALE','APP_FALLBACK_LOCALE','APP_FAKER_LOCALE','APP_MAINTENANCE_DRIVER','AWS_ACCESS_KEY_ID',
 'AWS_SECRET_ACCESS_KEY','AWS_DEFAULT_REGION','AWS_BUCKET','AWS_USE_PATH_STYLE_ENDPOINT','BCRYPT_ROUNDS',
@@ -2977,7 +2977,7 @@ namespace PHPSTORM_META {
 'MEMCACHED_HOST','REDIS_CLIENT','REDIS_HOST','REDIS_PASSWORD','REDIS_PORT',
 'SESSION_DRIVER','SESSION_LIFETIME','SESSION_ENCRYPT','SESSION_PATH','SESSION_DOMAIN',
 'STRIPE_KEY','STRIPE_SECRET','STRIPE_WEBHOOK_SECRET','PHP_CLI_SERVER_WORKERS','VITE_APP_NAME',);
-        
+
                 expectedArguments(\Illuminate\Support\Facades\Gate::has(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Support\Facades\Gate::allows(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Support\Facades\Gate::denies(), 0, argumentsSet('auth'));
@@ -3041,5 +3041,5 @@ namespace PHPSTORM_META {
                 expectedArguments(\Illuminate\Contracts\Translation\Translator::get(), 0, argumentsSet('translations'));
                 expectedArguments(\env(), 0, argumentsSet('env'));
                 expectedArguments(\Illuminate\Support\Env::get(), 0, argumentsSet('env'));
-            
+
 }

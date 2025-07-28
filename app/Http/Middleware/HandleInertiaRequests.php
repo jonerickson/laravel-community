@@ -7,6 +7,7 @@ namespace App\Http\Middleware;
 use BezhanSalleh\FilamentShield\Support\Utils;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
 
@@ -36,6 +37,14 @@ class HandleInertiaRequests extends Middleware
                 'location' => $request->url(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'cartCount' => $this->getCartCount(),
         ];
+    }
+
+    private function getCartCount(): int
+    {
+        $cart = Session::get('shopping_cart', []);
+
+        return collect($cart)->sum('quantity');
     }
 }

@@ -24,6 +24,7 @@ use Illuminate\Support\Str;
  * @property string $slug
  * @property string $description
  * @property ProductType $type
+ * @property bool $is_featured
  * @property string|null $featured_image
  * @property string|null $stripe_product_id
  * @property array<array-key, mixed>|null $metadata
@@ -56,9 +57,11 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|Product whereSlug($value)
  * @method static Builder<static>|Product whereStripeProductId($value)
  * @method static Builder<static>|Product whereType($value)
+ * @method static Builder<static>|Product whereIsFeatured($value)
  * @method static Builder<static>|Product whereUpdatedAt($value)
  * @method static Builder<static>|Product withStripeProduct()
  * @method static Builder<static>|Product withoutStripeProduct()
+ * @method static Builder<static>|Product featured()
  *
  * @mixin \Eloquent
  */
@@ -74,6 +77,7 @@ class Product extends Model implements Sluggable
         'name',
         'description',
         'type',
+        'is_featured',
         'stripe_product_id',
         'files',
     ];
@@ -144,6 +148,11 @@ class Product extends Model implements Sluggable
     public function scopeWithoutStripeProduct($query)
     {
         return $query->whereNull('stripe_product_id');
+    }
+
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
     }
 
     protected function casts(): array

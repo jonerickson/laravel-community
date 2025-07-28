@@ -2,7 +2,10 @@ import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import type { Product as ProductType } from '@/types';
+import axios from 'axios';
 import { CurrencyIcon, GlobeIcon, StarIcon } from 'lucide-react';
+import { useState } from 'react';
 
 const product = {
     name: 'Basic Tee',
@@ -57,13 +60,45 @@ const policies = [
     { name: 'Loyalty rewards', icon: CurrencyIcon, description: "Don't look at other tees" },
 ];
 
-export default function Product() {
+interface ProductProps {
+    product?: ProductType;
+}
+
+export default function Product({ product: productData }: ProductProps) {
+    const [isAddingToCart, setIsAddingToCart] = useState(false);
+    const [quantity, setQuantity] = useState(1);
+
+    const addToCart = async () => {
+        if (!productData) return;
+
+        setIsAddingToCart(true);
+        try {
+            const response = await axios.post(route('store.cart.store'), {
+                product_id: productData.id,
+                quantity: quantity,
+            });
+
+            window.dispatchEvent(
+                new CustomEvent('cart-updated', {
+                    detail: {
+                        cartCount: response.data.data.cartCount,
+                        cartItems: response.data.data.cartItems
+                    },
+                }),
+            );
+        } catch (error) {
+            console.error('Failed to add to cart:', error);
+        } finally {
+            setIsAddingToCart(false);
+        }
+    };
+
     return (
         <div className="sm:flex sm:items-baseline sm:justify-between">
             <div className="lg:grid lg:auto-rows-min lg:grid-cols-12 lg:gap-x-8">
                 <div className="lg:col-span-5 lg:col-start-8">
                     <div className="flex justify-between">
-                        <Heading title={product.name} description={product.price} />
+                        <Heading title={productData?.name || product.name} description={productData ? 'Price TBD' : product.price} />
                     </div>
                     <div>
                         <h2 className="sr-only">Reviews</h2>
@@ -89,23 +124,61 @@ export default function Product() {
                     <h2 className="sr-only">Images</h2>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-3 lg:gap-8">
-                        {product.images.map((image) => (
-                            <img
-                                key={image.id}
-                                alt={image.imageAlt}
-                                src={image.imageSrc}
-                                className={cn(image.primary ? 'lg:col-span-2 lg:row-span-2' : 'hidden lg:block', 'rounded-lg')}
-                            />
-                        ))}
+                        {productData?.featured_image_url ? (
+                            <img alt={productData.name} src={productData.featured_image_url} className="col-span-2 row-span-2 rounded-lg" />
+                        ) : (
+                            product.images.map((image) => (
+                                <img
+                                    key={image.id}
+                                    alt={image.imageAlt}
+                                    src={image.imageSrc}
+                                    className={cn(image.primary ? 'lg:col-span-2 lg:row-span-2' : 'hidden lg:block', 'rounded-lg')}
+                                />
+                            ))
+                        )}
                     </div>
                 </div>
 
                 <div className="mt-8 lg:col-span-5">
                     <HeadingSmall title="Description" />
-                    <div dangerouslySetInnerHTML={{ __html: product.description }} className="mt-4 space-y-4 text-sm/6 text-muted-foreground" />
+                    <div
+                        dangerouslySetInnerHTML={{
+                            __html: productData?.description || product.description,
+                        }}
+                        className="mt-4 space-y-4 text-sm/6 text-muted-foreground"
+                    />
 
-                    <form>
-                        <Button className="mt-8 flex w-full items-center justify-center">Add to cart</Button>
+                    {productData && (
+                        <div className="mt-6">
+                            <div className="flex items-center gap-4">
+                                <label htmlFor="quantity" className="text-sm font-medium">
+                                    Quantity:
+                                </label>
+                                <select
+                                    id="quantity"
+                                    value={quantity}
+                                    onChange={(e) => setQuantity(parseInt(e.target.value))}
+                                    className="rounded-md border border-gray-300 px-3 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                                >
+                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                                        <option key={num} value={num}>
+                                            {num}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                    )}
+
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            addToCart();
+                        }}
+                    >
+                        <Button type="submit" disabled={isAddingToCart || !productData} className="mt-8 flex w-full items-center justify-center">
+                            {isAddingToCart ? 'Adding...' : 'Add to cart'}
+                        </Button>
                     </form>
 
                     <div className="mt-8 border-t border-accent pt-8"></div>

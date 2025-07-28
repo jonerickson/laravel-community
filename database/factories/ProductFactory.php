@@ -24,6 +24,7 @@ class ProductFactory extends Factory
             'slug' => Str::slug($name),
             'description' => $this->faker->paragraph(),
             'type' => $type,
+            'is_featured' => $this->faker->boolean(0.2),
             'stripe_product_id' => $this->faker->optional(0.6)->regexify('prod_[A-Za-z0-9]{14}'),
             'featured_image' => $this->faker->optional(0.8)->imageUrl(800, 600, 'products'),
         ];
@@ -58,6 +59,20 @@ class ProductFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'stripe_product_id' => null,
+        ]);
+    }
+
+    public function featured(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_featured' => true,
+        ]);
+    }
+
+    public function notFeatured(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_featured' => false,
         ]);
     }
 }

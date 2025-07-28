@@ -70,7 +70,7 @@ const storeNavItems: NavItem[] = [
     },
     {
         title: 'Subscriptions',
-        href: '/subscriptions',
+        href: '/store/subscriptions',
         icon: CalendarSync,
     },
     {

@@ -38,6 +38,7 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    cartCount?: number;
     [key: string]: unknown;
 }
 
@@ -58,6 +59,7 @@ export interface Product {
     slug: string;
     description: string;
     type: 'product' | 'subscription';
+    is_featured: boolean;
     featured_image?: string | null;
     featured_image_url?: string | null;
     stripe_product_id?: string | null;
@@ -246,4 +248,16 @@ export interface Policy {
     author?: User;
     created_at: string;
     updated_at: string;
+}
+
+export interface ApiResponse<T = any> {
+    success: boolean;
+    message: string;
+    data: T;
+    meta: {
+        timestamp: string;
+        version: string;
+        [key: string]: any;
+    };
+    errors?: any[] | null;
 }
