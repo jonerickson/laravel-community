@@ -1,5 +1,7 @@
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Comment, Post } from '@/types';
+import { ApiError, apiRequest } from '@/utils/api';
 import axios from 'axios';
 import { useState } from 'react';
 
@@ -63,14 +65,14 @@ export default function EmojiReactions({ post, comment, initialReactions = [], u
         try {
             const url = post ? route('posts.like', { post: post.slug }) : route('comments.like', { comment: comment?.id });
 
-            const response = await axios.post(url, { emoji });
+            const data = await apiRequest(axios.post(url, { emoji }));
 
-            if (response.data.success) {
-                setReactions(response.data.likes_summary || []);
-                setCurrentUserReactions(response.data.user_reactions || []);
-            }
+            setReactions(data.likes_summary || []);
+            setCurrentUserReactions(data.user_reactions || []);
         } catch (error) {
             console.error('Error toggling reaction:', error);
+            const apiError = error as ApiError;
+            console.error('API Error:', apiError.message);
 
             setReactions(initialReactions);
             setCurrentUserReactions(userReactions);
@@ -113,20 +115,39 @@ export default function EmojiReactions({ post, comment, initialReactions = [], u
                     const hasReactions = count > 0;
                     const isActive = currentUserReactions.includes(emoji);
 
+                    const renderTooltipContent = () => {
+                        if (!reaction?.users.length) {
+                            return <p>React with {emoji}</p>;
+                        }
+
+                        const displayUsers = reaction.users.slice(0, 5);
+                        const remainingCount = reaction.users.length - displayUsers.length;
+
+                        return (
+                            <div className="space-y-1">
+                                <div className="text-xs">
+                                    {displayUsers.map((user, index) => (
+                                        <div key={index}>{user}</div>
+                                    ))}
+                                    {remainingCount > 0 && <div className="text-muted-foreground">+{remainingCount} more</div>}
+                                </div>
+                            </div>
+                        );
+                    };
+
                     return (
-                        <ToggleGroupItem
-                            key={emoji}
-                            value={emoji}
-                            className={`px-2 py-1 text-sm transition-all hover:scale-105 ${hasReactions || isActive ? 'opacity-100' : 'opacity-60'}`}
-                            title={
-                                reaction?.users.length
-                                    ? `${reaction.users.join(', ')}${reaction.users.length > 3 ? ' and others' : ''}`
-                                    : `React with ${emoji}`
-                            }
-                        >
-                            <span className="mr-1">{emoji}</span>
-                            {hasReactions && <span className="text-xs font-medium">{count}</span>}
-                        </ToggleGroupItem>
+                        <Tooltip key={emoji}>
+                            <TooltipTrigger asChild>
+                                <ToggleGroupItem
+                                    value={emoji}
+                                    className={`px-2 py-1 text-sm transition-all hover:scale-105 ${hasReactions || isActive ? 'opacity-100' : 'opacity-60'}`}
+                                >
+                                    <span className="mr-1">{emoji}</span>
+                                    {hasReactions && <span className="text-xs font-medium">{count}</span>}
+                                </ToggleGroupItem>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">{renderTooltipContent()}</TooltipContent>
+                        </Tooltip>
                     );
                 })}
             </ToggleGroup>

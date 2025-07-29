@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Forum, PaginatedData, Post, Topic } from '@/types';
+import { ApiError, apiRequest } from '@/utils/api';
 import { Head, Link, router } from '@inertiajs/react';
 import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
@@ -25,9 +26,11 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
         if (!topic.is_read_by_user) {
             const markAsRead = async () => {
                 try {
-                    await axios.post(route('forums.topics.read', { forum: forum.slug, topic: topic.slug }));
+                    await apiRequest(axios.post(route('forums.topics.read', { forum: forum.slug, topic: topic.slug })));
                 } catch (error) {
                     console.error('Error marking topic as read:', error);
+                    const apiError = error as ApiError;
+                    console.error('API Error:', apiError.message);
                 }
             };
 

@@ -5,25 +5,23 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ApiResource;
 use App\Models\Policy;
 use App\Models\Post;
 use App\Models\Topic;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class SearchController extends Controller
 {
-    public function search(Request $request): JsonResponse
+    public function search(Request $request): JsonResource
     {
         $query = $request->get('q', '');
 
         if (empty($query) || strlen($query) < 2) {
-            return response()->json([
-                'data' => [],
-                'meta' => [
-                    'total' => 0,
-                    'query' => $query,
-                ],
+            return ApiResource::success([], 'Search query too short', [
+                'total' => 0,
+                'query' => $query,
             ]);
         }
 
@@ -80,16 +78,13 @@ class SearchController extends Controller
 
         $results = $topics->concat($posts)->concat($policies)->take($limit);
 
-        return response()->json([
-            'data' => $results->values(),
-            'meta' => [
-                'total' => $results->count(),
-                'query' => $query,
-                'counts' => [
-                    'topics' => $topics->count(),
-                    'posts' => $posts->count(),
-                    'policies' => $policies->count(),
-                ],
+        return ApiResource::success($results->values(), 'Search completed successfully', [
+            'total' => $results->count(),
+            'query' => $query,
+            'counts' => [
+                'topics' => $topics->count(),
+                'posts' => $posts->count(),
+                'policies' => $policies->count(),
             ],
         ]);
     }

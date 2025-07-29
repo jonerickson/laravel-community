@@ -5,26 +5,27 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Comments;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ApiResource;
 use App\Models\Comment;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class LikeController extends Controller
 {
-    public function __invoke(Request $request, Comment $comment): JsonResponse
+    public function __invoke(Request $request, Comment $comment): JsonResource
     {
         $request->validate([
             'emoji' => 'required|string|max:10',
         ]);
 
         $result = $comment->toggleLike($request->emoji);
+        $freshComment = $comment->fresh();
 
-        return response()->json([
-            'success' => true,
+        return ApiResource::success([
             'liked' => ! is_bool($result),
-            'likes_count' => $comment->fresh()->likes_count,
-            'likes_summary' => $comment->fresh()->likes_summary,
-            'user_reactions' => $comment->fresh()->user_reactions,
-        ]);
+            'likes_count' => $freshComment->likes_count,
+            'likes_summary' => $freshComment->likes_summary,
+            'user_reactions' => $freshComment->user_reactions,
+        ], 'Comment reaction updated successfully');
     }
 }

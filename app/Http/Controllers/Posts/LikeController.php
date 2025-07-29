@@ -5,26 +5,27 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Posts;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ApiResource;
 use App\Models\Post;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class LikeController extends Controller
 {
-    public function __invoke(Request $request, Post $post): JsonResponse
+    public function __invoke(Request $request, Post $post): JsonResource
     {
         $request->validate([
             'emoji' => 'required|string|max:50',
         ]);
 
         $result = $post->toggleLike($request->input('emoji'));
+        $freshPost = $post->fresh();
 
-        return response()->json([
-            'success' => true,
+        return ApiResource::success([
             'liked' => ! is_bool($result),
-            'likes_count' => $post->fresh()->likes_count,
-            'likes_summary' => $post->fresh()->likes_summary,
-            'user_reactions' => $post->fresh()->user_reactions,
-        ]);
+            'likes_count' => $freshPost->likes_count,
+            'likes_summary' => $freshPost->likes_summary,
+            'user_reactions' => $freshPost->user_reactions,
+        ], 'Reaction updated successfully');
     }
 }

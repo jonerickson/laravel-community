@@ -1,8 +1,10 @@
 import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import type { Product as ProductType } from '@/types';
+import { ApiError, apiRequest } from '@/utils/api';
 import axios from 'axios';
 import { CurrencyIcon, GlobeIcon, StarIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -73,21 +75,26 @@ export default function Product({ product: productData }: ProductProps) {
 
         setIsAddingToCart(true);
         try {
-            const response = await axios.post(route('store.cart.store'), {
-                product_id: productData.id,
-                quantity: quantity,
-            });
+            const data = await apiRequest(
+                axios.post(route('store.cart.store'), {
+                    product_id: productData.id,
+                    quantity: quantity,
+                }),
+            );
 
             window.dispatchEvent(
                 new CustomEvent('cart-updated', {
                     detail: {
-                        cartCount: response.data.data.cartCount,
-                        cartItems: response.data.data.cartItems
+                        cartCount: data.cartCount,
+                        cartItems: data.cartItems,
                     },
                 }),
             );
         } catch (error) {
             console.error('Failed to add to cart:', error);
+            const apiError = error as ApiError;
+            console.error('API Error:', apiError.message);
+            alert(apiError.message || 'Failed to add product to cart');
         } finally {
             setIsAddingToCart(false);
         }
@@ -141,11 +148,11 @@ export default function Product({ product: productData }: ProductProps) {
 
                 <div className="mt-8 lg:col-span-5">
                     <HeadingSmall title="Description" />
-                    <div
+                    <p
                         dangerouslySetInnerHTML={{
                             __html: productData?.description || product.description,
                         }}
-                        className="mt-4 space-y-4 text-sm/6 text-muted-foreground"
+                        className="mt-4 text-sm text-muted-foreground"
                     />
 
                     {productData && (
@@ -154,18 +161,18 @@ export default function Product({ product: productData }: ProductProps) {
                                 <label htmlFor="quantity" className="text-sm font-medium">
                                     Quantity:
                                 </label>
-                                <select
-                                    id="quantity"
-                                    value={quantity}
-                                    onChange={(e) => setQuantity(parseInt(e.target.value))}
-                                    className="rounded-md border border-gray-300 px-3 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-                                >
-                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                                        <option key={num} value={num}>
-                                            {num}
-                                        </option>
-                                    ))}
-                                </select>
+                                <Select id="quantity" value={quantity} onValueChange={(e) => setQuantity(parseInt(e.target.value))}>
+                                    <SelectTrigger className="w-[180px]">
+                                        <SelectValue placeholder="Quantity" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                                            <SelectItem key={num} value={num}>
+                                                {num}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </div>
                     )}

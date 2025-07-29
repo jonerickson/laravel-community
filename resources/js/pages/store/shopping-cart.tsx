@@ -45,29 +45,21 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
     const updateQuantity = async (productId: number, quantity: number) => {
         setLoading(productId);
         try {
-            const response = await axios.put(route('store.cart.update', productId), { quantity: quantity });
+            const data = await apiRequest(axios.put(route('store.cart.update', productId), { quantity: quantity }));
 
-            if (response.data.success) {
-                setItems(response.data.data.cartItems);
-                window.dispatchEvent(
-                    new CustomEvent('cart-updated', {
-                        detail: {
-                            cartCount: response.data.data.cartCount,
-                            cartItems: response.data.data.cartItems,
-                        },
-                    }),
-                );
-            } else {
-                console.error('Failed to update cart:', response.data.message);
-                alert(response.data.message || 'Failed to update cart');
-            }
+            setItems(data.cartItems);
+            window.dispatchEvent(
+                new CustomEvent('cart-updated', {
+                    detail: {
+                        cartCount: data.cartCount,
+                        cartItems: data.cartItems,
+                    },
+                }),
+            );
         } catch (error) {
             console.error('Failed to update cart:', error);
-            if (axios.isAxiosError(error) && error.response?.data?.message) {
-                alert(error.response.data.message);
-            } else {
-                alert('Failed to update cart. Please try again.');
-            }
+            const apiError = error as ApiError;
+            alert(apiError.message || 'Failed to update cart. Please try again.');
         } finally {
             setLoading(null);
         }
@@ -76,29 +68,21 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
     const removeItem = async (productId: number) => {
         setLoading(productId);
         try {
-            const response = await axios.delete(route('store.cart.delete', productId));
+            const data = await apiRequest(axios.delete(route('store.cart.delete', productId)));
 
-            if (response.data.success) {
-                setItems(response.data.data.cartItems);
-                window.dispatchEvent(
-                    new CustomEvent('cart-updated', {
-                        detail: {
-                            cartCount: response.data.data.cartCount,
-                            cartItems: response.data.data.cartItems,
-                        },
-                    }),
-                );
-            } else {
-                console.error('Failed to remove item:', response.data.message);
-                alert(response.data.message || 'Failed to remove item');
-            }
+            setItems(data.cartItems);
+            window.dispatchEvent(
+                new CustomEvent('cart-updated', {
+                    detail: {
+                        cartCount: data.cartCount,
+                        cartItems: data.cartItems,
+                    },
+                }),
+            );
         } catch (error) {
             console.error('Failed to remove item:', error);
-            if (axios.isAxiosError(error) && error.response?.data?.message) {
-                alert(error.response.data.message);
-            } else {
-                alert('Failed to remove item. Please try again.');
-            }
+            const apiError = error as ApiError;
+            alert(apiError.message || 'Failed to remove item. Please try again.');
         } finally {
             setLoading(null);
         }
