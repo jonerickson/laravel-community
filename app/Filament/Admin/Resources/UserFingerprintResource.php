@@ -12,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class UserFingerprintResource extends Resource
@@ -20,13 +21,9 @@ class UserFingerprintResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-device-phone-mobile';
 
-    protected static ?string $navigationGroup = 'User Management';
+    protected static ?string $navigationGroup = 'Users';
 
-    protected static ?string $navigationLabel = 'Device Fingerprints';
-
-    protected static ?string $modelLabel = 'Device Fingerprint';
-
-    protected static ?string $pluralModelLabel = 'Device Fingerprints';
+    protected static ?string $label = 'Fingerprints';
 
     public static function form(Form $form): Form
     {
@@ -79,7 +76,7 @@ class UserFingerprintResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('fingerprint_id')
                     ->label('Fingerprint ID')
-                    ->limit(12)
+                    ->limit(20)
                     ->tooltip(fn ($record) => $record->fingerprint_id)
                     ->copyable()
                     ->searchable(),
@@ -130,7 +127,15 @@ class UserFingerprintResource extends Resource
                     ->label('User Agent')
                     ->limit(30)
                     ->tooltip(fn ($record) => $record->user_agent)
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Updated')
+                    ->dateTime()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Created')
+                    ->dateTime()
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_banned')
@@ -146,7 +151,6 @@ class UserFingerprintResource extends Resource
                     ->label('Active in last 7 days'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('ban')
                     ->label('Ban Device')
                     ->icon('heroicon-o-x-circle')
@@ -175,6 +179,7 @@ class UserFingerprintResource extends Resource
                     ->modalHeading('Unban Device')
                     ->modalDescription('Are you sure you want to unban this device?')
                     ->modalSubmitActionLabel('Unban Device'),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -204,19 +209,20 @@ class UserFingerprintResource extends Resource
             ->defaultSort('last_seen_at', 'desc');
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListUserFingerprints::route('/'),
-            'create' => Pages\CreateUserFingerprint::route('/create'),
-            'edit' => Pages\EditUserFingerprint::route('/{record}/edit'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
     }
 }

@@ -6,6 +6,7 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\UserResource\Pages;
 use App\Models\User;
+use App\Models\UserFingerprint;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -20,7 +21,7 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationGroup = 'User Management';
+    protected static ?string $navigationGroup = 'Users';
 
     public static function form(Form $form): Form
     {
@@ -111,16 +112,14 @@ class UserResource extends Resource
                     ->label('Ban User')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (User $record): bool => ! $record->is_banned)
+                    ->visible(fn (User $record): bool => ! $record->is_banned && $record->fingerprints->count())
                     ->form([
                         Forms\Components\Textarea::make('ban_reason')
                             ->label('Ban Reason')
                             ->required()
                             ->maxLength(1000),
                     ])
-                    ->action(function (User $record, array $data): void {
-                        $record->banUser($data['ban_reason'], Auth::user());
-                    })
+                    ->action(fn (User $record, array $data) => $record->fingerprints()->each(fn (UserFingerprint $fingerprint) => $fingerprint->banFingerprint($data['ban_reason'])))
                     ->requiresConfirmation()
                     ->modalHeading('Ban User')
                     ->modalDescription('Are you sure you want to ban this user? They will be immediately logged out and unable to access the site.')
@@ -129,8 +128,8 @@ class UserResource extends Resource
                     ->label('Unban User')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (User $record): bool => $record->is_banned)
-                    ->action(fn (User $record) => $record->unbanUser())
+                    ->visible(fn (User $record): bool => $record->is_banned && $record->fingerprints->count())
+                    ->action(fn (User $record) => $record->fingerprints()->each(fn (UserFingerprint $fingerprint) => $fingerprint->unbanFingerprint()))
                     ->requiresConfirmation()
                     ->modalHeading('Unban User')
                     ->modalDescription('Are you sure you want to unban this user?')
