@@ -25,6 +25,7 @@
         "typescript-eslint": "^8.23.0"
     },
     "dependencies": {
+        "@fingerprintjs/fingerprintjs": "4.6.2",
         "@headlessui/react": "^2.2.0",
         "@inertiajs/react": "^2.0.14",
         "@radix-ui/react-avatar": "^1.1.3",

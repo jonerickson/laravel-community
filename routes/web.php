@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Api\SearchController;
+use App\Http\Controllers\BannedController;
 use App\Http\Controllers\Blog\BlogController;
 use App\Http\Controllers\Blog\CommentController;
 use App\Http\Controllers\Comments\LikeController as CommentLikeController;
@@ -28,7 +28,7 @@ Route::get('/policies', [PolicyCategoryController::class, 'index'])->name('polic
 Route::get('/policies/{category:slug}', [PolicyCategoryController::class, 'show'])->name('policies.categories.show');
 Route::get('/policies/{category:slug}/{policy:slug}', [PolicyController::class, 'show'])->name('policies.show');
 
-Route::get('/api/search', [SearchController::class, 'search'])->name('api.search');
+Route::get('/banned', BannedController::class)->name('banned')->middleware('auth');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');

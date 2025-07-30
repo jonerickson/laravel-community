@@ -64,8 +64,15 @@ export interface Product {
     featured_image_url?: string | null;
     stripe_product_id?: string | null;
     metadata?: Record<string, never> | null;
+    prices?: ProductPrice[];
+    default_price?: ProductPrice | null;
     created_at: string;
     updated_at: string;
+    // Additional properties for dashboard display
+    image?: string | null;
+    price?: number;
+    rating?: number;
+    category?: ProductCategory | null;
 }
 
 export interface ProductPrice {
@@ -260,4 +267,24 @@ export interface ApiResponse<T = any> {
         [key: string]: any;
     };
     errors?: any[] | null;
+}
+
+export interface CartResponse {
+    cartCount: number;
+    cartItems: any[];
+}
+
+export interface CheckoutResponse {
+    checkout_url: string;
+}
+
+export interface EmojiReactionResponse {
+    likes_summary: any[];
+    user_reactions: any[];
+}
+
+export interface FingerprintTrackingResponse {
+    fingerprint_id: string;
+    first_seen: string;
+    last_seen: string;
 }

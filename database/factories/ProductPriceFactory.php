@@ -83,6 +83,13 @@ class ProductPriceFactory extends Factory
         ]);
     }
 
+    public function withStripePriceId(string $envKey): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'stripe_price_id' => env($envKey),
+        ]);
+    }
+
     public function withoutStripe(): static
     {
         return $this->state(fn (array $attributes) => [

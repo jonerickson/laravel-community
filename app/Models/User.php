@@ -9,10 +9,13 @@ use Exception;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Cashier\Billable;
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -38,6 +41,9 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $billing_country
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, UserFingerprint> $fingerprints
+ * @property-read int|null $fingerprints_count
+ * @property-read bool $is_banned
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
@@ -46,6 +52,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read int|null $roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Cashier\Subscription> $subscriptions
  * @property-read int|null $subscriptions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
+ * @property-read int|null $tokens_count
  *
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User hasExpiredGenericTrial()
@@ -85,6 +93,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     use Billable;
+    use HasApiTokens;
     use HasFactory;
     use HasRoles;
     use Notifiable;
@@ -92,7 +101,12 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     protected $fillable = [
         'name',
         'email',
+        'email_verified_at',
         'avatar',
+        'is_banned',
+        'banned_at',
+        'ban_reason',
+        'banned_by',
     ];
 
     protected $hidden = [
@@ -111,6 +125,10 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'vat_id',
     ];
 
+    protected $appends = [
+        'is_banned',
+    ];
+
     /**
      * @throws Exception
      */
@@ -123,12 +141,26 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return $panel->getId() === 'marketplace';
     }
 
+    public function fingerprints(): HasMany
+    {
+        return $this->hasMany(UserFingerprint::class);
+    }
+
+    public function isBanned(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): bool => $this->fingerprints()->banned()->exists(),
+        )->shouldCache();
+    }
+
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'trial_ends_at' => 'datetime',
+            'is_banned' => 'boolean',
+            'banned_at' => 'datetime',
         ];
     }
 }

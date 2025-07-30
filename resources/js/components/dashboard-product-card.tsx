@@ -77,7 +77,7 @@ export default function DashboardProductCard({ product, type, className }: Dashb
                     {product.description && <p className="line-clamp-2 text-sm text-muted-foreground">{product.description}</p>}
 
                     <div className="flex items-center justify-between">
-                        <span className="text-lg font-bold">${product.price.toFixed(2)}</span>
+                        <span className="text-lg font-bold">${product.price?.toFixed(2) || '0.00'}</span>
 
                         {product.rating && (
                             <div className="flex items-center gap-1">

@@ -3,11 +3,11 @@ import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import type { Product as ProductType } from '@/types';
+import type { CartResponse, Product as ProductType } from '@/types';
 import { ApiError, apiRequest } from '@/utils/api';
 import axios from 'axios';
 import { CurrencyIcon, GlobeIcon, StarIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const product = {
     name: 'Basic Tee',
@@ -69,15 +69,23 @@ interface ProductProps {
 export default function Product({ product: productData }: ProductProps) {
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [quantity, setQuantity] = useState(1);
+    const [selectedPriceId, setSelectedPriceId] = useState<number | null>(productData?.default_price?.id || null);
+
+    useEffect(() => {
+        if (productData?.default_price && !selectedPriceId) {
+            setSelectedPriceId(productData.default_price.id);
+        }
+    }, [selectedPriceId, productData?.default_price]);
 
     const addToCart = async () => {
         if (!productData) return;
 
         setIsAddingToCart(true);
         try {
-            const data = await apiRequest(
+            const data = await apiRequest<CartResponse>(
                 axios.post(route('store.cart.store'), {
                     product_id: productData.id,
+                    price_id: selectedPriceId,
                     quantity: quantity,
                 }),
             );
@@ -105,7 +113,16 @@ export default function Product({ product: productData }: ProductProps) {
             <div className="lg:grid lg:auto-rows-min lg:grid-cols-12 lg:gap-x-8">
                 <div className="lg:col-span-5 lg:col-start-8">
                     <div className="flex justify-between">
-                        <Heading title={productData?.name || product.name} description={productData ? 'Price TBD' : product.price} />
+                        <Heading
+                            title={productData?.name || product.name}
+                            description={
+                                productData
+                                    ? productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price
+                                        ? `$${(productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price)?.amount} ${(productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price)?.currency}${(productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price)?.interval ? ` / ${(productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price)?.interval}` : ''}`
+                                        : 'Price TBD'
+                                    : product.price
+                            }
+                        />
                     </div>
                     <div>
                         <h2 className="sr-only">Reviews</h2>
@@ -156,18 +173,43 @@ export default function Product({ product: productData }: ProductProps) {
                     />
 
                     {productData && (
-                        <div className="mt-6">
+                        <div className="mt-6 space-y-4">
+                            {productData.prices && productData.prices.length > 0 && (
+                                <div className="flex items-center gap-4">
+                                    <label htmlFor="price" className="text-sm font-medium">
+                                        Price:
+                                    </label>
+                                    <Select
+                                        value={selectedPriceId?.toString() || ''}
+                                        onValueChange={(value) => setSelectedPriceId(value ? parseInt(value) : null)}
+                                        disabled={productData.prices.length === 1}
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Select price" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {productData.prices.map((price) => (
+                                                <SelectItem key={price.id} value={price.id.toString()}>
+                                                    {price.name} - ${price.amount} {price.currency}
+                                                    {price.interval && ` / ${price.interval}`}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
+
                             <div className="flex items-center gap-4">
                                 <label htmlFor="quantity" className="text-sm font-medium">
                                     Quantity:
                                 </label>
-                                <Select id="quantity" value={quantity} onValueChange={(e) => setQuantity(parseInt(e.target.value))}>
+                                <Select value={quantity.toString()} onValueChange={(value) => setQuantity(parseInt(value))}>
                                     <SelectTrigger className="w-[180px]">
                                         <SelectValue placeholder="Quantity" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                                            <SelectItem key={num} value={num}>
+                                            <SelectItem key={num} value={num.toString()}>
                                                 {num}
                                             </SelectItem>
                                         ))}

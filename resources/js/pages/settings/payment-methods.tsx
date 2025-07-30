@@ -305,11 +305,11 @@ export default function PaymentMethods() {
                                 {cards.map((card) => (
                                     <CreditCardComponent
                                         key={card.id}
-                                        brand={card.brand}
-                                        last4={card.last4}
-                                        expMonth={card.expMonth}
-                                        expYear={card.expYear}
-                                        holderName={card.holderName}
+                                        brand={card.brand || 'unknown'}
+                                        last4={card.last4 || '0000'}
+                                        expMonth={card.expMonth || 0}
+                                        expYear={card.expYear || 0}
+                                        holderName={card.holderName || 'Unknown'}
                                         isDefault={card.isDefault}
                                         onSetDefault={() => handleSetDefault(card.id)}
                                         onDelete={() => handleDelete(card.id)}

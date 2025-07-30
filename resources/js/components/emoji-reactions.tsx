@@ -1,6 +1,6 @@
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Comment, Post } from '@/types';
+import { Comment, EmojiReactionResponse, Post } from '@/types';
 import { ApiError, apiRequest } from '@/utils/api';
 import axios from 'axios';
 import { useState } from 'react';
@@ -65,7 +65,7 @@ export default function EmojiReactions({ post, comment, initialReactions = [], u
         try {
             const url = post ? route('posts.like', { post: post.slug }) : route('comments.like', { comment: comment?.id });
 
-            const data = await apiRequest(axios.post(url, { emoji }));
+            const data = await apiRequest<EmojiReactionResponse>(axios.post(url, { emoji }));
 
             setReactions(data.likes_summary || []);
             setCurrentUserReactions(data.user_reactions || []);

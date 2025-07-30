@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Store;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ApiResource;
 use App\Models\Product;
+use App\Models\ProductPrice;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -30,19 +31,31 @@ class ShoppingCartController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
+            'price_id' => 'nullable|exists:product_prices,id',
             'quantity' => 'integer|min:1|max:99',
         ]);
 
         $product = Product::findOrFail($request->input('product_id'));
+        $priceId = $request->input('price_id');
         $quantity = $request->input('quantity') ?? 1;
 
-        $cart = Session::get('shopping_cart', []);
+        // If no price_id provided, use the default price
+        if (! $priceId) {
+            $defaultPrice = $product->defaultPrice;
+            if ($defaultPrice) {
+                $priceId = $defaultPrice->id;
+            }
+        }
 
-        if (isset($cart[$product->id])) {
-            $cart[$product->id]['quantity'] += $quantity;
+        $cart = Session::get('shopping_cart', []);
+        $cartKey = $product->id.($priceId ? '_'.$priceId : '');
+
+        if (isset($cart[$cartKey])) {
+            $cart[$cartKey]['quantity'] += $quantity;
         } else {
-            $cart[$product->id] = [
+            $cart[$cartKey] = [
                 'product_id' => $product->id,
+                'price_id' => $priceId,
                 'name' => $product->name,
                 'slug' => $product->slug,
                 'quantity' => $quantity,
@@ -63,13 +76,16 @@ class ShoppingCartController extends Controller
     public function update(Request $request, Product $product): JsonResource
     {
         $request->validate([
+            'price_id' => 'nullable|exists:product_prices,id',
             'quantity' => 'required|integer|min:1|max:99',
         ]);
 
         $cart = Session::get('shopping_cart', []);
+        $priceId = $request->input('price_id');
+        $cartKey = $product->getKey().($priceId ? '_'.$priceId : '');
 
-        if (isset($cart[$product->getKey()])) {
-            $cart[$product->getKey()]['quantity'] = $request->input('quantity');
+        if (isset($cart[$cartKey])) {
+            $cart[$cartKey]['quantity'] = $request->input('quantity');
             Session::put('shopping_cart', $cart);
         }
 
@@ -81,12 +97,14 @@ class ShoppingCartController extends Controller
         ], 'Cart updated successfully');
     }
 
-    public function delete(Product $product): JsonResource
+    public function delete(Request $request, Product $product): JsonResource
     {
         $cart = Session::get('shopping_cart', []);
+        $priceId = $request->input('price_id');
+        $cartKey = $product->getKey().($priceId ? '_'.$priceId : '');
 
-        if (isset($cart[$product->getKey()])) {
-            unset($cart[$product->getKey()]);
+        if (isset($cart[$cartKey])) {
+            unset($cart[$cartKey]);
             Session::put('shopping_cart', $cart);
         }
 
@@ -126,15 +144,23 @@ class ShoppingCartController extends Controller
                 ], 400);
             }
 
-            $defaultPrice = $product->defaultPrice;
-            if (! $defaultPrice || ! $defaultPrice->stripe_price_id) {
+            $selectedPrice = null;
+            if ($item['price_id']) {
+                $selectedPrice = $product->prices()->where('id', $item['price_id'])->first();
+            }
+
+            if (! $selectedPrice) {
+                $selectedPrice = $product->defaultPrice;
+            }
+
+            if (! $selectedPrice || ! $selectedPrice->stripe_price_id) {
                 return ApiResource::error("Price not configured for {$item['name']}", [
                     'price' => ["Price not configured for {$item['name']}."],
                 ], 400);
             }
 
             $lineItems[] = [
-                'price' => $defaultPrice->stripe_price_id,
+                'price' => $selectedPrice->stripe_price_id,
                 'quantity' => $item['quantity'],
             ];
         }
@@ -166,23 +192,37 @@ class ShoppingCartController extends Controller
     private function getCartItems(): array
     {
         $cart = Session::get('shopping_cart', []);
-        $productIds = array_keys($cart);
-
-        if (empty($productIds)) {
+        if (empty($cart)) {
             return [];
         }
 
-        $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+        $productIds = array_unique(array_column($cart, 'product_id'));
+        $priceIds = array_filter(array_column($cart, 'price_id'));
 
-        return collect($cart)->map(function ($item) use ($products) {
+        $products = Product::with(['prices' => function ($query) {
+            $query->where('is_active', true)->orderBy('is_default', 'desc');
+        }, 'defaultPrice'])
+            ->whereIn('id', $productIds)
+            ->get()
+            ->keyBy('id');
+
+        $prices = ! empty($priceIds)
+            ? ProductPrice::whereIn('id', $priceIds)->get()->keyBy('id')
+            : collect();
+
+        return collect($cart)->map(function ($item) use ($products, $prices) {
             $product = $products->get($item['product_id']);
+            $selectedPrice = $item['price_id'] ? $prices->get($item['price_id']) : null;
 
             return [
                 'product_id' => $item['product_id'],
+                'price_id' => $item['price_id'],
                 'name' => $product?->name ?? $item['name'],
                 'slug' => $product?->slug ?? $item['slug'],
                 'quantity' => $item['quantity'],
                 'product' => $product,
+                'selected_price' => $selectedPrice,
+                'available_prices' => $product?->prices ?? collect(),
                 'added_at' => $item['added_at'],
             ];
         })->values()->toArray();

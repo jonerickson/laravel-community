@@ -2,20 +2,24 @@ import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Product } from '@/types';
+import type { BreadcrumbItem, CartResponse, CheckoutResponse, Product, ProductPrice } from '@/types';
 import { ApiError, apiRequest } from '@/utils/api';
 import { Head, Link, router } from '@inertiajs/react';
 import axios from 'axios';
-import { ArrowDownIcon, MessageCircleQuestionIcon, ShoppingCart as ShoppingCartIcon, XIcon } from 'lucide-react';
+import { MessageCircleQuestionIcon, ShoppingCart as ShoppingCartIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 
 interface CartItem {
     product_id: number;
+    price_id?: number | null;
     name: string;
     slug: string;
     quantity: number;
     product: Product | null;
+    selected_price?: ProductPrice | null;
+    available_prices?: ProductPrice[];
     added_at: string;
 }
 
@@ -42,10 +46,35 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
     const [loading, setLoading] = useState<number | null>(null);
     const [checkoutLoading, setCheckoutLoading] = useState(false);
 
-    const updateQuantity = async (productId: number, quantity: number) => {
+    // Calculate order totals
+    const calculateTotals = () => {
+        const subtotal = items.reduce((total, item) => {
+            const price = item.selected_price || item.product?.default_price;
+            if (price) {
+                return total + price.amount * item.quantity;
+            }
+            return total;
+        }, 0);
+
+        const shipping = subtotal > 0 ? 5.0 : 0; // Free shipping over certain amount could be added
+        const taxRate = 0.08; // 8% tax rate
+        const tax = subtotal * taxRate;
+        const total = subtotal + shipping + tax;
+
+        return { subtotal, shipping, tax, total };
+    };
+
+    const { subtotal, shipping, tax, total } = calculateTotals();
+
+    const updateQuantity = async (productId: number, quantity: number, priceId?: number | null) => {
         setLoading(productId);
         try {
-            const data = await apiRequest(axios.put(route('store.cart.update', productId), { quantity: quantity }));
+            const data = await apiRequest<CartResponse>(
+                axios.put(route('store.cart.update', productId), {
+                    quantity: quantity,
+                    price_id: priceId,
+                }),
+            );
 
             setItems(data.cartItems);
             window.dispatchEvent(
@@ -65,10 +94,21 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
         }
     };
 
-    const removeItem = async (productId: number) => {
+    const removeItem = async (productId: number, priceId?: number | null) => {
+        const item = items.find((i) => i.product_id === productId);
+        const confirmed = window.confirm(`Are you sure you want to remove "${item?.name}" from your cart?`);
+
+        if (!confirmed) {
+            return;
+        }
+
         setLoading(productId);
         try {
-            const data = await apiRequest(axios.delete(route('store.cart.delete', productId)));
+            const data = await apiRequest<CartResponse>(
+                axios.delete(route('store.cart.delete', productId), {
+                    data: { price_id: priceId },
+                }),
+            );
 
             setItems(data.cartItems);
             window.dispatchEvent(
@@ -91,7 +131,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
     const handleCheckout = async () => {
         setCheckoutLoading(true);
         try {
-            const data = await apiRequest(axios.post(route('store.cart.checkout')));
+            const data = await apiRequest<CheckoutResponse>(axios.post(route('store.cart.checkout')));
             window.location.href = data.checkout_url;
         } catch (error) {
             console.error('Checkout failed:', error);
@@ -132,26 +172,26 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                         </div>
 
                         <ul role="list" className="divide-y divide-gray-200 border-t border-b border-gray-200">
-                            {items.map((item, itemIdx) => (
+                            {items.map((item) => (
                                 <li key={item.product_id} className="flex py-6 sm:py-10">
                                     <div className="shrink-0">
                                         {item.product?.featured_image_url ? (
                                             <img
                                                 alt={item.name}
                                                 src={item.product.featured_image_url}
-                                                className="size-24 rounded-md object-cover sm:size-48"
+                                                className="size-32 rounded-md object-cover sm:size-64"
                                             />
                                         ) : (
-                                            <div className="flex size-24 items-center justify-center rounded-md bg-gray-100 sm:size-48">
+                                            <div className="flex size-32 items-center justify-center rounded-md bg-gray-100 sm:size-64">
                                                 <span className="text-gray-400">No image</span>
                                             </div>
                                         )}
                                     </div>
 
-                                    <div className="ml-4 flex flex-1 flex-col justify-between sm:ml-6">
-                                        <div className="relative pr-9 sm:pr-0">
-                                            <div className="flex h-full flex-col justify-between sm:h-24 lg:h-48">
-                                                <div>
+                                    <div className="ml-4 flex flex-1 flex-col sm:ml-6">
+                                        <div className="relative flex h-full flex-col pr-9 sm:pr-0">
+                                            <div className="flex flex-1 flex-col">
+                                                <div className="flex-grow">
                                                     <div className="flex justify-between">
                                                         <h3 className="text-sm">
                                                             <Link
@@ -169,29 +209,63 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                                                 : item.product?.description || ''}
                                                         </p>
                                                     </div>
-                                                    <p className="mt-1 text-sm font-medium text-gray-900">Price TBD</p>
+                                                    <p className="mt-1 text-sm font-medium text-gray-900">
+                                                        {item.selected_price
+                                                            ? `$${item.selected_price.amount} ${item.selected_price.currency}${item.selected_price.interval ? ` / ${item.selected_price.interval}` : ''}`
+                                                            : item.product?.default_price
+                                                              ? `$${item.product.default_price.amount} ${item.product.default_price.currency}${item.product.default_price.interval ? ` / ${item.product.default_price.interval}` : ''}`
+                                                              : 'Price TBD'}
+                                                    </p>
                                                 </div>
 
-                                                <div className="mt-4 flex items-end justify-between sm:mt-0">
-                                                    <div className="grid w-full max-w-16 grid-cols-1">
-                                                        <select
-                                                            value={item.quantity}
-                                                            onChange={(e) => updateQuantity(item.product_id, parseInt(e.target.value))}
+                                                <div className="mt-auto space-y-3">
+                                                    {item.available_prices && item.available_prices.length > 1 && (
+                                                        <div>
+                                                            <label className="mb-1 block text-xs font-medium text-gray-700">Price:</label>
+                                                            <Select
+                                                                value={
+                                                                    item.selected_price?.id?.toString() ||
+                                                                    item.available_prices.find((p) => p.is_default)?.id?.toString() ||
+                                                                    ''
+                                                                }
+                                                                onValueChange={(value) => {
+                                                                    const newPriceId = parseInt(value);
+                                                                    updateQuantity(item.product_id, item.quantity, newPriceId);
+                                                                }}
+                                                            >
+                                                                <SelectTrigger className="w-full">
+                                                                    <SelectValue placeholder="Select price" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {item.available_prices.map((price) => (
+                                                                        <SelectItem key={price.id} value={price.id.toString()}>
+                                                                            {price.name} - ${price.amount} {price.currency}
+                                                                            {price.interval && ` / ${price.interval}`}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="w-full max-w-24">
+                                                        <label className="mb-1 block text-xs font-medium text-gray-700">Quantity:</label>
+                                                        <Select
+                                                            value={item.quantity.toString()}
+                                                            onValueChange={(value) => updateQuantity(item.product_id, parseInt(value), item.price_id)}
                                                             disabled={loading === item.product_id}
-                                                            name={`quantity-${itemIdx}`}
-                                                            aria-label={`Quantity, ${item.name}`}
-                                                            className="col-start-1 row-start-1 appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 disabled:opacity-50 sm:text-sm/6"
                                                         >
-                                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                                                                <option key={num} value={num}>
-                                                                    {num}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                        <ArrowDownIcon
-                                                            aria-hidden="true"
-                                                            className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
-                                                        />
+                                                            <SelectTrigger className="w-full">
+                                                                <SelectValue placeholder="Qty" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                                                                    <SelectItem key={num} value={num.toString()}>
+                                                                        {num}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
                                                     </div>
                                                 </div>
                                             </div>
@@ -199,7 +273,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                             <div className="absolute top-0 right-0">
                                                 <button
                                                     type="button"
-                                                    onClick={() => removeItem(item.product_id)}
+                                                    onClick={() => removeItem(item.product_id, item.price_id)}
                                                     disabled={loading === item.product_id}
                                                     className="-m-2 inline-flex p-2 text-gray-400 hover:text-gray-500 disabled:opacity-50"
                                                 >
@@ -220,7 +294,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                         <dl className="mt-6 space-y-4">
                             <div className="flex items-center justify-between">
                                 <dt className="text-sm text-gray-600">Subtotal</dt>
-                                <dd className="text-sm font-medium text-gray-900">$99.00</dd>
+                                <dd className="text-sm font-medium text-gray-900">${subtotal.toFixed(2)}</dd>
                             </div>
                             <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                                 <dt className="flex items-center text-sm text-gray-600">
@@ -230,7 +304,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                         <MessageCircleQuestionIcon aria-hidden="true" className="size-5" />
                                     </a>
                                 </dt>
-                                <dd className="text-sm font-medium text-gray-900">$5.00</dd>
+                                <dd className="text-sm font-medium text-gray-900">{shipping > 0 ? `$${shipping.toFixed(2)}` : 'Free'}</dd>
                             </div>
                             <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                                 <dt className="flex text-sm text-gray-600">
@@ -240,11 +314,11 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                         <MessageCircleQuestionIcon aria-hidden="true" className="size-5" />
                                     </a>
                                 </dt>
-                                <dd className="text-sm font-medium text-gray-900">$8.32</dd>
+                                <dd className="text-sm font-medium text-gray-900">${tax.toFixed(2)}</dd>
                             </div>
                             <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                                 <dt className="text-base font-medium text-gray-900">Order total</dt>
-                                <dd className="text-base font-medium text-gray-900">$112.32</dd>
+                                <dd className="text-base font-medium text-gray-900">${total.toFixed(2)}</dd>
                             </div>
                         </dl>
 

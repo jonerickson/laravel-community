@@ -14,7 +14,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class SearchController extends Controller
 {
-    public function search(Request $request): JsonResource
+    public function __invoke(Request $request): JsonResource
     {
         $query = $request->get('q', '');
 

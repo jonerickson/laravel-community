@@ -1,0 +1,149 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+/**
+ * @property int $id
+ * @property int|null $user_id
+ * @property string $fingerprint_id
+ * @property array<array-key, mixed>|null $fingerprint_data
+ * @property string|null $ip_address
+ * @property string|null $user_agent
+ * @property bool $is_banned
+ * @property string|null $ban_reason
+ * @property int|null $banned_by
+ * @property \Illuminate\Support\Carbon|null $banned_at
+ * @property \Illuminate\Support\Carbon $first_seen_at
+ * @property \Illuminate\Support\Carbon $last_seen_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read User|null $bannedBy
+ * @property-read User|null $user
+ *
+ * @method static Builder<static>|UserFingerprint banned()
+ * @method static Builder<static>|UserFingerprint newModelQuery()
+ * @method static Builder<static>|UserFingerprint newQuery()
+ * @method static Builder<static>|UserFingerprint query()
+ * @method static Builder<static>|UserFingerprint whereBanReason($value)
+ * @method static Builder<static>|UserFingerprint whereBannedAt($value)
+ * @method static Builder<static>|UserFingerprint whereBannedBy($value)
+ * @method static Builder<static>|UserFingerprint whereCreatedAt($value)
+ * @method static Builder<static>|UserFingerprint whereFingerprintData($value)
+ * @method static Builder<static>|UserFingerprint whereFingerprintId($value)
+ * @method static Builder<static>|UserFingerprint whereFirstSeenAt($value)
+ * @method static Builder<static>|UserFingerprint whereId($value)
+ * @method static Builder<static>|UserFingerprint whereIpAddress($value)
+ * @method static Builder<static>|UserFingerprint whereIsBanned($value)
+ * @method static Builder<static>|UserFingerprint whereLastSeenAt($value)
+ * @method static Builder<static>|UserFingerprint whereUpdatedAt($value)
+ * @method static Builder<static>|UserFingerprint whereUserAgent($value)
+ * @method static Builder<static>|UserFingerprint whereUserId($value)
+ *
+ * @mixin \Eloquent
+ */
+class UserFingerprint extends Model
+{
+    protected $table = 'users_fingerprints';
+
+    protected $fillable = [
+        'user_id',
+        'fingerprint_id',
+        'fingerprint_data',
+        'ip_address',
+        'user_agent',
+        'first_seen_at',
+        'last_seen_at',
+        'is_banned',
+        'banned_at',
+        'ban_reason',
+        'banned_by',
+    ];
+
+    protected $casts = [
+        'fingerprint_data' => 'array',
+        'first_seen_at' => 'datetime',
+        'last_seen_at' => 'datetime',
+        'is_banned' => 'boolean',
+        'banned_at' => 'datetime',
+    ];
+
+    public static function trackFingerprint(
+        ?int $userId,
+        string $fingerprintId,
+        ?array $fingerprintData = null,
+        ?string $ipAddress = null,
+        ?string $userAgent = null
+    ): self {
+        $fingerprint = static::where('fingerprint_id', $fingerprintId)
+            ->when($userId, fn ($query) => $query->where('user_id', $userId))
+            ->first();
+
+        if ($fingerprint) {
+            $fingerprint->update([
+                'user_id' => $userId ?? $fingerprint->user_id,
+                'fingerprint_data' => $fingerprintData ?? $fingerprint->fingerprint_data,
+                'ip_address' => $ipAddress ?? $fingerprint->ip_address,
+                'user_agent' => $userAgent ?? $fingerprint->user_agent,
+                'last_seen_at' => now(),
+            ]);
+
+            return $fingerprint;
+        }
+
+        return static::create([
+            'user_id' => $userId,
+            'fingerprint_id' => $fingerprintId,
+            'fingerprint_data' => $fingerprintData,
+            'ip_address' => $ipAddress,
+            'user_agent' => $userAgent,
+            'first_seen_at' => now(),
+            'last_seen_at' => now(),
+        ]);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function bannedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'banned_by');
+    }
+
+    public function scopeBanned(Builder $query): void
+    {
+        $query->where('is_banned', true);
+    }
+
+    public function isBanned(): bool
+    {
+        return $this->is_banned;
+    }
+
+    public function banFingerprint(string $reason, ?User $bannedBy = null): void
+    {
+        $this->update([
+            'is_banned' => true,
+            'banned_at' => now(),
+            'ban_reason' => $reason,
+            'banned_by' => $bannedBy?->id,
+        ]);
+    }
+
+    public function unbanFingerprint(): void
+    {
+        $this->update([
+            'is_banned' => false,
+            'banned_at' => null,
+            'ban_reason' => null,
+            'banned_by' => null,
+        ]);
+    }
+}
