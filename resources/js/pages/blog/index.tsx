@@ -26,7 +26,7 @@ export default function Index({ posts, postsPagination }: { posts: Post[]; posts
 
                 {posts.length > 0 && (
                     <>
-                        <div className="mx-auto grid max-w-2xl grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+                        <div className="mx-auto -my-8 grid max-w-2xl grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
                             {posts.map((post) => (
                                 <BlogIndexItem key={post.id} post={post} />
                             ))}

@@ -209,7 +209,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                                                 : item.product?.description || ''}
                                                         </p>
                                                     </div>
-                                                    <p className="mt-1 text-sm font-medium text-gray-900">
+                                                    <p className="mt-3 text-sm font-medium text-gray-900">
                                                         {item.selected_price
                                                             ? `$${item.selected_price.amount} ${item.selected_price.currency}${item.selected_price.interval ? ` / ${item.selected_price.interval}` : ''}`
                                                             : item.product?.default_price
