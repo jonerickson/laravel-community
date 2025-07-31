@@ -28,7 +28,7 @@ const typeConfig = {
     },
 } as const;
 
-export default function AnnouncementBanner({ announcement, onDismiss }: AnnouncementBannerProps) {
+export default function AnnouncementsBanner({ announcement, onDismiss }: AnnouncementBannerProps) {
     const [isDismissed, setIsDismissed] = useState(false);
     const config = typeConfig[announcement.type];
     const IconComponent = config.icon;

@@ -8,6 +8,7 @@ use App\Contracts\Sluggable;
 use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
 /**
@@ -17,6 +18,8 @@ use Illuminate\Support\Str;
  * @property string $slug
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
+ * @property-read int|null $products_count
  *
  * @method static \Database\Factories\ProductCategoryFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory newModelQuery()
@@ -42,6 +45,11 @@ class ProductCategory extends Model implements Sluggable
         'name',
         'slug',
     ];
+
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'categories_products', 'category_id', 'product_id');
+    }
 
     public function generateSlug(): string
     {

@@ -6,11 +6,15 @@ namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductCategory;
+use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
-    public function show(ProductCategory $category)
+    public function __invoke(ProductCategory $category)
     {
-        return back();
+        return Inertia::render('store/categories/show', [
+            'category' => $category,
+            'products' => $category->products()->with(['prices', 'defaultPrice'])->get(),
+        ]);
     }
 }

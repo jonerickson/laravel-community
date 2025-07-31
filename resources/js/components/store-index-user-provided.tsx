@@ -1,9 +1,9 @@
 import Heading from '@/components/heading';
-import type { StoreUserProvidedItem as StoreUserProvidedItemData } from '@/components/store-user-provided-item';
-import StoreUserProvidedItem from '@/components/store-user-provided-item';
+import type { StoreIndexUserProvidedItem as StoreUserProvidedItemData } from '@/components/store-index-user-provided-item';
+import StoreUserProvidedItem from '@/components/store-index-user-provided-item';
 import { Link } from '@inertiajs/react';
 
-export default function StoreUserProvided({ products }: { products: StoreUserProvidedItemData[] }) {
+export default function StoreIndexUserProvided({ products }: { products: StoreUserProvidedItemData[] }) {
     return (
         <div>
             <div className="sm:flex sm:items-baseline sm:justify-between">

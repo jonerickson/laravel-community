@@ -47,7 +47,7 @@ This is a Laravel + React application built using the Laravel React Starter Kit.
 ### Backend Structure
 - **Models**: Core models include `User`, `Product`, `ProductCategory`, `Invoice` with Eloquent relationships
 - **Controllers**: Organized by feature (Auth, Blog, Store, Settings, OAuth)
-- **Filament Resources**: Admin panel resources for product/category management
+- **Filament Resources**: Admin panel resources for storeProduct/category management
 - **Providers**: Custom social auth providers (Discord, Roblox)
 - **Policies**: Authorization logic for resources
 - **Traits**: Reusable functionality like `HasSlug`, `HasFiles`

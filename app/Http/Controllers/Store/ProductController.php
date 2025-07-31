@@ -12,12 +12,11 @@ use Inertia\Response;
 
 class ProductController extends Controller
 {
-    public function __invoke(ProductCategory $category, Product $product): Response
+    public function __invoke(?ProductCategory $category = null, ?Product $product = null): Response
     {
-        $product->load(['prices', 'defaultPrice']);
-
-        return Inertia::render('store/product', [
-            'product' => $product,
+        return Inertia::render('store/products/show', [
+            'product' => $product->loadMissing(['prices', 'defaultPrice']),
+            'category' => $category,
         ]);
     }
 }

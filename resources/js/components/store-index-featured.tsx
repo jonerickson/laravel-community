@@ -6,7 +6,7 @@ interface StoreFeaturedProps {
     products: Product[];
 }
 
-export default function StoreFeatured({ products }: StoreFeaturedProps) {
+export default function StoreIndexFeatured({ products }: StoreFeaturedProps) {
     if (products.length === 0) {
         return null;
     }

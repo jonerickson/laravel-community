@@ -1,6 +1,6 @@
 # Mountain Interactive
 
-A modern Laravel + React marketplace application built with Inertia.js, featuring user authentication, product management, subscription billing, and administrative tools.
+A modern Laravel + React marketplace application built with Inertia.js, featuring user authentication, storeProduct management, subscription billing, and administrative tools.
 
 ## Features
 
@@ -150,7 +150,7 @@ routes/
 ### Marketplace
 - Product catalog with categories
 - File uploads and attachments
-- User-generated product listings
+- User-generated storeProduct listings
 - Search and filtering
 
 ### Billing & Subscriptions

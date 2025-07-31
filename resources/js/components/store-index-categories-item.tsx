@@ -1,7 +1,7 @@
 import { ProductCategory } from '@/types';
 import { Link } from '@inertiajs/react';
 
-export default function StoreCategoriesItem({ item }: { item: ProductCategory }) {
+export default function StoreIndexCategoriesItem({ item }: { item: ProductCategory }) {
     return (
         <Link
             key={item.name}

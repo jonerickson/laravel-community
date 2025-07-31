@@ -14,7 +14,7 @@ class StoreController extends Controller
 {
     public function __invoke(): Response
     {
-        return Inertia::render('store/categories', [
+        return Inertia::render('store/index', [
             'categories' => ProductCategory::query()
                 ->latest()
                 ->take(5)

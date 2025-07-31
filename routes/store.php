@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => ['auth', 'verified'], 'as' => 'store.', 'prefix' => 'store'], function () {
     Route::get('/', StoreController::class)->name('index');
-    Route::get('categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
+    Route::get('categories/{category:slug}', CategoryController::class)->name('categories.show');
+    Route::get('products/{category:slug?}/{product:slug}', ProductController::class)->name('categories.products.show');
     Route::get('products/{product:slug}', ProductController::class)->name('products.show');
     Route::get('subscriptions', SubscriptionController::class)->name('subscriptions');
 

@@ -1,9 +1,9 @@
 import Heading from '@/components/heading';
-import StoreCategoriesItem from '@/components/store-categories-item';
+import StoreIndexCategoriesItem from '@/components/store-index-categories-item';
 import { ProductCategory } from '@/types';
 import { Link } from '@inertiajs/react';
 
-export default function StoreCategories({ categories }: { categories: ProductCategory[] }) {
+export default function StoreIndexCategories({ categories }: { categories: ProductCategory[] }) {
     return (
         <div>
             <div className="sm:flex sm:items-baseline sm:justify-between">
@@ -19,7 +19,7 @@ export default function StoreCategories({ categories }: { categories: ProductCat
                     <div className="relative box-content h-80 overflow-x-auto py-2 xl:overflow-visible">
                         <div className="absolute flex space-x-8 px-4 sm:px-6 lg:px-8 xl:relative xl:grid xl:grid-cols-5 xl:gap-x-8 xl:space-x-0 xl:px-0">
                             {categories.map((category) => (
-                                <StoreCategoriesItem key={category.id} item={category} />
+                                <StoreIndexCategoriesItem key={category.id} item={category} />
                             ))}
                         </div>
                     </div>

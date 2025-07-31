@@ -1,6 +1,6 @@
-import Product from '@/components/product';
+import Product from '@/components/store-product';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Product as ProductType } from '@/types';
+import type { BreadcrumbItem, ProductCategory, Product as ProductType } from '@/types';
 import { Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -8,22 +8,27 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Store',
         href: '/store',
     },
-    {
-        title: 'Product',
-        href: '/store/product',
-    },
 ];
 
 interface ProductPageProps {
     product: ProductType;
+    category?: ProductCategory;
 }
 
-export default function ProductPage({ product }: ProductPageProps) {
+export default function ProductPage({ product, category }: ProductPageProps) {
     const productBreadcrumbs: BreadcrumbItem[] = [
         ...breadcrumbs,
+        ...(category
+            ? [
+                  {
+                      title: category.name,
+                      href: `/store/categories/${category.slug}`,
+                  },
+              ]
+            : []),
         {
             title: product.name,
-            href: `/store/products/${product.slug}`,
+            href: category ? `/store/categories/${category.slug}/products/${product.slug}` : `/store/products/${product.slug}`,
         },
     ];
 

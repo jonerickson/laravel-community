@@ -1,4 +1,4 @@
-import AnnouncementBanner from '@/components/announcement-banner';
+import AnnouncementsBanner from '@/components/announcements-banner';
 import type { Announcement } from '@/types';
 
 interface AnnouncementsListProps {
@@ -14,7 +14,7 @@ export default function AnnouncementsList({ announcements, onDismiss }: Announce
     return (
         <div className="space-y-3">
             {announcements.map((announcement) => (
-                <AnnouncementBanner key={announcement.id} announcement={announcement} onDismiss={onDismiss} />
+                <AnnouncementsBanner key={announcement.id} announcement={announcement} onDismiss={onDismiss} />
             ))}
         </div>
     );
