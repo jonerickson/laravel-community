@@ -8,7 +8,7 @@ import type { BreadcrumbItem, CartResponse, CheckoutResponse, Product, ProductPr
 import { ApiError, apiRequest } from '@/utils/api';
 import { Head, Link, router } from '@inertiajs/react';
 import axios from 'axios';
-import { MessageCircleQuestionIcon, ShoppingCart as ShoppingCartIcon, XIcon } from 'lucide-react';
+import { ImageIcon, MessageCircleQuestionIcon, ShoppingCart as ShoppingCartIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 
 interface CartItem {
@@ -182,8 +182,8 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                                 className="size-32 rounded-md object-cover sm:size-64"
                                             />
                                         ) : (
-                                            <div className="flex size-32 items-center justify-center rounded-md bg-gray-100 sm:size-64">
-                                                <span className="text-gray-400">No image</span>
+                                            <div className="flex size-32 items-center justify-center rounded-md bg-muted sm:size-64">
+                                                <ImageIcon className="h-8 w-8 text-muted-foreground sm:h-12 sm:w-12" />
                                             </div>
                                         )}
                                     </div>

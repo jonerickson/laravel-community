@@ -4,7 +4,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { UserInfo } from '@/components/user-info';
 import { Comment, Post, type PaginatedData } from '@/types';
 import { Deferred } from '@inertiajs/react';
-import { Calendar, Clock } from 'lucide-react';
+import { Calendar, Clock, ImageIcon } from 'lucide-react';
 
 interface BlogPostProps {
     post: Post;
@@ -52,11 +52,15 @@ export default function BlogPost({ post, comments, commentsPagination }: BlogPos
                 </div>
             </div>
 
-            {post.featured_image_url && (
-                <div className="mb-8">
+            <div className="mb-8">
+                {post.featured_image_url ? (
                     <img src={post.featured_image_url} alt={post.title} className="aspect-video w-full rounded-lg object-cover" />
-                </div>
-            )}
+                ) : (
+                    <div className="flex aspect-video w-full items-center justify-center rounded-lg bg-muted">
+                        <ImageIcon className="h-16 w-16 text-muted-foreground" />
+                    </div>
+                )}
+            </div>
 
             <div
                 className="prose prose-lg dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground prose-a:text-primary hover:prose-a:text-primary/80 prose-code:text-foreground prose-pre:bg-muted max-w-none"

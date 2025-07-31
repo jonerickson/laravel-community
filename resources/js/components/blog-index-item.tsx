@@ -2,7 +2,7 @@ import HeadingSmall from '@/components/heading-small';
 import { UserInfo } from '@/components/user-info';
 import { Post } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Clock, MessageCircle } from 'lucide-react';
+import { Clock, ImageIcon, MessageCircle } from 'lucide-react';
 
 interface BlogIndexItemProps {
     post: Post;
@@ -28,7 +28,7 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                         />
                     ) : (
                         <div className="flex aspect-video w-full items-center justify-center rounded-2xl bg-muted sm:aspect-[2/1] lg:aspect-[3/2]">
-                            <span className="text-sm text-muted-foreground">No image</span>
+                            <ImageIcon className="h-16 w-16 text-muted-foreground" />
                         </div>
                     )}
                     <div className="absolute inset-0 rounded-2xl ring-1 ring-gray-900/10 ring-inset" />

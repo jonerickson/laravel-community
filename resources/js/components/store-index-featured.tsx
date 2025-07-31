@@ -1,6 +1,7 @@
 import Heading from '@/components/heading';
 import { type Product } from '@/types';
 import { Link } from '@inertiajs/react';
+import { ImageIcon } from 'lucide-react';
 
 interface StoreFeaturedProps {
     products: Product[];
@@ -25,14 +26,17 @@ export default function StoreIndexFeatured({ products }: StoreFeaturedProps) {
                             index === 0 ? 'sm:row-span-2 sm:aspect-square' : 'sm:aspect-auto'
                         }`}
                     >
-                        <img
-                            alt={product.name}
-                            src={
-                                product.featured_image_url ||
-                                'https://tailwindcss.com/plus-assets/img/ecommerce-images/home-page-03-featured-category.jpg'
-                            }
-                            className="absolute size-full object-cover group-hover:opacity-75"
-                        />
+                        {product.featured_image_url ? (
+                            <img
+                                alt={product.name}
+                                src={product.featured_image_url}
+                                className="absolute size-full object-cover group-hover:opacity-75"
+                            />
+                        ) : (
+                            <div className="absolute flex size-full items-center justify-center bg-muted group-hover:opacity-75">
+                                <ImageIcon className="h-16 w-16 text-muted-foreground" />
+                            </div>
+                        )}
                         <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-50" />
                         <div className="absolute inset-0 flex items-end p-6">
                             <div>

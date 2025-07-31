@@ -5,6 +5,7 @@ import { ApiError, apiRequest } from '@/utils/api';
 import { truncate } from '@/utils/truncate';
 import { Link } from '@inertiajs/react';
 import axios from 'axios';
+import { ImageIcon } from 'lucide-react';
 import { useState } from 'react';
 
 export default function StoreCategoriesProductItem({ product, category }: { product: Product; category: ProductCategory }) {
@@ -42,7 +43,13 @@ export default function StoreCategoriesProductItem({ product, category }: { prod
 
     return (
         <div key={product.id} className="group relative flex flex-col p-4 sm:p-6">
-            <img alt={product.name} src={product.featured_image_url || ''} className="aspect-square rounded-lg bg-gray-200 object-cover" />
+            {product.featured_image_url ? (
+                <img alt={product.name} src={product.featured_image_url} className="aspect-square rounded-lg object-cover" />
+            ) : (
+                <div className="flex aspect-square items-center justify-center rounded-lg bg-muted">
+                    <ImageIcon className="h-12 w-12 text-muted-foreground" />
+                </div>
+            )}
             <div className="flex flex-1 flex-col pt-6 pb-4">
                 <div className="flex-1">
                     <HeadingSmall title={product.name} description={truncate(product.description)} />
