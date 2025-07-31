@@ -16,7 +16,7 @@ export default function StoreCategoriesProductItem({ product, category }: { prod
         setIsAddingToCart(true);
         try {
             const data = await apiRequest<CartResponse>(
-                axios.post(route('store.cart.store'), {
+                axios.post(route('api.cart.store'), {
                     product_id: product.id,
                     price_id: product.default_price.id,
                     quantity: 1,

@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
+use Laravel\Scout\Searchable;
 
 /**
  * @property int $id
@@ -72,6 +73,7 @@ class Product extends Model implements Sluggable
     use HasFiles;
     use HasMetadata;
     use HasSlug;
+    use Searchable;
 
     protected $fillable = [
         'name',
@@ -153,6 +155,16 @@ class Product extends Model implements Sluggable
     public function scopeFeatured($query)
     {
         return $query->where('is_featured', true);
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'type' => $this->type->value ?? '',
+        ];
     }
 
     protected function casts(): array

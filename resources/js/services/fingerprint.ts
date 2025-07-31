@@ -57,7 +57,7 @@ class FingerprintService {
 
             await apiRequest<FingerprintTrackingResponse>(
                 axios.post(
-                    '/api/fingerprint',
+                    route('api.fingerprint'),
                     {
                         fingerprint_id: fingerprint.visitorId,
                         fingerprint_data: fingerprint.components,

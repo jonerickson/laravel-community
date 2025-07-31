@@ -70,7 +70,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
         setLoading(productId);
         try {
             const data = await apiRequest<CartResponse>(
-                axios.put(route('store.cart.update', productId), {
+                axios.put(route('api.cart.update', productId), {
                     quantity: quantity,
                     price_id: priceId,
                 }),
@@ -105,7 +105,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
         setLoading(productId);
         try {
             const data = await apiRequest<CartResponse>(
-                axios.delete(route('store.cart.delete', productId), {
+                axios.delete(route('api.cart.delete', productId), {
                     data: { price_id: priceId },
                 }),
             );
@@ -131,7 +131,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
     const handleCheckout = async () => {
         setCheckoutLoading(true);
         try {
-            const data = await apiRequest<CheckoutResponse>(axios.post(route('store.cart.checkout')));
+            const data = await apiRequest<CheckoutResponse>(axios.post(route('api.checkout')));
             window.location.href = data.checkout_url;
         } catch (error) {
             console.error('Checkout failed:', error);

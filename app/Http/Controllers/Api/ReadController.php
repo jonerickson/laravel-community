@@ -6,54 +6,46 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ApiResource;
-use App\Models\Comment;
-use App\Models\Like;
-use App\Models\Post;
+use App\Models\Topic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
-class LikeController extends Controller
+class ReadController extends Controller
 {
     public function __invoke(Request $request): ApiResource
     {
         $validated = $request->validate([
-            'type' => 'required|string|in:post,comment',
+            'type' => 'required|string|in:topic',
             'id' => 'required|integer',
-            'emoji' => 'required',
         ]);
 
-        $likeable = $this->resolveLikeable($validated['type'], $validated['id']);
+        $readable = $this->resolveReadable($validated['type'], $validated['id']);
 
-        if (! $likeable) {
+        if (! $readable) {
             throw ValidationException::withMessages([
                 'id' => ['The specified item could not be found.'],
             ]);
         }
 
         $user = Auth::guard('api')->user();
-        $result = $likeable->toggleLike($validated['emoji'], $user->id);
-
-        $liked = $result instanceof Like;
+        $result = $readable->markAsRead($user->id);
 
         return new ApiResource(
             resource: [
-                'liked' => $liked,
-                'likes_count' => $likeable->likes_count,
-                'likes_summary' => $likeable->likes_summary,
-                'user_reactions' => $likeable->user_reactions,
+                'marked_as_read' => ! is_bool($result),
+                'is_read_by_user' => $readable->fresh()->is_read_by_user,
                 'type' => $validated['type'],
                 'id' => $validated['id'],
             ],
-            message: 'Item liked successfully.'
+            message: 'Item read successfully.'
         );
     }
 
-    private function resolveLikeable(string $type, int $id)
+    private function resolveReadable(string $type, int $id)
     {
         return match ($type) {
-            'post' => Post::find($id),
-            'comment' => Comment::find($id),
+            'topic' => Topic::find($id),
             default => null,
         };
     }

@@ -16,12 +16,8 @@ Route::group(['middleware' => ['auth', 'verified'], 'as' => 'store.', 'prefix' =
     Route::get('products/{product:slug}', ProductController::class)->name('products.show');
     Route::get('subscriptions', SubscriptionController::class)->name('subscriptions');
 
-    Route::get('cart', [ShoppingCartController::class, 'index'])->name('cart');
-    Route::post('cart', [ShoppingCartController::class, 'store'])->name('cart.store');
-    Route::put('cart/{product}', [ShoppingCartController::class, 'update'])->name('cart.update');
-    Route::delete('cart/{product}', [ShoppingCartController::class, 'delete'])->name('cart.delete');
-    Route::delete('cart', [ShoppingCartController::class, 'clear'])->name('cart.clear');
-    Route::post('cart/checkout', [ShoppingCartController::class, 'checkout'])->name('cart.checkout');
+    Route::get('cart', [ShoppingCartController::class, 'index'])->name('cart.index');
+    Route::delete('cart', [ShoppingCartController::class, 'destroy'])->name('cart.destroy');
 
     Route::redirect('checkout/success', '/store/cart')->name('checkout.success');
     Route::redirect('checkout/cancel', '/store/cart')->name('checkout.cancel');

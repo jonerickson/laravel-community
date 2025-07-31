@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Forums\ForumController;
-use App\Http\Controllers\Forums\ReadController as TopicReadController;
 use App\Http\Controllers\Forums\TopicController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +15,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{forum:slug}/create', [TopicController::class, 'create'])->name('topics.create');
         Route::post('/{forum:slug}/topics', [TopicController::class, 'store'])->name('topics.store');
         Route::post('/{forum:slug}/{topic:slug}/reply', [TopicController::class, 'reply'])->name('topics.reply');
-        Route::post('/{forum:slug}/{topic:slug}/read', TopicReadController::class)->name('topics.read');
     });
 });

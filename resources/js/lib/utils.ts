@@ -5,7 +5,9 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export function currency(value: string) {
+export function currency(value: string | null | undefined) {
+    if (!value) return '0.00';
+
     const amount = parseFloat(value);
 
     return new Intl.NumberFormat('en-US', {

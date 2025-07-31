@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import type { CartResponse, Product as ProductType } from '@/types';
 import { ApiError, apiRequest } from '@/utils/api';
 import axios from 'axios';
-import { CurrencyIcon, GlobeIcon } from 'lucide-react';
+import { CurrencyIcon, GlobeIcon, ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const policies = [
@@ -34,7 +34,7 @@ export default function Product({ product: productData }: ProductProps) {
         setIsAddingToCart(true);
         try {
             const data = await apiRequest<CartResponse>(
-                axios.post(route('store.cart.store'), {
+                axios.post(route('api.cart.store'), {
                     product_id: productData.id,
                     price_id: selectedPriceId,
                     quantity: quantity,
@@ -99,8 +99,12 @@ export default function Product({ product: productData }: ProductProps) {
                     <h2 className="sr-only">Images</h2>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-3 lg:gap-8">
-                        {productData?.featured_image_url && (
+                        {productData?.featured_image_url ? (
                             <img alt={productData.name} src={productData.featured_image_url} className="col-span-2 row-span-2 rounded-lg" />
+                        ) : (
+                            <div className="col-span-2 row-span-2 flex min-h-[600px] items-center justify-center rounded-lg bg-muted">
+                                <ImageIcon className="h-24 w-24 text-muted-foreground" />
+                            </div>
                         )}
                     </div>
                 </div>

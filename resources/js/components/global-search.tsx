@@ -1,54 +1,79 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Calendar, FileText, MessageSquare, Search, Shield, User } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Toggle } from '@/components/ui/toggle';
+import { currency } from '@/lib/utils';
+import { ApiError } from '@/utils/api';
+import axios from 'axios';
+import { Calendar, ChevronDown, FileText, MessageSquare, Search, Shield, ShoppingBag, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface SearchResult {
     id: number;
-    type: 'topic' | 'post' | 'policy';
+    type: 'topic' | 'post' | 'policy' | 'product';
     title: string;
     description?: string;
     excerpt?: string;
     version?: string;
+    price?: string;
     url: string;
     forum_name?: string;
     category_name?: string;
     author_name: string;
     post_type?: string;
     effective_date?: string;
-    created_at: string;
+    created_at?: string;
+    updated_at?: string;
 }
 
 interface SearchResponse {
+    success: boolean;
+    message: string;
     data: SearchResult[];
     meta: {
+        timestamp: string;
+        version: string;
         total: number;
         query: string;
+        types: string[];
+        date_filters: {
+            created_after: string | null;
+            created_before: string | null;
+            updated_after: string | null;
+            updated_before: string | null;
+        };
         counts: {
             topics: number;
             posts: number;
             policies: number;
+            products: number;
         };
     };
+    errors: any;
 }
 
 const typeIcons = {
     topic: MessageSquare,
     post: FileText,
     policy: Shield,
+    product: ShoppingBag,
 };
 
 const typeLabels = {
     topic: 'Topic',
     post: 'Post',
     policy: 'Policy',
+    product: 'Product',
 };
 
 const typeBadgeVariants = {
     topic: 'secondary' as const,
     post: 'outline' as const,
     policy: 'default' as const,
+    product: 'destructive' as const,
 };
 
 export function GlobalSearch() {
@@ -57,8 +82,15 @@ export function GlobalSearch() {
     const [results, setResults] = useState<SearchResult[]>([]);
     const [loading, setLoading] = useState(false);
     const [meta, setMeta] = useState<SearchResponse['meta'] | null>(null);
+    const [selectedTypes, setSelectedTypes] = useState<string[]>(['topic', 'post', 'policy', 'product']);
+    const [dateFiltersOpen, setDateFiltersOpen] = useState(false);
+    const [dateFilters, setDateFilters] = useState({
+        created_after: '',
+        created_before: '',
+        updated_after: '',
+        updated_before: '',
+    });
 
-    // Debounced search
     useEffect(() => {
         if (query.length < 2) {
             setResults([]);
@@ -69,12 +101,24 @@ export function GlobalSearch() {
         const timeoutId = setTimeout(async () => {
             setLoading(true);
             try {
-                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&limit=10`);
-                const data: SearchResponse = await response.json();
-                setResults(data.data);
-                setMeta(data.meta);
+                const response = await axios.get(route('api.search'), {
+                    params: {
+                        q: query,
+                        limit: 10,
+                        types: selectedTypes,
+                        created_after: dateFilters.created_after || undefined,
+                        created_before: dateFilters.created_before || undefined,
+                        updated_after: dateFilters.updated_after || undefined,
+                        updated_before: dateFilters.updated_before || undefined,
+                    },
+                });
+                const data = response.data as SearchResponse;
+                setResults(data.data || []);
+                setMeta(data.meta || null);
             } catch (error) {
                 console.error('Search error:', error);
+                const apiError = error as ApiError;
+                console.error('API Error:', apiError.message);
                 setResults([]);
                 setMeta(null);
             } finally {
@@ -83,9 +127,8 @@ export function GlobalSearch() {
         }, 300);
 
         return () => clearTimeout(timeoutId);
-    }, [query]);
+    }, [query, selectedTypes, dateFilters]);
 
-    // Handle keyboard shortcuts
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
             if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
@@ -107,7 +150,32 @@ export function GlobalSearch() {
         return new Date(dateString).toLocaleDateString();
     };
 
-    const groupedResults = results.reduce(
+    const toggleType = (type: string) => {
+        setSelectedTypes((prev) => {
+            const newTypes = prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type];
+
+            // Ensure at least one type is always selected
+            return newTypes.length === 0 ? [type] : newTypes;
+        });
+    };
+
+    const updateDateFilter = (key: keyof typeof dateFilters, value: string) => {
+        setDateFilters((prev) => ({
+            ...prev,
+            [key]: value,
+        }));
+    };
+
+    const clearDateFilters = () => {
+        setDateFilters({
+            created_after: '',
+            created_before: '',
+            updated_after: '',
+            updated_before: '',
+        });
+    };
+
+    const groupedResults = (results || []).reduce(
         (acc, result) => {
             if (!acc[result.type]) {
                 acc[result.type] = [];
@@ -126,7 +194,113 @@ export function GlobalSearch() {
             </Button>
 
             <CommandDialog open={open} onOpenChange={setOpen} className="w-full lg:!max-w-5xl">
-                <CommandInput placeholder="Search topics, posts, and policies..." value={query} onValueChange={setQuery} />
+                <CommandInput placeholder="Search topics, posts, policies, and products..." value={query} onValueChange={setQuery} />
+
+                <Collapsible open={dateFiltersOpen} onOpenChange={setDateFiltersOpen}>
+                    <div className="flex items-center gap-2 border-b px-3 py-2">
+                        <span className="mr-2 text-sm text-muted-foreground">Filter by:</span>
+                        <Toggle
+                            pressed={selectedTypes.includes('topic')}
+                            onPressedChange={() => toggleType('topic')}
+                            size="sm"
+                            className="h-7 px-2 text-xs"
+                        >
+                            <MessageSquare className="mr-1 h-3 w-3" />
+                            Topics
+                        </Toggle>
+                        <Toggle
+                            pressed={selectedTypes.includes('post')}
+                            onPressedChange={() => toggleType('post')}
+                            size="sm"
+                            className="h-7 px-2 text-xs"
+                        >
+                            <FileText className="mr-1 h-3 w-3" />
+                            Posts
+                        </Toggle>
+                        <Toggle
+                            pressed={selectedTypes.includes('policy')}
+                            onPressedChange={() => toggleType('policy')}
+                            size="sm"
+                            className="h-7 px-2 text-xs"
+                        >
+                            <Shield className="mr-1 h-3 w-3" />
+                            Policies
+                        </Toggle>
+                        <Toggle
+                            pressed={selectedTypes.includes('product')}
+                            onPressedChange={() => toggleType('product')}
+                            size="sm"
+                            className="h-7 px-2 text-xs"
+                        >
+                            <ShoppingBag className="mr-1 h-3 w-3" />
+                            Products
+                        </Toggle>
+                        <CollapsibleTrigger asChild>
+                            <Button variant="ghost" size="sm" className="ml-2 h-7 px-2 text-xs">
+                                <Calendar className="mr-1 h-3 w-3" />
+                                Date Filters
+                                <ChevronDown className="ml-1 h-3 w-3" />
+                            </Button>
+                        </CollapsibleTrigger>
+                    </div>
+                    <CollapsibleContent className="border-b px-3 py-3">
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                                <Label htmlFor="created-after" className="text-xs">
+                                    Created After
+                                </Label>
+                                <Input
+                                    id="created-after"
+                                    type="date"
+                                    value={dateFilters.created_after}
+                                    onChange={(e) => updateDateFilter('created_after', e.target.value)}
+                                    className="h-7 text-xs"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <Label htmlFor="created-before" className="text-xs">
+                                    Created Before
+                                </Label>
+                                <Input
+                                    id="created-before"
+                                    type="date"
+                                    value={dateFilters.created_before}
+                                    onChange={(e) => updateDateFilter('created_before', e.target.value)}
+                                    className="h-7 text-xs"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <Label htmlFor="updated-after" className="text-xs">
+                                    Updated After
+                                </Label>
+                                <Input
+                                    id="updated-after"
+                                    type="date"
+                                    value={dateFilters.updated_after}
+                                    onChange={(e) => updateDateFilter('updated_after', e.target.value)}
+                                    className="h-7 text-xs"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <Label htmlFor="updated-before" className="text-xs">
+                                    Updated Before
+                                </Label>
+                                <Input
+                                    id="updated-before"
+                                    type="date"
+                                    value={dateFilters.updated_before}
+                                    onChange={(e) => updateDateFilter('updated_before', e.target.value)}
+                                    className="h-7 text-xs"
+                                />
+                            </div>
+                        </div>
+                        <div className="mt-3 flex justify-end">
+                            <Button variant="ghost" size="sm" onClick={clearDateFilters} className="h-6 px-2 text-xs">
+                                Clear Filters
+                            </Button>
+                        </div>
+                    </CollapsibleContent>
+                </Collapsible>
                 <CommandList
                     className={`max-h-screen transition-all duration-500 ease-in-out ${
                         results.length > 0 || loading || (query.length >= 2 && results.length === 0) ? 'h-[30rem]' : 'h-32'
@@ -174,11 +348,15 @@ export function GlobalSearch() {
 
                                             {result.excerpt && <div className="line-clamp-1 text-sm text-muted-foreground">{result.excerpt}</div>}
 
+                                            {result.price && <div className="text-sm font-medium text-primary">{currency(result.price)}</div>}
+
                                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                <div className="flex items-center gap-1">
-                                                    <User className="h-3 w-3" />
-                                                    {result.author_name}
-                                                </div>
+                                                {result.author_name && (
+                                                    <div className="flex items-center gap-1">
+                                                        <User className="h-3 w-3" />
+                                                        {result.author_name}
+                                                    </div>
+                                                )}
 
                                                 {result.forum_name && <div>in {result.forum_name}</div>}
 
@@ -186,10 +364,13 @@ export function GlobalSearch() {
 
                                                 {result.version && <div>v{result.version}</div>}
 
-                                                <div className="flex items-center gap-1">
-                                                    <Calendar className="h-3 w-3" />
-                                                    {formatDate(result.effective_date || result.created_at)}
-                                                </div>
+                                                {result.effective_date ||
+                                                    (result.created_at && (
+                                                        <div className="flex items-center gap-1">
+                                                            <Calendar className="h-3 w-3" />
+                                                            {formatDate(result.effective_date || result.created_at)}
+                                                        </div>
+                                                    ))}
                                             </div>
                                         </div>
                                     </CommandItem>

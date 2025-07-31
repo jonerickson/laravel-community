@@ -26,7 +26,12 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
         if (!topic.is_read_by_user) {
             const markAsRead = async () => {
                 try {
-                    await apiRequest(axios.post(route('forums.topics.read', { forum: forum.slug, topic: topic.slug })));
+                    await apiRequest(
+                        axios.post(route('api.read'), {
+                            type: 'topic',
+                            id: topic.id,
+                        }),
+                    );
                 } catch (error) {
                     console.error('Error marking topic as read:', error);
                     const apiError = error as ApiError;
@@ -36,7 +41,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
 
             markAsRead();
         }
-    }, [topic.slug, topic.is_read_by_user, forum.slug]);
+    }, [topic.id, topic.is_read_by_user]);
 
     const topicUrl = `/forums/${forum.slug}/${topic.slug}`;
 

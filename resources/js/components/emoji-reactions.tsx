@@ -64,7 +64,7 @@ export default function EmojiReactions({ post, comment, initialReactions = [], u
 
         try {
             const data = await apiRequest<EmojiReactionResponse>(
-                axios.post(route('like'), {
+                axios.post(route('api.like'), {
                     type: post ? 'post' : 'comment',
                     id: post ? post.id : comment?.id,
                     emoji,
