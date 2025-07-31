@@ -24,17 +24,17 @@ import AppLogo from './app-logo';
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: () => route('dashboard'),
         icon: LayoutGrid,
     },
     {
         title: 'Blog',
-        href: '/blog',
+        href: () => route('blog.index'),
         icon: Newspaper,
     },
     {
         title: 'Forums',
-        href: '/forums',
+        href: () => route('forums.index'),
         icon: LibraryBig,
     },
 ];
@@ -42,22 +42,22 @@ const mainNavItems: NavItem[] = [
 const accountNavItems: NavItem[] = [
     {
         title: 'My Account',
-        href: '/settings/account',
+        href: () => route('settings'),
         icon: CircleUser,
     },
     {
         title: 'Billing',
-        href: '/settings/billing',
+        href: () => route('settings.billing'),
         icon: DollarSign,
     },
     {
         title: 'Orders',
-        href: '/settings/orders',
+        href: () => route('settings.invoices'),
         icon: CircleDollarSign,
     },
     {
         title: 'Payment Methods',
-        href: '/settings/payment-methods',
+        href: () => route('settings.payment-methods'),
         icon: CreditCard,
     },
 ];
@@ -65,12 +65,12 @@ const accountNavItems: NavItem[] = [
 const storeNavItems: NavItem[] = [
     {
         title: 'Store',
-        href: '/store',
+        href: () => route('store.index'),
         icon: ShoppingCart,
     },
     {
         title: 'Subscriptions',
-        href: '/store/subscriptions',
+        href: () => route('store.subscriptions'),
         icon: CalendarSync,
     },
     {

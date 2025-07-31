@@ -128,7 +128,9 @@ class PostResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('featured_image')
-                    ->label('Image')
+                    ->grow(false)
+                    ->alignCenter()
+                    ->label('')
                     ->disk('public')
                     ->size(60)
                     ->square(),
@@ -136,14 +138,11 @@ class PostResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->limit(50),
-                Tables\Columns\IconColumn::make('is_published')
-                    ->boolean()
+                Tables\Columns\ToggleColumn::make('is_published')
                     ->label('Published'),
-                Tables\Columns\IconColumn::make('is_featured')
-                    ->boolean()
+                Tables\Columns\ToggleColumn::make('is_featured')
                     ->label('Featured'),
-                Tables\Columns\IconColumn::make('comments_enabled')
-                    ->boolean()
+                Tables\Columns\ToggleColumn::make('comments_enabled')
                     ->label('Comments'),
                 Tables\Columns\TextColumn::make('author.name')
                     ->label('Author')

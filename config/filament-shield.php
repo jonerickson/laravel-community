@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 return [
     'shield_resource' => [
-        'should_register_navigation' => true,
+        'should_register_navigation' => false,
         'slug' => 'shield/roles',
         'navigation_sort' => -1,
         'navigation_badge' => true,
@@ -26,7 +26,7 @@ return [
         'enabled' => true,
         'name' => 'super_admin',
         'define_via_gate' => false,
-        'intercept_gate' => 'before', // after
+        'intercept_gate' => 'before',
     ],
 
     'panel_user' => [

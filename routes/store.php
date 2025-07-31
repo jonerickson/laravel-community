@@ -5,11 +5,12 @@ declare(strict_types=1);
 use App\Http\Controllers\Store\CategoryController;
 use App\Http\Controllers\Store\ProductController;
 use App\Http\Controllers\Store\ShoppingCartController;
+use App\Http\Controllers\Store\StoreController;
 use App\Http\Controllers\Store\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => ['auth', 'verified'], 'as' => 'store.', 'prefix' => 'store'], function () {
-    Route::get('/', [CategoryController::class, 'index'])->name('categories');
+    Route::get('/', StoreController::class)->name('index');
     Route::get('categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
     Route::get('products/{product:slug}', ProductController::class)->name('products.show');
     Route::get('subscriptions', SubscriptionController::class)->name('subscriptions');

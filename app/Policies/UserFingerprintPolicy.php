@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Models\Forum;
 use App\Models\User;
+use App\Models\UserFingerprint;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class ForumPolicy
+class UserFingerprintPolicy
 {
     use HandlesAuthorization;
 
@@ -17,15 +17,15 @@ class ForumPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_forum');
+        return $user->can('view_any_user::fingerprint');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Forum $forum): bool
+    public function view(User $user, UserFingerprint $userFingerprint): bool
     {
-        return $user->can('view_forum');
+        return $user->can('view_user::fingerprint');
     }
 
     /**
@@ -33,23 +33,23 @@ class ForumPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_forum');
+        return $user->can('create_user::fingerprint');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Forum $forum): bool
+    public function update(User $user, UserFingerprint $userFingerprint): bool
     {
-        return $user->can('update_forum');
+        return $user->can('update_user::fingerprint');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Forum $forum): bool
+    public function delete(User $user, UserFingerprint $userFingerprint): bool
     {
-        return $user->can('delete_forum');
+        return $user->can('delete_user::fingerprint');
     }
 
     /**
@@ -57,15 +57,15 @@ class ForumPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_forum');
+        return $user->can('delete_any_user::fingerprint');
     }
 
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(User $user, Forum $forum): bool
+    public function forceDelete(User $user, UserFingerprint $userFingerprint): bool
     {
-        return $user->can('force_delete_forum');
+        return $user->can('force_delete_user::fingerprint');
     }
 
     /**
@@ -73,15 +73,15 @@ class ForumPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_forum');
+        return $user->can('force_delete_any_user::fingerprint');
     }
 
     /**
      * Determine whether the user can restore.
      */
-    public function restore(User $user, Forum $forum): bool
+    public function restore(User $user, UserFingerprint $userFingerprint): bool
     {
-        return $user->can('restore_forum');
+        return $user->can('restore_user::fingerprint');
     }
 
     /**
@@ -89,15 +89,15 @@ class ForumPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_forum');
+        return $user->can('restore_any_user::fingerprint');
     }
 
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User $user, Forum $forum): bool
+    public function replicate(User $user, UserFingerprint $userFingerprint): bool
     {
-        return $user->can('replicate_forum');
+        return $user->can('replicate_user::fingerprint');
     }
 
     /**
@@ -105,6 +105,6 @@ class ForumPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_forum');
+        return $user->can('reorder_user::fingerprint');
     }
 }

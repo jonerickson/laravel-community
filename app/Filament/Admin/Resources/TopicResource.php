@@ -22,6 +22,8 @@ class TopicResource extends Resource
 
     protected static ?string $navigationGroup = 'Forums';
 
+    protected static ?int $navigationSort = 2;
+
     public static function form(Form $form): Form
     {
         return $form
@@ -56,10 +58,6 @@ class TopicResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('forum.name')
-                    ->label('Forum')
-                    ->searchable()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('author.name')
                     ->label('Author')
                     ->searchable()
@@ -72,12 +70,10 @@ class TopicResource extends Resource
                     ->label('Views')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\IconColumn::make('is_pinned')
-                    ->label('Pinned')
-                    ->boolean(),
-                Tables\Columns\IconColumn::make('is_locked')
-                    ->label('Locked')
-                    ->boolean(),
+                Tables\Columns\ToggleColumn::make('is_pinned')
+                    ->label('Pinned'),
+                Tables\Columns\ToggleColumn::make('is_locked')
+                    ->label('Locked'),
                 //                Tables\Columns\TextColumn::make('last_reply_at')
                 //                    ->label('Last Reply')
                 //                    ->dateTime()
@@ -103,14 +99,9 @@ class TopicResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
+            ])
+            ->defaultPaginationPageOption('all')
+            ->defaultGroup('forum.name');
     }
 
     public static function getPages(): array

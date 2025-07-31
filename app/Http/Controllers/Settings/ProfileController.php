@@ -14,9 +14,6 @@ use Laravel\WorkOS\Http\Requests\AuthKitAccountDeletionRequest;
 
 class ProfileController extends Controller
 {
-    /**
-     * Show the user's profile settings page.
-     */
     public function edit(Request $request): Response
     {
         return Inertia::render('settings/profile', [
@@ -24,9 +21,6 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Update the user's profile settings.
-     */
     public function update(Request $request): RedirectResponse
     {
         $request->validate([
@@ -35,12 +29,9 @@ class ProfileController extends Controller
 
         $request->user()->update(['name' => $request->name]);
 
-        return to_route('profile.edit');
+        return to_route('settings.profile.edit');
     }
 
-    /**
-     * Delete the user's account.
-     */
     public function destroy(AuthKitAccountDeletionRequest $request): RedirectResponse
     {
         return $request->delete(

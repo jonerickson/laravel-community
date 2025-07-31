@@ -8,23 +8,26 @@ export function NavMain({ title, items = [] }: { title: string; items: NavItem[]
         <SidebarGroup className="px-2 py-0">
             <SidebarGroupLabel>{title}</SidebarGroupLabel>
             <SidebarMenu>
-                {items.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild isActive={page.url.startsWith(item.href)} tooltip={{ children: item.title }}>
-                            {item.target === '_blank' ? (
-                                <a href={item.href} target="_blank">
-                                    {item.icon && <item.icon />}
-                                    <span>{item.title}</span>
-                                </a>
-                            ) : (
-                                <Link href={item.href} prefetch>
-                                    {item.icon && <item.icon />}
-                                    <span>{item.title}</span>
-                                </Link>
-                            )}
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                ))}
+                {items.map((item) => {
+                    const href = typeof item.href === 'function' ? item.href() : item.href;
+                    return (
+                        <SidebarMenuItem key={item.title}>
+                            <SidebarMenuButton asChild isActive={page.url.startsWith(href)} tooltip={{ children: item.title }}>
+                                {item.target === '_blank' ? (
+                                    <a href={href} target="_blank">
+                                        {item.icon && <item.icon />}
+                                        <span>{item.title}</span>
+                                    </a>
+                                ) : (
+                                    <Link href={href} prefetch>
+                                        {item.icon && <item.icon />}
+                                        <span>{item.title}</span>
+                                    </Link>
+                                )}
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    );
+                })}
             </SidebarMenu>
         </SidebarGroup>
     );

@@ -102,13 +102,10 @@ class AnnouncementResource extends Resource
                     ->weight('bold'),
                 Tables\Columns\TextColumn::make('type')
                     ->badge(),
-                Tables\Columns\IconColumn::make('is_active')
-                    ->label('Active')
-                    ->boolean()
-                    ->sortable(),
-                Tables\Columns\IconColumn::make('is_dismissible')
-                    ->label('Dismissible')
-                    ->boolean(),
+                Tables\Columns\ToggleColumn::make('is_active')
+                    ->label('Active'),
+                Tables\Columns\ToggleColumn::make('is_dismissible')
+                    ->label('Dismissible'),
                 Tables\Columns\TextColumn::make('starts_at')
                     ->label('Starts')
                     ->dateTime()

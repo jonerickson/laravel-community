@@ -18,7 +18,7 @@ export interface NavGroup {
 
 export interface NavItem {
     title: string;
-    href: string;
+    href: string | (() => string);
     icon?: LucideIcon | null;
     isActive?: boolean;
     target?: string;
@@ -50,7 +50,7 @@ export interface User {
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
 
 export interface Product {
@@ -68,7 +68,6 @@ export interface Product {
     default_price?: ProductPrice | null;
     created_at: string;
     updated_at: string;
-    // Additional properties for dashboard display
     image?: string | null;
     price?: number;
     rating?: number;
@@ -212,6 +211,7 @@ export interface Topic {
     is_pinned: boolean;
     is_locked: boolean;
     views_count: number;
+    order: number;
     posts_count: number;
     last_reply_at?: string | null;
     is_read_by_user: boolean;

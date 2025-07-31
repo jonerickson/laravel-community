@@ -12,6 +12,8 @@ class ListTopics extends ListRecords
 {
     protected static string $resource = TopicResource::class;
 
+    protected ?string $subheading = 'Manage your forum topics.';
+
     protected function getHeaderActions(): array
     {
         return [
