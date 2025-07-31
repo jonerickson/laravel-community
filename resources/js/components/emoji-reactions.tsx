@@ -63,9 +63,13 @@ export default function EmojiReactions({ post, comment, initialReactions = [], u
         setReactions(updatedReactions.filter((r) => r.count > 0));
 
         try {
-            const url = post ? route('posts.like', { post: post.slug }) : route('comments.like', { comment: comment?.id });
-
-            const data = await apiRequest<EmojiReactionResponse>(axios.post(url, { emoji }));
+            const data = await apiRequest<EmojiReactionResponse>(
+                axios.post(route('like'), {
+                    type: post ? 'post' : 'comment',
+                    id: post ? post.id : comment?.id,
+                    emoji,
+                }),
+            );
 
             setReactions(data.likes_summary || []);
             setCurrentUserReactions(data.user_reactions || []);
