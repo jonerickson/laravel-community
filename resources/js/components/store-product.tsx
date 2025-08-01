@@ -1,9 +1,14 @@
 import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
+import { StarRating } from '@/components/star-rating';
+import { StoreProductRating } from '@/components/store-product-rating';
+import { StoreProductReviewsList } from '@/components/store-product-reviews-list';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { CartResponse, Product as ProductType } from '@/types';
+import type { CartResponse, Comment, PaginatedData, Product as ProductType } from '@/types';
 import { ApiError, apiRequest } from '@/utils/api';
+import { Deferred } from '@inertiajs/react';
 import axios from 'axios';
 import { CurrencyIcon, GlobeIcon, ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -15,12 +20,15 @@ const policies = [
 
 interface ProductProps {
     product: ProductType;
+    reviews: Comment[];
+    reviewsPagination: PaginatedData;
 }
 
-export default function Product({ product: productData }: ProductProps) {
+export default function Product({ product: productData, reviews, reviewsPagination }: ProductProps) {
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [quantity, setQuantity] = useState(1);
     const [selectedPriceId, setSelectedPriceId] = useState<number | null>(productData?.default_price?.id || null);
+    const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
 
     useEffect(() => {
         if (productData?.default_price && !selectedPriceId) {
@@ -61,65 +69,96 @@ export default function Product({ product: productData }: ProductProps) {
 
     return (
         <div className="sm:flex sm:items-baseline sm:justify-between">
-            <div className="lg:grid lg:auto-rows-min lg:grid-cols-12 lg:gap-x-8">
+            <div className="lg:grid lg:auto-rows-min lg:grid-cols-12 lg:items-stretch lg:gap-x-8">
                 <div className="lg:col-span-5 lg:col-start-8">
-                    <div className="flex justify-between">
-                        <Heading
-                            title={productData.name}
-                            description={
-                                productData
-                                    ? productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price
-                                        ? `$${(productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price)?.amount} ${(productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price)?.currency}${(productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price)?.interval ? ` / ${(productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price)?.interval}` : ''}`
-                                        : 'Price TBD'
-                                    : '0.00'
-                            }
-                        />
+                    <Heading
+                        title={productData.name}
+                        description={
+                            productData
+                                ? productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price
+                                    ? `$${(productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price)?.amount} ${(productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price)?.currency}${(productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price)?.interval ? ` / ${(productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price)?.interval}` : ''}`
+                                    : 'Price TBD'
+                                : '0.00'
+                        }
+                    />
+                    <div className="-mt-2 flex items-center gap-4">
+                        <StarRating rating={productData.average_rating || 0} showValue={true} />
+                        <Deferred fallback={() => 'Loading...'} data={'reviews'}>
+                            <Dialog open={isRatingModalOpen} onOpenChange={setIsRatingModalOpen}>
+                                <DialogTrigger asChild>
+                                    <button className="text-sm text-primary hover:underline">See all {productData.reviews_count || 0} reviews</button>
+                                </DialogTrigger>
+                                <DialogContent className="max-h-[80vh] min-w-[90vh] overflow-y-auto">
+                                    <DialogHeader>
+                                        <DialogTitle>Product Reviews</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="pt-4">
+                                        <StoreProductReviewsList reviews={reviews || []} reviewsPagination={reviewsPagination} />
+
+                                        <div className="border-t border-muted pt-6">
+                                            <h3 className="mb-4 text-lg font-medium">Write a Review</h3>
+                                            <StoreProductRating
+                                                product={productData}
+                                                onRatingAdded={() => {
+                                                    setIsRatingModalOpen(false);
+                                                    window.location.reload();
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
+                        </Deferred>
                     </div>
-                    {/*<div>*/}
-                    {/*    <h2 className="sr-only">Reviews</h2>*/}
-                    {/*    <div className="flex items-center">*/}
-                    {/*        <p className="text-sm text-muted-foreground">*/}
-                    {/*            {productData.rating}*/}
-                    {/*            <span className="sr-only"> out of 5 stars</span>*/}
-                    {/*        </p>*/}
-                    {/*        <div className="ml-1 flex items-center">*/}
-                    {/*            {[0, 1, 2, 3, 4].map((rating) => (*/}
-                    {/*                <StarIcon*/}
-                    {/*                    key={rating}*/}
-                    {/*                    aria-hidden="true"*/}
-                    {/*                    className={cn(productData.rating > rating ? 'text-yellow-400' : 'text-gray-200', 'size-5 shrink-0')}*/}
-                    {/*                />*/}
-                    {/*            ))}*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
                 </div>
 
-                <div className="mt-8 lg:col-span-7 lg:col-start-1 lg:row-span-3 lg:row-start-1 lg:mt-0">
+                <div className="mt-8 lg:col-span-7 lg:col-start-1 lg:row-span-3 lg:row-start-1 lg:mt-0 lg:flex lg:flex-col">
                     <h2 className="sr-only">Images</h2>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-3 lg:gap-8">
+                    <div className="grid grid-cols-1 lg:flex-1 lg:grid-cols-2 lg:gap-8">
                         {productData?.featured_image_url ? (
-                            <img alt={productData.name} src={productData.featured_image_url} className="col-span-2 row-span-2 rounded-lg" />
+                            <img
+                                alt={productData.name}
+                                src={productData.featured_image_url}
+                                className="col-span-2 row-span-2 h-full w-full rounded-lg object-cover"
+                            />
                         ) : (
-                            <div className="col-span-2 row-span-2 flex min-h-[600px] items-center justify-center rounded-lg bg-muted">
+                            <div className="col-span-2 row-span-2 flex h-full w-full items-center justify-center rounded-lg bg-muted">
                                 <ImageIcon className="h-24 w-24 text-muted-foreground" />
                             </div>
                         )}
                     </div>
+
+                    <div className="mt-4">
+                        <div className="flex gap-2 overflow-x-auto">
+                            <div className="h-16 w-16 flex-shrink-0 rounded border border-border">
+                                {productData?.featured_image_url ? (
+                                    <img
+                                        alt={`${productData.name} thumbnail`}
+                                        src={productData.featured_image_url}
+                                        className="h-full w-full rounded object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex h-full w-full items-center justify-center rounded bg-muted">
+                                        <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="mt-8 lg:col-span-5">
+                <div className="mt-8 lg:col-span-5 lg:flex lg:h-full lg:flex-col">
                     <HeadingSmall title="Description" />
                     <p
                         dangerouslySetInnerHTML={{
                             __html: productData?.description,
                         }}
-                        className="mt-4 text-sm text-muted-foreground"
+                        className="mt-2 text-sm text-muted-foreground"
                     />
 
                     {productData && (
-                        <div className="mt-6 space-y-4">
+                        <div className="mt-8 space-y-4">
                             {productData.prices && productData.prices.length > 0 && (
                                 <div className="flex items-center gap-4">
                                     <label htmlFor="price" className="text-sm font-medium">

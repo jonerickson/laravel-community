@@ -1,4 +1,5 @@
 import HeadingSmall from '@/components/heading-small';
+import { StarRating } from '@/components/star-rating';
 import { Button } from '@/components/ui/button';
 import { CartResponse, Product, ProductCategory } from '@/types';
 import { ApiError, apiRequest } from '@/utils/api';
@@ -53,21 +54,8 @@ export default function StoreCategoriesProductItem({ product, category }: { prod
             <div className="flex flex-1 flex-col pt-6 pb-4">
                 <div className="flex-1">
                     <HeadingSmall title={product.name} description={truncate(product.description)} />
-                    <div className="mt-3 flex flex-col items-center">
-                        <p className="sr-only">{product.rating} out of 5 stars</p>
-                        {/*<div className="flex items-center">*/}
-                        {/*    {[0, 1, 2, 3, 4].map((rating) => (*/}
-                        {/*        <StarIcon*/}
-                        {/*            key={rating}*/}
-                        {/*            aria-hidden="true"*/}
-                        {/*            className={classNames(*/}
-                        {/*                product.rating > rating ? 'text-yellow-400' : 'text-gray-200',*/}
-                        {/*                'size-5 shrink-0',*/}
-                        {/*            )}*/}
-                        {/*        />*/}
-                        {/*    ))}*/}
-                        {/*</div>*/}
-                        {/*<p className="mt-1 text-sm text gray-500">{product.reviewCount} reviews</p>*/}
+                    <div className="mt-3">
+                        <StarRating rating={product.average_rating || 0} size="sm" className="mb-1" />
                     </div>
                 </div>
                 <div className="mt-4 space-y-2">

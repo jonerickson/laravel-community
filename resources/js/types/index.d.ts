@@ -3,6 +3,7 @@ import type { Config } from 'ziggy-js';
 
 export interface Auth {
     user: User;
+    groups: Group[];
     isAdmin: boolean;
 }
 
@@ -48,9 +49,15 @@ export interface User {
     email: string;
     avatar?: string;
     email_verified_at: string | null;
+    groups: Group[];
     created_at: string;
     updated_at: string;
     [key: string]: unknown;
+}
+
+export interface Group {
+    id: number;
+    name: string;
 }
 
 export interface Product {
@@ -71,7 +78,10 @@ export interface Product {
     image?: string | null;
     price?: number;
     rating?: number;
+    average_rating?: number;
+    reviews_count?: number;
     category?: ProductCategory | null;
+    reviews?: Comment[];
 }
 
 export interface ProductPrice {
@@ -173,6 +183,7 @@ export interface Comment {
     is_approved: boolean;
     created_by: number;
     parent_id?: number | null;
+    rating?: number | null;
     likes_count: number;
     likes_summary: EmojiReaction[];
     user_reaction?: string | null;

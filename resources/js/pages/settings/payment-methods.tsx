@@ -86,7 +86,6 @@ function CreditCardComponent({ brand, last4, expMonth, expYear, holderName, isDe
     };
 
     const getBrandLogo = (brand: string) => {
-        // In a real app, you'd return actual brand logos
         return brand.toUpperCase();
     };
 
@@ -94,20 +93,16 @@ function CreditCardComponent({ brand, last4, expMonth, expYear, holderName, isDe
         <Card className="w-full max-w-sm overflow-hidden p-0">
             <CardContent className="p-0">
                 <div className={`relative h-48 w-full bg-gradient-to-br ${getBrandColor(brand)} p-6 text-white shadow-lg`}>
-                    {/* Card decorative elements */}
                     <div className="absolute -top-8 -right-8 h-32 w-32 rounded-full bg-white/10"></div>
                     <div className="absolute -top-4 -right-4 h-20 w-20 rounded-full bg-white/5"></div>
 
-                    {/* Brand logo */}
                     <div className="mb-8 flex items-start justify-between">
                         <CreditCard className="h-8 w-8" />
                         <div className="text-lg font-bold tracking-wider">{getBrandLogo(brand)}</div>
                     </div>
 
-                    {/* Card number */}
                     <div className="mb-6 font-mono text-xl tracking-widest">•••• •••• •••• {last4}</div>
 
-                    {/* Cardholder info */}
                     <div className="flex justify-between text-sm">
                         <div>
                             <div className="text-xs text-white/70">CARDHOLDER</div>
@@ -122,7 +117,6 @@ function CreditCardComponent({ brand, last4, expMonth, expYear, holderName, isDe
                     </div>
                 </div>
 
-                {/* Card actions */}
                 <div className="flex items-center justify-between p-4">
                     <div className="flex items-center gap-2">
                         <div className="text-sm text-muted-foreground">

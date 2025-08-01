@@ -11,7 +11,6 @@ interface AppShellProps {
 export function AppShell({ children, variant = 'header' }: AppShellProps) {
     const isOpen = usePage<SharedData>().props.sidebarOpen;
 
-    // Initialize fingerprint tracking
     useFingerprint();
 
     if (variant === 'header') {

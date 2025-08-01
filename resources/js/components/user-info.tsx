@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useInitials } from '@/hooks/use-initials';
 import { type User } from '@/types';
 
-export function UserInfo({ user, showEmail = false }: { user: User; showEmail?: boolean }) {
+export function UserInfo({ user, showEmail = false, showGroups = false }: { user: User; showEmail?: boolean; showGroups?: boolean }) {
     const getInitials = useInitials();
 
     return (
@@ -17,6 +17,7 @@ export function UserInfo({ user, showEmail = false }: { user: User; showEmail?: 
                 <span className="truncate font-medium">{user.name}</span>
                 {showEmail && <span className="truncate text-xs text-muted-foreground">{user.email}</span>}
             </div>
+            {showGroups && <span className="truncate font-medium">{user.name}</span>}
         </>
     );
 }

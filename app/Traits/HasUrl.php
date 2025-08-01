@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
+use Eloquent;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 /**
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 trait HasUrl
 {

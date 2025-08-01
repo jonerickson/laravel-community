@@ -154,7 +154,6 @@ export function GlobalSearch() {
         setSelectedTypes((prev) => {
             const newTypes = prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type];
 
-            // Ensure at least one type is always selected
             return newTypes.length === 0 ? [type] : newTypes;
         });
     };

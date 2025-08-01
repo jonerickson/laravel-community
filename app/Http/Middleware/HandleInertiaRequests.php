@@ -29,8 +29,9 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
-                'isAdmin' => $request->user()?->hasRole(Utils::getSuperAdminName()),
+                'user' => $user = $request->user(),
+                'groups' => $user?->groups?->pluck(['id', 'name', 'color']),
+                'isAdmin' => $user?->hasRole(Utils::getSuperAdminName()),
             ],
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),

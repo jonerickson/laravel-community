@@ -163,34 +163,27 @@ class Topic extends Model implements Sluggable
     {
         return Attribute::make(
             get: function (): bool {
-                // Don't consider old topics as hot (older than 7 days)
                 $weekAgo = now()->subWeek();
                 if ($this->created_at < $weekAgo) {
                     return false;
                 }
 
-                // Get recent posts (last 24 hours)
                 $dayAgo = now()->subDay();
                 $recentPosts = $this->posts()
                     ->where('created_at', '>=', $dayAgo)
                     ->with('likes')
                     ->get();
 
-                // Calculate posting frequency score (posts per hour in last 24h)
                 $postsInLast24h = $recentPosts->count();
-                $postingScore = $postsInLast24h * 2; // Each post = 2 points
+                $postingScore = $postsInLast24h * 2;
 
-                // Calculate engagement score (likes in last 24h)
                 $likesInLast24h = $recentPosts->sum(function ($post) {
                     return $post->likes()->count();
                 });
-                $engagementScore = $likesInLast24h * 1; // Each like = 1 point
+                $engagementScore = $likesInLast24h * 1;
 
-                // Calculate total activity score
                 $totalScore = $postingScore + $engagementScore;
 
-                // Topic is "hot" if it has a score of 10 or more
-                // This means: 5+ posts OR 10+ likes OR combination in last 24h
                 return $totalScore >= 10;
             }
         )->shouldCache();
@@ -202,10 +195,6 @@ class Topic extends Model implements Sluggable
             'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
-            //            'forum' => [
-            //                'name' => $this->forum?->name ?? ''
-            //            ],
-            //            'author_name' => $this->author?->name ?? '',
             'created_at' => $this->created_at?->toDateTimeString() ?? '',
         ];
     }

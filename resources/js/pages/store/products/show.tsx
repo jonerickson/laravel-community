@@ -1,6 +1,6 @@
 import Product from '@/components/store-product';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, ProductCategory, Product as ProductType } from '@/types';
+import type { BreadcrumbItem, Comment, PaginatedData, ProductCategory, Product as ProductType } from '@/types';
 import { Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -12,10 +12,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface ProductPageProps {
     product: ProductType;
+    reviews: Comment[];
+    reviewsPagination: PaginatedData;
     category?: ProductCategory;
 }
 
-export default function ProductPage({ product, category }: ProductPageProps) {
+export default function ProductPage({ product, reviews, reviewsPagination, category }: ProductPageProps) {
     const productBreadcrumbs: BreadcrumbItem[] = [
         ...breadcrumbs,
         ...(category
@@ -36,7 +38,7 @@ export default function ProductPage({ product, category }: ProductPageProps) {
         <AppLayout breadcrumbs={productBreadcrumbs}>
             <Head title={product.name} />
             <div className="px-4 py-6">
-                <Product product={product} />
+                <Product product={product} reviews={reviews} reviewsPagination={reviewsPagination} />
             </div>
         </AppLayout>
     );

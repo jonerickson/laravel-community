@@ -172,7 +172,6 @@ export default function Subscriptions() {
     const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
 
     const handleSubscribe = (planId: string) => {
-        // Handle subscription logic here
         console.log(`Subscribing to ${planId} with ${billingCycle} billing`);
     };
 
@@ -181,14 +180,12 @@ export default function Subscriptions() {
             <Head title="Subscriptions" />
 
             <div className="mx-auto max-w-7xl px-4 py-8">
-                {/* Header Section */}
                 <div className="mb-12 text-center">
                     <Heading
                         title="Choose Your Plan"
                         description="Select the perfect subscription plan for your needs. Upgrade or downgrade anytime."
                     />
 
-                    {/* Billing Cycle Toggle */}
                     <div className="mt-8 flex justify-center">
                         <Tabs value={billingCycle} onValueChange={(value) => setBillingCycle(value as BillingCycle)}>
                             <TabsList className="grid w-full max-w-md grid-cols-2">
@@ -204,7 +201,6 @@ export default function Subscriptions() {
                     </div>
                 </div>
 
-                {/* Pricing Cards */}
                 <div className="mb-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                     {subscriptionPlans.map((plan) => (
                         <div key={plan.id} className="flex justify-center">
@@ -213,7 +209,6 @@ export default function Subscriptions() {
                     ))}
                 </div>
 
-                {/* Additional Information */}
                 <div className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-3">
                     <Card>
                         <CardContent className="p-6 text-center">

@@ -53,7 +53,7 @@ class SearchController extends Controller
         $topics = collect()
             ->when(in_array('topic', $types), function () use ($query, $limit, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore) {
                 return Topic::search($query)
-                    ->take($limit * 3) // Get more results to account for filtering
+                    ->take($limit * 3)
                     ->get()
                     ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, function ($collection) use ($createdAfter, $createdBefore, $updatedAfter, $updatedBefore) {
                         return $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore);
@@ -77,7 +77,7 @@ class SearchController extends Controller
         $posts = collect()
             ->when(in_array('post', $types), function () use ($query, $limit, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore) {
                 return Post::search($query)
-                    ->take($limit * 3) // Get more results to account for filtering
+                    ->take($limit * 3)
                     ->get()
                     ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, function ($collection) use ($createdAfter, $createdBefore, $updatedAfter, $updatedBefore) {
                         return $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore);
@@ -101,7 +101,7 @@ class SearchController extends Controller
         $policies = collect()
             ->when(in_array('policy', $types), function () use ($query, $limit, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore) {
                 return Policy::search($query)
-                    ->take($limit * 3) // Get more results to account for filtering
+                    ->take($limit * 3)
                     ->get()
                     ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, function ($collection) use ($createdAfter, $createdBefore, $updatedAfter, $updatedBefore) {
                         return $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore);

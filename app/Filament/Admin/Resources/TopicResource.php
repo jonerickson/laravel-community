@@ -74,10 +74,6 @@ class TopicResource extends Resource
                     ->label('Pinned'),
                 Tables\Columns\ToggleColumn::make('is_locked')
                     ->label('Locked'),
-                //                Tables\Columns\TextColumn::make('last_reply_at')
-                //                    ->label('Last Reply')
-                //                    ->dateTime()
-                //                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Traits\HasGroups;
 use BezhanSalleh\FilamentShield\Support\Utils;
 use Exception;
 use Filament\Models\Contracts\FilamentUser;
@@ -16,6 +17,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Cashier\Billable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -43,6 +45,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, UserFingerprint> $fingerprints
  * @property-read int|null $fingerprints_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Group> $groups
+ * @property-read int|null $groups_count
  * @property-read bool $is_banned
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
@@ -95,6 +99,8 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     use Billable;
     use HasApiTokens;
     use HasFactory;
+    use HasGroups;
+    use HasPermissions;
     use HasRoles;
     use Notifiable;
 
@@ -129,6 +135,10 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'is_banned',
     ];
 
+    protected $with = [
+        'groups',
+    ];
+
     /**
      * @throws Exception
      */
@@ -151,6 +161,42 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return Attribute::make(
             get: fn (): bool => $this->fingerprints()->banned()->exists(),
         )->shouldCache();
+    }
+
+    //    public function hasPermissionTo($permission, $guardName = null): bool
+    //    {
+    //        if ($this->hasAnyPermission($permission)) {
+    //            return true;
+    //        }
+    //
+    //        return $this->groups()
+    //            ->active()
+    //            ->whereHas('permissions', function ($query) use ($permission, $guardName) {
+    //                $query->where('name', $permission);
+    //                if ($guardName) {
+    //                    $query->where('guard_name', $guardName);
+    //                }
+    //            })
+    //            ->exists();
+    //    }
+
+    public function can($abilities, $arguments = []): bool
+    {
+        if (is_string($abilities)) {
+            return $this->hasPermissionTo($abilities);
+        }
+
+        if (is_array($abilities)) {
+            foreach ($abilities as $ability) {
+                if ($this->hasPermissionTo($ability)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return parent::can($abilities, $arguments);
     }
 
     protected function casts(): array

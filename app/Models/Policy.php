@@ -104,8 +104,6 @@ class Policy extends Model implements Sluggable
             'title' => $this->title,
             'content' => strip_tags($this->content ?? ''),
             'version' => $this->version,
-            //            'category_name' => $this->category?->name ?? '',
-            //            'author_name' => $this->author?->name ?? '',
             'effective_date' => $this->effective_date?->toDateTimeString(),
             'created_at' => $this->created_at?->toDateTimeString() ?? '',
         ];

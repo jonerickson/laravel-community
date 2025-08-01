@@ -76,7 +76,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${topic.title} - ${forum.name} - Forums`} />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col items-start justify-between md:flex-row">
                     <div className="flex-1">
                         <div className="mb-2 flex items-center gap-2">
                             {topic.is_pinned && <Pin className="h-5 w-5 text-blue-500" />}
@@ -85,25 +85,6 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                         </div>
 
                         {topic.description && <p className="mb-4 text-muted-foreground">{topic.description}</p>}
-
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                                <User className="h-4 w-4" />
-                                <span>Started by {topic.author?.name}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <Eye className="h-4 w-4" />
-                                <span>{topic.views_count} views</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <MessageSquare className="h-4 w-4" />
-                                <span>{topic.posts_count} replies</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <Clock className="h-4 w-4" />
-                                <span>{formatDistanceToNow(new Date(topic.created_at), { addSuffix: true })}</span>
-                            </div>
-                        </div>
                     </div>
 
                     {!topic.is_locked && (
@@ -120,6 +101,25 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                     )}
                 </div>
 
+                <div className="hidden items-center gap-4 text-sm text-muted-foreground sm:flex md:-mt-4">
+                    <div className="flex items-center gap-1">
+                        <User className="h-4 w-4" />
+                        <span>Started by {topic.author?.name}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Eye className="h-4 w-4" />
+                        <span>{topic.views_count} views</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <MessageSquare className="h-4 w-4" />
+                        <span>{topic.posts_count} replies</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        <span>{formatDistanceToNow(new Date(topic.created_at), { addSuffix: true })}</span>
+                    </div>
+                </div>
+
                 {showReplyForm && (
                     <div className="pt-4">
                         <ForumTopicReply
@@ -131,7 +131,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                     </div>
                 )}
 
-                <Pagination pagination={postsPagination} baseUrl={topicUrl} entityLabel="post" className="py-4" />
+                <Pagination pagination={postsPagination} baseUrl={topicUrl} entityLabel="post" className="hidden py-4 md:flex" />
 
                 {posts.length > 0 && (
                     <div className="grid gap-4">

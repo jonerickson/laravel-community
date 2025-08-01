@@ -169,22 +169,14 @@ class Post extends Model implements Sluggable
 
     public function toSearchableArray(): array
     {
-        $searchable = [
+        return [
             'id' => $this->id,
             'title' => $this->title,
             'content' => strip_tags($this->content ?? ''),
             'excerpt' => $this->excerpt,
             'type' => $this->type->value ?? '',
-            //            'author_name' => $this->author?->name ?? '',
             'created_at' => $this->created_at?->toDateTimeString() ?? '',
         ];
-
-        if ($this->type === PostType::Forum && $this->topic) {
-            //            $searchable['topic_title'] = $this->topic->title;
-            //            $searchable['forum_name'] = $this->topic->forum?->name ?? '';
-        }
-
-        return $searchable;
     }
 
     public function shouldBeSearchable(): bool

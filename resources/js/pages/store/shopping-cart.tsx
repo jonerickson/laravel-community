@@ -46,7 +46,6 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
     const [loading, setLoading] = useState<number | null>(null);
     const [checkoutLoading, setCheckoutLoading] = useState(false);
 
-    // Calculate order totals
     const calculateTotals = () => {
         const subtotal = items.reduce((total, item) => {
             const price = item.selected_price || item.product?.default_price;
@@ -56,8 +55,8 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
             return total;
         }, 0);
 
-        const shipping = subtotal > 0 ? 5.0 : 0; // Free shipping over certain amount could be added
-        const taxRate = 0.08; // 8% tax rate
+        const shipping = subtotal > 0 ? 5.0 : 0;
+        const taxRate = 0.08;
         const tax = subtotal * taxRate;
         const total = subtotal + shipping + tax;
 
@@ -153,7 +152,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                         title="Your cart is empty"
                         description="No items in your cart yet. Start shopping to add products to your cart."
                         buttonText="Continue Shopping"
-                        onButtonClick={() => router.visit(route('store.categories'))}
+                        onButtonClick={() => router.visit(route('store.index'))}
                     />
                 </div>
             </AppLayout>

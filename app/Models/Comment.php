@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string $commentable_type
  * @property int $commentable_id
  * @property string $content
+ * @property int|null $rating
  * @property bool $is_approved
  * @property int $created_by
  * @property int|null $parent_id
@@ -37,11 +38,13 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property-read array $user_reactions
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment approved()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment comments()
  * @method static \Database\Factories\CommentFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment pending()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment ratings()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment topLevel()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereCommentableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereCommentableType($value)
@@ -51,6 +54,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereIsApproved($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereParentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereRating($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereUpdatedAt($value)
  *
  * @mixin Eloquent
@@ -65,6 +69,7 @@ class Comment extends Model
         'commentable_type',
         'commentable_id',
         'content',
+        'rating',
         'is_approved',
         'parent_id',
     ];
@@ -102,6 +107,21 @@ class Comment extends Model
     public function isReply(): bool
     {
         return ! is_null($this->parent_id);
+    }
+
+    public function isRating(): bool
+    {
+        return ! is_null($this->rating);
+    }
+
+    public function scopeRatings($query)
+    {
+        return $query->whereNotNull('rating');
+    }
+
+    public function scopeComments($query)
+    {
+        return $query->whereNull('rating');
     }
 
     protected function casts(): array

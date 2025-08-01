@@ -9,6 +9,7 @@ use App\Enums\ProductType;
 use App\Traits\HasFeaturedImage;
 use App\Traits\HasFiles;
 use App\Traits\HasMetadata;
+use App\Traits\HasReviews;
 use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -33,8 +34,11 @@ use Laravel\Scout\Searchable;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductPrice> $activePrices
  * @property-read int|null $active_prices_count
+ * @property-read mixed $average_rating
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductCategory> $categories
  * @property-read int|null $categories_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $comments
+ * @property-read int|null $comments_count
  * @property-read ProductPrice|null $defaultPrice
  * @property-read string|null $featured_image_url
  * @property-read File|null $file
@@ -42,6 +46,8 @@ use Laravel\Scout\Searchable;
  * @property-read int|null $files_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductPrice> $prices
  * @property-read int|null $prices_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $reviews
+ * @property-read int|null $reviews_count
  *
  * @method static \Database\Factories\ProductFactory factory($count = null, $state = [])
  * @method static Builder<static>|Product featured()
@@ -72,6 +78,7 @@ class Product extends Model implements Sluggable
     use HasFeaturedImage;
     use HasFiles;
     use HasMetadata;
+    use HasReviews;
     use HasSlug;
     use Searchable;
 

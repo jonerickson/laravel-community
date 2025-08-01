@@ -20,7 +20,6 @@ export function useFingerprint(): UseFingerprintReturn {
 
                 if (fingerprint) {
                     setFingerprintId(fingerprint.visitorId);
-                    // Track the fingerprint automatically
                     await service.trackFingerprint();
                 } else {
                     setError('Failed to generate fingerprint');

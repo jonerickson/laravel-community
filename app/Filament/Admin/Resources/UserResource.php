@@ -29,29 +29,26 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
-                Forms\Components\Toggle::make('is_banned')
-                    ->label('Banned')
-                    ->reactive(),
-                Forms\Components\DateTimePicker::make('banned_at')
-                    ->label('Banned At')
-                    ->visible(fn (Forms\Get $get) => $get('is_banned')),
-                Forms\Components\Textarea::make('ban_reason')
-                    ->label('Ban Reason')
-                    ->visible(fn (Forms\Get $get) => $get('is_banned'))
-                    ->maxLength(1000),
-                Forms\Components\Select::make('banned_by')
-                    ->label('Banned By')
-                    ->relationship('bannedBy', 'name')
-                    ->visible(fn (Forms\Get $get) => $get('is_banned'))
-                    ->disabled(),
+                Forms\Components\Section::make('User Information')
+                    ->columns()
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->columnSpanFull()
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('email')
+                            ->email()
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\DateTimePicker::make('email_verified_at')
+                            ->label('Email Verified'),
+                        Forms\Components\Select::make('groups')
+                            ->relationship('groups', 'name')
+                            ->multiple()
+                            ->searchable()
+                            ->preload()
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -162,13 +159,6 @@ class UserResource extends Resource
                         ->modalDescription('Are you sure you want to ban the selected users?'),
                 ]),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
     }
 
     public static function getPages(): array

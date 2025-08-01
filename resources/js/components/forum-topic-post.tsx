@@ -1,4 +1,5 @@
 import EmojiReactions from '@/components/emoji-reactions';
+import ForumUserInfo from '@/components/forum-user-info';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import type { Post } from '@/types';
@@ -12,18 +13,10 @@ interface ForumTopicPostProps {
 export default function ForumTopicPost({ post, index }: ForumTopicPostProps) {
     return (
         <Card data-post>
-            <CardContent className="p-6">
-                <div className="flex gap-4">
-                    <div className="flex min-w-0 flex-col items-center gap-2">
-                        <div className="flex flex-col items-center px-8">
-                            <Avatar className="h-12 w-12">
-                                <AvatarFallback>{post.author?.name.charAt(0).toUpperCase()}</AvatarFallback>
-                            </Avatar>
-                            <div className="mt-2 text-center">
-                                <div className="text-sm font-medium">{post.author?.name}</div>
-                                <div className="text-xs text-muted-foreground">{index === 0 ? 'Author' : 'Member'}</div>
-                            </div>
-                        </div>
+            <CardContent className="px-6 py-0 md:py-6">
+                <div className="flex flex-col gap-4 md:flex-row">
+                    <div className="flex min-w-0 flex-col items-start gap-2 md:items-center">
+                        <ForumUserInfo user={post.author} isAuthor={index === 0} />
                     </div>
 
                     <div className="min-w-0 flex-1">

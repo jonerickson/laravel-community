@@ -21,7 +21,7 @@ interface ForumsIndexProps {
 }
 
 export default function ForumsIndex({ forums }: ForumsIndexProps) {
-    const [viewMode, setViewMode] = useCookie<'list' | 'grid'>('forum-view', 'list');
+    const [viewMode, setViewMode] = useCookie<'list' | 'grid'>('forum_view', 'list');
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -30,7 +30,7 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
                 <div className="flex items-start justify-between">
                     <Heading title="Forums" description="Connect with our community and get support" />
 
-                    <div className="flex items-center gap-1 rounded-lg border p-1">
+                    <div className="hidden items-center gap-1 rounded-lg border p-1 md:flex">
                         <Button
                             variant={viewMode === 'list' ? 'default' : 'ghost'}
                             size="sm"

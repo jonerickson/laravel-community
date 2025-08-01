@@ -58,7 +58,7 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
 
     return (
         <div className={`flex items-center justify-between ${className}`}>
-            <div className="text-sm text-muted-foreground">
+            <div className="hidden md:block text-sm text-muted-foreground">
                 Showing {((current_page - 1) * per_page) + 1} to {Math.min(current_page * per_page, total)} of {total} {pluralize(entityLabel, total)}
             </div>
 
