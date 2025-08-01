@@ -38,7 +38,7 @@ class ShoppingCartController extends Controller
         }
 
         $cart = Session::get('shopping_cart', []);
-        $cartKey = $product->id.($priceId ? '_'.$priceId : '');
+        $cartKey = $product->id.'_'.$priceId;
 
         if (isset($cart[$cartKey])) {
             $cart[$cartKey]['quantity'] += $quantity;
@@ -66,16 +66,18 @@ class ShoppingCartController extends Controller
         );
     }
 
-    public function update(Request $request, Product $product): JsonResource
+    public function update(Request $request): JsonResource
     {
         $request->validate([
+            'product_id' => 'required|exists:products,id',
             'price_id' => 'nullable|exists:products_prices,id',
             'quantity' => 'required|integer|min:1|max:99',
         ]);
 
         $cart = Session::get('shopping_cart', []);
+        $productId = $request->input('product_id');
         $priceId = $request->input('price_id');
-        $cartKey = $product->getKey().($priceId ? '_'.$priceId : '');
+        $cartKey = $productId.'_'.$priceId;
 
         if (isset($cart[$cartKey])) {
             $cart[$cartKey]['quantity'] = $request->input('quantity');
@@ -93,11 +95,17 @@ class ShoppingCartController extends Controller
         );
     }
 
-    public function destroy(Request $request, Product $product): JsonResource
+    public function destroy(Request $request): JsonResource
     {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'price_id' => 'nullable|exists:products_prices,id',
+        ]);
+
         $cart = Session::get('shopping_cart', []);
+        $productId = $request->input('product_id');
         $priceId = $request->input('price_id');
-        $cartKey = $product->getKey().($priceId ? '_'.$priceId : '');
+        $cartKey = $productId.'_'.$priceId;
 
         if (isset($cart[$cartKey])) {
             unset($cart[$cartKey]);

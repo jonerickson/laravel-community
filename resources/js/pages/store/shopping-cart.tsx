@@ -69,9 +69,10 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
         setLoading(productId);
         try {
             const data = await apiRequest<CartResponse>(
-                axios.put(route('api.cart.update', productId), {
-                    quantity: quantity,
+                axios.put(route('api.cart.update'), {
+                    product_id: productId,
                     price_id: priceId,
+                    quantity: quantity,
                 }),
             );
 
@@ -104,8 +105,11 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
         setLoading(productId);
         try {
             const data = await apiRequest<CartResponse>(
-                axios.delete(route('api.cart.destroy', productId), {
-                    data: { price_id: priceId },
+                axios.delete(route('api.cart.destroy'), {
+                    data: {
+                        product_id: productId,
+                        price_id: priceId,
+                    },
                 }),
             );
 

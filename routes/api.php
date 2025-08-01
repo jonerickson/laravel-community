@@ -12,9 +12,11 @@ use App\Http\Controllers\Api\ShoppingCartController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => 'auth:api', 'as' => 'api.'], function () {
-    Route::apiResource('/cart', ShoppingCartController::class)->only(['store', 'update', 'destroy']);
+    Route::post('/cart', [ShoppingCartController::class, 'store'])->name('cart.store');
+    Route::put('/cart', [ShoppingCartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart', [ShoppingCartController::class, 'destroy'])->name('cart.destroy');
     Route::post('/checkout', CheckoutController::class)->name('checkout');
-    Route::apiResource('/comments', CommentController::class)->only(['store']);
+    Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::post('/fingerprint', FingerprintController::class)->name('fingerprint');
     Route::post('/like', LikeController::class)->name('like');
     Route::post('/read', ReadController::class)->name('read');
