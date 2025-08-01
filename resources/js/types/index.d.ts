@@ -201,6 +201,7 @@ export interface Forum {
     name: string;
     slug: string;
     description?: string | null;
+    rules?: string | null;
     icon?: string | null;
     color: string;
     order: number;

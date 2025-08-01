@@ -1,5 +1,6 @@
 import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
@@ -50,6 +51,15 @@ export default function ForumShow({ forum, topics, topicsPagination }: ForumShow
                         </Button>
                     </Link>
                 </div>
+
+                {forum.rules && (
+                    <Alert>
+                        <AlertTitle>Forum Rules</AlertTitle>
+                        <AlertDescription>
+                            <p className="prose prose-base" dangerouslySetInnerHTML={{ __html: forum.rules }} />
+                        </AlertDescription>
+                    </Alert>
+                )}
 
                 {topics.length > 0 && (
                     <>

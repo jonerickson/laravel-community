@@ -18,7 +18,7 @@ class TopicResource extends Resource
 {
     protected static ?string $model = Topic::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
+    protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
 
     protected static ?string $navigationGroup = 'Forums';
 
@@ -75,9 +75,9 @@ class TopicResource extends Resource
                 Tables\Columns\ToggleColumn::make('is_locked')
                     ->label('Locked'),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Created')
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('forum')
@@ -97,7 +97,8 @@ class TopicResource extends Resource
                 ]),
             ])
             ->defaultPaginationPageOption('all')
-            ->defaultGroup('forum.name');
+            ->defaultGroup('forum.name')
+            ->defaultSort('created_at');
     }
 
     public static function getPages(): array

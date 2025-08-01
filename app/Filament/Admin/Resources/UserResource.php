@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\UserResource\Pages;
+use App\Filament\Admin\Resources\UserResource\RelationManagers\FingerprintsRelationManager;
 use App\Models\User;
 use App\Models\UserFingerprint;
 use Filament\Forms;
@@ -12,7 +13,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class UserResource extends Resource
@@ -60,11 +60,8 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
-                Tables\Columns\IconColumn::make('email_verified_at')
-                    ->label('Verified')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->falseIcon('heroicon-o-x-circle'),
+                Tables\Columns\TextColumn::make('groups.name')
+                    ->badge(),
                 Tables\Columns\IconColumn::make('is_banned')
                     ->label('Banned')
                     ->boolean()
@@ -72,6 +69,11 @@ class UserResource extends Resource
                     ->falseIcon('heroicon-o-check-circle')
                     ->trueColor('danger')
                     ->falseColor('success'),
+                Tables\Columns\IconColumn::make('email_verified_at')
+                    ->label('Verified')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle'),
                 Tables\Columns\TextColumn::make('banned_at')
                     ->dateTime()
                     ->sortable()
@@ -101,10 +103,13 @@ class UserResource extends Resource
                     ->trueLabel('Banned users only')
                     ->falseLabel('Active users only')
                     ->native(false),
-                Tables\Filters\Filter::make('email_verified')
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('email_verified_at'))
-                    ->label('Email verified only'),
+                Tables\Filters\SelectFilter::make('groups')
+                    ->relationship('groups', 'name')
+                    ->multiple()
+                    ->searchable()
+                    ->preload(),
             ])
+            ->groups(['groups.name'])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('ban')
@@ -159,6 +164,13 @@ class UserResource extends Resource
                         ->modalDescription('Are you sure you want to ban the selected users?'),
                 ]),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            FingerprintsRelationManager::make(),
+        ];
     }
 
     public static function getPages(): array

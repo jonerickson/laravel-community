@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\ForumResource\Pages;
+use App\Filament\Admin\Resources\ForumResource\RelationManagers\TopicsRelationManager;
 use App\Models\Forum;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -27,8 +28,10 @@ class ForumResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Forum Information')
+                    ->columns()
                     ->schema([
                         Forms\Components\TextInput::make('name')
+                            ->helperText('The name of the forum.')
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
@@ -39,22 +42,20 @@ class ForumResource extends Resource
                             ->maxLength(255)
                             ->helperText('URL-friendly version of the name'),
                         Forms\Components\Textarea::make('description')
+                            ->helperText('A helpful description on what the forum is about.')
+                            ->columnSpanFull()
                             ->maxLength(500)
                             ->rows(3),
+                        Forms\Components\RichEditor::make('rules')
+                            ->columnSpanFull()
+                            ->nullable()
+                            ->helperText('Optional rules to display at the top of the forum.'),
                         Forms\Components\TextInput::make('icon')
                             ->maxLength(255)
                             ->helperText('Icon class or emoji'),
                         Forms\Components\ColorPicker::make('color')
                             ->required()
                             ->default('#3b82f6'),
-                        Forms\Components\TextInput::make('order')
-                            ->numeric()
-                            ->default(0)
-                            ->helperText('Lower numbers appear first'),
-                        Forms\Components\Toggle::make('is_active')
-                            ->label('Active')
-                            ->default(true)
-                            ->helperText('Inactive forums are hidden from users'),
                     ]),
             ]);
     }
@@ -129,6 +130,13 @@ class ForumResource extends Resource
             ])
             ->reorderable()
             ->defaultSort('order');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            TopicsRelationManager::make(),
+        ];
     }
 
     public static function getPages(): array

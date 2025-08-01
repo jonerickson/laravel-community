@@ -87,11 +87,6 @@ class UserFingerprintResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->placeholder('Guest'),
-                Tables\Columns\TextColumn::make('user.email')
-                    ->label('Email')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->placeholder('N/A'),
                 Tables\Columns\TextColumn::make('ip_address')
                     ->label('IP Address')
                     ->searchable()
@@ -102,25 +97,12 @@ class UserFingerprintResource extends Resource
                     ->trueIcon('heroicon-o-x-circle')
                     ->falseIcon('heroicon-o-check-circle')
                     ->trueColor('danger')
-                    ->falseColor('success'),
-                Tables\Columns\TextColumn::make('banned_at')
-                    ->label('Banned At')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('ban_reason')
-                    ->label('Ban Reason')
-                    ->limit(50)
-                    ->tooltip(fn ($record) => $record->ban_reason)
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('bannedBy.name')
-                    ->label('Banned By')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->falseColor('success')
+                    ->tooltip(fn ($record) => $record->is_banned ? $record->ban_reason : null),
                 Tables\Columns\TextColumn::make('first_seen_at')
                     ->label('First Seen')
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('last_seen_at')
                     ->label('Last Seen')
                     ->dateTime()
@@ -128,8 +110,7 @@ class UserFingerprintResource extends Resource
                 Tables\Columns\TextColumn::make('user_agent')
                     ->label('User Agent')
                     ->limit(30)
-                    ->tooltip(fn ($record) => $record->user_agent)
-                    ->toggleable(),
+                    ->tooltip(fn ($record) => $record->user_agent),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Updated')
                     ->dateTime()

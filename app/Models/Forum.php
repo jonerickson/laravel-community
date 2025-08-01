@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
  * @property string $name
  * @property string $slug
  * @property string|null $description
+ * @property string|null $rules
  * @property string|null $icon
  * @property string $color
  * @property int $order
@@ -45,6 +46,7 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Forum whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Forum whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Forum whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Forum whereRules($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Forum whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Forum whereUpdatedAt($value)
  *
@@ -58,6 +60,7 @@ class Forum extends Model implements Sluggable
     protected $fillable = [
         'name',
         'description',
+        'rules',
         'icon',
         'color',
         'order',
