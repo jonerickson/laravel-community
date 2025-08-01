@@ -24,7 +24,7 @@ interface SearchResult {
     category_name?: string;
     author_name: string;
     post_type?: string;
-    effective_date?: string;
+    effective_at?: string;
     created_at?: string;
     updated_at?: string;
 }
@@ -363,11 +363,11 @@ export function GlobalSearch() {
 
                                                 {result.version && <div>v{result.version}</div>}
 
-                                                {result.effective_date ||
+                                                {result.effective_at ||
                                                     (result.created_at && (
                                                         <div className="flex items-center gap-1">
                                                             <Calendar className="h-3 w-3" />
-                                                            {formatDate(result.effective_date || result.created_at)}
+                                                            {formatDate(result.effective_at || result.created_at)}
                                                         </div>
                                                     ))}
                                             </div>

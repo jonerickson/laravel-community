@@ -64,7 +64,7 @@ class PolicyResource extends Resource
                                     ->helperText('Enable the policy for viewing.')
                                     ->required()
                                     ->default(true),
-                                Forms\Components\DateTimePicker::make('effective_date')
+                                Forms\Components\DateTimePicker::make('effective_at')
                                     ->default(today())
                                     ->label('Effective Date')
                                     ->helperText('Leave empty for immediate effect'),
@@ -91,8 +91,8 @@ class PolicyResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('version')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('effective_date')
-                    ->label('Effective Date')
+                Tables\Columns\TextColumn::make('effective_at')
+                    ->label('Effective')
                     ->dateTime()
                     ->sortable()
                     ->placeholder('Effective immediately'),

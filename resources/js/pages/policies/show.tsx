@@ -40,10 +40,10 @@ export default function PoliciesShow({ category, policy }: PoliciesShowProps) {
                             <span>{category.name}</span>
                         </div>
 
-                        {policy.effective_date && (
+                        {policy.effective_at && (
                             <div className="flex items-center gap-1">
                                 <Calendar className="h-4 w-4" />
-                                <span>Effective {new Date(policy.effective_date).toLocaleDateString()}</span>
+                                <span>Effective {new Date(policy.effective_at).toLocaleDateString()}</span>
                             </div>
                         )}
 

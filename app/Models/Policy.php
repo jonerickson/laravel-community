@@ -25,7 +25,7 @@ use Laravel\Scout\Searchable;
  * @property int $order
  * @property bool $is_active
  * @property int $created_by
- * @property \Illuminate\Support\Carbon|null $effective_date
+ * @property \Illuminate\Support\Carbon|null $effective_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read User $author
@@ -71,7 +71,7 @@ class Policy extends Model implements Sluggable
         'version',
         'policy_category_id',
         'is_active',
-        'effective_date',
+        'effective_at',
     ];
 
     public function generateSlug(): string
@@ -92,8 +92,8 @@ class Policy extends Model implements Sluggable
     public function scopeEffective($query)
     {
         return $query->where(function ($q) {
-            $q->whereNull('effective_date')
-                ->orWhere('effective_date', '<=', now());
+            $q->whereNull('effective_at')
+                ->orWhere('effective_at', '<=', now());
         });
     }
 
@@ -104,14 +104,14 @@ class Policy extends Model implements Sluggable
             'title' => $this->title,
             'content' => strip_tags($this->content ?? ''),
             'version' => $this->version,
-            'effective_date' => $this->effective_date?->toDateTimeString(),
+            'effective_at' => $this->effective_at?->toDateTimeString(),
             'created_at' => $this->created_at?->toDateTimeString() ?? '',
         ];
     }
 
     public function shouldBeSearchable(): bool
     {
-        return $this->is_active && ($this->effective_date === null || $this->effective_date->isPast());
+        return $this->is_active && ($this->effective_at === null || $this->effective_at->isPast());
     }
 
     public function getUrl(): ?string
@@ -123,7 +123,7 @@ class Policy extends Model implements Sluggable
     {
         return [
             'is_active' => 'boolean',
-            'effective_date' => 'datetime',
+            'effective_at' => 'datetime',
         ];
     }
 }

@@ -116,7 +116,7 @@ class SearchController extends Controller
                             'url' => $policy->url,
                             'category_name' => $policy->category->name,
                             'author_name' => $policy->author->name,
-                            'effective_date' => $policy->effective_date?->toISOString(),
+                            'effective_at' => $policy->effective_at?->toISOString(),
                             'created_at' => $policy->created_at->toISOString(),
                             'updated_at' => $policy->updated_at->toISOString(),
                         ];

@@ -104,7 +104,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
         setLoading(productId);
         try {
             const data = await apiRequest<CartResponse>(
-                axios.delete(route('api.cart.delete', productId), {
+                axios.delete(route('api.cart.destroy', productId), {
                     data: { price_id: priceId },
                 }),
             );

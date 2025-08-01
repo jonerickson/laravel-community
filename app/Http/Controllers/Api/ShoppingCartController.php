@@ -22,7 +22,7 @@ class ShoppingCartController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'price_id' => 'nullable|exists:product_prices,id',
+            'price_id' => 'nullable|exists:products_prices,id',
             'quantity' => 'integer|min:1|max:99',
         ]);
 
@@ -69,7 +69,7 @@ class ShoppingCartController extends Controller
     public function update(Request $request, Product $product): JsonResource
     {
         $request->validate([
-            'price_id' => 'nullable|exists:product_prices,id',
+            'price_id' => 'nullable|exists:products_prices,id',
             'quantity' => 'required|integer|min:1|max:99',
         ]);
 
@@ -93,7 +93,7 @@ class ShoppingCartController extends Controller
         );
     }
 
-    public function delete(Request $request, Product $product): JsonResource
+    public function destroy(Request $request, Product $product): JsonResource
     {
         $cart = Session::get('shopping_cart', []);
         $priceId = $request->input('price_id');

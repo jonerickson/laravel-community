@@ -21,7 +21,7 @@ class PolicyFactory extends Factory
             'version' => $this->faker->numerify('v#.#.#'),
             'policy_category_id' => PolicyCategory::factory(),
             'is_active' => $this->faker->boolean(),
-            'effective_date' => now(),
+            'effective_at' => now(),
         ];
     }
 }

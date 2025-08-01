@@ -259,7 +259,7 @@ export interface Policy {
     content: string;
     version?: string | null;
     is_active: boolean;
-    effective_date?: string | null;
+    effective_at?: string | null;
     order: number;
     policy_category_id: number;
     category?: PolicyCategory;

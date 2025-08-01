@@ -18,7 +18,7 @@ class PolicyController extends Controller
         abort_if(! $category->is_active, 404);
         abort_if($policy->policy_category_id !== $category->id, 404);
 
-        if ($policy->effective_date && $policy->effective_date->isFuture()) {
+        if ($policy->effective_at && $policy->effective_at->isFuture()) {
             abort(404);
         }
 

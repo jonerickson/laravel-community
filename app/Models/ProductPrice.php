@@ -58,6 +58,8 @@ class ProductPrice extends Model
     use HasFactory;
     use HasMetadata;
 
+    protected $table = 'products_prices';
+
     protected $fillable = [
         'product_id',
         'name',
