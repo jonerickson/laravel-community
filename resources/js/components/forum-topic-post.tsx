@@ -1,18 +1,23 @@
 import EmojiReactions from '@/components/emoji-reactions';
+import ForumTopicPostModerationMenu from '@/components/forum-topic-post-moderation-menu';
 import ForumUserInfo from '@/components/forum-user-info';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import type { Post } from '@/types';
+import type { Forum, Post, Topic } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
+import { EyeOff } from 'lucide-react';
 
 interface ForumTopicPostProps {
     post: Post;
     index: number;
+    forum: Forum;
+    topic: Topic;
 }
 
-export default function ForumTopicPost({ post, index }: ForumTopicPostProps) {
+export default function ForumTopicPost({ post, index, forum, topic }: ForumTopicPostProps) {
     return (
-        <Card data-post>
+        <Card data-post className={post.is_published ? '' : 'border-warning-foreground bg-warning'}>
             <CardContent className="px-6 py-0 md:py-6">
                 <div className="flex flex-col gap-4 md:flex-row">
                     <div className="flex min-w-0 flex-col items-start gap-2 md:items-center">
@@ -21,9 +26,18 @@ export default function ForumTopicPost({ post, index }: ForumTopicPostProps) {
 
                     <div className="min-w-0 flex-1">
                         <div className="mb-4 flex items-center justify-between">
-                            <div className="text-sm text-muted-foreground">
-                                Posted {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-muted-foreground">
+                                    Posted {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                                </span>
+                                {!post.is_published && (
+                                    <Badge variant="destructive">
+                                        <EyeOff className="mr-1 h-3 w-3" />
+                                        Unpublished
+                                    </Badge>
+                                )}
                             </div>
+                            <ForumTopicPostModerationMenu post={post} forum={forum} topic={topic} />
                         </div>
 
                         <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />

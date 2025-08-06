@@ -34,13 +34,19 @@ export interface Invoice {
 export type InvoiceStatus = 'draft' | 'open' | 'paid' | 'uncollectible' | 'void';
 
 export interface SharedData {
-    name: string;
-    quote: { message: string; author: string };
     auth: Auth;
-    ziggy: Config & { location: string };
-    sidebarOpen: boolean;
+    name: string;
     cartCount?: number;
+    flash?: FlashData;
+    sidebarOpen: boolean;
+    ziggy: Config & { location: string };
     [key: string]: unknown;
+}
+
+export interface FlashData {
+    scrollToBottom?: boolean;
+    message?: string | null;
+    messageVariant?: string | null;
 }
 
 export interface User {
@@ -154,7 +160,7 @@ export interface Post {
     reading_time?: number;
     published_at?: string | null;
     created_by: number;
-    author?: User;
+    author: User;
     metadata?: Record<string, never> | null;
     created_at: string;
     updated_at: string;

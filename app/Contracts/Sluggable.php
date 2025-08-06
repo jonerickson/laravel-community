@@ -11,5 +11,5 @@ use Illuminate\Database\Eloquent\Model;
  */
 interface Sluggable
 {
-    public function generateSlug(): string;
+    public function generateSlug(): ?string;
 }

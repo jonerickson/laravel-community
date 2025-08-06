@@ -119,7 +119,7 @@ class Product extends Model implements Sluggable
         });
     }
 
-    public function generateSlug(): string
+    public function generateSlug(): ?string
     {
         return Str::slug($this->name);
     }

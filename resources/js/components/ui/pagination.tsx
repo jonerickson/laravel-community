@@ -68,7 +68,7 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
                         href={`${baseUrl}?page=${current_page - 1}`}
                         className="inline-flex"
                     >
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className='cursor-pointer'>
                             <ChevronLeft className="h-4 w-4 mr-1" />
                             Previous
                         </Button>
@@ -94,7 +94,7 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
                             <Button
                                 variant={current_page === page ? "default" : "outline"}
                                 size="sm"
-                                className="min-w-[40px]"
+                                className="min-w-[40px] cursor-pointer"
                             >
                                 {page}
                             </Button>
@@ -107,7 +107,7 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
                         href={`${baseUrl}?page=${current_page + 1}`}
                         className="inline-flex"
                     >
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className='cursor-pointer'>
                             Next
                             <ChevronRight className="h-4 w-4 ml-1" />
                         </Button>

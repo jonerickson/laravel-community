@@ -51,7 +51,7 @@ class ProductCategory extends Model implements Sluggable
         return $this->belongsToMany(Product::class, 'categories_products', 'category_id', 'product_id');
     }
 
-    public function generateSlug(): string
+    public function generateSlug(): ?string
     {
         return Str::slug($this->name);
     }

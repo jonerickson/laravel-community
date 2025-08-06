@@ -66,7 +66,7 @@ class Announcement extends Model implements Sluggable
         'ends_at',
     ];
 
-    public function generateSlug(): string
+    public function generateSlug(): ?string
     {
         return Str::slug($this->title);
     }

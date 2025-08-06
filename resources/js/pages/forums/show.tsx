@@ -44,12 +44,12 @@ export default function ForumShow({ forum, topics, topicsPagination }: ForumShow
                             <Heading title={forum.name} description={forum.description ?? ''} />
                         </div>
                     </div>
-                    <Link href={`/forums/${forum.slug}/create`}>
-                        <Button>
+                    <Button asChild>
+                        <Link href={route('forums.topics.create', { forum: forum.slug })}>
                             <Plus className="mr-2 h-4 w-4" />
                             New Topic
-                        </Button>
-                    </Link>
+                        </Link>
+                    </Button>
                 </div>
 
                 {forum.rules && (

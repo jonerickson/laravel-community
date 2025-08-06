@@ -93,7 +93,7 @@ class Topic extends Model implements Sluggable
         'forum',
     ];
 
-    public function generateSlug(): string
+    public function generateSlug(): ?string
     {
         return Str::slug($this->title);
     }

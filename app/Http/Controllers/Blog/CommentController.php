@@ -26,6 +26,6 @@ class CommentController extends Controller
             'is_approved' => true,
         ]);
 
-        return redirect()->route('blog.show', [$post]);
+        return to_route('blog.show', [$post]);
     }
 }

@@ -28,7 +28,7 @@ class TopicController extends Controller
             ->oldest()
             ->paginate(10);
 
-        return Inertia::render('forums/topic', [
+        return Inertia::render('forums/topics/show', [
             'forum' => $forum,
             'topic' => $topic->load(['author', 'forum']),
             'posts' => $posts->items(),
@@ -38,7 +38,7 @@ class TopicController extends Controller
 
     public function create(Forum $forum): Response
     {
-        return Inertia::render('forums/create-topic', [
+        return Inertia::render('forums/topics/create', [
             'forum' => $forum,
         ]);
     }
@@ -55,12 +55,14 @@ class TopicController extends Controller
         ]);
 
         $topic = DB::transaction(function () use ($validated, $forum) {
-            return Topic::create([
+            $topic = Topic::create([
                 'title' => $validated['title'],
                 'description' => $validated['description'],
                 'forum_id' => $forum->id,
                 'created_by' => Auth::id(),
-            ])->posts()->create([
+            ]);
+
+            $topic->posts()->create([
                 'type' => PostType::Forum,
                 'title' => $validated['title'],
                 'content' => $validated['content'],
@@ -68,28 +70,30 @@ class TopicController extends Controller
                 'published_at' => now(),
                 'created_by' => Auth::id(),
             ]);
+
+            return $topic;
         });
 
-        return redirect()->route('forums.topics.show', [$forum, $topic]);
+        return to_route('forums.topics.show', compact(['forum', 'topic']));
     }
 
-    public function reply(Request $request, Forum $forum, Topic $topic): RedirectResponse
+    public function destroy(Request $request, Forum $forum, Topic $topic): RedirectResponse
     {
-        $validated = $request->validate([
-            'content' => 'required|string',
-        ], [
-            'content.required' => 'Please provide a reply before posting.',
-        ]);
+        if ($topic->created_by !== Auth::id() && ! $request->user()?->hasRole('super_admin')) {
+            abort(403, 'You are not authorized to delete this topic.');
+        }
 
-        $topic->posts()->create([
-            'type' => PostType::Forum,
-            'title' => 'Re: '.$topic->title,
-            'content' => $validated['content'],
-            'is_published' => true,
-            'published_at' => now(),
-            'created_by' => Auth::id(),
-        ]);
+        if ($topic->forum_id !== $forum->id) {
+            abort(404, 'Topic not found.');
+        }
 
-        return back();
+        $topic->posts()->delete();
+        $topic->delete();
+
+        return to_route('forums.show', compact('forum'))
+            ->with([
+                'message' => 'Topic deleted successfully.',
+                'messageVariant' => 'success',
+            ]);
     }
 }

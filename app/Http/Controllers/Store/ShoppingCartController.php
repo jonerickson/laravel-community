@@ -28,6 +28,6 @@ class ShoppingCartController extends Controller
     {
         $this->cartService->clearCart();
 
-        return redirect()->route('store.cart.index')->with('success', 'Cart cleared');
+        return to_route('store.cart.index')->with('success', 'Cart cleared');
     }
 }

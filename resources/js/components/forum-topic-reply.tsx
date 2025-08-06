@@ -11,18 +11,15 @@ interface ForumTopicReplyProps {
     onSuccess?: () => void;
 }
 
-export default function ForumTopicReply({ forumSlug, topicSlug, onCancel, onSuccess }: ForumTopicReplyProps) {
+export default function ForumTopicReply({ forumSlug, topicSlug, onCancel }: ForumTopicReplyProps) {
     const { data, setData, post, processing, errors, reset } = useForm({
         content: '',
     });
 
     const handleReply = (e: React.FormEvent) => {
         e.preventDefault();
-        post(`/forums/${forumSlug}/${topicSlug}/reply`, {
-            onSuccess: () => {
-                reset();
-                onSuccess?.();
-            },
+        post(route('forums.posts.store', { forum: forumSlug, topic: topicSlug }), {
+            onSuccess: () => reset('content'),
         });
     };
 

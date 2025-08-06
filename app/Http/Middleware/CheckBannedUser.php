@@ -21,7 +21,7 @@ class CheckBannedUser
             if ($fingerprint && $fingerprint->isBanned()) {
                 if (! $request->routeIs('banned')) {
                     if (Auth::check()) {
-                        return redirect()->route('banned');
+                        return to_route('banned');
                     }
 
                     return response()->view('errors.banned', [

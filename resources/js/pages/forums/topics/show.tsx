@@ -1,12 +1,13 @@
 import { EmptyState } from '@/components/empty-state';
+import ForumTopicModerationMenu from '@/components/forum-topic-moderation-menu';
 import ForumTopicPost from '@/components/forum-topic-post';
 import ForumTopicReply from '@/components/forum-topic-reply';
 import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Forum, PaginatedData, Post, Topic } from '@/types';
+import type { BreadcrumbItem, Forum, PaginatedData, Post, SharedData, Topic } from '@/types';
 import { ApiError, apiRequest } from '@/utils/api';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowDown, ArrowLeft, Clock, Eye, Lock, MessageSquare, Pin, Reply, User } from 'lucide-react';
@@ -21,6 +22,15 @@ interface TopicShowProps {
 
 export default function TopicShow({ forum, topic, posts, postsPagination }: TopicShowProps) {
     const [showReplyForm, setShowReplyForm] = useState(false);
+    const scrollToBottom = usePage<SharedData>().props.flash?.scrollToBottom;
+
+    useEffect(() => {
+        if (scrollToBottom) {
+            setTimeout(() => {
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            }, 100);
+        }
+    }, [scrollToBottom]);
 
     useEffect(() => {
         if (!topic.is_read_by_user) {
@@ -88,7 +98,8 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                     </div>
 
                     {!topic.is_locked && (
-                        <div className="flex gap-2">
+                        <div className="flex items-center gap-2">
+                            <ForumTopicModerationMenu topic={topic} forum={forum} />
                             <Button onClick={goToLatestPost} variant="outline" className="cursor-pointer">
                                 <ArrowDown className="mr-2 h-4 w-4" />
                                 Latest
@@ -126,12 +137,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
 
                 {showReplyForm && (
                     <div className="pt-4">
-                        <ForumTopicReply
-                            forumSlug={forum.slug}
-                            topicSlug={topic.slug}
-                            onCancel={() => setShowReplyForm(false)}
-                            onSuccess={() => setShowReplyForm(false)}
-                        />
+                        <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} onCancel={() => setShowReplyForm(false)} />
                     </div>
                 )}
 
@@ -140,7 +146,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                 {posts.length > 0 && (
                     <div className="grid gap-4">
                         {posts.map((post, index) => (
-                            <ForumTopicPost key={post.id} post={post} index={index} />
+                            <ForumTopicPost key={post.id} post={post} index={index} forum={forum} topic={topic} />
                         ))}
                     </div>
                 )}
@@ -157,7 +163,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
 
                 {!topic.is_locked && posts.length > 0 && (
                     <div className="pt-4">
-                        <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} onSuccess={() => setShowReplyForm(false)} />
+                        <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} />
                     </div>
                 )}
 

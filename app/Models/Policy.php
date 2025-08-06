@@ -74,7 +74,7 @@ class Policy extends Model implements Sluggable
         'effective_at',
     ];
 
-    public function generateSlug(): string
+    public function generateSlug(): ?string
     {
         return Str::slug($this->title);
     }

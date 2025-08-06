@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use BezhanSalleh\FilamentShield\Support\Utils;
-use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Inertia\Middleware;
@@ -22,23 +21,25 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request): array
     {
-        [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
-
         return [
             ...parent::share($request),
-            'name' => config('app.name'),
-            'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $user = $request->user(),
                 'groups' => $user?->groups?->pluck(['id', 'name', 'color']),
                 'isAdmin' => $user?->hasRole(Utils::getSuperAdminName()),
             ],
+            'cartCount' => $this->getCartCount(),
+            'flash' => [
+                'scrollToBottom' => fn () => $request->session()->pull('scrollToBottom'),
+                'message' => fn () => $request->session()->pull('message'),
+                'messageVariant' => fn () => $request->session()->pull('messageVariant'),
+            ],
+            'name' => config('app.name'),
+            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-            'cartCount' => $this->getCartCount(),
         ];
     }
 

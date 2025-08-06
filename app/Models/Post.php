@@ -24,7 +24,7 @@ use Laravel\Scout\Searchable;
  * @property int $id
  * @property PostType $type
  * @property string $title
- * @property string $slug
+ * @property string|null $slug
  * @property string|null $excerpt
  * @property string $content
  * @property bool $is_published
@@ -115,9 +115,12 @@ class Post extends Model implements Sluggable
         'reading_time',
     ];
 
-    public function generateSlug(): string
+    public function generateSlug(): ?string
     {
-        return Str::slug($this->title);
+        return match ($this->type) {
+            PostType::Blog => Str::slug($this->title),
+            PostType::Forum => null,
+        };
     }
 
     public function topic(): BelongsTo
@@ -163,7 +166,7 @@ class Post extends Model implements Sluggable
     {
         return match ($this->type) {
             PostType::Blog => route('blog.show', $this),
-            PostType::Forum => route('forums.show', $this),
+            PostType::Forum => null,
         };
     }
 

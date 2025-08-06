@@ -57,7 +57,7 @@ class PolicyCategory extends Model implements Sluggable
         'is_active',
     ];
 
-    public function generateSlug(): string
+    public function generateSlug(): ?string
     {
         return Str::slug($this->name);
     }

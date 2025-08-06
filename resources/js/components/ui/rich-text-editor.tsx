@@ -4,7 +4,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import Link from '@tiptap/extension-link';
 import { Button } from '@/components/ui/button';
 import { Bold, Italic, List, ListOrdered, Quote, Undo, Redo, Link as LinkIcon } from 'lucide-react';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 interface RichTextEditorProps {
     content: string;
@@ -29,6 +29,12 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
             onChange(editor.getHTML());
         },
     });
+
+    useEffect(() => {
+        if (editor && content !== editor.getHTML()) {
+            editor.commands.setContent(content);
+        }
+    }, [editor, content]);
 
     const setLink = useCallback(() => {
         if (!editor) return;
