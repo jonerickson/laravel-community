@@ -7,7 +7,7 @@ import { useForm } from '@inertiajs/react';
 interface ForumTopicReplyProps {
     forumSlug: string;
     topicSlug: string;
-    onCancel: () => void;
+    onCancel?: () => void;
     onSuccess?: () => void;
 }
 
@@ -43,12 +43,14 @@ export default function ForumTopicReply({ forumSlug, topicSlug, onCancel, onSucc
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Button type="submit" disabled={processing}>
-                            {processing ? 'Posting...' : 'Post Reply'}
+                        <Button type="submit" disabled={processing} className="cursor-pointer">
+                            {processing ? 'Posting...' : 'Post reply'}
                         </Button>
-                        <Button type="button" variant="outline" onClick={onCancel}>
-                            Cancel
-                        </Button>
+                        {onCancel && (
+                            <Button type="button" variant="outline" onClick={onCancel} className="cursor-pointer">
+                                Cancel
+                            </Button>
+                        )}
                     </div>
                 </form>
             </CardContent>

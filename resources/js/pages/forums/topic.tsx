@@ -89,11 +89,15 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
 
                     {!topic.is_locked && (
                         <div className="flex gap-2">
-                            <Button onClick={goToLatestPost} variant="outline">
+                            <Button onClick={goToLatestPost} variant="outline" className="cursor-pointer">
                                 <ArrowDown className="mr-2 h-4 w-4" />
                                 Latest
                             </Button>
-                            <Button onClick={() => setShowReplyForm(!showReplyForm)} variant={showReplyForm ? 'outline' : 'default'}>
+                            <Button
+                                onClick={() => setShowReplyForm(!showReplyForm)}
+                                variant={showReplyForm ? 'outline' : 'default'}
+                                className="cursor-pointer"
+                            >
                                 <Reply className="mr-2 h-4 w-4" />
                                 Reply
                             </Button>
@@ -153,12 +157,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
 
                 {!topic.is_locked && posts.length > 0 && (
                     <div className="pt-4">
-                        <ForumTopicReply
-                            forumSlug={forum.slug}
-                            topicSlug={topic.slug}
-                            onCancel={() => setShowReplyForm(false)}
-                            onSuccess={() => setShowReplyForm(false)}
-                        />
+                        <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} onSuccess={() => setShowReplyForm(false)} />
                     </div>
                 )}
 

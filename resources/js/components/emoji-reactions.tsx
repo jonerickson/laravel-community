@@ -144,7 +144,7 @@ export default function EmojiReactions({ post, comment, initialReactions = [], u
                             <TooltipTrigger asChild>
                                 <ToggleGroupItem
                                     value={emoji}
-                                    className={`px-2 py-1 text-sm transition-all hover:scale-105 ${hasReactions || isActive ? 'opacity-100' : 'opacity-60'}`}
+                                    className={`cursor-pointer px-2 py-1 text-sm transition-all hover:scale-105 ${hasReactions || isActive ? 'opacity-100' : 'opacity-60'}`}
                                 >
                                     <span className="mr-1">{emoji}</span>
                                     {hasReactions && <span className="text-xs font-medium">{count}</span>}

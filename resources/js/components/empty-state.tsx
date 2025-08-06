@@ -20,7 +20,7 @@ export function EmptyState({ icon, title, description, buttonText, onButtonClick
                 <HeadingSmall title={title} description={description} />
                 {onButtonClick && buttonText && (
                     <div className="mt-6">
-                        <Button onClick={onButtonClick}>
+                        <Button onClick={onButtonClick} className="cursor-pointer">
                             <Plus className="mr-2 h-4 w-4" />
                             {buttonText}
                         </Button>

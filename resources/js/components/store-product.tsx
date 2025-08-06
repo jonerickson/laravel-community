@@ -210,7 +210,11 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                             addToCart();
                         }}
                     >
-                        <Button type="submit" disabled={isAddingToCart || !productData} className="mt-8 flex w-full items-center justify-center">
+                        <Button
+                            type="submit"
+                            disabled={isAddingToCart || !productData}
+                            className="mt-8 flex w-full cursor-pointer items-center justify-center"
+                        >
                             {isAddingToCart ? 'Adding...' : 'Add to cart'}
                         </Button>
                     </form>
