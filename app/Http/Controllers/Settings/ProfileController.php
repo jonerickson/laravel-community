@@ -6,11 +6,11 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\WorkOS\Http\Requests\AuthKitAccountDeletionRequest;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class ProfileController extends Controller
 {
@@ -25,9 +25,17 @@ class ProfileController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'avatar' => ['nullable', 'image', 'max:2048'],
         ]);
 
-        $request->user()->update(['name' => $request->name]);
+        $data = ['name' => $request->name];
+
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $data['avatar'] = $path;
+        }
+
+        $request->user()->update($data);
 
         return to_route('settings.profile.edit');
     }

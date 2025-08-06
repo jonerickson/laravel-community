@@ -163,6 +163,13 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         )->shouldCache();
     }
 
+    public function avatar(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value): ?string => $value ? asset('storage/'.$value) : null,
+        );
+    }
+
     //    public function hasPermissionTo($permission, $guardName = null): bool
     //    {
     //        if ($this->hasAnyPermission($permission)) {

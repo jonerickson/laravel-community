@@ -58,6 +58,7 @@ export interface User {
 export interface Group {
     id: number;
     name: string;
+    color: string;
 }
 
 export interface Product {

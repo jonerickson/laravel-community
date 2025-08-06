@@ -13,7 +13,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::redirect('settings', '/settings/account')->name('settings');
 
     Route::get('settings/account', [ProfileController::class, 'edit'])->name('settings.profile.edit');
-    Route::patch('settings/account', [ProfileController::class, 'update'])->name('settings.profile.update');
+    Route::post('settings/account', [ProfileController::class, 'update'])->name('settings.profile.update');
     Route::delete('settings/account', [ProfileController::class, 'destroy'])->name('settings.profile.destroy');
 
     Route::get('settings/appearance', AppearanceController::class)->name('settings.appearance');

@@ -1,14 +1,16 @@
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useRef, useState } from 'react';
 
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useInitials } from '@/hooks/use-initials';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
@@ -26,21 +28,39 @@ const breadcrumbs: BreadcrumbItem[] = [
 type ProfileForm = {
     name: string;
     email: string;
+    avatar: File | null;
 };
 
 export default function Profile() {
     const { auth } = usePage<SharedData>().props;
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const getInitials = useInitials();
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
+    const { data, setData, post, errors, processing, recentlySuccessful } = useForm<ProfileForm>({
         name: auth.user.name,
         email: auth.user.email,
+        avatar: null,
     });
+
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+        setData('avatar', file);
+
+        if (file) {
+            const url = URL.createObjectURL(file);
+            setPreviewUrl(url);
+        } else {
+            setPreviewUrl(null);
+        }
+    };
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        patch(route('settings.profile.update'), {
+        post(route('settings.profile.update'), {
             preserveScroll: true,
+            forceFormData: true,
         });
     };
 
@@ -53,6 +73,24 @@ export default function Profile() {
                     <HeadingSmall title="Profile information" description="Update your name and email address" />
 
                     <form onSubmit={submit} className="space-y-6">
+                        <div className="grid gap-2">
+                            <Label>Profile Picture</Label>
+                            <div className="flex items-center gap-4">
+                                <Avatar className="h-20 w-20">
+                                    <AvatarImage src={previewUrl || auth.user.avatar || undefined} alt={auth.user.name} />
+                                    <AvatarFallback className="text-lg">{getInitials(auth.user.name)}</AvatarFallback>
+                                </Avatar>
+                                <div className="flex flex-col gap-2">
+                                    <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                                        Choose Photo
+                                    </Button>
+                                    <p className="text-sm text-muted-foreground">JPG, PNG up to 2MB</p>
+                                </div>
+                                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+                            </div>
+                            <InputError message={errors.avatar} />
+                        </div>
+
                         <div className="grid gap-2">
                             <Label htmlFor="name">Name</Label>
 
