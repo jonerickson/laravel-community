@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { ApiError, apiRequest } from '@/utils/api';
 import { router } from '@inertiajs/react';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
@@ -102,20 +101,18 @@ export default function AddPaymentMethodDialog({ open, onOpenChange }: AddPaymen
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="holder-name">Cardholder Name</Label>
                         <Input
                             id="holder-name"
                             type="text"
                             value={holderName}
                             onChange={(e) => setHolderName(e.target.value)}
-                            placeholder="Enter cardholder name"
+                            placeholder="Cardholder name"
                             disabled={loading}
                             required
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Card Information</Label>
                         <div className="rounded-md border border-input px-3 py-2">
                             <CardElement
                                 options={{

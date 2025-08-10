@@ -44,7 +44,7 @@ export default function ForumTopicReply({ forumSlug, topicSlug, onCancel }: Foru
                             {processing ? 'Posting...' : 'Post reply'}
                         </Button>
                         {onCancel && (
-                            <Button type="button" variant="outline" onClick={onCancel}>
+                            <Button type="button" variant="outline" onClick={onCancel} disabled={processing}>
                                 Cancel
                             </Button>
                         )}

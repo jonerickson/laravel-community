@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\ReadController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\ShoppingCartController;
+use App\Http\Controllers\Api\TopicController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => 'auth:api', 'as' => 'api.'], function () {
@@ -25,4 +26,5 @@ Route::group(['middleware' => 'auth:api', 'as' => 'api.'], function () {
     Route::delete('/payment-methods', [PaymentMethodController::class, 'destroy'])->name('payment-methods.destroy');
     Route::post('/read', ReadController::class)->name('read');
     Route::get('/search', SearchController::class)->name('search');
+    Route::delete('/forums/topics', [TopicController::class, 'destroy'])->name('forums.topics.destroy');
 });

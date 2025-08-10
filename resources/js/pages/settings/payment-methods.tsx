@@ -254,7 +254,6 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
 
-    // Update local state when props change (after router.reload)
     useEffect(() => {
         setPaymentMethods(initialPaymentMethods);
     }, [initialPaymentMethods]);
@@ -262,13 +261,12 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
     const handleSetDefault = async (id: string) => {
         try {
             await apiRequest(
-                axios.patch('/api/payment-methods', {
+                axios.patch(route('api.payment-methods.update'), {
                     method: id,
                     is_default: true,
                 }),
             );
 
-            // Reload the page to get updated payment methods and show success message
             router.reload({
                 only: ['paymentMethods'],
                 onSuccess: () => {

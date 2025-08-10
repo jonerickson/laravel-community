@@ -94,7 +94,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                             <Button type="submit" size="sm" disabled={processing}>
                                 {processing ? 'Posting...' : 'Post reply'}
                             </Button>
-                            <Button type="button" variant="outline" size="sm" onClick={() => onReply(0)}>
+                            <Button type="button" variant="outline" size="sm" onClick={() => onReply(0)} disabled={processing}>
                                 Cancel
                             </Button>
                         </div>

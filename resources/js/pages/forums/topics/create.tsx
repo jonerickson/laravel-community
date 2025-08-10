@@ -83,7 +83,7 @@ export default function Create({ forum }: CreateTopicProps) {
                                 <Button type="submit" disabled={processing}>
                                     {processing ? 'Creating topic...' : 'Create topic'}
                                 </Button>
-                                <Button variant="outline" type="button">
+                                <Button variant="outline" type="button" disabled={processing}>
                                     <Link href={route('forums.show', { forum: forum.slug })}>Cancel</Link>
                                 </Button>
                             </div>

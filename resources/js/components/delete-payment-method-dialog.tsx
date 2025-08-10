@@ -29,7 +29,7 @@ export default function DeletePaymentMethodDialog({ open, onOpenChange, paymentM
 
         try {
             await apiRequest(
-                axios.delete('/api/payment-methods', {
+                axios.delete(route('api.payment-methods.destroy'), {
                     data: {
                         method: paymentMethod.id,
                     },
