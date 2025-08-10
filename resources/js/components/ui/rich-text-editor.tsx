@@ -137,10 +137,12 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                     <Redo className="h-4 w-4" />
                 </Button>
             </div>
-            <EditorContent
-                editor={editor}
-                className="prose prose-sm max-w-none p-3 min-h-[150px] focus-within:outline-none flex-1 flex-col"
-            />
+            <div className="p-3 min-h-[150px] cursor-text" onClick={() => editor?.chain().focus().run()}>
+                <EditorContent
+                    editor={editor}
+                    className="prose prose-sm max-w-none focus-within:outline-none [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:min-h-[120px] [&_.ProseMirror]:cursor-text"
+                />
+            </div>
         </div>
     );
 }
