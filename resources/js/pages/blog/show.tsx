@@ -3,13 +3,13 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Comment, PaginatedData, Post } from '@/types';
 import { Head } from '@inertiajs/react';
 
-interface BlogShowPageProps {
+interface BlogShowProps {
     post: Post;
     comments: Comment[];
     commentsPagination: PaginatedData;
 }
 
-export default function Show({ post, comments, commentsPagination }: BlogShowPageProps) {
+export default function BlogShow({ post, comments, commentsPagination }: BlogShowProps) {
     const pageDescription = post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, '') + '...';
 
     const breadcrumbs: BreadcrumbItem[] = [

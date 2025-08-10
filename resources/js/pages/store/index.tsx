@@ -12,15 +12,17 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Index({
-    categories,
-    featuredProducts,
-    userProvidedProducts,
-}: {
+interface StoreIndexProps {
     categories: ProductCategory[];
     featuredProducts: Product[];
     userProvidedProducts: Product[];
-}) {
+}
+
+export default function StoreIndex({
+    categories,
+    featuredProducts,
+    userProvidedProducts,
+}: StoreIndexProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Store" />

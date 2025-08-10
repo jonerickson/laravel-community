@@ -15,7 +15,12 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Index({ posts, postsPagination }: { posts: Post[]; postsPagination: PaginatedData }) {
+interface BlogIndexProps {
+    posts: Post[];
+    postsPagination: PaginatedData;
+}
+
+export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Blog" />

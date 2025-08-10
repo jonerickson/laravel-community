@@ -1,3 +1,4 @@
+import ForumSelectionDialog from '@/components/forum-selection-dialog';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +8,8 @@ import { pluralize } from '@/lib/utils';
 import type { BreadcrumbItem, Forum } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
-import { Circle, Eye, Grid3X3, List, MessageSquare, Pin, Users } from 'lucide-react';
+import { Circle, Eye, Grid3X3, List, MessageSquare, Pin, Plus, Users } from 'lucide-react';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,6 +24,7 @@ interface ForumsIndexProps {
 
 export default function ForumsIndex({ forums }: ForumsIndexProps) {
     const [viewMode, setViewMode] = useCookie<'list' | 'grid'>('forum_view', 'list');
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -30,22 +33,28 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
                 <div className="flex items-start justify-between">
                     <Heading title="Forums" description="Connect with our community and get support" />
 
-                    <div className="hidden items-center gap-1 rounded-lg border p-1 md:flex">
-                        <Button
-                            variant={viewMode === 'list' ? 'default' : 'ghost'}
-                            size="sm"
-                            onClick={() => setViewMode('list')}
-                            className="h-8 px-3"
-                        >
-                            <List className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                            size="sm"
-                            onClick={() => setViewMode('grid')}
-                            className="h-8 px-3"
-                        >
-                            <Grid3X3 className="h-4 w-4" />
+                    <div className="flex items-center gap-3">
+                        <div className="hidden items-center gap-1 rounded-lg border p-1 md:flex">
+                            <Button
+                                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                                size="sm"
+                                onClick={() => setViewMode('list')}
+                                className="h-8 px-3"
+                            >
+                                <List className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                                size="sm"
+                                onClick={() => setViewMode('grid')}
+                                className="h-8 px-3"
+                            >
+                                <Grid3X3 className="h-4 w-4" />
+                            </Button>
+                        </div>
+                        <Button onClick={() => setIsDialogOpen(true)}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            New Topic
                         </Button>
                     </div>
                 </div>
@@ -141,6 +150,12 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
                         </CardContent>
                     </Card>
                 )}
+
+                <ForumSelectionDialog
+                    forums={forums}
+                    isOpen={isDialogOpen}
+                    onClose={() => setIsDialogOpen(false)}
+                />
             </div>
         </AppLayout>
     );

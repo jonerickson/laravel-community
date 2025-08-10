@@ -11,7 +11,7 @@ interface CreateTopicProps {
     forum: Forum;
 }
 
-export default function Create({ forum }: CreateTopicProps) {
+export default function CreateTopic({ forum }: CreateTopicProps) {
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
         description: '',
@@ -79,7 +79,7 @@ export default function Create({ forum }: CreateTopicProps) {
                                 <div className="text-xs text-muted-foreground">This will be the first post in your topic thread.</div>
                             </div>
 
-                            <div className="flex items-center gap-4 pt-4">
+                            <div className="flex items-center gap-4">
                                 <Button type="submit" disabled={processing}>
                                     {processing ? 'Creating topic...' : 'Create topic'}
                                 </Button>

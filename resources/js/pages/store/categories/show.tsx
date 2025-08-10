@@ -2,7 +2,7 @@ import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
 import StoreCategoriesProductItem from '@/components/store-categories-product-item';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Product, ProductCategory as ProductCategoryType } from '@/types';
+import type { BreadcrumbItem, Product, ProductCategory } from '@/types';
 import { Head } from '@inertiajs/react';
 import { ShoppingBag } from 'lucide-react';
 
@@ -13,12 +13,12 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface CategoryPageProps {
-    category: ProductCategoryType;
+interface StoreCategoryShowProps {
+    category: ProductCategory;
     products: Product[];
 }
 
-export default function ProductCategoryPage({ category, products }: CategoryPageProps) {
+export default function StoreCategoryShow({ category, products }: StoreCategoryShowProps) {
     const categoryBreadcrumbs: BreadcrumbItem[] = [
         ...breadcrumbs,
         {
