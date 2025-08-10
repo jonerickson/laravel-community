@@ -40,6 +40,10 @@ export interface SharedData {
     flash?: FlashData;
     sidebarOpen: boolean;
     ziggy: Config & { location: string };
+    quote?: {
+        message: string;
+        author: string;
+    };
     [key: string]: unknown;
 }
 
@@ -276,21 +280,31 @@ export interface Policy {
     updated_at: string;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
     success: boolean;
     message: string;
     data: T;
     meta: {
         timestamp: string;
         version: string;
-        [key: string]: any;
+        [key: string]: unknown;
     };
-    errors?: any[] | null;
+    errors?: Record<string, string[]> | null;
 }
 
 export interface CartResponse {
     cartCount: number;
-    cartItems: any[];
+    cartItems: {
+        product_id: number;
+        price_id?: number | null;
+        name: string;
+        slug: string;
+        quantity: number;
+        product: Product | null;
+        selected_price?: ProductPrice | null;
+        available_prices?: ProductPrice[];
+        added_at: string;
+    }[];
 }
 
 export interface CheckoutResponse {
@@ -298,8 +312,8 @@ export interface CheckoutResponse {
 }
 
 export interface EmojiReactionResponse {
-    likes_summary: any[];
-    user_reactions: any[];
+    likes_summary: EmojiReaction[];
+    user_reactions: string[];
 }
 
 export interface FingerprintTrackingResponse {

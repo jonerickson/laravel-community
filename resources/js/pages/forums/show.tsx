@@ -59,6 +59,9 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                     },
                 }),
             );
+
+            setTopics((prevTopics) => prevTopics.filter((topic) => !selectedTopics.includes(topic.id)));
+            setSelectedTopics([]);
         } catch (error) {
             if (error instanceof ApiError) {
                 alert(`Error: ${error.message}`);

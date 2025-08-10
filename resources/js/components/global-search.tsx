@@ -52,7 +52,7 @@ interface SearchResponse {
             products: number;
         };
     };
-    errors: any;
+    errors: Record<string, string[]>;
 }
 
 const typeIcons = {

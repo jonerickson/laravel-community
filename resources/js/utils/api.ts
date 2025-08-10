@@ -5,7 +5,7 @@ export class ApiError extends Error {
     constructor(
         message: string,
         public statusCode: number,
-        public errors?: any[] | null,
+        public errors?: Record<string, string[]> | null,
         public response?: AxiosResponse,
     ) {
         super(message);

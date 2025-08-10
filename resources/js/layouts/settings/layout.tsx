@@ -55,10 +55,10 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                 variant="ghost"
                                 asChild
                                 className={cn('w-full justify-start', {
-                                    'bg-muted': currentPath === item.href,
+                                    'bg-muted': currentPath === (typeof item.href === 'function' ? item.href() : item.href),
                                 })}
                             >
-                                <Link href={item.href} prefetch>
+                                <Link href={typeof item.href === 'function' ? item.href() : item.href} prefetch>
                                     {item.title}
                                 </Link>
                             </Button>

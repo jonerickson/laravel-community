@@ -12,12 +12,7 @@ interface ForumTopicPostModerationMenuProps {
 
 export default function ForumTopicPostModerationMenu({ post, forum, topic }: ForumTopicPostModerationMenuProps) {
     const { auth } = usePage<SharedData>().props;
-    const {
-        delete: deletePost,
-        patch,
-        setData,
-        reset,
-    } = useForm({
+    const { delete: deletePost } = useForm({
         is_published: post.is_published,
     });
 

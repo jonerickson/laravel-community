@@ -5,7 +5,7 @@ import axios from 'axios';
 
 class FingerprintService {
     private static instance: FingerprintService;
-    private fp: any = null;
+    private fp: Awaited<ReturnType<typeof FingerprintJS.load>> | null = null;
     private fingerprintId: string | null = null;
 
     private constructor() {}
@@ -27,7 +27,7 @@ class FingerprintService {
         }
     }
 
-    public async getFingerprint(): Promise<{ visitorId: string; components: any } | null> {
+    public async getFingerprint(): Promise<{ visitorId: string; components: Record<string, unknown> } | null> {
         if (!this.fp) {
             await this.initialize();
         }
@@ -69,10 +69,18 @@ class FingerprintService {
                     },
                 ),
             );
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Failed to track fingerprint:', error);
 
-            if (error?.response?.status === 403) {
+            if (
+                error &&
+                typeof error === 'object' &&
+                'response' in error &&
+                error.response &&
+                typeof error.response === 'object' &&
+                'status' in error.response &&
+                error.response.status === 403
+            ) {
                 window.location.href = '/banned';
             }
         }

@@ -23,13 +23,6 @@ interface CartItem {
     added_at: string;
 }
 
-interface CartTotal {
-    subtotal: number;
-    tax: number;
-    shipping: number;
-    total: number;
-}
-
 interface ShoppingCartProps {
     cartItems: CartItem[];
 }
