@@ -1,11 +1,5 @@
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Forum } from '@/types';
 import { router } from '@inertiajs/react';
@@ -28,9 +22,7 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumS
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>Select a Forum</DialogTitle>
-                    <DialogDescription>
-                        Choose which forum you'd like to create a new topic in.
-                    </DialogDescription>
+                    <DialogDescription>Choose which forum you'd like to create a new topic in.</DialogDescription>
                 </DialogHeader>
                 <ScrollArea className="max-h-[400px]">
                     <div className="space-y-2">
@@ -38,24 +30,20 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumS
                             <Button
                                 key={forum.id}
                                 variant="ghost"
-                                className="w-full h-auto p-4 justify-start text-left"
+                                className="h-auto w-full justify-start p-4 text-left"
                                 onClick={() => handleForumSelect(forum)}
                             >
-                                <div className="flex items-start gap-3 w-full">
+                                <div className="flex w-full items-start gap-3">
                                     <div
-                                        className="flex h-10 w-10 items-center justify-center rounded-lg text-white flex-shrink-0"
+                                        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg text-white"
                                         style={{ backgroundColor: forum.color }}
                                     >
                                         <MessageSquare className="h-5 w-5" />
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="font-medium text-sm">{forum.name}</div>
-                                        {forum.description && (
-                                            <div className="text-xs text-muted-foreground mt-1 truncate">
-                                                {forum.description}
-                                            </div>
-                                        )}
-                                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-2">
+                                    <div className="min-w-0 flex-1">
+                                        <div className="text-sm font-medium">{forum.name}</div>
+                                        {forum.description && <div className="mt-1 truncate text-xs text-muted-foreground">{forum.description}</div>}
+                                        <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
                                             <span>{forum.topics_count || 0} topics</span>
                                             <span>{forum.posts_count || 0} posts</span>
                                         </div>
@@ -66,8 +54,8 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumS
                     </div>
                 </ScrollArea>
                 {forums.length === 0 && (
-                    <div className="text-center py-6 text-muted-foreground">
-                        <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <div className="py-6 text-center text-muted-foreground">
+                        <MessageSquare className="mx-auto mb-3 h-12 w-12 opacity-50" />
                         <p className="text-sm">No forums available</p>
                     </div>
                 )}

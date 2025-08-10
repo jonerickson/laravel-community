@@ -36,7 +36,6 @@ export default function DeletePaymentMethodDialog({ open, onOpenChange, paymentM
                 }),
             );
 
-            // Success - close dialog and refresh page
             onOpenChange(false);
             router.reload({ only: ['paymentMethods'] });
         } catch (err) {

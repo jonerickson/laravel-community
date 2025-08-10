@@ -18,11 +18,7 @@ interface StoreIndexProps {
     userProvidedProducts: Product[];
 }
 
-export default function StoreIndex({
-    categories,
-    featuredProducts,
-    userProvidedProducts,
-}: StoreIndexProps) {
+export default function StoreIndex({ categories, featuredProducts, userProvidedProducts }: StoreIndexProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Store" />

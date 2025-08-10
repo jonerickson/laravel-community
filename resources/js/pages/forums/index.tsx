@@ -151,11 +151,7 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
                     </Card>
                 )}
 
-                <ForumSelectionDialog
-                    forums={forums}
-                    isOpen={isDialogOpen}
-                    onClose={() => setIsDialogOpen(false)}
-                />
+                <ForumSelectionDialog forums={forums} isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} />
             </div>
         </AppLayout>
     );

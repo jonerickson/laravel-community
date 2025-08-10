@@ -269,9 +269,7 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
 
             router.reload({
                 only: ['paymentMethods'],
-                onSuccess: () => {
-                    // The backend could set a flash message here
-                },
+                onSuccess: () => {},
             });
         } catch (err) {
             console.error('Error setting default payment method:', err);
