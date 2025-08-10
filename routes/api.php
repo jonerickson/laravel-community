@@ -6,10 +6,10 @@ use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\FingerprintController;
 use App\Http\Controllers\Api\LikeController;
+use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\ReadController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\ShoppingCartController;
-use App\Http\Controllers\Api\PaymentMethodController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => 'auth:api', 'as' => 'api.'], function () {
