@@ -25,10 +25,14 @@ class ProfileController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'signature' => ['nullable', 'string', 'max:500'],
             'avatar' => ['nullable', 'image', 'max:2048'],
         ]);
 
-        $data = ['name' => $request->name];
+        $data = [
+            'name' => $request->name,
+            'signature' => $request->signature,
+        ];
 
         if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('avatars', 'public');

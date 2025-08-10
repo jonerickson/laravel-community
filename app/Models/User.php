@@ -25,6 +25,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string $name
  * @property string $email
  * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property string|null $signature
  * @property string $password
  * @property string|null $remember_token
  * @property string|null $stripe_id
@@ -108,6 +109,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'name',
         'email',
         'email_verified_at',
+        'signature',
         'avatar',
         'is_banned',
         'banned_at',

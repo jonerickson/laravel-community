@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { useInitials } from '@/hooks/use-initials';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
@@ -28,6 +29,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 type ProfileForm = {
     name: string;
     email: string;
+    signature: string;
     avatar: File | null;
 };
 
@@ -40,6 +42,7 @@ export default function Profile() {
     const { data, setData, post, errors, processing, recentlySuccessful } = useForm<ProfileForm>({
         name: auth.user.name,
         email: auth.user.email,
+        signature: auth.user.signature || '',
         avatar: null,
     });
 
@@ -121,6 +124,22 @@ export default function Profile() {
                             />
 
                             <InputError className="mt-2" message={errors.email} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="signature">Signature</Label>
+
+                            <RichTextEditor
+                                content={data.signature}
+                                onChange={(content) => setData('signature', content)}
+                                placeholder="Your forum signature (optional)"
+                                className="mt-1"
+                            />
+                            <p className="text-sm text-muted-foreground">
+                                This signature will appear under your posts in forums. Keep it concise and professional.
+                            </p>
+
+                            <InputError className="mt-2" message={errors.signature} />
                         </div>
 
                         <div className="flex items-center gap-4">

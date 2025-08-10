@@ -58,6 +58,7 @@ export interface User {
     name: string;
     email: string;
     avatar?: string;
+    signature?: string;
     email_verified_at: string | null;
     groups: Group[];
     created_at: string;

@@ -123,7 +123,7 @@ CREATE TABLE `forums` (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `rules` longtext COLLATE utf8mb4_unicode_ci,
+  `rules` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `color` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#3b82f6',
   `order` int NOT NULL DEFAULT '0',
@@ -140,10 +140,10 @@ DROP TABLE IF EXISTS `groups`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `groups` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `color` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#6b7280',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `color` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#6b7280',
   `order` int NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -199,7 +199,7 @@ DROP TABLE IF EXISTS `likes`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `likes` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `likeable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `likeable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `likeable_id` bigint unsigned NOT NULL,
   `emoji` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_by` bigint unsigned NOT NULL,
@@ -274,11 +274,11 @@ DROP TABLE IF EXISTS `personal_access_tokens`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `personal_access_tokens` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `tokenable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tokenable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tokenable_id` bigint unsigned NOT NULL,
-  `name` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `abilities` text COLLATE utf8mb4_unicode_ci,
+  `name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `abilities` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `last_used_at` timestamp NULL DEFAULT NULL,
   `expires_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -294,10 +294,10 @@ DROP TABLE IF EXISTS `policies`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `policies` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `version` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `version` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `policy_category_id` bigint unsigned NOT NULL,
   `order` int NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
@@ -318,9 +318,9 @@ DROP TABLE IF EXISTS `policies_categories`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `policies_categories` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `order` int NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -336,7 +336,7 @@ CREATE TABLE `posts` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'blog',
   `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `excerpt` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `is_published` tinyint(1) NOT NULL DEFAULT '0',
@@ -421,7 +421,7 @@ DROP TABLE IF EXISTS `reads`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `reads` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `readable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `readable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `readable_id` bigint unsigned NOT NULL,
   `created_by` bigint unsigned NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -463,8 +463,8 @@ DROP TABLE IF EXISTS `scout_indexes`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `scout_indexes` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `searchable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `searchable_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `searchable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `searchable_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `searchable_data` json NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -569,8 +569,10 @@ CREATE TABLE `users` (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
+  `signature` text COLLATE utf8mb4_unicode_ci,
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `remember_token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `stripe_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `pm_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `pm_last_four` varchar(4) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -598,12 +600,12 @@ DROP TABLE IF EXISTS `users_fingerprints`;
 CREATE TABLE `users_fingerprints` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned DEFAULT NULL,
-  `fingerprint_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fingerprint_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `fingerprint_data` json DEFAULT NULL,
-  `ip_address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ip_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_banned` tinyint(1) NOT NULL DEFAULT '0',
-  `ban_reason` text COLLATE utf8mb4_unicode_ci,
+  `ban_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `banned_by` bigint unsigned DEFAULT NULL,
   `banned_at` timestamp NULL DEFAULT NULL,
   `first_seen_at` timestamp NOT NULL,
@@ -676,3 +678,6 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (34,'2025_07_31_215
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (35,'2025_07_31_230243_create_groups_table',7);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (36,'2025_07_31_230332_create_users_groups_table',7);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (37,'2025_08_01_011302_add_rules_to_forums',8);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (38,'2025_08_06_185220_add_avatar_to_users_table',9);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (39,'2025_08_06_191221_make_slug_nullable_in_posts_table',10);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (40,'2025_08_10_232058_add_signature_to_users_table',11);

@@ -43,7 +43,16 @@ export default function ForumTopicPost({ post, index, forum, topic }: ForumTopic
                         <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
 
                         <div className="mt-4 border-t border-muted pt-2">
-                            <div className="mt-2">
+                            {post.author?.signature && (
+                                <div className="mt-2 text-xs text-muted-foreground">
+                                    <div
+                                        className="prose prose-xs max-w-none italic [&>*]:text-muted-foreground"
+                                        dangerouslySetInnerHTML={{ __html: post.author.signature }}
+                                    />
+                                </div>
+                            )}
+
+                            <div className="mt-4">
                                 <EmojiReactions
                                     post={post}
                                     initialReactions={post.likes_summary}
