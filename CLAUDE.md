@@ -109,6 +109,8 @@ This is a Laravel + React application built using the Laravel React Starter Kit.
 - Follow the existing component structure in `resources/js/components/`
 - Leverage shadcn/ui components as building blocks
 - Always use Lucide React icons instead of Heroicons or other icon libraries
+- Always use the `apiRequest` wrapper from `@/utils/api` for API calls instead of direct axios calls
+- Import and use proper error handling: `import { ApiError, apiRequest } from '@/utils/api';`
 
 ### Laravel Development Guidelines
 - Always use Facades instead of helper functions (e.g., `Auth::id()` not `auth()->id()`)

@@ -40,11 +40,11 @@ export default function ForumTopicReply({ forumSlug, topicSlug, onCancel }: Foru
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Button type="submit" disabled={processing} className="cursor-pointer">
+                        <Button type="submit" disabled={processing}>
                             {processing ? 'Posting...' : 'Post reply'}
                         </Button>
                         {onCancel && (
-                            <Button type="button" variant="outline" onClick={onCancel} className="cursor-pointer">
+                            <Button type="button" variant="outline" onClick={onCancel}>
                                 Cancel
                             </Button>
                         )}

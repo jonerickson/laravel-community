@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Forum;
 use App\Models\Post;
 use App\Models\Topic;
+use BezhanSalleh\FilamentShield\Support\Utils;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,13 +46,17 @@ class PostController extends Controller
 
     public function update(Request $request, Forum $forum, Topic $topic, Post $post): RedirectResponse
     {
-        if ($post->created_by !== Auth::id() && ! $request->user()?->hasRole('super_admin')) {
-            abort(403, 'You are not authorized to moderate this post.');
-        }
+        abort_if(
+            boolean: $post->created_by !== Auth::id() && ! $request->user()?->hasRole(Utils::getSuperAdminName()),
+            code: 403,
+            message: 'You are not authorized to moderate this post.'
+        );
 
-        if ($post->topic_id !== $topic->id) {
-            abort(404, 'Post not found.');
-        }
+        abort_if(
+            boolean: $post->topic_id !== $topic->id,
+            code: 404,
+            message: 'Post not found.'
+        );
 
         $validated = $request->validate([
             'is_published' => 'required|boolean',
@@ -70,13 +75,17 @@ class PostController extends Controller
 
     public function destroy(Request $request, Forum $forum, Topic $topic, Post $post): RedirectResponse
     {
-        if ($post->created_by !== Auth::id() && ! $request->user()?->hasRole('super_admin')) {
-            abort(403, 'You are not authorized to delete this post.');
-        }
+        abort_if(
+            boolean: $post->created_by !== Auth::id() && ! $request->user()?->hasRole(Utils::getSuperAdminName()),
+            code: 403,
+            message: 'You are not authorized to delete this post.'
+        );
 
-        if ($post->topic_id !== $topic->id) {
-            abort(404, 'Post not found.');
-        }
+        abort_if(
+            boolean: $post->topic_id !== $topic->id,
+            code: 404,
+            message: 'Post not found.'
+        );
 
         $post->delete();
 

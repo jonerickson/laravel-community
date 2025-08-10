@@ -83,7 +83,7 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                     />
                     <div className="-mt-2 flex items-center gap-4">
                         <StarRating rating={productData.average_rating || 0} showValue={true} />
-                        <Deferred fallback={() => 'Loading...'} data={'reviews'}>
+                        <Deferred fallback={<div className="text-sm text-primary">Loading reviews...</div>} data="reviews">
                             <Dialog open={isRatingModalOpen} onOpenChange={setIsRatingModalOpen}>
                                 <DialogTrigger asChild>
                                     <button className="text-sm text-primary hover:underline">See all {productData.reviews_count || 0} reviews</button>
@@ -210,11 +210,7 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                             addToCart();
                         }}
                     >
-                        <Button
-                            type="submit"
-                            disabled={isAddingToCart || !productData}
-                            className="mt-8 flex w-full cursor-pointer items-center justify-center"
-                        >
+                        <Button type="submit" disabled={isAddingToCart || !productData} className="mt-8 flex w-full items-center justify-center">
                             {isAddingToCart ? 'Adding...' : 'Add to cart'}
                         </Button>
                     </form>

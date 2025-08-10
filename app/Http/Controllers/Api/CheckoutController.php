@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\ApiResource;
+use App\Services\ShoppingCartService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -12,6 +13,10 @@ use Illuminate\Support\Facades\Auth;
 
 class CheckoutController
 {
+    public function __construct(
+        private readonly ShoppingCartService $cartService
+    ) {}
+
     public function __invoke(Request $request): JsonResource
     {
         $user = Auth::guard('api')->user();
@@ -19,7 +24,7 @@ class CheckoutController
             return ApiResource::error('Authentication required to checkout', ['auth' => ['User must be authenticated.']], 401);
         }
 
-        $cartItems = $this->getCartItems();
+        $cartItems = $this->cartService->getCartItems();
         if (empty($cartItems)) {
             return ApiResource::error('Cart is empty', ['cart' => ['Cart cannot be empty.']], 400);
         }
@@ -58,6 +63,7 @@ class CheckoutController
             $checkout = $user->checkout($lineItems, [
                 'success_url' => route('store.checkout.success').'?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => route('store.cart.index'),
+                'mode' => 'subscription',
                 'metadata' => [
                     'cart_items' => json_encode(array_map(fn ($item) => [
                         'product_id' => $item['product_id'],

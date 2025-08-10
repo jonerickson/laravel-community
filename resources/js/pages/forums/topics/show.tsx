@@ -100,15 +100,11 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                     {!topic.is_locked && (
                         <div className="flex items-center gap-2">
                             <ForumTopicModerationMenu topic={topic} forum={forum} />
-                            <Button onClick={goToLatestPost} variant="outline" className="cursor-pointer">
+                            <Button onClick={goToLatestPost} variant="outline">
                                 <ArrowDown className="mr-2 h-4 w-4" />
                                 Latest
                             </Button>
-                            <Button
-                                onClick={() => setShowReplyForm(!showReplyForm)}
-                                variant={showReplyForm ? 'outline' : 'default'}
-                                className="cursor-pointer"
-                            >
+                            <Button onClick={() => setShowReplyForm(!showReplyForm)} variant={showReplyForm ? 'outline' : 'default'}>
                                 <Reply className="mr-2 h-4 w-4" />
                                 Reply
                             </Button>

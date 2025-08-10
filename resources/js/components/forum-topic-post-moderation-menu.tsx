@@ -59,13 +59,13 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 cursor-pointer p-0">
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                     <MoreHorizontal className="h-4 w-4" />
                     <span className="sr-only">Open menu</span>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleTogglePublish} className="cursor-pointer">
+                <DropdownMenuItem onClick={handleTogglePublish}>
                     {post.is_published ? (
                         <>
                             <EyeOff className="mr-2 h-4 w-4" />
@@ -78,7 +78,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                         </>
                     )}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleDeletePost} className="cursor-pointer text-destructive focus:text-destructive">
+                <DropdownMenuItem onClick={handleDeletePost} className="text-destructive focus:text-destructive">
                     <Trash className="mr-2 h-4 w-4 text-destructive" />
                     Delete Post
                 </DropdownMenuItem>

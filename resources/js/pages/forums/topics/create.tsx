@@ -2,9 +2,7 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
-import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Forum } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -82,10 +80,10 @@ export default function Create({ forum }: CreateTopicProps) {
                             </div>
 
                             <div className="flex items-center gap-4 pt-4">
-                                <Button type="submit" disabled={processing} className="cursor-pointer">
+                                <Button type="submit" disabled={processing}>
                                     {processing ? 'Creating topic...' : 'Create topic'}
                                 </Button>
-                                <Button variant="outline" type="button" className="cursor-pointer">
+                                <Button variant="outline" type="button">
                                     <Link href={route('forums.show', { forum: forum.slug })}>Cancel</Link>
                                 </Button>
                             </div>

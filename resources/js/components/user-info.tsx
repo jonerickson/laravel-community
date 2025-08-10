@@ -13,11 +13,29 @@ export function UserInfo({ user, showEmail = false, showGroups = false }: { user
                     {getInitials(user.name)}
                 </AvatarFallback>
             </Avatar>
-            <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                {showEmail && <span className="truncate text-xs text-muted-foreground">{user.email}</span>}
+            <div className="flex flex-col">
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">{user.name}</span>
+                    {showEmail && <span className="truncate text-xs text-muted-foreground">{user.email}</span>}
+                </div>
+                {showGroups && user.groups.length > 0 && (
+                    <div className="flex text-xs font-medium">
+                        {user.groups.map((group) => (
+                            <>
+                                <span
+                                    key={group.id}
+                                    style={{
+                                        color: group.color || undefined,
+                                    }}
+                                >
+                                    {group.name}
+                                </span>
+                                <span className="mr-1 last:hidden">,</span>
+                            </>
+                        ))}
+                    </div>
+                )}
             </div>
-            {showGroups && <span className="truncate font-medium">{user.name}</span>}
         </>
     );
 }

@@ -8,7 +8,7 @@ import type { BreadcrumbItem, CartResponse, CheckoutResponse, Product, ProductPr
 import { ApiError, apiRequest } from '@/utils/api';
 import { Head, Link, router } from '@inertiajs/react';
 import axios from 'axios';
-import { ImageIcon, MessageCircleQuestionIcon, ShoppingCart as ShoppingCartIcon, XIcon } from 'lucide-react';
+import { ImageIcon, ShoppingCart as ShoppingCartIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 
 interface CartItem {
@@ -63,7 +63,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
         return { subtotal, shipping, tax, total };
     };
 
-    const { subtotal, shipping, tax, total } = calculateTotals();
+    const { subtotal, total } = calculateTotals();
 
     const updateQuantity = async (productId: number, quantity: number, priceId?: number | null) => {
         setLoading(productId);
@@ -298,26 +298,6 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                             <div className="flex items-center justify-between">
                                 <dt className="text-sm text-gray-600">Subtotal</dt>
                                 <dd className="text-sm font-medium text-gray-900">${subtotal.toFixed(2)}</dd>
-                            </div>
-                            <div className="flex items-center justify-between border-t border-gray-200 pt-4">
-                                <dt className="flex items-center text-sm text-gray-600">
-                                    <span>Shipping estimate</span>
-                                    <a href="#" className="ml-2 shrink-0 text-gray-400 hover:text-gray-500">
-                                        <span className="sr-only">Learn more about how shipping is calculated</span>
-                                        <MessageCircleQuestionIcon aria-hidden="true" className="size-5" />
-                                    </a>
-                                </dt>
-                                <dd className="text-sm font-medium text-gray-900">{shipping > 0 ? `$${shipping.toFixed(2)}` : 'Free'}</dd>
-                            </div>
-                            <div className="flex items-center justify-between border-t border-gray-200 pt-4">
-                                <dt className="flex text-sm text-gray-600">
-                                    <span>Tax estimate</span>
-                                    <a href="#" className="ml-2 shrink-0 text-gray-400 hover:text-gray-500">
-                                        <span className="sr-only">Learn more about how tax is calculated</span>
-                                        <MessageCircleQuestionIcon aria-hidden="true" className="size-5" />
-                                    </a>
-                                </dt>
-                                <dd className="text-sm font-medium text-gray-900">${tax.toFixed(2)}</dd>
                             </div>
                             <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                                 <dt className="text-base font-medium text-gray-900">Order total</dt>

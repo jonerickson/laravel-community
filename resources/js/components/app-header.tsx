@@ -106,11 +106,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                     <NavigationMenuItem key={index} className="relative flex h-full items-center">
                                         <Link
                                             href={item.href}
-                                            className={cn(
-                                                navigationMenuTriggerStyle(),
-                                                page.url === item.href && activeItemStyles,
-                                                'h-9 cursor-pointer px-3',
-                                            )}
+                                            className={cn(navigationMenuTriggerStyle(), page.url === item.href && activeItemStyles, 'h-9 px-3')}
                                         >
                                             {item.icon && <Icon iconNode={item.icon} className="mr-2 h-4 w-4" />}
                                             {item.title}

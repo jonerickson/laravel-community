@@ -19,6 +19,8 @@ class ShoppingCartService
             return [];
         }
 
+        dump($cart);
+
         $productIds = array_unique(array_column($cart, 'product_id'));
         $priceIds = array_filter(array_column($cart, 'price_id'));
 

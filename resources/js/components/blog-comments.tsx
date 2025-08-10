@@ -58,7 +58,9 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
         <div className="border-l-2 border-muted pl-4">
             <div className="mb-4 rounded-lg bg-muted/50 p-4">
                 <div className="mb-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2">{comment.author && <UserInfo user={comment.author} showEmail={false} />}</div>
+                    <div className="flex items-center gap-2">
+                        {comment.author && <UserInfo user={comment.author} showEmail={false} showGroups={true} />}
+                    </div>
                     <time className="text-xs text-muted-foreground" dateTime={comment.created_at}>
                         {formattedDate}
                     </time>
@@ -89,10 +91,10 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                             required
                         />
                         <div className="flex gap-2">
-                            <Button type="submit" size="sm" disabled={processing} className="cursor-pointer">
+                            <Button type="submit" size="sm" disabled={processing}>
                                 {processing ? 'Posting...' : 'Post reply'}
                             </Button>
-                            <Button type="button" variant="outline" size="sm" onClick={() => onReply(0)} className="cursor-pointer">
+                            <Button type="button" variant="outline" size="sm" onClick={() => onReply(0)}>
                                 Cancel
                             </Button>
                         </div>
@@ -168,7 +170,7 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
                     />
                     {errors.content && <InputError message={errors.content} />}
                 </div>
-                <Button type="submit" disabled={processing} className="cursor-pointer">
+                <Button type="submit" disabled={processing}>
                     {processing ? 'Posting...' : 'Post comment'}
                 </Button>
             </form>

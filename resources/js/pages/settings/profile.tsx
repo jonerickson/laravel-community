@@ -124,7 +124,7 @@ export default function Profile() {
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <Button disabled={processing}>Save</Button>
+                            <Button disabled={processing}>{processing ? 'Saving...' : 'Save'}</Button>
 
                             <Transition
                                 show={recentlySuccessful}

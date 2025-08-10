@@ -20,23 +20,25 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
 
     const handleDeleteTopic = () => {
         if (window.confirm('Are you sure you want to delete this topic? This action cannot be undone and will delete all posts in this topic.')) {
-            router.delete(route('forums.topics.destroy', {
-                forum: forum.slug,
-                topic: topic.slug,
-            }));
+            router.delete(
+                route('forums.topics.destroy', {
+                    forum: forum.slug,
+                    topic: topic.slug,
+                }),
+            );
         }
     };
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 cursor-pointer p-0">
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                     <MoreHorizontal className="h-4 w-4" />
                     <span className="sr-only">Open menu</span>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleDeleteTopic} className="cursor-pointer text-destructive focus:text-destructive">
+                <DropdownMenuItem onClick={handleDeleteTopic} className="text-destructive focus:text-destructive">
                     <Trash className="mr-2 h-4 w-4 text-destructive" />
                     Delete Topic
                 </DropdownMenuItem>

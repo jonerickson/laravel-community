@@ -60,10 +60,10 @@ export default function StoreCategoriesProductItem({ product, category }: { prod
                 </div>
                 <div className="mt-4 space-y-2">
                     <p className="text-base font-medium text-primary">${product.default_price?.amount || '0.00'}</p>
-                    <Button className="w-full cursor-pointer" variant="outline" asChild>
+                    <Button className="w-full" variant="outline" asChild>
                         <Link href={route('store.categories.products.show', { product: product.slug, category: category.slug })}>View</Link>
                     </Button>
-                    <Button className="w-full cursor-pointer" onClick={addToCart} disabled={isAddingToCart || !product.default_price}>
+                    <Button className="w-full" onClick={addToCart} disabled={isAddingToCart || !product.default_price}>
                         {isAddingToCart ? 'Adding...' : 'Add to cart'}
                     </Button>
                 </div>

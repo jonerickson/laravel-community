@@ -29,7 +29,11 @@ class BlogController extends Controller
 
     public function show(Request $request, Post $post): Response
     {
-        abort_if(! $post->is_published, 404);
+        abort_if(
+            boolean: ! $post->is_published,
+            code: 404,
+            message: 'Post not found.'
+        );
 
         $perPage = $request->input('per_page', 10);
 

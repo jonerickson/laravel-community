@@ -13,7 +13,11 @@ class CommentController extends Controller
 {
     public function store(Request $request, Post $post): RedirectResponse
     {
-        abort_if(! $post->is_published, 404);
+        abort_if(
+            boolean: ! $post->is_published,
+            code: 404,
+            message: 'Post not found.'
+        );
 
         $validated = $request->validate([
             'content' => 'required|string',
