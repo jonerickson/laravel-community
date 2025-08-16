@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -18,11 +19,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property bool $is_banned
  * @property string|null $ban_reason
  * @property int|null $banned_by
- * @property \Illuminate\Support\Carbon|null $banned_at
- * @property \Illuminate\Support\Carbon $first_seen_at
- * @property \Illuminate\Support\Carbon $last_seen_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $banned_at
+ * @property Carbon $first_seen_at
+ * @property Carbon $last_seen_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property-read User|null $bannedBy
  * @property-read User|null $user
  *

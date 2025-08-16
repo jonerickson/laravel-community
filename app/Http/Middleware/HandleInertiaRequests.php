@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use BezhanSalleh\FilamentShield\Support\Utils;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Inertia\Middleware;
@@ -26,7 +25,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $user = $request->user(),
                 'groups' => $user?->groups?->pluck(['id', 'name', 'color']),
-                'isAdmin' => $user?->hasRole(Utils::getSuperAdminName()),
+                'isAdmin' => $user?->hasRole('super_admin'),
             ],
             'cartCount' => $this->getCartCount(),
             'flash' => [

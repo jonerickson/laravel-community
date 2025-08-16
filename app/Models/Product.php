@@ -12,11 +12,13 @@ use App\Traits\HasMetadata;
 use App\Traits\HasReviews;
 use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Laravel\Scout\Searchable;
 
@@ -30,23 +32,23 @@ use Laravel\Scout\Searchable;
  * @property string|null $featured_image
  * @property string|null $stripe_product_id
  * @property array<array-key, mixed>|null $metadata
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductPrice> $activePrices
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection<int, ProductPrice> $activePrices
  * @property-read int|null $active_prices_count
  * @property-read mixed $average_rating
- * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductCategory> $categories
+ * @property-read Collection<int, ProductCategory> $categories
  * @property-read int|null $categories_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $comments
+ * @property-read Collection<int, Comment> $comments
  * @property-read int|null $comments_count
  * @property-read ProductPrice|null $defaultPrice
  * @property-read string|null $featured_image_url
  * @property-read File|null $file
- * @property-read \Illuminate\Database\Eloquent\Collection<int, File> $files
+ * @property-read Collection<int, File> $files
  * @property-read int|null $files_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductPrice> $prices
+ * @property-read Collection<int, ProductPrice> $prices
  * @property-read int|null $prices_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $reviews
+ * @property-read Collection<int, Comment> $reviews
  * @property-read int|null $reviews_count
  *
  * @method static \Database\Factories\ProductFactory factory($count = null, $state = [])

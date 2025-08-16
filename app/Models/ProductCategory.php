@@ -6,9 +6,12 @@ namespace App\Models;
 
 use App\Contracts\Sluggable;
 use App\Traits\HasSlug;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
@@ -16,21 +19,21 @@ use Illuminate\Support\Str;
  * @property string $name
  * @property string|null $description
  * @property string $slug
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection<int, Product> $products
  * @property-read int|null $products_count
  *
  * @method static \Database\Factories\ProductCategoryFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductCategory whereUpdatedAt($value)
+ * @method static Builder<static>|ProductCategory newModelQuery()
+ * @method static Builder<static>|ProductCategory newQuery()
+ * @method static Builder<static>|ProductCategory query()
+ * @method static Builder<static>|ProductCategory whereCreatedAt($value)
+ * @method static Builder<static>|ProductCategory whereDescription($value)
+ * @method static Builder<static>|ProductCategory whereId($value)
+ * @method static Builder<static>|ProductCategory whereName($value)
+ * @method static Builder<static>|ProductCategory whereSlug($value)
+ * @method static Builder<static>|ProductCategory whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */

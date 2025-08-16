@@ -9,9 +9,11 @@ use App\Traits\HasAuthor;
 use App\Traits\HasOrder;
 use App\Traits\HasSlug;
 use App\Traits\HasUrl;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Laravel\Scout\Searchable;
 
@@ -24,35 +26,35 @@ use Laravel\Scout\Searchable;
  * @property int $policy_category_id
  * @property int $order
  * @property bool $is_active
+ * @property Carbon|null $effective_at
  * @property int $created_by
- * @property \Illuminate\Support\Carbon|null $effective_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property-read User $author
  * @property-read mixed $author_name
  * @property-read PolicyCategory $category
  * @property-read User $creator
  * @property-read string|null $url
  *
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy active()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy effective()
+ * @method static Builder<static>|Policy active()
+ * @method static Builder<static>|Policy effective()
  * @method static \Database\Factories\PolicyFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy ordered()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy whereContent($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy whereCreatedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy whereEffectiveDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy whereOrder($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy wherePolicyCategoryId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy whereTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Policy whereVersion($value)
+ * @method static Builder<static>|Policy newModelQuery()
+ * @method static Builder<static>|Policy newQuery()
+ * @method static Builder<static>|Policy ordered()
+ * @method static Builder<static>|Policy query()
+ * @method static Builder<static>|Policy whereContent($value)
+ * @method static Builder<static>|Policy whereCreatedAt($value)
+ * @method static Builder<static>|Policy whereCreatedBy($value)
+ * @method static Builder<static>|Policy whereEffectiveAt($value)
+ * @method static Builder<static>|Policy whereId($value)
+ * @method static Builder<static>|Policy whereIsActive($value)
+ * @method static Builder<static>|Policy whereOrder($value)
+ * @method static Builder<static>|Policy wherePolicyCategoryId($value)
+ * @method static Builder<static>|Policy whereSlug($value)
+ * @method static Builder<static>|Policy whereTitle($value)
+ * @method static Builder<static>|Policy whereUpdatedAt($value)
+ * @method static Builder<static>|Policy whereVersion($value)
  *
  * @mixin \Eloquent
  */

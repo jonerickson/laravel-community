@@ -7,9 +7,12 @@ namespace App\Models;
 use App\Contracts\Sluggable;
 use App\Traits\HasOrder;
 use App\Traits\HasSlug;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
@@ -19,27 +22,27 @@ use Illuminate\Support\Str;
  * @property string|null $description
  * @property int $order
  * @property bool $is_active
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Policy> $activePolicies
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection<int, Policy> $activePolicies
  * @property-read int|null $active_policies_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Policy> $policies
+ * @property-read Collection<int, Policy> $policies
  * @property-read int|null $policies_count
  *
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PolicyCategory active()
+ * @method static Builder<static>|PolicyCategory active()
  * @method static \Database\Factories\PolicyCategoryFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PolicyCategory newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PolicyCategory newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PolicyCategory ordered()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PolicyCategory query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PolicyCategory whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PolicyCategory whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PolicyCategory whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PolicyCategory whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PolicyCategory whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PolicyCategory whereOrder($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PolicyCategory whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PolicyCategory whereUpdatedAt($value)
+ * @method static Builder<static>|PolicyCategory newModelQuery()
+ * @method static Builder<static>|PolicyCategory newQuery()
+ * @method static Builder<static>|PolicyCategory ordered()
+ * @method static Builder<static>|PolicyCategory query()
+ * @method static Builder<static>|PolicyCategory whereCreatedAt($value)
+ * @method static Builder<static>|PolicyCategory whereDescription($value)
+ * @method static Builder<static>|PolicyCategory whereId($value)
+ * @method static Builder<static>|PolicyCategory whereIsActive($value)
+ * @method static Builder<static>|PolicyCategory whereName($value)
+ * @method static Builder<static>|PolicyCategory whereOrder($value)
+ * @method static Builder<static>|PolicyCategory whereSlug($value)
+ * @method static Builder<static>|PolicyCategory whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */

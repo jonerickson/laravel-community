@@ -13,10 +13,13 @@ use App\Traits\HasLikes;
 use App\Traits\HasMetadata;
 use App\Traits\HasSlug;
 use App\Traits\HasUrl;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Laravel\Scout\Searchable;
 
@@ -32,55 +35,55 @@ use Laravel\Scout\Searchable;
  * @property bool $comments_enabled
  * @property int|null $topic_id
  * @property string|null $featured_image
- * @property int $created_by
  * @property array<array-key, mixed>|null $metadata
- * @property \Illuminate\Support\Carbon|null $published_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $approvedComments
+ * @property Carbon|null $published_at
+ * @property int $created_by
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection<int, Comment> $approvedComments
  * @property-read int|null $approved_comments_count
  * @property-read User $author
  * @property-read mixed $author_name
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $comments
+ * @property-read Collection<int, Comment> $comments
  * @property-read int $comments_count
  * @property-read User $creator
  * @property-read string|null $featured_image_url
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Like> $likes
+ * @property-read Collection<int, Like> $likes
  * @property-read int $likes_count
  * @property-read array $likes_summary
  * @property-read int $reading_time
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $topLevelComments
+ * @property-read Collection<int, Comment> $topLevelComments
  * @property-read int|null $top_level_comments_count
  * @property-read Topic|null $topic
  * @property-read string|null $url
  * @property-read string|null $user_reaction
  * @property-read array $user_reactions
  *
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post blog()
+ * @method static Builder<static>|Post blog()
  * @method static \Database\Factories\PostFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post featured()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post forum()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post published()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post recent()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereCommentsEnabled($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereContent($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereCreatedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereExcerpt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereFeaturedImage($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereIsFeatured($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereIsPublished($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereMetadata($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post wherePublishedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereTopicId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Post whereUpdatedAt($value)
+ * @method static Builder<static>|Post featured()
+ * @method static Builder<static>|Post forum()
+ * @method static Builder<static>|Post newModelQuery()
+ * @method static Builder<static>|Post newQuery()
+ * @method static Builder<static>|Post published()
+ * @method static Builder<static>|Post query()
+ * @method static Builder<static>|Post recent()
+ * @method static Builder<static>|Post whereCommentsEnabled($value)
+ * @method static Builder<static>|Post whereContent($value)
+ * @method static Builder<static>|Post whereCreatedAt($value)
+ * @method static Builder<static>|Post whereCreatedBy($value)
+ * @method static Builder<static>|Post whereExcerpt($value)
+ * @method static Builder<static>|Post whereFeaturedImage($value)
+ * @method static Builder<static>|Post whereId($value)
+ * @method static Builder<static>|Post whereIsFeatured($value)
+ * @method static Builder<static>|Post whereIsPublished($value)
+ * @method static Builder<static>|Post whereMetadata($value)
+ * @method static Builder<static>|Post wherePublishedAt($value)
+ * @method static Builder<static>|Post whereSlug($value)
+ * @method static Builder<static>|Post whereTitle($value)
+ * @method static Builder<static>|Post whereTopicId($value)
+ * @method static Builder<static>|Post whereType($value)
+ * @method static Builder<static>|Post whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */

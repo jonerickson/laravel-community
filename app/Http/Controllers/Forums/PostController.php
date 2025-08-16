@@ -9,7 +9,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Forum;
 use App\Models\Post;
 use App\Models\Topic;
-use BezhanSalleh\FilamentShield\Support\Utils;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,7 +46,7 @@ class PostController extends Controller
     public function update(Request $request, Forum $forum, Topic $topic, Post $post): RedirectResponse
     {
         abort_if(
-            boolean: $post->created_by !== Auth::id() && ! $request->user()?->hasRole(Utils::getSuperAdminName()),
+            boolean: $post->created_by !== Auth::id() && ! $request->user()?->hasRole('super_admin'),
             code: 403,
             message: 'You are not authorized to moderate this post.'
         );
@@ -76,7 +75,7 @@ class PostController extends Controller
     public function destroy(Request $request, Forum $forum, Topic $topic, Post $post): RedirectResponse
     {
         abort_if(
-            boolean: $post->created_by !== Auth::id() && ! $request->user()?->hasRole(Utils::getSuperAdminName()),
+            boolean: $post->created_by !== Auth::id() && ! $request->user()?->hasRole('super_admin'),
             code: 403,
             message: 'You are not authorized to delete this post.'
         );

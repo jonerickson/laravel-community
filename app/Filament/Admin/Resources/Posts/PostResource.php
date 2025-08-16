@@ -1,0 +1,275 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Filament\Admin\Resources\Posts;
+
+use App\Filament\Admin\Resources\Posts\Pages\CreatePost;
+use App\Filament\Admin\Resources\Posts\Pages\EditPost;
+use App\Filament\Admin\Resources\Posts\Pages\ListPosts;
+use App\Filament\Admin\Resources\Posts\RelationManagers\CommentsRelationManager;
+use App\Models\Post;
+use BackedEnum;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use UnitEnum;
+
+class PostResource extends Resource
+{
+    protected static ?string $model = Post::class;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Blog';
+
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+
+    protected static ?int $navigationSort = 1;
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema
+            ->columns(3)
+            ->components([
+                Group::make()
+                    ->columnSpan(['lg' => 2])
+                    ->schema([
+                        Section::make('Post Content')
+                            ->columns()
+                            ->schema([
+                                TextInput::make('title')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function ($operation, $state, Set $set): void {
+                                        if ($operation === 'create') {
+                                            $set('slug', Str::slug($state));
+                                        }
+                                    }),
+                                TextInput::make('slug')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->unique(ignoreRecord: true),
+                                Textarea::make('excerpt')
+                                    ->columnSpanFull()
+                                    ->maxLength(500)
+                                    ->helperText('Brief description of the post (optional).'),
+                                RichEditor::make('content')
+                                    ->required()
+                                    ->columnSpanFull()
+                                    ->toolbarButtons([
+                                        'bold',
+                                        'italic',
+                                        'underline',
+                                        'strike',
+                                        'link',
+                                        'bulletList',
+                                        'orderedList',
+                                        'h2',
+                                        'h3',
+                                        'blockquote',
+                                        'codeBlock',
+                                    ]),
+                            ]),
+                        Section::make('Media')
+                            ->schema([
+                                FileUpload::make('featured_image')
+                                    ->label('Featured Image')
+                                    ->disk('public')
+                                    ->directory('posts/featured-images')
+                                    ->visibility('public')
+                                    ->image()
+                                    ->imageEditor()
+                                    ->imageEditorAspectRatios([
+                                        '16:9',
+                                        '4:3',
+                                        '1:1',
+                                    ])
+                                    ->helperText('Upload a featured image for the post.'),
+                            ]),
+                    ]),
+                Group::make()
+                    ->schema([
+                        Section::make('Publishing')
+                            ->columns()
+                            ->schema([
+                                Toggle::make('is_published')
+                                    ->default(false)
+                                    ->helperText('Publish this post immediately.'),
+                                Toggle::make('is_featured')
+                                    ->default(false)
+                                    ->helperText('Feature this post on the homepage.'),
+                                Toggle::make('comments_enabled')
+                                    ->default(true)
+                                    ->helperText('Allow users to comment on this post.'),
+                                DateTimePicker::make('published_at')
+                                    ->columnSpanFull()
+                                    ->native(false)
+                                    ->helperText('Schedule when this post should be published.')
+                                    ->default(now()),
+                                Hidden::make('created_by')
+                                    ->default(Auth::id()),
+                            ]),
+                        Section::make('SEO & Meta')
+                            ->collapsible()
+                            ->collapsed()
+                            ->schema([
+                                KeyValue::make('metadata')
+                                    ->keyLabel('Meta Key')
+                                    ->valueLabel('Meta Value')
+                                    ->helperText('Additional metadata for the post (SEO, tags, etc.).'),
+                            ]),
+                    ]),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                ImageColumn::make('featured_image')
+                    ->grow(false)
+                    ->alignCenter()
+                    ->label('')
+                    ->disk('public')
+                    ->size(60)
+                    ->square(),
+                TextColumn::make('title')
+                    ->searchable()
+                    ->sortable()
+                    ->limit(50),
+                ToggleColumn::make('is_published')
+                    ->label('Published'),
+                ToggleColumn::make('is_featured')
+                    ->label('Featured'),
+                ToggleColumn::make('comments_enabled')
+                    ->label('Comments'),
+                TextColumn::make('author.name')
+                    ->label('Author')
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('published_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('reading_time')
+                    ->label('Read Time')
+                    ->suffix(' min')
+                    ->toggleable(),
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                TernaryFilter::make('is_published')
+                    ->label('Publication Status'),
+                TernaryFilter::make('is_featured')
+                    ->label('Featured Status'),
+                TernaryFilter::make('comments_enabled')
+                    ->label('Comments Status'),
+                Filter::make('published')
+                    ->query(fn (Builder $query): Builder => $query->published()),
+                Filter::make('drafts')
+                    ->query(fn (Builder $query): Builder => $query->where('is_published', false)),
+            ])
+            ->recordActions([
+                ViewAction::make()
+                    ->url(fn (Post $record) => $record->url, shouldOpenInNewTab: true),
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    BulkAction::make('publish')
+                        ->label('Publish Selected')
+                        ->icon('heroicon-o-eye')
+                        ->requiresConfirmation()
+                        ->action(function ($records) {
+                            $records->each(function ($record) {
+                                $record->update([
+                                    'is_published' => true,
+                                    'published_at' => $record->published_at ?? now(),
+                                ]);
+                            });
+                        }),
+                    BulkAction::make('unpublish')
+                        ->label('Unpublish Selected')
+                        ->icon('heroicon-o-eye-slash')
+                        ->requiresConfirmation()
+                        ->action(function ($records) {
+                            $records->each(function ($record) {
+                                $record->update(['is_published' => false]);
+                            });
+                        }),
+                ]),
+            ])
+            ->defaultSort('created_at', 'desc');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            CommentsRelationManager::class,
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListPosts::route('/'),
+            'create' => CreatePost::route('/create'),
+            'edit' => EditPost::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->blog();
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::where('is_published', false)->count();
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        $count = static::getNavigationBadge();
+
+        return match (true) {
+            $count > 10 => 'warning',
+            $count > 0 => 'primary',
+            default => null,
+        };
+    }
+}

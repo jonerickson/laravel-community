@@ -12,9 +12,10 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Filament\View\PanelsRenderHook;
-use Filament\Widgets;
+use Filament\Widgets\AccountWidget;
+use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -41,8 +42,8 @@ class MarketplacePanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Marketplace/Widgets'), for: 'App\\Filament\\Marketplace\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                AccountWidget::class,
+                FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -59,7 +60,7 @@ class MarketplacePanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->font('Instrument Sans')
-            ->maxContentWidth(MaxWidth::Full)
+            ->maxContentWidth(Width::Full)
             ->sidebarCollapsibleOnDesktop()
             ->darkMode()
             ->theme(asset('css/filament/marketplace/theme.css'))

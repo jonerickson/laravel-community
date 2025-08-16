@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -16,22 +18,22 @@ use Illuminate\Support\Facades\Storage;
  * @property string|null $filename
  * @property string|null $mime
  * @property string|null $size
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
- * @method static \Illuminate\Database\Eloquent\Builder<static>|File newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|File newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|File query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereFilename($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereMime($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|File wherePath($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereResourceId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereResourceType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereSize($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereUpdatedAt($value)
+ * @method static Builder<static>|File newModelQuery()
+ * @method static Builder<static>|File newQuery()
+ * @method static Builder<static>|File query()
+ * @method static Builder<static>|File whereCreatedAt($value)
+ * @method static Builder<static>|File whereFilename($value)
+ * @method static Builder<static>|File whereId($value)
+ * @method static Builder<static>|File whereMime($value)
+ * @method static Builder<static>|File whereName($value)
+ * @method static Builder<static>|File wherePath($value)
+ * @method static Builder<static>|File whereResourceId($value)
+ * @method static Builder<static>|File whereResourceType($value)
+ * @method static Builder<static>|File whereSize($value)
+ * @method static Builder<static>|File whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */

@@ -8,8 +8,10 @@ use App\Contracts\Sluggable;
 use App\Enums\AnnouncementType;
 use App\Traits\HasAuthor;
 use App\Traits\HasSlug;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
@@ -20,33 +22,33 @@ use Illuminate\Support\Str;
  * @property AnnouncementType $type
  * @property bool $is_active
  * @property bool $is_dismissible
+ * @property Carbon|null $starts_at
+ * @property Carbon|null $ends_at
  * @property int $created_by
- * @property \Illuminate\Support\Carbon|null $starts_at
- * @property \Illuminate\Support\Carbon|null $ends_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property-read User $author
  * @property-read mixed $author_name
  * @property-read User $creator
  *
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement active()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement current()
+ * @method static Builder<static>|Announcement active()
+ * @method static Builder<static>|Announcement current()
  * @method static \Database\Factories\AnnouncementFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereContent($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereCreatedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereEndsAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereIsDismissible($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereStartsAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Announcement whereUpdatedAt($value)
+ * @method static Builder<static>|Announcement newModelQuery()
+ * @method static Builder<static>|Announcement newQuery()
+ * @method static Builder<static>|Announcement query()
+ * @method static Builder<static>|Announcement whereContent($value)
+ * @method static Builder<static>|Announcement whereCreatedAt($value)
+ * @method static Builder<static>|Announcement whereCreatedBy($value)
+ * @method static Builder<static>|Announcement whereEndsAt($value)
+ * @method static Builder<static>|Announcement whereId($value)
+ * @method static Builder<static>|Announcement whereIsActive($value)
+ * @method static Builder<static>|Announcement whereIsDismissible($value)
+ * @method static Builder<static>|Announcement whereSlug($value)
+ * @method static Builder<static>|Announcement whereStartsAt($value)
+ * @method static Builder<static>|Announcement whereTitle($value)
+ * @method static Builder<static>|Announcement whereType($value)
+ * @method static Builder<static>|Announcement whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */

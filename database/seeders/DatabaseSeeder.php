@@ -8,7 +8,6 @@ use App\Enums\AnnouncementType;
 use App\Models\Announcement;
 use App\Models\Group;
 use App\Models\User;
-use BezhanSalleh\FilamentShield\Support\Utils;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Seeder;
 
@@ -17,7 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            ShieldSeeder::class,
+            RoleSeeder::class,
         ]);
 
         Announcement::factory()->state([
@@ -37,7 +36,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->hasAttached($group)->create([
             'name' => 'Test User',
             'email' => 'test@deschutesdesigngroup.com',
-        ])->assignRole(Utils::getSuperAdminName());
+        ])->assignRole('super_admin');
 
         $this->call([
             BlogSeeder::class,

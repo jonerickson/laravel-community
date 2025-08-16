@@ -8,7 +8,6 @@ use App\Enums\PostType;
 use App\Http\Controllers\Controller;
 use App\Models\Forum;
 use App\Models\Topic;
-use BezhanSalleh\FilamentShield\Support\Utils;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -81,7 +80,7 @@ class TopicController extends Controller
     public function destroy(Request $request, Forum $forum, Topic $topic): RedirectResponse
     {
         abort_if(
-            boolean: $topic->created_by !== Auth::id() && ! $request->user()?->hasRole(Utils::getSuperAdminName()),
+            boolean: $topic->created_by !== Auth::id() && ! $request->user()?->hasRole('super_admin'),
             code: 403,
             message: 'You are not authorized to delete this topic.'
         );

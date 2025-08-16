@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Traits\HasMetadata;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -22,34 +24,34 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property bool $is_default
  * @property string|null $stripe_price_id
  * @property array<array-key, mixed>|null $metadata
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property-read Product $product
  *
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice active()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice default()
+ * @method static Builder<static>|ProductPrice active()
+ * @method static Builder<static>|ProductPrice default()
  * @method static \Database\Factories\ProductPriceFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice oneTime()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice recurring()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereAmount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereCurrency($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereInterval($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereIntervalCount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereIsDefault($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereMetadata($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereProductId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereStripePriceId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice withStripePrice()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice withoutStripePrice()
+ * @method static Builder<static>|ProductPrice newModelQuery()
+ * @method static Builder<static>|ProductPrice newQuery()
+ * @method static Builder<static>|ProductPrice oneTime()
+ * @method static Builder<static>|ProductPrice query()
+ * @method static Builder<static>|ProductPrice recurring()
+ * @method static Builder<static>|ProductPrice whereAmount($value)
+ * @method static Builder<static>|ProductPrice whereCreatedAt($value)
+ * @method static Builder<static>|ProductPrice whereCurrency($value)
+ * @method static Builder<static>|ProductPrice whereDescription($value)
+ * @method static Builder<static>|ProductPrice whereId($value)
+ * @method static Builder<static>|ProductPrice whereInterval($value)
+ * @method static Builder<static>|ProductPrice whereIntervalCount($value)
+ * @method static Builder<static>|ProductPrice whereIsActive($value)
+ * @method static Builder<static>|ProductPrice whereIsDefault($value)
+ * @method static Builder<static>|ProductPrice whereMetadata($value)
+ * @method static Builder<static>|ProductPrice whereName($value)
+ * @method static Builder<static>|ProductPrice whereProductId($value)
+ * @method static Builder<static>|ProductPrice whereStripePriceId($value)
+ * @method static Builder<static>|ProductPrice whereUpdatedAt($value)
+ * @method static Builder<static>|ProductPrice withStripePrice()
+ * @method static Builder<static>|ProductPrice withoutStripePrice()
  *
  * @mixin \Eloquent
  */

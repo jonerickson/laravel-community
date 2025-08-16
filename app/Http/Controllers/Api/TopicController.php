@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Topic;
-use BezhanSalleh\FilamentShield\Support\Utils;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,7 +16,7 @@ class TopicController extends Controller
 {
     public function destroy(Request $request): JsonResponse
     {
-        if (! Auth::user()?->hasRole(Utils::getSuperAdminName())) {
+        if (! Auth::user()?->hasRole('super_admin')) {
             return response()->json([
                 'message' => 'Unauthorized. Admin access required.',
             ], 403);

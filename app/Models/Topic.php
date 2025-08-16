@@ -10,11 +10,13 @@ use App\Traits\HasReads;
 use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Laravel\Scout\Searchable;
 
@@ -24,12 +26,12 @@ use Laravel\Scout\Searchable;
  * @property string $slug
  * @property string|null $description
  * @property int $forum_id
- * @property int $created_by
  * @property bool $is_pinned
  * @property bool $is_locked
  * @property int $views_count
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int $created_by
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property-read User $author
  * @property-read mixed $author_name
  * @property-read User $creator
@@ -38,9 +40,9 @@ use Laravel\Scout\Searchable;
  * @property-read bool $is_read_by_user
  * @property-read Post|null $lastPost
  * @property-read mixed $last_reply_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Post> $posts
+ * @property-read Collection<int, Post> $posts
  * @property-read int|null $posts_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Read> $reads
+ * @property-read Collection<int, Read> $reads
  * @property-read int $reads_count
  *
  * @method static \Database\Factories\TopicFactory factory($count = null, $state = [])

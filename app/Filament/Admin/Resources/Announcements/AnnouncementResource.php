@@ -1,0 +1,206 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Filament\Admin\Resources\Announcements;
+
+use App\Enums\AnnouncementType;
+use App\Filament\Admin\Resources\Announcements\Pages\CreateAnnouncement;
+use App\Filament\Admin\Resources\Announcements\Pages\EditAnnouncement;
+use App\Filament\Admin\Resources\Announcements\Pages\ListAnnouncements;
+use App\Filament\Admin\Resources\Announcements\Pages\ViewAnnouncement;
+use App\Models\Announcement;
+use BackedEnum;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+
+class AnnouncementResource extends Resource
+{
+    protected static ?string $model = Announcement::class;
+
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-megaphone';
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Section::make('Announcement Details')
+                    ->schema([
+                        TextInput::make('title')
+                            ->required()
+                            ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn (string $context, $state, Set $set) => $context === 'create' ? $set('slug', Str::slug($state)) : null),
+                        TextInput::make('slug')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(ignoreRecord: true)
+                            ->rules(['alpha_dash']),
+                        Select::make('type')
+                            ->required()
+                            ->options(AnnouncementType::class)
+                            ->default(AnnouncementType::Info->value)
+                            ->native(false),
+                        RichEditor::make('content')
+                            ->required()
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+
+                Section::make('Settings')
+                    ->schema([
+                        Toggle::make('is_active')
+                            ->label('Active')
+                            ->default(true)
+                            ->helperText('Only active announcements will be displayed to users.'),
+                        Toggle::make('is_dismissible')
+                            ->label('Dismissible')
+                            ->default(true)
+                            ->helperText('Allow users to dismiss this announcement.'),
+                    ])
+                    ->columns(2),
+
+                Section::make('Schedule')
+                    ->schema([
+                        DateTimePicker::make('starts_at')
+                            ->label('Start Date & Time')
+                            ->helperText('Leave empty to display immediately.')
+                            ->native(false),
+                        DateTimePicker::make('ends_at')
+                            ->label('End Date & Time')
+                            ->helperText('Leave empty to display indefinitely.')
+                            ->after('starts_at')
+                            ->native(false),
+                    ])
+                    ->columns(2),
+
+                Section::make('Author')
+                    ->schema([
+                        Select::make('created_by')
+                            ->relationship('author', 'name')
+                            ->required()
+                            ->default(Auth::id())
+                            ->preload()
+                            ->searchable(),
+                    ])
+                    ->collapsed(),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->emptyStateDescription('There are no announcements.')
+            ->columns([
+                TextColumn::make('title')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold'),
+                TextColumn::make('type')
+                    ->badge(),
+                ToggleColumn::make('is_active')
+                    ->label('Active'),
+                ToggleColumn::make('is_dismissible')
+                    ->label('Dismissible'),
+                TextColumn::make('starts_at')
+                    ->label('Starts')
+                    ->dateTime()
+                    ->sortable()
+                    ->placeholder('Immediately'),
+                TextColumn::make('ends_at')
+                    ->label('Ends')
+                    ->dateTime()
+                    ->sortable()
+                    ->placeholder('Never'),
+                TextColumn::make('author.name')
+                    ->label('Author')
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                SelectFilter::make('type')
+                    ->options(AnnouncementType::class),
+                TernaryFilter::make('is_active')
+                    ->label('Active'),
+                TernaryFilter::make('is_dismissible')
+                    ->label('Dismissible'),
+                Filter::make('current')
+                    ->label('Currently Active')
+                    ->query(fn (Builder $query): Builder => $query->current()),
+                Filter::make('scheduled')
+                    ->label('Scheduled')
+                    ->query(fn (Builder $query): Builder => $query->where('starts_at', '>', now())
+                    ),
+                Filter::make('expired')
+                    ->label('Expired')
+                    ->query(fn (Builder $query): Builder => $query->where('ends_at', '<', now())
+                    ),
+            ])
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ])
+            ->defaultSort('created_at', 'desc');
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListAnnouncements::route('/'),
+            'create' => CreateAnnouncement::route('/create'),
+            'view' => ViewAnnouncement::route('/{record}'),
+            'edit' => EditAnnouncement::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::current()->count();
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        $count = static::getNavigationBadge();
+
+        return match (true) {
+            $count > 5 => 'warning',
+            $count > 0 => 'success',
+            default => 'gray',
+        };
+    }
+}

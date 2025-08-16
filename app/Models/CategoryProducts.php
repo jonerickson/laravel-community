@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
@@ -13,11 +14,11 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @property-read ProductCategory|null $category
  * @property-read Product|null $product
  *
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryProducts newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryProducts newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryProducts query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryProducts whereCategoryId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CategoryProducts whereProductId($value)
+ * @method static Builder<static>|CategoryProducts newModelQuery()
+ * @method static Builder<static>|CategoryProducts newQuery()
+ * @method static Builder<static>|CategoryProducts query()
+ * @method static Builder<static>|CategoryProducts whereCategoryId($value)
+ * @method static Builder<static>|CategoryProducts whereProductId($value)
  *
  * @mixin \Eloquent
  */

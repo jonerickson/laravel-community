@@ -7,11 +7,14 @@ namespace App\Models;
 use App\Traits\HasAuthor;
 use App\Traits\HasLikes;
 use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -20,42 +23,42 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string $content
  * @property int|null $rating
  * @property bool $is_approved
- * @property int $created_by
  * @property int|null $parent_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int $created_by
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property-read User $author
  * @property-read mixed $author_name
  * @property-read Model|Eloquent $commentable
  * @property-read User $creator
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Like> $likes
+ * @property-read Collection<int, Like> $likes
  * @property-read int $likes_count
  * @property-read array $likes_summary
  * @property-read Comment|null $parent
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $replies
+ * @property-read Collection<int, Comment> $replies
  * @property-read int|null $replies_count
  * @property-read string|null $user_reaction
  * @property-read array $user_reactions
  *
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment approved()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment comments()
+ * @method static Builder<static>|Comment approved()
+ * @method static Builder<static>|Comment comments()
  * @method static \Database\Factories\CommentFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment pending()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment ratings()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment topLevel()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereCommentableId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereCommentableType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereContent($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereCreatedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereIsApproved($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereParentId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereRating($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Comment whereUpdatedAt($value)
+ * @method static Builder<static>|Comment newModelQuery()
+ * @method static Builder<static>|Comment newQuery()
+ * @method static Builder<static>|Comment pending()
+ * @method static Builder<static>|Comment query()
+ * @method static Builder<static>|Comment ratings()
+ * @method static Builder<static>|Comment topLevel()
+ * @method static Builder<static>|Comment whereCommentableId($value)
+ * @method static Builder<static>|Comment whereCommentableType($value)
+ * @method static Builder<static>|Comment whereContent($value)
+ * @method static Builder<static>|Comment whereCreatedAt($value)
+ * @method static Builder<static>|Comment whereCreatedBy($value)
+ * @method static Builder<static>|Comment whereId($value)
+ * @method static Builder<static>|Comment whereIsApproved($value)
+ * @method static Builder<static>|Comment whereParentId($value)
+ * @method static Builder<static>|Comment whereRating($value)
+ * @method static Builder<static>|Comment whereUpdatedAt($value)
  *
  * @mixin Eloquent
  */
