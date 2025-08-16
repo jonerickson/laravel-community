@@ -23,7 +23,7 @@
         "barryvdh/laravel-ide-helper": "^3.5",
         "fakerphp/faker": "^1.23",
         "laravel/pail": "^1.2.2",
-        "laravel/pint": "^1.24",
+        "laravel/pint": "^v1.24.0",
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
@@ -77,7 +77,7 @@
             "@dev"
         ],
         "analyze": "vendor/bin/phpstan analyse --memory-limit=2G -v",
-        "cs-fix": "vendor/bin/pint",
+        "cs-fix": "vendor/bin/pint --parallel",
         "docs:models": [
             "@php artisan ide-helper:models -nRW",
             "@cs-fix app/Models"

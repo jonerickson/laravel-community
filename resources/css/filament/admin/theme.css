@@ -1,8 +1,5 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
 
-@source '../../../../app/Filament';
-@source '../../../../resources/views/filament';
-
-.fi-body {
-    background-color: #ffffff;
-}
+@source '../../../../app/Filament/Admin/**/*';
+@source '../../../../resources/views/filament/admin/**/*';
+@source '../../../../resources/views/filament/**/*';

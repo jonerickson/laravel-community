@@ -24060,6 +24060,21 @@ namespace Illuminate\Database\Eloquent\Relations {
      */
     class HasOneOrManyThrough extends \Illuminate\Database\Eloquent\Relations\Relation {
             }
+    /**
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+     * @extends \Illuminate\Database\Eloquent\Relations\HasOneOrMany<TRelatedModel, TDeclaringModel, \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>>
+     */
+    class HasMany extends \Illuminate\Database\Eloquent\Relations\HasOneOrMany {
+            }
+    /**
+     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+     * @template TResult
+     * @extends \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, TDeclaringModel, TResult>
+     */
+    class HasOneOrMany extends \Illuminate\Database\Eloquent\Relations\Relation {
+            }
     }
 
 namespace Livewire\Features\SupportTesting {

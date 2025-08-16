@@ -69,6 +69,7 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
                 fn (): View => view('filament.components.head'),
-            );
+            )
+            ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }
