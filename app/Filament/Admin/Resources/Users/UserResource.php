@@ -26,10 +26,14 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Flex;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -57,18 +61,48 @@ class UserResource extends Resource
                     ->columnSpan(2)
                     ->components([
                         Section::make('User Information')
-                            ->columns()
+                            ->columns(1)
                             ->schema([
-                                TextInput::make('name')
-                                    ->columnSpanFull()
-                                    ->required()
-                                    ->maxLength(255),
-                                TextInput::make('email')
-                                    ->email()
-                                    ->required()
-                                    ->maxLength(255),
-                                DateTimePicker::make('email_verified_at')
-                                    ->label('Email Verified'),
+                                Flex::make([
+                                    Section::make()
+                                        ->contained(false)
+                                        ->columns(1)
+                                        ->grow(false)
+                                        ->components([
+                                            FileUpload::make('avatar')
+                                                ->alignCenter()
+                                                ->hiddenLabel()
+                                                ->avatar()
+                                                ->image()
+                                                ->imageEditor()
+                                                ->imageEditorAspectRatios([
+                                                    '1:1',
+                                                    '4:3',
+                                                    '16:9',
+                                                ])
+                                                ->imageCropAspectRatio('1:1')
+                                                ->visibility('public')
+                                                ->disk('public')
+                                                ->directory('avatars')
+                                                ->openable()
+                                                ->downloadable(),
+                                        ]),
+                                    Section::make()
+                                        ->columns(2)
+                                        ->contained(false)
+                                        ->components([
+                                            TextInput::make('name')
+                                                ->columnSpanFull()
+                                                ->required()
+                                                ->maxLength(255),
+                                            TextInput::make('email')
+                                                ->email()
+                                                ->required()
+                                                ->maxLength(255),
+                                            DateTimePicker::make('email_verified_at')
+                                                ->label('Email Verified'),
+                                        ])
+                                ])->verticallyAlignCenter(),
                                 Select::make('groups')
                                     ->helperText('The groups the user is assigned to.')
                                     ->relationship('groups', 'name')
@@ -82,20 +116,6 @@ class UserResource extends Resource
                             ->persistCollapsed()
                             ->columns(1)
                             ->components([
-                                FileUpload::make('avatar')
-                                    ->image()
-                                    ->imageEditor()
-                                    ->imageEditorAspectRatios([
-                                        '1:1',
-                                        '4:3',
-                                        '16:9',
-                                    ])
-                                    ->imageCropAspectRatio('1:1')
-                                    ->visibility('public')
-                                    ->disk('public')
-                                    ->directory('avatars')
-                                    ->openable()
-                                    ->downloadable(),
                                 RichEditor::make('signature')
                                     ->nullable(),
                             ]),
@@ -148,7 +168,14 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
+                ImageColumn::make('avatar_url')
+                    ->circular()
+                    ->label('')
+                    ->width(1)
+                    ->grow(false),
                 TextColumn::make('name')
+                    ->weight(FontWeight::Bold)
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('email')
                     ->searchable(),
