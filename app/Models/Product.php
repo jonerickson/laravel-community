@@ -8,9 +8,11 @@ use App\Contracts\Sluggable;
 use App\Enums\ProductType;
 use App\Traits\HasFeaturedImage;
 use App\Traits\HasFiles;
+use App\Traits\HasLogging;
 use App\Traits\HasMetadata;
 use App\Traits\HasReviews;
 use App\Traits\HasSlug;
+use App\Traits\LogsMarketplaceActivity;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -36,6 +38,8 @@ use Laravel\Scout\Searchable;
  * @property Carbon|null $updated_at
  * @property-read Collection<int, ProductPrice> $activePrices
  * @property-read int|null $active_prices_count
+ * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read mixed $average_rating
  * @property-read Collection<int, ProductCategory> $categories
  * @property-read int|null $categories_count
@@ -79,9 +83,11 @@ class Product extends Model implements Sluggable
     use HasFactory;
     use HasFeaturedImage;
     use HasFiles;
+    use HasLogging;
     use HasMetadata;
     use HasReviews;
     use HasSlug;
+    use LogsMarketplaceActivity;
     use Searchable;
 
     protected $fillable = [
@@ -174,6 +180,30 @@ class Product extends Model implements Sluggable
             'description' => $this->description,
             'type' => $this->type->value ?? '',
         ];
+    }
+
+    public function getLoggedAttributes(): array
+    {
+        return [
+            'name',
+            'description',
+            'type',
+            'is_featured',
+            'stripe_product_id',
+        ];
+    }
+
+    public function getActivityDescription(string $eventName): string
+    {
+        $type = $this->type?->value ?? 'product';
+        $name = $this->name ? " \"{$this->name}\"" : '';
+
+        return ucfirst($type).$name." {$eventName}";
+    }
+
+    public function getActivityLogName(): string
+    {
+        return 'ecommerce';
     }
 
     protected function casts(): array

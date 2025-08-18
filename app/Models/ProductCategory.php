@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\Sluggable;
+use App\Traits\HasLogging;
 use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -21,6 +22,8 @@ use Illuminate\Support\Str;
  * @property string $slug
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read Collection<int, Product> $products
  * @property-read int|null $products_count
  *
@@ -40,6 +43,7 @@ use Illuminate\Support\Str;
 class ProductCategory extends Model implements Sluggable
 {
     use HasFactory;
+    use HasLogging;
     use HasSlug;
 
     protected $table = 'products_categories';
@@ -57,5 +61,25 @@ class ProductCategory extends Model implements Sluggable
     public function generateSlug(): ?string
     {
         return Str::slug($this->name);
+    }
+
+    public function getLoggedAttributes(): array
+    {
+        return [
+            'name',
+            'description',
+        ];
+    }
+
+    public function getActivityDescription(string $eventName): string
+    {
+        $name = $this->name ? " \"{$this->name}\"" : '';
+
+        return "Product category{$name} {$eventName}";
+    }
+
+    public function getActivityLogName(): string
+    {
+        return 'ecommerce';
     }
 }

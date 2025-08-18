@@ -4,9 +4,19 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Traits\HasAvatar;
+use App\Traits\HasEmailAuthentication;
 use App\Traits\HasGroups;
+use App\Traits\HasLogging;
+use App\Traits\HasMultiFactorAuthentication;
+use App\Traits\LogsAuthActivity;
 use Exception;
+use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthentication;
+use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthenticationRecovery;
+use Filament\Auth\MultiFactor\Email\Contracts\HasEmailAuthentication as EmailAuthenticationContract;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar as FilamentAvatar;
+use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Builder;
@@ -36,6 +46,9 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $signature
  * @property string $password
  * @property string|null $remember_token
+ * @property string|null $app_authentication_secret
+ * @property array<array-key, mixed>|null $app_authentication_recovery_codes
+ * @property bool $has_email_authentication
  * @property string|null $avatar
  * @property string|null $stripe_id
  * @property string|null $pm_type
@@ -53,6 +66,9 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $billing_country
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read string|null $avatar_url
  * @property-read Collection<int, UserFingerprint> $fingerprints
  * @property-read int|null $fingerprints_count
  * @property-read Collection<int, Group> $groups
@@ -77,6 +93,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder<static>|User permission($permissions, $without = false)
  * @method static Builder<static>|User query()
  * @method static Builder<static>|User role($roles, $guard = null, $without = false)
+ * @method static Builder<static>|User whereAppAuthenticationRecoveryCodes($value)
+ * @method static Builder<static>|User whereAppAuthenticationSecret($value)
  * @method static Builder<static>|User whereAvatar($value)
  * @method static Builder<static>|User whereBillingAddress($value)
  * @method static Builder<static>|User whereBillingAddressLine2($value)
@@ -88,6 +106,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder<static>|User whereEmail($value)
  * @method static Builder<static>|User whereEmailVerifiedAt($value)
  * @method static Builder<static>|User whereExtraBillingInformation($value)
+ * @method static Builder<static>|User whereHasEmailAuthentication($value)
  * @method static Builder<static>|User whereId($value)
  * @method static Builder<static>|User whereInvoiceEmails($value)
  * @method static Builder<static>|User whereName($value)
@@ -106,14 +125,19 @@ use Spatie\Permission\Traits\HasRoles;
  *
  * @mixin \Eloquent
  */
-class User extends Authenticatable implements FilamentUser, MustVerifyEmail
+class User extends Authenticatable implements EmailAuthenticationContract, FilamentAvatar, FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery, HasName, MustVerifyEmail
 {
     use Billable;
     use HasApiTokens;
+    use HasAvatar;
+    use HasEmailAuthentication;
     use HasFactory;
     use HasGroups;
+    use HasLogging;
+    use HasMultiFactorAuthentication;
     use HasPermissions;
     use HasRoles;
+    use LogsAuthActivity;
     use Notifiable;
 
     protected $fillable = [
@@ -121,7 +145,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'email',
         'email_verified_at',
         'signature',
-        'avatar',
         'is_banned',
         'banned_at',
         'ban_reason',
@@ -164,6 +187,11 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return $panel->getId() === 'marketplace';
     }
 
+    public function getFilamentName(): string
+    {
+        return $this->name;
+    }
+
     public function fingerprints(): HasMany
     {
         return $this->hasMany(UserFingerprint::class);
@@ -174,13 +202,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return Attribute::make(
             get: fn (): bool => $this->fingerprints()->banned()->exists(),
         )->shouldCache();
-    }
-
-    public function avatar(): Attribute
-    {
-        return Attribute::make(
-            get: fn (?string $value): ?string => $value ? asset('storage/'.$value) : null,
-        );
     }
 
     //    public function hasPermissionTo($permission, $guardName = null): bool
@@ -217,6 +238,27 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         }
 
         return parent::can($abilities, $arguments);
+    }
+
+    public function getLoggedAttributes(): array
+    {
+        return [
+            'name',
+            'email',
+            'email_verified_at',
+            'signature',
+            'avatar',
+        ];
+    }
+
+    public function getActivityDescription(string $eventName): string
+    {
+        return "User account {$eventName}";
+    }
+
+    public function getActivityLogName(): string
+    {
+        return 'user';
     }
 
     protected function casts(): array

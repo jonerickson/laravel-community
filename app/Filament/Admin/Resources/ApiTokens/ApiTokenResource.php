@@ -68,6 +68,7 @@ class ApiTokenResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateDescription('There are no API keys available yet. Create your first one to get started.')
             ->columns([
                 TextColumn::make('tokenable.name')
                     ->label('User')

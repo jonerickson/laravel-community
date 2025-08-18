@@ -10,6 +10,7 @@ use App\Traits\HasAuthor;
 use App\Traits\HasComments;
 use App\Traits\HasFeaturedImage;
 use App\Traits\HasLikes;
+use App\Traits\HasLogging;
 use App\Traits\HasMetadata;
 use App\Traits\HasSlug;
 use App\Traits\HasUrl;
@@ -40,6 +41,8 @@ use Laravel\Scout\Searchable;
  * @property int $created_by
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read Collection<int, Comment> $approvedComments
  * @property-read int|null $approved_comments_count
  * @property-read User $author
@@ -94,6 +97,7 @@ class Post extends Model implements Sluggable
     use HasFactory;
     use HasFeaturedImage;
     use HasLikes;
+    use HasLogging;
     use HasMetadata;
     use HasSlug;
     use HasUrl;
@@ -188,6 +192,36 @@ class Post extends Model implements Sluggable
     public function shouldBeSearchable(): bool
     {
         return $this->is_published;
+    }
+
+    public function getLoggedAttributes(): array
+    {
+        return [
+            'type',
+            'title',
+            'content',
+            'is_published',
+            'is_featured',
+            'published_at',
+            'topic_id',
+        ];
+    }
+
+    public function getActivityDescription(string $eventName): string
+    {
+        $type = $this->type?->value ?? 'post';
+        $title = $this->title ? " \"{$this->title}\"" : '';
+
+        return ucfirst($type).$title." {$eventName}";
+    }
+
+    public function getActivityLogName(): string
+    {
+        return match ($this->type) {
+            PostType::Blog => 'blog',
+            PostType::Forum => 'forum',
+            default => 'post',
+        };
     }
 
     protected function readingTime(): Attribute

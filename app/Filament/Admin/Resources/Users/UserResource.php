@@ -8,6 +8,8 @@ use App\Filament\Admin\Resources\Users\Pages\CreateUser;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Filament\Admin\Resources\Users\Pages\ListUsers;
 use App\Filament\Admin\Resources\Users\RelationManagers\FingerprintsRelationManager;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\UserFingerprint;
 use BackedEnum;
@@ -17,10 +19,14 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
@@ -29,6 +35,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 class UserResource extends Resource
@@ -44,26 +51,95 @@ class UserResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(3)
             ->components([
-                Section::make('User Information')
-                    ->columns()
-                    ->schema([
-                        TextInput::make('name')
-                            ->columnSpanFull()
-                            ->required()
-                            ->maxLength(255),
-                        TextInput::make('email')
-                            ->email()
-                            ->required()
-                            ->maxLength(255),
-                        DateTimePicker::make('email_verified_at')
-                            ->label('Email Verified'),
-                        Select::make('groups')
-                            ->relationship('groups', 'name')
-                            ->multiple()
-                            ->searchable()
-                            ->preload()
-                            ->columnSpanFull(),
+                Group::make()
+                    ->columnSpan(2)
+                    ->components([
+                        Section::make('User Information')
+                            ->columns()
+                            ->schema([
+                                TextInput::make('name')
+                                    ->columnSpanFull()
+                                    ->required()
+                                    ->maxLength(255),
+                                TextInput::make('email')
+                                    ->email()
+                                    ->required()
+                                    ->maxLength(255),
+                                DateTimePicker::make('email_verified_at')
+                                    ->label('Email Verified'),
+                                Select::make('groups')
+                                    ->helperText('The groups the user is assigned to.')
+                                    ->relationship('groups', 'name')
+                                    ->multiple()
+                                    ->searchable()
+                                    ->preload()
+                                    ->columnSpanFull(),
+                            ]),
+                        Section::make('Profile')
+                            ->collapsible()
+                            ->persistCollapsed()
+                            ->columns(1)
+                            ->components([
+                                FileUpload::make('avatar')
+                                    ->image()
+                                    ->imageEditor()
+                                    ->imageEditorAspectRatios([
+                                        '1:1',
+                                        '4:3',
+                                        '16:9',
+                                    ])
+                                    ->imageCropAspectRatio('1:1')
+                                    ->visibility('public')
+                                    ->disk('public')
+                                    ->directory('avatars')
+                                    ->openable()
+                                    ->downloadable(),
+                                RichEditor::make('signature')
+                                    ->nullable(),
+                            ]),
+                    ]),
+                Group::make()
+                    ->components([
+                        Section::make('Details')
+                            ->collapsible()
+                            ->persistCollapsed()
+                            ->components([
+                                TextEntry::make('created_at')
+                                    ->dateTime()
+                                    ->since()
+                                    ->dateTimeTooltip(),
+                                TextEntry::make('updated_at')
+                                    ->dateTime()
+                                    ->since()
+                                    ->dateTimeTooltip(),
+                            ]),
+                        Section::make('Permissions')
+                            ->collapsible()
+                            ->persistCollapsed()
+                            ->components([
+                                Select::make('roles')
+                                    ->relationship('roles', 'name')
+                                    ->multiple()
+                                    ->searchable()
+                                    ->preload()
+                                    ->getOptionLabelUsing(fn (Role $role) => Str::of($role->name)->replace('_', ' ')->title()->toString())
+                                    ->helperText('The roles that are assigned to the user.'),
+                                Select::make('permissions')
+                                    ->relationship('permissions', 'name')
+                                    ->multiple()
+                                    ->searchable()
+                                    ->preload()
+                                    ->getOptionLabelUsing(fn (Permission $permission) => Str::of($permission->name)->replace('_', ' ')->title()->toString())
+                                    ->helperText('The permissions that are assigned to the user. These are in addition to the permissions already inherited by any assigned roles.'),
+                            ]),
+                        Section::make('Activity')
+                            ->collapsible()
+                            ->persistCollapsed()
+                            ->components([
+
+                            ]),
                     ]),
             ]);
     }

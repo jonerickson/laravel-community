@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Contracts\Sluggable;
 use App\Traits\HasAuthor;
+use App\Traits\HasLogging;
 use App\Traits\HasReads;
 use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,6 +33,8 @@ use Laravel\Scout\Searchable;
  * @property int $created_by
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read User $author
  * @property-read mixed $author_name
  * @property-read User $creator
@@ -71,6 +74,7 @@ class Topic extends Model implements Sluggable
 {
     use HasAuthor;
     use HasFactory;
+    use HasLogging;
     use HasReads;
     use HasSlug;
     use Searchable;
@@ -199,6 +203,29 @@ class Topic extends Model implements Sluggable
             'description' => $this->description,
             'created_at' => $this->created_at?->toDateTimeString() ?? '',
         ];
+    }
+
+    public function getLoggedAttributes(): array
+    {
+        return [
+            'title',
+            'description',
+            'is_pinned',
+            'is_locked',
+            'forum_id',
+        ];
+    }
+
+    public function getActivityDescription(string $eventName): string
+    {
+        $title = $this->title ? " \"{$this->title}\"" : '';
+
+        return "Forum topic{$title} {$eventName}";
+    }
+
+    public function getActivityLogName(): string
+    {
+        return 'forum';
     }
 
     protected function casts(): array
