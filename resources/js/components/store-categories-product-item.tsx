@@ -1,45 +1,19 @@
 import HeadingSmall from '@/components/heading-small';
 import { StarRating } from '@/components/star-rating';
 import { Button } from '@/components/ui/button';
-import { CartResponse, Product, ProductCategory } from '@/types';
-import { ApiError, apiRequest } from '@/utils/api';
+import { useCartOperations } from '@/hooks/use-cart-operations';
+import { Product, ProductCategory } from '@/types';
 import { truncate } from '@/utils/truncate';
 import { Link } from '@inertiajs/react';
-import axios from 'axios';
 import { ImageIcon } from 'lucide-react';
-import { useState } from 'react';
 
 export default function StoreCategoriesProductItem({ product, category }: { product: Product; category: ProductCategory }) {
-    const [isAddingToCart, setIsAddingToCart] = useState(false);
+    const { addItem, loading } = useCartOperations();
 
-    const addToCart = async () => {
+    const handleAddToCart = async () => {
         if (!product.default_price) return;
 
-        setIsAddingToCart(true);
-        try {
-            const data = await apiRequest<CartResponse>(
-                axios.post(route('api.cart.store'), {
-                    product_id: product.id,
-                    price_id: product.default_price.id,
-                    quantity: 1,
-                }),
-            );
-
-            window.dispatchEvent(
-                new CustomEvent('cart-updated', {
-                    detail: {
-                        cartCount: data.cartCount,
-                        cartItems: data.cartItems,
-                    },
-                }),
-            );
-        } catch (error) {
-            console.error('Failed to add to cart:', error);
-            const apiError = error as ApiError;
-            alert(apiError.message || 'Failed to add product to cart');
-        } finally {
-            setIsAddingToCart(false);
-        }
+        await addItem(product.id, product.default_price.id, 1);
     };
 
     return (
@@ -63,8 +37,8 @@ export default function StoreCategoriesProductItem({ product, category }: { prod
                     <Button className="w-full" variant="outline" asChild>
                         <Link href={route('store.categories.products.show', { product: product.slug, category: category.slug })}>View</Link>
                     </Button>
-                    <Button className="w-full" onClick={addToCart} disabled={isAddingToCart || !product.default_price}>
-                        {isAddingToCart ? 'Adding...' : 'Add to cart'}
+                    <Button className="w-full" onClick={handleAddToCart} disabled={loading === product.id || !product.default_price}>
+                        {loading === product.id ? 'Adding...' : 'Add to cart'}
                     </Button>
                 </div>
             </div>

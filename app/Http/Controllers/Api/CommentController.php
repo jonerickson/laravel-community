@@ -8,12 +8,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ApiResource;
 use App\Models\Comment;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
-    public function store(Request $request): JsonResource
+    public function store(Request $request): ApiResource
     {
         $validated = $request->validate([
             'commentable_type' => 'required|string',
@@ -39,6 +38,9 @@ class CommentController extends Controller
 
         $comment->load('author');
 
-        return ApiResource::created($comment, 'Comment created successfully');
+        return ApiResource::created(
+            resource: $comment,
+            message: 'Comment created successfully.'
+        );
     }
 }

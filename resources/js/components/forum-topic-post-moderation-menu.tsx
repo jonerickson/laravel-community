@@ -1,8 +1,10 @@
+import { ReportDialog } from '@/components/report-dialog';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { Forum, Post, SharedData, Topic } from '@/types';
-import { router, useForm, usePage } from '@inertiajs/react';
-import { Eye, EyeOff, MoreHorizontal, Trash } from 'lucide-react';
+import { useForm, usePage } from '@inertiajs/react';
+import { Eye, EyeOff, Flag, MoreHorizontal, Trash } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ForumTopicPostModerationMenuProps {
     post: Post;
@@ -15,40 +17,61 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
     const { delete: deletePost } = useForm({
         is_published: post.is_published,
     });
+    const { patch: updatePost, transform: transformUpdatePost } = useForm();
 
     const canModerate = post.created_by === auth.user?.id || auth.isAdmin;
+    const canReport = auth.user && auth.user.id !== post.created_by && !post.is_reported;
 
-    if (!canModerate) {
+    if (!canModerate && !canReport) {
         return null;
     }
 
     const handleDeletePost = () => {
-        if (window.confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
-            deletePost(
-                route('forums.posts.destroy', {
-                    forum: forum.slug,
-                    topic: topic.slug,
-                    post: post.id,
-                }),
-            );
+        if (!window.confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+            return;
         }
+
+        deletePost(
+            route('forums.posts.destroy', {
+                forum: forum.slug,
+                topic: topic.slug,
+                post: post.id,
+            }),
+            {
+                onSuccess: () => toast.success(`The post has been deleted.`),
+                onError: (err) => {
+                    console.error(err);
+                    toast.error(err.message || 'There was an error. Please try again.');
+                },
+            },
+        );
     };
 
     const handleTogglePublish = () => {
         const action = post.is_published ? 'unpublish' : 'publish';
 
-        if (window.confirm(`Are you sure you want to ${action} this post?`)) {
-            router.patch(
-                route('forums.posts.update', {
-                    forum: forum.slug,
-                    topic: topic.slug,
-                    post: post.id,
-                }),
-                {
-                    is_published: !post.is_published,
-                },
-            );
+        if (!window.confirm(`Are you sure you want to ${action} this post?`)) {
+            return;
         }
+
+        transformUpdatePost(() => ({
+            is_published: !post.is_published,
+        }));
+
+        updatePost(
+            route('forums.posts.update', {
+                forum: forum.slug,
+                topic: topic.slug,
+                post: post.id,
+            }),
+            {
+                onSuccess: () => toast.success(`The post has been ${action}ed.`),
+                onError: (err) => {
+                    console.error(err);
+                    toast.error(err.message || 'There was an error. Please try again.');
+                },
+            },
+        );
     };
 
     return (
@@ -60,23 +83,36 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleTogglePublish}>
-                    {post.is_published ? (
-                        <>
-                            <EyeOff className="mr-2 h-4 w-4" />
-                            Unpublish Post
-                        </>
-                    ) : (
-                        <>
-                            <Eye className="mr-2 h-4 w-4" />
-                            Publish Post
-                        </>
-                    )}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleDeletePost} className="text-destructive focus:text-destructive">
-                    <Trash className="mr-2 h-4 w-4 text-destructive" />
-                    Delete Post
-                </DropdownMenuItem>
+                {canReport && (
+                    <ReportDialog reportableType="App\Models\Post" reportableId={post.id}>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                            <Flag className="mr-2 h-4 w-4" />
+                            Report Post
+                        </DropdownMenuItem>
+                    </ReportDialog>
+                )}
+
+                {canModerate && (
+                    <>
+                        <DropdownMenuItem onClick={handleTogglePublish}>
+                            {post.is_published ? (
+                                <>
+                                    <EyeOff className="mr-2 h-4 w-4" />
+                                    Unpublish Post
+                                </>
+                            ) : (
+                                <>
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    Publish Post
+                                </>
+                            )}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleDeletePost} className="text-destructive focus:text-destructive">
+                            <Trash className="mr-2 h-4 w-4 text-destructive" />
+                            Delete Post
+                        </DropdownMenuItem>
+                    </>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );

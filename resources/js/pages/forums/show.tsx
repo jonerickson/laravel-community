@@ -6,14 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Pagination } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useApiRequest } from '@/hooks/use-api-request';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Forum, PaginatedData, SharedData, Topic } from '@/types';
-import { ApiError, apiRequest } from '@/utils/api';
 import { Head, Link, usePage } from '@inertiajs/react';
-import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import { Circle, Eye, LibraryBig, Lock, MessageSquare, Pin, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface ForumShowProps {
     forum: Forum;
@@ -26,7 +26,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
     const forumUrl = `/forums/${forum.slug}`;
     const [topics, setTopics] = useState<Topic[]>(initialTopics);
     const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
-    const [isDeleting, setIsDeleting] = useState(false);
+    const { loading: isDeleting, execute: executeBulkDelete } = useApiRequest();
     const isAdmin = auth?.isAdmin;
 
     const handleSelectTopic = (topicId: number, checked: boolean) => {
@@ -50,27 +50,23 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
             return;
         }
 
-        setIsDeleting(true);
-        try {
-            await apiRequest(
-                axios.delete(route('api.forums.topics.destroy'), {
-                    data: {
-                        topic_ids: selectedTopics,
-                    },
-                }),
-            );
-
-            setTopics((prevTopics) => prevTopics.filter((topic) => !selectedTopics.includes(topic.id)));
-            setSelectedTopics([]);
-        } catch (error) {
-            if (error instanceof ApiError) {
-                alert(`Error: ${error.message}`);
-            } else {
-                alert('An unexpected error occurred while deleting topics.');
-            }
-        } finally {
-            setIsDeleting(false);
-        }
+        await executeBulkDelete(
+            {
+                url: route('api.forums.topics.destroy'),
+                method: 'DELETE',
+                data: {
+                    topic_ids: selectedTopics,
+                    forum_id: forum.id,
+                },
+            },
+            {
+                onSuccess: () => {
+                    setTopics((prevTopics) => prevTopics.filter((topic) => !selectedTopics.includes(topic.id)));
+                    setSelectedTopics([]);
+                    toast.success('The post(s) have been successfully deleted.');
+                },
+            },
+        );
     };
 
     const breadcrumbs: BreadcrumbItem[] = [

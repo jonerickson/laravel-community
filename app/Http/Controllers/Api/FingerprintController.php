@@ -40,7 +40,7 @@ class FingerprintController extends Controller
                 'first_seen' => $fingerprint->first_seen_at,
                 'last_seen' => $fingerprint->last_seen_at,
             ],
-            message: 'Fingerprint tracked successfully'
+            message: 'Fingerprint tracked successfully.'
         );
     }
 }

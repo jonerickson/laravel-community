@@ -170,6 +170,8 @@ export interface Post {
     created_at: string;
     updated_at: string;
     comments?: Comment[];
+    is_reported?: boolean;
+    report_count?: number;
 }
 
 export interface PaginatedData {

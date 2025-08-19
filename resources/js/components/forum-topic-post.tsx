@@ -4,9 +4,10 @@ import ForumUserInfo from '@/components/forum-user-info';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import type { Forum, Post, Topic } from '@/types';
+import type { Forum, Post, SharedData, Topic } from '@/types';
+import { usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
-import { EyeOff } from 'lucide-react';
+import { EyeOff, Flag } from 'lucide-react';
 
 interface ForumTopicPostProps {
     post: Post;
@@ -16,8 +17,25 @@ interface ForumTopicPostProps {
 }
 
 export default function ForumTopicPost({ post, index, forum, topic }: ForumTopicPostProps) {
+    const { auth } = usePage<SharedData>().props;
+
+    // Determine if post should be hidden (reported but not for admins)
+    const isHiddenForUser = post.is_reported && !auth.isAdmin;
+
+    // Determine card styling based on post status
+    const getCardClassName = () => {
+        if (!post.is_published) return 'border-warning-foreground bg-warning';
+        if (post.is_reported && auth.isAdmin) return 'border-destructive-foreground bg-destructive/10';
+        return '';
+    };
+
+    // Don't render reported posts for non-admin users
+    if (isHiddenForUser) {
+        return null;
+    }
+
     return (
-        <Card data-post className={post.is_published ? '' : 'border-warning-foreground bg-warning'}>
+        <Card data-post className={getCardClassName()}>
             <CardContent className="px-6 py-0 md:py-6">
                 <div className="flex flex-col gap-4 md:flex-row">
                     <div className="flex min-w-0 flex-col items-start gap-2 md:items-center">
@@ -34,6 +52,12 @@ export default function ForumTopicPost({ post, index, forum, topic }: ForumTopic
                                     <Badge variant="destructive">
                                         <EyeOff className="mr-1 h-3 w-3" />
                                         Unpublished
+                                    </Badge>
+                                )}
+                                {post.is_reported && auth.isAdmin && (
+                                    <Badge variant="destructive">
+                                        <Flag className="mr-1 h-3 w-3" />
+                                        Reported {post.report_count && post.report_count > 1 ? `(${post.report_count})` : ''}
                                     </Badge>
                                 )}
                             </div>

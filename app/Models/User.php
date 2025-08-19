@@ -10,6 +10,7 @@ use App\Traits\HasGroups;
 use App\Traits\HasLogging;
 use App\Traits\HasMultiFactorAuthentication;
 use App\Traits\LogsAuthActivity;
+use App\Traits\Reportable;
 use Exception;
 use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthentication;
 use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthenticationRecovery;
@@ -68,16 +69,25 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $updated_at
  * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
+ * @property-read Collection<int, Report> $approvedReports
+ * @property-read int|null $approved_reports_count
  * @property-read string|null $avatar_url
  * @property-read Collection<int, UserFingerprint> $fingerprints
  * @property-read int|null $fingerprints_count
  * @property-read Collection<int, Group> $groups
  * @property-read int|null $groups_count
  * @property-read bool $is_banned
+ * @property-read bool $is_reported
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
+ * @property-read Collection<int, Report> $pendingReports
+ * @property-read int|null $pending_reports_count
  * @property-read Collection<int, \App\Models\Permission> $permissions
  * @property-read int|null $permissions_count
+ * @property-read Collection<int, Report> $rejectedReports
+ * @property-read int|null $rejected_reports_count
+ * @property-read Collection<int, Report> $reports
+ * @property-read int|null $reports_count
  * @property-read Collection<int, \App\Models\Role> $roles
  * @property-read int|null $roles_count
  * @property-read Collection<int, Subscription> $subscriptions
@@ -139,6 +149,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     use HasRoles;
     use LogsAuthActivity;
     use Notifiable;
+    use Reportable;
 
     protected $fillable = [
         'name',

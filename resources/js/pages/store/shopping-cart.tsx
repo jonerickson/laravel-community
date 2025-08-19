@@ -3,28 +3,15 @@ import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useApiRequest } from '@/hooks/use-api-request';
+import { useCartOperations } from '@/hooks/use-cart-operations';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, CartResponse, CheckoutResponse, Product, ProductPrice } from '@/types';
-import { ApiError, apiRequest } from '@/utils/api';
+import type { BreadcrumbItem, CartResponse, CheckoutResponse } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import axios from 'axios';
 import { ImageIcon, ShoppingCart as ShoppingCartIcon, XIcon } from 'lucide-react';
-import { useState } from 'react';
-
-interface CartItem {
-    product_id: number;
-    price_id?: number | null;
-    name: string;
-    slug: string;
-    quantity: number;
-    product: Product | null;
-    selected_price?: ProductPrice | null;
-    available_prices?: ProductPrice[];
-    added_at: string;
-}
 
 interface ShoppingCartProps {
-    cartItems: CartItem[];
+    cartItems: CartResponse['cartItems'];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -35,107 +22,34 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
-    const [items, setItems] = useState<CartItem[]>(cartItems);
-    const [loading, setLoading] = useState<number | null>(null);
-    const [checkoutLoading, setCheckoutLoading] = useState(false);
-
-    const calculateTotals = () => {
-        const subtotal = items.reduce((total, item) => {
-            const price = item.selected_price || item.product?.default_price;
-            if (price) {
-                return total + price.amount * item.quantity;
-            }
-            return total;
-        }, 0);
-
-        const shipping = subtotal > 0 ? 5.0 : 0;
-        const taxRate = 0.08;
-        const tax = subtotal * taxRate;
-        const total = subtotal + shipping + tax;
-
-        return { subtotal, shipping, tax, total };
-    };
+    const { items, updateQuantity, removeItem, calculateTotals, loading } = useCartOperations(cartItems);
+    const { loading: checkoutLoading, execute: executeCheckout } = useApiRequest<CheckoutResponse>();
 
     const { subtotal, total } = calculateTotals();
 
-    const updateQuantity = async (productId: number, quantity: number, priceId?: number | null) => {
-        setLoading(productId);
-        try {
-            const data = await apiRequest<CartResponse>(
-                axios.put(route('api.cart.update'), {
-                    product_id: productId,
-                    price_id: priceId,
-                    quantity: quantity,
-                }),
-            );
-
-            setItems(data.cartItems);
-            window.dispatchEvent(
-                new CustomEvent('cart-updated', {
-                    detail: {
-                        cartCount: data.cartCount,
-                        cartItems: data.cartItems,
-                    },
-                }),
-            );
-        } catch (error) {
-            console.error('Failed to update cart:', error);
-            const apiError = error as ApiError;
-            alert(apiError.message || 'Failed to update cart. Please try again.');
-        } finally {
-            setLoading(null);
-        }
+    const handleUpdateQuantity = (productId: number, quantity: number, priceId?: number | null) => {
+        updateQuantity(productId, quantity, priceId);
     };
 
-    const removeItem = async (productId: number, priceId?: number | null) => {
+    const handleRemoveItem = (productId: number, priceId?: number | null) => {
         const item = items.find((i) => i.product_id === productId);
-        const confirmed = window.confirm(`Are you sure you want to remove "${item?.name}" from your cart?`);
+        if (!item) return;
 
-        if (!confirmed) {
-            return;
-        }
-
-        setLoading(productId);
-        try {
-            const data = await apiRequest<CartResponse>(
-                axios.delete(route('api.cart.destroy'), {
-                    data: {
-                        product_id: productId,
-                        price_id: priceId,
-                    },
-                }),
-            );
-
-            setItems(data.cartItems);
-            window.dispatchEvent(
-                new CustomEvent('cart-updated', {
-                    detail: {
-                        cartCount: data.cartCount,
-                        cartItems: data.cartItems,
-                    },
-                }),
-            );
-        } catch (error) {
-            console.error('Failed to remove item:', error);
-            const apiError = error as ApiError;
-            alert(apiError.message || 'Failed to remove item. Please try again.');
-        } finally {
-            setLoading(null);
-        }
+        removeItem(productId, item.name, priceId);
     };
 
     const handleCheckout = async () => {
-        setCheckoutLoading(true);
-        try {
-            const data = await apiRequest<CheckoutResponse>(axios.post(route('api.checkout')));
-            window.location.href = data.checkout_url;
-        } catch (error) {
-            console.error('Checkout failed:', error);
-            const apiError = error as ApiError;
-            alert(apiError.message || 'Checkout failed. Please try again.');
-        } finally {
-            setCheckoutLoading(false);
-        }
+        await executeCheckout(
+            {
+                url: route('api.checkout'),
+                method: 'POST',
+            },
+            {
+                onSuccess: (data) => {
+                    window.location.href = data.checkout_url;
+                },
+            },
+        );
     };
 
     if (items.length === 0) {
@@ -226,7 +140,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                                                 }
                                                                 onValueChange={(value) => {
                                                                     const newPriceId = parseInt(value);
-                                                                    updateQuantity(item.product_id, item.quantity, newPriceId);
+                                                                    handleUpdateQuantity(item.product_id, item.quantity, newPriceId);
                                                                 }}
                                                             >
                                                                 <SelectTrigger className="w-full">
@@ -248,7 +162,9 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                                         <label className="mb-1 block text-xs font-medium text-gray-700">Quantity:</label>
                                                         <Select
                                                             value={item.quantity.toString()}
-                                                            onValueChange={(value) => updateQuantity(item.product_id, parseInt(value), item.price_id)}
+                                                            onValueChange={(value) =>
+                                                                handleUpdateQuantity(item.product_id, parseInt(value), item.price_id)
+                                                            }
                                                             disabled={loading === item.product_id}
                                                         >
                                                             <SelectTrigger className="w-full">
@@ -269,7 +185,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                             <div className="absolute top-0 right-0">
                                                 <button
                                                     type="button"
-                                                    onClick={() => removeItem(item.product_id, item.price_id)}
+                                                    onClick={() => handleRemoveItem(item.product_id, item.price_id)}
                                                     disabled={loading === item.product_id}
                                                     className="-m-2 inline-flex p-2 text-gray-400 hover:text-gray-500 disabled:opacity-50"
                                                 >

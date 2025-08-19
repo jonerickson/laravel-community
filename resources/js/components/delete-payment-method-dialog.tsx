@@ -1,8 +1,7 @@
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ApiError, apiRequest } from '@/utils/api';
-import { router } from '@inertiajs/react';
-import axios from 'axios';
+import { usePaymentMethods } from '@/hooks/use-payment-methods';
 import { useState } from 'react';
 
 interface DeletePaymentMethodDialogProps {
@@ -18,32 +17,20 @@ interface DeletePaymentMethodDialogProps {
 }
 
 export default function DeletePaymentMethodDialog({ open, onOpenChange, paymentMethod }: DeletePaymentMethodDialogProps) {
-    const [loading, setLoading] = useState(false);
+    const { deletePaymentMethod, deleteLoading: loading } = usePaymentMethods();
     const [error, setError] = useState<string | null>(null);
 
     const handleDelete = async () => {
         if (!paymentMethod) return;
 
-        setLoading(true);
         setError(null);
 
         try {
-            await apiRequest(
-                axios.delete(route('api.payment-methods.destroy'), {
-                    data: {
-                        method: paymentMethod.id,
-                    },
-                }),
-            );
-
+            await deletePaymentMethod(paymentMethod.id);
             onOpenChange(false);
-            router.reload({ only: ['paymentMethods'] });
         } catch (err) {
             console.error('Error deleting payment method:', err);
-            const apiError = err as ApiError;
-            setError(apiError.message || 'An unexpected error occurred');
-        } finally {
-            setLoading(false);
+            setError((err as Error).message || 'An unexpected error occurred');
         }
     };
 
@@ -82,7 +69,7 @@ export default function DeletePaymentMethodDialog({ open, onOpenChange, paymentM
                         </div>
                     )}
 
-                    {error && <div className="mt-1 text-sm text-destructive">{error}</div>}
+                    {error && <InputError message={error} />}
                 </div>
 
                 <DialogFooter>

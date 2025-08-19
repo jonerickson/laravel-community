@@ -11,11 +11,10 @@ use App\Models\Post;
 use App\Models\Product;
 use App\Models\Topic;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 
 class SearchController extends Controller
 {
-    public function __invoke(Request $request): JsonResource
+    public function __invoke(Request $request): ApiResource
     {
         $query = $request->get('q', '');
         $types = $request->get('types', ['topic', 'post', 'policy', 'product']);
@@ -35,17 +34,21 @@ class SearchController extends Controller
         }
 
         if (empty($query) || strlen($query) < 2) {
-            return ApiResource::success([], 'Search query too short', [
-                'total' => 0,
-                'query' => $query,
-                'types' => $types,
-                'date_filters' => [
-                    'created_after' => $createdAfter,
-                    'created_before' => $createdBefore,
-                    'updated_after' => $updatedAfter,
-                    'updated_before' => $updatedBefore,
-                ],
-            ]);
+            return ApiResource::success(
+                resource: [],
+                message: 'Search query too short.',
+                meta: [
+                    'total' => 0,
+                    'query' => $query,
+                    'types' => $types,
+                    'date_filters' => [
+                        'created_after' => $createdAfter,
+                        'created_before' => $createdBefore,
+                        'updated_after' => $updatedAfter,
+                        'updated_before' => $updatedBefore,
+                    ],
+                ]
+            );
         }
 
         $limit = min((int) $request->get('limit', 10), 50);
@@ -149,7 +152,7 @@ class SearchController extends Controller
 
         return ApiResource::success(
             resource: $results->values(),
-            message: 'Search completed successfully',
+            message: 'Search completed successfully.',
             meta: [
                 'total' => $results->count(),
                 'query' => $query,

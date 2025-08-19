@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { useApiRequest } from '@/hooks/use-api-request';
 import { cn } from '@/lib/utils';
 import { Product } from '@/types';
-import { ApiError, apiRequest } from '@/utils/api';
-import axios from 'axios';
 import { Star } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface ProductRatingProps {
     product: Product;
@@ -16,38 +16,35 @@ export function StoreProductRating({ product, onRatingAdded }: ProductRatingProp
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [comment, setComment] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { loading: isSubmitting, execute: executeSubmitRating } = useApiRequest();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (rating === 0) {
-            alert('Please select a rating');
+            toast.error('Please select a rating');
             return;
         }
 
-        setIsSubmitting(true);
-        try {
-            await apiRequest(
-                axios.post(route('api.comments.store'), {
-                    commentable_type: 'App\\Models\\Product',
+        await executeSubmitRating(
+            {
+                url: route('api.comments.store'),
+                method: 'POST',
+                data: {
+                    commentable_type: 'App\Models\Product',
                     commentable_id: product.id,
                     content: comment,
                     rating: rating,
-                }),
-            );
-
-            setRating(0);
-            setComment('');
-
-            onRatingAdded?.();
-        } catch (error) {
-            console.error('Failed to submit rating:', error);
-            const apiError = error as ApiError;
-            alert(apiError.message || 'Failed to submit rating');
-        } finally {
-            setIsSubmitting(false);
-        }
+                },
+            },
+            {
+                onSuccess: () => {
+                    setRating(0);
+                    setComment('');
+                    onRatingAdded?.();
+                },
+            },
+        );
     };
 
     return (

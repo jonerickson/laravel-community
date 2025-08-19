@@ -6,10 +6,9 @@ import { StoreProductReviewsList } from '@/components/store-product-reviews-list
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { CartResponse, Comment, PaginatedData, Product as ProductType } from '@/types';
-import { ApiError, apiRequest } from '@/utils/api';
+import { useCartOperations } from '@/hooks/use-cart-operations';
+import type { Comment, PaginatedData, Product as ProductType } from '@/types';
 import { Deferred } from '@inertiajs/react';
-import axios from 'axios';
 import { CurrencyIcon, GlobeIcon, ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -25,10 +24,10 @@ interface ProductProps {
 }
 
 export default function Product({ product: productData, reviews, reviewsPagination }: ProductProps) {
-    const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [quantity, setQuantity] = useState(1);
     const [selectedPriceId, setSelectedPriceId] = useState<number | null>(productData?.default_price?.id || null);
     const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
+    const { addItem, loading } = useCartOperations();
 
     useEffect(() => {
         if (productData?.default_price && !selectedPriceId) {
@@ -36,35 +35,10 @@ export default function Product({ product: productData, reviews, reviewsPaginati
         }
     }, [selectedPriceId, productData?.default_price]);
 
-    const addToCart = async () => {
+    const handleAddToCart = async () => {
         if (!productData) return;
 
-        setIsAddingToCart(true);
-        try {
-            const data = await apiRequest<CartResponse>(
-                axios.post(route('api.cart.store'), {
-                    product_id: productData.id,
-                    price_id: selectedPriceId,
-                    quantity: quantity,
-                }),
-            );
-
-            window.dispatchEvent(
-                new CustomEvent('cart-updated', {
-                    detail: {
-                        cartCount: data.cartCount,
-                        cartItems: data.cartItems,
-                    },
-                }),
-            );
-        } catch (error) {
-            console.error('Failed to add to cart:', error);
-            const apiError = error as ApiError;
-            console.error('API Error:', apiError.message);
-            alert(apiError.message || 'Failed to add storeProduct to cart');
-        } finally {
-            setIsAddingToCart(false);
-        }
+        await addItem(productData.id, selectedPriceId, quantity);
     };
 
     return (
@@ -207,11 +181,15 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                     <form
                         onSubmit={(e) => {
                             e.preventDefault();
-                            addToCart();
+                            handleAddToCart();
                         }}
                     >
-                        <Button type="submit" disabled={isAddingToCart || !productData} className="mt-8 flex w-full items-center justify-center">
-                            {isAddingToCart ? 'Adding...' : 'Add to cart'}
+                        <Button
+                            type="submit"
+                            disabled={loading === productData?.id || !productData}
+                            className="mt-8 flex w-full items-center justify-center"
+                        >
+                            {loading === productData?.id ? 'Adding...' : 'Add to cart'}
                         </Button>
                     </form>
 

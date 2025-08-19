@@ -1,5 +1,5 @@
-import FlashToast from '@/components/flash-toast';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { Toaster } from '@/components/ui/sonner';
 import { useFingerprint } from '@/hooks/use-fingerprint';
 import { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
@@ -18,7 +18,7 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
         return (
             <div className="flex min-h-screen w-full flex-col">
                 {children}
-                <FlashToast />
+                <Toaster />
             </div>
         );
     }
@@ -26,7 +26,7 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
     return (
         <SidebarProvider defaultOpen={isOpen}>
             {children}
-            <FlashToast />
+            <Toaster />
         </SidebarProvider>
     );
 }

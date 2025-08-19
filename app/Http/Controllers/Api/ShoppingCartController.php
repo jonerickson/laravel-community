@@ -18,7 +18,7 @@ class ShoppingCartController extends Controller
         private readonly ShoppingCartService $cartService
     ) {}
 
-    public function store(Request $request): JsonResource
+    public function store(Request $request): ApiResource
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
@@ -62,7 +62,7 @@ class ShoppingCartController extends Controller
                 'cartItems' => $cartItems,
                 'cartCount' => count($cartItems),
             ],
-            message: 'Product added to cart successfully'
+            message: 'Product added to cart successfully.'
         );
     }
 
@@ -91,7 +91,7 @@ class ShoppingCartController extends Controller
                 'cartItems' => $cartItems,
                 'cartCount' => count($cartItems),
             ],
-            message: 'Cart updated successfully'
+            message: 'Cart updated successfully.'
         );
     }
 
@@ -119,7 +119,7 @@ class ShoppingCartController extends Controller
                 'cartItems' => $cartItems,
                 'cartCount' => count($cartItems),
             ],
-            message: 'Item removed from cart successfully'
+            message: 'Item removed from cart successfully.'
         );
     }
 }

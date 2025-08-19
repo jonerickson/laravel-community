@@ -8,7 +8,6 @@ use App\Http\Resources\ApiResource;
 use App\Services\ShoppingCartService;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 
 class CheckoutController
@@ -17,25 +16,35 @@ class CheckoutController
         private readonly ShoppingCartService $cartService
     ) {}
 
-    public function __invoke(Request $request): JsonResource
+    public function __invoke(Request $request): ApiResource
     {
         $user = Auth::guard('api')->user();
         if (! $user) {
-            return ApiResource::error('Authentication required to checkout', ['auth' => ['User must be authenticated.']], 401);
+            return ApiResource::error(
+                message: 'Authentication required to checkout.',
+                errors: ['auth' => ['User must be authenticated.']],
+                status: 401
+            );
         }
 
         $cartItems = $this->cartService->getCartItems();
         if (empty($cartItems)) {
-            return ApiResource::error('Cart is empty', ['cart' => ['Cart cannot be empty.']], 400);
+            return ApiResource::error(
+                message: 'Cart is empty.',
+                errors: ['cart' => ['Cart cannot be empty.']],
+                status: 400
+            );
         }
 
         $lineItems = [];
         foreach ($cartItems as $item) {
             $product = $item['product'];
             if (! $product || ! $product->stripe_product_id) {
-                return ApiResource::error("{$item['name']} is not available for purchase.", [
-                    'product' => ["{$item['name']} is not configured for purchase."],
-                ], 400);
+                return ApiResource::error(
+                    message: "{$item['name']} is not available for purchase.",
+                    errors: ['product' => ["{$item['name']} is not configured for purchase."]],
+                    status: 400
+                );
             }
 
             $selectedPrice = null;
@@ -48,9 +57,11 @@ class CheckoutController
             }
 
             if (! $selectedPrice || ! $selectedPrice->stripe_price_id) {
-                return ApiResource::error("Price not configured for {$item['name']}", [
-                    'price' => ["Price not configured for {$item['name']}."],
-                ], 400);
+                return ApiResource::error(
+                    message: "Price not configured for {$item['name']}.",
+                    errors: ['price' => ["Price not configured for {$item['name']}."]],
+                    status: 400
+                );
             }
 
             $lineItems[] = [
@@ -72,11 +83,15 @@ class CheckoutController
                 ],
             ]);
 
-            return ApiResource::success([
-                'checkout_url' => $checkout->url,
-            ], 'Checkout session created successfully', [
-                'session_id' => $checkout->id,
-            ]);
+            return ApiResource::success(
+                resource: [
+                    'checkout_url' => $checkout->url,
+                ],
+                message: 'Checkout session created successfully.',
+                meta: [
+                    'session_id' => $checkout->id,
+                ]
+            );
         } catch (Exception $e) {
             return ApiResource::error('Failed to create checkout session: '.$e->getMessage(), [
                 'checkout' => [$e->getMessage()],

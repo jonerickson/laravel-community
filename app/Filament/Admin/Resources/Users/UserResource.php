@@ -27,7 +27,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Flex;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -101,7 +100,7 @@ class UserResource extends Resource
                                                 ->maxLength(255),
                                             DateTimePicker::make('email_verified_at')
                                                 ->label('Email Verified'),
-                                        ])
+                                        ]),
                                 ])->verticallyAlignCenter(),
                                 Select::make('groups')
                                     ->helperText('The groups the user is assigned to.')

@@ -14,6 +14,7 @@ use App\Traits\HasLogging;
 use App\Traits\HasMetadata;
 use App\Traits\HasSlug;
 use App\Traits\HasUrl;
+use App\Traits\Reportable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -45,16 +46,25 @@ use Laravel\Scout\Searchable;
  * @property-read int|null $activities_count
  * @property-read Collection<int, Comment> $approvedComments
  * @property-read int|null $approved_comments_count
+ * @property-read Collection<int, Report> $approvedReports
+ * @property-read int|null $approved_reports_count
  * @property-read User $author
  * @property-read mixed $author_name
  * @property-read Collection<int, Comment> $comments
  * @property-read int $comments_count
  * @property-read User $creator
  * @property-read string|null $featured_image_url
+ * @property-read bool $is_reported
  * @property-read Collection<int, Like> $likes
  * @property-read int $likes_count
  * @property-read array $likes_summary
+ * @property-read Collection<int, Report> $pendingReports
+ * @property-read int|null $pending_reports_count
  * @property-read int $reading_time
+ * @property-read Collection<int, Report> $rejectedReports
+ * @property-read int|null $rejected_reports_count
+ * @property-read Collection<int, Report> $reports
+ * @property-read int|null $reports_count
  * @property-read Collection<int, Comment> $topLevelComments
  * @property-read int|null $top_level_comments_count
  * @property-read Topic|null $topic
@@ -101,6 +111,7 @@ class Post extends Model implements Sluggable
     use HasMetadata;
     use HasSlug;
     use HasUrl;
+    use Reportable;
     use Searchable;
 
     protected $fillable = [

@@ -1,4 +1,5 @@
 import Heading from '@/components/heading';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -66,7 +67,7 @@ export default function CreateTopic({ forum }: CreateTopicProps) {
                                     placeholder="Title"
                                     required
                                 />
-                                {errors.title && <div className="text-sm text-destructive">{errors.title}</div>}
+                                {errors.title && <InputError message={errors.title} />}
                             </div>
 
                             <div className="space-y-2">
@@ -75,7 +76,7 @@ export default function CreateTopic({ forum }: CreateTopicProps) {
                                     onChange={(content) => setData('content', content)}
                                     placeholder="Write the first post for your topic. Be detailed and clear to encourage discussion."
                                 />
-                                {errors.content && <div className="text-sm text-destructive">{errors.content}</div>}
+                                {errors.content && <InputError message={errors.content} />}
                                 <div className="text-xs text-muted-foreground">This will be the first post in your topic thread.</div>
                             </div>
 

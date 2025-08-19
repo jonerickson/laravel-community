@@ -4,11 +4,10 @@ import ForumTopicPost from '@/components/forum-topic-post';
 import ForumTopicReply from '@/components/forum-topic-reply';
 import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
+import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Forum, PaginatedData, Post, SharedData, Topic } from '@/types';
-import { ApiError, apiRequest } from '@/utils/api';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowDown, ArrowLeft, Clock, Eye, Lock, MessageSquare, Pin, Reply, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -24,6 +23,12 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
     const [showReplyForm, setShowReplyForm] = useState(false);
     const scrollToBottom = usePage<SharedData>().props.flash?.scrollToBottom;
 
+    useMarkAsRead({
+        id: topic.id,
+        type: 'topic',
+        isRead: topic.is_read_by_user,
+    });
+
     useEffect(() => {
         if (scrollToBottom) {
             setTimeout(() => {
@@ -31,27 +36,6 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
             }, 100);
         }
     }, [scrollToBottom]);
-
-    useEffect(() => {
-        if (!topic.is_read_by_user) {
-            const markAsRead = async () => {
-                try {
-                    await apiRequest(
-                        axios.post(route('api.read'), {
-                            type: 'topic',
-                            id: topic.id,
-                        }),
-                    );
-                } catch (error) {
-                    console.error('Error marking topic as read:', error);
-                    const apiError = error as ApiError;
-                    console.error('API Error:', apiError.message);
-                }
-            };
-
-            markAsRead();
-        }
-    }, [topic.id, topic.is_read_by_user]);
 
     const topicUrl = `/forums/${forum.slug}/${topic.slug}`;
 

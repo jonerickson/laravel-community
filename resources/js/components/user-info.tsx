@@ -5,6 +5,10 @@ import { type User } from '@/types';
 export function UserInfo({ user, showEmail = false, showGroups = false }: { user: User; showEmail?: boolean; showGroups?: boolean }) {
     const getInitials = useInitials();
 
+    if (!user) {
+        return null;
+    }
+
     return (
         <>
             <Avatar className="h-8 w-8 overflow-hidden rounded-full">

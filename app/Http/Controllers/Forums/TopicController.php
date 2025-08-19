@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Forums;
 
+use App\Actions\Forums\DeleteTopicAction;
 use App\Enums\PostType;
 use App\Http\Controllers\Controller;
 use App\Models\Forum;
@@ -24,7 +25,7 @@ class TopicController extends Controller
         $topic->incrementViews();
 
         $posts = $topic->posts()
-            ->with(['author', 'comments.author', 'comments.replies.author'])
+            ->with(['author', 'comments.author', 'comments.replies.author', 'reports'])
             ->oldest()
             ->paginate(10);
 
@@ -77,22 +78,12 @@ class TopicController extends Controller
         return to_route('forums.topics.show', compact(['forum', 'topic']));
     }
 
-    public function destroy(Request $request, Forum $forum, Topic $topic): RedirectResponse
+    /**
+     * @throws Throwable
+     */
+    public function destroy(Forum $forum, Topic $topic): RedirectResponse
     {
-        abort_if(
-            boolean: $topic->created_by !== Auth::id() && ! $request->user()?->hasRole('super_admin'),
-            code: 403,
-            message: 'You are not authorized to delete this topic.'
-        );
-
-        abort_if(
-            boolean: $topic->forum_id !== $forum->id,
-            code: 404,
-            message: 'Topic not found.'
-        );
-
-        $topic->posts()->delete();
-        $topic->delete();
+        DeleteTopicAction::execute($topic, $forum);
 
         return to_route('forums.show', compact('forum'))
             ->with([

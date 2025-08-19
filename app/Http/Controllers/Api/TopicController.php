@@ -4,47 +4,39 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\Forums\DeleteTopicAction;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ApiResource;
+use App\Models\Forum;
 use App\Models\Topic;
-use Exception;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class TopicController extends Controller
 {
-    public function destroy(Request $request): JsonResponse
+    /**
+     * @throws Throwable
+     */
+    public function destroy(Request $request): ApiResource
     {
-        if (! Auth::user()?->hasRole('super_admin')) {
-            return response()->json([
-                'message' => 'Unauthorized. Admin access required.',
-            ], 403);
-        }
-
         $validated = $request->validate([
             'topic_ids' => 'required|array|min:1',
             'topic_ids.*' => 'integer|exists:topics,id',
+            'forum_id' => 'required|integer|exists:forums,id',
         ]);
 
-        try {
-            DB::transaction(function () use ($validated) {
-                $topics = Topic::whereIn('id', $validated['topic_ids'])->get();
+        $forum = Forum::find($validated['forum_id']);
+        $topics = Topic::whereIn('id', $validated['topic_ids'])->get();
 
-                foreach ($topics as $topic) {
-                    $topic->posts()->delete();
-                    $topic->delete();
-                }
-            });
-
-            return response()->json([
-                'message' => 'Topics deleted successfully.',
-                'deleted_count' => count($validated['topic_ids']),
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'An error occurred while deleting topics.',
-            ], 500);
+        foreach ($topics as $topic) {
+            DeleteTopicAction::execute($topic, $forum);
         }
+
+        return ApiResource::success(
+            resource: [
+                'deleted_count' => count($validated['topic_ids']),
+            ],
+            message: 'Topics deleted successfully.',
+        );
     }
 }
