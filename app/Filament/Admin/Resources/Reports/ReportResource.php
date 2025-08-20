@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Reports;
 
+use App\Enums\ReportReason;
+use App\Enums\ReportStatus;
 use App\Filament\Admin\Resources\Reports\Pages\ListReports;
-use App\Filament\Admin\Resources\Reports\Pages\ViewReport;
 use App\Models\Report;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -36,7 +37,7 @@ class ReportResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::where('status', 'pending')->count() ?: null;
+        return (string) static::getModel()::where('status', ReportStatus::Pending)->count() ?: null;
     }
 
     public static function getNavigationBadgeColor(): string|array|null
@@ -60,15 +61,7 @@ class ReportResource extends Resource
                             ->label('Content ID')
                             ->disabled(),
                         Forms\Components\Select::make('reason')
-                            ->options([
-                                'spam' => 'Spam',
-                                'harassment' => 'Harassment',
-                                'inappropriate_content' => 'Inappropriate Content',
-                                'abuse' => 'Abuse',
-                                'impersonation' => 'Impersonation',
-                                'false_information' => 'False Information',
-                                'other' => 'Other',
-                            ])
+                            ->options(ReportReason::class)
                             ->disabled(),
                         Forms\Components\Textarea::make('additional_info')
                             ->label('Additional Information')
@@ -80,11 +73,7 @@ class ReportResource extends Resource
                 Section::make('Review')
                     ->schema([
                         Forms\Components\Select::make('status')
-                            ->options([
-                                'pending' => 'Pending',
-                                'approved' => 'Approved',
-                                'rejected' => 'Rejected',
-                            ])
+                            ->options(ReportStatus::class)
                             ->required(),
                         Forms\Components\Textarea::make('admin_notes')
                             ->label('Admin Notes')
@@ -104,7 +93,7 @@ class ReportResource extends Resource
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('reporter.name')
+                Tables\Columns\TextColumn::make('author.name')
                     ->label('Reporter')
                     ->searchable()
                     ->sortable(),
@@ -114,22 +103,9 @@ class ReportResource extends Resource
                     ->formatStateUsing(fn (string $state): string => class_basename($state)),
                 Tables\Columns\TextColumn::make('reason')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'spam' => 'warning',
-                        'harassment', 'abuse', 'inappropriate_content' => 'danger',
-                        'impersonation' => 'warning',
-                        'false_information' => 'info',
-                        'other' => 'gray',
-                        default => 'gray',
-                    }),
+                    ->searchable(['reason', 'additional_info']),
                 Tables\Columns\TextColumn::make('status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
-                        'approved' => 'success',
-                        'rejected' => 'danger',
-                        default => 'gray',
-                    }),
+                    ->badge(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Reported At')
                     ->dateTime()
@@ -140,46 +116,53 @@ class ReportResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
-                    ->options([
-                        'pending' => 'Pending',
-                        'approved' => 'Approved',
-                        'rejected' => 'Rejected',
-                    ]),
+                    ->multiple()
+                    ->preload()
+                    ->searchable()
+                    ->options(ReportStatus::class),
                 Tables\Filters\SelectFilter::make('reason')
-                    ->options([
-                        'spam' => 'Spam',
-                        'harassment' => 'Harassment',
-                        'inappropriate_content' => 'Inappropriate Content',
-                        'abuse' => 'Abuse',
-                        'impersonation' => 'Impersonation',
-                        'false_information' => 'False Information',
-                        'other' => 'Other',
-                    ]),
+                    ->multiple()
+                    ->preload()
+                    ->searchable()
+                    ->options(ReportReason::class),
             ])
             ->recordActions([
-                ViewAction::make(),
+                Action::make('details')
+                    ->label('Details')
+                    ->icon('heroicon-o-document-text')
+                    ->color('gray')
+                    ->modalHeading('Report Details')
+                    ->modalDescription(fn (Report $record): string => "Report #{$record->id} - {$record->reason->getLabel()}")
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close')
+                    ->schema([
+                        TextEntry::make('additional_info')
+                            ->hiddenLabel()
+                            ->default('There is no additional information.'),
+                    ]),
+                Action::make('view_content')
+                    ->label('View Content')
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->url(fn (Report $record): ?string => $record->getUrl())
+                    ->openUrlInNewTab()
+                    ->visible(fn (Report $record): bool => $record->getUrl() !== null),
                 Action::make('approve')
                     ->icon('heroicon-o-check')
                     ->color('success')
+                    ->requiresConfirmation()
                     ->action(function (Report $record) {
-                        $record->update([
-                            'status' => 'approved',
-                            'reviewed_by' => auth()->id(),
-                            'reviewed_at' => now(),
-                        ]);
+                        $record->approve(auth()->user());
                     })
-                    ->visible(fn (Report $record): bool => $record->status === 'pending'),
+                    ->visible(fn (Report $record): bool => $record->isPending()),
                 Action::make('reject')
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
+                    ->requiresConfirmation()
                     ->action(function (Report $record) {
-                        $record->update([
-                            'status' => 'rejected',
-                            'reviewed_by' => auth()->id(),
-                            'reviewed_at' => now(),
-                        ]);
+                        $record->reject(auth()->user());
                     })
-                    ->visible(fn (Report $record): bool => $record->status === 'pending'),
+                    ->visible(fn (Report $record): bool => $record->isPending()),
             ])
             ->toolbarActions([
                 BulkAction::make('approve')
@@ -188,11 +171,7 @@ class ReportResource extends Resource
                     ->color('success')
                     ->action(function ($records) {
                         $records->each(function (Report $record) {
-                            $record->update([
-                                'status' => 'approved',
-                                'reviewed_by' => auth()->id(),
-                                'reviewed_at' => now(),
-                            ]);
+                            $record->approve(auth()->user());
                         });
                     }),
                 BulkAction::make('reject')
@@ -201,11 +180,7 @@ class ReportResource extends Resource
                     ->color('danger')
                     ->action(function ($records) {
                         $records->each(function (Report $record) {
-                            $record->update([
-                                'status' => 'rejected',
-                                'reviewed_by' => auth()->id(),
-                                'reviewed_at' => now(),
-                            ]);
+                            $record->reject(auth()->user());
                         });
                     }),
             ])
@@ -216,7 +191,11 @@ class ReportResource extends Resource
     {
         return [
             'index' => ListReports::route('/'),
-            // 'view' => ViewReport::route('/{record}'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ReportReason;
+use App\Enums\ReportStatus;
 use App\Traits\HasAuthor;
 use Eloquent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,7 +20,7 @@ use Illuminate\Support\Carbon;
  * @property int $reportable_id
  * @property ReportReason $reason
  * @property string|null $additional_info
- * @property string $status
+ * @property ReportStatus $status
  * @property int|null $reviewed_by
  * @property Carbon|null $reviewed_at
  * @property string|null $admin_notes
@@ -77,11 +78,88 @@ class Report extends Model
         return $this->belongsTo(User::class, 'reviewed_by');
     }
 
+    public function markAsReviewed(?User $reviewer = null, ?string $notes = null): bool
+    {
+        return $this->update([
+            'status' => ReportStatus::Reviewed,
+            'reviewed_by' => $reviewer?->id,
+            'reviewed_at' => now(),
+            'admin_notes' => $notes,
+        ]);
+    }
+
+    public function approve(?User $reviewer = null, ?string $notes = null): bool
+    {
+        return $this->update([
+            'status' => ReportStatus::Approved,
+            'reviewed_by' => $reviewer?->id,
+            'reviewed_at' => now(),
+            'admin_notes' => $notes,
+        ]);
+    }
+
+    public function reject(?User $reviewer = null, ?string $notes = null): bool
+    {
+        return $this->update([
+            'status' => ReportStatus::Rejected,
+            'reviewed_by' => $reviewer?->id,
+            'reviewed_at' => now(),
+            'admin_notes' => $notes,
+        ]);
+    }
+
+    public function isPending(): bool
+    {
+        return $this->status === ReportStatus::Pending;
+    }
+
+    public function isReviewed(): bool
+    {
+        return $this->status === ReportStatus::Reviewed;
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->status === ReportStatus::Approved;
+    }
+
+    public function isRejected(): bool
+    {
+        return $this->status === ReportStatus::Rejected;
+    }
+
+    public function getUrl(): ?string
+    {
+        $reportable = $this->reportable;
+
+        if (! $reportable) {
+            return null;
+        }
+
+        return match ($this->reportable_type) {
+            Post::class => $this->getPostUrl($reportable),
+            Topic::class => route('forums.topics.show', [$reportable->forum, $reportable]),
+            default => null,
+        };
+    }
+
     protected function casts(): array
     {
         return [
             'reason' => ReportReason::class,
+            'status' => ReportStatus::class,
             'reviewed_at' => 'datetime',
         ];
+    }
+
+    private function getPostUrl(Post $post): ?string
+    {
+        return match ($post->type->value) {
+            'blog' => route('blog.show', $post),
+            'forum' => $post->topic
+                ? route('forums.topics.show', [$post->topic->forum, $post->topic]).'#post-'.$post->id
+                : null,
+            default => null,
+        };
     }
 }
