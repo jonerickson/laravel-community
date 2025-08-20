@@ -4,8 +4,8 @@ import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
 import { Spinner } from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, PaginatedData, Post } from '@/types';
-import { Head, WhenVisible } from '@inertiajs/react';
+import type { BreadcrumbItem, PaginatedData, Post, SharedData } from '@/types';
+import { Head, usePage, WhenVisible } from '@inertiajs/react';
 import { Newspaper } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -21,9 +21,42 @@ interface BlogIndexProps {
 }
 
 export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
+    const { name: pageName } = usePage<SharedData>().props;
+
+    const structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'Blog',
+        name: `${pageName} Blog`,
+        description: 'Browse our latest blog posts and articles',
+        url: window.location.href,
+        publisher: {
+            '@type': 'Organization',
+            name: pageName,
+        },
+        blogPost: posts.map((post) => ({
+            '@type': 'BlogPosting',
+            headline: post.title,
+            description: post.excerpt || post.title,
+            author: {
+                '@type': 'Person',
+                name: post.author?.name,
+            },
+            datePublished: post.published_at || post.created_at,
+            dateModified: post.updated_at,
+            image: post.featured_image_url,
+            url: `/blog/${post.slug}`,
+        })),
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Blog" />
+            <Head title="Blog">
+                <meta name="description" content="Browse our latest blog posts and articles from Mountain Interactive" />
+                <meta property="og:title" content="Blog - Mountain Interactive" />
+                <meta property="og:description" content="Browse our latest blog posts and articles from Mountain Interactive" />
+                <meta property="og:type" content="website" />
+                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+            </Head>
             <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto rounded-xl p-4">
                 <div className="sm:flex sm:items-baseline sm:justify-between">
                     <Heading title="Blog" description="Browse our latest blog posts and articles" />

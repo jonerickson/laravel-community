@@ -1,7 +1,7 @@
 import BlogPost from '@/components/blog-post';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Comment, PaginatedData, Post } from '@/types';
-import { Head } from '@inertiajs/react';
+import type { BreadcrumbItem, Comment, PaginatedData, Post, SharedData } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
 
 interface BlogShowProps {
     post: Post;
@@ -10,6 +10,7 @@ interface BlogShowProps {
 }
 
 export default function BlogShow({ post, comments, commentsPagination }: BlogShowProps) {
+    const { name: pageName } = usePage<SharedData>().props;
     const pageDescription = post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, '') + '...';
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -50,7 +51,7 @@ export default function BlogShow({ post, comments, commentsPagination }: BlogSho
                             },
                             publisher: {
                                 '@type': 'Organization',
-                                name: 'Mountain Interactive',
+                                name: pageName,
                             },
                             datePublished: post.published_at || post.created_at,
                             dateModified: post.updated_at,
