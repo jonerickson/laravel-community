@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
 import { Textarea } from '@/components/ui/textarea';
 import { UserInfo } from '@/components/user-info';
-import { Comment, type PaginatedData, Post } from '@/types';
-import { useForm } from '@inertiajs/react';
-import { MessageCircle, Reply } from 'lucide-react';
+import { Comment, type PaginatedData, Post, type SharedData } from '@/types';
+import { useForm, usePage } from '@inertiajs/react';
+import { Edit, MessageCircle, Reply, Trash } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface BlogCommentsProps {
     post: Post;
@@ -24,6 +25,8 @@ interface CommentItemProps {
 }
 
 function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
+    const { auth } = usePage<SharedData>().props;
+    const [isEditing, setIsEditing] = useState(false);
     const commentDate = new Date(comment.created_at);
     const formattedDate = commentDate.toLocaleDateString('en-US', {
         year: 'numeric',
@@ -44,15 +47,66 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
         parent_id: comment.id,
     });
 
+    const {
+        data: editData,
+        setData: setEditData,
+        patch: updateComment,
+        processing: editing,
+        reset: resetEdit,
+    } = useForm({
+        content: comment.content,
+    });
+
+    const {
+        delete: deleteComment,
+        processing: deleting,
+    } = useForm();
+
     const handleReplySubmit = (e: React.FormEvent) => {
         e.preventDefault();
         submitComment(route('blog.comments.store', { post }), {
             onSuccess: () => {
                 reset();
                 onReply(0);
+                toast.success('The reply has been successfully added.');
             },
+            onError: (error) => toast.error(error.message || 'Unable to add reply. Please try again.')
         });
     };
+
+    const canEdit = auth.user && comment.author && auth.user.id === comment.author.id;
+
+    const handleDelete = () => {
+        if (! canEdit || ! confirm('Are you sure you want to delete this comment?')) {
+            return
+        }
+
+        deleteComment(route('blog.comments.destroy', { post, comment }), {
+            onSuccess: () => toast.success('The comment has been successfully deleted.'),
+            onError: (error) => toast.error(error.message || 'Unable to delete comment. Please try again.')
+        });
+    };
+
+    const handleEditSubmit = (e: React.FormEvent) => {
+        if (! canEdit) {
+            return
+        }
+
+        e.preventDefault();
+        updateComment(route('blog.comments.update', { post, comment }), {
+            onSuccess: () => {
+                setIsEditing(false);
+                toast.success('The comment has been successfully updated.');
+            },
+            onError: (error) => toast.error(error.message || 'Unable to update comment. Please try again.')
+        });
+    };
+
+    const handleEditCancel = () => {
+        setIsEditing(false);
+        resetEdit();
+    };
+
 
     return (
         <div className="border-l-2 border-muted pl-4">
@@ -66,20 +120,66 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                     </time>
                 </div>
 
-                <div className="mb-3 text-sm text-foreground">{comment.content}</div>
+                {isEditing ? (
+                    <form onSubmit={handleEditSubmit} className="space-y-3">
+                        <Textarea
+                            value={editData.content}
+                            onChange={(e) => setEditData('content', e.target.value)}
+                            className="min-h-[80px]"
+                            required
+                        />
+                        <div className="flex gap-2">
+                            <Button type="submit" size="sm" disabled={editing}>
+                                {editing ? 'Saving...' : 'Save'}
+                            </Button>
+                            <Button type="button" variant="outline" size="sm" onClick={handleEditCancel} disabled={editing}>
+                                Cancel
+                            </Button>
+                        </div>
+                    </form>
+                ) : (
+                    <>
+                        <div className="mb-3 text-sm text-foreground">{comment.content}</div>
 
-                <div className="flex items-center justify-between">
-                    <Button variant="ghost" size="sm" onClick={() => onReply(comment.id)} className="h-auto p-1 text-xs">
-                        <Reply className="mr-1 h-3 w-3" />
-                        Reply
-                    </Button>
-                    <EmojiReactions
-                        comment={comment}
-                        initialReactions={comment.likes_summary}
-                        userReactions={comment.user_reactions}
-                        className="ml-auto"
-                    />
-                </div>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Button variant="ghost" size="sm" onClick={() => onReply(comment.id)} className="h-auto p-1 text-xs">
+                                    <Reply className="mr-1 h-3 w-3" />
+                                    Reply
+                                </Button>
+                                {canEdit && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setIsEditing(true)}
+                                        className="h-auto p-1 text-xs"
+                                    >
+                                        <Edit className="mr-1 h-3 w-3" />
+                                        Edit
+                                    </Button>
+                                )}
+                                {canEdit && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={handleDelete}
+                                        disabled={deleting}
+                                        className="h-auto p-1 text-xs text-destructive hover:text-destructive"
+                                    >
+                                        <Trash className="mr-1 h-3 w-3" />
+                                        {deleting ? 'Deleting...' : 'Delete'}
+                                    </Button>
+                                )}
+                            </div>
+                            <EmojiReactions
+                                comment={comment}
+                                initialReactions={comment.likes_summary}
+                                userReactions={comment.user_reactions}
+                                className="ml-auto"
+                            />
+                        </div>
+                    </>
+                )}
 
                 {replyingTo === comment.id && (
                     <form onSubmit={handleReplySubmit} className="mt-3 space-y-3">
@@ -131,7 +231,9 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
         submitComment(route('blog.comments.store', { post }), {
             onSuccess: () => {
                 reset();
+                toast.success('The comment has been successfully added.');
             },
+            onError: (error) => toast.error(error.message || 'Unable to add comment. Please try again.')
         });
     };
 

@@ -189,7 +189,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                                             {topic.is_pinned && <Pin className="h-4 w-4 text-blue-500" />}
                                                             {topic.is_locked && <Lock className="h-4 w-4 text-gray-500" />}
                                                             <Link
-                                                                href={`/forums/${forum.slug}/${topic.slug}`}
+                                                                href={route('forums.topics.show', {forum: forum.slug, topic: topic.slug})}
                                                                 className={`hover:underline ${
                                                                     topic.is_read_by_user ? 'font-normal text-muted-foreground' : 'font-medium'
                                                                 }`}

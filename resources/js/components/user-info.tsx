@@ -10,7 +10,7 @@ export function UserInfo({ user, showEmail = false, showGroups = false }: { user
     }
 
     return (
-        <>
+        <div className='flex flex-row gap-2 items-center'>
             <Avatar className="h-8 w-8 overflow-hidden rounded-full">
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
@@ -40,6 +40,6 @@ export function UserInfo({ user, showEmail = false, showGroups = false }: { user
                     </div>
                 )}
             </div>
-        </>
+        </div>
     );
 }
