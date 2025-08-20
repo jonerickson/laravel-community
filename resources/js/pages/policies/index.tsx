@@ -33,7 +33,7 @@ export default function PoliciesIndex({ categories }: PoliciesIndexProps) {
                                     </div>
                                     <div className="flex-1">
                                         <CardTitle>
-                                            <Link href={`/policies/${category.slug}`} className="hover:underline">
+                                            <Link href={route('policies.categories.show', { category: category.slug })} className="hover:underline">
                                                 {category.name}
                                             </Link>
                                         </CardTitle>
@@ -56,7 +56,7 @@ export default function PoliciesIndex({ categories }: PoliciesIndexProps) {
                                             {category.active_policies.slice(0, 3).map((policy) => (
                                                 <div key={policy.id}>
                                                     <Link
-                                                        href={`/policies/${category.slug}/${policy.slug}`}
+                                                        href={route('policies.show', { category: category.slug, policy: policy.slug })}
                                                         className="block text-sm hover:underline"
                                                     >
                                                         {policy.title}

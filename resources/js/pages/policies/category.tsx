@@ -38,7 +38,10 @@ export default function PoliciesCategory({ category, policies }: PoliciesCategor
                                     </div>
                                     <div className="flex-1">
                                         <CardTitle>
-                                            <Link href={`/policies/${category.slug}/${policy.slug}`} className="hover:underline">
+                                            <Link
+                                                href={route('policies.show', { category: category.slug, policy: policy.slug })}
+                                                className="hover:underline"
+                                            >
                                                 {policy.title}
                                             </Link>
                                         </CardTitle>

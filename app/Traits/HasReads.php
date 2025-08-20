@@ -11,14 +11,6 @@ use Illuminate\Support\Facades\Auth;
 
 trait HasReads
 {
-    public function initializeHasReads(): void
-    {
-        $this->setAppends(array_merge($this->getAppends(), [
-            'is_read_by_user',
-            'reads_count',
-        ]));
-    }
-
     public function reads(): MorphMany
     {
         return $this->morphMany(Read::class, 'readable');
@@ -115,5 +107,13 @@ trait HasReads
         return Attribute::make(
             get: fn (): int => $this->reads()->count(),
         )->shouldCache();
+    }
+
+    protected function initializeHasReads(): void
+    {
+        $this->mergeAppends([
+            'is_read_by_user',
+            'reads_count',
+        ]);
     }
 }

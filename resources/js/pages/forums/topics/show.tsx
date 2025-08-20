@@ -20,6 +20,7 @@ interface TopicShowProps {
 }
 
 export default function TopicShow({ forum, topic, posts, postsPagination }: TopicShowProps) {
+    const { name: siteName } = usePage<SharedData>().props;
     const [showReplyForm, setShowReplyForm] = useState(false);
     const scrollToBottom = usePage<SharedData>().props.flash?.scrollToBottom;
 
@@ -51,6 +52,47 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
         });
     };
 
+    const structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'DiscussionForumPosting',
+        headline: topic.title,
+        description: topic.description || `Discussion topic: ${topic.title}`,
+        dateCreated: topic.created_at,
+        dateModified: topic.updated_at,
+        url: window.location.href,
+        author: {
+            '@type': 'Person',
+            name: topic.author?.name,
+        },
+        publisher: {
+            '@type': 'Organization',
+            name: siteName,
+        },
+        interactionStatistic: [
+            {
+                '@type': 'InteractionCounter',
+                interactionType: 'https://schema.org/ViewAction',
+                userInteractionCount: topic.views_count,
+            },
+            {
+                '@type': 'InteractionCounter',
+                interactionType: 'https://schema.org/ReplyAction',
+                userInteractionCount: topic.posts_count,
+            },
+        ],
+        commentsCount: topic.posts_count,
+        comment: posts.map((post) => ({
+            '@type': 'Comment',
+            text: post.content,
+            dateCreated: post.created_at,
+            dateModified: post.updated_at,
+            author: {
+                '@type': 'Person',
+                name: post.author?.name,
+            },
+        })),
+    };
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Forums',
@@ -68,7 +110,16 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`${topic.title} - ${forum.name} - Forums`} />
+            <Head title={`${topic.title} - ${forum.name} - Forums`}>
+                <meta name="description" content={topic.description || `Discussion topic: ${topic.title}`} />
+                <meta property="og:title" content={`${topic.title} - ${forum.name} - Forums`} />
+                <meta property="og:description" content={topic.description || `Discussion topic: ${topic.title}`} />
+                <meta property="og:type" content="article" />
+                <meta property="article:author" content={topic.author?.name} />
+                <meta property="article:published_time" content={topic.created_at} />
+                <meta property="article:modified_time" content={topic.updated_at} />
+                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+            </Head>
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="flex flex-col items-start justify-between md:flex-row">
                     <div className="flex-1">
@@ -151,7 +202,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
 
                 <div className="flex justify-start py-4">
                     <Link
-                        href={`/forums/${forum.slug}`}
+                        href={route('forums.show', { forum: forum.slug })}
                         className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                         <ArrowLeft className="h-4 w-4" />

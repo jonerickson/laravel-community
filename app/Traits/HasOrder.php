@@ -20,11 +20,6 @@ trait HasOrder
         });
     }
 
-    public function initializeHasOrder(): void
-    {
-        $this->fillable = array_merge($this->fillable ?? [], ['order']);
-    }
-
     public function scopeOrdered($query)
     {
         return $query->orderBy('order');
@@ -50,6 +45,11 @@ trait HasOrder
         if ($next) {
             $this->swapOrder($next);
         }
+    }
+
+    protected function initializeHasOrder(): void
+    {
+        $this->fillable = array_merge($this->fillable ?? [], ['order']);
     }
 
     protected function swapOrder($other): void

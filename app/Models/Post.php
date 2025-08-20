@@ -12,6 +12,7 @@ use App\Traits\HasFeaturedImage;
 use App\Traits\HasLikes;
 use App\Traits\HasLogging;
 use App\Traits\HasMetadata;
+use App\Traits\HasReads;
 use App\Traits\HasSlug;
 use App\Traits\HasUrl;
 use App\Traits\Reportable;
@@ -109,6 +110,7 @@ class Post extends Model implements Sluggable
     use HasLikes;
     use HasLogging;
     use HasMetadata;
+    use HasReads;
     use HasSlug;
     use HasUrl;
     use Reportable;

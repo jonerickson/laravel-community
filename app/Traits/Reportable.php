@@ -49,9 +49,9 @@ trait Reportable
 
     protected function initializeReportable(): void
     {
-        $this->setAppends(array_merge($this->getAppends(), [
+        $this->mergeAppends([
             'is_reported',
             'report_count',
-        ]));
+        ]);
     }
 }

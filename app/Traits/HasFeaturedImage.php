@@ -25,9 +25,9 @@ trait HasFeaturedImage
 
     protected function initializeHasFeaturedImage(): void
     {
-        $this->setAppends(array_merge($this->getAppends(), [
+        $this->mergeAppends([
             'featured_image_url',
-        ]));
+        ]);
 
         $this->mergeFillable([
             'featured_image',

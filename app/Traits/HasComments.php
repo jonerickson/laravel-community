@@ -10,21 +10,6 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 trait HasComments
 {
-    public function initializeHasComments(): void
-    {
-        $this->mergeFillable([
-            'comments_enabled',
-        ]);
-
-        $this->mergeCasts([
-            'comments_enabled' => 'boolean',
-        ]);
-
-        $this->setAppends(array_merge($this->getAppends(), [
-            'comments_count',
-        ]));
-    }
-
     public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');
@@ -50,5 +35,20 @@ trait HasComments
         return Attribute::make(
             get: fn (): int => $this->approvedComments()->count() ?? 0,
         )->shouldCache();
+    }
+
+    protected function initializeHasComments(): void
+    {
+        $this->mergeFillable([
+            'comments_enabled',
+        ]);
+
+        $this->mergeCasts([
+            'comments_enabled' => 'boolean',
+        ]);
+
+        $this->mergeAppends([
+            'comments_count',
+        ]);
     }
 }

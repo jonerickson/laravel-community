@@ -5,8 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useCookie } from '@/hooks/use-cookie';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
-import type { BreadcrumbItem, Forum } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import type { BreadcrumbItem, Forum, SharedData } from '@/types';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { Circle, Eye, Grid3X3, List, MessageSquare, Pin, Plus, Users } from 'lucide-react';
 import { useState } from 'react';
@@ -23,12 +23,54 @@ interface ForumsIndexProps {
 }
 
 export default function ForumsIndex({ forums }: ForumsIndexProps) {
+    const { name: siteName } = usePage<SharedData>().props;
     const [viewMode, setViewMode] = useCookie<'list' | 'grid'>('forum_view', 'list');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+    const structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: `${siteName} Forums`,
+        description: 'Connect with our community and get support',
+        url: window.location.href,
+        publisher: {
+            '@type': 'Organization',
+            name: siteName,
+        },
+        mainEntity: {
+            '@type': 'CollectionPage',
+            name: 'Community Forums',
+            description: 'Browse our community forums and discussions',
+            hasPart: forums.map((forum) => ({
+                '@type': 'WebPage',
+                name: forum.name,
+                description: forum.description,
+                url: `/forums/${forum.slug}`,
+                interactionStatistic: [
+                    {
+                        '@type': 'InteractionCounter',
+                        interactionType: 'https://schema.org/CommentAction',
+                        userInteractionCount: forum.topics_count || 0,
+                    },
+                    {
+                        '@type': 'InteractionCounter',
+                        interactionType: 'https://schema.org/ReplyAction',
+                        userInteractionCount: forum.posts_count || 0,
+                    },
+                ],
+            })),
+        },
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Forums" />
+            <Head title="Forums">
+                <meta name="description" content="Connect with our community and get support through our forums" />
+                <meta property="og:title" content={`Forums - ${siteName}`} />
+                <meta property="og:description" content="Connect with our community and get support through our forums" />
+                <meta property="og:type" content="website" />
+                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+            </Head>
             <div className="flex h-full flex-1 flex-col overflow-x-auto rounded-xl p-4">
                 <div className="flex items-start justify-between">
                     <Heading title="Forums" description="Connect with our community and get support" />
@@ -73,7 +115,7 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2">
                                             <CardTitle>
-                                                <Link href={`/forums/${forum.slug}`} className="hover:underline">
+                                                <Link href={route('forums.show', { forum: forum.slug })} className="hover:underline">
                                                     {forum.name}
                                                 </Link>
                                             </CardTitle>
@@ -106,7 +148,7 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
                                                             {topic.is_hot && <span className="text-sm">🔥</span>}
                                                             {topic.is_pinned && <Pin className="h-3 w-3 text-blue-500" />}
                                                             <Link
-                                                                href={`/forums/${forum.slug}/${topic.slug}`}
+                                                                href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
                                                                 className={`truncate text-sm hover:underline ${
                                                                     topic.is_read_by_user ? 'font-normal text-muted-foreground' : 'font-medium'
                                                                 }`}

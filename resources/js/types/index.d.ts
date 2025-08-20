@@ -165,6 +165,9 @@ export interface Post {
     reading_time?: number;
     published_at?: string | null;
     created_by: number;
+    views_count: number;
+    is_read_by_user: boolean;
+    reads_count: number;
     author: User;
     metadata?: Record<string, never> | null;
     created_at: string;

@@ -22,12 +22,60 @@ interface ForumShowProps {
 }
 
 export default function ForumShow({ forum, topics: initialTopics, topicsPagination }: ForumShowProps) {
-    const { auth } = usePage<SharedData>().props;
+    const { auth, name: siteName } = usePage<SharedData>().props;
     const forumUrl = `/forums/${forum.slug}`;
     const [topics, setTopics] = useState<Topic[]>(initialTopics);
     const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
     const { loading: isDeleting, execute: executeBulkDelete } = useApiRequest();
     const isAdmin = auth?.isAdmin;
+
+    const structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        name: forum.name,
+        description: forum.description || `Discussions and topics in ${forum.name}`,
+        url: window.location.href,
+        publisher: {
+            '@type': 'Organization',
+            name: siteName,
+        },
+        mainEntity: {
+            '@type': 'CollectionPage',
+            name: forum.name,
+            description: forum.description || `Discussions and topics in ${forum.name}`,
+            interactionStatistic: [
+                {
+                    '@type': 'InteractionCounter',
+                    interactionType: 'https://schema.org/CommentAction',
+                    userInteractionCount: topics.length,
+                },
+            ],
+            hasPart: topics.map((topic) => ({
+                '@type': 'DiscussionForumPosting',
+                headline: topic.title,
+                description: topic.description,
+                dateCreated: topic.created_at,
+                dateModified: topic.updated_at,
+                author: {
+                    '@type': 'Person',
+                    name: topic.author?.name,
+                },
+                url: `/forums/${forum.slug}/${topic.slug}`,
+                interactionStatistic: [
+                    {
+                        '@type': 'InteractionCounter',
+                        interactionType: 'https://schema.org/ViewAction',
+                        userInteractionCount: topic.views_count,
+                    },
+                    {
+                        '@type': 'InteractionCounter',
+                        interactionType: 'https://schema.org/ReplyAction',
+                        userInteractionCount: topic.posts_count,
+                    },
+                ],
+            })),
+        },
+    };
 
     const handleSelectTopic = (topicId: number, checked: boolean) => {
         if (checked) {
@@ -82,7 +130,13 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`${forum.name} - Forums`} />
+            <Head title={`${forum.name} - Forums`}>
+                <meta name="description" content={forum.description || `Discussions and topics in ${forum.name}`} />
+                <meta property="og:title" content={`${forum.name} - Forums`} />
+                <meta property="og:description" content={forum.description || `Discussions and topics in ${forum.name}`} />
+                <meta property="og:type" content="website" />
+                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+            </Head>
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
                 <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center sm:gap-0">
                     <div className="flex items-center gap-4">
@@ -189,7 +243,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                                             {topic.is_pinned && <Pin className="h-4 w-4 text-blue-500" />}
                                                             {topic.is_locked && <Lock className="h-4 w-4 text-gray-500" />}
                                                             <Link
-                                                                href={route('forums.topics.show', {forum: forum.slug, topic: topic.slug})}
+                                                                href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
                                                                 className={`hover:underline ${
                                                                     topic.is_read_by_user ? 'font-normal text-muted-foreground' : 'font-medium'
                                                                 }`}

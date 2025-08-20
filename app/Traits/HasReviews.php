@@ -10,14 +10,6 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 trait HasReviews
 {
-    public function initializeHasReviews(): void
-    {
-        $this->setAppends(array_merge($this->getAppends(), [
-            'average_rating',
-            'reviews_count',
-        ]));
-    }
-
     public function reviews(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable')->ratings();
@@ -26,6 +18,14 @@ trait HasReviews
     public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable')->comments();
+    }
+
+    protected function initializeHasReviews(): void
+    {
+        $this->mergeAppends([
+            'average_rating',
+            'reviews_count',
+        ]);
     }
 
     protected function averageRating(): Attribute

@@ -17,7 +17,7 @@ class BlogController extends Controller
     {
         $perPage = $request->input('per_page', 9);
 
-        $posts = Post::query()->blog()->with(['comments', 'author'])->published()->latest()->paginate(
+        $posts = Post::query()->blog()->with(['comments', 'author', 'reads'])->published()->latest()->paginate(
             perPage: $perPage
         );
 

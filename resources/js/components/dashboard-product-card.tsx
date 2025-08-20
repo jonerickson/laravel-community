@@ -97,7 +97,7 @@ export default function DashboardProductCard({ product, type, className }: Dashb
 
             <CardFooter className="relative pt-2">
                 <Button asChild className="w-full" size="sm">
-                    <Link href={`/store/products/${product.id}`}>View Product</Link>
+                    <Link href={route('store.products.show', { product: product.slug })}>View Product</Link>
                 </Button>
             </CardFooter>
         </Card>

@@ -57,10 +57,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
         content: comment.content,
     });
 
-    const {
-        delete: deleteComment,
-        processing: deleting,
-    } = useForm();
+    const { delete: deleteComment, processing: deleting } = useForm();
 
     const handleReplySubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -70,26 +67,26 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                 onReply(0);
                 toast.success('The reply has been successfully added.');
             },
-            onError: (error) => toast.error(error.message || 'Unable to add reply. Please try again.')
+            onError: (error) => toast.error(error.message || 'Unable to add reply. Please try again.'),
         });
     };
 
     const canEdit = auth.user && comment.author && auth.user.id === comment.author.id;
 
     const handleDelete = () => {
-        if (! canEdit || ! confirm('Are you sure you want to delete this comment?')) {
-            return
+        if (!canEdit || !confirm('Are you sure you want to delete this comment?')) {
+            return;
         }
 
         deleteComment(route('blog.comments.destroy', { post, comment }), {
             onSuccess: () => toast.success('The comment has been successfully deleted.'),
-            onError: (error) => toast.error(error.message || 'Unable to delete comment. Please try again.')
+            onError: (error) => toast.error(error.message || 'Unable to delete comment. Please try again.'),
         });
     };
 
     const handleEditSubmit = (e: React.FormEvent) => {
-        if (! canEdit) {
-            return
+        if (!canEdit) {
+            return;
         }
 
         e.preventDefault();
@@ -98,7 +95,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                 setIsEditing(false);
                 toast.success('The comment has been successfully updated.');
             },
-            onError: (error) => toast.error(error.message || 'Unable to update comment. Please try again.')
+            onError: (error) => toast.error(error.message || 'Unable to update comment. Please try again.'),
         });
     };
 
@@ -107,15 +104,19 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
         resetEdit();
     };
 
-
     return (
-        <div className="border-l-2 border-muted pl-4">
-            <div className="mb-4 rounded-lg bg-muted/50 p-4">
-                <div className="mb-2 flex items-center justify-between">
+        <div className="space-y-6 border-l-2 border-muted pl-4" itemScope itemType="https://schema.org/Comment">
+            <div className="flex flex-col gap-3 rounded-lg bg-muted/50 p-4">
+                <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        {comment.author && <UserInfo user={comment.author} showEmail={false} showGroups={true} />}
+                        {comment.author && (
+                            <span itemProp="author" itemScope itemType="https://schema.org/Person">
+                                <UserInfo user={comment.author} showEmail={false} showGroups={true} />
+                                <meta itemProp="name" content={comment.author.name} />
+                            </span>
+                        )}
                     </div>
-                    <time className="text-xs text-muted-foreground" dateTime={comment.created_at}>
+                    <time className="text-xs text-muted-foreground" dateTime={comment.created_at} itemProp="datePublished">
                         {formattedDate}
                     </time>
                 </div>
@@ -139,21 +140,18 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                     </form>
                 ) : (
                     <>
-                        <div className="mb-3 text-sm text-foreground">{comment.content}</div>
+                        <div className="text-sm text-foreground" itemProp="text">
+                            {comment.content}
+                        </div>
 
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center">
                                 <Button variant="ghost" size="sm" onClick={() => onReply(comment.id)} className="h-auto p-1 text-xs">
                                     <Reply className="mr-1 h-3 w-3" />
                                     Reply
                                 </Button>
                                 {canEdit && (
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => setIsEditing(true)}
-                                        className="h-auto p-1 text-xs"
-                                    >
+                                    <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="h-auto p-1 text-xs">
                                         <Edit className="mr-1 h-3 w-3" />
                                         Edit
                                     </Button>
@@ -233,7 +231,7 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
                 reset();
                 toast.success('The comment has been successfully added.');
             },
-            onError: (error) => toast.error(error.message || 'Unable to add comment. Please try again.')
+            onError: (error) => toast.error(error.message || 'Unable to add comment. Please try again.'),
         });
     };
 

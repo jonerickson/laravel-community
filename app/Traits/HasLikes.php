@@ -12,16 +12,6 @@ use Illuminate\Support\Facades\Auth;
 
 trait HasLikes
 {
-    public function initializeHasLikes(): void
-    {
-        $this->setAppends(array_merge($this->getAppends(), [
-            'likes_count',
-            'likes_summary',
-            'user_reaction',
-            'user_reactions',
-        ]));
-    }
-
     public function likes(): MorphMany
     {
         return $this->morphMany(Like::class, 'likeable');
@@ -187,5 +177,15 @@ trait HasLikes
         }
 
         return $emoji;
+    }
+
+    protected function initializeHasLikes(): void
+    {
+        $this->mergeAppends([
+            'likes_count',
+            'likes_summary',
+            'user_reaction',
+            'user_reactions',
+        ]);
     }
 }

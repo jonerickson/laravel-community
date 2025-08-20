@@ -28,8 +28,8 @@ trait HasAvatar
     protected function initializeHasAvatar(): void
     {
         $this->mergeFillable(['avatar']);
-        $this->setAppends(array_merge($this->getAppends(), [
+        $this->mergeAppends([
             'avatar_url',
-        ]));
+        ]);
     }
 }

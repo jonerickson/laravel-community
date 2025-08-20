@@ -23,8 +23,8 @@ trait HasUrl
 
     protected function initializeHasUrl(): void
     {
-        $this->setAppends(array_merge($this->getAppends(), [
+        $this->mergeAppends([
             'url',
-        ]));
+        ]);
     }
 }

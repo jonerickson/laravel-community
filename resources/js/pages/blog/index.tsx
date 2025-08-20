@@ -21,17 +21,17 @@ interface BlogIndexProps {
 }
 
 export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
-    const { name: pageName } = usePage<SharedData>().props;
+    const { name: siteName } = usePage<SharedData>().props;
 
     const structuredData = {
         '@context': 'https://schema.org',
         '@type': 'Blog',
-        name: `${pageName} Blog`,
+        name: `${siteName} Blog`,
         description: 'Browse our latest blog posts and articles',
         url: window.location.href,
         publisher: {
             '@type': 'Organization',
-            name: pageName,
+            name: siteName,
         },
         blogPost: posts.map((post) => ({
             '@type': 'BlogPosting',
@@ -45,6 +45,23 @@ export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
             dateModified: post.updated_at,
             image: post.featured_image_url,
             url: `/blog/${post.slug}`,
+            interactionStatistic: [
+                {
+                    '@type': 'InteractionCounter',
+                    interactionType: 'https://schema.org/CommentAction',
+                    userInteractionCount: post.comments_count || 0,
+                },
+                {
+                    '@type': 'InteractionCounter',
+                    interactionType: 'https://schema.org/LikeAction',
+                    userInteractionCount: post.likes_count || 0,
+                },
+                {
+                    '@type': 'InteractionCounter',
+                    interactionType: 'https://schema.org/ViewAction',
+                    userInteractionCount: post.views_count || 0,
+                },
+            ],
         })),
     };
 

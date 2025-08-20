@@ -19,35 +19,38 @@ interface ForumTopicPostProps {
 export default function ForumTopicPost({ post, index, forum, topic }: ForumTopicPostProps) {
     const { auth } = usePage<SharedData>().props;
 
-    // Determine if post should be hidden (reported but not for admins)
     const isHiddenForUser = post.is_reported && !auth.isAdmin;
 
-    // Determine card styling based on post status
     const getCardClassName = () => {
         if (!post.is_published) return 'border-warning-foreground bg-warning';
         if (post.is_reported && auth.isAdmin) return 'border-destructive-foreground bg-destructive/10';
         return '';
     };
 
-    // Don't render reported posts for non-admin users
     if (isHiddenForUser) {
         return null;
     }
 
     return (
-        <Card data-post className={getCardClassName()}>
+        <Card data-post className={getCardClassName()} itemScope itemType="https://schema.org/Comment">
             <CardContent className="px-6 py-0 md:py-6">
                 <div className="flex flex-col gap-4 md:flex-row">
-                    <div className="flex min-w-0 flex-col items-start gap-2 md:items-center">
+                    <div
+                        className="flex min-w-0 flex-col items-start gap-2 md:items-center"
+                        itemProp="author"
+                        itemScope
+                        itemType="https://schema.org/Person"
+                    >
                         <ForumUserInfo user={post.author} isAuthor={index === 0} />
+                        <meta itemProp="name" content={post.author?.name || ''} />
                     </div>
 
                     <div className="min-w-0 flex-1">
                         <div className="mb-4 flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <span className="text-sm text-muted-foreground">
+                                <time className="text-sm text-muted-foreground" itemProp="dateCreated" dateTime={post.created_at}>
                                     Posted {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
-                                </span>
+                                </time>
                                 {!post.is_published && (
                                     <Badge variant="destructive">
                                         <EyeOff className="mr-1 h-3 w-3" />
@@ -64,7 +67,7 @@ export default function ForumTopicPost({ post, index, forum, topic }: ForumTopic
                             <ForumTopicPostModerationMenu post={post} forum={forum} topic={topic} />
                         </div>
 
-                        <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
+                        <div className="prose prose-sm max-w-none" itemProp="text" dangerouslySetInnerHTML={{ __html: post.content }} />
 
                         <div className="mt-4 border-t border-muted pt-2">
                             {post.author?.signature && (
