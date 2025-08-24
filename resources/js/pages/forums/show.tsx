@@ -137,7 +137,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                 <meta property="og:type" content="website" />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl">
                 <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center sm:gap-0">
                     <div className="flex items-center gap-4">
                         <div className="flex h-12 w-12 items-center justify-center rounded-lg text-white" style={{ backgroundColor: forum.color }}>
@@ -168,12 +168,14 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                 )}
                             </>
                         )}
-                        <Button asChild>
-                            <Link href={route('forums.topics.create', { forum: forum.slug })}>
-                                <Plus className="mr-2 h-4 w-4" />
-                                New Topic
-                            </Link>
-                        </Button>
+                        {auth && auth.user && (
+                            <Button asChild>
+                                <Link href={route('forums.topics.create', { forum: forum.slug })}>
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    New Topic
+                                </Link>
+                            </Button>
+                        )}
                     </div>
                 </div>
 

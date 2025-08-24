@@ -83,7 +83,7 @@ export default function BlogShow({ post, comments, commentsPagination }: BlogSho
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
 
-            <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto rounded-xl">
                 <BlogPost post={post} comments={comments} commentsPagination={commentsPagination} />
             </div>
         </AppLayout>

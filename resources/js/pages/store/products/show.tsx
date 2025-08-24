@@ -37,7 +37,7 @@ export default function ProductPage({ product, reviews, reviewsPagination, categ
     return (
         <AppLayout breadcrumbs={productBreadcrumbs}>
             <Head title={product.name} />
-            <div className="px-4 py-6">
+            <div className="py-2">
                 <Product product={product} reviews={reviews} reviewsPagination={reviewsPagination} />
             </div>
         </AppLayout>

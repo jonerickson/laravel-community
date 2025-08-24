@@ -28,7 +28,7 @@ export default function PoliciesShow({ category, policy }: PoliciesShowProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${policy.title} - ${category.name} - Policies`} />
-            <div className="flex h-full flex-1 flex-col overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col overflow-x-auto rounded-xl">
                 <div className="mb-8">
                     <div className="-mb-4">
                         <Heading title={policy.title} />

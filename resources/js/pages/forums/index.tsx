@@ -23,7 +23,7 @@ interface ForumsIndexProps {
 }
 
 export default function ForumsIndex({ forums }: ForumsIndexProps) {
-    const { name: siteName } = usePage<SharedData>().props;
+    const { name: siteName, auth } = usePage<SharedData>().props;
     const [viewMode, setViewMode] = useCookie<'list' | 'grid'>('forum_view', 'list');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -71,7 +71,7 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
                 <meta property="og:type" content="website" />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
-            <div className="flex h-full flex-1 flex-col overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col overflow-x-auto rounded-xl">
                 <div className="flex items-start justify-between">
                     <Heading title="Forums" description="Connect with our community and get support" />
 
@@ -94,10 +94,12 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
                                 <Grid3X3 className="h-4 w-4" />
                             </Button>
                         </div>
-                        <Button onClick={() => setIsDialogOpen(true)}>
-                            <Plus className="mr-2 h-4 w-4" />
-                            New Topic
-                        </Button>
+                        {auth && auth.user && (
+                            <Button onClick={() => setIsDialogOpen(true)}>
+                                <Plus className="mr-2 h-4 w-4" />
+                                New Topic
+                            </Button>
+                        )}
                     </div>
                 </div>
 

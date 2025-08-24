@@ -74,7 +74,7 @@ export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
                 <meta property="og:type" content="website" />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
-            <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto rounded-xl">
                 <div className="sm:flex sm:items-baseline sm:justify-between">
                     <Heading title="Blog" description="Browse our latest blog posts and articles" />
                 </div>

@@ -93,7 +93,7 @@ const adminNavItems: NavItem[] = [
 const footerNavItems: NavItem[] = [
     {
         title: 'Policies',
-        href: '/policies',
+        href: () => route('policies.index'),
         icon: Folder,
     },
     {

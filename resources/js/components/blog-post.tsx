@@ -2,8 +2,8 @@ import BlogComments from '@/components/blog-comments';
 import EmojiReactions from '@/components/emoji-reactions';
 import { Spinner } from '@/components/ui/spinner';
 import { UserInfo } from '@/components/user-info';
-import { Comment, Post, type PaginatedData } from '@/types';
-import { Deferred } from '@inertiajs/react';
+import { Comment, Post, type PaginatedData, type SharedData } from '@/types';
+import { Deferred, usePage } from '@inertiajs/react';
 import { Calendar, Clock, ImageIcon } from 'lucide-react';
 
 interface BlogPostProps {
@@ -13,6 +13,7 @@ interface BlogPostProps {
 }
 
 export default function BlogPost({ post, comments, commentsPagination }: BlogPostProps) {
+    const { auth } = usePage<SharedData>().props;
     const publishedDate = new Date(post.published_at || post.created_at);
     const formattedDate = publishedDate.toLocaleDateString('en-US', {
         year: 'numeric',
@@ -104,9 +105,11 @@ export default function BlogPost({ post, comments, commentsPagination }: BlogPos
             />
 
             <footer className="mt-8">
-                <section aria-label="Post reactions">
-                    <EmojiReactions post={post} initialReactions={post.likes_summary} userReactions={post.user_reactions} className="mb-4" />
-                </section>
+                {auth && auth.user && (
+                    <section aria-label="Post reactions">
+                        <EmojiReactions post={post} initialReactions={post.likes_summary} userReactions={post.user_reactions} className="mb-4" />
+                    </section>
+                )}
 
                 {post.comments_enabled && (
                     <section className="mt-8 border-t pt-6" aria-label="Comments section">

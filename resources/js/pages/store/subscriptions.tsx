@@ -179,7 +179,7 @@ export default function Subscriptions() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Subscriptions" />
 
-            <div className="mx-auto max-w-7xl px-4 py-8">
+            <div className="mx-auto max-w-7xl py-4">
                 <div className="mb-12 text-center">
                     <Heading
                         title="Choose Your Plan"

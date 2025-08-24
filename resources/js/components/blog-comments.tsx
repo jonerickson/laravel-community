@@ -144,38 +144,40 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                             {comment.content}
                         </div>
 
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center">
-                                <Button variant="ghost" size="sm" onClick={() => onReply(comment.id)} className="h-auto p-1 text-xs">
-                                    <Reply className="mr-1 h-3 w-3" />
-                                    Reply
-                                </Button>
-                                {canEdit && (
-                                    <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="h-auto p-1 text-xs">
-                                        <Edit className="mr-1 h-3 w-3" />
-                                        Edit
+                        {auth && auth.user && (
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                    <Button variant="ghost" size="sm" onClick={() => onReply(comment.id)} className="h-auto p-1 text-xs">
+                                        <Reply className="mr-1 h-3 w-3" />
+                                        Reply
                                     </Button>
-                                )}
-                                {canEdit && (
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={handleDelete}
-                                        disabled={deleting}
-                                        className="h-auto p-1 text-xs text-destructive hover:text-destructive"
-                                    >
-                                        <Trash className="mr-1 h-3 w-3" />
-                                        {deleting ? 'Deleting...' : 'Delete'}
-                                    </Button>
-                                )}
+                                    {canEdit && (
+                                        <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="h-auto p-1 text-xs">
+                                            <Edit className="mr-1 h-3 w-3" />
+                                            Edit
+                                        </Button>
+                                    )}
+                                    {canEdit && (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={handleDelete}
+                                            disabled={deleting}
+                                            className="h-auto p-1 text-xs text-destructive hover:text-destructive"
+                                        >
+                                            <Trash className="mr-1 h-3 w-3" />
+                                            {deleting ? 'Deleting...' : 'Delete'}
+                                        </Button>
+                                    )}
+                                </div>
+                                <EmojiReactions
+                                    comment={comment}
+                                    initialReactions={comment.likes_summary}
+                                    userReactions={comment.user_reactions}
+                                    className="ml-auto"
+                                />
                             </div>
-                            <EmojiReactions
-                                comment={comment}
-                                initialReactions={comment.likes_summary}
-                                userReactions={comment.user_reactions}
-                                className="ml-auto"
-                            />
-                        </div>
+                        )}
                     </>
                 )}
 
@@ -212,6 +214,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
 }
 
 export default function BlogComments({ post, comments, commentsPagination }: BlogCommentsProps) {
+    const { auth } = usePage<SharedData>().props;
     const [replyingTo, setReplyingTo] = useState<number | null>(null);
     const {
         data,
@@ -259,21 +262,23 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
                 <HeadingSmall title={`Comments (${comments.length || 0})`} />
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <Textarea
-                        value={data.content}
-                        onChange={(e) => setData('content', e.target.value)}
-                        placeholder="Share your thoughts..."
-                        className="min-h-[120px]"
-                        required
-                    />
-                    {errors.content && <InputError message={errors.content} />}
-                </div>
-                <Button type="submit" disabled={processing}>
-                    {processing ? 'Posting...' : 'Post comment'}
-                </Button>
-            </form>
+            {auth && auth.user && (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <Textarea
+                            value={data.content}
+                            onChange={(e) => setData('content', e.target.value)}
+                            placeholder="Share your thoughts..."
+                            className="min-h-[120px]"
+                            required
+                        />
+                        {errors.content && <InputError message={errors.content} />}
+                    </div>
+                    <Button type="submit" disabled={processing}>
+                        {processing ? 'Posting...' : 'Post comment'}
+                    </Button>
+                </form>
+            )}
 
             {approvedComments.length > 0 ? (
                 <div className="space-y-6">

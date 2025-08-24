@@ -20,7 +20,7 @@ interface TopicShowProps {
 }
 
 export default function TopicShow({ forum, topic, posts, postsPagination }: TopicShowProps) {
-    const { name: siteName } = usePage<SharedData>().props;
+    const { auth, name: siteName } = usePage<SharedData>().props;
     const [showReplyForm, setShowReplyForm] = useState(false);
     const scrollToBottom = usePage<SharedData>().props.flash?.scrollToBottom;
 
@@ -120,7 +120,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                 <meta property="article:modified_time" content={topic.updated_at} />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl">
                 <div className="flex flex-col items-start justify-between md:flex-row">
                     <div className="flex-1">
                         <div className="mb-2 flex items-center gap-2">
@@ -139,10 +139,12 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                                 <ArrowDown className="mr-2 h-4 w-4" />
                                 Latest
                             </Button>
-                            <Button onClick={() => setShowReplyForm(!showReplyForm)} variant={showReplyForm ? 'outline' : 'default'}>
-                                <Reply className="mr-2 h-4 w-4" />
-                                Reply
-                            </Button>
+                            {auth && auth.user && (
+                                <Button onClick={() => setShowReplyForm(!showReplyForm)} variant={showReplyForm ? 'outline' : 'default'}>
+                                    <Reply className="mr-2 h-4 w-4" />
+                                    Reply
+                                </Button>
+                            )}
                         </div>
                     )}
                 </div>
@@ -192,7 +194,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                     </div>
                 )}
 
-                {!topic.is_locked && posts.length > 0 && (
+                {auth && auth.user && !topic.is_locked && posts.length > 0 && (
                     <div className="pt-4">
                         <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} />
                     </div>

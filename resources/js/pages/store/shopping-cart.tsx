@@ -79,7 +79,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
         return (
             <AppLayout breadcrumbs={breadcrumbs}>
                 <Head title="Shopping Cart" />
-                <div className="flex h-full flex-1 flex-col overflow-x-auto rounded-xl p-4">
+                <div className="flex h-full flex-1 flex-col overflow-x-auto rounded-xl">
                     <Heading title="Shopping Cart" description="Your cart is empty" />
                     <EmptyState
                         icon={<ShoppingCartIcon className="h-12 w-12" />}
@@ -96,7 +96,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Shopping Cart" />
-            <div className="flex h-full flex-1 flex-col overflow-x-auto rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col overflow-x-auto rounded-xl">
                 <Heading title="Shopping Cart" description={`${items.length} ${items.length === 1 ? 'item' : 'items'} in your cart`} />
                 <form className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16">
                     <section aria-labelledby="cart-heading" className="lg:col-span-7">
