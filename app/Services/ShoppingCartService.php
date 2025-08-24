@@ -74,6 +74,6 @@ class ShoppingCartService
                 'available_prices' => $product?->prices ?? collect(),
                 'added_at' => $item['added_at'],
             ];
-        })->values()->toArray();
+        })->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->values()->toArray();
     }
 }

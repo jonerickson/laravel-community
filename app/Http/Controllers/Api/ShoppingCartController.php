@@ -77,12 +77,29 @@ class ShoppingCartController extends Controller
         $cart = Session::get('shopping_cart', []);
         $productId = $request->input('product_id');
         $priceId = $request->input('price_id');
-        $cartKey = $productId.'_'.$priceId;
+        $quantity = $request->input('quantity');
 
-        if (isset($cart[$cartKey])) {
-            $cart[$cartKey]['quantity'] = $request->input('quantity');
-            Session::put('shopping_cart', $cart);
+        $existingKeys = array_filter(array_keys($cart), function ($key) use ($productId) {
+            return str_starts_with($key, $productId.'_');
+        });
+
+        foreach ($existingKeys as $key) {
+            unset($cart[$key]);
         }
+
+        $product = Product::findOrFail($productId);
+        $newCartKey = $productId.'_'.$priceId;
+
+        $cart[$newCartKey] = [
+            'product_id' => $productId,
+            'price_id' => $priceId,
+            'name' => $product->name,
+            'slug' => $product->slug,
+            'quantity' => $quantity,
+            'added_at' => now()->toISOString(),
+        ];
+
+        Session::put('shopping_cart', $cart);
 
         $cartItems = $this->cartService->getCartItems();
 
