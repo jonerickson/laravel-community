@@ -19,8 +19,6 @@ class ShoppingCartService
             return [];
         }
 
-        dump($cart);
-
         $productIds = array_unique(array_column($cart, 'product_id'));
         $priceIds = array_filter(array_column($cart, 'price_id'));
 
@@ -44,7 +42,9 @@ class ShoppingCartService
     {
         return Product::with(['prices' => function ($query) {
             $query->where('is_active', true)->orderBy('is_default', 'desc');
-        }, 'defaultPrice'])
+        }, 'defaultPrice', 'policies' => function ($query) {
+            $query->active()->effective()->orderBy('title');
+        }])
             ->whereIn('id', $productIds)
             ->get()
             ->keyBy('id');

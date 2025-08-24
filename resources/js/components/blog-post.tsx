@@ -109,13 +109,7 @@ export default function BlogPost({ post, comments, commentsPagination }: BlogPos
                 </section>
 
                 {post.comments_enabled && (
-                    <section
-                        className="mt-8 border-t pt-6"
-                        aria-label="Comments section"
-                        itemProp="comment"
-                        itemScope
-                        itemType="https://schema.org/Comment"
-                    >
+                    <section className="mt-8 border-t pt-6" aria-label="Comments section">
                         <Deferred
                             fallback={
                                 <div className="flex items-center justify-center" role="status" aria-live="polite" aria-label="Loading comments">

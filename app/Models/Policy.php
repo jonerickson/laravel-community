@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Laravel\Scout\Searchable;
@@ -34,6 +35,8 @@ use Laravel\Scout\Searchable;
  * @property-read mixed $author_name
  * @property-read PolicyCategory $category
  * @property-read User $creator
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
+ * @property-read int|null $products_count
  * @property-read string|null $url
  *
  * @method static Builder<static>|Policy active()
@@ -84,6 +87,11 @@ class Policy extends Model implements Sluggable
     public function category(): BelongsTo
     {
         return $this->belongsTo(PolicyCategory::class, 'policy_category_id');
+    }
+
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'policies_products');
     }
 
     public function scopeActive($query)

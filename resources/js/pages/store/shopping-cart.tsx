@@ -2,13 +2,15 @@ import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useApiRequest } from '@/hooks/use-api-request';
 import { useCartOperations } from '@/hooks/use-cart-operations';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, CartResponse, CheckoutResponse } from '@/types';
+import type { BreadcrumbItem, CartResponse, CheckoutResponse, Policy } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { ImageIcon, ShoppingCart as ShoppingCartIcon, XIcon } from 'lucide-react';
+import { useState } from 'react';
 
 interface ShoppingCartProps {
     cartItems: CartResponse['cartItems'];
@@ -24,8 +26,29 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
     const { items, updateQuantity, removeItem, calculateTotals, loading } = useCartOperations(cartItems);
     const { loading: checkoutLoading, execute: executeCheckout } = useApiRequest<CheckoutResponse>();
+    const [policiesAgreed, setPoliciesAgreed] = useState(false);
 
     const { subtotal, total } = calculateTotals();
+
+    const getAllPolicies = (): Policy[] => {
+        const allPolicies: Policy[] = [];
+        const seenPolicyIds = new Set<number>();
+
+        items.forEach((item) => {
+            if (item.product?.policies) {
+                item.product.policies.forEach((policy) => {
+                    if (!seenPolicyIds.has(policy.id)) {
+                        seenPolicyIds.add(policy.id);
+                        allPolicies.push(policy);
+                    }
+                });
+            }
+        });
+
+        return allPolicies.sort((a, b) => a.title.localeCompare(b.title));
+    };
+
+    const policies = getAllPolicies();
 
     const handleUpdateQuantity = (productId: number, quantity: number, priceId?: number | null) => {
         updateQuantity(productId, quantity, priceId);
@@ -83,7 +106,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
 
                         <ul role="list" className="divide-y divide-gray-200 border-t border-b border-gray-200">
                             {items.map((item) => (
-                                <li key={item.product_id} className="flex py-6 sm:py-10">
+                                <li key={item.product_id} className="flex items-center py-6 sm:py-10">
                                     <div className="shrink-0">
                                         {item.product?.featured_image_url ? (
                                             <img
@@ -100,7 +123,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
 
                                     <div className="ml-4 flex flex-1 flex-col sm:ml-6">
                                         <div className="relative flex h-full flex-col pr-9 sm:pr-0">
-                                            <div className="flex flex-1 flex-col">
+                                            <div className="flex flex-1 flex-col gap-3">
                                                 <div className="flex-grow">
                                                     <div className="flex justify-between">
                                                         <h3 className="text-sm">
@@ -113,11 +136,15 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                                         </h3>
                                                     </div>
                                                     <div className="mt-1 flex text-sm">
-                                                        <p className="max-w-[90%] break-words text-gray-500 sm:max-w-[66%]">
-                                                            {(item.product?.description || '').length > 200
-                                                                ? `${item.product?.description?.substring(0, 200)}...`
-                                                                : item.product?.description || ''}
-                                                        </p>
+                                                        <p
+                                                            className="max-w-[90%] break-words text-gray-500 sm:max-w-[85%]"
+                                                            dangerouslySetInnerHTML={{
+                                                                __html:
+                                                                    (item.product?.description || '').length > 200
+                                                                        ? `${item.product?.description?.substring(0, 200)}...`
+                                                                        : item.product?.description || '',
+                                                            }}
+                                                        ></p>
                                                     </div>
                                                     <p className="mt-3 text-sm font-medium text-gray-900">
                                                         {item.selected_price
@@ -203,20 +230,67 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                     <section aria-labelledby="summary-heading" className="mt-16 rounded-lg bg-gray-50 px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8">
                         <HeadingSmall title="Order summary" />
 
-                        <dl className="mt-6 space-y-4">
-                            <div className="flex items-center justify-between">
-                                <dt className="text-sm text-gray-600">Subtotal</dt>
-                                <dd className="text-sm font-medium text-gray-900">${subtotal.toFixed(2)}</dd>
+                        <dl className="mt-6 divide-y divide-gray-200">
+                            <div className="flex items-center justify-between py-3">
+                                <dt className="text-sm text-muted-foreground">Subtotal</dt>
+                                <dd className="text-sm font-medium text-foreground">${subtotal.toFixed(2)}</dd>
                             </div>
-                            <div className="flex items-center justify-between border-t border-gray-200 pt-4">
-                                <dt className="text-base font-medium text-gray-900">Order total</dt>
-                                <dd className="text-base font-medium text-gray-900">${total.toFixed(2)}</dd>
+                            <div className="flex items-center justify-between py-3">
+                                <dt className="text-base font-medium text-foreground">Order total</dt>
+                                <dd className="text-base font-medium text-foreground">${total.toFixed(2)}</dd>
                             </div>
+
+                            {policies.length > 0 && (
+                                <div className="py-3">
+                                    <dt className="mb-3 flex items-center gap-2">
+                                        <h4 className="text-sm font-medium text-foreground">Required Policies</h4>
+                                    </dt>
+                                    <dd className="mb-3 text-xs text-gray-600">By proceeding with checkout, you agree to the following policies:</dd>
+                                    <ul className="mb-4 space-y-2">
+                                        {policies.map((policy) => (
+                                            <li key={policy.id}>
+                                                <Link
+                                                    href={
+                                                        policy.category?.slug && policy.slug
+                                                            ? route('policies.show', [policy.category.slug, policy.slug])
+                                                            : '#'
+                                                    }
+                                                    className="text-xs text-blue-600 underline hover:text-blue-800"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    {policy.title}
+                                                    {policy.version && ` (v${policy.version})`}
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <div className="flex items-start space-x-2">
+                                        <Checkbox
+                                            id="policies-agreement"
+                                            checked={policiesAgreed}
+                                            onCheckedChange={(checked) => setPoliciesAgreed(checked === true)}
+                                            className="mt-0.5"
+                                        />
+                                        <label htmlFor="policies-agreement" className="cursor-pointer text-xs leading-relaxed text-muted-foreground">
+                                            I agree to the above policies and understand that I must comply with them.
+                                        </label>
+                                    </div>
+                                </div>
+                            )}
                         </dl>
 
-                        <div className="mt-6">
-                            <Button className="w-full" onClick={handleCheckout} disabled={checkoutLoading}>
-                                {checkoutLoading ? 'Processing...' : 'Checkout'}
+                        <div className="mt-2">
+                            <Button
+                                className="w-full"
+                                onClick={handleCheckout}
+                                disabled={checkoutLoading || (policies.length > 0 && !policiesAgreed)}
+                            >
+                                {checkoutLoading
+                                    ? 'Processing...'
+                                    : policies.length > 0 && !policiesAgreed
+                                      ? 'Agree to Policies to Checkout'
+                                      : 'Checkout'}
                             </Button>
                         </div>
                     </section>

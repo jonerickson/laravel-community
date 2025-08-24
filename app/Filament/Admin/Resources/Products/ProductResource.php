@@ -50,6 +50,7 @@ class ProductResource extends Resource
         return $schema
             ->components([
                 Section::make('Product Information')
+                    ->columnSpanFull()
                     ->columns()
                     ->schema([
                         Radio::make('type')
@@ -84,12 +85,22 @@ class ProductResource extends Resource
                             ->relationship('categories', 'name')
                             ->multiple()
                             ->required(),
+                        Select::make('policies')
+                            ->label('Required Policies')
+                            ->helperText('Select policies that customers must agree to when purchasing this product.')
+                            ->columnSpanFull()
+                            ->preload()
+                            ->relationship('policies', 'title', function (Builder $query) {
+                                return $query->active()->effective()->orderBy('title');
+                            })
+                            ->multiple(),
                         RichEditor::make('description')
                             ->helperText('The main product overview.')
                             ->required()
                             ->columnSpanFull(),
                     ]),
                 Section::make('Media')
+                    ->columnSpanFull()
                     ->schema([
                         FileUpload::make('featured_image')
                             ->disk('public')
@@ -106,6 +117,7 @@ class ProductResource extends Resource
                             ]),
                     ]),
                 Section::make('Files')
+                    ->columnSpanFull()
                     ->description('Add files the customer will have access to if they have purchased this product.')
                     ->schema([
                         Repeater::make('files')
@@ -142,6 +154,13 @@ class ProductResource extends Resource
                     ->searchable()
                     ->listWithLineBreaks()
                     ->limitList(2),
+                TextColumn::make('policies.title')
+                    ->label('Required Policies')
+                    ->badge()
+                    ->searchable()
+                    ->listWithLineBreaks()
+                    ->limitList(3)
+                    ->toggleable(),
                 TextColumn::make('defaultPrice.amount')
                     ->label('Default Price')
                     ->default(0)

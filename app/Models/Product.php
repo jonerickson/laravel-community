@@ -43,6 +43,8 @@ use Laravel\Scout\Searchable;
  * @property-read mixed $average_rating
  * @property-read Collection<int, ProductCategory> $categories
  * @property-read int|null $categories_count
+ * @property-read Collection<int, Policy> $policies
+ * @property-read int|null $policies_count
  * @property-read Collection<int, Comment> $comments
  * @property-read int|null $comments_count
  * @property-read ProductPrice|null $defaultPrice
@@ -106,6 +108,11 @@ class Product extends Model implements Sluggable
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(ProductCategory::class, 'categories_products', 'product_id', 'category_id');
+    }
+
+    public function policies(): BelongsToMany
+    {
+        return $this->belongsToMany(Policy::class, 'policies_products');
     }
 
     public function prices(): HasMany

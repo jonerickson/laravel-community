@@ -94,6 +94,7 @@ export interface Product {
     reviews_count?: number;
     category?: ProductCategory | null;
     reviews?: Comment[];
+    policies?: Policy[];
 }
 
 export interface ProductPrice {
