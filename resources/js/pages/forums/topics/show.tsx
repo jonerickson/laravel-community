@@ -2,27 +2,54 @@ import { EmptyState } from '@/components/empty-state';
 import ForumTopicModerationMenu from '@/components/forum-topic-moderation-menu';
 import ForumTopicPost from '@/components/forum-topic-post';
 import ForumTopicReply from '@/components/forum-topic-reply';
+import RecentViewers from '@/components/recent-viewers';
 import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
+import { pluralize } from '@/lib/utils';
 import type { BreadcrumbItem, Forum, PaginatedData, Post, SharedData, Topic } from '@/types';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowDown, ArrowLeft, Clock, Eye, Lock, MessageSquare, Pin, Reply, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
+
+interface RecentViewer {
+    user: {
+        id: number;
+        name: string;
+        avatar?: string;
+    };
+    viewed_at: string;
+}
 
 interface TopicShowProps {
     forum: Forum;
     topic: Topic;
     posts: Post[];
     postsPagination: PaginatedData;
+    recentViewers: RecentViewer[];
 }
 
-export default function TopicShow({ forum, topic, posts, postsPagination }: TopicShowProps) {
+export default function TopicShow({ forum, topic, posts, postsPagination, recentViewers }: TopicShowProps) {
     const { auth, name: siteName } = usePage<SharedData>().props;
     const [showReplyForm, setShowReplyForm] = useState(false);
     const scrollToBottom = usePage<SharedData>().props.flash?.scrollToBottom;
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Forums',
+            href: '/forums',
+        },
+        {
+            title: forum.name,
+            href: `/forums/${forum.slug}`,
+        },
+        {
+            title: topic.title,
+            href: `/forums/${forum.slug}/${topic.slug}`,
+        },
+    ];
 
     useMarkAsRead({
         id: topic.id,
@@ -91,21 +118,6 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
         })),
     };
 
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Forums',
-            href: '/forums',
-        },
-        {
-            title: forum.name,
-            href: `/forums/${forum.slug}`,
-        },
-        {
-            title: topic.title,
-            href: `/forums/${forum.slug}/${topic.slug}`,
-        },
-    ];
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${topic.title} - ${forum.name} - Forums`}>
@@ -120,14 +132,14 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
             </Head>
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl">
                 <div className="flex flex-col items-start justify-between md:flex-row">
-                    <div className="flex-1">
+                    <div className="mb-4 flex-1">
                         <div className="mb-2 flex items-center gap-2">
                             {topic.is_pinned && <Pin className="h-5 w-5 text-blue-500" />}
                             {topic.is_locked && <Lock className="h-5 w-5 text-gray-500" />}
-                            <h1 className="text-2xl font-bold">{topic.title}</h1>
+                            <h1 className="text-xl font-semibold tracking-tight">{topic.title}</h1>
                         </div>
 
-                        {topic.description && <p className="mb-4 text-muted-foreground">{topic.description}</p>}
+                        {topic.description && <p className="max-w-3xl text-sm text-muted-foreground">{topic.description}</p>}
                     </div>
 
                     {!topic.is_locked && (
@@ -154,11 +166,15 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                     </div>
                     <div className="flex items-center gap-1">
                         <Eye className="h-4 w-4" />
-                        <span>{topic.views_count} views</span>
+                        <span>
+                            {topic.views_count} {pluralize('view', topic.views_count)}
+                        </span>
                     </div>
                     <div className="flex items-center gap-1">
                         <MessageSquare className="h-4 w-4" />
-                        <span>{topic.posts_count} replies</span>
+                        <span>
+                            {topic.posts_count} {pluralize('reply', topic.posts_count)}
+                        </span>
                     </div>
                     <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
@@ -168,7 +184,12 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
 
                 {showReplyForm && (
                     <div className="pt-4">
-                        <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} onCancel={() => setShowReplyForm(false)} />
+                        <ForumTopicReply
+                            forumSlug={forum.slug}
+                            topicSlug={topic.slug}
+                            onCancel={() => setShowReplyForm(false)}
+                            onSuccess={() => setShowReplyForm(false)}
+                        />
                     </div>
                 )}
 
@@ -197,11 +218,11 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                     </div>
                 )}
 
-                {auth?.user && !topic.is_locked && posts.length > 0 && (
-                    <div className="pt-4">
-                        <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} />
-                    </div>
-                )}
+                <Deferred fallback={null} data="recentViewers">
+                    <RecentViewers viewers={recentViewers} />
+                </Deferred>
+
+                {auth?.user && !topic.is_locked && posts.length > 0 && <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} />}
 
                 <Pagination
                     pagination={postsPagination}

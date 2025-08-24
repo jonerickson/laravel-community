@@ -4,13 +4,23 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Comment, PaginatedData, Post, SharedData } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 
+interface RecentViewer {
+    user: {
+        id: number;
+        name: string;
+        avatar?: string;
+    };
+    viewed_at: string;
+}
+
 interface BlogShowProps {
     post: Post;
     comments: Comment[];
     commentsPagination: PaginatedData;
+    recentViewers: RecentViewer[];
 }
 
-export default function BlogShow({ post, comments, commentsPagination }: BlogShowProps) {
+export default function BlogShow({ post, comments, commentsPagination, recentViewers }: BlogShowProps) {
     const { name: siteName } = usePage<SharedData>().props;
     const pageDescription = post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, '') + '...';
 
@@ -84,7 +94,7 @@ export default function BlogShow({ post, comments, commentsPagination }: BlogSho
             </Head>
 
             <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto rounded-xl">
-                <BlogPost post={post} comments={comments} commentsPagination={commentsPagination} />
+                <BlogPost post={post} comments={comments} commentsPagination={commentsPagination} recentViewers={recentViewers} />
             </div>
         </AppLayout>
     );

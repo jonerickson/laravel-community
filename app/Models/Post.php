@@ -6,16 +6,18 @@ namespace App\Models;
 
 use App\Contracts\Sluggable;
 use App\Enums\PostType;
+use App\Traits\Commentable;
 use App\Traits\HasAuthor;
-use App\Traits\HasComments;
 use App\Traits\HasFeaturedImage;
-use App\Traits\HasLikes;
 use App\Traits\HasLogging;
 use App\Traits\HasMetadata;
-use App\Traits\HasReads;
 use App\Traits\HasSlug;
 use App\Traits\HasUrl;
+use App\Traits\Likeable;
+use App\Traits\Pinnable;
+use App\Traits\Readable;
 use App\Traits\Reportable;
+use App\Traits\Viewable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -35,6 +37,7 @@ use Laravel\Scout\Searchable;
  * @property string $content
  * @property bool $is_published
  * @property bool $is_featured
+ * @property bool $is_pinned
  * @property bool $comments_enabled
  * @property int|null $topic_id
  * @property string|null $featured_image
@@ -55,6 +58,7 @@ use Laravel\Scout\Searchable;
  * @property-read int $comments_count
  * @property-read User $creator
  * @property-read string|null $featured_image_url
+ * @property-read bool $is_read_by_user
  * @property-read bool $is_reported
  * @property-read Collection<int, Like> $likes
  * @property-read int $likes_count
@@ -62,23 +66,32 @@ use Laravel\Scout\Searchable;
  * @property-read Collection<int, Report> $pendingReports
  * @property-read int|null $pending_reports_count
  * @property-read int $reading_time
+ * @property-read Collection<int, Read> $reads
+ * @property-read int $reads_count
  * @property-read Collection<int, Report> $rejectedReports
  * @property-read int|null $rejected_reports_count
+ * @property-read int $report_count
  * @property-read Collection<int, Report> $reports
  * @property-read int|null $reports_count
  * @property-read Collection<int, Comment> $topLevelComments
  * @property-read int|null $top_level_comments_count
  * @property-read Topic|null $topic
+ * @property-read int $unique_views_count
  * @property-read string|null $url
  * @property-read string|null $user_reaction
  * @property-read array $user_reactions
+ * @property-read Collection<int, View> $views
+ * @property-read int $views_count
  *
  * @method static Builder<static>|Post blog()
  * @method static \Database\Factories\PostFactory factory($count = null, $state = [])
  * @method static Builder<static>|Post featured()
  * @method static Builder<static>|Post forum()
+ * @method static Builder<static>|Post latestActivity()
  * @method static Builder<static>|Post newModelQuery()
  * @method static Builder<static>|Post newQuery()
+ * @method static Builder<static>|Post notPinned()
+ * @method static Builder<static>|Post pinned()
  * @method static Builder<static>|Post published()
  * @method static Builder<static>|Post query()
  * @method static Builder<static>|Post recent()
@@ -90,6 +103,7 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Post whereFeaturedImage($value)
  * @method static Builder<static>|Post whereId($value)
  * @method static Builder<static>|Post whereIsFeatured($value)
+ * @method static Builder<static>|Post whereIsPinned($value)
  * @method static Builder<static>|Post whereIsPublished($value)
  * @method static Builder<static>|Post whereMetadata($value)
  * @method static Builder<static>|Post wherePublishedAt($value)
@@ -103,18 +117,20 @@ use Laravel\Scout\Searchable;
  */
 class Post extends Model implements Sluggable
 {
+    use Commentable;
     use HasAuthor;
-    use HasComments;
     use HasFactory;
     use HasFeaturedImage;
-    use HasLikes;
     use HasLogging;
     use HasMetadata;
-    use HasReads;
     use HasSlug;
     use HasUrl;
+    use Likeable;
+    use Pinnable;
+    use Readable;
     use Reportable;
     use Searchable;
+    use Viewable;
 
     protected $fillable = [
         'type',
@@ -175,6 +191,12 @@ class Post extends Model implements Sluggable
         return $query->where('type', PostType::Forum);
     }
 
+    public function scopeLatestActivity($query)
+    {
+        return $query->orderByDesc('is_pinned')
+            ->orderBy('created_at');
+    }
+
     public function isPublished(): bool
     {
         return $this->is_published
@@ -215,6 +237,7 @@ class Post extends Model implements Sluggable
             'content',
             'is_published',
             'is_featured',
+            'is_pinned',
             'published_at',
             'topic_id',
         ];

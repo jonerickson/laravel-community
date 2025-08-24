@@ -11,7 +11,7 @@ export default function ForumUserInfo({ user, isAuthor = false }: { user: User; 
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
-            <div className="text-center">
+            <div className="text-left md:text-center">
                 <div className="text-sm font-medium">{user.name}</div>
                 <div className="text-xs text-muted-foreground">{isAuthor ? 'Author' : ''}</div>
             </div>

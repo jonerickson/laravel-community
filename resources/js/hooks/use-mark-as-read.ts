@@ -15,7 +15,7 @@ export function useMarkAsRead({ id, type, isRead, enabled = true }: UseMarkAsRea
     const { auth } = usePage<SharedData>().props;
 
     useEffect(() => {
-        if (!enabled || isRead || !auth?.user) {
+        if (!enabled || !auth?.user) {
             return;
         }
 
@@ -35,5 +35,5 @@ export function useMarkAsRead({ id, type, isRead, enabled = true }: UseMarkAsRea
         };
 
         markAsRead();
-    }, [id, type, isRead, enabled]);
+    }, [id, type, isRead, enabled, auth?.user]);
 }

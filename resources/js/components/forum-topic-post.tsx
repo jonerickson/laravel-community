@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import type { Forum, Post, SharedData, Topic } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
-import { EyeOff, Flag } from 'lucide-react';
+import { EyeOff, Flag, Pin } from 'lucide-react';
 
 interface ForumTopicPostProps {
     post: Post;
@@ -36,21 +36,30 @@ export default function ForumTopicPost({ post, index, forum, topic }: ForumTopic
             <CardContent className="px-6 py-0 md:py-6">
                 <div className="flex flex-col gap-4 md:flex-row">
                     <div
-                        className="flex min-w-0 flex-col items-start gap-2 md:items-center"
+                        className="flex min-w-0 flex-row items-start justify-between gap-2 md:flex-col md:items-center md:justify-start"
                         itemProp="author"
                         itemScope
                         itemType="https://schema.org/Person"
                     >
-                        <ForumUserInfo user={post.author} isAuthor={index === 0} />
-                        <meta itemProp="name" content={post.author?.name || ''} />
+                        <div>
+                            <ForumUserInfo user={post.author} isAuthor={index === 0} />
+                            <meta itemProp="name" content={post.author?.name || ''} />
+                        </div>
+                        {auth?.user && <ForumTopicPostModerationMenu post={post} forum={forum} topic={topic} />}
                     </div>
 
                     <div className="min-w-0 flex-1">
-                        <div className="mb-4 flex items-center justify-between">
+                        <div className="mb-4 hidden items-center justify-between md:flex">
                             <div className="flex items-center gap-2">
                                 <time className="text-sm text-muted-foreground" itemProp="dateCreated" dateTime={post.created_at}>
                                     Posted {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                                 </time>
+                                {post.is_pinned && (
+                                    <Badge variant="secondary">
+                                        <Pin className="mr-1 h-3 w-3" />
+                                        Pinned
+                                    </Badge>
+                                )}
                                 {!post.is_published && (
                                     <Badge variant="destructive">
                                         <EyeOff className="mr-1 h-3 w-3" />

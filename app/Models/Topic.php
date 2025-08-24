@@ -7,8 +7,11 @@ namespace App\Models;
 use App\Contracts\Sluggable;
 use App\Traits\HasAuthor;
 use App\Traits\HasLogging;
-use App\Traits\HasReads;
 use App\Traits\HasSlug;
+use App\Traits\Lockable;
+use App\Traits\Pinnable;
+use App\Traits\Readable;
+use App\Traits\Viewable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -29,7 +32,6 @@ use Laravel\Scout\Searchable;
  * @property int $forum_id
  * @property bool $is_pinned
  * @property bool $is_locked
- * @property int $views_count
  * @property int $created_by
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -47,9 +49,13 @@ use Laravel\Scout\Searchable;
  * @property-read int|null $posts_count
  * @property-read Collection<int, Read> $reads
  * @property-read int $reads_count
+ * @property-read int $unique_views_count
+ * @property-read Collection<int, View> $views
+ * @property-read int $views_count
  *
  * @method static \Database\Factories\TopicFactory factory($count = null, $state = [])
  * @method static Builder<static>|Topic latestActivity()
+ * @method static Builder<static>|Topic locked()
  * @method static Builder<static>|Topic newModelQuery()
  * @method static Builder<static>|Topic newQuery()
  * @method static Builder<static>|Topic notPinned()
@@ -66,7 +72,6 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Topic whereSlug($value)
  * @method static Builder<static>|Topic whereTitle($value)
  * @method static Builder<static>|Topic whereUpdatedAt($value)
- * @method static Builder<static>|Topic whereViewsCount($value)
  *
  * @mixin \Eloquent
  */
@@ -75,17 +80,17 @@ class Topic extends Model implements Sluggable
     use HasAuthor;
     use HasFactory;
     use HasLogging;
-    use HasReads;
     use HasSlug;
+    use Lockable;
+    use Pinnable;
+    use Readable;
     use Searchable;
+    use Viewable;
 
     protected $fillable = [
         'title',
         'description',
         'forum_id',
-        'is_pinned',
-        'is_locked',
-        'views_count',
         'last_reply_at',
     ];
 
@@ -131,31 +136,11 @@ class Topic extends Model implements Sluggable
         )->shouldCache();
     }
 
-    public function scopePinned($query)
-    {
-        return $query->where('is_pinned', true);
-    }
-
-    public function scopeNotPinned($query)
-    {
-        return $query->where('is_pinned', false);
-    }
-
-    public function scopeUnlocked($query)
-    {
-        return $query->where('is_locked', false);
-    }
-
     public function scopeLatestActivity($query)
     {
         return $query->orderByDesc('is_pinned')
             ->orderByDesc('updated_at')
             ->orderByDesc('created_at');
-    }
-
-    public function incrementViews(): void
-    {
-        $this->increment('views_count');
     }
 
     public function postsCount(): Attribute
@@ -231,8 +216,6 @@ class Topic extends Model implements Sluggable
     protected function casts(): array
     {
         return [
-            'is_pinned' => 'boolean',
-            'is_locked' => 'boolean',
             'last_reply_at' => 'datetime',
         ];
     }

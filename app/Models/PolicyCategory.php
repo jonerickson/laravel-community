@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\Sluggable;
-use App\Traits\HasOrder;
 use App\Traits\HasSlug;
+use App\Traits\Orderable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -49,8 +49,8 @@ use Illuminate\Support\Str;
 class PolicyCategory extends Model implements Sluggable
 {
     use HasFactory;
-    use HasOrder;
     use HasSlug;
+    use Orderable;
 
     protected $table = 'policies_categories';
 

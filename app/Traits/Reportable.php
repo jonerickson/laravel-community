@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace App\Traits;
 
 use App\Models\Report;
+use Eloquent;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
+/**
+ * @mixin Eloquent
+ */
 trait Reportable
 {
     public function reports(): MorphMany

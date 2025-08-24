@@ -86,6 +86,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read int|null $permissions_count
  * @property-read Collection<int, Report> $rejectedReports
  * @property-read int|null $rejected_reports_count
+ * @property-read int $report_count
  * @property-read Collection<int, Report> $reports
  * @property-read int|null $reports_count
  * @property-read Collection<int, \App\Models\Role> $roles

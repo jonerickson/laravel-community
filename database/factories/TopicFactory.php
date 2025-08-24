@@ -23,7 +23,6 @@ class TopicFactory extends Factory
             'created_by' => User::factory(),
             'is_pinned' => $this->faker->boolean(10),
             'is_locked' => $this->faker->boolean(5),
-            'views_count' => $this->faker->numberBetween(0, 1000),
         ];
     }
 }

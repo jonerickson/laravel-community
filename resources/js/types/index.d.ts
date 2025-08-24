@@ -155,6 +155,7 @@ export interface Post {
     content: string;
     is_published: boolean;
     is_featured: boolean;
+    is_pinned: boolean;
     comments_enabled: boolean;
     comments_count: number;
     likes_count: number;

@@ -1,9 +1,10 @@
 import { ReportDialog } from '@/components/report-dialog';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useApiRequest } from '@/hooks/use-api-request';
 import type { Forum, Post, SharedData, Topic } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
-import { Eye, EyeOff, Flag, MoreHorizontal, Trash } from 'lucide-react';
+import { Eye, EyeOff, Flag, MoreHorizontal, Pin, PinOff, Trash } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ForumTopicPostModerationMenuProps {
@@ -18,6 +19,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
         is_published: post.is_published,
     });
     const { patch: updatePost, transform: transformUpdatePost } = useForm();
+    const { execute: pinPost, loading: pinLoading } = useApiRequest();
 
     const canModerate = post.created_by === auth.user?.id || auth.isAdmin;
     const canReport = auth.user && auth.user.id !== post.created_by && !post.is_reported;
@@ -74,6 +76,33 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
         );
     };
 
+    const handleTogglePin = async () => {
+        const isCurrentlyPinned = post.is_pinned;
+        const url = isCurrentlyPinned ? route('api.pin.destroy') : route('api.pin.store');
+        const method = isCurrentlyPinned ? 'DELETE' : 'POST';
+
+        await pinPost(
+            {
+                url,
+                method,
+                data: {
+                    post_id: post.id,
+                },
+            },
+            {
+                onSuccess: () => {
+                    const message = isCurrentlyPinned ? 'The post has been unpinned.' : 'The post has been pinned.';
+                    toast.success(message);
+                    window.location.reload();
+                },
+                onError: (err) => {
+                    console.error(err);
+                    toast.error(err.message || 'There was an error. Please try again.');
+                },
+            },
+        );
+    };
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -94,6 +123,19 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
 
                 {canModerate && (
                     <>
+                        <DropdownMenuItem onClick={handleTogglePin} disabled={pinLoading}>
+                            {post.is_pinned ? (
+                                <>
+                                    <PinOff className="mr-2 h-4 w-4" />
+                                    Unpin Post
+                                </>
+                            ) : (
+                                <>
+                                    <Pin className="mr-2 h-4 w-4" />
+                                    Pin Post
+                                </>
+                            )}
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={handleTogglePublish}>
                             {post.is_published ? (
                                 <>

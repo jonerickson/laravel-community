@@ -1,8 +1,9 @@
 import HeadingSmall from '@/components/heading-small';
 import { UserInfo } from '@/components/user-info';
+import { pluralize } from '@/lib/utils';
 import { Post } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Clock, ImageIcon, MessageCircle } from 'lucide-react';
+import { Clock, Eye, ImageIcon, MessageCircle } from 'lucide-react';
 
 interface BlogIndexItemProps {
     post: Post;
@@ -41,19 +42,28 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                         {post.is_featured && (
                             <span className="relative z-10 rounded-full bg-primary/10 px-3 py-1.5 font-medium text-primary">Featured</span>
                         )}
+
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                            <Eye className="h-3 w-3" />
+                            <span>
+                                {post.views_count} {pluralize('view', post.views_count)}
+                            </span>
+                        </div>
+
+                        {post.comments_enabled && (
+                            <div className="flex items-center gap-1 text-muted-foreground">
+                                <MessageCircle className="h-3 w-3" />
+                                <span>
+                                    {post.comments_count} {pluralize('comment', post.comments_count)}
+                                </span>
+                            </div>
+                        )}
+
                         {post.reading_time && (
                             <div className="flex items-center gap-1 text-muted-foreground">
                                 <Clock className="h-3 w-3" />
                                 <span>{post.reading_time} min read</span>
                             </div>
-                        )}
-                        {post.comments_enabled && post.comments_count ? (
-                            <div className="flex items-center gap-1 text-muted-foreground">
-                                <MessageCircle className="h-3 w-3" />
-                                <span>{post.comments_count} comments</span>
-                            </div>
-                        ) : (
-                            <></>
                         )}
                     </div>
                     <div className="group relative mt-2 grow">

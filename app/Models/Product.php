@@ -10,9 +10,9 @@ use App\Traits\HasFeaturedImage;
 use App\Traits\HasFiles;
 use App\Traits\HasLogging;
 use App\Traits\HasMetadata;
-use App\Traits\HasReviews;
 use App\Traits\HasSlug;
 use App\Traits\LogsMarketplaceActivity;
+use App\Traits\Reviewable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -43,8 +43,6 @@ use Laravel\Scout\Searchable;
  * @property-read mixed $average_rating
  * @property-read Collection<int, ProductCategory> $categories
  * @property-read int|null $categories_count
- * @property-read Collection<int, Policy> $policies
- * @property-read int|null $policies_count
  * @property-read Collection<int, Comment> $comments
  * @property-read int|null $comments_count
  * @property-read ProductPrice|null $defaultPrice
@@ -52,6 +50,8 @@ use Laravel\Scout\Searchable;
  * @property-read File|null $file
  * @property-read Collection<int, File> $files
  * @property-read int|null $files_count
+ * @property-read Collection<int, Policy> $policies
+ * @property-read int|null $policies_count
  * @property-read Collection<int, ProductPrice> $prices
  * @property-read int|null $prices_count
  * @property-read Collection<int, Comment> $reviews
@@ -87,9 +87,9 @@ class Product extends Model implements Sluggable
     use HasFiles;
     use HasLogging;
     use HasMetadata;
-    use HasReviews;
     use HasSlug;
     use LogsMarketplaceActivity;
+    use Reviewable;
     use Searchable;
 
     protected $fillable = [

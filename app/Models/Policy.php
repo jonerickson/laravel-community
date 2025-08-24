@@ -6,9 +6,9 @@ namespace App\Models;
 
 use App\Contracts\Sluggable;
 use App\Traits\HasAuthor;
-use App\Traits\HasOrder;
 use App\Traits\HasSlug;
 use App\Traits\HasUrl;
+use App\Traits\Orderable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -65,9 +65,9 @@ class Policy extends Model implements Sluggable
 {
     use HasAuthor;
     use HasFactory;
-    use HasOrder;
     use HasSlug;
     use HasUrl;
+    use Orderable;
     use Searchable;
 
     protected $fillable = [

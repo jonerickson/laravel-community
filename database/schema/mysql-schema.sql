@@ -4,6 +4,28 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+DROP TABLE IF EXISTS `activity`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `activity` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `log_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `event` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subject_id` bigint unsigned DEFAULT NULL,
+  `causer_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `causer_id` bigint unsigned DEFAULT NULL,
+  `properties` json DEFAULT NULL,
+  `batch_uuid` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `subject` (`subject_type`,`subject_id`),
+  KEY `causer` (`causer_type`,`causer_id`),
+  KEY `activity_log_name_index` (`log_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `announcements`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -329,6 +351,18 @@ CREATE TABLE `policies_categories` (
   UNIQUE KEY `policies_categories_slug_unique` (`slug`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `policies_products`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `policies_products` (
+  `policy_id` bigint unsigned NOT NULL,
+  `product_id` bigint unsigned NOT NULL,
+  PRIMARY KEY (`policy_id`,`product_id`),
+  KEY `policies_products_product_id_foreign` (`product_id`),
+  CONSTRAINT `policies_products_policy_id_foreign` FOREIGN KEY (`policy_id`) REFERENCES `policies` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `policies_products_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `posts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -336,11 +370,12 @@ CREATE TABLE `posts` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'blog',
   `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `excerpt` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `is_published` tinyint(1) NOT NULL DEFAULT '0',
   `is_featured` tinyint(1) NOT NULL DEFAULT '0',
+  `is_pinned` tinyint(1) NOT NULL DEFAULT '0',
   `comments_enabled` tinyint(1) NOT NULL DEFAULT '1',
   `topic_id` bigint unsigned DEFAULT NULL,
   `featured_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -431,6 +466,31 @@ CREATE TABLE `reads` (
   KEY `reads_readable_type_readable_id_index` (`readable_type`,`readable_id`),
   KEY `reads_created_by_foreign` (`created_by`),
   CONSTRAINT `reads_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `reports`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `reports` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `reportable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reportable_id` bigint unsigned NOT NULL,
+  `reason` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `additional_info` text COLLATE utf8mb4_unicode_ci,
+  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `reviewed_by` bigint unsigned DEFAULT NULL,
+  `reviewed_at` timestamp NULL DEFAULT NULL,
+  `admin_notes` text COLLATE utf8mb4_unicode_ci,
+  `created_by` bigint unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `reports_reportable_type_reportable_id_index` (`reportable_type`,`reportable_id`),
+  KEY `reports_reviewed_by_foreign` (`reviewed_by`),
+  KEY `reports_created_by_foreign` (`created_by`),
+  KEY `reports_status_created_at_index` (`status`,`created_at`),
+  CONSTRAINT `reports_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `reports_reviewed_by_foreign` FOREIGN KEY (`reviewed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `role_has_permissions`;
@@ -569,10 +629,13 @@ CREATE TABLE `users` (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
-  `signature` text COLLATE utf8mb4_unicode_ci,
+  `signature` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `remember_token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `app_authentication_secret` text COLLATE utf8mb4_unicode_ci,
+  `app_authentication_recovery_codes` text COLLATE utf8mb4_unicode_ci,
+  `has_email_authentication` tinyint(1) NOT NULL DEFAULT '0',
+  `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `stripe_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `pm_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `pm_last_four` varchar(4) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -681,3 +744,10 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (37,'2025_08_01_011
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (38,'2025_08_06_185220_add_avatar_to_users_table',9);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (39,'2025_08_06_191221_make_slug_nullable_in_posts_table',10);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (40,'2025_08_10_232058_add_signature_to_users_table',11);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (41,'2025_08_17_195139_create_activity_log_table',12);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (42,'2025_08_17_195140_add_event_column_to_activity_log_table',12);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (43,'2025_08_17_195141_add_batch_uuid_column_to_activity_log_table',12);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (44,'2025_08_17_204139_add_2fa_to_users_table',12);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (45,'2025_08_18_224211_create_reports_table',12);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (46,'2025_08_24_145818_create_policies_products_table',13);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (47,'2025_08_24_211549_add_is_pinned_to_posts_table',14);

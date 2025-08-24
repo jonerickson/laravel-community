@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Traits\HasAuthor;
-use App\Traits\HasLikes;
+use App\Traits\Likeable;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -66,7 +66,7 @@ class Comment extends Model
 {
     use HasAuthor;
     use HasFactory;
-    use HasLikes;
+    use Likeable;
 
     protected $fillable = [
         'commentable_type',

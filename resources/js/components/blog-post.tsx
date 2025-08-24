@@ -1,18 +1,30 @@
 import BlogComments from '@/components/blog-comments';
 import EmojiReactions from '@/components/emoji-reactions';
+import RecentViewers from '@/components/recent-viewers';
 import { Spinner } from '@/components/ui/spinner';
 import { UserInfo } from '@/components/user-info';
+import { pluralize } from '@/lib/utils';
 import { Comment, Post, type PaginatedData, type SharedData } from '@/types';
 import { Deferred, usePage } from '@inertiajs/react';
-import { Calendar, Clock, ImageIcon } from 'lucide-react';
+import { Calendar, Clock, Eye, ImageIcon, MessageSquare } from 'lucide-react';
+
+interface RecentViewer {
+    user: {
+        id: number;
+        name: string;
+        avatar?: string;
+    };
+    viewed_at: string;
+}
 
 interface BlogPostProps {
     post: Post;
     comments: Comment[];
     commentsPagination: PaginatedData;
+    recentViewers: RecentViewer[];
 }
 
-export default function BlogPost({ post, comments, commentsPagination }: BlogPostProps) {
+export default function BlogPost({ post, comments, commentsPagination, recentViewers }: BlogPostProps) {
     const { auth } = usePage<SharedData>().props;
     const publishedDate = new Date(post.published_at || post.created_at);
     const formattedDate = publishedDate.toLocaleDateString('en-US', {
@@ -40,7 +52,7 @@ export default function BlogPost({ post, comments, commentsPagination }: BlogPos
                 </h1>
 
                 {post.excerpt && (
-                    <p className="mb-6 text-xl text-muted-foreground" itemProp="description">
+                    <p className="mb-6 max-w-3xl text-lg text-muted-foreground" itemProp="description">
                         {post.excerpt}
                     </p>
                 )}
@@ -59,6 +71,22 @@ export default function BlogPost({ post, comments, commentsPagination }: BlogPos
                             {formattedDate}
                         </time>
                     </div>
+
+                    <div className="flex items-center gap-1">
+                        <Eye className="h-4 w-4" aria-hidden="true" />
+                        <span aria-label={`Total views: ${post.views_count} views`}>
+                            {post.views_count} {pluralize('view', post.views_count)}
+                        </span>
+                    </div>
+
+                    {post.comments_enabled && (
+                        <div className="flex items-center gap-1">
+                            <MessageSquare className="h-4 w-4" aria-hidden="true" />
+                            <span aria-label={`Total comments: ${post.comments_count} comments`}>
+                                {post.comments_count} {pluralize('comment', post.comments_count)}
+                            </span>
+                        </div>
+                    )}
 
                     {post.reading_time && (
                         <div className="flex items-center gap-1">
@@ -110,6 +138,12 @@ export default function BlogPost({ post, comments, commentsPagination }: BlogPos
                         <EmojiReactions post={post} initialReactions={post.likes_summary} userReactions={post.user_reactions} className="mb-4" />
                     </section>
                 )}
+
+                <Deferred fallback={null} data="recentViewers">
+                    <div className="mt-6">
+                        <RecentViewers viewers={recentViewers} />
+                    </div>
+                </Deferred>
 
                 {post.comments_enabled && (
                     <section className="mt-8 border-t pt-6" aria-label="Comments section">

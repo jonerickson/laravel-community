@@ -35,6 +35,8 @@ class BlogController extends Controller
             message: 'Post not found.'
         );
 
+        $post->incrementViews();
+
         $perPage = $request->input('per_page', 10);
 
         $comments = $post->approvedComments()->with(['author', 'replies', 'replies.author', 'parent'])->latest()->paginate(
@@ -45,6 +47,7 @@ class BlogController extends Controller
             'post' => $post->loadMissing(['author']),
             'comments' => Inertia::defer(fn () => $comments->items()),
             'commentsPagination' => Arr::except($comments->toArray(), ['data']),
+            'recentViewers' => Inertia::defer(fn () => $post->getRecentViewers()),
         ]);
     }
 }

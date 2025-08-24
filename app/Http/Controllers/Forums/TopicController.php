@@ -11,6 +11,7 @@ use App\Models\Forum;
 use App\Models\Topic;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,9 +25,10 @@ class TopicController extends Controller
     {
         $topic->incrementViews();
 
+        /** @var LengthAwarePaginator $posts */
         $posts = $topic->posts()
             ->with(['author', 'comments.author', 'comments.replies.author', 'reports'])
-            ->oldest()
+            ->latestActivity()
             ->paginate(10);
 
         return Inertia::render('forums/topics/show', [
@@ -34,6 +36,7 @@ class TopicController extends Controller
             'topic' => $topic->load(['author', 'forum']),
             'posts' => $posts->items(),
             'postsPagination' => Arr::except($posts->toArray(), ['data']),
+            'recentViewers' => Inertia::defer(fn () => $topic->getRecentViewers()),
         ]);
     }
 

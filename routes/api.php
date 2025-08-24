@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\FingerprintController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\PaymentMethodController;
+use App\Http\Controllers\Api\PinController;
 use App\Http\Controllers\Api\ReadController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SearchController;
@@ -31,5 +32,7 @@ Route::group(['as' => 'api.'], function () {
         Route::post('/read', ReadController::class)->name('read');
         Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
         Route::delete('/forums/topics', [TopicController::class, 'destroy'])->name('forums.topics.destroy');
+        Route::post('/pin', [PinController::class, 'store'])->name('pin.store');
+        Route::delete('/pin', [PinController::class, 'destroy'])->name('pin.destroy');
     });
 });
