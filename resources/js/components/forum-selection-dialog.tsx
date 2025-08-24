@@ -14,7 +14,7 @@ interface ForumSelectionDialogProps {
 export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumSelectionDialogProps) {
     const handleForumSelect = (forum: Forum) => {
         onClose();
-        router.visit(`/forums/${forum.slug}/create`);
+        router.get(route('forums.topics.create', { forum: forum.slug }));
     };
 
     return (

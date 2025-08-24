@@ -38,8 +38,6 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
         }
     }, [scrollToBottom]);
 
-    const topicUrl = `/forums/${forum.slug}/${topic.slug}`;
-
     const goToLatestPost = () => {
         router.reload({
             data: { page: postsPagination.last_page },
@@ -139,7 +137,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                                 <ArrowDown className="mr-2 h-4 w-4" />
                                 Latest
                             </Button>
-                            {auth && auth.user && (
+                            {auth?.user && (
                                 <Button onClick={() => setShowReplyForm(!showReplyForm)} variant={showReplyForm ? 'outline' : 'default'}>
                                     <Reply className="mr-2 h-4 w-4" />
                                     Reply
@@ -174,7 +172,12 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                     </div>
                 )}
 
-                <Pagination pagination={postsPagination} baseUrl={topicUrl} entityLabel="post" className="hidden py-4 md:flex" />
+                <Pagination
+                    pagination={postsPagination}
+                    baseUrl={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
+                    entityLabel="post"
+                    className="hidden py-4 md:flex"
+                />
 
                 {posts.length > 0 && (
                     <div className="grid gap-4">
@@ -194,13 +197,18 @@ export default function TopicShow({ forum, topic, posts, postsPagination }: Topi
                     </div>
                 )}
 
-                {auth && auth.user && !topic.is_locked && posts.length > 0 && (
+                {auth?.user && !topic.is_locked && posts.length > 0 && (
                     <div className="pt-4">
                         <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} />
                     </div>
                 )}
 
-                <Pagination pagination={postsPagination} baseUrl={topicUrl} entityLabel="post" className="py-4" />
+                <Pagination
+                    pagination={postsPagination}
+                    baseUrl={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
+                    entityLabel="post"
+                    className="py-4"
+                />
 
                 <div className="flex justify-start py-4">
                     <Link

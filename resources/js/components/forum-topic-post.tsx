@@ -64,30 +64,34 @@ export default function ForumTopicPost({ post, index, forum, topic }: ForumTopic
                                     </Badge>
                                 )}
                             </div>
-                            <ForumTopicPostModerationMenu post={post} forum={forum} topic={topic} />
+                            {auth?.user && <ForumTopicPostModerationMenu post={post} forum={forum} topic={topic} />}
                         </div>
 
                         <div className="prose prose-sm max-w-none" itemProp="text" dangerouslySetInnerHTML={{ __html: post.content }} />
 
-                        <div className="mt-4 border-t border-muted pt-2">
-                            {post.author?.signature && (
-                                <div className="mt-2 text-xs text-muted-foreground">
-                                    <div
-                                        className="prose prose-xs max-w-none italic [&>*]:text-muted-foreground"
-                                        dangerouslySetInnerHTML={{ __html: post.author.signature }}
-                                    />
-                                </div>
-                            )}
+                        {(auth?.user || post.author?.signature) && (
+                            <div className="mt-4 border-t border-muted pt-2">
+                                {post.author?.signature && (
+                                    <div className="mt-2 text-xs text-muted-foreground">
+                                        <div
+                                            className="prose prose-xs max-w-none [&>*]:text-muted-foreground"
+                                            dangerouslySetInnerHTML={{ __html: post.author.signature }}
+                                        />
+                                    </div>
+                                )}
 
-                            <div className="mt-4">
-                                <EmojiReactions
-                                    post={post}
-                                    initialReactions={post.likes_summary}
-                                    userReactions={post.user_reactions}
-                                    className="mb-2"
-                                />
+                                {auth?.user && (
+                                    <div className="mt-4">
+                                        <EmojiReactions
+                                            post={post}
+                                            initialReactions={post.likes_summary}
+                                            userReactions={post.user_reactions}
+                                            className="mb-2"
+                                        />
+                                    </div>
+                                )}
                             </div>
-                        </div>
+                        )}
 
                         {post.comments && post.comments.length > 0 && (
                             <div className="mt-6 border-t pt-4">

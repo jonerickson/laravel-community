@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCartOperations } from '@/hooks/use-cart-operations';
-import type { Comment, PaginatedData, Product as ProductType } from '@/types';
-import { Deferred } from '@inertiajs/react';
+import type { Comment, PaginatedData, Product as ProductType, SharedData } from '@/types';
+import { Deferred, usePage } from '@inertiajs/react';
 import { CurrencyIcon, GlobeIcon, ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -24,6 +24,7 @@ interface ProductProps {
 }
 
 export default function Product({ product: productData, reviews, reviewsPagination }: ProductProps) {
+    const { auth } = usePage<SharedData>().props;
     const [quantity, setQuantity] = useState(1);
     const [selectedPriceId, setSelectedPriceId] = useState<number | null>(productData?.default_price?.id || null);
     const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
@@ -69,16 +70,18 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                                     <div className="pt-4">
                                         <StoreProductReviewsList reviews={reviews || []} reviewsPagination={reviewsPagination} />
 
-                                        <div className="border-t border-muted pt-6">
-                                            <h3 className="mb-4 text-lg font-medium">Write a Review</h3>
-                                            <StoreProductRating
-                                                product={productData}
-                                                onRatingAdded={() => {
-                                                    setIsRatingModalOpen(false);
-                                                    window.location.reload();
-                                                }}
-                                            />
-                                        </div>
+                                        {auth?.user && (
+                                            <div className="border-t border-muted pt-6">
+                                                <h3 className="mb-4 text-lg font-medium">Write a Review</h3>
+                                                <StoreProductRating
+                                                    product={productData}
+                                                    onRatingAdded={() => {
+                                                        setIsRatingModalOpen(false);
+                                                        window.location.reload();
+                                                    }}
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                 </DialogContent>
                             </Dialog>

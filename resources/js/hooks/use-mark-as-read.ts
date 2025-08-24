@@ -1,4 +1,6 @@
+import type { SharedData } from '@/types';
 import { ApiError, apiRequest } from '@/utils/api';
+import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useEffect } from 'react';
 
@@ -10,8 +12,10 @@ interface UseMarkAsReadOptions {
 }
 
 export function useMarkAsRead({ id, type, isRead, enabled = true }: UseMarkAsReadOptions) {
+    const { auth } = usePage<SharedData>().props;
+
     useEffect(() => {
-        if (!enabled || isRead) {
+        if (!enabled || isRead || !auth?.user) {
             return;
         }
 

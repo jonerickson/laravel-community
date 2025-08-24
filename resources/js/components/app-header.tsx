@@ -11,9 +11,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
-import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
+import { Auth, type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, Home, LibraryBig, Menu, Newspaper, ShoppingCart } from 'lucide-react';
+import { BookOpen, Folder, Grid, Home, LibraryBig, Menu, Newspaper, ShoppingCart } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
@@ -22,11 +22,19 @@ const mainNavItems: NavItem[] = [
         title: 'Home',
         href: '/',
         icon: Home,
+        shouldShow: (auth: Auth): boolean => auth?.user === null,
+    },
+    {
+        title: 'Dashboard',
+        href: () => route('dashboard'),
+        icon: Grid,
+        shouldShow: (auth: Auth): boolean => auth?.user !== null,
     },
     {
         title: 'Blog',
         href: () => route('blog.index'),
         icon: Newspaper,
+        isActive: true,
     },
     {
         title: 'Forums',
@@ -82,16 +90,23 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 <div className="flex h-full flex-1 flex-col space-y-4 p-4">
                                     <div className="flex h-full flex-col justify-between text-sm">
                                         <div className="flex flex-col space-y-4">
-                                            {mainNavItems.map((item) => (
-                                                <Link
-                                                    key={item.title}
-                                                    href={typeof item.href === 'function' ? item.href() : item.href}
-                                                    className="flex items-center space-x-2 font-medium"
-                                                >
-                                                    {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
-                                                    <span>{item.title}</span>
-                                                </Link>
-                                            ))}
+                                            {mainNavItems.map((item) => {
+                                                const shouldShow =
+                                                    typeof item.shouldShow === 'function' ? item.shouldShow(auth) : item.shouldShow || true;
+
+                                                return shouldShow ? (
+                                                    <Link
+                                                        key={item.title}
+                                                        href={typeof item.href === 'function' ? item.href() : item.href}
+                                                        className="flex items-center space-x-2 font-medium"
+                                                    >
+                                                        {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
+                                                        <span>{item.title}</span>
+                                                    </Link>
+                                                ) : (
+                                                    <></>
+                                                );
+                                            })}
                                         </div>
 
                                         <div className="flex flex-col space-y-4">
@@ -121,24 +136,30 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     <div className="ml-6 hidden h-full items-center space-x-6 lg:flex">
                         <NavigationMenu className="flex h-full items-stretch">
                             <NavigationMenuList className="flex h-full items-stretch space-x-2">
-                                {mainNavItems.map((item, index) => (
-                                    <NavigationMenuItem key={index} className="relative flex h-full items-center">
-                                        <Link
-                                            href={typeof item.href === 'function' ? item.href() : item.href}
-                                            className={cn(
-                                                navigationMenuTriggerStyle(),
-                                                page.url === (typeof item.href === 'function' ? item.href() : item.href) && activeItemStyles,
-                                                'h-9 px-3',
+                                {mainNavItems.map((item, index) => {
+                                    const shouldShow = typeof item.shouldShow === 'function' ? item.shouldShow(auth) : item.shouldShow || true;
+
+                                    return shouldShow ? (
+                                        <NavigationMenuItem key={index} className="relative flex h-full items-center">
+                                            <Link
+                                                href={typeof item.href === 'function' ? item.href() : item.href}
+                                                className={cn(
+                                                    navigationMenuTriggerStyle(),
+                                                    page.url === (typeof item.href === 'function' ? item.href() : item.href) && activeItemStyles,
+                                                    'h-9 px-3',
+                                                )}
+                                            >
+                                                {item.icon && <Icon iconNode={item.icon} className="mr-2 h-4 w-4" />}
+                                                {item.title}
+                                            </Link>
+                                            {page.url === (typeof item.href === 'function' ? item.href() : item.href) && (
+                                                <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
                                             )}
-                                        >
-                                            {item.icon && <Icon iconNode={item.icon} className="mr-2 h-4 w-4" />}
-                                            {item.title}
-                                        </Link>
-                                        {page.url === (typeof item.href === 'function' ? item.href() : item.href) && (
-                                            <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
-                                        )}
-                                    </NavigationMenuItem>
-                                ))}
+                                        </NavigationMenuItem>
+                                    ) : (
+                                        <></>
+                                    );
+                                })}
                             </NavigationMenuList>
                         </NavigationMenu>
                     </div>
@@ -170,7 +191,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 ))}
                             </div>
                         </div>
-                        {auth && auth.user && (
+                        {auth?.user ? (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" className="size-10 rounded-full p-1">
@@ -186,6 +207,10 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                     <UserMenuContent user={auth.user} />
                                 </DropdownMenuContent>
                             </DropdownMenu>
+                        ) : (
+                            <Button variant="ghost" size="sm" asChild>
+                                <Link href={route('login')}>Login</Link>
+                            </Button>
                         )}
                     </div>
                 </div>

@@ -23,6 +23,7 @@ export interface NavItem {
     icon?: LucideIcon | null;
     isActive?: boolean;
     target?: string;
+    shouldShow?: boolean | ((auth: Auth) => boolean);
 }
 
 export interface Invoice {

@@ -23,7 +23,6 @@ interface ForumShowProps {
 
 export default function ForumShow({ forum, topics: initialTopics, topicsPagination }: ForumShowProps) {
     const { auth, name: siteName } = usePage<SharedData>().props;
-    const forumUrl = `/forums/${forum.slug}`;
     const [topics, setTopics] = useState<Topic[]>(initialTopics);
     const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
     const { loading: isDeleting, execute: executeBulkDelete } = useApiRequest();
@@ -168,7 +167,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                 )}
                             </>
                         )}
-                        {auth && auth.user && (
+                        {auth?.user && (
                             <Button asChild>
                                 <Link href={route('forums.topics.create', { forum: forum.slug })}>
                                     <Plus className="mr-2 h-4 w-4" />
@@ -297,7 +296,12 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                             </Table>
                         </div>
 
-                        <Pagination pagination={topicsPagination} baseUrl={forumUrl} entityLabel="topic" className="py-4" />
+                        <Pagination
+                            pagination={topicsPagination}
+                            baseUrl={route('forums.show', { forum: forum.slug })}
+                            entityLabel="topic"
+                            className="py-4"
+                        />
                     </>
                 )}
 

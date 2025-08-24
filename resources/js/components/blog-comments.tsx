@@ -144,7 +144,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                             {comment.content}
                         </div>
 
-                        {auth && auth.user && (
+                        {auth?.user && (
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center">
                                     <Button variant="ghost" size="sm" onClick={() => onReply(comment.id)} className="h-auto p-1 text-xs">
@@ -262,7 +262,7 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
                 <HeadingSmall title={`Comments (${comments.length || 0})`} />
             </div>
 
-            {auth && auth.user && (
+            {auth?.user && (
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <Textarea
@@ -286,7 +286,7 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
                         <CommentItem key={comment.id} post={post} comment={comment} onReply={setReplyingTo} replyingTo={replyingTo} />
                     ))}
 
-                    <Pagination pagination={commentsPagination} baseUrl={''} entityLabel="comment" />
+                    <Pagination pagination={commentsPagination} baseUrl={route('blog.show', { post: post.slug })} entityLabel="comment" />
                 </div>
             ) : (
                 <div className="py-8 text-center text-muted-foreground">

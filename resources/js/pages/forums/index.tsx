@@ -94,7 +94,7 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
                                 <Grid3X3 className="h-4 w-4" />
                             </Button>
                         </div>
-                        {auth && auth.user && (
+                        {auth?.user && (
                             <Button onClick={() => setIsDialogOpen(true)}>
                                 <Plus className="mr-2 h-4 w-4" />
                                 New Topic

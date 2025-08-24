@@ -1,7 +1,8 @@
 import { useLayout } from '@/hooks/use-layout';
 import AppHeaderLayout from '@/layouts/app/app-header-layout';
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type SharedData } from '@/types';
+import { usePage } from '@inertiajs/react';
 import { clsx } from 'clsx';
 import { type ReactNode } from 'react';
 
@@ -11,16 +12,17 @@ interface AppLayoutProps {
 }
 
 export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
+    const { auth } = usePage<SharedData>().props;
     const { layout } = useLayout();
 
-    const LayoutComponent = layout === 'header' ? AppHeaderLayout : AppSidebarLayout;
+    const LayoutComponent = layout === 'header' || !auth?.user ? AppHeaderLayout : AppSidebarLayout;
 
     return (
         <LayoutComponent breadcrumbs={breadcrumbs} {...props}>
             <div
                 className={clsx({
-                    'px-8 py-6': layout === 'sidebar',
-                    'px-4 py-6': layout === 'header',
+                    'px-6 py-6 lg:px-8': LayoutComponent === AppSidebarLayout,
+                    'px-6 py-6 lg:px-4': LayoutComponent === AppHeaderLayout,
                 })}
             >
                 {children}
