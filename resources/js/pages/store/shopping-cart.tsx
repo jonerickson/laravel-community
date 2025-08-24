@@ -104,7 +104,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                             <HeadingSmall title="Items in your shopping cart" />
                         </div>
 
-                        <ul role="list" className="divide-y divide-gray-200 border-t border-b border-gray-200">
+                        <ul role="list" className="divide-y divide-border border-t border-b border-border">
                             {items.map((item) => (
                                 <li key={item.product_id} className="flex items-center py-6 sm:py-10">
                                     <div className="shrink-0">
@@ -129,7 +129,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                                         <h3 className="text-sm">
                                                             <Link
                                                                 href={route('store.products.show', item.slug)}
-                                                                className="font-medium text-gray-700 hover:text-gray-800"
+                                                                className="font-medium text-shadow-muted-foreground hover:text-shadow-muted"
                                                             >
                                                                 {item.name}
                                                             </Link>
@@ -137,7 +137,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                                     </div>
                                                     <div className="mt-1 flex text-sm">
                                                         <p
-                                                            className="max-w-[90%] break-words text-gray-500 sm:max-w-[85%]"
+                                                            className="max-w-[90%] break-words text-muted-foreground sm:max-w-[85%]"
                                                             dangerouslySetInnerHTML={{
                                                                 __html:
                                                                     (item.product?.description || '').length > 200
@@ -146,7 +146,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                                             }}
                                                         ></p>
                                                     </div>
-                                                    <p className="mt-3 text-sm font-medium text-gray-900">
+                                                    <p className="mt-3 text-sm font-medium text-foreground">
                                                         {item.selected_price
                                                             ? `$${item.selected_price.amount} ${item.selected_price.currency}${item.selected_price.interval ? ` / ${item.selected_price.interval}` : ''}`
                                                             : item.product?.default_price
@@ -158,7 +158,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                                 <div className="mt-auto space-y-3">
                                                     {item.available_prices && item.available_prices.length > 1 && (
                                                         <div>
-                                                            <label className="mb-1 block text-xs font-medium text-gray-700">Price:</label>
+                                                            <label className="mb-1 block text-xs font-medium text-foreground">Price:</label>
                                                             <Select
                                                                 value={
                                                                     item.selected_price?.id?.toString() ||
@@ -186,7 +186,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                                     )}
 
                                                     <div className="w-full max-w-24">
-                                                        <label className="mb-1 block text-xs font-medium text-gray-700">Quantity:</label>
+                                                        <label className="mb-1 block text-xs font-medium text-foreground">Quantity:</label>
                                                         <Select
                                                             value={item.quantity.toString()}
                                                             onValueChange={(value) =>
@@ -227,25 +227,27 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                         </ul>
                     </section>
 
-                    <section aria-labelledby="summary-heading" className="mt-16 rounded-lg bg-gray-50 px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8">
+                    <section aria-labelledby="summary-heading" className="mt-16 rounded-lg bg-sidebar px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8">
                         <HeadingSmall title="Order summary" />
 
-                        <dl className="mt-6 divide-y divide-gray-200">
+                        <dl className="divide-shadow-muted mt-6 divide-y">
                             <div className="flex items-center justify-between py-3">
-                                <dt className="text-sm text-muted-foreground">Subtotal</dt>
-                                <dd className="text-sm font-medium text-foreground">${subtotal.toFixed(2)}</dd>
+                                <dt className="text-sm text-sidebar-primary">Subtotal</dt>
+                                <dd className="text-sm font-medium text-sidebar-accent-foreground">${subtotal.toFixed(2)}</dd>
                             </div>
                             <div className="flex items-center justify-between py-3">
-                                <dt className="text-base font-medium text-foreground">Order total</dt>
-                                <dd className="text-base font-medium text-foreground">${total.toFixed(2)}</dd>
+                                <dt className="text-base font-medium text-sidebar-primary">Order total</dt>
+                                <dd className="text-base font-medium text-sidebar-accent-foreground">${total.toFixed(2)}</dd>
                             </div>
 
                             {policies.length > 0 && (
                                 <div className="py-3">
                                     <dt className="mb-3 flex items-center gap-2">
-                                        <h4 className="text-sm font-medium text-foreground">Required Policies</h4>
+                                        <h4 className="sidebar-primary text-sm font-medium">Required Policies</h4>
                                     </dt>
-                                    <dd className="mb-3 text-xs text-gray-600">By proceeding with checkout, you agree to the following policies:</dd>
+                                    <dd className="mb-3 text-xs text-sidebar-accent-foreground">
+                                        By proceeding with checkout, you agree to the following policies:
+                                    </dd>
                                     <ul className="mb-4 space-y-2">
                                         {policies.map((policy) => (
                                             <li key={policy.id}>
