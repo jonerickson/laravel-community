@@ -216,12 +216,15 @@ trait LogsAuthActivity
 
         $activity = activity('auth')
             ->causedBy($user)
-            ->performedOn($user)
             ->withProperties(array_merge($properties ?? [], [
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
                 'timestamp' => now()->toISOString(),
             ]));
+
+        if ($user) {
+            $activity->performedOn($user);
+        }
 
         if ($event) {
             $activity->event($event);
