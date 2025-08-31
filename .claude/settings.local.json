@@ -11,6 +11,7 @@
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
-    "laravel-boost"
+    "laravel-boost",
+    "playwright"
   ]
 }

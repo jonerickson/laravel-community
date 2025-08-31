@@ -99,7 +99,7 @@ class ApiTokenResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->badge()
-                    ->color(fn ($state) => $state && $state->isPast() ? 'danger' : 'success')
+                    ->color(fn ($state): string => $state && $state->isPast() ? 'danger' : 'success')
                     ->formatStateUsing(fn ($state) => $state ? $state->format('M j, Y H:i') : 'Never'),
                 TextColumn::make('created_at')
                     ->dateTime()
@@ -117,7 +117,7 @@ class ApiTokenResource extends Resource
                     ->falseLabel('Active tokens only')
                     ->queries(
                         true: fn (Builder $query) => $query->where('expires_at', '<', now()),
-                        false: fn (Builder $query) => $query->where(function ($q) {
+                        false: fn (Builder $query) => $query->where(function ($q): void {
                             $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
                         }),
                     ),

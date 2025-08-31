@@ -214,8 +214,8 @@ class PostResource extends Resource
                         ->label('Publish Selected')
                         ->icon('heroicon-o-eye')
                         ->requiresConfirmation()
-                        ->action(function ($records) {
-                            $records->each(function ($record) {
+                        ->action(function ($records): void {
+                            $records->each(function ($record): void {
                                 $record->update([
                                     'is_published' => true,
                                     'published_at' => $record->published_at ?? now(),
@@ -226,8 +226,8 @@ class PostResource extends Resource
                         ->label('Unpublish Selected')
                         ->icon('heroicon-o-eye-slash')
                         ->requiresConfirmation()
-                        ->action(function ($records) {
-                            $records->each(function ($record) {
+                        ->action(function ($records): void {
+                            $records->each(function ($record): void {
                                 $record->update(['is_published' => false]);
                             });
                         }),

@@ -16,19 +16,17 @@ class PaymentMethodController extends Controller
     {
         $user = Auth::user();
 
-        $paymentMethods = $user->paymentMethods()->map(function (PaymentMethod $paymentMethod) use ($user) {
-            return [
-                'id' => $paymentMethod->id,
-                'type' => $paymentMethod->type,
-                'brand' => $paymentMethod->card->brand ?? null,
-                'last4' => $paymentMethod->card->last4 ?? null,
-                'exp_month' => $paymentMethod->card->exp_month ?? null,
-                'exp_year' => $paymentMethod->card->exp_year ?? null,
-                'holder_name' => $paymentMethod->billing_details->name ?? null,
-                'email' => $paymentMethod->billing_details->email ?? null,
-                'is_default' => $user->defaultPaymentMethod()?->id === $paymentMethod->id,
-            ];
-        });
+        $paymentMethods = $user->paymentMethods()->map(fn (PaymentMethod $paymentMethod): array => [
+            'id' => $paymentMethod->id,
+            'type' => $paymentMethod->type,
+            'brand' => $paymentMethod->card->brand ?? null,
+            'last4' => $paymentMethod->card->last4 ?? null,
+            'exp_month' => $paymentMethod->card->exp_month ?? null,
+            'exp_year' => $paymentMethod->card->exp_year ?? null,
+            'holder_name' => $paymentMethod->billing_details->name ?? null,
+            'email' => $paymentMethod->billing_details->email ?? null,
+            'is_default' => $user->defaultPaymentMethod()?->id === $paymentMethod->id,
+        ]);
 
         return Inertia::render('settings/payment-methods', [
             'paymentMethods' => $paymentMethods,

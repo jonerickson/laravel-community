@@ -75,7 +75,7 @@ class ActivityLogResource extends Resource
                     ->sortable(),
                 TextColumn::make('subject_type')
                     ->label('Subject Type')
-                    ->formatStateUsing(fn (?string $state): string => $state ? class_basename($state) : 'N/A')
+                    ->formatStateUsing(fn (?string $state): string => $state !== null && $state !== '' && $state !== '0' ? class_basename($state) : 'N/A')
                     ->sortable(),
                 TextColumn::make('event')
                     ->label('Event')
@@ -147,7 +147,7 @@ class ActivityLogResource extends Resource
                                     ->default('System'),
                                 TextEntry::make('subject_type')
                                     ->label('Subject Type')
-                                    ->formatStateUsing(fn (?string $state): string => $state ? class_basename($state) : 'N/A'),
+                                    ->formatStateUsing(fn (?string $state): string => filled($state) ? class_basename($state) : 'N/A'),
                                 TextEntry::make('created_at')
                                     ->label('Created At')
                                     ->dateTime(),

@@ -31,7 +31,7 @@ class MarketplacePanelProvider extends PanelProvider
         return $panel
             ->id('marketplace')
             ->path('marketplace')
-            ->brandLogo(fn () => view('filament.components.logo'))
+            ->brandLogo(fn (): View|\Illuminate\Contracts\View\Factory => view('filament.components.logo'))
             ->colors([
                 'primary' => Color::Zinc,
             ])

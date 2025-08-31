@@ -7,7 +7,7 @@ arch()->preset()->laravel();
 
 arch()
     ->expect('App\\Actions')
-    ->toImplement('App\\Contracts\\Actionable');
+    ->toImplement(App\Contracts\Actionable::class);
 
 arch()
     ->expect('App\\Http\\Controllers\\Api');

@@ -32,7 +32,7 @@ class EditApiToken extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $abilities = json_decode($data['abilities'], true) ?? ['*'];
+        $abilities = json_decode((string) $data['abilities'], true) ?? ['*'];
         $data['abilities'] = $abilities;
 
         return $data;

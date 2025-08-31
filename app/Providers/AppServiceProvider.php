@@ -56,21 +56,17 @@ class AppServiceProvider extends ServiceProvider
                 ->subscriptions()
                 ->with(['prices' => fn ($query) => $query->active()->withStripePrice()])
                 ->get()
-                ->flatMap(function (Product $product) {
-                    return $product->prices()->active()->get()->map(function (ProductPrice $price) use ($product) {
-                        return [
-                            'name' => $product->name,
-                            'short_description' => $product->description,
-                            'monthly_id' => $price->stripe_price_id,
-                            'yearly_id' => $price->interval === 'year' ? $price->stripe_price_id : null,
-                            'features' => [
-                                'Feature 1',
-                                'Feature 2',
-                                'Feature 3',
-                            ],
-                        ];
-                    });
-                })
+                ->flatMap(fn (Product $product) => $product->prices()->active()->get()->map(fn (ProductPrice $price): array => [
+                    'name' => $product->name,
+                    'short_description' => $product->description,
+                    'monthly_id' => $price->stripe_price_id,
+                    'yearly_id' => $price->interval === 'year' ? $price->stripe_price_id : null,
+                    'features' => [
+                        'Feature 1',
+                        'Feature 2',
+                        'Feature 3',
+                    ],
+                ]))
                 ->toArray()
         );
     }

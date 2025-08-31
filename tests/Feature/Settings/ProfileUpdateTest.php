@@ -6,7 +6,7 @@ use App\Models\User;
 
 uses(Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-test('profile page is displayed', function () {
+test('profile page is displayed', function (): void {
     $user = User::factory()->create();
 
     $response = $this
@@ -16,7 +16,7 @@ test('profile page is displayed', function () {
     $response->assertOk();
 });
 
-test('profile information can be updated', function () {
+test('profile information can be updated', function (): void {
     $user = User::factory()->create();
 
     $response = $this
@@ -34,7 +34,7 @@ test('profile information can be updated', function () {
     expect($user->name)->toBe('Updated Name');
 });
 
-test('user can delete their account', function () {
+test('user can delete their account', function (): void {
     $user = User::factory()->create();
 
     $response = $this

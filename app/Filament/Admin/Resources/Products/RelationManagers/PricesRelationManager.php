@@ -97,8 +97,7 @@ class PricesRelationManager extends RelationManager
                     ->sortable(),
                 TextColumn::make('interval')
                     ->badge()
-                    ->formatStateUsing(fn (?string $state): string => $state ? ucfirst($state) : 'One-time'
-                    )
+                    ->formatStateUsing(fn (?string $state): string => filled($state) ? ucfirst($state) : 'One-time')
                     ->colors([
                         'success' => fn (?string $state): bool => is_null($state),
                         'info' => fn (?string $state): bool => ! is_null($state),

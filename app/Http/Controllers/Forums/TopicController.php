@@ -36,7 +36,7 @@ class TopicController extends Controller
             'topic' => $topic->load(['author', 'forum']),
             'posts' => $posts->items(),
             'postsPagination' => Arr::except($posts->toArray(), ['data']),
-            'recentViewers' => Inertia::defer(fn () => $topic->getRecentViewers()),
+            'recentViewers' => Inertia::defer(fn (): array => $topic->getRecentViewers()),
         ]);
     }
 
@@ -78,7 +78,10 @@ class TopicController extends Controller
             return $topic;
         });
 
-        return to_route('forums.topics.show', compact(['forum', 'topic']));
+        return to_route('forums.topics.show', [
+            'forum' => $forum,
+            'topic' => $topic,
+        ]);
     }
 
     /**
@@ -88,7 +91,7 @@ class TopicController extends Controller
     {
         DeleteTopicAction::execute($topic, $forum);
 
-        return to_route('forums.show', compact('forum'))
+        return to_route('forums.show', ['forum' => $forum])
             ->with([
                 'message' => 'Topic deleted successfully.',
                 'messageVariant' => 'success',

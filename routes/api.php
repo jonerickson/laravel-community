@@ -15,14 +15,14 @@ use App\Http\Controllers\Api\ShoppingCartController;
 use App\Http\Controllers\Api\TopicController;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['as' => 'api.'], function () {
+Route::group(['as' => 'api.'], function (): void {
     Route::post('/cart', [ShoppingCartController::class, 'store'])->name('cart.store');
     Route::put('/cart', [ShoppingCartController::class, 'update'])->name('cart.update');
     Route::delete('/cart', [ShoppingCartController::class, 'destroy'])->name('cart.destroy');
     Route::post('/fingerprint', FingerprintController::class)->name('fingerprint');
     Route::get('/search', SearchController::class)->name('search');
 
-    Route::middleware(['auth:api', 'verified'])->group(function () {
+    Route::middleware(['auth:api', 'verified'])->group(function (): void {
         Route::post('/checkout', CheckoutController::class)->name('checkout');
         Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
         Route::post('/like', LikeController::class)->name('like');

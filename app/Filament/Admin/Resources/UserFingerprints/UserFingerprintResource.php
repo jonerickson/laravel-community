@@ -73,16 +73,16 @@ class UserFingerprintResource extends Resource
                     ->reactive(),
                 DateTimePicker::make('banned_at')
                     ->label('Banned At')
-                    ->visible(fn (Get $get) => $get('is_banned'))
+                    ->visible(fn (Get $get): mixed => $get('is_banned'))
                     ->disabled(),
                 Textarea::make('ban_reason')
                     ->label('Ban Reason')
-                    ->visible(fn (Get $get) => $get('is_banned'))
+                    ->visible(fn (Get $get): mixed => $get('is_banned'))
                     ->maxLength(1000),
                 Select::make('banned_by')
                     ->label('Banned By')
                     ->relationship('bannedBy', 'name')
-                    ->visible(fn (Get $get) => $get('is_banned'))
+                    ->visible(fn (Get $get): mixed => $get('is_banned'))
                     ->disabled(),
             ]);
     }

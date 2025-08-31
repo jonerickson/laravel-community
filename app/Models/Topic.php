@@ -124,7 +124,7 @@ class Topic extends Model implements Sluggable
         return $this->hasOne(Post::class)
             ->ofMany([
                 'id' => 'max',
-            ], function (Builder $query) {
+            ], function (Builder $query): void {
                 $query->where('type', 'forum');
             });
     }
@@ -168,9 +168,7 @@ class Topic extends Model implements Sluggable
                 $postsInLast24h = $recentPosts->count();
                 $postingScore = $postsInLast24h * 2;
 
-                $likesInLast24h = $recentPosts->sum(function ($post) {
-                    return $post->likes()->count();
-                });
+                $likesInLast24h = $recentPosts->sum(fn ($post) => $post->likes()->count());
                 $engagementScore = $likesInLast24h * 1;
 
                 $totalScore = $postingScore + $engagementScore;

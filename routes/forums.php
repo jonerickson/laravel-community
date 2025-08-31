@@ -7,11 +7,11 @@ use App\Http\Controllers\Forums\PostController;
 use App\Http\Controllers\Forums\TopicController;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => 'forums', 'as' => 'forums.'], function () {
+Route::group(['prefix' => 'forums', 'as' => 'forums.'], function (): void {
     Route::get('/', [ForumController::class, 'index'])->name('index');
     Route::get('/{forum:slug}', [ForumController::class, 'show'])->name('show');
 
-    Route::middleware(['auth', 'verified'])->group(function () {
+    Route::middleware(['auth', 'verified'])->group(function (): void {
         Route::post('/{forum:slug}/topics', [TopicController::class, 'store'])->name('topics.store');
         Route::get('/{forum:slug}/topics/create', [TopicController::class, 'create'])->name('topics.create');
         Route::delete('/{forum:slug}/topics/{topic:slug}', [TopicController::class, 'destroy'])->name('topics.destroy');

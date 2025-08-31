@@ -101,7 +101,7 @@ class Policy extends Model implements Sluggable
 
     public function scopeEffective($query)
     {
-        return $query->where(function ($q) {
+        return $query->where(function ($q): void {
             $q->whereNull('effective_at')
                 ->orWhere('effective_at', '<=', now());
         });

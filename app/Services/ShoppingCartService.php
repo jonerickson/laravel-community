@@ -40,9 +40,9 @@ class ShoppingCartService
 
     private function getProducts(array $productIds): Collection
     {
-        return Product::with(['prices' => function ($query) {
+        return Product::with(['prices' => function ($query): void {
             $query->where('is_active', true)->orderBy('is_default', 'desc');
-        }, 'defaultPrice', 'policies' => function ($query) {
+        }, 'defaultPrice', 'policies' => function ($query): void {
             $query->active()->effective()->orderBy('title');
         }])
             ->whereIn('id', $productIds)
@@ -52,14 +52,14 @@ class ShoppingCartService
 
     private function getPrices(array $priceIds): Collection
     {
-        return ! empty($priceIds)
-            ? ProductPrice::whereIn('id', $priceIds)->get()->keyBy('id')
-            : collect();
+        return blank($priceIds)
+            ? collect()
+            : ProductPrice::whereIn('id', $priceIds)->get()->keyBy('id');
     }
 
     private function mapCartItems(array $cart, Collection $products, Collection $prices): array
     {
-        return collect($cart)->map(function ($item) use ($products, $prices) {
+        return collect($cart)->map(function (array $item) use ($products, $prices): array {
             $product = $products->get($item['product_id']);
             $selectedPrice = $item['price_id'] ? $prices->get($item['price_id']) : null;
 

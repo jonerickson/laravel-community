@@ -129,7 +129,7 @@ class Product extends Model implements Sluggable
     {
         return $this->hasOne(ProductPrice::class)->ofMany([
             'id' => 'max',
-        ], function (Builder|ProductPrice $query) {
+        ], function (Builder|ProductPrice $query): void {
             $query->default()->active();
         });
     }

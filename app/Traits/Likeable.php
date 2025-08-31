@@ -26,7 +26,7 @@ trait Likeable
 
     public function userLike(?int $userId = null): ?Like
     {
-        $userId = $userId ?? auth()->id();
+        $userId ??= auth()->id();
 
         if (! $userId) {
             return null;
@@ -37,7 +37,7 @@ trait Likeable
 
     public function userLikes(?int $userId = null): Collection
     {
-        $userId = $userId ?? auth()->id();
+        $userId ??= auth()->id();
 
         if (! $userId) {
             return collect();
@@ -142,7 +142,7 @@ trait Likeable
 
                 $unicodes = $this->likes()->where('created_by', $userId)->pluck('emoji')->toArray();
 
-                return array_map([self::class, 'unicodeToEmoji'], $unicodes);
+                return array_map(self::unicodeToEmoji(...), $unicodes);
             }
         )->shouldCache();
     }

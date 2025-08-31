@@ -9,7 +9,7 @@ use App\Http\Controllers\Settings\PaymentMethodController;
 use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::redirect('settings', '/settings/account')->name('settings');
 
     Route::get('settings/account', [ProfileController::class, 'edit'])->name('settings.profile.edit');

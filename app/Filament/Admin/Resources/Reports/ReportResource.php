@@ -9,6 +9,7 @@ use App\Enums\ReportStatus;
 use App\Filament\Admin\Resources\Reports\Pages\ListReports;
 use App\Models\Report;
 use BackedEnum;
+use Carbon\CarbonInterface;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Forms;
@@ -37,7 +38,7 @@ class ReportResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::getModel()::where('status', ReportStatus::Pending)->count() ?: null;
+        return (string) static::getModel()::where('status', ReportStatus::Pending)->count() !== '' && (string) static::getModel()::where('status', ReportStatus::Pending)->count() !== '0' ? (string) static::getModel()::where('status', ReportStatus::Pending)->count() : null;
     }
 
     public static function getNavigationBadgeColor(): string|array|null
@@ -81,7 +82,7 @@ class ReportResource extends Resource
                         Forms\Components\Hidden::make('reviewed_by')
                             ->default(fn () => auth()->id()),
                         Forms\Components\Hidden::make('reviewed_at')
-                            ->default(fn () => now()),
+                            ->default(fn (): CarbonInterface => now()),
                     ]),
             ]);
     }
@@ -151,7 +152,7 @@ class ReportResource extends Resource
                     ->icon('heroicon-o-check')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->action(function (Report $record) {
+                    ->action(function (Report $record): void {
                         $record->approve(auth()->user());
                     })
                     ->visible(fn (Report $record): bool => $record->isPending()),
@@ -159,7 +160,7 @@ class ReportResource extends Resource
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->action(function (Report $record) {
+                    ->action(function (Report $record): void {
                         $record->reject(auth()->user());
                     })
                     ->visible(fn (Report $record): bool => $record->isPending()),
@@ -169,8 +170,8 @@ class ReportResource extends Resource
                     ->label('Approve Selected')
                     ->icon('heroicon-o-check')
                     ->color('success')
-                    ->action(function ($records) {
-                        $records->each(function (Report $record) {
+                    ->action(function ($records): void {
+                        $records->each(function (Report $record): void {
                             $record->approve(auth()->user());
                         });
                     }),
@@ -178,8 +179,8 @@ class ReportResource extends Resource
                     ->label('Reject Selected')
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
-                    ->action(function ($records) {
-                        $records->each(function (Report $record) {
+                    ->action(function ($records): void {
+                        $records->each(function (Report $record): void {
                             $record->reject(auth()->user());
                         });
                     }),

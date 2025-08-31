@@ -6,5 +6,5 @@ return [
     App\Providers\AppServiceProvider::class,
     App\Providers\Filament\AdminPanelProvider::class,
     App\Providers\Filament\MarketplacePanelProvider::class,
-    App\Providers\SparkServiceProvider::class,
+    App\Providers\SupportTicketServiceProvider::class,
 ];

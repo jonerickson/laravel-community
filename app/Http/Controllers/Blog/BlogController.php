@@ -47,7 +47,7 @@ class BlogController extends Controller
             'post' => $post->loadMissing(['author']),
             'comments' => Inertia::defer(fn () => $comments->items()),
             'commentsPagination' => Arr::except($comments->toArray(), ['data']),
-            'recentViewers' => Inertia::defer(fn () => $post->getRecentViewers()),
+            'recentViewers' => Inertia::defer(fn (): array => $post->getRecentViewers()),
         ]);
     }
 }

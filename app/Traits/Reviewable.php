@@ -23,7 +23,7 @@ trait Reviewable
     public function averageRating(): Attribute
     {
         return Attribute::make(
-            get: fn () => (float) $this->reviews()->avg('rating') ?: 0
+            get: fn (): float|int => (float) $this->reviews()->avg('rating') ?: 0
         )->shouldCache();
     }
 

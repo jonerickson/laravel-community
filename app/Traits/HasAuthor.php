@@ -29,7 +29,7 @@ trait HasAuthor
 
     protected static function bootHasAuthor(): void
     {
-        static::creating(function (Model $model) {
+        static::creating(function (Model $model): void {
             if (blank($model->getAttribute('created_by'))) {
                 $model->forceFill([
                     'created_by' => Auth::id(),

@@ -15,7 +15,7 @@ class CategoryController extends Controller
     {
         $categories = PolicyCategory::active()
             ->ordered()
-            ->with(['activePolicies' => function ($query) {
+            ->with(['activePolicies' => function ($query): void {
                 $query->effective()->ordered();
             }])
             ->get();

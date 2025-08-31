@@ -65,7 +65,7 @@ class PostController extends Controller
 
         $status = $post->is_published ? 'published' : 'unpublished';
 
-        return to_route('forums.topics.show', compact(['forum', 'topic', 'post']))
+        return to_route('forums.topics.show', ['forum' => $forum, 'topic' => $topic, 'post' => $post])
             ->with([
                 'message' => "Post $status successfully.",
                 'messageVariant' => 'success',
@@ -88,7 +88,7 @@ class PostController extends Controller
 
         $post->delete();
 
-        return to_route('forums.topics.show', compact(['forum', 'topic', 'post']))
+        return to_route('forums.topics.show', ['forum' => $forum, 'topic' => $topic, 'post' => $post])
             ->with([
                 'message' => 'Post deleted successfully.',
                 'messageVariant' => 'success',

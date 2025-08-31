@@ -4,18 +4,14 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\Group;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Group>
+ * @extends Factory<Group>
  */
 class GroupFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         $colors = [
@@ -35,7 +31,7 @@ class GroupFactory extends Factory
             'description' => fake()->sentence(),
             'color' => fake()->randomElement($colors),
             'order' => fake()->numberBetween(0, 100),
-            'is_active' => fake()->boolean(90), // 90% chance of being active
+            'is_active' => fake()->boolean(90),
         ];
     }
 }

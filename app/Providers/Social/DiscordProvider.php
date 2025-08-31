@@ -25,7 +25,7 @@ class DiscordProvider extends AbstractProvider
             Arr::get($response, 'access_token'),
             Arr::get($response, 'refresh_token', $refreshToken),
             Arr::get($response, 'expires_in'),
-            explode($this->scopeSeparator, Arr::get($response, 'scope', ''))
+            explode($this->scopeSeparator, (string) Arr::get($response, 'scope', ''))
         );
     }
 

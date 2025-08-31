@@ -14,7 +14,7 @@ use App\Http\Controllers\OAuth\CallbackController;
 use App\Http\Controllers\OAuth\RedirectController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('guest')->group(function () {
+Route::middleware('guest')->group(function (): void {
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
 
@@ -37,7 +37,7 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
 
-    Route::group(['prefix' => 'oauth'], function () {
+    Route::group(['prefix' => 'oauth'], function (): void {
         Route::get('redirect/{provider}', RedirectController::class)
             ->name('oauth.redirect');
         Route::get('callback/{provider}', CallbackController::class)
@@ -45,7 +45,7 @@ Route::middleware('guest')->group(function () {
     });
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth')->group(function (): void {
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
 

@@ -14,7 +14,7 @@ trait HasSlug
 {
     protected static function bootHasSlug(): void
     {
-        static::creating(function (Sluggable $model) {
+        static::creating(function (Sluggable $model): void {
             if (blank($model->getAttribute('slug'))) {
                 $model->forceFill([
                     'slug' => $model->generateSlug(),

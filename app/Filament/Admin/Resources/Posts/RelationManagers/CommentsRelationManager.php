@@ -42,14 +42,12 @@ class CommentsRelationManager extends RelationManager
                     ->helperText('The content of the comment.'),
                 Select::make('parent_id')
                     ->label('Reply to Comment')
-                    ->options(function (RelationManager $livewire) {
-                        return Comment::query()
-                            ->where('commentable_type', get_class($livewire->getOwnerRecord()))
-                            ->where('commentable_id', $livewire->getOwnerRecord()->id)
-                            ->whereNull('parent_id')
-                            ->pluck('content', 'id')
-                            ->map(fn (string $content) => strlen($content) > 50 ? substr($content, 0, 50).'...' : $content);
-                    })
+                    ->options(fn (RelationManager $livewire) => Comment::query()
+                        ->where('commentable_type', $livewire->getOwnerRecord()::class)
+                        ->where('commentable_id', $livewire->getOwnerRecord()->id)
+                        ->whereNull('parent_id')
+                        ->pluck('content', 'id')
+                        ->map(fn (string $content): string => strlen($content) > 50 ? substr($content, 0, 50).'...' : $content))
                     ->searchable()
                     ->nullable()
                     ->helperText('Select a parent comment if this is a reply.'),
@@ -153,8 +151,8 @@ class CommentsRelationManager extends RelationManager
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->requiresConfirmation()
-                        ->action(function ($records) {
-                            $records->each(function ($record) {
+                        ->action(function ($records): void {
+                            $records->each(function ($record): void {
                                 $record->update(['is_approved' => true]);
                             });
                         }),
@@ -163,8 +161,8 @@ class CommentsRelationManager extends RelationManager
                         ->icon('heroicon-o-x-circle')
                         ->color('warning')
                         ->requiresConfirmation()
-                        ->action(function ($records) {
-                            $records->each(function ($record) {
+                        ->action(function ($records): void {
+                            $records->each(function ($record): void {
                                 $record->update(['is_approved' => false]);
                             });
                         }),

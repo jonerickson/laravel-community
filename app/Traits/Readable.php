@@ -124,16 +124,14 @@ trait Readable
             ->take($limit)
             ->values();
 
-        return $recentViewers->map(function (Read $read) {
-            return [
-                'user' => [
-                    'id' => $read->author->id,
-                    'name' => $read->author->name,
-                    'avatar' => $read->author->avatar,
-                ],
-                'viewed_at' => $read->updated_at->toISOString(),
-            ];
-        })->toArray();
+        return $recentViewers->map(fn (Read $read): array => [
+            'user' => [
+                'id' => $read->author->id,
+                'name' => $read->author->name,
+                'avatar' => $read->author->avatar,
+            ],
+            'viewed_at' => $read->updated_at->toISOString(),
+        ])->toArray();
     }
 
     protected function initializeReadable(): void

@@ -28,7 +28,7 @@ class CheckoutController
         }
 
         $cartItems = $this->cartService->getCartItems();
-        if (empty($cartItems)) {
+        if (blank($cartItems)) {
             return ApiResource::error(
                 message: 'Cart is empty.',
                 errors: ['cart' => ['Cart cannot be empty.']],
@@ -76,7 +76,7 @@ class CheckoutController
                 'cancel_url' => route('store.cart.index'),
                 'mode' => 'subscription',
                 'metadata' => [
-                    'cart_items' => json_encode(array_map(fn ($item) => [
+                    'cart_items' => json_encode(array_map(fn (array $item): array => [
                         'product_id' => $item['product_id'],
                         'quantity' => $item['quantity'],
                     ], $cartItems)),

@@ -29,10 +29,9 @@ trait HasLogging
             $options->setDescriptionForEvent(fn (string $eventName) => $this->getActivityDescription($eventName));
         } else {
             $modelName = class_basename($this);
-            $options->setDescriptionForEvent(fn (string $eventName) => "{$modelName} {$eventName}");
+            $options->setDescriptionForEvent(fn (string $eventName): string => "$modelName $eventName");
         }
 
-        // Allow models to specify custom log name
         if (method_exists($this, 'getActivityLogName')) {
             $options->useLogName($this->getActivityLogName());
         }

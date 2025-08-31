@@ -49,7 +49,7 @@ class File extends Model
 
     protected static function booted()
     {
-        static::creating(function (File $model) {
+        static::creating(function (File $model): void {
             $model->forceFill([
                 'size' => Storage::fileSize($model->path),
                 'mime' => Storage::mimeType($model->path),

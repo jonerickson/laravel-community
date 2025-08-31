@@ -7,15 +7,15 @@ use App\Models\Post;
 use App\Models\Report;
 use App\Models\User;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->user = User::factory()->create();
     $this->targetUser = User::factory()->create();
     $this->post = Post::factory()->create();
 });
 
-test('authenticated user can submit a report', function () {
+test('authenticated user can submit a report', function (): void {
     $reportData = [
-        'reportable_type' => 'App\Models\User',
+        'reportable_type' => User::class,
         'reportable_id' => $this->targetUser->id,
         'reason' => ReportReason::Spam->value,
         'additional_info' => 'This user is posting spam content.',
@@ -33,7 +33,7 @@ test('authenticated user can submit a report', function () {
 
     $this->assertDatabaseHas('reports', [
         'created_by' => $this->user->id,
-        'reportable_type' => 'App\Models\User',
+        'reportable_type' => User::class,
         'reportable_id' => $this->targetUser->id,
         'reason' => ReportReason::Spam->value,
         'additional_info' => 'This user is posting spam content.',
@@ -41,17 +41,17 @@ test('authenticated user can submit a report', function () {
     ]);
 });
 
-test('user cannot report the same content twice', function () {
+test('user cannot report the same content twice', function (): void {
     // Create initial report
     Report::factory()->create([
         'created_by' => $this->user->id,
-        'reportable_type' => 'App\Models\User',
+        'reportable_type' => User::class,
         'reportable_id' => $this->targetUser->id,
         'reason' => ReportReason::Spam,
     ]);
 
     $reportData = [
-        'reportable_type' => 'App\Models\User',
+        'reportable_type' => User::class,
         'reportable_id' => $this->targetUser->id,
         'reason' => ReportReason::Harassment->value,
         'additional_info' => 'Another reason',
@@ -67,9 +67,9 @@ test('user cannot report the same content twice', function () {
         ]);
 });
 
-test('unauthenticated user cannot submit a report', function () {
+test('unauthenticated user cannot submit a report', function (): void {
     $reportData = [
-        'reportable_type' => 'App\Models\User',
+        'reportable_type' => User::class,
         'reportable_id' => $this->targetUser->id,
         'reason' => ReportReason::Spam->value,
     ];
@@ -79,7 +79,7 @@ test('unauthenticated user cannot submit a report', function () {
     $response->assertUnauthorized();
 });
 
-test('report requires valid data', function () {
+test('report requires valid data', function (): void {
     $response = $this->actingAs($this->user)
         ->postJson('/api/reports', []);
 
@@ -87,9 +87,9 @@ test('report requires valid data', function () {
         ->assertJsonValidationErrors(['reportable_type', 'reportable_id', 'reason']);
 });
 
-test('report reason must be valid enum value', function () {
+test('report reason must be valid enum value', function (): void {
     $reportData = [
-        'reportable_type' => 'App\Models\User',
+        'reportable_type' => User::class,
         'reportable_id' => $this->targetUser->id,
         'reason' => 'invalid_reason',
     ];
@@ -101,9 +101,9 @@ test('report reason must be valid enum value', function () {
         ->assertJsonValidationErrors(['reason']);
 });
 
-test('additional info has character limit', function () {
+test('additional info has character limit', function (): void {
     $reportData = [
-        'reportable_type' => 'App\Models\User',
+        'reportable_type' => User::class,
         'reportable_id' => $this->targetUser->id,
         'reason' => ReportReason::Other->value,
         'additional_info' => str_repeat('a', 1001), // Exceeds 1000 character limit
@@ -116,9 +116,9 @@ test('additional info has character limit', function () {
         ->assertJsonValidationErrors(['additional_info']);
 });
 
-test('can report different types of content', function () {
+test('can report different types of content', function (): void {
     $reportData = [
-        'reportable_type' => 'App\Models\User',
+        'reportable_type' => User::class,
         'reportable_id' => $this->post->id,
         'reason' => ReportReason::InappropriateContent->value,
         'additional_info' => 'This post contains inappropriate content.',
@@ -131,16 +131,16 @@ test('can report different types of content', function () {
 
     $this->assertDatabaseHas('reports', [
         'created_by' => $this->user->id,
-        'reportable_type' => 'App\Models\Post',
+        'reportable_type' => Post::class,
         'reportable_id' => $this->post->id,
         'reason' => ReportReason::InappropriateContent->value,
     ]);
 });
 
-test('report model relationships work correctly', function () {
+test('report model relationships work correctly', function (): void {
     $report = Report::factory()->create([
         'created_by' => $this->user->id,
-        'reportable_type' => 'App\Models\User',
+        'reportable_type' => User::class,
         'reportable_id' => $this->targetUser->id,
         'reviewed_by' => $this->user->id,
     ]);
@@ -153,7 +153,7 @@ test('report model relationships work correctly', function () {
     expect($report->reviewer->id)->toBe($this->user->id);
 });
 
-test('report enum provides correct labels and colors', function () {
+test('report enum provides correct labels and colors', function (): void {
     expect(ReportReason::Spam->getLabel())->toBe('Spam');
     expect(ReportReason::Harassment->getLabel())->toBe('Harassment');
     expect(ReportReason::Abuse->getColor())->toBe('danger');

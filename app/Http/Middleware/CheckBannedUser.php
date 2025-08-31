@@ -18,16 +18,14 @@ class CheckBannedUser
 
         if ($fingerprintId) {
             $fingerprint = UserFingerprint::where('fingerprint_id', $fingerprintId)->first();
-            if ($fingerprint && $fingerprint->isBanned()) {
-                if (! $request->routeIs('banned')) {
-                    if (Auth::check()) {
-                        return to_route('banned');
-                    }
-
-                    return response()->view('errors.banned', [
-                        'message' => 'This device has been banned from accessing the site.',
-                    ], 403);
+            if ($fingerprint && $fingerprint->isBanned() && ! $request->routeIs('banned')) {
+                if (Auth::check()) {
+                    return to_route('banned');
                 }
+
+                return response()->view('errors.banned', [
+                    'message' => 'This device has been banned from accessing the site.',
+                ], 403);
             }
         }
 

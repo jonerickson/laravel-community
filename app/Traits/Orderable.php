@@ -15,7 +15,7 @@ trait Orderable
 
     public static function bootOrderable(): void
     {
-        static::creating(function ($model) {
+        static::creating(function ($model): void {
             if (is_null($model->order)) {
                 $model->order = static::getNextOrder();
             }

@@ -90,9 +90,7 @@ class ProductResource extends Resource
                             ->helperText('Select policies that customers must agree to when purchasing this product.')
                             ->columnSpanFull()
                             ->preload()
-                            ->relationship('policies', 'title', function (Builder $query) {
-                                return $query->active()->effective()->orderBy('title');
-                            })
+                            ->relationship('policies', 'title', fn (Builder $query) => $query->active()->effective()->orderBy('title'))
                             ->multiple(),
                         RichEditor::make('description')
                             ->helperText('The main product overview.')
@@ -172,8 +170,8 @@ class ProductResource extends Resource
                     ->copyable()
                     ->copyMessage('Stripe Product ID copied')
                     ->placeholder('Not linked')
-                    ->icon(fn ($state) => $state ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
-                    ->iconColor(fn ($state) => $state ? 'success' : 'danger')
+                    ->icon(fn ($state): string => $state ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
+                    ->iconColor(fn ($state): string => $state ? 'success' : 'danger')
                     ->toggleable(),
                 TextColumn::make('created_at')
                     ->dateTime()

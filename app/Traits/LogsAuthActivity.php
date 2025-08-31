@@ -20,7 +20,7 @@ trait LogsAuthActivity
     {
         $properties = [];
 
-        if ($request) {
+        if ($request instanceof Request) {
             $properties['login_method'] = 'standard';
             $properties['remember_me'] = $request->boolean('remember');
         }
@@ -212,7 +212,7 @@ trait LogsAuthActivity
 
     protected function logAuthActivity(string $description, ?string $event = null, ?array $properties = [], ?int $userId = null): Activity
     {
-        $user = $userId ? static::find($userId) : Auth::user();
+        $user = $userId !== null && $userId !== 0 ? static::find($userId) : Auth::user();
 
         $activity = activity('auth')
             ->causedBy($user)
@@ -226,7 +226,7 @@ trait LogsAuthActivity
             $activity->performedOn($user);
         }
 
-        if ($event) {
+        if ($event !== null && $event !== '' && $event !== '0') {
             $activity->event($event);
         }
 

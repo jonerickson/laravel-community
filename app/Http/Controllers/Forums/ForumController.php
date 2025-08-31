@@ -18,7 +18,7 @@ class ForumController extends Controller
         $forums = Forum::active()
             ->ordered()
             ->withCount(['topics', 'posts'])
-            ->with(['latestTopics' => function ($query) {
+            ->with(['latestTopics' => function ($query): void {
                 $query->with(['author', 'lastPost.author'])
                     ->limit(3);
             }])

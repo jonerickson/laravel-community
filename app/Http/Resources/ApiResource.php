@@ -10,21 +10,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ApiResource extends JsonResource
 {
-    protected string $message;
-
-    protected array $meta;
-
-    protected ?array $errors;
-
-    protected int $status;
-
-    public function __construct($resource, string $message = 'Success', int $status = 200, array $meta = [], ?array $errors = null)
+    public function __construct($resource, protected string $message = 'Success', protected int $status = 200, protected array $meta = [], protected ?array $errors = null)
     {
         parent::__construct($resource);
-        $this->message = $message;
-        $this->status = $status;
-        $this->meta = $meta;
-        $this->errors = $errors;
     }
 
     public static function success($resource = null, string $message = 'Success', array $meta = []): self

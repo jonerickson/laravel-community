@@ -6,6 +6,7 @@ namespace App\Traits;
 
 use App\Models\View;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,7 +19,7 @@ trait Viewable
 
     public function userView(?int $userId = null): ?View
     {
-        $userId = $userId ?? Auth::id();
+        $userId ??= Auth::id();
 
         if (! $userId) {
             return null;
@@ -32,7 +33,7 @@ trait Viewable
         return $this->userView($userId) !== null;
     }
 
-    public function recordView(?int $userId = null): View|bool
+    public function recordView(?int $userId = null): Model|bool
     {
         $userId ??= Auth::id();
 

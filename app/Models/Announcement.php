@@ -83,11 +83,11 @@ class Announcement extends Model implements Sluggable
         $now = now();
 
         return $query->active()
-            ->where(function ($query) use ($now) {
+            ->where(function ($query) use ($now): void {
                 $query->whereNull('starts_at')
                     ->orWhere('starts_at', '<=', $now);
             })
-            ->where(function ($query) use ($now) {
+            ->where(function ($query) use ($now): void {
                 $query->whereNull('ends_at')
                     ->orWhere('ends_at', '>=', $now);
             });
