@@ -98,7 +98,7 @@ const footerNavItems: NavItem[] = [
     },
     {
         title: 'Support',
-        href: 'https://laravel.com/docs/starter-kits#react',
+        href: () => route('support.index'),
         icon: BookOpen,
     },
 ];

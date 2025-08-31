@@ -15,6 +15,72 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property string $ticket_number
+ * @property string $subject
+ * @property string $description
+ * @property SupportTicketStatus $status
+ * @property SupportTicketPriority $priority
+ * @property int $support_ticket_category_id
+ * @property int|null $assigned_to
+ * @property string|null $external_id
+ * @property string|null $external_driver
+ * @property array<array-key, mixed>|null $external_data
+ * @property Carbon|null $last_synced_at
+ * @property int $created_by
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $approvedComments
+ * @property-read int|null $approved_comments_count
+ * @property-read User|null $assignedTo
+ * @property-read string|null $assignee_name
+ * @property-read User $author
+ * @property-read mixed $author_name
+ * @property-read SupportTicketCategory $category
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $comments
+ * @property-read int $comments_count
+ * @property-read User $creator
+ * @property-read File|null $file
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, File> $files
+ * @property-read int|null $files_count
+ * @property-read bool $is_active
+ * @property-read string $priority_color
+ * @property-read string $priority_label
+ * @property-read string $status_color
+ * @property-read string $status_label
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $topLevelComments
+ * @property-read int|null $top_level_comments_count
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket active()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket assignedTo(\App\Models\User $user)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket byPriority(\App\Enums\SupportTicketPriority $priority)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket byStatus(\App\Enums\SupportTicketStatus $status)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket external(?string $driver = null)
+ * @method static \Database\Factories\SupportTicketFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket needsSyncing(int $hoursOld = 24)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket unassigned()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereAssignedTo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereExternalData($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereExternalDriver($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereExternalId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereLastSyncedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket wherePriority($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereSubject($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereSupportTicketCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereTicketNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereUpdatedAt($value)
+ *
+ * @mixin \Eloquent
+ */
 class SupportTicket extends Model
 {
     use Commentable;
@@ -57,11 +123,6 @@ class SupportTicket extends Model
     public function assignedTo(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_to');
-    }
-
-    public function assignee(): BelongsTo
-    {
-        return $this->assignedTo();
     }
 
     public function scopeActive($query)

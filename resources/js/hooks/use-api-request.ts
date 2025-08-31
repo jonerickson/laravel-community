@@ -12,7 +12,7 @@ interface UseApiRequestOptions<T> {
 interface ApiRequestParams {
     url: string;
     method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
-    data?: any;
+    data?: unknown;
     config?: AxiosRequestConfig;
 }
 

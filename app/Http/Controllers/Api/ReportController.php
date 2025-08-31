@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreReportRequest;
+use App\Http\Requests\Reports\StoreReportRequest;
 use App\Http\Resources\ApiResource;
 use App\Models\Report;
 use Illuminate\Support\Facades\Auth;

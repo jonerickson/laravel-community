@@ -21,3 +21,4 @@ require __DIR__.'/forums.php';
 require __DIR__.'/policies.php';
 require __DIR__.'/settings.php';
 require __DIR__.'/store.php';
+require __DIR__.'/support.php';

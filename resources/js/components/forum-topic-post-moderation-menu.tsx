@@ -43,7 +43,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                 onSuccess: () => toast.success(`The post has been deleted.`),
                 onError: (err) => {
                     console.error(err);
-                    toast.error(err.message || 'There was an error. Please try again.');
+                    toast.error(err.message || 'Unable to delete post. Please try again.');
                 },
             },
         );
@@ -70,7 +70,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                 onSuccess: () => toast.success(`The post has been ${action}ed.`),
                 onError: (err) => {
                     console.error(err);
-                    toast.error(err.message || 'There was an error. Please try again.');
+                    toast.error(err.message || 'Unable to update post. Please try again.');
                 },
             },
         );
@@ -97,7 +97,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                 },
                 onError: (err) => {
                     console.error(err);
-                    toast.error(err.message || 'There was an error. Please try again.');
+                    toast.error(err.message || 'Unable to unpin post. Please try again.');
                 },
             },
         );

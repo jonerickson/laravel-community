@@ -35,7 +35,7 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
                 onSuccess: () => toast.success(`The topic has been deleted.`),
                 onError: (err) => {
                     console.error(err);
-                    toast.error(err.message || 'There was an error. Please try again.');
+                    toast.error(err.message || 'Unable to delete topic. Please try again.');
                 },
             },
         );
@@ -62,7 +62,7 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
                 },
                 onError: (err) => {
                     console.error(err);
-                    toast.error(err.message || 'There was an error. Please try again.');
+                    toast.error(err.message || 'Unable to unpin topic. Please try again.');
                 },
             },
         );

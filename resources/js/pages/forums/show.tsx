@@ -146,7 +146,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                             <Heading title={forum.name} description={forum.description ?? ''} />
                         </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex shrink-0 items-center gap-2">
                         {isAdmin && (
                             <>
                                 {selectedTopics.length > 0 && (

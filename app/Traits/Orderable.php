@@ -22,9 +22,9 @@ trait Orderable
         });
     }
 
-    public function scopeOrdered(Builder $query)
+    public function scopeOrdered(Builder $query): void
     {
-        return $query->orderBy('order');
+        $query->orderBy('order');
     }
 
     public function moveUp(): void

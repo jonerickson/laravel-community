@@ -115,12 +115,7 @@ class CommentsRelationManager extends RelationManager
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('parent_id')),
             ])
             ->headerActions([
-                CreateAction::make()
-                    ->mutateDataUsing(function (array $data): array {
-                        $data['created_by'] = auth()->id();
-
-                        return $data;
-                    }),
+                CreateAction::make(),
             ])
             ->recordActions([
                 Action::make('approve')

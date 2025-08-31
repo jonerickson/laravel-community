@@ -81,7 +81,7 @@ use Laravel\Scout\Searchable;
  * @property-read string|null $user_reaction
  * @property-read array $user_reactions
  * @property-read Collection<int, View> $views
- * @property-read int $views_count
+ * @property-read string|int $views_count
  *
  * @method static Builder<static>|Post blog()
  * @method static \Database\Factories\PostFactory factory($count = null, $state = [])

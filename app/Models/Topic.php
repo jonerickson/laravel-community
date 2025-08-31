@@ -51,7 +51,7 @@ use Laravel\Scout\Searchable;
  * @property-read int $reads_count
  * @property-read int $unique_views_count
  * @property-read Collection<int, View> $views
- * @property-read int $views_count
+ * @property-read string|int $views_count
  *
  * @method static \Database\Factories\TopicFactory factory($count = null, $state = [])
  * @method static Builder<static>|Topic latestActivity()

@@ -20,6 +20,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 use UnitEnum;
 
 class ReportResource extends Resource
@@ -80,7 +81,7 @@ class ReportResource extends Resource
                             ->label('Admin Notes')
                             ->rows(3),
                         Forms\Components\Hidden::make('reviewed_by')
-                            ->default(fn () => auth()->id()),
+                            ->default(fn () => Auth::user()->getAuthIdentifier()),
                         Forms\Components\Hidden::make('reviewed_at')
                             ->default(fn (): CarbonInterface => now()),
                     ]),
@@ -153,7 +154,7 @@ class ReportResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->action(function (Report $record): void {
-                        $record->approve(auth()->user());
+                        $record->approve(Auth::user());
                     })
                     ->visible(fn (Report $record): bool => $record->isPending()),
                 Action::make('reject')
@@ -161,7 +162,7 @@ class ReportResource extends Resource
                     ->color('danger')
                     ->requiresConfirmation()
                     ->action(function (Report $record): void {
-                        $record->reject(auth()->user());
+                        $record->reject(Auth::user());
                     })
                     ->visible(fn (Report $record): bool => $record->isPending()),
             ])
@@ -172,7 +173,7 @@ class ReportResource extends Resource
                     ->color('success')
                     ->action(function ($records): void {
                         $records->each(function (Report $record): void {
-                            $record->approve(auth()->user());
+                            $record->approve(Auth::user());
                         });
                     }),
                 BulkAction::make('reject')
@@ -181,7 +182,7 @@ class ReportResource extends Resource
                     ->color('danger')
                     ->action(function ($records): void {
                         $records->each(function (Report $record): void {
-                            $record->reject(auth()->user());
+                            $record->reject(Auth::user());
                         });
                     }),
             ])

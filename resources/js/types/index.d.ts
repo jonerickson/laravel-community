@@ -330,3 +330,38 @@ export interface FingerprintTrackingResponse {
     first_seen: string;
     last_seen: string;
 }
+
+export interface SupportTicketCategory {
+    id: number;
+    name: string;
+    slug: string;
+    description?: string | null;
+    color?: string | null;
+    order: number;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface SupportTicket {
+    id: number;
+    subject: string;
+    description: string;
+    status: 'new' | 'open' | 'in_progress' | 'resolved' | 'closed';
+    priority: 'low' | 'medium' | 'high' | 'critical';
+    support_ticket_category_id: number;
+    category?: SupportTicketCategory;
+    assigned_to?: number | null;
+    assignedTo?: User | null;
+    created_by: number;
+    author?: User;
+    external_id?: string | null;
+    external_url?: string | null;
+    last_synced_at?: string | null;
+    resolved_at?: string | null;
+    closed_at?: string | null;
+    created_at: string;
+    updated_at: string;
+    comments?: Comment[];
+    files?: { id: string; name: string }[];
+}

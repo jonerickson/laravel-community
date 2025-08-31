@@ -40,7 +40,7 @@ use Laravel\Scout\Searchable;
  * @property-read int|null $active_prices_count
  * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
- * @property-read mixed $average_rating
+ * @property-read int|float $average_rating
  * @property-read Collection<int, ProductCategory> $categories
  * @property-read int|null $categories_count
  * @property-read Collection<int, Comment> $comments

@@ -22,7 +22,7 @@ export function StoreProductRating({ product, onRatingAdded }: ProductRatingProp
         e.preventDefault();
 
         if (rating === 0) {
-            toast.error('Please select a rating');
+            toast.error('Please select a rating.');
             return;
         }
 
@@ -31,7 +31,7 @@ export function StoreProductRating({ product, onRatingAdded }: ProductRatingProp
                 url: route('api.comments.store'),
                 method: 'POST',
                 data: {
-                    commentable_type: 'App\Models\Product',
+                    commentable_type: 'App\\Models\\Product',
                     commentable_id: product.id,
                     content: comment,
                     rating: rating,
