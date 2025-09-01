@@ -34,6 +34,8 @@ interface TopicShowProps {
 export default function TopicShow({ forum, topic, posts, postsPagination, recentViewers }: TopicShowProps) {
     const { auth, name: siteName } = usePage<SharedData>().props;
     const [showReplyForm, setShowReplyForm] = useState(false);
+    const [quotedContent, setQuotedContent] = useState<string>('');
+    const [quotedAuthor, setQuotedAuthor] = useState<string>('');
     const scrollToBottom = usePage<SharedData>().props.flash?.scrollToBottom;
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -75,6 +77,31 @@ export default function TopicShow({ forum, topic, posts, postsPagination, recent
                 }, 100);
             },
         });
+    };
+
+    const handleQuotePost = (postContent: string, authorName: string) => {
+        setQuotedContent(postContent);
+        setQuotedAuthor(authorName);
+        setShowReplyForm(true);
+
+        setTimeout(() => {
+            const replyForm = document.querySelector('[data-reply-form]');
+            if (replyForm) {
+                replyForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
+    };
+
+    const handleReplySuccess = () => {
+        setShowReplyForm(false);
+        setQuotedContent('');
+        setQuotedAuthor('');
+    };
+
+    const handleReplyCancel = () => {
+        setShowReplyForm(false);
+        setQuotedContent('');
+        setQuotedAuthor('');
     };
 
     const structuredData = {
@@ -187,8 +214,10 @@ export default function TopicShow({ forum, topic, posts, postsPagination, recent
                         <ForumTopicReply
                             forumSlug={forum.slug}
                             topicSlug={topic.slug}
-                            onCancel={() => setShowReplyForm(false)}
-                            onSuccess={() => setShowReplyForm(false)}
+                            onCancel={handleReplyCancel}
+                            onSuccess={handleReplySuccess}
+                            quotedContent={quotedContent}
+                            quotedAuthor={quotedAuthor}
                         />
                     </div>
                 )}
@@ -203,7 +232,14 @@ export default function TopicShow({ forum, topic, posts, postsPagination, recent
                 {posts.length > 0 && (
                     <div className="grid gap-4">
                         {posts.map((post, index) => (
-                            <ForumTopicPost key={post.id} post={post} index={index} forum={forum} topic={topic} />
+                            <ForumTopicPost
+                                key={post.id}
+                                post={post}
+                                index={index}
+                                forum={forum}
+                                topic={topic}
+                                onQuote={handleQuotePost}
+                            />
                         ))}
                     </div>
                 )}

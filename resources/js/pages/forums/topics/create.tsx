@@ -67,7 +67,7 @@ export default function CreateTopic({ forum }: CreateTopicProps) {
                                     placeholder="Title"
                                     required
                                 />
-                                {errors.title && <InputError message={errors.title} />}
+                                <InputError message={errors.title} />
                             </div>
 
                             <div className="space-y-2">
@@ -76,7 +76,7 @@ export default function CreateTopic({ forum }: CreateTopicProps) {
                                     onChange={(content) => setData('content', content)}
                                     placeholder="Write the first post for your topic. Be detailed and clear to encourage discussion."
                                 />
-                                {errors.content && <InputError message={errors.content} />}
+                                <InputError message={errors.content} />
                                 <div className="text-xs text-muted-foreground">This will be the first post in your topic thread.</div>
                             </div>
 

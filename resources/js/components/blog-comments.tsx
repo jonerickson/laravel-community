@@ -272,7 +272,7 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
                             className="min-h-[120px]"
                             required
                         />
-                        {errors.content && <InputError message={errors.content} />}
+                        <InputError message={errors.content} />
                     </div>
                     <Button type="submit" disabled={processing}>
                         {processing ? 'Posting...' : 'Post comment'}

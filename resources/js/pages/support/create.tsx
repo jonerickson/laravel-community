@@ -82,7 +82,7 @@ export default function CreateSupportTicket({ categories }: CreateSupportTicketP
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                {errors.support_ticket_category_id && <InputError message={errors.support_ticket_category_id} />}
+                                <InputError message={errors.support_ticket_category_id} />
                             </div>
 
                             <div className="grid gap-2">
@@ -95,7 +95,7 @@ export default function CreateSupportTicket({ categories }: CreateSupportTicketP
                                     placeholder="Brief description of your issue"
                                     required
                                 />
-                                {errors.subject && <InputError message={errors.subject} />}
+                                <InputError message={errors.subject} />
                             </div>
 
                             <div className="grid gap-2">
@@ -108,7 +108,7 @@ export default function CreateSupportTicket({ categories }: CreateSupportTicketP
                                     rows={8}
                                     required
                                 />
-                                {errors.description && <InputError message={errors.description} />}
+                                <InputError message={errors.description} />
                                 <div className="text-xs text-muted-foreground">
                                     The more details you provide, the faster we can help resolve your issue.
                                 </div>

@@ -105,7 +105,7 @@ export default function Profile() {
                                 autoComplete="name"
                                 placeholder="Full name"
                             />
-                            <InputError className="mt-2" message={errors.name} />
+                            <InputError message={errors.name} />
                         </div>
 
                         <div className="grid gap-2">
@@ -119,7 +119,7 @@ export default function Profile() {
                                 autoComplete="username"
                                 disabled
                             />
-                            <InputError className="mt-2" message={errors.email} />
+                            <InputError message={errors.email} />
                         </div>
 
                         <div className="grid gap-2">
@@ -130,10 +130,10 @@ export default function Profile() {
                                 placeholder="Your forum signature (optional)"
                                 className="mt-1"
                             />
+                            <InputError message={errors.signature} />
                             <p className="text-sm text-muted-foreground">
                                 This signature will appear under your posts in forums. Keep it concise and professional.
                             </p>
-                            <InputError className="mt-2" message={errors.signature} />
                         </div>
 
                         <div className="flex items-center gap-4">

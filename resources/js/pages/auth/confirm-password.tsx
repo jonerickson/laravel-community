@@ -42,7 +42,6 @@ export default function ConfirmPassword() {
                             autoFocus
                             onChange={(e) => setData('password', e.target.value)}
                         />
-
                         <InputError message={errors.password} />
                     </div>
 

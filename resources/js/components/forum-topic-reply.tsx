@@ -3,18 +3,28 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { useForm } from '@inertiajs/react';
+import { useEffect } from 'react';
 
 interface ForumTopicReplyProps {
     forumSlug: string;
     topicSlug: string;
     onCancel?: () => void;
     onSuccess?: () => void;
+    quotedContent?: string;
+    quotedAuthor?: string;
 }
 
-export default function ForumTopicReply({ forumSlug, topicSlug, onCancel, onSuccess }: ForumTopicReplyProps) {
+export default function ForumTopicReply({ forumSlug, topicSlug, onCancel, onSuccess, quotedContent, quotedAuthor }: ForumTopicReplyProps) {
     const { data, setData, post, processing, errors, reset } = useForm({
         content: '',
     });
+
+    useEffect(() => {
+        if (quotedContent && quotedAuthor) {
+            const quotedText = `<blockquote><strong>${quotedAuthor} wrote:</strong><br>${quotedContent}</blockquote><br><br>`;
+            setData('content', quotedText);
+        }
+    }, [quotedContent, quotedAuthor, setData]);
 
     const handleReply = (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,19 +40,19 @@ export default function ForumTopicReply({ forumSlug, topicSlug, onCancel, onSucc
     };
 
     return (
-        <Card>
+        <Card data-reply-form>
             <CardHeader>
                 <CardTitle>Reply to Topic</CardTitle>
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleReply} className="space-y-4">
-                    <div>
+                    <div className="grid gap-2">
                         <RichTextEditor
                             content={data.content}
                             onChange={(content) => setData('content', content)}
                             placeholder="Write your reply..."
                         />
-                        {errors.content && <InputError message={errors.content} />}
+                        <InputError message={errors.content} />
                     </div>
 
                     <div className="flex items-center gap-2">

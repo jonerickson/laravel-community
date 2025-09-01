@@ -69,7 +69,7 @@ export default function DeletePaymentMethodDialog({ open, onOpenChange, paymentM
                         </div>
                     )}
 
-                    {error && <InputError message={error} />}
+                    <InputError message={error} />
                 </div>
 
                 <DialogFooter>

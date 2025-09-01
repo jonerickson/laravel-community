@@ -15,9 +15,10 @@ interface ForumTopicPostProps {
     index: number;
     forum: Forum;
     topic: Topic;
+    onQuote?: (content: string, authorName: string) => void;
 }
 
-export default function ForumTopicPost({ post, index, forum, topic }: ForumTopicPostProps) {
+export default function ForumTopicPost({ post, index, forum, topic, onQuote }: ForumTopicPostProps) {
     const { auth } = usePage<SharedData>().props;
 
     const isHiddenForUser = post.is_reported && !auth.isAdmin;
@@ -26,6 +27,15 @@ export default function ForumTopicPost({ post, index, forum, topic }: ForumTopic
         if (!post.is_published) return 'border-warning-foreground bg-warning';
         if (post.is_reported && auth.isAdmin) return 'border-destructive-foreground bg-destructive/10';
         return '';
+    };
+
+    const handleQuote = () => {
+        if (onQuote && post.author?.name) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = post.content;
+            const cleanContent = tempDiv.textContent || tempDiv.innerText || '';
+            onQuote(cleanContent, post.author.name);
+        }
     };
 
     if (isHiddenForUser) {
@@ -93,7 +103,12 @@ export default function ForumTopicPost({ post, index, forum, topic }: ForumTopic
                                 {auth?.user && (
                                     <div className="mt-2 flex items-start justify-between">
                                         <div className="flex gap-2">
-                                            <Button variant="ghost" size="sm" className="h-8 px-3 text-muted-foreground">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 px-3 text-muted-foreground"
+                                                onClick={handleQuote}
+                                            >
                                                 <Quote className="mr-1 size-3" />
                                                 Quote
                                             </Button>

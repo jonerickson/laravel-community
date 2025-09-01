@@ -81,7 +81,7 @@ export default function AddPaymentMethodDialog({ open, onOpenChange }: AddPaymen
                         </div>
                     </div>
 
-                    {error && <InputError message={error} />}
+                    <InputError message={error} />
 
                     <div className="flex justify-end gap-2 pt-4">
                         <Button type="button" variant="outline" onClick={handleClose} disabled={loading}>
