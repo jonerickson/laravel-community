@@ -4,6 +4,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import TextAlign from '@tiptap/extension-text-align';
+import { Code as CodeExtension }from '@tiptap/extension-code';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -13,7 +14,16 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Bold, Italic, List, ListOrdered, Quote, Undo, Redo, Link as LinkIcon, Smile, ImageIcon, AlignLeft, AlignCenter, AlignRight, AlignJustify, MoreHorizontal, Code } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Quote, Undo, Redo, Link as LinkIcon, Smile, ImageIcon, AlignLeft, AlignCenter, AlignRight, AlignJustify, MoreHorizontal, Code,
+    Strikethrough,
+    Underline,
+    Heading1,
+    Heading2,
+    Heading3,
+    Heading4,
+    Heading5,
+    Heading6
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
 
@@ -407,6 +417,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                 emojis: gitHubEmojis,
                 enableEmoticons: true,
             }),
+            CodeExtension
         ],
         content,
         onUpdate: ({ editor }) => {
@@ -438,6 +449,67 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                         icon={Italic}
                         isActive={editor.isActive('italic')}
                     />
+                    <ToolbarButton
+                        action={() => editor.chain().focus().toggleStrike().run()}
+                        icon={Strikethrough}
+                        isActive={editor.isActive('strike')}
+                    />
+                    <ToolbarButton
+                        action={() => editor.chain().focus().toggleUnderline().run()}
+                        icon={Underline}
+                        isActive={editor.isActive('underline')}
+                    />
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button type="button" variant="ghost" size="sm">
+                                <Heading1 className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                                onClick={() => editor.chain().focus().toggleHeading({level: 1}).run()}
+                                className="flex items-center gap-2"
+                            >
+                                <Heading1 className="h-4 w-4" />
+                                Heading 1
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => editor.chain().focus().toggleHeading({level: 2}).run()}
+                                className="flex items-center gap-2"
+                            >
+                                <Heading2 className="h-4 w-4" />
+                                Heading 2
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => editor.chain().focus().toggleHeading({level: 3}).run()}
+                                className="flex items-center gap-2"
+                            >
+                                <Heading3 className="h-4 w-4" />
+                                Heading 3
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => editor.chain().focus().toggleHeading({level: 4}).run()}
+                                className="flex items-center gap-2"
+                            >
+                                <Heading4 className="h-4 w-4" />
+                                Heading 4
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => editor.chain().focus().toggleHeading({level: 5}).run()}
+                                className="flex items-center gap-2"
+                            >
+                                <Heading5 className="h-4 w-4" />
+                                Heading 5
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => editor.chain().focus().toggleHeading({level: 6}).run()}
+                                className="flex items-center gap-2"
+                            >
+                                <Heading6 className="h-4 w-4" />
+                                Heading 6
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                     <ToolbarSeparator />
                     <ToolbarButton
                         action={() => editor.chain().focus().toggleBulletList().run()}
@@ -521,7 +593,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                 <div className="p-3 min-h-[150px] cursor-text" onClick={() => editor?.chain().focus().run()}>
                     <EditorContent
                         editor={editor}
-                        className="prose prose-sm max-w-none focus-within:outline-none [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:min-h-[120px] [&_.ProseMirror]:cursor-text [&_.ProseMirror_a]:text-blue-600 [&_.ProseMirror_a]:underline [&_.ProseMirror_a]:decoration-blue-600 [&_.ProseMirror_a]:underline-offset-2 [&_.ProseMirror_a]:cursor-pointer dark:[&_.ProseMirror_a]:text-blue-400 dark:[&_.ProseMirror_a]:decoration-blue-400 [&_.ProseMirror_pre]:bg-muted [&_.ProseMirror_pre]:border [&_.ProseMirror_pre]:border-border [&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:rounded-md [&_.ProseMirror_pre]:font-mono [&_.ProseMirror_pre]:text-sm [&_.ProseMirror_pre]:overflow-x-auto [&_.ProseMirror_pre]:my-4 [&_.ProseMirror_pre]:relative [&_.ProseMirror_pre_code]:bg-transparent [&_.ProseMirror_pre_code]:p-0 [&_.ProseMirror_pre_code]:text-foreground [&_.ProseMirror_pre_code]:font-mono"
+                        className="prose prose-sm max-w-none focus-within:outline-none [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:min-h-[120px] [&_.ProseMirror]:cursor-text [&_.ProseMirror_a]:text-blue-600 [&_.ProseMirror_a]:underline [&_.ProseMirror_a]:decoration-blue-600 [&_.ProseMirror_a]:underline-offset-2 [&_.ProseMirror_a]:cursor-pointer dark:[&_.ProseMirror_a]:text-blue-400 dark:[&_.ProseMirror_a]:decoration-blue-400 [&_.ProseMirror_pre]:bg-muted [&_.ProseMirror_pre]:border [&_.ProseMirror_pre]:border-border [&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:rounded-md [&_.ProseMirror_pre]:font-mono [&_.ProseMirror_pre]:text-sm [&_.ProseMirror_pre]:overflow-x-auto [&_.ProseMirror_pre]:my-4 [&_.ProseMirror_pre]:relative [&_.ProseMirror_pre_code]:bg-transparent [&_.ProseMirror_pre_code]:p-0 [&_.ProseMirror_pre_code]:text-foreground [&_.ProseMirror_pre_code]:font-mono [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:italic [&_.ProseMirror_blockquote]:bg-muted [&_.ProseMirror_blockquote]:py-2 [&_.ProseMirror_blockquote]:text-muted-foreground [&_.ProseMirror_blockquote]:border-border [&_.ProseMirror_blockquote]:my-4"
                     />
                 </div>
             </div>
