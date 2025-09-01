@@ -43,6 +43,7 @@ class DatabaseSeeder extends Seeder
             ProductSeeder::class,
             ForumSeeder::class,
             PolicySeeder::class,
+            SupportTicketCategorySeeder::class,
         ]);
     }
 }

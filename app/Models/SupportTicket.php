@@ -27,8 +27,10 @@ use Illuminate\Support\Carbon;
  * @property string|null $external_id
  * @property string|null $external_driver
  * @property array<array-key, mixed>|null $external_data
- * @property Carbon|null $last_synced_at
  * @property int $created_by
+ * @property Carbon|null $closed_at
+ * @property Carbon|null $resolved_at
+ * @property Carbon|null $last_synced_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $approvedComments
@@ -45,10 +47,6 @@ use Illuminate\Support\Carbon;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, File> $files
  * @property-read int|null $files_count
  * @property-read bool $is_active
- * @property-read string $priority_color
- * @property-read string $priority_label
- * @property-read string $status_color
- * @property-read string $status_label
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $topLevelComments
  * @property-read int|null $top_level_comments_count
  *
@@ -64,6 +62,7 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket unassigned()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereAssignedTo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereClosedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereCreatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereDescription($value)
@@ -73,6 +72,7 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereLastSyncedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket wherePriority($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereResolvedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereSubject($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicket whereSupportTicketCategoryId($value)
@@ -88,6 +88,11 @@ class SupportTicket extends Model
     use HasFactory;
     use HasFiles;
 
+    protected $attributes = [
+        'status' => SupportTicketStatus::New,
+        'priority' => SupportTicketPriority::Low,
+    ];
+
     protected $fillable = [
         'ticket_number',
         'subject',
@@ -100,6 +105,12 @@ class SupportTicket extends Model
         'external_driver',
         'external_data',
         'last_synced_at',
+        'closed_at',
+        'resolved_at',
+    ];
+
+    protected $appends = [
+        'is_active',
     ];
 
     protected $hidden = [
@@ -186,7 +197,7 @@ class SupportTicket extends Model
 
     public function canTransitionTo(SupportTicketStatus $status): bool
     {
-        return $this->statusEnum()->canTransitionTo($status);
+        return $this->status->canTransitionTo($status);
     }
 
     public function updateStatus(SupportTicketStatus $status): bool
@@ -213,14 +224,18 @@ class SupportTicket extends Model
         return $this->update(['last_synced_at' => Carbon::now()]);
     }
 
-    public function statusEnum(): SupportTicketStatus
+    public function isActive(): Attribute
     {
-        return SupportTicketStatus::from($this->status);
+        return Attribute::make(
+            get: fn (): bool => $this->status->isActive()
+        );
     }
 
-    public function priorityEnum(): SupportTicketPriority
+    public function assigneeName(): Attribute
     {
-        return SupportTicketPriority::from($this->priority);
+        return Attribute::make(
+            get: fn (): ?string => $this->assignedTo?->name
+        );
     }
 
     protected static function booted(): void
@@ -229,57 +244,7 @@ class SupportTicket extends Model
             if (blank($ticket->ticket_number)) {
                 $ticket->ticket_number = static::generateTicketNumber();
             }
-
-            if (blank($ticket->status)) {
-                $ticket->status = SupportTicketStatus::New;
-            }
-
-            if (blank($ticket->priority)) {
-                $ticket->priority = SupportTicketPriority::Medium;
-            }
         });
-    }
-
-    protected function statusLabel(): Attribute
-    {
-        return Attribute::make(
-            get: fn (): string => $this->statusEnum()->label()
-        );
-    }
-
-    protected function priorityLabel(): Attribute
-    {
-        return Attribute::make(
-            get: fn (): string => $this->priorityEnum()->label()
-        );
-    }
-
-    protected function statusColor(): Attribute
-    {
-        return Attribute::make(
-            get: fn (): string => $this->statusEnum()->color()
-        );
-    }
-
-    protected function priorityColor(): Attribute
-    {
-        return Attribute::make(
-            get: fn (): string => $this->priorityEnum()->color()
-        );
-    }
-
-    protected function isActive(): Attribute
-    {
-        return Attribute::make(
-            get: fn (): bool => $this->statusEnum()->isActive()
-        );
-    }
-
-    protected function assigneeName(): Attribute
-    {
-        return Attribute::make(
-            get: fn (): ?string => $this->assignedTo?->name
-        );
     }
 
     protected function casts(): array
@@ -289,6 +254,8 @@ class SupportTicket extends Model
             'priority' => SupportTicketPriority::class,
             'external_data' => 'array',
             'last_synced_at' => 'datetime',
+            'closed_at' => 'datetime',
+            'resolved_at' => 'datetime',
         ];
     }
 }

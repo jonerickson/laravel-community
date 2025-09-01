@@ -7,18 +7,16 @@ import { Pagination } from '@/components/ui/pagination';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, PaginatedData, SupportTicket } from '@/types';
 import { formatPriority, formatStatus, getPriorityVariant, getStatusVariant } from '@/utils/support-ticket';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Calendar, Clock, Flag, HelpCircle, Plus, Tag, Ticket, User } from 'lucide-react';
 
 interface SupportTicketsIndexProps {
-    tickets: PaginatedData & {
-        data: SupportTicket[];
-    };
+    tickets: SupportTicket[];
+    ticketsPagination: PaginatedData;
 }
 
-
-export default function SupportTicketsIndex({ tickets }: SupportTicketsIndexProps) {
+export default function SupportTicketsIndex({ tickets, ticketsPagination }: SupportTicketsIndexProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Support',
@@ -30,42 +28,38 @@ export default function SupportTicketsIndex({ tickets }: SupportTicketsIndexProp
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Support Tickets" />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl">
-                <div className="flex items-center justify-between">
-                    <Heading
-                        title={
-                            <div className="flex items-center gap-2">
-                                <HelpCircle className="size-6" />
-                                Support Tickets
-                            </div>
-                        }
-                        description="View and manage your support tickets"
-                    />
-                    <Button asChild>
-                        <Link href={route('support.create')}>
-                            <Plus className="size-4" />
-                            Create New Ticket
-                        </Link>
-                    </Button>
+                <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center sm:gap-0">
+                    <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-white">
+                            <HelpCircle className="h-6 w-6" />
+                        </div>
+                        <div className="-mb-6">
+                            <Heading title="Support Tickets" description="View and manage your support tickets" />
+                        </div>
+                    </div>
+
+                    <div className="flex shrink-0 items-center gap-2">
+                        <Button asChild>
+                            <Link href={route('support.create')}>
+                                <Plus className="size-4" />
+                                Create New Ticket
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
-                {tickets.data.length === 0 ? (
+                {tickets.length === 0 ? (
                     <EmptyState
-                        icon={Ticket}
+                        icon={<Ticket className="h-12 w-12" />}
                         title="No support tickets found"
                         description="You haven't created any support tickets yet. Create one to get help from our support team."
-                        action={
-                            <Button asChild>
-                                <Link href={route('support.create')}>
-                                    <Plus className="size-4" />
-                                    Create Your First Ticket
-                                </Link>
-                            </Button>
-                        }
+                        buttonText="Create Your First Ticket"
+                        onButtonClick={() => router.get(route('support.create'))}
                     />
                 ) : (
                     <>
                         <div className="grid gap-4">
-                            {tickets.data.map((ticket) => (
+                            {tickets.map((ticket) => (
                                 <Card key={ticket.id} className="transition-shadow hover:shadow-md">
                                     <CardHeader className="pb-3">
                                         <div className="flex items-start justify-between gap-4">
@@ -114,19 +108,7 @@ export default function SupportTicketsIndex({ tickets }: SupportTicketsIndexProp
                             ))}
                         </div>
 
-                        {tickets.last_page > 1 && (
-                            <div className="flex justify-center">
-                                <Pagination
-                                    currentPage={tickets.current_page}
-                                    lastPage={tickets.last_page}
-                                    perPage={tickets.per_page}
-                                    total={tickets.total}
-                                    from={tickets.from}
-                                    to={tickets.to}
-                                    links={tickets.links}
-                                />
-                            </div>
-                        )}
+                        <Pagination pagination={ticketsPagination} baseUrl={''} entityLabel={'ticket'} />
                     </>
                 )}
 

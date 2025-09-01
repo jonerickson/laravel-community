@@ -39,11 +39,11 @@ enum SupportTicketStatus: string implements HasColor, HasLabel
     public function canTransitionTo(self $status): bool
     {
         return match ($this) {
-            self::New => in_array($status, [self::Open, self::InProgress, self::Closed]),
+            self::New => in_array($status, [self::Open, self::InProgress, self::Closed, self::Resolved]),
             self::Open => in_array($status, [self::InProgress, self::Resolved, self::Closed]),
             self::InProgress => in_array($status, [self::Open, self::Resolved, self::Closed]),
             self::Resolved => in_array($status, [self::Open, self::Closed]),
-            self::Closed => false,
+            self::Closed => $status == self::Open,
         };
     }
 

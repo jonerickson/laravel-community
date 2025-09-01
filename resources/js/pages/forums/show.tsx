@@ -142,7 +142,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                         <div className="flex h-12 w-12 items-center justify-center rounded-lg text-white" style={{ backgroundColor: forum.color }}>
                             <MessageSquare className="h-6 w-6" />
                         </div>
-                        <div className="-mb-8">
+                        <div className="-mb-6">
                             <Heading title={forum.name} description={forum.description ?? ''} />
                         </div>
                     </div>

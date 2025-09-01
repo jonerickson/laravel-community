@@ -364,4 +364,5 @@ export interface SupportTicket {
     updated_at: string;
     comments?: Comment[];
     files?: { id: string; name: string }[];
+    is_active: boolean;
 }

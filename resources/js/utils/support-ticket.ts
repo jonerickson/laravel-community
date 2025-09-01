@@ -6,7 +6,7 @@ export function getStatusVariant(status: string) {
         case 'in_progress':
             return 'secondary';
         case 'resolved':
-            return 'outline';
+            return 'success';
         case 'closed':
             return 'destructive';
         default:

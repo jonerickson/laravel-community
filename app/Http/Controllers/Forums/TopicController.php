@@ -34,7 +34,7 @@ class TopicController extends Controller
         return Inertia::render('forums/topics/show', [
             'forum' => $forum,
             'topic' => $topic->load(['author', 'forum']),
-            'posts' => $posts->items(),
+            'posts' => Inertia::merge(fn () => $posts->items()),
             'postsPagination' => Arr::except($posts->toArray(), ['data']),
             'recentViewers' => Inertia::defer(fn (): array => $topic->getRecentViewers()),
         ]);

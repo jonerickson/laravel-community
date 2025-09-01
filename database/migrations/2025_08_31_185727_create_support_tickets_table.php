@@ -25,8 +25,10 @@ return new class extends Migration
             $table->string('external_id')->nullable();
             $table->string('external_driver')->nullable();
             $table->json('external_data')->nullable();
-            $table->timestamp('last_synced_at')->nullable();
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
+            $table->timestamp('closed_at')->nullable();
+            $table->timestamp('resolved_at')->nullable();
+            $table->timestamp('last_synced_at')->nullable();
             $table->timestamps();
 
             $table->index(['status', 'priority']);

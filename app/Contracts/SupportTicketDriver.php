@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Contracts;
 
+use App\Enums\SupportTicketStatus;
+use App\Models\Comment;
 use App\Models\SupportTicket;
 use Illuminate\Support\Collection;
 
@@ -29,9 +31,15 @@ interface SupportTicketDriver
 
     public function addComment(SupportTicket $ticket, string $content, ?int $userId = null): bool;
 
+    public function deleteComment(SupportTicket $ticket, Comment $comment): bool;
+
     public function assignTicket(SupportTicket $ticket, ?string $externalUserId = null): bool;
 
-    public function updateStatus(SupportTicket $ticket, string $status): bool;
+    public function updateStatus(SupportTicket $ticket, SupportTicketStatus $status): bool;
+
+    public function closeTicket(SupportTicket $ticket): bool;
+
+    public function resolveTicket(SupportTicket $ticket): bool;
 
     public function uploadAttachment(SupportTicket $ticket, string $filePath, string $filename): ?array;
 

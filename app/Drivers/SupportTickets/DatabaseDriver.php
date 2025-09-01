@@ -12,9 +12,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use ValueError;
 
 class DatabaseDriver implements SupportTicketDriver
 {
@@ -90,10 +88,14 @@ class DatabaseDriver implements SupportTicketDriver
             'commentable_id' => $ticket->id,
             'content' => $content,
             'is_approved' => true,
-            'created_by' => $userId ?? Auth::id(),
         ]);
 
         return $comment->exists;
+    }
+
+    public function deleteComment(SupportTicket $ticket, Comment $comment): bool
+    {
+        return $comment->delete();
     }
 
     public function assignTicket(SupportTicket $ticket, ?string $externalUserId = null): bool
@@ -105,15 +107,35 @@ class DatabaseDriver implements SupportTicketDriver
         return $ticket->unassign();
     }
 
-    public function updateStatus(SupportTicket $ticket, string $status): bool
+    public function updateStatus(SupportTicket $ticket, SupportTicketStatus $status): bool
     {
-        try {
-            $statusEnum = SupportTicketStatus::from($status);
+        return $ticket->updateStatus($status);
+    }
 
-            return $ticket->updateStatus($statusEnum);
-        } catch (ValueError) {
-            return false;
+    public function closeTicket(SupportTicket $ticket): bool
+    {
+        if ($ticket->updateStatus(SupportTicketStatus::Closed)) {
+            $ticket->update([
+                'closed_at' => now(),
+            ]);
+
+            return true;
         }
+
+        return false;
+    }
+
+    public function resolveTicket(SupportTicket $ticket): bool
+    {
+        if ($ticket->updateStatus(SupportTicketStatus::Resolved)) {
+            $ticket->update([
+                'resolved_at' => now(),
+            ]);
+
+            return true;
+        }
+
+        return false;
     }
 
     public function uploadAttachment(SupportTicket $ticket, string $filePath, string $filename): ?array

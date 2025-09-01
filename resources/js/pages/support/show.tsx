@@ -1,22 +1,28 @@
 import Heading from '@/components/heading';
+import SupportTicketCommentForm from '@/components/support-ticket-comment-form';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { useApiRequest } from '@/hooks/use-api-request';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Comment, SupportTicket } from '@/types';
 import { formatPriority, formatStatus, getPriorityVariant, getStatusVariant } from '@/utils/support-ticket';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { Calendar, Clock, FileText, Flag, MessageCircle, Tag, Ticket, User } from 'lucide-react';
+import { Calendar, CheckCircle, Clock, FileText, Flag, Lock, LockOpen, MessageCircle, Tag, Ticket, User, XCircle } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface SupportTicketShowProps {
     ticket: SupportTicket;
 }
 
-
 export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
+    const [showCommentForm, setShowCommentForm] = useState(false);
+    const { execute: updateTicket, loading: ticketUpdating } = useApiRequest();
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Support',
@@ -31,6 +37,37 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
     const createdAt = new Date(ticket.created_at);
     const updatedAt = new Date(ticket.updated_at);
 
+    const handleCommentSuccess = () => {
+        setShowCommentForm(false);
+        router.reload({ only: ['ticket'] });
+    };
+
+    const handleTicketAction = async (action: string) => {
+        if (!window.confirm(`Are you sure you want to ${action} this ticket?`)) {
+            return;
+        }
+
+        await updateTicket(
+            {
+                url: route('api.support'),
+                method: 'POST',
+                data: {
+                    ticket_id: ticket.id,
+                    action: action,
+                },
+            },
+            {
+                onSuccess: () => {
+                    router.reload({ only: ['ticket'] });
+                },
+                onError: (err) => {
+                    console.error(err);
+                    toast.error(err.message || 'Unable to close support ticket. Please try again.');
+                },
+            },
+        );
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Support Ticket #${ticket.id} - ${ticket.subject}`} />
@@ -40,7 +77,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                         <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-white">
                             <Ticket className="h-6 w-6" />
                         </div>
-                        <div className="-mb-8">
+                        <div className="-mb-6">
                             <Heading title={ticket.subject} description={`Created ${format(createdAt, 'PPP')} at ${format(createdAt, 'p')}`} />
                         </div>
                     </div>
@@ -56,57 +93,67 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                     </div>
                 </div>
 
-                <div className="grid gap-6 lg:grid-cols-4">
+                <div className="grid gap-4 lg:grid-cols-4">
                     <div className="lg:col-span-3">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    Support Ticket #{ticket.id}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="prose prose-sm dark:prose-invert max-w-none">
-                                    <p className="leading-relaxed whitespace-pre-wrap">{ticket.description}</p>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {ticket.comments && ticket.comments.length > 0 && (
-                            <Card className="mt-6">
+                        <div className="flex flex-col space-y-4">
+                            <Card>
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <MessageCircle className="size-4" />
-                                        Comments ({ticket.comments.length})
-                                    </CardTitle>
-                                    <CardDescription>Conversation history and updates</CardDescription>
+                                    <CardTitle className="flex items-center gap-2">Support Ticket #{ticket.id}</CardTitle>
                                 </CardHeader>
-                                <CardContent className="space-y-4">
-                                    {ticket.comments.map((comment: Comment, index: number) => (
-                                        <div key={comment.id}>
-                                            <div className="flex items-start gap-3">
-                                                <Avatar className="size-8">
-                                                    <AvatarImage src={comment.author?.avatar} alt={comment.author?.name} />
-                                                    <AvatarFallback>{comment.author?.name?.charAt(0)?.toUpperCase()}</AvatarFallback>
-                                                </Avatar>
-                                                <div className="flex-1 space-y-2">
-                                                    <div className="flex items-center gap-2 text-sm">
-                                                        <span className="font-medium">{comment.author?.name}</span>
-                                                        <span className="text-muted-foreground">{format(new Date(comment.created_at), 'PPp')}</span>
-                                                    </div>
-                                                    <div className="prose prose-sm dark:prose-invert max-w-none">
-                                                        <p className="whitespace-pre-wrap">{comment.content}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {index < ticket.comments!.length - 1 && <Separator className="my-4" />}
-                                        </div>
-                                    ))}
+                                <CardContent>
+                                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                                        <p className="leading-relaxed whitespace-pre-wrap">{ticket.description}</p>
+                                    </div>
                                 </CardContent>
                             </Card>
-                        )}
+
+                            {ticket.comments && ticket.comments.length > 0 && (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2">
+                                            <MessageCircle className="size-4" />
+                                            Comments ({ticket.comments.length})
+                                        </CardTitle>
+                                        <CardDescription>Conversation history and updates</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        {ticket.comments.map((comment: Comment, index: number) => (
+                                            <div key={comment.id}>
+                                                <div className="flex items-start gap-3">
+                                                    <Avatar className="size-8">
+                                                        <AvatarImage src={comment.author?.avatar} alt={comment.author?.name} />
+                                                        <AvatarFallback>{comment.author?.name?.charAt(0)?.toUpperCase()}</AvatarFallback>
+                                                    </Avatar>
+                                                    <div className="flex-1 space-y-2">
+                                                        <div className="flex items-center gap-2 text-sm">
+                                                            <span className="font-medium">{comment.author?.name}</span>
+                                                            <span className="text-muted-foreground">
+                                                                {format(new Date(comment.created_at), 'PPp')}
+                                                            </span>
+                                                        </div>
+                                                        <div className="prose prose-sm dark:prose-invert max-w-none">
+                                                            <p className="whitespace-pre-wrap">{comment.content}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {index < ticket.comments!.length - 1 && <Separator className="my-4" />}
+                                            </div>
+                                        ))}
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {showCommentForm && (
+                                <SupportTicketCommentForm
+                                    ticket={ticket}
+                                    onCancel={() => setShowCommentForm(false)}
+                                    onSuccess={handleCommentSuccess}
+                                />
+                            )}
+                        </div>
                     </div>
 
-                    <div className="space-y-6">
+                    <div className="space-y-4">
                         <Card>
                             <CardHeader>
                                 <CardTitle className="text-base">Ticket Details</CardTitle>
@@ -187,20 +234,30 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                 <CardTitle className="text-base">Actions</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-2">
-                                <Button variant="outline" size="sm" className="w-full justify-start">
-                                    <MessageCircle className="size-4" />
-                                    Add Comment
-                                </Button>
-
-                                {ticket.external_url && (
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="w-full justify-start"
-                                        onClick={() => ticket.external_url && window.open(ticket.external_url, '_blank')}
-                                    >
-                                        <FileText className="size-4" />
-                                        View External Ticket
+                                {ticket.is_active ? (
+                                    <>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="w-full justify-start"
+                                            onClick={() => setShowCommentForm(!showCommentForm)}
+                                        >
+                                            <MessageCircle className="size-4" />
+                                            {showCommentForm ? 'Cancel comment' : 'Add comment'}
+                                        </Button>
+                                        <Button variant="outline" size="sm" className="w-full justify-start" onClick={() => handleTicketAction('close')}>
+                                            <Lock className="size-4" />
+                                            {ticketUpdating ? 'Closing...' : 'Close ticket'}
+                                        </Button>
+                                        <Button variant="outline" size="sm" className="w-full justify-start" onClick={() => handleTicketAction('resolve')}>
+                                            <CheckCircle className="size-4" />
+                                            {ticketUpdating ? 'Resolving...' : 'Resolve ticket'}
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <Button variant="outline" size="sm" className="w-full justify-start" onClick={() => handleTicketAction('open')}>
+                                        <LockOpen className="size-4" />
+                                        {ticketUpdating ? 'Opening...' : 'Re-open ticket'}
                                     </Button>
                                 )}
                             </CardContent>
