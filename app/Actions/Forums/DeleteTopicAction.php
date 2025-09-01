@@ -24,7 +24,7 @@ class DeleteTopicAction extends Action
     public function __invoke(): ?bool
     {
         abort_if(
-            boolean: $this->topic->created_by !== Auth::id() && ! request()->user()?->hasRole('super_admin'),
+            boolean: $this->topic->created_by !== Auth::id() && ! request()->user()?->hasRole('super-admin'),
             code: 403,
             message: 'You are not authorized to delete this topic.'
         );

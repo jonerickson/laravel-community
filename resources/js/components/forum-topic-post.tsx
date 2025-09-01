@@ -6,10 +6,10 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import type { Forum, Post, SharedData, Topic } from '@/types';
-import { usePage } from '@inertiajs/react';
+import type { Forum, Post, Topic } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 import { EyeOff, Flag, Pin, Quote } from 'lucide-react';
+import usePermissions from '../hooks/use-permissions';
 
 interface ForumTopicPostProps {
     post: Post;
@@ -20,18 +20,26 @@ interface ForumTopicPostProps {
 }
 
 export default function ForumTopicPost({ post, index, forum, topic, onQuote }: ForumTopicPostProps) {
-    const { auth } = usePage<SharedData>().props;
+    const { can, cannot, hasAnyPermission, hasAllPermissions } = usePermissions();
 
-    const isHiddenForUser = post.is_reported && !auth.isAdmin;
+    const isHiddenForUser = (post.is_reported || !post.is_published) && !hasAllPermissions(['report_posts', 'publish_posts']);
+
+    if (isHiddenForUser) {
+        return null;
+    }
 
     const getCardClassName = () => {
         if (post.is_pinned) return 'border-info-foreground/10 bg-info/10';
-        if (!post.is_published) return 'border-warning-foreground bg-warning';
-        if (post.is_reported && auth.isAdmin) return 'border-destructive/10 bg-destructive/10';
+        if (!post.is_published && can('publish_posts')) return 'border-warning-foreground bg-warning';
+        if (post.is_reported && can('report_posts')) return 'border-destructive/10 bg-destructive/10';
         return '';
     };
 
     const handleQuote = () => {
+        if (cannot('reply_topics')) {
+            return;
+        }
+
         if (onQuote && post.author?.name) {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = post.content;
@@ -39,10 +47,6 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
             onQuote(cleanContent, post.author.name);
         }
     };
-
-    if (isHiddenForUser) {
-        return null;
-    }
 
     return (
         <Card data-post className={getCardClassName()} itemScope itemType="https://schema.org/Comment">
@@ -78,19 +82,19 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                                         Unpublished
                                     </Badge>
                                 )}
-                                {post.is_reported && auth.isAdmin && (
+                                {post.is_reported && can('report_posts') && (
                                     <Badge variant="destructive">
                                         <Flag className="mr-1 h-3 w-3" />
                                         Reported {post.report_count && post.report_count > 1 ? `(${post.report_count})` : ''}
                                     </Badge>
                                 )}
                             </div>
-                            {auth?.user && <ForumTopicPostModerationMenu post={post} forum={forum} topic={topic} />}
+                            <ForumTopicPostModerationMenu post={post} forum={forum} topic={topic} />
                         </div>
 
                         <RichEditorContent itemProp="text" content={post.content} />
 
-                        {(auth?.user || post.author?.signature) && (
+                        {(hasAnyPermission(['like_posts', 'reply_topics']) || post.author?.signature) && (
                             <div className="mt-4 border-t border-muted pt-2">
                                 {post.author?.signature && (
                                     <div className="mt-2 text-xs text-muted-foreground">
@@ -101,15 +105,19 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                                     </div>
                                 )}
 
-                                {auth?.user && (
+                                {hasAnyPermission(['like_posts', 'reply_topics']) && (
                                     <div className="mt-2 flex items-start justify-between">
                                         <div className="flex gap-2">
-                                            <Button variant="ghost" size="sm" className="h-8 px-3 text-muted-foreground" onClick={handleQuote}>
-                                                <Quote className="mr-1 size-3" />
-                                                Quote
-                                            </Button>
+                                            {can('reply_topics') && (
+                                                <Button variant="ghost" size="sm" className="h-8 px-3 text-muted-foreground" onClick={handleQuote}>
+                                                    <Quote className="mr-1 size-3" />
+                                                    Quote
+                                                </Button>
+                                            )}
                                         </div>
-                                        <EmojiReactions post={post} initialReactions={post.likes_summary} userReactions={post.user_reactions} />
+                                        {can('like_posts') && (
+                                            <EmojiReactions post={post} initialReactions={post.likes_summary} userReactions={post.user_reactions} />
+                                        )}
                                     </div>
                                 )}
                             </div>

@@ -13,6 +13,7 @@ import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowDown, ArrowLeft, Clock, Eye, Lock, MessageSquare, Pin, Reply, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import usePermissions from '../../../hooks/use-permissions';
 
 interface RecentViewer {
     user: {
@@ -32,7 +33,8 @@ interface TopicShowProps {
 }
 
 export default function TopicShow({ forum, topic, posts, postsPagination, recentViewers }: TopicShowProps) {
-    const { auth, name: siteName } = usePage<SharedData>().props;
+    const { can, cannot } = usePermissions();
+    const { name: siteName } = usePage<SharedData>().props;
     const [showReplyForm, setShowReplyForm] = useState(false);
     const [quotedContent, setQuotedContent] = useState<string>('');
     const [quotedAuthor, setQuotedAuthor] = useState<string>('');
@@ -80,6 +82,10 @@ export default function TopicShow({ forum, topic, posts, postsPagination, recent
     };
 
     const handleQuotePost = (postContent: string, authorName: string) => {
+        if (cannot('reply_topics')) {
+            return;
+        }
+
         setQuotedContent(postContent);
         setQuotedAuthor(authorName);
         setShowReplyForm(true);
@@ -157,7 +163,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination, recent
                 <meta property="article:modified_time" content={topic.updated_at} />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl">
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto">
                 <div className="flex flex-col items-start justify-between md:flex-row">
                     <div className="mb-4 flex-1">
                         <div className="mb-2 flex items-center gap-2">
@@ -169,21 +175,19 @@ export default function TopicShow({ forum, topic, posts, postsPagination, recent
                         {topic.description && <p className="max-w-3xl text-sm text-muted-foreground">{topic.description}</p>}
                     </div>
 
-                    {!topic.is_locked && (
-                        <div className="flex shrink-0 items-center gap-2">
-                            <ForumTopicModerationMenu topic={topic} forum={forum} />
-                            <Button onClick={goToLatestPost} variant="outline">
-                                <ArrowDown className="mr-2 h-4 w-4" />
-                                Latest
+                    <div className="flex shrink-0 items-center gap-2">
+                        <ForumTopicModerationMenu topic={topic} forum={forum} />
+                        <Button onClick={goToLatestPost} variant="outline">
+                            <ArrowDown className="mr-2 h-4 w-4" />
+                            Latest
+                        </Button>
+                        {can('reply_topics') && !topic.is_locked && (
+                            <Button onClick={() => setShowReplyForm(!showReplyForm)} variant={showReplyForm ? 'outline' : 'default'}>
+                                <Reply className="mr-2 h-4 w-4" />
+                                Reply
                             </Button>
-                            {auth?.user && (
-                                <Button onClick={() => setShowReplyForm(!showReplyForm)} variant={showReplyForm ? 'outline' : 'default'}>
-                                    <Reply className="mr-2 h-4 w-4" />
-                                    Reply
-                                </Button>
-                            )}
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
 
                 <div className="hidden items-center gap-4 text-sm text-muted-foreground sm:flex md:-mt-4">
@@ -209,7 +213,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination, recent
                     </div>
                 </div>
 
-                {showReplyForm && (
+                {showReplyForm && can('reply_topics') && (
                     <div className="pt-4">
                         <ForumTopicReply
                             forumSlug={forum.slug}
@@ -251,7 +255,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination, recent
                     <RecentViewers viewers={recentViewers} />
                 </Deferred>
 
-                {auth?.user && !topic.is_locked && posts.length > 0 && <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} />}
+                {!topic.is_locked && posts.length > 0 && can('reply_topics') && <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} />}
 
                 <Pagination
                     pagination={postsPagination}

@@ -5,11 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
 import { Textarea } from '@/components/ui/textarea';
 import { UserInfo } from '@/components/user-info';
-import { Comment, type PaginatedData, Post, type SharedData } from '@/types';
-import { useForm, usePage } from '@inertiajs/react';
+import { Comment, type PaginatedData, Post } from '@/types';
+import { useForm } from '@inertiajs/react';
 import { Edit, MessageCircle, Reply, Trash } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import usePermissions from '../hooks/use-permissions';
 
 interface BlogCommentsProps {
     post: Post;
@@ -25,7 +26,7 @@ interface CommentItemProps {
 }
 
 function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
-    const { auth } = usePage<SharedData>().props;
+    const { can, cannot, hasAnyPermission } = usePermissions();
     const [isEditing, setIsEditing] = useState(false);
     const commentDate = new Date(comment.created_at);
     const formattedDate = commentDate.toLocaleDateString('en-US', {
@@ -60,6 +61,10 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
     const { delete: deleteComment, processing: deleting } = useForm();
 
     const handleReplySubmit = (e: React.FormEvent) => {
+        if (cannot('create_comments')) {
+            return;
+        }
+
         e.preventDefault();
         submitComment(route('blog.comments.store', { post }), {
             onSuccess: () => {
@@ -71,10 +76,12 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
         });
     };
 
-    const canEdit = auth.user && comment.author && auth.user.id === comment.author.id;
-
     const handleDelete = () => {
-        if (!canEdit || !confirm('Are you sure you want to delete this comment?')) {
+        if (cannot('delete_comments')) {
+            return;
+        }
+
+        if (!confirm('Are you sure you want to delete this comment?')) {
             return;
         }
 
@@ -85,7 +92,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
     };
 
     const handleEditSubmit = (e: React.FormEvent) => {
-        if (!canEdit) {
+        if (cannot('update_comments')) {
             return;
         }
 
@@ -144,20 +151,20 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                             {comment.content}
                         </div>
 
-                        {auth?.user && (
+                        {hasAnyPermission(['create_comments', 'update_permissions', 'like_comments']) && (
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center">
                                     <Button variant="ghost" size="sm" onClick={() => onReply(comment.id)} className="h-auto p-1 text-xs">
                                         <Reply className="mr-1 h-3 w-3" />
                                         Reply
                                     </Button>
-                                    {canEdit && (
+                                    {can('update_comments') && (
                                         <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="h-auto p-1 text-xs">
                                             <Edit className="mr-1 h-3 w-3" />
                                             Edit
                                         </Button>
                                     )}
-                                    {canEdit && (
+                                    {can('delete_comments') && (
                                         <Button
                                             variant="ghost"
                                             size="sm"
@@ -170,12 +177,14 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                                         </Button>
                                     )}
                                 </div>
-                                <EmojiReactions
-                                    comment={comment}
-                                    initialReactions={comment.likes_summary}
-                                    userReactions={comment.user_reactions}
-                                    className="ml-auto"
-                                />
+                                {can('like_comments') && (
+                                    <EmojiReactions
+                                        comment={comment}
+                                        initialReactions={comment.likes_summary}
+                                        userReactions={comment.user_reactions}
+                                        className="ml-auto"
+                                    />
+                                )}
                             </div>
                         )}
                     </>
@@ -214,7 +223,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
 }
 
 export default function BlogComments({ post, comments, commentsPagination }: BlogCommentsProps) {
-    const { auth } = usePage<SharedData>().props;
+    const { can, cannot } = usePermissions();
     const [replyingTo, setReplyingTo] = useState<number | null>(null);
     const {
         data,
@@ -228,6 +237,10 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
     });
 
     const handleSubmit = (e: React.FormEvent) => {
+        if (cannot('create_comments')) {
+            return;
+        }
+
         e.preventDefault();
         submitComment(route('blog.comments.store', { post }), {
             onSuccess: () => {
@@ -262,7 +275,7 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
                 <HeadingSmall title={`Comments (${comments.length || 0})`} />
             </div>
 
-            {auth?.user && (
+            {can('create_comments') && (
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <Textarea

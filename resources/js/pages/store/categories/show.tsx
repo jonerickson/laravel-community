@@ -30,7 +30,7 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
     return (
         <AppLayout breadcrumbs={categoryBreadcrumbs}>
             <Head title={`${category.name} - Store`} />
-            <div className="flex h-full flex-1 flex-col overflow-x-auto rounded-xl">
+            <div className="flex h-full flex-1 flex-col overflow-x-auto">
                 <Heading title={category.name} description={category.description} />
 
                 {products.length > 0 ? (

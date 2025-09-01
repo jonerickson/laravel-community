@@ -6,9 +6,10 @@ import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { UserInfo } from '@/components/user-info';
 import { pluralize } from '@/lib/utils';
-import { Comment, Post, type PaginatedData, type SharedData } from '@/types';
-import { Deferred, usePage } from '@inertiajs/react';
+import { Comment, Post, type PaginatedData } from '@/types';
+import { Deferred } from '@inertiajs/react';
 import { Calendar, Clock, Eye, ImageIcon, MessageSquare } from 'lucide-react';
+import usePermissions from '../hooks/use-permissions';
 
 interface RecentViewer {
     user: {
@@ -27,7 +28,7 @@ interface BlogPostProps {
 }
 
 export default function BlogPost({ post, comments, commentsPagination, recentViewers }: BlogPostProps) {
-    const { auth } = usePage<SharedData>().props;
+    const { can } = usePermissions();
     const publishedDate = new Date(post.published_at || post.created_at);
     const formattedDate = publishedDate.toLocaleDateString('en-US', {
         year: 'numeric',
@@ -78,7 +79,7 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
                         </span>
                     </div>
 
-                    {post.comments_enabled && (
+                    {post.comments_enabled && can('view_any_comments') && (
                         <div className="flex items-center gap-1">
                             <MessageSquare className="h-4 w-4" aria-hidden="true" />
                             <span aria-label={`Total comments: ${post.comments_count} comments`}>
@@ -126,7 +127,7 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
             <RichEditorContent itemProp="articleBody" role="main" aria-label="Article content" content={post.content} />
 
             <footer className="mt-4">
-                {auth?.user && (
+                {can('like_posts') && (
                     <section aria-label="Post reactions">
                         <EmojiReactions post={post} initialReactions={post.likes_summary} userReactions={post.user_reactions} className="mb-4" />
                     </section>
@@ -138,7 +139,7 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
                     </div>
                 </Deferred>
 
-                {post.comments_enabled && (
+                {post.comments_enabled && can('view_any_comments') && (
                     <section className="mt-8 border-t pt-6" aria-label="Comments section">
                         <Deferred
                             fallback={

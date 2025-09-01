@@ -21,7 +21,7 @@ export default function PoliciesIndex({ categories }: PoliciesIndexProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Policies" />
-            <div className="flex h-full flex-1 flex-col overflow-x-auto rounded-xl">
+            <div className="flex h-full flex-1 flex-col overflow-x-auto">
                 <Heading title="Policies" description="Browse our policies, terms of service, and legal documents" />
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {categories.map((category) => (

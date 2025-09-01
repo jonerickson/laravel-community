@@ -14,6 +14,7 @@ use Filament\Support\Facades\FilamentColor;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Cashier\Cashier;
 use Laravel\Socialite\Facades\Socialite;
@@ -36,6 +37,12 @@ class AppServiceProvider extends ServiceProvider
         FilamentColor::register([
             'primary' => Color::Zinc,
         ]);
+
+        Gate::before(function (?User $user = null) {
+            if ($user?->hasRole('super-admin')) {
+                return true;
+            }
+        });
 
         Model::automaticallyEagerLoadRelationships();
         Model::shouldBeStrict();

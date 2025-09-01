@@ -25,7 +25,7 @@ export default function PoliciesCategory({ category, policies }: PoliciesCategor
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${category.name} - Policies`} />
-            <div className="flex h-full flex-1 flex-col overflow-x-auto rounded-xl">
+            <div className="flex h-full flex-1 flex-col overflow-x-auto">
                 <Heading title={category.name} description={category.description || `Browse ${category.name.toLowerCase()} and related documents`} />
 
                 <div className="space-y-6">

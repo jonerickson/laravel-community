@@ -5,6 +5,8 @@ export interface Auth {
     user: User;
     groups: Group[];
     isAdmin: boolean;
+    can?: Record<string, boolean>;
+    roles?: string[];
 }
 
 export interface BreadcrumbItem {

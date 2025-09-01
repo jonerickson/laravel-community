@@ -22,7 +22,7 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Store" />
-            <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto rounded-xl">
+            <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto">
                 {categories.length > 0 && (
                     <WhenVisible fallback={<div className="h-64 animate-pulse rounded-lg bg-muted" />} data={['categories']}>
                         <StoreIndexCategories categories={categories} />

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
-use App\Contracts\SupportTicketDriver;
 use App\Enums\SupportTicketStatus;
 use App\Http\Resources\ApiResource;
+use App\Managers\SupportTicketManager;
 use App\Models\SupportTicket;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
 class SupportTicketController
 {
     public function __construct(
-        protected readonly SupportTicketDriver $supportTicketDriver
+        protected readonly SupportTicketManager $supportTicketManager
     ) {
         //
     }
@@ -43,7 +43,7 @@ class SupportTicketController
 
     private function close(SupportTicket $ticket): ApiResource
     {
-        $result = $this->supportTicketDriver->closeTicket($ticket);
+        $result = $this->supportTicketManager->closeTicket($ticket);
 
         if (! $result) {
             return ApiResource::error(
@@ -59,7 +59,7 @@ class SupportTicketController
 
     private function resolve(SupportTicket $ticket): ApiResource
     {
-        $result = $this->supportTicketDriver->resolveTicket($ticket);
+        $result = $this->supportTicketManager->resolveTicket($ticket);
 
         if (! $result) {
             return ApiResource::error(
@@ -75,7 +75,7 @@ class SupportTicketController
 
     private function open(SupportTicket $ticket): ApiResource
     {
-        $result = $this->supportTicketDriver->updateStatus($ticket, SupportTicketStatus::Open);
+        $result = $this->supportTicketManager->updateStatus($ticket, SupportTicketStatus::Open);
 
         if (! $result) {
             return ApiResource::error(

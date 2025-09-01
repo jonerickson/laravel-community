@@ -14,6 +14,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Circle, Eye, LibraryBig, Lock, MessageSquare, Pin, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import usePermissions from '../../hooks/use-permissions';
 
 interface ForumShowProps {
     forum: Forum;
@@ -22,11 +23,11 @@ interface ForumShowProps {
 }
 
 export default function ForumShow({ forum, topics: initialTopics, topicsPagination }: ForumShowProps) {
-    const { auth, name: siteName } = usePage<SharedData>().props;
+    const { can, cannot, hasAnyPermission } = usePermissions();
+    const { name: siteName } = usePage<SharedData>().props;
     const [topics, setTopics] = useState<Topic[]>(initialTopics);
     const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
     const { loading: isDeleting, execute: executeBulkDelete } = useApiRequest();
-    const isAdmin = auth?.isAdmin;
 
     const structuredData = {
         '@context': 'https://schema.org',
@@ -93,6 +94,10 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
     };
 
     const handleBulkDelete = async () => {
+        if (cannot('delete_topics')) {
+            return;
+        }
+
         if (!selectedTopics.length || !confirm(`Are you sure you want to delete ${selectedTopics.length} topic(s)? This action cannot be undone.`)) {
             return;
         }
@@ -136,7 +141,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                 <meta property="og:type" content="website" />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center sm:gap-0">
                     <div className="flex items-center gap-4">
                         <div className="flex h-12 w-12 items-center justify-center rounded-lg text-white" style={{ backgroundColor: forum.color }}>
@@ -147,7 +152,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                         </div>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
-                        {isAdmin && (
+                        {hasAnyPermission(['delete_topics']) && (
                             <>
                                 {selectedTopics.length > 0 && (
                                     <>
@@ -167,7 +172,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                 )}
                             </>
                         )}
-                        {auth?.user && (
+                        {can('create_topics') && (
                             <Button asChild>
                                 <Link href={route('forums.topics.create', { forum: forum.slug })}>
                                     <Plus className="mr-2 h-4 w-4" />
@@ -207,7 +212,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                         >
                                             <TableCell className="p-4">
                                                 <div className="flex items-start gap-3">
-                                                    {isAdmin ? (
+                                                    {hasAnyPermission(['delete_topics']) ? (
                                                         <button
                                                             onClick={(e) => {
                                                                 e.preventDefault();

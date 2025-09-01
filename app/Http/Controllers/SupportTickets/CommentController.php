@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\SupportTickets;
 
-use App\Contracts\SupportTicketDriver;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SupportTickets\StoreSupportTicketCommentRequest;
+use App\Managers\SupportTicketManager;
 use App\Models\Comment;
 use App\Models\SupportTicket;
 use Illuminate\Http\RedirectResponse;
@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
 class CommentController extends Controller
 {
     public function __construct(
-        protected readonly SupportTicketDriver $supportTicketDriver
+        protected readonly SupportTicketManager $supportTicketManager
     ) {
         //
     }
@@ -24,7 +24,7 @@ class CommentController extends Controller
     {
         $validated = $request->validated();
 
-        $this->supportTicketDriver->addComment(
+        $this->supportTicketManager->addComment(
             ticket: $ticket,
             content: $validated['content'],
             userId: Auth::id(),
@@ -39,7 +39,7 @@ class CommentController extends Controller
         abort_unless($ticket->isAuthoredBy(Auth::user()), 403);
         abort_unless($comment->created_by === Auth::id(), 403);
 
-        $this->supportTicketDriver->deleteComment($ticket, $comment);
+        $this->supportTicketManager->deleteComment($ticket, $comment);
 
         return to_route('support.show', $ticket)
             ->with('message', 'Comment deleted successfully!');

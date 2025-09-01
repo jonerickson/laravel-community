@@ -93,7 +93,7 @@ export default function BlogShow({ post, comments, commentsPagination, recentVie
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
 
-            <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto rounded-xl">
+            <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto">
                 <BlogPost post={post} comments={comments} commentsPagination={commentsPagination} recentViewers={recentViewers} />
             </div>
         </AppLayout>

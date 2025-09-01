@@ -46,7 +46,7 @@ export default function CreateTopic({ forum }: CreateTopicProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Create Topic - ${forum.name} - Forums`} />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <Heading title="Create New Topic" description={`Start a new discussion in ${forum.name}`} />
 
                 <Card className="-mt-8">

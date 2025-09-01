@@ -201,7 +201,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {
-            return $this->hasRole('super_admin');
+            return $this->hasRole('super-admin');
         }
 
         return $panel->getId() === 'marketplace';
@@ -222,42 +222,6 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         return Attribute::make(
             get: fn (): bool => $this->fingerprints()->banned()->exists(),
         )->shouldCache();
-    }
-
-    //    public function hasPermissionTo($permission, $guardName = null): bool
-    //    {
-    //        if ($this->hasAnyPermission($permission)) {
-    //            return true;
-    //        }
-    //
-    //        return $this->groups()
-    //            ->active()
-    //            ->whereHas('permissions', function ($query) use ($permission, $guardName) {
-    //                $query->where('name', $permission);
-    //                if ($guardName) {
-    //                    $query->where('guard_name', $guardName);
-    //                }
-    //            })
-    //            ->exists();
-    //    }
-
-    public function can($abilities, $arguments = []): bool
-    {
-        if (is_string($abilities)) {
-            return $this->hasPermissionTo($abilities);
-        }
-
-        if (is_array($abilities)) {
-            foreach ($abilities as $ability) {
-                if ($this->hasPermissionTo($ability)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        return parent::can($abilities, $arguments);
     }
 
     public function getLoggedAttributes(): array

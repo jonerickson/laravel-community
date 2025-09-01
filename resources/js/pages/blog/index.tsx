@@ -7,6 +7,7 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, PaginatedData, Post, SharedData } from '@/types';
 import { Head, usePage, WhenVisible } from '@inertiajs/react';
 import { Newspaper } from 'lucide-react';
+import usePermissions from '../../hooks/use-permissions';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -21,6 +22,7 @@ interface BlogIndexProps {
 }
 
 export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
+    const { can } = usePermissions();
     const { name: siteName } = usePage<SharedData>().props;
 
     const structuredData = {
@@ -74,12 +76,12 @@ export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
                 <meta property="og:type" content="website" />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
-            <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto rounded-xl">
+            <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto">
                 <div className="sm:flex sm:items-baseline sm:justify-between">
                     <Heading title="Blog" description="Browse our latest blog posts and articles" />
                 </div>
 
-                {posts.length > 0 && (
+                {can('view_any_posts') && posts.length > 0 && (
                     <>
                         <div className="mx-auto -my-8 grid max-w-2xl grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
                             {posts.map((post) => (

@@ -29,7 +29,7 @@ export default function Dashboard({ newestProduct, popularProduct, featuredProdu
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <div className="relative flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl">
+            <div className="relative flex h-full flex-1 flex-col gap-4 overflow-x-auto">
                 <div className="relative z-10 flex flex-col gap-4">
                     {announcements.length > 0 && (
                         <Deferred fallback={<WidgetLoading />} data={'announcements'}>

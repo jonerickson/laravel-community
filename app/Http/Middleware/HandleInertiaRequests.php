@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Inertia\Middleware;
@@ -13,11 +14,6 @@ class HandleInertiaRequests extends Middleware
 {
     protected $rootView = 'app';
 
-    public function version(Request $request): ?string
-    {
-        return parent::version($request);
-    }
-
     public function share(Request $request): array
     {
         return [
@@ -25,7 +21,11 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $user = $request->user(),
                 'groups' => $user?->groups?->pluck(['id', 'name', 'color']),
-                'isAdmin' => $user?->hasRole('super_admin'),
+                'isAdmin' => $user?->hasRole('super-admin'),
+                'roles' => $user?->roles?->pluck('name'),
+                'can' => $user?->getPermissionsViaRoles()->mapWithKeys(function (Permission $permission) use ($user) {
+                    return [$permission->name => $user->can($permission->name)];
+                })->toArray(),
             ],
             'cartCount' => $this->getCartCount(),
             'flash' => [

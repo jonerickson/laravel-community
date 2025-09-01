@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\SupportTickets;
 
-use App\Contracts\SupportTicketDriver;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SupportTickets\StoreSupportTicketRequest;
+use App\Managers\SupportTicketManager;
 use App\Models\SupportTicket;
 use App\Models\SupportTicketCategory;
 use Illuminate\Http\RedirectResponse;
@@ -18,7 +18,7 @@ use Inertia\Response;
 class SupportTicketController extends Controller
 {
     public function __construct(
-        private readonly SupportTicketDriver $supportTicketDriver
+        private readonly SupportTicketManager $supportTicketManager
     ) {}
 
     public function index(): Response
@@ -47,7 +47,7 @@ class SupportTicketController extends Controller
     {
         $validated = $request->validated();
 
-        $ticket = $this->supportTicketDriver->createTicket($validated);
+        $ticket = $this->supportTicketManager->createTicket($validated);
 
         return to_route('support.show', $ticket)
             ->with('message', 'Support ticket created successfully!');

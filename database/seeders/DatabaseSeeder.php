@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            RoleSeeder::class,
+            PermissionSeeder::class,
         ]);
 
         Announcement::factory()->state([
@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->hasAttached($group)->create([
             'name' => 'Test User',
             'email' => 'test@deschutesdesigngroup.com',
-        ])->assignRole('super_admin');
+        ])->assignRole('super-admin');
 
         $this->call([
             BlogSeeder::class,

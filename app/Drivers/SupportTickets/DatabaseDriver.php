@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Drivers\SupportTickets;
 
-use App\Contracts\SupportTicketDriver;
+use App\Contracts\SupportTicketService;
 use App\Enums\SupportTicketStatus;
 use App\Models\Comment;
 use App\Models\SupportTicket;
@@ -14,7 +14,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
-class DatabaseDriver implements SupportTicketDriver
+class DatabaseDriver implements SupportTicketService
 {
     public function __construct(
         protected Container $container

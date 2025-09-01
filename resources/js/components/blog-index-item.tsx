@@ -5,12 +5,14 @@ import { pluralize } from '@/lib/utils';
 import { Post } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Clock, Eye, ImageIcon, MessageCircle } from 'lucide-react';
+import usePermissions from '../hooks/use-permissions';
 
 interface BlogIndexItemProps {
     post: Post;
 }
 
 export default function BlogIndexItem({ post }: BlogIndexItemProps) {
+    const { can } = usePermissions();
     const publishedDate = new Date(post.published_at || post.created_at);
     const formattedDate = publishedDate.toLocaleDateString('en-US', {
         year: 'numeric',
@@ -49,7 +51,7 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                             </span>
                         </div>
 
-                        {post.comments_enabled && (
+                        {can('view_any_comments') && post.comments_enabled && (
                             <div className="flex items-center gap-1 text-muted-foreground">
                                 <MessageCircle className="h-3 w-3" />
                                 <span>

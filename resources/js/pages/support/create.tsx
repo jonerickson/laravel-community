@@ -49,7 +49,7 @@ export default function CreateSupportTicket({ categories }: CreateSupportTicketP
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Support Ticket" />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <Heading
                     title="Create Support Ticket"
                     description="Need help? Create a support ticket and our team will get back to you as soon as possible."

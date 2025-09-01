@@ -29,7 +29,6 @@ class PostController extends Controller
             'content' => $validated['content'],
             'is_published' => true,
             'published_at' => now(),
-            'created_by' => Auth::id(),
         ]);
 
         $totalPosts = $topic->posts()->count();
@@ -46,7 +45,7 @@ class PostController extends Controller
     public function update(Request $request, Forum $forum, Topic $topic, Post $post): RedirectResponse
     {
         abort_if(
-            boolean: $post->created_by !== Auth::id() && ! $request->user()?->hasRole('super_admin'),
+            boolean: $post->created_by !== Auth::id() && ! $request->user()?->hasRole('super-admin'),
             code: 403,
             message: 'You are not authorized to moderate this post.'
         );
@@ -75,7 +74,7 @@ class PostController extends Controller
     public function destroy(Request $request, Forum $forum, Topic $topic, Post $post): RedirectResponse
     {
         abort_if(
-            boolean: $post->created_by !== Auth::id() && ! $request->user()?->hasRole('super_admin'),
+            boolean: $post->created_by !== Auth::id() && ! $request->user()?->hasRole('super-admin'),
             code: 403,
             message: 'You are not authorized to delete this post.'
         );
