@@ -60,7 +60,7 @@ export default function AddPaymentMethodDialog({ open, onOpenChange }: AddPaymen
                         />
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="grid gap-2">
                         <div className="rounded-md border border-input px-3 py-2">
                             <CardElement
                                 options={{
@@ -79,9 +79,8 @@ export default function AddPaymentMethodDialog({ open, onOpenChange }: AddPaymen
                                 }}
                             />
                         </div>
+                        {error && <InputError message={error} />}
                     </div>
-
-                    {error && <InputError message={error} />}
 
                     <div className="flex justify-end gap-2 pt-4">
                         <Button type="button" variant="outline" onClick={handleClose} disabled={loading}>

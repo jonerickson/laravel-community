@@ -40,6 +40,7 @@ class ProductCategoryResource extends Resource
         return $schema
             ->components([
                 Section::make('Category Information')
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('name')
                             ->required()

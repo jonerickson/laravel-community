@@ -115,7 +115,7 @@ class PostResource extends Resource
                 Group::make()
                     ->schema([
                         Section::make('Publishing')
-                            ->columns()
+                            ->columns(1)
                             ->schema([
                                 Toggle::make('is_published')
                                     ->default(false)

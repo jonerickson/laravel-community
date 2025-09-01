@@ -47,6 +47,7 @@ class ForumResource extends Resource
         return $schema
             ->components([
                 Section::make('Forum Information')
+                    ->columnSpanFull()
                     ->columns()
                     ->schema([
                         TextInput::make('name')

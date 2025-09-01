@@ -43,6 +43,7 @@ class PolicyCategoryResource extends Resource
         return $schema
             ->components([
                 Section::make('Category Information')
+                    ->columnSpanFull()
                     ->columns()
                     ->schema([
                         TextInput::make('name')

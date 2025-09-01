@@ -43,6 +43,7 @@ class GroupResource extends Resource
         return $schema
             ->components([
                 Section::make('Group Information')
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('name')
                             ->required()

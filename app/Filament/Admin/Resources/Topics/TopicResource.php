@@ -123,4 +123,9 @@ class TopicResource extends Resource
             'edit' => EditTopic::route('/{record}/edit'),
         ];
     }
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
 }

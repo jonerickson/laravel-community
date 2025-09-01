@@ -46,6 +46,7 @@ class AnnouncementResource extends Resource
         return $schema
             ->components([
                 Section::make('Announcement Details')
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('title')
                             ->required()
@@ -69,6 +70,7 @@ class AnnouncementResource extends Resource
                     ->columns(2),
 
                 Section::make('Settings')
+                    ->columnSpanFull()
                     ->schema([
                         Toggle::make('is_active')
                             ->label('Active')
@@ -82,6 +84,7 @@ class AnnouncementResource extends Resource
                     ->columns(2),
 
                 Section::make('Schedule')
+                    ->columnSpanFull()
                     ->schema([
                         DateTimePicker::make('starts_at')
                             ->label('Start Date & Time')
@@ -96,6 +99,7 @@ class AnnouncementResource extends Resource
                     ->columns(2),
 
                 Section::make('Author')
+                    ->columnSpanFull()
                     ->schema([
                         Select::make('created_by')
                             ->relationship('author', 'name')

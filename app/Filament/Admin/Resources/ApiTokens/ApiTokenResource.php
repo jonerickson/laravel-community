@@ -44,6 +44,7 @@ class ApiTokenResource extends Resource
         return $schema
             ->components([
                 Section::make('API Key Information')
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('name')
                             ->required()
