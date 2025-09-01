@@ -1,6 +1,8 @@
 import BlogComments from '@/components/blog-comments';
 import EmojiReactions from '@/components/emoji-reactions';
 import RecentViewers from '@/components/recent-viewers';
+import RichEditorContent from '@/components/rich-editor-content';
+import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { UserInfo } from '@/components/user-info';
 import { pluralize } from '@/lib/utils';
@@ -38,12 +40,9 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
             <header className="mb-8">
                 {post.is_featured && (
                     <div className="mb-4" role="banner">
-                        <span
-                            className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
-                            aria-label="Featured blog post"
-                        >
+                        <Badge aria-label="Featured blog post" variant="secondary">
                             Featured Post
-                        </span>
+                        </Badge>
                     </div>
                 )}
 
@@ -124,13 +123,7 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
                 )}
             </figure>
 
-            <div
-                className="prose prose-lg dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground prose-a:text-primary hover:prose-a:text-primary/80 prose-code:text-foreground prose-pre:bg-muted max-w-none"
-                dangerouslySetInnerHTML={{ __html: post.content }}
-                itemProp="articleBody"
-                role="main"
-                aria-label="Article content"
-            />
+            <RichEditorContent itemProp="articleBody" role="main" aria-label="Article content" content={post.content} />
 
             <footer className="mt-4">
                 {auth?.user && (

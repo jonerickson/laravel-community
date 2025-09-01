@@ -1,4 +1,5 @@
 import HeadingSmall from '@/components/heading-small';
+import { Badge } from '@/components/ui/badge';
 import { UserInfo } from '@/components/user-info';
 import { pluralize } from '@/lib/utils';
 import { Post } from '@/types';
@@ -34,14 +35,12 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                     )}
                     <div className="absolute inset-0 rounded-2xl ring-1 ring-gray-900/10 ring-inset" />
                 </div>
-                <div className="flex max-w-xl grow flex-col justify-between">
-                    <div className="mt-8 flex items-center gap-x-4 text-xs">
+                <div className="mt-4 flex max-w-xl grow flex-col justify-between">
+                    {post.is_featured && <Badge variant="secondary">Featured</Badge>}
+                    <div className="mt-2 flex items-center gap-x-4 text-xs">
                         <time dateTime={post.published_at || post.created_at} className="text-muted-foreground">
                             {formattedDate}
                         </time>
-                        {post.is_featured && (
-                            <span className="relative z-10 rounded-full bg-primary/10 px-3 py-1.5 font-medium text-primary">Featured</span>
-                        )}
 
                         <div className="flex items-center gap-1 text-muted-foreground">
                             <Eye className="h-3 w-3" />
@@ -67,7 +66,10 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                         )}
                     </div>
                     <div className="group relative mt-2 grow">
-                        <HeadingSmall title={post.title} description={post.excerpt || post.content.substring(0, 150) + '...'} />
+                        <HeadingSmall
+                            title={post.title}
+                            description={post.excerpt || post.content.replace(/<\/?[^>]+(>|$)/g, '').substring(0, 150) + '...'}
+                        />
                     </div>
                     <div className="flex items-center gap-2 py-1.5 pt-4 text-left text-sm">
                         {post.author && <UserInfo user={post.author} showEmail={false} />}
