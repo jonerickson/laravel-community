@@ -24,8 +24,9 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
     const isHiddenForUser = post.is_reported && !auth.isAdmin;
 
     const getCardClassName = () => {
+        if (post.is_pinned) return 'border-info-foreground/10 bg-info/10';
         if (!post.is_published) return 'border-warning-foreground bg-warning';
-        if (post.is_reported && auth.isAdmin) return 'border-destructive-foreground bg-destructive/10';
+        if (post.is_reported && auth.isAdmin) return 'border-destructive/10 bg-destructive/10';
         return '';
     };
 
@@ -56,7 +57,6 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                             <ForumUserInfo user={post.author} isAuthor={index === 0} />
                             <meta itemProp="name" content={post.author?.name || ''} />
                         </div>
-                        {auth?.user && <ForumTopicPostModerationMenu post={post} forum={forum} topic={topic} />}
                     </div>
 
                     <div className="min-w-0 flex-1">
@@ -66,7 +66,7 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                                     Posted {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                                 </time>
                                 {post.is_pinned && (
-                                    <Badge variant="secondary">
+                                    <Badge variant="info">
                                         <Pin className="mr-1 h-3 w-3" />
                                         Pinned
                                     </Badge>
@@ -103,12 +103,7 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                                 {auth?.user && (
                                     <div className="mt-2 flex items-start justify-between">
                                         <div className="flex gap-2">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-8 px-3 text-muted-foreground"
-                                                onClick={handleQuote}
-                                            >
+                                            <Button variant="ghost" size="sm" className="h-8 px-3 text-muted-foreground" onClick={handleQuote}>
                                                 <Quote className="mr-1 size-3" />
                                                 Quote
                                             </Button>

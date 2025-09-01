@@ -232,14 +232,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination, recent
                 {posts.length > 0 && (
                     <div className="grid gap-4">
                         {posts.map((post, index) => (
-                            <ForumTopicPost
-                                key={post.id}
-                                post={post}
-                                index={index}
-                                forum={forum}
-                                topic={topic}
-                                onQuote={handleQuotePost}
-                            />
+                            <ForumTopicPost key={post.id} post={post} index={index} forum={forum} topic={topic} onQuote={handleQuotePost} />
                         ))}
                     </div>
                 )}
