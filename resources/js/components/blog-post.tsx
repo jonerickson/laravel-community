@@ -132,7 +132,7 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
                 aria-label="Article content"
             />
 
-            <footer className="mt-8">
+            <footer className="mt-4">
                 {auth?.user && (
                     <section aria-label="Post reactions">
                         <EmojiReactions post={post} initialReactions={post.likes_summary} userReactions={post.user_reactions} className="mb-4" />

@@ -87,7 +87,11 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                             {auth?.user && <ForumTopicPostModerationMenu post={post} forum={forum} topic={topic} />}
                         </div>
 
-                        <div className="prose prose-sm max-w-none" itemProp="text" dangerouslySetInnerHTML={{ __html: post.content }} />
+                        <div
+                            className="prose prose-sm max-w-none [&_a]:font-medium [&_a]:text-primary [&_a]:underline [&_a]:decoration-primary [&_a]:underline-offset-2 dark:[&_a]:text-blue-400 dark:[&_a]:decoration-blue-400 [&_pre]:relative [&_pre]:my-4 [&_pre]:overflow-x-auto [&_pre]:rounded-md [&_pre]:border [&_pre]:border-border [&_pre]:bg-muted [&_pre]:p-4 [&_pre]:font-mono [&_pre]:text-sm [&_pre]:text-muted-foreground [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:font-mono [&_pre_code]:text-foreground"
+                            itemProp="text"
+                            dangerouslySetInnerHTML={{ __html: post.content }}
+                        />
 
                         {(auth?.user || post.author?.signature) && (
                             <div className="mt-4 border-t border-muted pt-2">

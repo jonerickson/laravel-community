@@ -28,7 +28,7 @@ export default function AddPaymentMethodDialog({ open, onOpenChange }: AddPaymen
             setHolderName('');
         } catch (err) {
             console.error('Error adding payment method:', err);
-            setError((err as Error).message || 'An unexpected error occurred');
+            setError((err as Error).message || 'An unexpected error occurred.');
         }
     };
 
@@ -81,7 +81,7 @@ export default function AddPaymentMethodDialog({ open, onOpenChange }: AddPaymen
                         </div>
                     </div>
 
-                    <InputError message={error} />
+                    {error && <InputError message={error} />}
 
                     <div className="flex justify-end gap-2 pt-4">
                         <Button type="button" variant="outline" onClick={handleClose} disabled={loading}>
