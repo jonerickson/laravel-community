@@ -245,6 +245,11 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         return 'user';
     }
 
+    protected function getDefaultGuardName(): string
+    {
+        return 'web';
+    }
+
     protected function casts(): array
     {
         return [

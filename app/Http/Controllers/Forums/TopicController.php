@@ -9,11 +9,12 @@ use App\Enums\PostType;
 use App\Http\Controllers\Controller;
 use App\Models\Forum;
 use App\Models\Topic;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -21,8 +22,16 @@ use Throwable;
 
 class TopicController extends Controller
 {
+    use AuthorizesRequests;
+
+    /**
+     * @throws AuthorizationException
+     */
     public function show(Forum $forum, Topic $topic): Response
     {
+        $this->authorize('view', $forum);
+        $this->authorize('view', $topic);
+
         $topic->incrementViews();
 
         /** @var LengthAwarePaginator $posts */
@@ -40,8 +49,14 @@ class TopicController extends Controller
         ]);
     }
 
+    /**
+     * @throws AuthorizationException
+     */
     public function create(Forum $forum): Response
     {
+        $this->authorize('view', $forum);
+        $this->authorize('create', Topic::class);
+
         return Inertia::render('forums/topics/create', [
             'forum' => $forum,
         ]);
@@ -52,6 +67,9 @@ class TopicController extends Controller
      */
     public function store(Request $request, Forum $forum): RedirectResponse
     {
+        $this->authorize('view', $forum);
+        $this->authorize('create', Topic::class);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:500',
@@ -63,7 +81,6 @@ class TopicController extends Controller
                 'title' => $validated['title'],
                 'description' => $validated['description'],
                 'forum_id' => $forum->id,
-                'created_by' => Auth::id(),
             ]);
 
             $topic->posts()->create([
@@ -72,7 +89,6 @@ class TopicController extends Controller
                 'content' => $validated['content'],
                 'is_published' => true,
                 'published_at' => now(),
-                'created_by' => Auth::id(),
             ]);
 
             return $topic;
@@ -89,6 +105,9 @@ class TopicController extends Controller
      */
     public function destroy(Forum $forum, Topic $topic): RedirectResponse
     {
+        $this->authorize('view', $forum);
+        $this->authorize('delete', $topic);
+
         DeleteTopicAction::execute($topic, $forum);
 
         return to_route('forums.show', ['forum' => $forum])

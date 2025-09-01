@@ -30,7 +30,7 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
 
     const getCardClassName = () => {
         if (post.is_pinned) return 'border-info-foreground/10 bg-info/10';
-        if (!post.is_published && can('publish_posts')) return 'border-warning-foreground bg-warning';
+        if (!post.is_published && can('publish_posts')) return 'border-warning/10 bg-warning/10';
         if (post.is_reported && can('report_posts')) return 'border-destructive/10 bg-destructive/10';
         return '';
     };
@@ -77,7 +77,7 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                                     </Badge>
                                 )}
                                 {!post.is_published && (
-                                    <Badge variant="destructive">
+                                    <Badge variant="warning">
                                         <EyeOff className="mr-1 h-3 w-3" />
                                         Unpublished
                                     </Badge>

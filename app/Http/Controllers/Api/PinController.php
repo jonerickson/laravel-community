@@ -8,11 +8,18 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ApiResource;
 use App\Models\Post;
 use App\Models\Topic;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class PinController extends Controller
 {
+    use AuthorizesRequests;
+
+    /**
+     * @throws AuthorizationException
+     */
     public function store(Request $request): JsonResource
     {
         $request->validate([
@@ -20,29 +27,36 @@ class PinController extends Controller
             'post_id' => 'sometimes|required|exists:posts,id',
         ]);
 
+        $pinnable = null;
         if ($request->filled('topic_id')) {
-            $topic = Topic::findOrFail($request->input('topic_id'));
-            $topic->pin();
-
-            return ApiResource::success(
-                resource: $topic,
-                message: 'Topic has been pinned successfully.'
-            );
+            $pinnable = Topic::findOrFail($request->input('topic_id'));
         }
 
         if ($request->filled('post_id')) {
-            $post = Post::findOrFail($request->input('post_id'));
-            $post->pin();
+            $pinnable = Post::findOrFail($request->input('post_id'));
+        }
 
-            return ApiResource::success(
-                resource: $post,
-                message: 'Post has been pinned successfully.'
+        if (blank($pinnable)) {
+            return ApiResource::error(
+                message: 'Either a topic or post is required.'
             );
         }
 
-        return ApiResource::error(message: 'Either topic_id or post_id is required.');
+        $this->authorize('pin', $pinnable);
+
+        $pinnable->pin();
+
+        $class = class_basename($pinnable);
+
+        return ApiResource::success(
+            resource: $pinnable,
+            message: "$class has been pinned successfully."
+        );
     }
 
+    /**
+     * @throws AuthorizationException
+     */
     public function destroy(Request $request): JsonResource
     {
         $request->validate([
@@ -50,26 +64,30 @@ class PinController extends Controller
             'post_id' => 'sometimes|required|exists:posts,id',
         ]);
 
+        $pinnable = null;
         if ($request->filled('topic_id')) {
-            $topic = Topic::findOrFail($request->input('topic_id'));
-            $topic->unpin();
-
-            return ApiResource::success(
-                resource: $topic,
-                message: 'Topic has been unpinned successfully.'
-            );
+            $pinnable = Topic::findOrFail($request->input('topic_id'));
         }
 
         if ($request->filled('post_id')) {
-            $post = Post::findOrFail($request->input('post_id'));
-            $post->unpin();
+            $pinnable = Post::findOrFail($request->input('post_id'));
+        }
 
-            return ApiResource::success(
-                resource: $post,
-                message: 'Post has been unpinned successfully.'
+        if (blank($pinnable)) {
+            return ApiResource::error(
+                message: 'Either a topic or post is required.'
             );
         }
 
-        return ApiResource::error(message: 'Either topic_id or post_id is required.');
+        $this->authorize('pin', $pinnable);
+
+        $pinnable->unpin();
+
+        $class = class_basename($pinnable);
+
+        return ApiResource::success(
+            resource: $pinnable,
+            message: "$class has been pinned successfully."
+        );
     }
 }

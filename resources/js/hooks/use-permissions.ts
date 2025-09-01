@@ -14,7 +14,6 @@ interface UsePermissionsReturn {
 
 export function usePermissions(): UsePermissionsReturn {
     const { auth } = usePage<SharedData>().props;
-
     const can = (permission: string): boolean => {
         return auth?.can?.[permission] === true;
     };

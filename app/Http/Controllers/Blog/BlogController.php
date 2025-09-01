@@ -6,6 +6,8 @@ namespace App\Http\Controllers\Blog;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
@@ -13,8 +15,15 @@ use Inertia\Response;
 
 class BlogController extends Controller
 {
+    use AuthorizesRequests;
+
+    /**
+     * @throws AuthorizationException
+     */
     public function index(Request $request): Response
     {
+        $this->authorize('viewAny', Post::class);
+
         $perPage = $request->input('per_page', 9);
 
         $posts = Post::query()->blog()->with(['comments', 'author', 'reads'])->published()->latest()->paginate(
@@ -27,13 +36,12 @@ class BlogController extends Controller
         ]);
     }
 
+    /**
+     * @throws AuthorizationException
+     */
     public function show(Request $request, Post $post): Response
     {
-        abort_if(
-            boolean: ! $post->is_published,
-            code: 404,
-            message: 'Post not found.'
-        );
+        $this->authorize('view', $post);
 
         $post->incrementViews();
 

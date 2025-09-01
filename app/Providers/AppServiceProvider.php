@@ -38,11 +38,11 @@ class AppServiceProvider extends ServiceProvider
             'primary' => Color::Zinc,
         ]);
 
-        Gate::before(function (?User $user = null) {
-            if ($user?->hasRole('super-admin')) {
-                return true;
-            }
-        });
+        //        Gate::before(function (?User $user = null) {
+        //            if ($user?->hasRole('super-admin')) {
+        //                return true;
+        //            }
+        //        });
 
         Model::automaticallyEagerLoadRelationships();
         Model::shouldBeStrict();

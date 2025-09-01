@@ -7,13 +7,21 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ApiResource;
 use App\Models\Comment;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
+    use AuthorizesRequests;
+
+    /**
+     * @throws AuthorizationException
+     */
     public function store(Request $request): ApiResource
     {
+        $this->authorize('create', Comment::class);
+
         $validated = $request->validate([
             'commentable_type' => 'required|string',
             'commentable_id' => 'required|integer',
@@ -33,7 +41,6 @@ class CommentController extends Controller
             'rating' => $validated['rating'] ?? null,
             'parent_id' => $validated['parent_id'] ?? null,
             'is_approved' => true,
-            'created_by' => Auth::id(),
         ]);
 
         $comment->load('author');

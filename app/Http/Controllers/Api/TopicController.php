@@ -9,11 +9,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ApiResource;
 use App\Models\Forum;
 use App\Models\Topic;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Throwable;
 
 class TopicController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * @throws Throwable
      */
@@ -29,6 +32,8 @@ class TopicController extends Controller
         $topics = Topic::whereIn('id', $validated['topic_ids'])->get();
 
         foreach ($topics as $topic) {
+            $this->authorize('delete', $topic);
+
             DeleteTopicAction::execute($topic, $forum);
         }
 

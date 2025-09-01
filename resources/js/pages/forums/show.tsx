@@ -192,7 +192,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                     </Alert>
                 )}
 
-                {topics.length > 0 && (
+                {can('view_any_topics') && topics.length > 0 && (
                     <>
                         <div className="rounded-md border">
                             <Table>

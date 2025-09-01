@@ -6,6 +6,8 @@ namespace App\Http\Controllers\Forums;
 
 use App\Http\Controllers\Controller;
 use App\Models\Forum;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
@@ -13,8 +15,15 @@ use Inertia\Response;
 
 class ForumController extends Controller
 {
+    use AuthorizesRequests;
+
+    /**
+     * @throws AuthorizationException
+     */
     public function index(): Response
     {
+        $this->authorize('viewAny', Forum::class);
+
         $forums = Forum::active()
             ->ordered()
             ->withCount(['topics', 'posts'])
@@ -29,8 +38,13 @@ class ForumController extends Controller
         ]);
     }
 
+    /**
+     * @throws AuthorizationException
+     */
     public function show(Forum $forum): Response
     {
+        $this->authorize('view', $forum);
+
         /** @var LengthAwarePaginator $topics */
         $topics = $forum->topics()
             ->with(['author', 'lastPost.author'])

@@ -8,10 +8,17 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Reports\StoreReportRequest;
 use App\Http\Resources\ApiResource;
 use App\Models\Report;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
+    use AuthorizesRequests;
+
+    /**
+     * @throws AuthorizationException
+     */
     public function store(StoreReportRequest $request): ApiResource
     {
         $validated = $request->validated();
@@ -31,7 +38,6 @@ class ReportController extends Controller
         }
 
         $report = Report::create([
-            'created_by' => Auth::id(),
             'reportable_type' => $validated['reportable_type'],
             'reportable_id' => $validated['reportable_id'],
             'reason' => $validated['reason'],

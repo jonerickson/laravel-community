@@ -7,12 +7,14 @@ import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Forum } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
+import usePermissions from '../../../hooks/use-permissions';
 
 interface CreateTopicProps {
     forum: Forum;
 }
 
 export default function CreateTopic({ forum }: CreateTopicProps) {
+    const { can, cannot } = usePermissions();
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
         description: '',
@@ -35,6 +37,10 @@ export default function CreateTopic({ forum }: CreateTopicProps) {
     ];
 
     const handleSubmit = (e: React.FormEvent) => {
+        if (cannot('create_topics')) {
+            return;
+        }
+
         e.preventDefault();
         post(route('forums.topics.store', { forum: forum.slug }), {
             onSuccess: () => {
@@ -49,48 +55,50 @@ export default function CreateTopic({ forum }: CreateTopicProps) {
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <Heading title="Create New Topic" description={`Start a new discussion in ${forum.name}`} />
 
-                <Card className="-mt-8">
-                    <CardHeader>
-                        <CardTitle>Topic Details</CardTitle>
-                        <CardDescription>
-                            Provide a clear title and description for your topic to help others understand what you're discussing.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="space-y-2">
-                                <Input
-                                    id="title"
-                                    type="text"
-                                    value={data.title}
-                                    onChange={(e) => setData('title', e.target.value)}
-                                    placeholder="Title"
-                                    required
-                                />
-                                <InputError message={errors.title} />
-                            </div>
+                {can('create_topics') && (
+                    <Card className="-mt-8">
+                        <CardHeader>
+                            <CardTitle>Topic Details</CardTitle>
+                            <CardDescription>
+                                Provide a clear title and description for your topic to help others understand what you're discussing.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                <div className="space-y-2">
+                                    <Input
+                                        id="title"
+                                        type="text"
+                                        value={data.title}
+                                        onChange={(e) => setData('title', e.target.value)}
+                                        placeholder="Title"
+                                        required
+                                    />
+                                    <InputError message={errors.title} />
+                                </div>
 
-                            <div className="space-y-2">
-                                <RichTextEditor
-                                    content={data.content}
-                                    onChange={(content) => setData('content', content)}
-                                    placeholder="Write the first post for your topic. Be detailed and clear to encourage discussion."
-                                />
-                                <InputError message={errors.content} />
-                                <div className="text-xs text-muted-foreground">This will be the first post in your topic thread.</div>
-                            </div>
+                                <div className="space-y-2">
+                                    <RichTextEditor
+                                        content={data.content}
+                                        onChange={(content) => setData('content', content)}
+                                        placeholder="Write the first post for your topic. Be detailed and clear to encourage discussion."
+                                    />
+                                    <InputError message={errors.content} />
+                                    <div className="text-xs text-muted-foreground">This will be the first post in your topic thread.</div>
+                                </div>
 
-                            <div className="flex items-center gap-4">
-                                <Button type="submit" disabled={processing}>
-                                    {processing ? 'Creating topic...' : 'Create topic'}
-                                </Button>
-                                <Button variant="outline" type="button" disabled={processing}>
-                                    <Link href={route('forums.show', { forum: forum.slug })}>Cancel</Link>
-                                </Button>
-                            </div>
-                        </form>
-                    </CardContent>
-                </Card>
+                                <div className="flex items-center gap-4">
+                                    <Button type="submit" disabled={processing}>
+                                        {processing ? 'Creating topic...' : 'Create topic'}
+                                    </Button>
+                                    <Button variant="outline" type="button" disabled={processing}>
+                                        <Link href={route('forums.show', { forum: forum.slug })}>Cancel</Link>
+                                    </Button>
+                                </div>
+                            </form>
+                        </CardContent>
+                    </Card>
+                )}
 
                 <Card>
                     <CardHeader>

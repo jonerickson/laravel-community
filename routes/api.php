@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\LockController;
 use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\PinController;
+use App\Http\Controllers\Api\PublishController;
 use App\Http\Controllers\Api\ReadController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SearchController;
@@ -34,6 +35,8 @@ Route::group(['as' => 'api.'], function (): void {
         Route::delete('/payment-methods', [PaymentMethodController::class, 'destroy'])->name('payment-methods.destroy');
         Route::post('/pin', [PinController::class, 'store'])->name('pin.store');
         Route::delete('/pin', [PinController::class, 'destroy'])->name('pin.destroy');
+        Route::post('/publish', [PublishController::class, 'store'])->name('publish.store');
+        Route::delete('/publish', [PublishController::class, 'destroy'])->name('publish.destroy');
         Route::post('/lock', [LockController::class, 'store'])->name('lock.store');
         Route::delete('/lock', [LockController::class, 'destroy'])->name('lock.destroy');
         Route::post('/read', ReadController::class)->name('read');

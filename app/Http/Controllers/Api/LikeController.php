@@ -9,12 +9,20 @@ use App\Http\Resources\ApiResource;
 use App\Models\Comment;
 use App\Models\Like;
 use App\Models\Post;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class LikeController extends Controller
 {
+    use AuthorizesRequests;
+
+    /**
+     * @throws AuthorizationException
+     * @throws ValidationException
+     */
     public function __invoke(Request $request): ApiResource
     {
         $validated = $request->validate([
@@ -30,6 +38,8 @@ class LikeController extends Controller
                 'id' => ['The specified item could not be found.'],
             ]);
         }
+
+        $this->authorize('like', $likeable);
 
         $user = Auth::guard('api')->user();
         $result = $likeable->toggleLike($validated['emoji'], $user->id);

@@ -6,13 +6,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ApiResource;
-use App\Models\Topic;
+use App\Models\Post;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class LockController extends Controller
+class PublishController extends Controller
 {
     use AuthorizesRequests;
 
@@ -22,18 +22,18 @@ class LockController extends Controller
     public function store(Request $request): JsonResource
     {
         $request->validate([
-            'topic_id' => 'required|exists:topics,id',
+            'post_id' => 'required|exists:posts,id',
         ]);
 
-        $topic = Topic::findOrFail($request->input('topic_id'));
+        $post = Post::findOrFail($request->input('post_id'));
 
-        $this->authorize('lock', $topic);
+        $this->authorize('publish', $post);
 
-        $topic->lock();
+        $post->update(['is_published' => true]);
 
         return ApiResource::success(
-            resource: $topic,
-            message: 'Topic has been locked successfully.'
+            resource: $post->fresh(),
+            message: 'Post has been published successfully.'
         );
     }
 
@@ -43,18 +43,18 @@ class LockController extends Controller
     public function destroy(Request $request): JsonResource
     {
         $request->validate([
-            'topic_id' => 'required|exists:topics,id',
+            'post_id' => 'required|exists:posts,id',
         ]);
 
-        $topic = Topic::findOrFail($request->input('topic_id'));
+        $post = Post::findOrFail($request->input('post_id'));
 
-        $this->authorize('lock', $topic);
+        $this->authorize('publish', $post);
 
-        $topic->unlock();
+        $post->update(['is_published' => false]);
 
         return ApiResource::success(
-            resource: $topic,
-            message: 'Topic has been unlocked successfully.'
+            resource: $post->fresh(),
+            message: 'Post has been unpublished successfully.'
         );
     }
 }
