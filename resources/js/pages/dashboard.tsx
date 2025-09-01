@@ -1,9 +1,10 @@
 import AnnouncementsList from '@/components/announcements-list';
 import DashboardProductGrid from '@/components/dashboard-product-grid';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import SupportTicketWidget from '@/components/support-ticket-widget';
+import WidgetLoading from '@/components/widget-loading';
 import AppLayout from '@/layouts/app-layout';
-import { type Announcement, type BreadcrumbItem, type Product } from '@/types';
-import { Head } from '@inertiajs/react';
+import { type Announcement, type BreadcrumbItem, type Product, type SupportTicket } from '@/types';
+import { Deferred, Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,9 +18,10 @@ interface DashboardProps {
     popularProduct?: Product;
     featuredProduct?: Product;
     announcements?: Announcement[];
+    supportTickets?: SupportTicket[];
 }
 
-export default function Dashboard({ newestProduct, popularProduct, featuredProduct, announcements = [] }: DashboardProps) {
+export default function Dashboard({ newestProduct, popularProduct, featuredProduct, announcements = [], supportTickets = [] }: DashboardProps) {
     const handleAnnouncementDismiss = (announcementId: number) => {
         console.log('Dismissed announcement:', announcementId);
     };
@@ -29,13 +31,17 @@ export default function Dashboard({ newestProduct, popularProduct, featuredProdu
             <Head title="Dashboard" />
             <div className="relative flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl">
                 <div className="relative z-10 flex flex-col gap-4">
-                    {announcements.length > 0 && <AnnouncementsList announcements={announcements} onDismiss={handleAnnouncementDismiss} />}
+                    {announcements.length > 0 && (
+                        <Deferred fallback={<WidgetLoading />} data={'announcements'}>
+                            <AnnouncementsList announcements={announcements} onDismiss={handleAnnouncementDismiss} />
+                        </Deferred>
+                    )}
 
                     <DashboardProductGrid newestProduct={newestProduct} popularProduct={popularProduct} featuredProduct={featuredProduct} />
 
-                    <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
+                    <Deferred fallback={<WidgetLoading />} data={'supportTickets'}>
+                        <SupportTicketWidget tickets={supportTickets} />
+                    </Deferred>
                 </div>
             </div>
         </AppLayout>

@@ -108,7 +108,7 @@ export default function EmojiReactions({ post, comment, initialReactions = [], u
                         handleEmojiToggle(removed);
                     }
                 }}
-                variant="outline"
+                variant="default"
                 size="sm"
                 disabled={loading}
                 className="gap-0"

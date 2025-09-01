@@ -161,6 +161,14 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         'banned_at',
         'ban_reason',
         'banned_by',
+        'extra_billing_information',
+        'billing_address',
+        'billing_address_line_2',
+        'billing_city',
+        'billing_state',
+        'billing_postal_code',
+        'billing_country',
+        'vat_id',
     ];
 
     protected $hidden = [

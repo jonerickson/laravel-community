@@ -26,7 +26,7 @@ trait Likeable
 
     public function userLike(?int $userId = null): ?Like
     {
-        $userId ??= Auth::user()->getAuthIdentifier();
+        $userId ??= Auth::id();
 
         if (! $userId) {
             return null;
@@ -37,7 +37,7 @@ trait Likeable
 
     public function userLikes(?int $userId = null): Collection
     {
-        $userId ??= Auth::user()->getAuthIdentifier();
+        $userId ??= Auth::id();
 
         if (! $userId) {
             return collect();
@@ -117,7 +117,7 @@ trait Likeable
     {
         return Attribute::make(
             get: function (): ?string {
-                $userId = Auth::user()->getAuthIdentifier();
+                $userId = Auth::id();
 
                 if (! $userId) {
                     return null;
@@ -134,7 +134,7 @@ trait Likeable
     {
         return Attribute::make(
             get: function (): array {
-                $userId = Auth::user()->getAuthIdentifier();
+                $userId = Auth::id();
 
                 if (! $userId) {
                     return [];

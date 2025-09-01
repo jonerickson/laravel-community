@@ -81,7 +81,7 @@ class ReportResource extends Resource
                             ->label('Admin Notes')
                             ->rows(3),
                         Forms\Components\Hidden::make('reviewed_by')
-                            ->default(fn () => Auth::user()->getAuthIdentifier()),
+                            ->default(fn () => Auth::id()),
                         Forms\Components\Hidden::make('reviewed_at')
                             ->default(fn (): CarbonInterface => now()),
                     ]),

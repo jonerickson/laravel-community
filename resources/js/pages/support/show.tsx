@@ -11,7 +11,7 @@ import type { BreadcrumbItem, Comment, SupportTicket } from '@/types';
 import { formatPriority, formatStatus, getPriorityVariant, getStatusVariant } from '@/utils/support-ticket';
 import { Head, router } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { Calendar, CheckCircle, Clock, FileText, Flag, Lock, LockOpen, MessageCircle, Tag, Ticket, User, XCircle } from 'lucide-react';
+import { Calendar, CheckCircle, Clock, FileText, Flag, Lock, LockOpen, MessageCircle, Tag, Ticket, User } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -245,11 +245,21 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                             <MessageCircle className="size-4" />
                                             {showCommentForm ? 'Cancel comment' : 'Add comment'}
                                         </Button>
-                                        <Button variant="outline" size="sm" className="w-full justify-start" onClick={() => handleTicketAction('close')}>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="w-full justify-start"
+                                            onClick={() => handleTicketAction('close')}
+                                        >
                                             <Lock className="size-4" />
                                             {ticketUpdating ? 'Closing...' : 'Close ticket'}
                                         </Button>
-                                        <Button variant="outline" size="sm" className="w-full justify-start" onClick={() => handleTicketAction('resolve')}>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="w-full justify-start"
+                                            onClick={() => handleTicketAction('resolve')}
+                                        >
                                             <CheckCircle className="size-4" />
                                             {ticketUpdating ? 'Resolving...' : 'Resolve ticket'}
                                         </Button>

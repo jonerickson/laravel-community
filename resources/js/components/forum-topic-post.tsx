@@ -3,11 +3,12 @@ import ForumTopicPostModerationMenu from '@/components/forum-topic-post-moderati
 import ForumUserInfo from '@/components/forum-user-info';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import type { Forum, Post, SharedData, Topic } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
-import { EyeOff, Flag, Pin } from 'lucide-react';
+import { EyeOff, Flag, Pin, Quote } from 'lucide-react';
 
 interface ForumTopicPostProps {
     post: Post;
@@ -90,13 +91,14 @@ export default function ForumTopicPost({ post, index, forum, topic }: ForumTopic
                                 )}
 
                                 {auth?.user && (
-                                    <div className="mt-4">
-                                        <EmojiReactions
-                                            post={post}
-                                            initialReactions={post.likes_summary}
-                                            userReactions={post.user_reactions}
-                                            className="mb-2"
-                                        />
+                                    <div className="mt-2 flex items-start justify-between">
+                                        <div className="flex gap-2">
+                                            <Button variant="ghost" size="sm" className="h-8 px-3 text-muted-foreground">
+                                                <Quote className="mr-1 size-3" />
+                                                Quote
+                                            </Button>
+                                        </div>
+                                        <EmojiReactions post={post} initialReactions={post.likes_summary} userReactions={post.user_reactions} />
                                     </div>
                                 )}
                             </div>

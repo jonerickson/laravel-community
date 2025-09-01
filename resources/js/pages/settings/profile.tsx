@@ -96,7 +96,6 @@ export default function Profile() {
 
                         <div className="grid gap-2">
                             <Label htmlFor="name">Name</Label>
-
                             <Input
                                 id="name"
                                 className="mt-1 block w-full"
@@ -106,13 +105,11 @@ export default function Profile() {
                                 autoComplete="name"
                                 placeholder="Full name"
                             />
-
                             <InputError className="mt-2" message={errors.name} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="email">Email address</Label>
-
+                            <Label htmlFor="email">Email Address</Label>
                             <Input
                                 id="email"
                                 type="email"
@@ -122,13 +119,11 @@ export default function Profile() {
                                 autoComplete="username"
                                 disabled
                             />
-
                             <InputError className="mt-2" message={errors.email} />
                         </div>
 
                         <div className="grid gap-2">
                             <Label htmlFor="signature">Signature</Label>
-
                             <RichTextEditor
                                 content={data.signature}
                                 onChange={(content) => setData('signature', content)}
@@ -138,13 +133,11 @@ export default function Profile() {
                             <p className="text-sm text-muted-foreground">
                                 This signature will appear under your posts in forums. Keep it concise and professional.
                             </p>
-
                             <InputError className="mt-2" message={errors.signature} />
                         </div>
 
                         <div className="flex items-center gap-4">
                             <Button disabled={processing}>{processing ? 'Saving...' : 'Save'}</Button>
-
                             <Transition
                                 show={recentlySuccessful}
                                 enter="transition ease-in-out"

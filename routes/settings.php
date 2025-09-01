@@ -17,7 +17,10 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::delete('settings/account', [ProfileController::class, 'destroy'])->name('settings.profile.destroy');
 
     Route::get('settings/appearance', AppearanceController::class)->name('settings.appearance');
+
     Route::get('settings/billing', BillingController::class)->name('settings.billing');
+    Route::post('settings/billing', [BillingController::class, 'update'])->name('settings.billing.update');
+
     Route::get('settings/orders', InvoiceController::class)->name('settings.invoices');
     Route::get('settings/payment-methods', PaymentMethodController::class)->name('settings.payment-methods');
 });

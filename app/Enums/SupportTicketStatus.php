@@ -43,7 +43,7 @@ enum SupportTicketStatus: string implements HasColor, HasLabel
             self::Open => in_array($status, [self::InProgress, self::Resolved, self::Closed]),
             self::InProgress => in_array($status, [self::Open, self::Resolved, self::Closed]),
             self::Resolved => in_array($status, [self::Open, self::Closed]),
-            self::Closed => $status == self::Open,
+            self::Closed => $status === self::Open,
         };
     }
 
