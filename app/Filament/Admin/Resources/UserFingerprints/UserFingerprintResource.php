@@ -12,6 +12,7 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -27,7 +28,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use UnitEnum;
 
 class UserFingerprintResource extends Resource
@@ -161,7 +161,7 @@ class UserFingerprintResource extends Resource
                             ->maxLength(1000),
                     ])
                     ->action(function (UserFingerprint $record, array $data): void {
-                        $record->banFingerprint($data['ban_reason'], Auth::user());
+                        $record->banFingerprint($data['ban_reason'], Filament::auth()->user());
                     })
                     ->requiresConfirmation()
                     ->modalHeading('Ban Device')
@@ -195,7 +195,7 @@ class UserFingerprintResource extends Resource
                         ->action(function (array $data, $records): void {
                             foreach ($records as $record) {
                                 if (! $record->is_banned) {
-                                    $record->banFingerprint($data['ban_reason'], Auth::user());
+                                    $record->banFingerprint($data['ban_reason'], Filament::auth()->user());
                                 }
                             }
                         })

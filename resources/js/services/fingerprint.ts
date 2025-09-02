@@ -53,8 +53,6 @@ class FingerprintService {
         if (!fingerprint) return;
 
         try {
-            document.cookie = `fingerprint_id=${fingerprint.visitorId}; path=/; max-age=31536000; samesite=strict`;
-
             await apiRequest<FingerprintTrackingResponse>(
                 axios.post(
                     route('api.fingerprint'),
@@ -71,18 +69,6 @@ class FingerprintService {
             );
         } catch (error: unknown) {
             console.error('Failed to track fingerprint:', error);
-
-            if (
-                error &&
-                typeof error === 'object' &&
-                'response' in error &&
-                error.response &&
-                typeof error.response === 'object' &&
-                'status' in error.response &&
-                error.response.status === 403
-            ) {
-                window.location.href = '/banned';
-            }
         }
     }
 }

@@ -9,6 +9,7 @@ use App\Http\Resources\ApiResource;
 use App\Models\UserFingerprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 
 class FingerprintController extends Controller
 {
@@ -33,6 +34,11 @@ class FingerprintController extends Controller
                 status: 403
             );
         }
+
+        Cookie::queue(
+            key: 'fingerprint_id',
+            value: $fingerprint->fingerprint_id,
+        );
 
         return ApiResource::success(
             resource: [

@@ -2,13 +2,18 @@
 
 declare(strict_types=1);
 
+use App\Exceptions\BannedException;
 use App\Http\Middleware\CheckBannedUser;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Inertia\Inertia;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -21,6 +26,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
         $middleware->statefulApi();
 
+        $middleware->api([
+            AddQueuedCookiesToResponse::class,
+        ]);
+
         $middleware->web(append: [
             CheckBannedUser::class,
             HandleAppearance::class,
@@ -29,5 +38,28 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
+            if ($request->expectsJson()) {
+                return $response;
+            }
+
+            if ($exception instanceof BannedException) {
+                return Inertia::render('banned', [
+                    'user' => $exception->fingerprint->user,
+                    'fingerprint' => $exception->fingerprint,
+                    'banReason' => $exception->fingerprint?->ban_reason,
+                    'bannedAt' => $exception->fingerprint?->banned_at,
+                    'bannedBy' => $exception->fingerprint?->bannedBy?->name,
+                ]);
+            }
+
+            if (in_array($response->getStatusCode(), [500, 503, 404, 403])) {
+                return Inertia::render('error', [
+                    'status' => (string) $response->getStatusCode(),
+                    'message' => $exception->getMessage() ?: 'An error occurred',
+                ]);
+            }
+
+            return $response;
+        });
     })->create();

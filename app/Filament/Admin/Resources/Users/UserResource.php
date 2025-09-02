@@ -18,6 +18,7 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
@@ -241,7 +242,7 @@ class UserResource extends Resource
                             ->required()
                             ->maxLength(1000),
                     ])
-                    ->action(fn (User $record, array $data) => $record->fingerprints()->each(fn (UserFingerprint $fingerprint) => $fingerprint->banFingerprint($data['ban_reason'])))
+                    ->action(fn (User $record, array $data) => $record->fingerprints()->each(fn (UserFingerprint $fingerprint) => $fingerprint->banFingerprint($data['ban_reason'], Filament::auth()->user())))
                     ->requiresConfirmation()
                     ->modalHeading('Ban User')
                     ->modalDescription('Are you sure you want to ban this user? They will be immediately logged out and unable to access the site.')

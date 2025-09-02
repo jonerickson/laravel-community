@@ -39,18 +39,18 @@ export default function Banned({ user, fingerprint, banReason, bannedAt, bannedB
         <AppLayout>
             <Head title="Account Suspended" />
 
-            <div className="flex min-h-screen items-end justify-center px-4 pb-[33vh]">
+            <div className="flex h-full min-h-[60vh] items-center justify-center">
                 <Card className="w-full max-w-2xl">
                     <CardHeader className="text-center">
                         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive-foreground">
-                            <ShieldXIcon className="h-8 w-8 text-destructive" />
+                            <ShieldXIcon className="size-8 text-destructive" />
                         </div>
-                        <CardTitle className="text-2xl font-bold text-destructive">Device Banned</CardTitle>
-                        <CardDescription className="text-base">This device has been banned from accessing this platform.</CardDescription>
+                        <CardTitle>Device Banned</CardTitle>
+                        <CardDescription>This device has been banned from accessing this platform.</CardDescription>
                     </CardHeader>
 
                     <CardContent className="space-y-6">
-                        <div className="rounded-lg border bg-destructive-foreground p-4">
+                        <div className="rounded-lg border border-destructive/10 bg-destructive-foreground p-4">
                             <div className="flex items-start gap-3">
                                 <AlertTriangleIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-destructive" />
                                 <div className="space-y-2">
@@ -82,7 +82,7 @@ export default function Banned({ user, fingerprint, banReason, bannedAt, bannedB
                         {banReason && (
                             <div className="space-y-2">
                                 <h3 className="font-semibold">Reason for Ban</h3>
-                                <div className="rounded-lg border border-border bg-muted-foreground p-4">
+                                <div className="rounded-lg border border-muted-foreground/10 bg-muted p-4">
                                     <p className="text-sm whitespace-pre-wrap text-muted-foreground">{banReason}</p>
                                 </div>
                             </div>
@@ -90,7 +90,7 @@ export default function Banned({ user, fingerprint, banReason, bannedAt, bannedB
 
                         <div className="space-y-4 border-t pt-6">
                             <h3 className="font-semibold">What happens now?</h3>
-                            <div className="space-y-3 text-sm text-muted-foreground">
+                            <div className="space-y-2 text-sm text-muted-foreground">
                                 <div className="flex items-start gap-3">
                                     <div className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-muted-foreground" />
                                     <p>Your access to most platform features has been restricted</p>
@@ -120,8 +120,8 @@ export default function Banned({ user, fingerprint, banReason, bannedAt, bannedB
                             </Button>
                         </div>
 
-                        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-                            <div className="text-sm text-blue-700">
+                        <div className="rounded-lg border border-info/10 bg-info-foreground p-4">
+                            <div className="text-sm text-info">
                                 <p>
                                     <strong>Need Help?</strong>
                                 </p>
