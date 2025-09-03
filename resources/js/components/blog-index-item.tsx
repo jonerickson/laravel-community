@@ -38,6 +38,7 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                     <div className="absolute inset-0 rounded-2xl ring-1 ring-gray-900/10 ring-inset" />
                 </div>
                 <div className="mt-4 flex max-w-xl grow flex-col justify-between">
+                    {!post.is_read_by_user && <Badge variant="default">New</Badge>}
                     {post.is_featured && <Badge variant="secondary">Featured</Badge>}
                     <div className="mt-2 flex items-center gap-x-4 text-xs">
                         <time dateTime={post.published_at || post.created_at} className="text-muted-foreground">
