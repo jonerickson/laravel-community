@@ -9,15 +9,15 @@ DROP TABLE IF EXISTS `activity`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `activity` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `log_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `subject_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `event` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `log_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `event` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `subject_id` bigint unsigned DEFAULT NULL,
-  `causer_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `causer_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `causer_id` bigint unsigned DEFAULT NULL,
   `properties` json DEFAULT NULL,
-  `batch_uuid` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `batch_uuid` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -168,6 +168,8 @@ CREATE TABLE `groups` (
   `color` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#6b7280',
   `order` int NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `is_default_guest` tinyint(1) NOT NULL DEFAULT '0',
+  `is_default_member` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -405,13 +407,13 @@ CREATE TABLE `products` (
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'storeProduct',
   `is_featured` tinyint(1) NOT NULL DEFAULT '0',
   `featured_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `stripe_product_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `external_product_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `metadata` json DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `products_type_index` (`type`),
-  KEY `products_stripe_product_id_index` (`stripe_product_id`)
+  KEY `products_stripe_product_id_index` (`external_product_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `products_categories`;
@@ -425,6 +427,18 @@ CREATE TABLE `products_categories` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `products_groups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `products_groups` (
+  `product_id` bigint unsigned NOT NULL,
+  `group_id` bigint unsigned NOT NULL,
+  KEY `products_groups_product_id_foreign` (`product_id`),
+  KEY `products_groups_group_id_foreign` (`group_id`),
+  CONSTRAINT `products_groups_group_id_foreign` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `products_groups_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `products_prices`;
@@ -473,14 +487,14 @@ DROP TABLE IF EXISTS `reports`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `reports` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `reportable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reportable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `reportable_id` bigint unsigned NOT NULL,
-  `reason` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `additional_info` text COLLATE utf8mb4_unicode_ci,
-  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `additional_info` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `reviewed_by` bigint unsigned DEFAULT NULL,
   `reviewed_at` timestamp NULL DEFAULT NULL,
-  `admin_notes` text COLLATE utf8mb4_unicode_ci,
+  `admin_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_by` bigint unsigned NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -516,6 +530,18 @@ CREATE TABLE `roles` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `roles_name_guard_name_unique` (`name`,`guard_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `roles_groups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `roles_groups` (
+  `role_id` bigint unsigned NOT NULL,
+  `group_id` bigint unsigned NOT NULL,
+  KEY `roles_groups_role_id_foreign` (`role_id`),
+  KEY `roles_groups_group_id_foreign` (`group_id`),
+  CONSTRAINT `roles_groups_group_id_foreign` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `roles_groups_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `scout_indexes`;
@@ -584,6 +610,58 @@ CREATE TABLE `subscriptions` (
   KEY `subscriptions_user_id_stripe_status_index` (`user_id`,`stripe_status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `support_tickets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `support_tickets` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `ticket_number` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `priority` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `support_ticket_category_id` bigint unsigned NOT NULL,
+  `assigned_to` bigint unsigned DEFAULT NULL,
+  `external_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `external_driver` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `external_data` json DEFAULT NULL,
+  `created_by` bigint unsigned NOT NULL,
+  `closed_at` timestamp NULL DEFAULT NULL,
+  `resolved_at` timestamp NULL DEFAULT NULL,
+  `last_synced_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `support_tickets_ticket_number_unique` (`ticket_number`),
+  KEY `support_tickets_created_by_foreign` (`created_by`),
+  KEY `support_tickets_status_priority_index` (`status`,`priority`),
+  KEY `support_tickets_assigned_to_status_index` (`assigned_to`,`status`),
+  KEY `support_tickets_support_ticket_category_id_status_index` (`support_ticket_category_id`,`status`),
+  KEY `support_tickets_external_driver_external_id_index` (`external_driver`,`external_id`),
+  KEY `support_tickets_ticket_number_index` (`ticket_number`),
+  CONSTRAINT `support_tickets_assigned_to_foreign` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `support_tickets_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `support_tickets_support_ticket_category_id_foreign` FOREIGN KEY (`support_ticket_category_id`) REFERENCES `support_tickets_categories` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `support_tickets_categories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `support_tickets_categories` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `color` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `order` int NOT NULL DEFAULT '0',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `support_tickets_categories_slug_unique` (`slug`),
+  KEY `support_tickets_categories_is_active_order_index` (`is_active`,`order`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tax_rates`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -609,7 +687,6 @@ CREATE TABLE `topics` (
   `forum_id` bigint unsigned NOT NULL,
   `is_pinned` tinyint(1) NOT NULL DEFAULT '0',
   `is_locked` tinyint(1) NOT NULL DEFAULT '0',
-  `views_count` int NOT NULL DEFAULT '0',
   `created_by` bigint unsigned NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -632,8 +709,8 @@ CREATE TABLE `users` (
   `signature` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `remember_token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `app_authentication_secret` text COLLATE utf8mb4_unicode_ci,
-  `app_authentication_recovery_codes` text COLLATE utf8mb4_unicode_ci,
+  `app_authentication_secret` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `app_authentication_recovery_codes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `has_email_authentication` tinyint(1) NOT NULL DEFAULT '0',
   `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `stripe_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -697,6 +774,24 @@ CREATE TABLE `users_groups` (
   CONSTRAINT `users_groups_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `views`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `views` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `viewable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `viewable_id` bigint unsigned NOT NULL,
+  `created_by` bigint unsigned NOT NULL,
+  `count` int unsigned NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `views_viewable_type_viewable_id_created_by_unique` (`viewable_type`,`viewable_id`,`created_by`),
+  KEY `views_viewable_type_viewable_id_index` (`viewable_type`,`viewable_id`),
+  KEY `views_created_by_index` (`created_by`),
+  CONSTRAINT `views_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -751,3 +846,10 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (44,'2025_08_17_204
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (45,'2025_08_18_224211_create_reports_table',12);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (46,'2025_08_24_145818_create_policies_products_table',13);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (47,'2025_08_24_211549_add_is_pinned_to_posts_table',14);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (48,'2025_08_24_223358_create_views_table',15);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (49,'2025_08_24_223642_remove_views_count_from_topics_table',15);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (50,'2025_08_31_185720_create_support_ticket_categories_table',15);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (51,'2025_08_31_185727_create_support_tickets_table',15);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (52,'2025_09_02_204613_create_roles_groups_table',15);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (53,'2025_09_02_205222_add_defaults_to_groups_table',15);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (54,'2025_09_03_213036_create_products_groups_table',16);

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Models\Product;
-use App\Models\ProductPrice;
 use App\Models\User;
 use App\Providers\Social\DiscordProvider;
 use App\Providers\Social\RobloxProvider;
@@ -38,11 +36,11 @@ class AppServiceProvider extends ServiceProvider
             'primary' => Color::Zinc,
         ]);
 
-        //        Gate::before(function (?User $user = null) {
-        //            if ($user?->hasRole('super-admin')) {
-        //                return true;
-        //            }
-        //        });
+        Gate::before(function (?User $user = null) {
+            if ($user?->hasRole('super-admin')) {
+                return true;
+            }
+        });
 
         Model::automaticallyEagerLoadRelationships();
         Model::shouldBeStrict();
@@ -56,25 +54,5 @@ class AppServiceProvider extends ServiceProvider
             provider: RobloxProvider::class,
             config: config('services.roblox')
         ));
-
-        $this->app->get('config')->set(
-            key: 'spark.billables.user.plans',
-            value: Product::query()
-                ->subscriptions()
-                ->with(['prices' => fn ($query) => $query->active()->withStripePrice()])
-                ->get()
-                ->flatMap(fn (Product $product) => $product->prices()->active()->get()->map(fn (ProductPrice $price): array => [
-                    'name' => $product->name,
-                    'short_description' => $product->description,
-                    'monthly_id' => $price->stripe_price_id,
-                    'yearly_id' => $price->interval === 'year' ? $price->stripe_price_id : null,
-                    'features' => [
-                        'Feature 1',
-                        'Feature 2',
-                        'Feature 3',
-                    ],
-                ]))
-                ->toArray()
-        );
     }
 }

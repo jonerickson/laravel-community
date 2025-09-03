@@ -9,6 +9,7 @@ use App\Enums\ProductType;
 use App\Traits\Featureable;
 use App\Traits\HasFeaturedImage;
 use App\Traits\HasFiles;
+use App\Traits\HasGroups;
 use App\Traits\HasLogging;
 use App\Traits\HasMetadata;
 use App\Traits\HasSlug;
@@ -33,7 +34,7 @@ use Laravel\Scout\Searchable;
  * @property ProductType $type
  * @property bool $is_featured
  * @property string|null $featured_image
- * @property string|null $stripe_product_id
+ * @property string|null $external_product_id
  * @property array<array-key, mixed>|null $metadata
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -51,6 +52,8 @@ use Laravel\Scout\Searchable;
  * @property-read File|null $file
  * @property-read Collection<int, File> $files
  * @property-read int|null $files_count
+ * @property-read Collection<int, Group> $groups
+ * @property-read int|null $groups_count
  * @property-read Collection<int, Policy> $policies
  * @property-read int|null $policies_count
  * @property-read Collection<int, ProductPrice> $prices
@@ -67,17 +70,17 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Product subscriptions()
  * @method static Builder<static>|Product whereCreatedAt($value)
  * @method static Builder<static>|Product whereDescription($value)
+ * @method static Builder<static>|Product whereExternalProductId($value)
  * @method static Builder<static>|Product whereFeaturedImage($value)
  * @method static Builder<static>|Product whereId($value)
  * @method static Builder<static>|Product whereIsFeatured($value)
  * @method static Builder<static>|Product whereMetadata($value)
  * @method static Builder<static>|Product whereName($value)
  * @method static Builder<static>|Product whereSlug($value)
- * @method static Builder<static>|Product whereStripeProductId($value)
  * @method static Builder<static>|Product whereType($value)
  * @method static Builder<static>|Product whereUpdatedAt($value)
- * @method static Builder<static>|Product withStripeProduct()
- * @method static Builder<static>|Product withoutStripeProduct()
+ * @method static Builder<static>|Product withExternalProduct()
+ * @method static Builder<static>|Product withoutExternalProduct()
  *
  * @mixin \Eloquent
  */
@@ -87,6 +90,7 @@ class Product extends Model implements Sluggable
     use HasFactory;
     use HasFeaturedImage;
     use HasFiles;
+    use HasGroups;
     use HasLogging;
     use HasMetadata;
     use HasSlug;
@@ -98,12 +102,12 @@ class Product extends Model implements Sluggable
         'name',
         'description',
         'type',
-        'stripe_product_id',
+        'external_product_id',
         'files',
     ];
 
     protected $hidden = [
-        'stripe_product_id',
+        'external_product_id',
     ];
 
     public function categories(): BelongsToMany
@@ -160,19 +164,19 @@ class Product extends Model implements Sluggable
         return $this->type === ProductType::Subscription;
     }
 
-    public function hasStripeProduct(): bool
+    public function hasExternalProduct(): bool
     {
-        return ! is_null($this->stripe_product_id);
+        return ! is_null($this->external_product_id);
     }
 
-    public function scopeWithStripeProduct(Builder $query): void
+    public function scopeWithExternalProduct(Builder $query): void
     {
-        $query->whereNotNull('stripe_product_id');
+        $query->whereNotNull('external_product_id');
     }
 
-    public function scopeWithoutStripeProduct(Builder $query): void
+    public function scopeWithoutExternalProduct(Builder $query): void
     {
-        $query->whereNull('stripe_product_id');
+        $query->whereNull('external_product_id');
     }
 
     public function toSearchableArray(): array
@@ -192,7 +196,7 @@ class Product extends Model implements Sluggable
             'description',
             'type',
             'is_featured',
-            'stripe_product_id',
+            'external_product_id',
         ];
     }
 

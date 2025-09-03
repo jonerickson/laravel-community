@@ -40,10 +40,6 @@
     },
     "repositories": [
         {
-            "type": "composer",
-            "url": "https://spark.laravel.com"
-        },
-        {
             "type": "vcs",
             "url": "https://github.com/laravel/facade-documenter"
         }

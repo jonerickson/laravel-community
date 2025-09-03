@@ -23557,50 +23557,6 @@ namespace Livewire {
 
 namespace Illuminate\Support {
     /**
-     * @template TKey of array-key
-     * @template-covariant TValue
-     * @implements \ArrayAccess<TKey, TValue>
-     * @implements \Illuminate\Support\Enumerable<TKey, TValue>
-     */
-    class Collection {
-        /**
-         * @see \App\Models\Product::touch()
-         * @static
-         */
-        public static function searchable()
-        {
-            return \Illuminate\Support\Collection::searchable();
-        }
-
-        /**
-         * @see \App\Models\Product::withoutRecursion()
-         * @static
-         */
-        public static function unsearchable()
-        {
-            return \Illuminate\Support\Collection::unsearchable();
-        }
-
-        /**
-         * @see \App\Models\Product::resolveObserveAttributes()
-         * @static
-         */
-        public static function searchableSync()
-        {
-            return \Illuminate\Support\Collection::searchableSync();
-        }
-
-        /**
-         * @see \App\Models\Product::resolveObserveAttributes()
-         * @static
-         */
-        public static function unsearchableSync()
-        {
-            return \Illuminate\Support\Collection::unsearchableSync();
-        }
-
-            }
-    /**
      */
     class Str {
         /**
@@ -24084,58 +24040,6 @@ namespace Illuminate\Database\Eloquent\Relations {
             return \Illuminate\Database\Eloquent\Relations\Relation::getPowerJoinExistenceCompareKey();
         }
 
-        /**
-         * @see \Laravel\Scout\SearchableScope::extend()
-         * @param mixed $chunk
-         * @static
-         */
-        public static function searchable($chunk = null)
-        {
-            return \Illuminate\Database\Eloquent\Relations\Relation::searchable($chunk);
-        }
-
-        /**
-         * @see \Laravel\Scout\SearchableScope::extend()
-         * @param mixed $chunk
-         * @static
-         */
-        public static function unsearchable($chunk = null)
-        {
-            return \Illuminate\Database\Eloquent\Relations\Relation::unsearchable($chunk);
-        }
-
-            }
-    /**
-     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
-     * @template TIntermediateModel of \Illuminate\Database\Eloquent\Model
-     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
-     * @extends \Illuminate\Database\Eloquent\Relations\HasOneOrManyThrough<TRelatedModel, TIntermediateModel, TDeclaringModel, \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>>
-     */
-    class HasManyThrough extends \Illuminate\Database\Eloquent\Relations\HasOneOrManyThrough {
-            }
-    /**
-     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
-     * @template TIntermediateModel of \Illuminate\Database\Eloquent\Model
-     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
-     * @template TResult
-     * @extends \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, TIntermediateModel, TResult>
-     */
-    class HasOneOrManyThrough extends \Illuminate\Database\Eloquent\Relations\Relation {
-            }
-    /**
-     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
-     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
-     * @extends \Illuminate\Database\Eloquent\Relations\HasOneOrMany<TRelatedModel, TDeclaringModel, \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>>
-     */
-    class HasMany extends \Illuminate\Database\Eloquent\Relations\HasOneOrMany {
-            }
-    /**
-     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
-     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
-     * @template TResult
-     * @extends \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, TDeclaringModel, TResult>
-     */
-    class HasOneOrMany extends \Illuminate\Database\Eloquent\Relations\Relation {
             }
     }
 
@@ -26832,16 +26736,6 @@ namespace Illuminate\View {
             return \Illuminate\View\View::response($callback);
         }
 
-            }
-    }
-
-namespace Illuminate\Database\Eloquent {
-    /**
-     * @template TKey of array-key
-     * @template TModel of \Illuminate\Database\Eloquent\Model
-     * @extends \Illuminate\Support\Collection<TKey, TModel>
-     */
-    class Collection extends \Illuminate\Support\Collection {
             }
     }
 

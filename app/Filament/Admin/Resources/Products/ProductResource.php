@@ -74,11 +74,6 @@ class ProductResource extends Resource
                         TextInput::make('slug')
                             ->helperText('A SEO friendly title.')
                             ->required(),
-                        TextInput::make('stripe_product_id')
-                            ->label('Stripe Product ID')
-                            ->helperText('The Stripe product ID for payment processing (e.g., prod_xxxxxxxxxxxx).')
-                            ->placeholder('prod_xxxxxxxxxxxx')
-                            ->columnSpanFull(),
                         Select::make('categories')
                             ->columnSpanFull()
                             ->preload()
@@ -92,6 +87,13 @@ class ProductResource extends Resource
                             ->preload()
                             ->relationship('policies', 'title', fn (Builder $query) => $query->active()->effective()->orderBy('title'))
                             ->multiple(),
+                        Select::make('groups')
+                            ->relationship('groups', 'name')
+                            ->columnSpanFull()
+                            ->preload()
+                            ->multiple()
+                            ->searchable()
+                            ->helperText('Groups that a customer will be assigned when they purchase this product.'),
                         RichEditor::make('description')
                             ->helperText('The main product overview.')
                             ->required()
