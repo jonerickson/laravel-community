@@ -84,34 +84,34 @@ class ProductPrice extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): void
     {
-        return $query->where('is_active', true);
+        $query->where('is_active', true);
     }
 
-    public function scopeDefault($query)
+    public function scopeDefault(Builder $query): void
     {
-        return $query->where('is_default', true);
+        $query->where('is_default', true);
     }
 
-    public function scopeRecurring($query)
+    public function scopeRecurring(Builder $query): void
     {
-        return $query->whereNotNull('interval');
+        $query->whereNotNull('interval');
     }
 
-    public function scopeOneTime($query)
+    public function scopeOneTime(Builder $query): void
     {
-        return $query->whereNull('interval');
+        $query->whereNull('interval');
     }
 
-    public function scopeWithStripePrice($query)
+    public function scopeWithStripePrice(Builder $query): void
     {
-        return $query->whereNotNull('stripe_price_id');
+        $query->whereNotNull('stripe_price_id');
     }
 
-    public function scopeWithoutStripePrice($query)
+    public function scopeWithoutStripePrice(Builder $query): void
     {
-        return $query->whereNull('stripe_price_id');
+        $query->whereNull('stripe_price_id');
     }
 
     public function isRecurring(): bool

@@ -8,24 +8,31 @@ use App\Filament\Admin\Resources\Groups\Pages\CreateGroup;
 use App\Filament\Admin\Resources\Groups\Pages\EditGroup;
 use App\Filament\Admin\Resources\Groups\Pages\ListGroups;
 use App\Models\Group;
+use App\Models\Permission;
+use App\Models\Role;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Group as GroupSchema;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ColorColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 class GroupResource extends Resource
@@ -41,28 +48,65 @@ class GroupResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(3)
             ->components([
-                Section::make('Group Information')
-                    ->columnSpanFull()
-                    ->schema([
-                        TextInput::make('name')
-                            ->required()
-                            ->maxLength(255),
-                        Textarea::make('description')
-                            ->nullable(),
-                        ColorPicker::make('color')
-                            ->required(),
-                        FileUpload::make('image')
-                            ->nullable()
-                            ->disk('public')
-                            ->directory('groups/images')
-                            ->visibility('public')
-                            ->image()
-                            ->imageEditor()
-                            ->imageEditorAspectRatios([
-                                '16:9',
-                                '4:3',
-                                '1:1',
+                GroupSchema::make()
+                    ->columnSpan(2)
+                    ->components([
+                        Section::make('Group Information')
+                            ->columnSpanFull()
+                            ->schema([
+                                TextInput::make('name')
+                                    ->required()
+                                    ->maxLength(255),
+                                Textarea::make('description')
+                                    ->nullable(),
+                                ColorPicker::make('color')
+                                    ->required(),
+                                FileUpload::make('image')
+                                    ->nullable()
+                                    ->disk('public')
+                                    ->directory('groups/images')
+                                    ->visibility('public')
+                                    ->image()
+                                    ->imageEditor()
+                                    ->imageEditorAspectRatios([
+                                        '16:9',
+                                        '4:3',
+                                        '1:1',
+                                    ]),
+                                Checkbox::make('is_default_guest')
+                                    ->label('Default Guest Group')
+                                    ->helperText('This group will apply to all guests within the platform. Without a guest group, a guest will have no permissions to perform any action on the website. Checking this box will disable any previously checked default guest group.')
+                                    ->inline()
+                                    ->default(false),
+                                Checkbox::make('is_default_member')
+                                    ->label('Default Member Group')
+                                    ->helperText('All new members will be assigned to this group upon successful registration. Checking this box will disable any previously checked default member group.')
+                                    ->inline()
+                                    ->default(false),
+                            ]),
+                    ]),
+                GroupSchema::make()
+                    ->components([
+                        Section::make('Permissions')
+                            ->collapsible()
+                            ->persistCollapsed()
+                            ->components([
+                                Select::make('roles')
+                                    ->relationship('roles', 'name')
+                                    ->multiple()
+                                    ->searchable()
+                                    ->preload()
+                                    ->getOptionLabelUsing(fn (Role $role) => Str::of($role->name)->replace('_', ' ')->title()->toString())
+                                    ->helperText('The roles that are assigned to the group.'),
+                                Select::make('permissions')
+                                    ->relationship('permissions', 'name')
+                                    ->multiple()
+                                    ->searchable()
+                                    ->preload()
+                                    ->getOptionLabelUsing(fn (Permission $permission) => Str::of($permission->name)->replace('_', ' ')->title()->toString())
+                                    ->helperText('The permissions that are assigned to the group. These are in addition to the permissions already inherited by any assigned roles.'),
                             ]),
                     ]),
             ]);
@@ -85,6 +129,14 @@ class GroupResource extends Resource
                 ColorColumn::make('color'),
                 ToggleColumn::make('is_active')
                     ->label('Active'),
+                IconColumn::make('is_default_guest')
+                    ->sortable()
+                    ->boolean()
+                    ->label('Default Guest Group'),
+                IconColumn::make('is_default_member')
+                    ->sortable()
+                    ->boolean()
+                    ->label('Default Member Group'),
             ])
             ->filters([
                 TernaryFilter::make('is_active')

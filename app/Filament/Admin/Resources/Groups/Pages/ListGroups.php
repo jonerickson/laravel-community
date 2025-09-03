@@ -12,7 +12,7 @@ class ListGroups extends ListRecords
 {
     protected static string $resource = GroupResource::class;
 
-    protected ?string $subheading = 'Manage your community groups';
+    protected ?string $subheading = 'Manage your community groups.';
 
     protected function getHeaderActions(): array
     {

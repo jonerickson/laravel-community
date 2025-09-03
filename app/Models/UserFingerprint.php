@@ -66,14 +66,6 @@ class UserFingerprint extends Model
         'banned_by',
     ];
 
-    protected $casts = [
-        'fingerprint_data' => 'array',
-        'first_seen_at' => 'datetime',
-        'last_seen_at' => 'datetime',
-        'is_banned' => 'boolean',
-        'banned_at' => 'datetime',
-    ];
-
     public static function trackFingerprint(
         ?int $userId,
         string $fingerprintId,
@@ -146,5 +138,16 @@ class UserFingerprint extends Model
             'ban_reason' => null,
             'banned_by' => null,
         ]);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'fingerprint_data' => 'array',
+            'first_seen_at' => 'datetime',
+            'last_seen_at' => 'datetime',
+            'is_banned' => 'boolean',
+            'banned_at' => 'datetime',
+        ];
     }
 }

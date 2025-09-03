@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Contracts\Sluggable;
 use App\Traits\HasSlug;
+use App\Traits\Orderable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -59,6 +60,7 @@ class Forum extends Model implements Sluggable
 {
     use HasFactory;
     use HasSlug;
+    use Orderable;
 
     protected $fillable = [
         'name',
@@ -66,7 +68,6 @@ class Forum extends Model implements Sluggable
         'rules',
         'icon',
         'color',
-        'order',
         'is_active',
     ];
 
@@ -90,14 +91,9 @@ class Forum extends Model implements Sluggable
         return $this->hasManyThrough(Post::class, Topic::class);
     }
 
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): void
     {
-        return $query->where('is_active', true);
-    }
-
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order')->orderBy('name');
+        $query->where('is_active', true);
     }
 
     protected function topicsCount(): Attribute

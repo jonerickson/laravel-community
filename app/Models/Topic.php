@@ -136,9 +136,9 @@ class Topic extends Model implements Sluggable
         )->shouldCache();
     }
 
-    public function scopeLatestActivity($query)
+    public function scopeLatestActivity(Builder $query): void
     {
-        return $query->orderByDesc('is_pinned')
+        $query->orderByDesc('is_pinned')
             ->orderByDesc('updated_at')
             ->orderByDesc('created_at');
     }

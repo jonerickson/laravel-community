@@ -77,10 +77,11 @@ class PostResource extends Resource
                                 Textarea::make('excerpt')
                                     ->columnSpanFull()
                                     ->maxLength(500)
-                                    ->helperText('Brief description of the post (optional).'),
+                                    ->helperText('Brief description of the post (optional). If none is provided, the beginning of the post will be used as the excerpt.'),
                                 RichEditor::make('content')
                                     ->required()
                                     ->columnSpanFull()
+                                    ->helperText('The main post content.')
                                     ->toolbarButtons([
                                         'bold',
                                         'italic',
@@ -117,19 +118,20 @@ class PostResource extends Resource
                         Section::make('Publishing')
                             ->columns(1)
                             ->schema([
-                                Toggle::make('is_published')
-                                    ->default(false)
-                                    ->helperText('Publish this post immediately.'),
                                 Toggle::make('is_featured')
                                     ->default(false)
                                     ->helperText('Feature this post on the homepage.'),
                                 Toggle::make('comments_enabled')
                                     ->default(true)
                                     ->helperText('Allow users to comment on this post.'),
+                                Toggle::make('is_published')
+                                    ->default(true)
+                                    ->live()
+                                    ->helperText('Publish this post immediately.'),
                                 DateTimePicker::make('published_at')
                                     ->columnSpanFull()
                                     ->native(false)
-                                    ->helperText('Schedule when this post should be published.')
+                                    ->helperText('Schedule when this post should be published. Leave blank to keep the post in a draft state.')
                                     ->default(now()),
                                 Hidden::make('created_by')
                                     ->default(Auth::id()),
@@ -150,6 +152,7 @@ class PostResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateDescription('There are no posts to display. Create one to get started.')
             ->columns([
                 ImageColumn::make('featured_image')
                     ->grow(false)
@@ -180,6 +183,9 @@ class PostResource extends Resource
                     ->label('Read Time')
                     ->suffix(' min')
                     ->toggleable(),
+                TextColumn::make('status')
+                    ->badge()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

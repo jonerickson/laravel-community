@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Events\UserCreated;
+use App\Events\UserDeleted;
+use App\Events\UserUpdated;
 use App\Traits\HasAvatar;
 use App\Traits\HasEmailAuthentication;
 use App\Traits\HasGroups;
 use App\Traits\HasLogging;
 use App\Traits\HasMultiFactorAuthentication;
+use App\Traits\HasPermissions;
 use App\Traits\LogsAuthActivity;
 use App\Traits\Reportable;
 use Exception;
@@ -36,8 +40,6 @@ use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\Traits\HasPermissions;
-use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property int $id
@@ -80,6 +82,10 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read bool $is_reported
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
+ * @property-read Collection<int, \App\Models\Permission> $parentPermissions
+ * @property-read int|null $parent_permissions_count
+ * @property-read Collection<int, \App\Models\Role> $parentRoles
+ * @property-read int|null $parent_roles_count
  * @property-read Collection<int, Report> $pendingReports
  * @property-read int|null $pending_reports_count
  * @property-read Collection<int, \App\Models\Permission> $permissions
@@ -147,7 +153,6 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     use HasLogging;
     use HasMultiFactorAuthentication;
     use HasPermissions;
-    use HasRoles;
     use LogsAuthActivity;
     use Notifiable;
     use Reportable;
@@ -193,6 +198,12 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
 
     protected $with = [
         'groups',
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => UserCreated::class,
+        'updated' => UserUpdated::class,
+        'deleted' => UserDeleted::class,
     ];
 
     /**

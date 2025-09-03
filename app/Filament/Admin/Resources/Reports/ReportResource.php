@@ -91,6 +91,7 @@ class ReportResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateDescription('There are no reports to display.')
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')

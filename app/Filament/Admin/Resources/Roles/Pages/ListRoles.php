@@ -12,6 +12,8 @@ class ListRoles extends ListRecords
 {
     protected static string $resource = RoleResource::class;
 
+    protected ?string $subheading = 'Manage your community permissions that be assigned to users and groups.';
+
     protected function getHeaderActions(): array
     {
         return [

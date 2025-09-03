@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Events\GroupSaving;
 use App\Traits\HasFiles;
+use App\Traits\Orderable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Traits\HasPermissions;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property int $id
@@ -22,6 +24,8 @@ use Spatie\Permission\Traits\HasPermissions;
  * @property string $color
  * @property int $order
  * @property bool $is_active
+ * @property bool $is_default_guest
+ * @property bool $is_default_member
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read File|null $file
@@ -29,6 +33,8 @@ use Spatie\Permission\Traits\HasPermissions;
  * @property-read int|null $files_count
  * @property-read Collection<int, \App\Models\Permission> $permissions
  * @property-read int|null $permissions_count
+ * @property-read Collection<int, Role> $roles
+ * @property-read int|null $roles_count
  * @property-read Collection<int, User> $users
  * @property-read int|null $users_count
  *
@@ -39,16 +45,20 @@ use Spatie\Permission\Traits\HasPermissions;
  * @method static Builder<static>|Group ordered()
  * @method static Builder<static>|Group permission($permissions, $without = false)
  * @method static Builder<static>|Group query()
+ * @method static Builder<static>|Group role($roles, $guard = null, $without = false)
  * @method static Builder<static>|Group whereColor($value)
  * @method static Builder<static>|Group whereCreatedAt($value)
  * @method static Builder<static>|Group whereDescription($value)
  * @method static Builder<static>|Group whereId($value)
  * @method static Builder<static>|Group whereImage($value)
  * @method static Builder<static>|Group whereIsActive($value)
+ * @method static Builder<static>|Group whereIsDefaultGuest($value)
+ * @method static Builder<static>|Group whereIsDefaultMember($value)
  * @method static Builder<static>|Group whereName($value)
  * @method static Builder<static>|Group whereOrder($value)
  * @method static Builder<static>|Group whereUpdatedAt($value)
  * @method static Builder<static>|Group withoutPermission($permissions)
+ * @method static Builder<static>|Group withoutRole($roles, $guard = null)
  *
  * @mixin \Eloquent
  */
@@ -56,20 +66,21 @@ class Group extends Model
 {
     use HasFactory;
     use HasFiles;
-    use HasPermissions;
+    use HasRoles;
+    use Orderable;
 
     protected $fillable = [
         'name',
         'description',
         'image',
         'color',
-        'order',
         'is_active',
+        'is_default_guest',
+        'is_default_member',
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-        'order' => 'integer',
+    protected $dispatchesEvents = [
+        'saving' => GroupSaving::class,
     ];
 
     public function users(): BelongsToMany
@@ -77,13 +88,43 @@ class Group extends Model
         return $this->belongsToMany(User::class, 'users_groups');
     }
 
-    public function scopeActive($query)
+    public function toggleDefaultGuestGroup(): void
     {
-        return $query->where('is_active', true);
+        $builder = static::query()
+            ->whereKeyNot($this->id)
+            ->where('is_default_guest', true);
+
+        if ($builder->exists()) {
+            $builder->update([
+                'is_default_guest' => false,
+            ]);
+        }
     }
 
-    public function scopeOrdered($query)
+    public function toggleDefaultMemberGroup(): void
     {
-        return $query->orderBy('order')->orderBy('name');
+        $builder = static::query()
+            ->whereKeyNot($this->id)
+            ->where('is_default_member', true);
+
+        if ($builder->exists()) {
+            $builder->update([
+                'is_default_member' => false,
+            ]);
+        }
+    }
+
+    public function scopeActive(Builder $query): void
+    {
+        $query->where('is_active', true);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'is_default_member' => 'boolean',
+            'is_default_guest' => 'boolean',
+        ];
     }
 }

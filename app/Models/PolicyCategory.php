@@ -75,9 +75,9 @@ class PolicyCategory extends Model implements Sluggable
         return $this->policies()->where('is_active', true);
     }
 
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): void
     {
-        return $query->where('is_active', true);
+        $query->where('is_active', true);
     }
 
     protected function casts(): array

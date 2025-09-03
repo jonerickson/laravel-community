@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Traits\HasGroups;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Permission\Models\Role as BaseRole;
 
@@ -13,6 +14,8 @@ use Spatie\Permission\Models\Role as BaseRole;
  * @property string $guard_name
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Group> $groups
+ * @property-read int|null $groups_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Permission> $permissions
  * @property-read int|null $permissions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, User> $users
@@ -35,4 +38,5 @@ use Spatie\Permission\Models\Role as BaseRole;
 class Role extends BaseRole
 {
     use HasFactory;
+    use HasGroups;
 }

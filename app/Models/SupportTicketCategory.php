@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Contracts\Sluggable;
 use App\Traits\HasSlug;
 use App\Traits\Orderable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -57,7 +58,6 @@ class SupportTicketCategory extends Model implements Sluggable
         'name',
         'description',
         'color',
-        'order',
         'is_active',
     ];
 
@@ -71,9 +71,9 @@ class SupportTicketCategory extends Model implements Sluggable
         return $this->tickets()->whereIn('status', ['new', 'open', 'in_progress']);
     }
 
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): void
     {
-        return $query->where('is_active', true);
+        $query->where('is_active', true);
     }
 
     public function generateSlug(): ?string
@@ -85,7 +85,6 @@ class SupportTicketCategory extends Model implements Sluggable
     {
         return [
             'is_active' => 'boolean',
-            'order' => 'integer',
         ];
     }
 }

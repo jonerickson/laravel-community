@@ -6,10 +6,12 @@ namespace App\Http\Controllers\Forums;
 
 use App\Http\Controllers\Controller;
 use App\Models\Forum;
+use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -31,7 +33,8 @@ class ForumController extends Controller
                 $query->with(['author', 'lastPost.author'])
                     ->limit(3);
             }])
-            ->get();
+            ->get()
+            ->filter(fn (Forum $forum) => Auth::user()->can('view', $forum));
 
         return Inertia::render('forums/index', [
             'forums' => $forums,
@@ -50,6 +53,10 @@ class ForumController extends Controller
             ->with(['author', 'lastPost.author'])
             ->latestActivity()
             ->paginate(20);
+
+        $topics->setCollection(
+            collection: $topics->getCollection()->filter(fn (Topic $topic) => Auth::user()->can('view', $topic))
+        );
 
         return Inertia::render('forums/show', [
             'forum' => $forum,

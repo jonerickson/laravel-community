@@ -11,7 +11,9 @@ trait HasGroups
 {
     public function groups(): BelongsToMany
     {
-        return $this->belongsToMany(Group::class, 'users_groups');
+        $table = $this->getTable();
+
+        return $this->belongsToMany(Group::class, "{$table}_groups");
     }
 
     public function assignToGroup(Group $group): void

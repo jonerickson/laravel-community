@@ -5,20 +5,21 @@ declare(strict_types=1);
 namespace App\Traits;
 
 use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @mixin Eloquent
  */
 trait Pinnable
 {
-    public function scopePinned($query)
+    public function scopePinned(Builder $query): void
     {
-        return $query->where('is_pinned', true);
+        $query->where('is_pinned', true);
     }
 
-    public function scopeNotPinned($query)
+    public function scopeNotPinned(Builder $query): void
     {
-        return $query->where('is_pinned', false);
+        $query->where('is_pinned', false);
     }
 
     public function pin(): bool

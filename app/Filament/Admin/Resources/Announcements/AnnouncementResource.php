@@ -115,7 +115,7 @@ class AnnouncementResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->emptyStateDescription('There are no announcements.')
+            ->emptyStateDescription('There are no announcements to display.')
             ->columns([
                 TextColumn::make('title')
                     ->searchable()

@@ -6,9 +6,7 @@ namespace Database\Seeders;
 
 use App\Enums\AnnouncementType;
 use App\Models\Announcement;
-use App\Models\Group;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -17,6 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             PermissionSeeder::class,
+            GroupSeeder::class,
         ]);
 
         Announcement::factory()->state([
@@ -26,14 +25,7 @@ class DatabaseSeeder extends Seeder
             'content' => 'This is a test announcement.',
         ])->create();
 
-        $group = Group::factory()
-            ->count(2)
-            ->state(new Sequence(fn ($sequence) => [
-                'name' => "Test Group $sequence->index",
-            ]))
-            ->create();
-
-        User::factory()->hasAttached($group)->create([
+        User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@deschutesdesigngroup.com',
         ])->assignRole('super-admin');

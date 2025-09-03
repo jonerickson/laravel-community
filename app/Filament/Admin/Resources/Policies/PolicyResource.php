@@ -92,7 +92,7 @@ class PolicyResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->emptyStateDescription('There are no policies avaialble.')
+            ->emptyStateDescription('There are no policies available.')
             ->columns([
                 TextColumn::make('title')
                     ->searchable()

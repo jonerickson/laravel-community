@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Contracts\Sluggable;
 use App\Enums\ProductType;
+use App\Traits\Featureable;
 use App\Traits\HasFeaturedImage;
 use App\Traits\HasFiles;
 use App\Traits\HasLogging;
@@ -82,6 +83,7 @@ use Laravel\Scout\Searchable;
  */
 class Product extends Model implements Sluggable
 {
+    use Featureable;
     use HasFactory;
     use HasFeaturedImage;
     use HasFiles;
@@ -96,7 +98,6 @@ class Product extends Model implements Sluggable
         'name',
         'description',
         'type',
-        'is_featured',
         'stripe_product_id',
         'files',
     ];
@@ -139,14 +140,14 @@ class Product extends Model implements Sluggable
         return Str::slug($this->name);
     }
 
-    public function scopeProducts($query)
+    public function scopeProducts(Builder $query): void
     {
-        return $query->where('type', ProductType::Product);
+        $query->where('type', ProductType::Product);
     }
 
-    public function scopeSubscriptions($query)
+    public function scopeSubscriptions(Builder $query): void
     {
-        return $query->where('type', ProductType::Subscription);
+        $query->where('type', ProductType::Subscription);
     }
 
     public function isProduct(): bool
@@ -164,19 +165,14 @@ class Product extends Model implements Sluggable
         return ! is_null($this->stripe_product_id);
     }
 
-    public function scopeWithStripeProduct($query)
+    public function scopeWithStripeProduct(Builder $query): void
     {
-        return $query->whereNotNull('stripe_product_id');
+        $query->whereNotNull('stripe_product_id');
     }
 
-    public function scopeWithoutStripeProduct($query)
+    public function scopeWithoutStripeProduct(Builder $query): void
     {
-        return $query->whereNull('stripe_product_id');
-    }
-
-    public function scopeFeatured($query)
-    {
-        return $query->where('is_featured', true);
+        $query->whereNull('stripe_product_id');
     }
 
     public function toSearchableArray(): array

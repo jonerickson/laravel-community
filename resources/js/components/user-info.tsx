@@ -34,7 +34,14 @@ export function UserInfo({ user, showEmail = false, showGroups = false }: { user
                                 >
                                     {group.name}
                                 </span>
-                                <span className="mr-1 last:hidden">,</span>
+                                <span
+                                    className="mr-1 last:hidden"
+                                    style={{
+                                        color: group.color || "var('--text-primary')",
+                                    }}
+                                >
+                                    ,
+                                </span>
                             </>
                         ))}
                     </div>

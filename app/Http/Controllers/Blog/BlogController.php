@@ -9,7 +9,9 @@ use App\Models\Post;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -24,10 +26,17 @@ class BlogController extends Controller
     {
         $this->authorize('viewAny', Post::class);
 
-        $perPage = $request->input('per_page', 9);
+        /** @var LengthAwarePaginator $posts */
+        $posts = Post::query()
+            ->blog()
+            ->with(['comments', 'author', 'reads'])
+            ->latest()
+            ->paginate(
+                perPage: $request->input('per_page', 9)
+            );
 
-        $posts = Post::query()->blog()->with(['comments', 'author', 'reads'])->published()->latest()->paginate(
-            perPage: $perPage
+        $posts->setCollection(
+            collection: $posts->getCollection()->filter(fn (Post $post) => Auth::user()->can('view', $post))
         );
 
         return Inertia::render('blog/index', [

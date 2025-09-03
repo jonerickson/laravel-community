@@ -8,6 +8,7 @@ use App\Actions\Forums\DeleteTopicAction;
 use App\Enums\PostType;
 use App\Http\Controllers\Controller;
 use App\Models\Forum;
+use App\Models\Post;
 use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -15,6 +16,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -39,6 +41,10 @@ class TopicController extends Controller
             ->with(['author', 'comments.author', 'comments.replies.author', 'reports'])
             ->latestActivity()
             ->paginate(10);
+
+        $posts->setCollection(
+            collection: $posts->getCollection()->filter(fn (Post $post) => Auth::user()->can('view', $post))
+        );
 
         return Inertia::render('forums/topics/show', [
             'forum' => $forum,

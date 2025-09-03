@@ -24,6 +24,7 @@ class PermissionSeeder extends Seeder
         $role = Role::firstOrCreate(['name' => 'super-admin']);
         $role->givePermissionTo(Permission::all());
 
+        Role::firstOrCreate(['name' => 'guests']);
         Role::firstOrCreate(['name' => 'moderator']);
         Role::firstOrCreate(['name' => 'user']);
     }

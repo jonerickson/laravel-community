@@ -92,19 +92,19 @@ class Comment extends Model
         return $this->hasMany(Comment::class, 'parent_id');
     }
 
-    public function scopeApproved($query)
+    public function scopeApproved(Builder $query): void
     {
-        return $query->where('is_approved', true);
+        $query->where('is_approved', true);
     }
 
-    public function scopePending($query)
+    public function scopePending(Builder $query): void
     {
-        return $query->where('is_approved', false);
+        $query->where('is_approved', false);
     }
 
-    public function scopeTopLevel($query)
+    public function scopeTopLevel(Builder $query): void
     {
-        return $query->whereNull('parent_id');
+        $query->whereNull('parent_id');
     }
 
     public function isReply(): bool
@@ -117,14 +117,14 @@ class Comment extends Model
         return ! is_null($this->rating);
     }
 
-    public function scopeRatings($query)
+    public function scopeRatings(Builder $query): void
     {
-        return $query->whereNotNull('rating');
+        $query->whereNotNull('rating');
     }
 
-    public function scopeComments($query)
+    public function scopeComments(Builder $query): void
     {
-        return $query->whereNull('rating');
+        $query->whereNull('rating');
     }
 
     protected function casts(): array

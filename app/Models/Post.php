@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Contracts\Sluggable;
 use App\Enums\PostType;
 use App\Traits\Commentable;
+use App\Traits\Featureable;
 use App\Traits\HasAuthor;
 use App\Traits\HasFeaturedImage;
 use App\Traits\HasLogging;
@@ -15,6 +16,7 @@ use App\Traits\HasSlug;
 use App\Traits\HasUrl;
 use App\Traits\Likeable;
 use App\Traits\Pinnable;
+use App\Traits\Publishable;
 use App\Traits\Readable;
 use App\Traits\Reportable;
 use App\Traits\Viewable;
@@ -46,6 +48,7 @@ use Laravel\Scout\Searchable;
  * @property int $created_by
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property \App\Enums\PostStatus $status
  * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Collection<int, Comment> $approvedComments
@@ -118,6 +121,7 @@ use Laravel\Scout\Searchable;
 class Post extends Model implements Sluggable
 {
     use Commentable;
+    use Featureable;
     use HasAuthor;
     use HasFactory;
     use HasFeaturedImage;
@@ -127,6 +131,7 @@ class Post extends Model implements Sluggable
     use HasUrl;
     use Likeable;
     use Pinnable;
+    use Publishable;
     use Readable;
     use Reportable;
     use Searchable;
@@ -138,9 +143,6 @@ class Post extends Model implements Sluggable
         'title',
         'excerpt',
         'content',
-        'is_published',
-        'is_featured',
-        'published_at',
     ];
 
     protected $touches = [
@@ -164,44 +166,20 @@ class Post extends Model implements Sluggable
         return $this->belongsTo(Topic::class);
     }
 
-    public function scopePublished($query)
+    public function scopeBlog(Builder $query): void
     {
-        return $query->where('is_published', true)
-            ->whereNotNull('published_at')
-            ->where('published_at', '<=', now());
+        $query->where('type', PostType::Blog);
     }
 
-    public function scopeFeatured($query)
+    public function scopeForum(Builder $query): void
     {
-        return $query->where('is_featured', true);
+        $query->where('type', PostType::Forum);
     }
 
-    public function scopeRecent($query)
+    public function scopeLatestActivity(Builder $query): void
     {
-        return $query->orderBy('published_at', 'desc');
-    }
-
-    public function scopeBlog($query)
-    {
-        return $query->where('type', PostType::Blog);
-    }
-
-    public function scopeForum($query)
-    {
-        return $query->where('type', PostType::Forum);
-    }
-
-    public function scopeLatestActivity($query)
-    {
-        return $query->orderByDesc('is_pinned')
+        $query->orderByDesc('is_pinned')
             ->orderBy('created_at');
-    }
-
-    public function isPublished(): bool
-    {
-        return $this->is_published
-               && $this->published_at !== null
-               && $this->published_at->isPast();
     }
 
     public function getUrl(): ?string
@@ -275,9 +253,6 @@ class Post extends Model implements Sluggable
     {
         return [
             'type' => PostType::class,
-            'is_published' => 'boolean',
-            'is_featured' => 'boolean',
-            'published_at' => 'datetime',
         ];
     }
 }

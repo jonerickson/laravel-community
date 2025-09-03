@@ -73,21 +73,21 @@ class Announcement extends Model implements Sluggable
         return Str::slug($this->title);
     }
 
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): void
     {
-        return $query->where('is_active', true);
+        $query->where('is_active', true);
     }
 
-    public function scopeCurrent($query)
+    public function scopeCurrent(Builder $query): void
     {
         $now = now();
 
-        return $query->active()
-            ->where(function ($query) use ($now): void {
+        $query->active()
+            ->where(function (Builder $query) use ($now): void {
                 $query->whereNull('starts_at')
                     ->orWhere('starts_at', '<=', $now);
             })
-            ->where(function ($query) use ($now): void {
+            ->where(function (Builder $query) use ($now): void {
                 $query->whereNull('ends_at')
                     ->orWhere('ends_at', '>=', $now);
             });

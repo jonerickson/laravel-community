@@ -30,7 +30,6 @@ class GroupFactory extends Factory
             'name' => fake()->words(2, true),
             'description' => fake()->sentence(),
             'color' => fake()->randomElement($colors),
-            'order' => fake()->numberBetween(0, 100),
             'is_active' => fake()->boolean(90),
         ];
     }

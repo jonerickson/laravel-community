@@ -12,8 +12,8 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -53,7 +53,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 ]);
             }
 
-            if (in_array($response->getStatusCode(), [500, 503, 404, 403])) {
+            if (in_array($response->getStatusCode(), [500, 503, 404, 403]) && ! config('app.debug')) {
                 return Inertia::render('error', [
                     'status' => (string) $response->getStatusCode(),
                     'message' => $exception->getMessage() ?: 'An error occurred',

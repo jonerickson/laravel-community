@@ -16,6 +16,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
 class RoleResource extends Resource
@@ -54,5 +55,15 @@ class RoleResource extends Resource
             'create' => CreateRole::route('/create'),
             'edit' => EditRole::route('/{record}/edit'),
         ];
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return parent::canEdit($record) && ! in_array($record->name, ['super-admin', 'guests']);
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return parent::canDelete($record) && ! in_array($record->name, ['super-admin', 'guests']);
     }
 }

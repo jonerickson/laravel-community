@@ -3,7 +3,6 @@ import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Comment, PaginatedData, Post, SharedData } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import usePermissions from '../../hooks/use-permissions';
 
 interface RecentViewer {
     user: {
@@ -22,7 +21,6 @@ interface BlogShowProps {
 }
 
 export default function BlogShow({ post, comments, commentsPagination, recentViewers }: BlogShowProps) {
-    const { can } = usePermissions();
     const { name: siteName } = usePage<SharedData>().props;
     const pageDescription = post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, '') + '...';
 
@@ -96,9 +94,7 @@ export default function BlogShow({ post, comments, commentsPagination, recentVie
             </Head>
 
             <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto">
-                {can('view_posts') && (
-                    <BlogPost post={post} comments={comments} commentsPagination={commentsPagination} recentViewers={recentViewers} />
-                )}
+                <BlogPost post={post} comments={comments} commentsPagination={commentsPagination} recentViewers={recentViewers} />
             </div>
         </AppLayout>
     );

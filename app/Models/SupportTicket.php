@@ -9,6 +9,7 @@ use App\Enums\SupportTicketStatus;
 use App\Traits\Commentable;
 use App\Traits\HasAuthor;
 use App\Traits\HasFiles;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -136,49 +137,47 @@ class SupportTicket extends Model
         return $this->belongsTo(User::class, 'assigned_to');
     }
 
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): void
     {
-        return $query->whereIn('status', [
+        $query->whereIn('status', [
             SupportTicketStatus::New->value,
             SupportTicketStatus::Open->value,
             SupportTicketStatus::InProgress->value,
         ]);
     }
 
-    public function scopeByStatus($query, SupportTicketStatus $status)
+    public function scopeByStatus(Builder $query, SupportTicketStatus $status): void
     {
-        return $query->where('status', $status->value);
+        $query->where('status', $status->value);
     }
 
-    public function scopeByPriority($query, SupportTicketPriority $priority)
+    public function scopeByPriority(Builder $query, SupportTicketPriority $priority): void
     {
-        return $query->where('priority', $priority->value);
+        $query->where('priority', $priority->value);
     }
 
-    public function scopeAssignedTo($query, User $user)
+    public function scopeAssignedTo(Builder $query, User $user): void
     {
-        return $query->where('assigned_to', $user->id);
+        $query->where('assigned_to', $user->id);
     }
 
-    public function scopeUnassigned($query)
+    public function scopeUnassigned(Builder $query): void
     {
-        return $query->whereNull('assigned_to');
+        $query->whereNull('assigned_to');
     }
 
-    public function scopeExternal($query, ?string $driver = null)
+    public function scopeExternal(Builder $query, ?string $driver = null): void
     {
         $query = $query->whereNotNull('external_id');
 
         if ($driver !== null && $driver !== '' && $driver !== '0') {
             $query->where('external_driver', $driver);
         }
-
-        return $query;
     }
 
-    public function scopeNeedsSyncing($query, int $hoursOld = 24)
+    public function scopeNeedsSyncing(Builder $query, int $hoursOld = 24): void
     {
-        return $query->external()
+        $query->external()
             ->where(function ($query) use ($hoursOld): void {
                 $query->whereNull('last_synced_at')
                     ->orWhere('last_synced_at', '<', Carbon::now()->subHours($hoursOld));

@@ -94,15 +94,15 @@ class Policy extends Model implements Sluggable
         return $this->belongsToMany(Product::class, 'policies_products');
     }
 
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): void
     {
-        return $query->where('is_active', true);
+        $query->where('is_active', true);
     }
 
-    public function scopeEffective($query)
+    public function scopeEffective(Builder $query): void
     {
-        return $query->where(function ($q): void {
-            $q->whereNull('effective_at')
+        $query->where(function (Builder $query): void {
+            $query->whereNull('effective_at')
                 ->orWhere('effective_at', '<=', now());
         });
     }
