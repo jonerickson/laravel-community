@@ -16,6 +16,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
@@ -23,6 +24,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Group as GroupSchema;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
@@ -48,90 +50,115 @@ class ProductResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(3)
             ->components([
-                Section::make('Product Information')
-                    ->columnSpanFull()
-                    ->columns()
-                    ->schema([
-                        Radio::make('type')
+                GroupSchema::make()
+                    ->columnSpan(2)
+                    ->components([
+                        Section::make('Product Information')
                             ->columnSpanFull()
-                            ->required()
-                            ->options(ProductType::class)
-                            ->default(ProductType::Product->value),
-                        Toggle::make('is_featured')
-                            ->label('Featured Product')
-                            ->helperText('Mark this product as featured to display it prominently on the store page.')
-                            ->columnSpanFull(),
-                        TextInput::make('name')
-                            ->helperText('The product name.')
-                            ->required()
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(function ($operation, $state, Set $set): void {
-                                if ($operation === 'create') {
-                                    $set('slug', Str::slug($state));
-                                }
-                            }),
-                        TextInput::make('slug')
-                            ->helperText('A SEO friendly title.')
-                            ->required(),
-                        Select::make('categories')
+                            ->columns()
+                            ->schema([
+                                Radio::make('type')
+                                    ->columnSpanFull()
+                                    ->required()
+                                    ->options(ProductType::class)
+                                    ->default(ProductType::Product->value),
+                                TextInput::make('name')
+                                    ->helperText('The product name.')
+                                    ->required()
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function ($operation, $state, Set $set): void {
+                                        if ($operation === 'create') {
+                                            $set('slug', Str::slug($state));
+                                        }
+                                    }),
+                                TextInput::make('slug')
+                                    ->helperText('A SEO friendly title.')
+                                    ->required(),
+                                Select::make('categories')
+                                    ->columnSpanFull()
+                                    ->preload()
+                                    ->relationship('categories', 'name')
+                                    ->multiple()
+                                    ->required(),
+                                Select::make('groups')
+                                    ->relationship('groups', 'name')
+                                    ->columnSpanFull()
+                                    ->preload()
+                                    ->multiple()
+                                    ->searchable()
+                                    ->helperText('Groups that a customer will be assigned when they purchase this product.'),
+                                RichEditor::make('description')
+                                    ->helperText('The main product overview.')
+                                    ->required()
+                                    ->columnSpanFull(),
+                            ]),
+                        Section::make('Media')
                             ->columnSpanFull()
-                            ->preload()
-                            ->relationship('categories', 'name')
-                            ->multiple()
-                            ->required(),
-                        Select::make('policies')
-                            ->label('Required Policies')
-                            ->helperText('Select policies that customers must agree to when purchasing this product.')
+                            ->schema([
+                                FileUpload::make('featured_image')
+                                    ->disk('public')
+                                    ->directory('products/featured-images')
+                                    ->visibility('public')
+                                    ->helperText('The main product image.')
+                                    ->label('Featured Image')
+                                    ->image()
+                                    ->imageEditor()
+                                    ->imageEditorAspectRatios([
+                                        '16:9',
+                                        '4:3',
+                                        '1:1',
+                                    ]),
+                            ]),
+                        Section::make('Files')
                             ->columnSpanFull()
-                            ->preload()
-                            ->relationship('policies', 'title', fn (Builder $query) => $query->active()->effective()->orderBy('title'))
-                            ->multiple(),
-                        Select::make('groups')
-                            ->relationship('groups', 'name')
-                            ->columnSpanFull()
-                            ->preload()
-                            ->multiple()
-                            ->searchable()
-                            ->helperText('Groups that a customer will be assigned when they purchase this product.'),
-                        RichEditor::make('description')
-                            ->helperText('The main product overview.')
-                            ->required()
-                            ->columnSpanFull(),
-                    ]),
-                Section::make('Media')
-                    ->columnSpanFull()
-                    ->schema([
-                        FileUpload::make('featured_image')
-                            ->disk('public')
-                            ->directory('products/featured-images')
-                            ->visibility('public')
-                            ->helperText('The main product image.')
-                            ->label('Featured Image')
-                            ->image()
-                            ->imageEditor()
-                            ->imageEditorAspectRatios([
-                                '16:9',
-                                '4:3',
-                                '1:1',
+                            ->description('Add files the customer will have access to if they have purchased this product.')
+                            ->schema([
+                                Repeater::make('files')
+                                    ->hiddenLabel()
+                                    ->relationship('files')
+                                    ->addActionLabel('Add file')
+                                    ->schema([
+                                        FileUpload::make('files')
+                                            ->visibility('private')
+                                            ->helperText('Files the customer will have access to after purchasing the product.')
+                                            ->label('Downloads')
+                                            ->multiple(),
+                                    ]),
+
                             ]),
                     ]),
-                Section::make('Files')
-                    ->columnSpanFull()
-                    ->description('Add files the customer will have access to if they have purchased this product.')
-                    ->schema([
-                        Repeater::make('files')
-                            ->hiddenLabel()
-                            ->relationship('files')
-                            ->addActionLabel('Add file')
-                            ->schema([
-                                FileUpload::make('files')
-                                    ->visibility('private')
-                                    ->helperText('Files the customer will have access to after purchasing the product.')
-                                    ->label('Downloads')
+                GroupSchema::make()
+                    ->components([
+                        Section::make('Publishing')
+                            ->components([
+                                Toggle::make('is_featured')
+                                    ->label('Featured product')
+                                    ->helperText('Mark this product as featured to display it prominently on the store page.')
+                                    ->columnSpanFull(),
+                                Toggle::make('metadata.popular')
+                                    ->label('Popular product')
+                                    ->helperText('Mark this product as popular.')
+                                    ->columnSpanFull(),
+                            ]),
+                        Section::make('Compliance')
+                            ->components([
+                                Select::make('policies')
+                                    ->label('Required Policies')
+                                    ->helperText('Select policies that customers must agree to when purchasing this product.')
+                                    ->columnSpanFull()
+                                    ->preload()
+                                    ->relationship('policies', 'title', fn (Builder $query) => $query->active()->effective()->orderBy('title'))
                                     ->multiple(),
                             ]),
-
+                        Section::make('Metadata')
+                            ->components([
+                                KeyValue::make('metadata.features')
+                                    ->keyLabel('Feature')
+                                    ->valueLabel('Description')
+                                    ->nullable(),
+                            ]),
                     ]),
             ]);
     }

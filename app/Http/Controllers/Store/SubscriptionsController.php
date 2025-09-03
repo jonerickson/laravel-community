@@ -16,7 +16,6 @@ class SubscriptionsController extends Controller
         $subscriptionProducts = Product::subscriptions()
             ->with('activePrices')
             ->with('categories')
-            ->where('is_featured', true)
             ->orderBy('name')
             ->get()
             ->map(function (Product $product): array {
