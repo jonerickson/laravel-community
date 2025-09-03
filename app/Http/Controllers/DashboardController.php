@@ -16,8 +16,8 @@ class DashboardController
     public function __invoke(): Response
     {
         return Inertia::render('dashboard', [
-            'announcements' => Inertia::defer(fn () => $this->getAnnouncements()),
-            'supportTickets' => Inertia::defer(fn () => $this->getSupportTickets()),
+            'announcements' => Inertia::defer(fn (): Collection => $this->getAnnouncements()),
+            'supportTickets' => Inertia::defer(fn (): Collection => $this->getSupportTickets()),
         ]);
     }
 

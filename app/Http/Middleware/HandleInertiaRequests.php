@@ -23,9 +23,7 @@ class HandleInertiaRequests extends Middleware
                 'groups' => $user?->groups?->pluck(['id', 'name', 'color']),
                 'isAdmin' => $user?->hasRole('super-admin'),
                 'roles' => $user?->roles?->pluck('name'),
-                'can' => $user?->getPermissionsViaRoles()->mapWithKeys(function (Permission $permission) use ($user) {
-                    return [$permission->name => $user->can($permission->name)];
-                })->toArray(),
+                'can' => $user?->getPermissionsViaRoles()->mapWithKeys(fn (Permission $permission) => [$permission->name => $user->can($permission->name)])->toArray(),
             ],
             'cartCount' => $this->getCartCount(),
             'flash' => [

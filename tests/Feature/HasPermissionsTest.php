@@ -7,7 +7,7 @@ use App\Models\User;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->user = User::factory()->create();
     $this->group = Group::factory()->create();
 
@@ -23,7 +23,7 @@ beforeEach(function () {
     $this->moderatorRole->givePermissionTo([$this->readPermission, $this->writePermission]);
 });
 
-it('can check roles inherited from groups', function () {
+it('can check roles inherited from groups', function (): void {
     $this->group->assignRole($this->moderatorRole);
     $this->user->groups()->attach($this->group);
 
@@ -31,7 +31,7 @@ it('can check roles inherited from groups', function () {
     expect($this->user->hasRole('admin'))->toBeFalse();
 });
 
-it('can check permissions inherited from group roles', function () {
+it('can check permissions inherited from group roles', function (): void {
     $this->group->assignRole($this->moderatorRole);
     $this->user->groups()->attach($this->group);
 
@@ -39,7 +39,7 @@ it('can check permissions inherited from group roles', function () {
     expect($this->user->hasPermissionTo('write posts'))->toBeTrue();
 });
 
-it('can check direct group permissions', function () {
+it('can check direct group permissions', function (): void {
     $this->group->givePermissionTo($this->writePermission);
     $this->user->groups()->attach($this->group);
 
@@ -47,7 +47,7 @@ it('can check direct group permissions', function () {
     expect($this->user->hasPermissionTo('read posts'))->toBeFalse();
 });
 
-it('combines direct and group roles/permissions', function () {
+it('combines direct and group roles/permissions', function (): void {
     // Direct role
     $this->user->assignRole($this->userRole);
 
@@ -62,7 +62,7 @@ it('combines direct and group roles/permissions', function () {
     expect($this->user->hasPermissionTo('write posts'))->toBeTrue();
 });
 
-it('can get all roles including from groups', function () {
+it('can get all roles including from groups', function (): void {
     $this->user->assignRole($this->userRole);
     $this->group->assignRole($this->moderatorRole);
     $this->user->groups()->attach($this->group);
@@ -74,7 +74,7 @@ it('can get all roles including from groups', function () {
         ->and($allRoles->count())->toBe(2);
 });
 
-it('handles hasAllRoles correctly', function () {
+it('handles hasAllRoles correctly', function (): void {
     // Direct role
     $this->user->assignRole($this->userRole);
 

@@ -26,14 +26,20 @@ class TopicPolicy
 
     public function update(User $user, Topic $topic): bool
     {
-        return $user->hasPermissionTo('update_topics')
-            || $topic->isAuthoredBy($user);
+        if ($user->hasPermissionTo('update_topics')) {
+            return true;
+        }
+
+        return $topic->isAuthoredBy($user);
     }
 
     public function delete(User $user, Topic $topic): bool
     {
-        return $user->hasPermissionTo('delete_topics')
-            || $topic->isAuthoredBy($user);
+        if ($user->hasPermissionTo('delete_topics')) {
+            return true;
+        }
+
+        return $topic->isAuthoredBy($user);
     }
 
     public function reply(User $user, Topic $topic): bool

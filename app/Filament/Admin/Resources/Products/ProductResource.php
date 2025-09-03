@@ -166,8 +166,8 @@ class ProductResource extends Resource
                     ->default(0)
                     ->money()
                     ->sortable(),
-                TextColumn::make('stripe_product_id')
-                    ->label('Stripe ID')
+                TextColumn::make('external_product_id')
+                    ->label('External Product ID')
                     ->searchable()
                     ->copyable()
                     ->copyMessage('Stripe Product ID copied')

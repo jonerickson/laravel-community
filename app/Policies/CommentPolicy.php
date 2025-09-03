@@ -26,14 +26,20 @@ class CommentPolicy
 
     public function update(User $user, Comment $comment): bool
     {
-        return $user->hasPermissionTo('update_comments')
-            || $comment->isAuthoredBy($user);
+        if ($user->hasPermissionTo('update_comments')) {
+            return true;
+        }
+
+        return $comment->isAuthoredBy($user);
     }
 
     public function delete(User $user, Comment $comment): bool
     {
-        return $user->hasPermissionTo('delete_comments')
-            || $comment->isAuthoredBy($user);
+        if ($user->hasPermissionTo('delete_comments')) {
+            return true;
+        }
+
+        return $comment->isAuthoredBy($user);
     }
 
     public function like(User $user, Comment $comment): bool

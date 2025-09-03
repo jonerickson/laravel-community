@@ -60,7 +60,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if (in_array($response->getStatusCode(), [500, 503, 404, 403]) && ! config('app.debug')) {
                 return Inertia::render('error', [
                     'status' => (string) $response->getStatusCode(),
-                    'message' => $exception->getMessage() ?: 'An error occurred',
+                    'message' => in_array($exception->getMessage(), ['', '0'], true) ? 'An error occurred' : $exception->getMessage(),
                 ]);
             }
 

@@ -36,7 +36,7 @@ trait HasPermissions
 
         // Get roles from groups
         $groupRoles = Role::query()
-            ->whereHas('groups.users', function ($query) {
+            ->whereHas('groups.users', function ($query): void {
                 $query->where('users.id', $this->getKey());
             })
             ->get();

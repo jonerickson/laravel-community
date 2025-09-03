@@ -6,7 +6,7 @@ use App\Http\Controllers\Store\CategoryController;
 use App\Http\Controllers\Store\ProductController;
 use App\Http\Controllers\Store\ShoppingCartController;
 use App\Http\Controllers\Store\StoreController;
-use App\Http\Controllers\Store\SubscriptionController;
+use App\Http\Controllers\Store\SubscriptionsController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['as' => 'store.', 'prefix' => 'store'], function (): void {
@@ -14,7 +14,7 @@ Route::group(['as' => 'store.', 'prefix' => 'store'], function (): void {
     Route::get('categories/{category:slug}', CategoryController::class)->name('categories.show');
     Route::get('products/{category:slug?}/{product:slug}', ProductController::class)->name('categories.products.show');
     Route::get('products/{product:slug}', ProductController::class)->name('products.show');
-    Route::get('subscriptions', SubscriptionController::class)->name('subscriptions');
+    Route::get('subscriptions', [SubscriptionsController::class, 'index'])->name('subscriptions');
     Route::get('cart', [ShoppingCartController::class, 'index'])->name('cart.index');
     Route::delete('cart', [ShoppingCartController::class, 'destroy'])->name('cart.destroy');
 

@@ -26,14 +26,20 @@ class PostPolicy
 
     public function update(User $user, Post $post): bool
     {
-        return $user->hasPermissionTo('update_posts')
-            || $post->isAuthoredBy($user);
+        if ($user->hasPermissionTo('update_posts')) {
+            return true;
+        }
+
+        return $post->isAuthoredBy($user);
     }
 
     public function delete(User $user, Post $post): bool
     {
-        return $user->hasPermissionTo('delete_posts')
-            || $post->isAuthoredBy($user);
+        if ($user->hasPermissionTo('delete_posts')) {
+            return true;
+        }
+
+        return $post->isAuthoredBy($user);
     }
 
     public function report(User $user, Post $post): bool
