@@ -30,6 +30,7 @@ class BlogController extends Controller
         $posts = Post::query()
             ->blog()
             ->with(['comments', 'author', 'reads'])
+            ->published()
             ->latest()
             ->paginate(
                 perPage: $request->input('per_page', 9)

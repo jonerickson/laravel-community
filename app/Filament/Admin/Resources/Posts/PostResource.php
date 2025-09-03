@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Posts;
 
+use App\Enums\PostType;
 use App\Filament\Admin\Resources\Posts\Pages\CreatePost;
 use App\Filament\Admin\Resources\Posts\Pages\EditPost;
 use App\Filament\Admin\Resources\Posts\Pages\ListPosts;
@@ -61,6 +62,8 @@ class PostResource extends Resource
                         Section::make('Post Content')
                             ->columns()
                             ->schema([
+                                Hidden::make('type')
+                                    ->default(PostType::Blog),
                                 TextInput::make('title')
                                     ->required()
                                     ->maxLength(255)
