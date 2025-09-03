@@ -77,16 +77,14 @@ class Announcement extends Model implements Sluggable
 
     public function scopeCurrent(Builder $query): void
     {
-        $now = now();
-
         $query->active()
-            ->where(function (Builder $query) use ($now): void {
+            ->where(function (Builder $query): void {
                 $query->whereNull('starts_at')
-                    ->orWhere('starts_at', '<=', $now);
+                    ->orWhere('starts_at', '<=', now());
             })
-            ->where(function (Builder $query) use ($now): void {
+            ->where(function (Builder $query): void {
                 $query->whereNull('ends_at')
-                    ->orWhere('ends_at', '>=', $now);
+                    ->orWhere('ends_at', '>=', now());
             });
     }
 

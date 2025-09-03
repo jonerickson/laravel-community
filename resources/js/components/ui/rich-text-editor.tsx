@@ -17,6 +17,7 @@ import {
 import { Bold, Italic, List, ListOrdered, Quote, Undo, Redo, Link as LinkIcon, Smile, ImageIcon, AlignLeft, AlignCenter, AlignRight, AlignJustify, MoreHorizontal, Code,
     Strikethrough,
     Underline,
+    Heading,
     Heading1,
     Heading2,
     Heading3,
@@ -462,7 +463,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button type="button" variant="ghost" size="sm">
-                                <Heading1 className="h-4 w-4" />
+                                <Heading className="h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
