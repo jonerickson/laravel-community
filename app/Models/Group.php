@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Events\GroupSaving;
+use App\Traits\Activateable;
 use App\Traits\HasFiles;
 use App\Traits\Orderable;
 use Illuminate\Database\Eloquent\Builder;
@@ -40,6 +41,7 @@ use Spatie\Permission\Traits\HasRoles;
  *
  * @method static Builder<static>|Group active()
  * @method static \Database\Factories\GroupFactory factory($count = null, $state = [])
+ * @method static Builder<static>|Group inactive()
  * @method static Builder<static>|Group newModelQuery()
  * @method static Builder<static>|Group newQuery()
  * @method static Builder<static>|Group ordered()
@@ -64,6 +66,7 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class Group extends Model
 {
+    use Activateable;
     use HasFactory;
     use HasFiles;
     use HasRoles;
@@ -74,7 +77,6 @@ class Group extends Model
         'description',
         'image',
         'color',
-        'is_active',
         'is_default_guest',
         'is_default_member',
     ];
@@ -114,15 +116,9 @@ class Group extends Model
         }
     }
 
-    public function scopeActive(Builder $query): void
-    {
-        $query->where('is_active', true);
-    }
-
     protected function casts(): array
     {
         return [
-            'is_active' => 'boolean',
             'is_default_member' => 'boolean',
             'is_default_guest' => 'boolean',
         ];

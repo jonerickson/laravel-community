@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\Sluggable;
+use App\Traits\Activateable;
 use App\Traits\HasSlug;
 use App\Traits\Orderable;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,6 +39,7 @@ use Illuminate\Support\Str;
  *
  * @method static Builder<static>|Forum active()
  * @method static \Database\Factories\ForumFactory factory($count = null, $state = [])
+ * @method static Builder<static>|Forum inactive()
  * @method static Builder<static>|Forum newModelQuery()
  * @method static Builder<static>|Forum newQuery()
  * @method static Builder<static>|Forum ordered()
@@ -58,6 +60,7 @@ use Illuminate\Support\Str;
  */
 class Forum extends Model implements Sluggable
 {
+    use Activateable;
     use HasFactory;
     use HasSlug;
     use Orderable;
@@ -68,7 +71,6 @@ class Forum extends Model implements Sluggable
         'rules',
         'icon',
         'color',
-        'is_active',
     ];
 
     public function generateSlug(): ?string
@@ -91,11 +93,6 @@ class Forum extends Model implements Sluggable
         return $this->hasManyThrough(Post::class, Topic::class);
     }
 
-    public function scopeActive(Builder $query): void
-    {
-        $query->where('is_active', true);
-    }
-
     protected function topicsCount(): Attribute
     {
         return Attribute::make(
@@ -108,12 +105,5 @@ class Forum extends Model implements Sluggable
         return Attribute::make(
             get: fn (): int => Post::whereHas('topic', fn ($query) => $query->where('forum_id', $this->id))->count()
         );
-    }
-
-    protected function casts(): array
-    {
-        return [
-            'is_active' => 'boolean',
-        ];
     }
 }

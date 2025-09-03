@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Contracts\Sluggable;
 use App\Enums\AnnouncementType;
+use App\Traits\Activateable;
 use App\Traits\HasAuthor;
 use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Builder;
@@ -34,6 +35,7 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|Announcement active()
  * @method static Builder<static>|Announcement current()
  * @method static \Database\Factories\AnnouncementFactory factory($count = null, $state = [])
+ * @method static Builder<static>|Announcement inactive()
  * @method static Builder<static>|Announcement newModelQuery()
  * @method static Builder<static>|Announcement newQuery()
  * @method static Builder<static>|Announcement query()
@@ -54,6 +56,7 @@ use Illuminate\Support\Str;
  */
 class Announcement extends Model implements Sluggable
 {
+    use Activateable;
     use HasAuthor;
     use HasFactory;
     use HasSlug;
@@ -62,7 +65,6 @@ class Announcement extends Model implements Sluggable
         'title',
         'content',
         'type',
-        'is_active',
         'is_dismissible',
         'starts_at',
         'ends_at',
@@ -71,11 +73,6 @@ class Announcement extends Model implements Sluggable
     public function generateSlug(): ?string
     {
         return Str::slug($this->title);
-    }
-
-    public function scopeActive(Builder $query): void
-    {
-        $query->where('is_active', true);
     }
 
     public function scopeCurrent(Builder $query): void
@@ -110,7 +107,6 @@ class Announcement extends Model implements Sluggable
     protected function casts(): array
     {
         return [
-            'is_active' => 'boolean',
             'is_dismissible' => 'boolean',
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',

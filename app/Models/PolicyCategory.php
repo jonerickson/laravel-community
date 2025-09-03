@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\Sluggable;
+use App\Traits\Activateable;
 use App\Traits\HasSlug;
 use App\Traits\Orderable;
 use Illuminate\Database\Eloquent\Builder;
@@ -31,6 +32,7 @@ use Illuminate\Support\Str;
  *
  * @method static Builder<static>|PolicyCategory active()
  * @method static \Database\Factories\PolicyCategoryFactory factory($count = null, $state = [])
+ * @method static Builder<static>|PolicyCategory inactive()
  * @method static Builder<static>|PolicyCategory newModelQuery()
  * @method static Builder<static>|PolicyCategory newQuery()
  * @method static Builder<static>|PolicyCategory ordered()
@@ -48,6 +50,7 @@ use Illuminate\Support\Str;
  */
 class PolicyCategory extends Model implements Sluggable
 {
+    use Activateable;
     use HasFactory;
     use HasSlug;
     use Orderable;
@@ -57,7 +60,6 @@ class PolicyCategory extends Model implements Sluggable
     protected $fillable = [
         'name',
         'description',
-        'is_active',
     ];
 
     public function generateSlug(): ?string
@@ -72,18 +74,8 @@ class PolicyCategory extends Model implements Sluggable
 
     public function activePolicies(): HasMany
     {
-        return $this->policies()->where('is_active', true);
-    }
-
-    public function scopeActive(Builder $query): void
-    {
-        $query->where('is_active', true);
-    }
-
-    protected function casts(): array
-    {
-        return [
-            'is_active' => 'boolean',
-        ];
+        return $this
+            ->policies()
+            ->active();
     }
 }

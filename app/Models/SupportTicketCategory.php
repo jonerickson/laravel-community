@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\Sluggable;
+use App\Enums\SupportTicketStatus;
+use App\Traits\Activateable;
 use App\Traits\HasSlug;
 use App\Traits\Orderable;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -30,6 +31,7 @@ use Illuminate\Support\Str;
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicketCategory active()
  * @method static \Database\Factories\SupportTicketCategoryFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicketCategory inactive()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicketCategory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicketCategory newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupportTicketCategory ordered()
@@ -48,6 +50,7 @@ use Illuminate\Support\Str;
  */
 class SupportTicketCategory extends Model implements Sluggable
 {
+    use Activateable;
     use HasFactory;
     use HasSlug;
     use Orderable;
@@ -58,7 +61,6 @@ class SupportTicketCategory extends Model implements Sluggable
         'name',
         'description',
         'color',
-        'is_active',
     ];
 
     public function tickets(): HasMany
@@ -68,23 +70,11 @@ class SupportTicketCategory extends Model implements Sluggable
 
     public function activeTickets(): HasMany
     {
-        return $this->tickets()->whereIn('status', ['new', 'open', 'in_progress']);
-    }
-
-    public function scopeActive(Builder $query): void
-    {
-        $query->where('is_active', true);
+        return $this->tickets()->whereIn('status', [SupportTicketStatus::New, SupportTicketStatus::Open, SupportTicketStatus::InProgress]);
     }
 
     public function generateSlug(): ?string
     {
         return Str::slug($this->name);
-    }
-
-    protected function casts(): array
-    {
-        return [
-            'is_active' => 'boolean',
-        ];
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\Sluggable;
+use App\Traits\Activateable;
 use App\Traits\HasAuthor;
 use App\Traits\HasSlug;
 use App\Traits\HasUrl;
@@ -42,6 +43,7 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Policy active()
  * @method static Builder<static>|Policy effective()
  * @method static \Database\Factories\PolicyFactory factory($count = null, $state = [])
+ * @method static Builder<static>|Policy inactive()
  * @method static Builder<static>|Policy newModelQuery()
  * @method static Builder<static>|Policy newQuery()
  * @method static Builder<static>|Policy ordered()
@@ -63,6 +65,7 @@ use Laravel\Scout\Searchable;
  */
 class Policy extends Model implements Sluggable
 {
+    use Activateable;
     use HasAuthor;
     use HasFactory;
     use HasSlug;
@@ -75,7 +78,6 @@ class Policy extends Model implements Sluggable
         'content',
         'version',
         'policy_category_id',
-        'is_active',
         'effective_at',
     ];
 
@@ -92,11 +94,6 @@ class Policy extends Model implements Sluggable
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'policies_products');
-    }
-
-    public function scopeActive(Builder $query): void
-    {
-        $query->where('is_active', true);
     }
 
     public function scopeEffective(Builder $query): void
@@ -132,7 +129,6 @@ class Policy extends Model implements Sluggable
     protected function casts(): array
     {
         return [
-            'is_active' => 'boolean',
             'effective_at' => 'datetime',
         ];
     }

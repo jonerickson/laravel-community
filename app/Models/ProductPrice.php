@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Traits\Activateable;
 use App\Traits\HasMetadata;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -31,6 +32,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|ProductPrice active()
  * @method static Builder<static>|ProductPrice default()
  * @method static \Database\Factories\ProductPriceFactory factory($count = null, $state = [])
+ * @method static Builder<static>|ProductPrice inactive()
  * @method static Builder<static>|ProductPrice newModelQuery()
  * @method static Builder<static>|ProductPrice newQuery()
  * @method static Builder<static>|ProductPrice oneTime()
@@ -57,6 +59,7 @@ use Illuminate\Support\Carbon;
  */
 class ProductPrice extends Model
 {
+    use Activateable;
     use HasFactory;
     use HasMetadata;
 
@@ -70,7 +73,6 @@ class ProductPrice extends Model
         'interval',
         'interval_count',
         'stripe_price_id',
-        'is_active',
         'is_default',
         'description',
     ];
@@ -82,11 +84,6 @@ class ProductPrice extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
-    }
-
-    public function scopeActive(Builder $query): void
-    {
-        $query->where('is_active', true);
     }
 
     public function scopeDefault(Builder $query): void
@@ -151,7 +148,6 @@ class ProductPrice extends Model
     {
         return [
             'amount' => 'decimal:2',
-            'is_active' => 'boolean',
             'is_default' => 'boolean',
         ];
     }
