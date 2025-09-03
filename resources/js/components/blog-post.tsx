@@ -101,7 +101,7 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
             </header>
 
             <figure className="mb-8" itemProp="image" itemScope itemType="https://schema.org/ImageObject">
-                {post.featured_image_url ? (
+                {post.featured_image_url && (
                     <>
                         <img
                             src={post.featured_image_url}
@@ -113,14 +113,6 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
                         <meta itemProp="width" content="1200" />
                         <meta itemProp="height" content="675" />
                     </>
-                ) : (
-                    <div
-                        className="flex aspect-video w-full items-center justify-center rounded-lg bg-muted"
-                        role="img"
-                        aria-label="No featured image available"
-                    >
-                        <ImageIcon className="h-16 w-16 text-muted-foreground" aria-hidden="true" />
-                    </div>
                 )}
             </figure>
 
