@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { UserInfo } from '@/components/user-info';
 import { pluralize } from '@/lib/utils';
 import { Post } from '@/types';
+import { stripCharacters, truncate } from '@/utils/truncate';
 import { Link } from '@inertiajs/react';
 import { Clock, Eye, ImageIcon, MessageCircle } from 'lucide-react';
 import usePermissions from '../hooks/use-permissions';
@@ -71,10 +72,7 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                         )}
                     </div>
                     <div className="group relative mt-2 grow">
-                        <HeadingSmall
-                            title={post.title}
-                            description={post.excerpt || post.content.replace(/<\/?[^>]+(>|$)/g, '').substring(0, 150) + '...'}
-                        />
+                        <HeadingSmall title={post.title} description={post.excerpt || truncate(stripCharacters(post.content))} />
                     </div>
                     <div className="flex items-center gap-2 py-1.5 pt-4 text-left text-sm">
                         {post.author && <UserInfo user={post.author} showEmail={false} />}

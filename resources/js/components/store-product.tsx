@@ -189,7 +189,7 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                     >
                         <Button
                             type="submit"
-                            disabled={loading === productData?.id || !productData}
+                            disabled={loading === productData?.id || !productData || !productData.default_price}
                             className="mt-8 flex w-full items-center justify-center"
                         >
                             {loading === productData?.id ? 'Adding...' : 'Add to cart'}

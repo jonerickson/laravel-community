@@ -75,7 +75,7 @@ function PricingCard({ plan, billingCycle, onSubscribe }: PricingCardProps) {
 
     return (
         <Card
-            className={`relative w-full max-w-sm ${plan.popular ? 'border-2 border-chart-1 shadow-lg' : ''} ${plan.current ? 'ring-2 ring-green-500' : ''}`}
+            className={`relative w-full max-w-sm ${plan.popular ? 'border-2 border-info shadow-lg' : ''} ${plan.current ? 'ring-2 ring-green-500' : ''}`}
         >
             <CardHeader className="pb-4 text-center">
                 <div className={`mx-auto mb-4 rounded-full bg-gradient-to-r p-3 ${color} w-fit text-white`}>
@@ -124,7 +124,7 @@ function PricingCard({ plan, billingCycle, onSubscribe }: PricingCardProps) {
                             Current Plan
                         </Button>
                     ) : (
-                        <Button className={`w-full ${plan.popular ? 'bg-chart-1 hover:bg-chart-1/80' : ''}`} onClick={() => onSubscribe(plan.id)}>
+                        <Button className={`w-full ${plan.popular ? 'hover:bg-info-1/80 bg-info' : ''}`} onClick={() => onSubscribe(plan.id)}>
                             {plan.popular ? (
                                 <>
                                     <Rocket className="mr-2 h-4 w-4" />
@@ -185,7 +185,7 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                             <Card>
                                 <CardContent className="p-6 text-center">
-                                    <Shield className="mx-auto mb-4 h-12 w-12 text-blue-500" />
+                                    <Shield className="mx-auto mb-4 h-12 w-12 text-info" />
                                     <h3 className="mb-2 font-semibold">Secure payments</h3>
                                     <p className="text-sm text-muted-foreground">
                                         All payments are processed securely through Stripe with industry-standard encryption.
@@ -195,7 +195,7 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
 
                             <Card>
                                 <CardContent className="p-6 text-center">
-                                    <Users className="mx-auto mb-4 h-12 w-12 text-green-500" />
+                                    <Users className="mx-auto mb-4 h-12 w-12 text-success" />
                                     <h3 className="mb-2 font-semibold">24/7 support</h3>
                                     <p className="text-sm text-muted-foreground">
                                         Get help when you need it with our dedicated support team available around the clock.
@@ -205,7 +205,7 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
 
                             <Card>
                                 <CardContent className="p-6 text-center">
-                                    <Rocket className="mx-auto mb-4 h-12 w-12 text-purple-500" />
+                                    <Rocket className="mx-auto mb-4 h-12 w-12 text-destructive" />
                                     <h3 className="mb-2 font-semibold">Cancel anytime</h3>
                                     <p className="text-sm text-muted-foreground">
                                         No long-term commitments. Cancel your subscription at any time with just a few clicks.

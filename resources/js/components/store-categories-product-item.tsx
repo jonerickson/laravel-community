@@ -3,7 +3,7 @@ import { StarRating } from '@/components/star-rating';
 import { Button } from '@/components/ui/button';
 import { useCartOperations } from '@/hooks/use-cart-operations';
 import { Product, ProductCategory } from '@/types';
-import { truncate } from '@/utils/truncate';
+import { stripCharacters, truncate } from '@/utils/truncate';
 import { Link } from '@inertiajs/react';
 import { ImageIcon } from 'lucide-react';
 
@@ -27,7 +27,7 @@ export default function StoreCategoriesProductItem({ product, category }: { prod
             )}
             <div className="flex flex-1 flex-col pt-6 pb-4">
                 <div className="flex-1">
-                    <HeadingSmall title={product.name} description={truncate(product.description)} />
+                    <HeadingSmall title={product.name} description={truncate(stripCharacters(product.description))} />
                     <div className="mt-3">
                         <StarRating rating={product.average_rating || 0} size="sm" className="mb-1" />
                     </div>

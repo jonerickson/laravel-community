@@ -33,3 +33,14 @@ export function truncateWords(text: string | null | undefined, wordLimit: number
 
     return words.slice(0, wordLimit).join(' ').trim() + ellipsis;
 }
+
+/**
+ * Strip HTML characters from a string.
+ *
+ * @param text
+ */
+export function stripCharacters(text: string) {
+    if (!text) return '';
+
+    return text.replace(/<\/?[^>]+(>|$)/g, '');
+}

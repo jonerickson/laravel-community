@@ -181,13 +181,6 @@ class ProductResource extends Resource
                     ->searchable()
                     ->listWithLineBreaks()
                     ->limitList(2),
-                TextColumn::make('policies.title')
-                    ->label('Required Policies')
-                    ->badge()
-                    ->searchable()
-                    ->listWithLineBreaks()
-                    ->limitList(3)
-                    ->toggleable(),
                 TextColumn::make('defaultPrice.amount')
                     ->label('Default Price')
                     ->default(0)
@@ -217,19 +210,19 @@ class ProductResource extends Resource
                     ->native(false),
                 Filter::make('products')
                     ->label('Products Only')
-                    ->query(fn (Builder $query): Builder => $query->products()),
+                    ->query(fn (Builder|Product $query): Builder => $query->products()),
                 Filter::make('subscriptions')
                     ->label('Subscriptions Only')
-                    ->query(fn (Builder $query): Builder => $query->subscriptions()),
-                Filter::make('with_stripe')
-                    ->label('Linked to Stripe')
-                    ->query(fn (Builder $query): Builder => $query->withStripeProduct()),
-                Filter::make('without_stripe')
-                    ->label('Not Linked to Stripe')
-                    ->query(fn (Builder $query): Builder => $query->withoutStripeProduct()),
+                    ->query(fn (Builder|Product $query): Builder => $query->subscriptions()),
+                Filter::make('with_external_product_id')
+                    ->label('Linked to External Product')
+                    ->query(fn (Builder|Product $query): Builder => $query->withExternalProduct()),
+                Filter::make('without_external_product_id')
+                    ->label('Not Linked to External Product')
+                    ->query(fn (Builder|Product $query): Builder => $query->withoutExternalProduct()),
                 Filter::make('featured')
                     ->label('Featured Products')
-                    ->query(fn (Builder $query): Builder => $query->featured()),
+                    ->query(fn (Builder|Product $query): Builder => $query->featured()),
             ])
             ->recordActions([
                 EditAction::make(),
