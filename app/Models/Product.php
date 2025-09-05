@@ -5,7 +5,12 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\Sluggable;
+use App\Enums\ProductTaxCode;
 use App\Enums\ProductType;
+use App\Events\ProductCreated;
+use App\Events\ProductDeleted;
+use App\Events\ProductDeleting;
+use App\Events\ProductUpdated;
 use App\Traits\Featureable;
 use App\Traits\HasFeaturedImage;
 use App\Traits\HasFiles;
@@ -32,6 +37,7 @@ use Laravel\Scout\Searchable;
  * @property string $slug
  * @property string $description
  * @property ProductType $type
+ * @property ProductTaxCode $tax_code
  * @property bool $is_featured
  * @property string|null $featured_image
  * @property string|null $external_product_id
@@ -77,6 +83,7 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Product whereMetadata($value)
  * @method static Builder<static>|Product whereName($value)
  * @method static Builder<static>|Product whereSlug($value)
+ * @method static Builder<static>|Product whereTaxCode($value)
  * @method static Builder<static>|Product whereType($value)
  * @method static Builder<static>|Product whereUpdatedAt($value)
  * @method static Builder<static>|Product withExternalProduct()
@@ -102,12 +109,19 @@ class Product extends Model implements Sluggable
         'name',
         'description',
         'type',
+        'tax_code',
         'external_product_id',
-        'files',
     ];
 
     protected $hidden = [
         'external_product_id',
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => ProductCreated::class,
+        'updated' => ProductUpdated::class,
+        'deleting' => ProductDeleting::class,
+        'deleted' => ProductDeleted::class,
     ];
 
     public function categories(): BelongsToMany
@@ -217,6 +231,7 @@ class Product extends Model implements Sluggable
     {
         return [
             'type' => ProductType::class,
+            'tax_code' => ProductTaxCode::class,
         ];
     }
 }

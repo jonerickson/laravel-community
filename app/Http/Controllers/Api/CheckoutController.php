@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\ApiResource;
+use App\Models\Product;
 use App\Services\ShoppingCartService;
 use Exception;
 use Illuminate\Http\Request;
@@ -19,6 +20,7 @@ class CheckoutController
     public function __invoke(Request $request): ApiResource
     {
         $user = Auth::guard('api')->user();
+
         if (! $user) {
             return ApiResource::error(
                 message: 'Authentication required to checkout.',
@@ -28,6 +30,7 @@ class CheckoutController
         }
 
         $cartItems = $this->cartService->getCartItems();
+
         if (blank($cartItems)) {
             return ApiResource::error(
                 message: 'Cart is empty.',
@@ -36,9 +39,13 @@ class CheckoutController
             );
         }
 
+        $productPrices = [];
         $lineItems = [];
+
         foreach ($cartItems as $item) {
+            /** @var Product $product */
             $product = $item['product'];
+
             if (! $product || ! $product->external_product_id) {
                 return ApiResource::error(
                     message: "{$item['name']} is not available for purchase.",
@@ -56,25 +63,34 @@ class CheckoutController
                 $selectedPrice = $product->defaultPrice;
             }
 
-            if (! $selectedPrice || ! $selectedPrice->stripe_price_id) {
+            if (! $selectedPrice || ! $selectedPrice->external_price_id) {
                 return ApiResource::error(
-                    message: "Price not configured for {$item['name']}.",
+                    message: "No prices are configured for {$item['name']}.",
                     errors: ['price' => ["Price not configured for {$item['name']}."]],
                     status: 400
                 );
             }
 
+            $productPrices[] = $selectedPrice;
             $lineItems[] = [
-                'price' => $selectedPrice->stripe_price_id,
+                'price' => $selectedPrice->external_price_id,
                 'quantity' => $item['quantity'],
             ];
+        }
+
+        if (empty($productPrices) || empty($lineItems)) {
+            return ApiResource::error(
+                message: 'Cart is empty.',
+                errors: ['cart' => ['Cart cannot be empty.']],
+                status: 400
+            );
         }
 
         try {
             $checkout = $user->checkout($lineItems, [
                 'success_url' => route('store.checkout.success').'?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => route('store.cart.index'),
-                'mode' => 'subscription',
+                'mode' => $productPrices[0]->product->isSubscription() ? 'subscription' : 'payment',
                 'metadata' => [
                     'cart_items' => json_encode(array_map(fn (array $item): array => [
                         'product_id' => $item['product_id'],

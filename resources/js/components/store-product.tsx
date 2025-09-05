@@ -1,14 +1,14 @@
 import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
+import RichEditorContent from '@/components/rich-editor-content';
 import { StarRating } from '@/components/star-rating';
 import { StoreProductRating } from '@/components/store-product-rating';
 import { StoreProductReviewsList } from '@/components/store-product-reviews-list';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useCartOperations } from '@/hooks/use-cart-operations';
 import type { Comment, PaginatedData, Product as ProductType, SharedData } from '@/types';
-import { Deferred, usePage } from '@inertiajs/react';
+import { Deferred, useForm, usePage } from '@inertiajs/react';
 import { CurrencyIcon, GlobeIcon, ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -25,21 +25,49 @@ interface ProductProps {
 
 export default function Product({ product: productData, reviews, reviewsPagination }: ProductProps) {
     const { auth } = usePage<SharedData>().props;
-    const [quantity, setQuantity] = useState(1);
     const [selectedPriceId, setSelectedPriceId] = useState<number | null>(productData?.default_price?.id || null);
     const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
-    const { addItem, loading } = useCartOperations();
+
+    const { data, setData, post, processing, errors } = useForm({
+        price_id: selectedPriceId,
+        quantity: 1,
+    });
 
     useEffect(() => {
-        if (productData?.default_price && !selectedPriceId) {
-            setSelectedPriceId(productData.default_price.id);
+        let newPriceId = null;
+
+        if (productData?.prices && productData.prices.length === 1) {
+            newPriceId = productData.prices[0].id;
+        } else if (productData?.default_price) {
+            newPriceId = productData.default_price.id;
         }
-    }, [selectedPriceId, productData?.default_price]);
 
-    const handleAddToCart = async () => {
-        if (!productData) return;
+        if (newPriceId && newPriceId !== selectedPriceId) {
+            setSelectedPriceId(newPriceId);
+            setData('price_id', newPriceId);
+        }
+    }, [productData?.default_price, productData?.prices, selectedPriceId, setData]);
 
-        await addItem(productData.id, selectedPriceId, quantity);
+    const handlePriceChange = (value: string) => {
+        const priceId = value ? parseInt(value) : null;
+        setSelectedPriceId(priceId);
+        setData('price_id', priceId);
+    };
+
+    const handleQuantityChange = (value: string) => {
+        const quantity = parseInt(value);
+        setData('quantity', quantity);
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!productData || !data.price_id) return;
+
+        post(
+            route('store.products.store', {
+                product: productData.slug,
+            }),
+        );
     };
 
     return (
@@ -126,73 +154,69 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                 </div>
 
                 <div className="mt-8 lg:col-span-5 lg:flex lg:h-full lg:flex-col">
-                    <HeadingSmall title="Description" />
-                    <p
-                        dangerouslySetInnerHTML={{
-                            __html: productData?.description,
-                        }}
-                        className="mt-2 text-sm text-muted-foreground"
-                    />
+                    {productData?.description && (
+                        <>
+                            <HeadingSmall title="Description" />
+                            <RichEditorContent className="mt-2 text-sm text-muted-foreground" content={productData.description} />
+                        </>
+                    )}
 
                     {productData && (
                         <div className="mt-8 space-y-4">
                             {productData.prices && productData.prices.length > 0 && (
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-4">
+                                        <label htmlFor="price" className="text-sm font-medium">
+                                            Price:
+                                        </label>
+                                        <Select value={selectedPriceId?.toString() || ''} onValueChange={handlePriceChange}>
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Select price" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {productData.prices.map((price) => (
+                                                    <SelectItem key={price.id} value={price.id.toString()}>
+                                                        {price.name} - ${price.amount} {price.currency}
+                                                        {price.interval && ` / ${price.interval}`}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    {errors.price_id && <div className="text-sm text-red-600">{errors.price_id}</div>}
+                                </div>
+                            )}
+
+                            <div className="space-y-2">
                                 <div className="flex items-center gap-4">
-                                    <label htmlFor="price" className="text-sm font-medium">
-                                        Price:
+                                    <label htmlFor="quantity" className="text-sm font-medium">
+                                        Quantity:
                                     </label>
-                                    <Select
-                                        value={selectedPriceId?.toString() || ''}
-                                        onValueChange={(value) => setSelectedPriceId(value ? parseInt(value) : null)}
-                                        disabled={productData.prices.length === 1}
-                                    >
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select price" />
+                                    <Select value={data.quantity.toString()} onValueChange={handleQuantityChange}>
+                                        <SelectTrigger className="w-[180px]">
+                                            <SelectValue placeholder="Quantity" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {productData.prices.map((price) => (
-                                                <SelectItem key={price.id} value={price.id.toString()}>
-                                                    {price.name} - ${price.amount} {price.currency}
-                                                    {price.interval && ` / ${price.interval}`}
+                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                                                <SelectItem key={num} value={num.toString()}>
+                                                    {num}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
-                            )}
-
-                            <div className="flex items-center gap-4">
-                                <label htmlFor="quantity" className="text-sm font-medium">
-                                    Quantity:
-                                </label>
-                                <Select value={quantity.toString()} onValueChange={(value) => setQuantity(parseInt(value))}>
-                                    <SelectTrigger className="w-[180px]">
-                                        <SelectValue placeholder="Quantity" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                                            <SelectItem key={num} value={num.toString()}>
-                                                {num}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                {errors.quantity && <div className="text-sm text-red-600">{errors.quantity}</div>}
                             </div>
                         </div>
                     )}
 
-                    <form
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                            handleAddToCart();
-                        }}
-                    >
+                    <form onSubmit={handleSubmit}>
                         <Button
                             type="submit"
-                            disabled={loading === productData?.id || !productData || !productData.default_price}
+                            disabled={processing || !productData || !data.price_id}
                             className="mt-8 flex w-full items-center justify-center"
                         >
-                            {loading === productData?.id ? 'Adding...' : 'Add to cart'}
+                            {processing ? 'Adding...' : 'Add to cart'}
                         </Button>
                     </form>
 

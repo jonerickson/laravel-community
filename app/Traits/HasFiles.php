@@ -23,4 +23,11 @@ trait HasFiles
     {
         return $this->morphMany(File::class, 'resource');
     }
+
+    protected function initializeHasFiles(): void
+    {
+        $this->mergeFillable([
+            'files',
+        ]);
+    }
 }

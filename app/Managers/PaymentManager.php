@@ -7,6 +7,7 @@ namespace App\Managers;
 use App\Contracts\PaymentProcessor;
 use App\Drivers\Payments\StripeDriver;
 use App\Models\Product;
+use App\Models\ProductPrice;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
@@ -41,6 +42,21 @@ class PaymentManager extends Manager implements PaymentProcessor
     public function listProducts(array $filters = []): Collection
     {
         return $this->driver()->listProducts($filters);
+    }
+
+    public function createPrice(Product $product, ProductPrice $price): ProductPrice
+    {
+        return $this->driver()->createPrice($product, $price);
+    }
+
+    public function updatePrice(Product $product, ProductPrice $price): ProductPrice
+    {
+        return $this->driver()->updatePrice($product, $price);
+    }
+
+    public function deletePrice(Product $product, ProductPrice $price): bool
+    {
+        return $this->driver()->deletePrice($product, $price);
     }
 
     protected function createStripeDriver(): PaymentProcessor

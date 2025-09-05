@@ -32,7 +32,7 @@ class ProductPriceFactory extends Factory
             'currency' => 'USD',
             'interval' => $isRecurring ? $this->faker->randomElement($intervals) : null,
             'interval_count' => $isRecurring ? $this->faker->numberBetween(1, 12) : 1,
-            'stripe_price_id' => $this->faker->optional(0.7)->regexify('price_[A-Za-z0-9]{14}'),
+            'external_price_id' => $this->faker->optional(0.7)->regexify('price_[A-Za-z0-9]{14}'),
             'is_active' => $this->faker->boolean(85),
             'is_default' => false,
             'description' => $this->faker->optional(0.6)->sentence(),
@@ -79,21 +79,21 @@ class ProductPriceFactory extends Factory
     public function withStripe(): static
     {
         return $this->state(fn (array $attributes) => [
-            'stripe_price_id' => $this->faker->regexify('price_[A-Za-z0-9]{14}'),
+            'external_price_id' => $this->faker->regexify('price_[A-Za-z0-9]{14}'),
         ]);
     }
 
     public function withStripePriceId(string $envKey): static
     {
         return $this->state(fn (array $attributes) => [
-            'stripe_price_id' => env($envKey),
+            'external_price_id' => env($envKey),
         ]);
     }
 
     public function withoutStripe(): static
     {
         return $this->state(fn (array $attributes) => [
-            'stripe_price_id' => null,
+            'external_price_id' => null,
         ]);
     }
 

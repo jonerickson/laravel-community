@@ -455,13 +455,13 @@ CREATE TABLE `products_prices` (
   `interval_count` int NOT NULL DEFAULT '1',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `is_default` tinyint(1) NOT NULL DEFAULT '0',
-  `stripe_price_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `external_price_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `metadata` json DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `product_prices_product_id_is_active_index` (`product_id`,`is_active`),
-  KEY `product_prices_stripe_price_id_index` (`stripe_price_id`),
+  KEY `product_prices_stripe_price_id_index` (`external_price_id`),
   CONSTRAINT `product_prices_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -615,15 +615,15 @@ DROP TABLE IF EXISTS `support_tickets`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `support_tickets` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `ticket_number` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `subject` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `priority` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ticket_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `priority` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `support_ticket_category_id` bigint unsigned NOT NULL,
   `assigned_to` bigint unsigned DEFAULT NULL,
-  `external_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `external_driver` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `external_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `external_driver` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `external_data` json DEFAULT NULL,
   `created_by` bigint unsigned NOT NULL,
   `closed_at` timestamp NULL DEFAULT NULL,
@@ -649,10 +649,10 @@ DROP TABLE IF EXISTS `support_tickets_categories`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `support_tickets_categories` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `color` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `color` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `order` int NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -779,7 +779,7 @@ DROP TABLE IF EXISTS `views`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `views` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `viewable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `viewable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `viewable_id` bigint unsigned NOT NULL,
   `created_by` bigint unsigned NOT NULL,
   `count` int unsigned NOT NULL DEFAULT '1',

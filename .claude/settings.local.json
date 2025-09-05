@@ -5,7 +5,8 @@
       "mcp__laravel-boost__search-docs",
       "mcp__laravel-boost__list-artisan-commands",
       "mcp__playwright__browser_take_screenshot",
-      "mcp__playwright__browser_navigate"
+      "mcp__playwright__browser_navigate",
+      "Read(//Users/jonerickson/Downloads/**)"
     ],
     "deny": []
   },

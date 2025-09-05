@@ -111,7 +111,7 @@ export interface ProductPrice {
     interval_count: number;
     is_active: boolean;
     is_default: boolean;
-    stripe_price_id?: string | null;
+    external_price_id?: string | null;
     metadata?: Record<string, never> | null;
     created_at: string;
     updated_at: string;

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Events\ProductPriceCreated;
+use App\Events\ProductPriceDeleted;
+use App\Events\ProductPriceDeleting;
+use App\Events\ProductPriceUpdated;
 use App\Traits\Activateable;
 use App\Traits\HasMetadata;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,7 +27,7 @@ use Illuminate\Support\Carbon;
  * @property int $interval_count
  * @property bool $is_active
  * @property bool $is_default
- * @property string|null $stripe_price_id
+ * @property string|null $external_price_id
  * @property array<array-key, mixed>|null $metadata
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -42,6 +46,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|ProductPrice whereCreatedAt($value)
  * @method static Builder<static>|ProductPrice whereCurrency($value)
  * @method static Builder<static>|ProductPrice whereDescription($value)
+ * @method static Builder<static>|ProductPrice whereExternalPriceId($value)
  * @method static Builder<static>|ProductPrice whereId($value)
  * @method static Builder<static>|ProductPrice whereInterval($value)
  * @method static Builder<static>|ProductPrice whereIntervalCount($value)
@@ -50,10 +55,9 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|ProductPrice whereMetadata($value)
  * @method static Builder<static>|ProductPrice whereName($value)
  * @method static Builder<static>|ProductPrice whereProductId($value)
- * @method static Builder<static>|ProductPrice whereStripePriceId($value)
  * @method static Builder<static>|ProductPrice whereUpdatedAt($value)
- * @method static Builder<static>|ProductPrice withStripePrice()
- * @method static Builder<static>|ProductPrice withoutStripePrice()
+ * @method static Builder<static>|ProductPrice withExternalPrice()
+ * @method static Builder<static>|ProductPrice withoutExternalPrice()
  *
  * @mixin \Eloquent
  */
@@ -72,13 +76,24 @@ class ProductPrice extends Model
         'currency',
         'interval',
         'interval_count',
-        'stripe_price_id',
+        'external_price_id',
         'is_default',
         'description',
     ];
 
     protected $hidden = [
-        'stripe_price_id',
+        'external_price_id',
+    ];
+
+    protected $touches = [
+        'product',
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => ProductPriceCreated::class,
+        'updated' => ProductPriceUpdated::class,
+        'deleting' => ProductPriceDeleting::class,
+        'deleted' => ProductPriceDeleted::class,
     ];
 
     public function product(): BelongsTo
@@ -101,14 +116,14 @@ class ProductPrice extends Model
         $query->whereNull('interval');
     }
 
-    public function scopeWithStripePrice(Builder $query): void
+    public function scopeWithExternalPrice(Builder $query): void
     {
-        $query->whereNotNull('stripe_price_id');
+        $query->whereNotNull('external_price_id');
     }
 
-    public function scopeWithoutStripePrice(Builder $query): void
+    public function scopeWithoutExternalPrice(Builder $query): void
     {
-        $query->whereNull('stripe_price_id');
+        $query->whereNull('external_price_id');
     }
 
     public function isRecurring(): bool
@@ -123,7 +138,7 @@ class ProductPrice extends Model
 
     public function hasStripePrice(): bool
     {
-        return ! is_null($this->stripe_price_id);
+        return ! is_null($this->external_price_id);
     }
 
     public function getFormattedAmount(): string

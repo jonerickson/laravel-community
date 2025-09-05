@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Products;
 
+use App\Enums\ProductTaxCode;
 use App\Enums\ProductType;
 use App\Filament\Admin\Resources\Products\Pages\CreateProduct;
 use App\Filament\Admin\Resources\Products\Pages\EditProduct;
@@ -76,6 +77,13 @@ class ProductResource extends Resource
                                 TextInput::make('slug')
                                     ->helperText('A SEO friendly title.')
                                     ->required(),
+                                Select::make('tax_code')
+                                    ->required()
+                                    ->label('Tax Code')
+                                    ->preload()
+                                    ->columnSpanFull()
+                                    ->searchable()
+                                    ->options(ProductTaxCode::class),
                                 Select::make('categories')
                                     ->columnSpanFull()
                                     ->preload()
@@ -111,23 +119,25 @@ class ProductResource extends Resource
                                         '1:1',
                                     ]),
                             ]),
-                        Section::make('Files')
-                            ->columnSpanFull()
-                            ->description('Add files the customer will have access to if they have purchased this product.')
-                            ->schema([
-                                Repeater::make('files')
-                                    ->hiddenLabel()
-                                    ->relationship('files')
-                                    ->addActionLabel('Add file')
-                                    ->schema([
-                                        FileUpload::make('files')
-                                            ->visibility('private')
-                                            ->helperText('Files the customer will have access to after purchasing the product.')
-                                            ->label('Downloads')
-                                            ->multiple(),
-                                    ]),
-
-                            ]),
+                        //                        Section::make('Files')
+                        //                            ->columnSpanFull()
+                        //                            ->description('Add files the customer will have access to if they have purchased this product.')
+                        //                            ->schema([
+                        //                                Repeater::make('files')
+                        //                                    ->hiddenLabel()
+                        //                                    ->dehydrated(false)
+                        //                                    ->relationship('files')
+                        //                                    ->addActionLabel('Add file')
+                        //                                    ->schema([
+                        //                                        FileUpload::make('files')
+                        //                                            ->dehydrated(false)
+                        //                                            ->visibility('private')
+                        //                                            ->helperText('Files the customer will have access to after purchasing the product.')
+                        //                                            ->label('Downloads')
+                        //                                            ->multiple(),
+                        //                                    ]),
+                        //
+                        //                            ]),
                     ]),
                 GroupSchema::make()
                     ->components([

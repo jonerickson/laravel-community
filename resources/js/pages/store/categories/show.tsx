@@ -36,7 +36,7 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
                 {products.length > 0 ? (
                     <div className="-my-6 grid grid-cols-2 sm:-mx-6 md:grid-cols-3 lg:grid-cols-4">
                         {products.map((product) => (
-                            <StoreCategoriesProductItem product={product} category={category} />
+                            <StoreCategoriesProductItem product={product} />
                         ))}
                     </div>
                 ) : (

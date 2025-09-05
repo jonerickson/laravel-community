@@ -4,16 +4,40 @@ import { Button } from '@/components/ui/button';
 import { useCartOperations } from '@/hooks/use-cart-operations';
 import { Product, ProductCategory } from '@/types';
 import { stripCharacters, truncate } from '@/utils/truncate';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { ImageIcon } from 'lucide-react';
 
-export default function StoreCategoriesProductItem({ product, category }: { product: Product; category: ProductCategory }) {
+export default function StoreCategoriesProductItem({ product }: { product: Product; category: ProductCategory }) {
     const { addItem, loading } = useCartOperations();
 
     const handleAddToCart = async () => {
-        if (!product.default_price) return;
+        if (!product.default_price) {
+            // If no default price, redirect to product page to select price
+            router.visit(route('store.products.show', { product: product.slug }));
+            return;
+        }
 
         await addItem(product.id, product.default_price.id, 1);
+    };
+
+    const getPriceDisplay = () => {
+        if (product.default_price) {
+            return `$${product.default_price.amount}`;
+        }
+
+        if (product.prices && product.prices.length > 0) {
+            const amounts = product.prices.map((price) => parseFloat(price.amount.toString()));
+            const minPrice = Math.min(...amounts);
+            const maxPrice = Math.max(...amounts);
+
+            if (minPrice === maxPrice) {
+                return `$${minPrice.toFixed(2)}`;
+            }
+
+            return `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
+        }
+
+        return '$0.00';
     };
 
     return (
@@ -33,12 +57,12 @@ export default function StoreCategoriesProductItem({ product, category }: { prod
                     </div>
                 </div>
                 <div className="mt-4 space-y-2">
-                    <p className="text-base font-medium text-primary">${product.default_price?.amount || '0.00'}</p>
+                    <p className="text-base font-medium text-primary">{getPriceDisplay()}</p>
                     <Button className="w-full" variant="outline" asChild>
-                        <Link href={route('store.categories.products.show', { product: product.slug, category: category.slug })}>View</Link>
+                        <Link href={route('store.products.show', { product: product.slug })}>View</Link>
                     </Button>
-                    <Button className="w-full" onClick={handleAddToCart} disabled={loading === product.id || !product.default_price}>
-                        {loading === product.id ? 'Adding...' : 'Add to cart'}
+                    <Button className="w-full" onClick={handleAddToCart} disabled={loading === product.id}>
+                        {loading === product.id ? 'Adding...' : product.default_price ? 'Add to cart' : 'Select options'}
                     </Button>
                 </div>
             </div>

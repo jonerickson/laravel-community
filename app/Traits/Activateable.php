@@ -28,7 +28,7 @@ trait Activateable
         ]);
 
         $this->mergeFillable([
-            'is_active' => 'boolean',
+            'is_active',
         ]);
     }
 }

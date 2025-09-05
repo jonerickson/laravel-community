@@ -18,54 +18,6 @@ class ShoppingCartController extends Controller
         private readonly ShoppingCartService $cartService
     ) {}
 
-    public function store(Request $request): ApiResource
-    {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'price_id' => 'nullable|exists:products_prices,id',
-            'quantity' => 'integer|min:1|max:99',
-        ]);
-
-        $product = Product::findOrFail($request->input('product_id'));
-        $priceId = $request->input('price_id');
-        $quantity = $request->input('quantity') ?? 1;
-
-        if (! $priceId) {
-            $defaultPrice = $product->defaultPrice;
-            if ($defaultPrice) {
-                $priceId = $defaultPrice->id;
-            }
-        }
-
-        $cart = Session::get('shopping_cart', []);
-        $cartKey = $product->id.'_'.$priceId;
-
-        if (isset($cart[$cartKey])) {
-            $cart[$cartKey]['quantity'] += $quantity;
-        } else {
-            $cart[$cartKey] = [
-                'product_id' => $product->id,
-                'price_id' => $priceId,
-                'name' => $product->name,
-                'slug' => $product->slug,
-                'quantity' => $quantity,
-                'added_at' => now()->toISOString(),
-            ];
-        }
-
-        Session::put('shopping_cart', $cart);
-
-        $cartItems = $this->cartService->getCartItems();
-
-        return ApiResource::success(
-            resource: [
-                'cartItems' => $cartItems,
-                'cartCount' => count($cartItems),
-            ],
-            message: 'Product added to cart successfully.'
-        );
-    }
-
     public function update(Request $request): JsonResource
     {
         $request->validate([

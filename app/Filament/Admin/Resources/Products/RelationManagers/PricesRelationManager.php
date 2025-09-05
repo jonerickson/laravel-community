@@ -58,19 +58,16 @@ class PricesRelationManager extends RelationManager
                         'year' => 'Yearly',
                     ])
                     ->nullable()
-                    ->helperText('Leave empty for one-time payment.'),
+                    ->visible(fn () => $this->getOwnerRecord()->isSubscription())
+                    ->helperText('Subscription billing interval.'),
                 TextInput::make('interval_count')
                     ->label('Interval Count')
                     ->numeric()
                     ->default(1)
                     ->minValue(1)
                     ->maxValue(365)
+                    ->visible(fn () => $this->getOwnerRecord()->isSubscription())
                     ->helperText('Number of intervals (e.g., every 2 months).'),
-                TextInput::make('stripe_price_id')
-                    ->columnSpanFull()
-                    ->label('Stripe Price ID')
-                    ->helperText('The Stripe price ID (e.g., price_xxxxxxxxxxxx).')
-                    ->placeholder('price_xxxxxxxxxxxx'),
                 Toggle::make('is_active')
                     ->default(true)
                     ->helperText('Whether this price is available for purchase.'),
@@ -85,8 +82,12 @@ class PricesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->description('The individual pricing for the product.')
-            ->emptyStateDescription('There are no prices for this product.')
+            ->description(fn () => $this->getOwnerRecord()->isSubscription()
+                ? 'Subscription pricing for this product.'
+                : 'One-time pricing for this product.')
+            ->emptyStateDescription(fn () => $this->getOwnerRecord()->isSubscription()
+                ? 'No subscription prices set for this product.'
+                : 'No prices set for this product.')
             ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('name')
@@ -97,23 +98,15 @@ class PricesRelationManager extends RelationManager
                     ->sortable(),
                 TextColumn::make('interval')
                     ->badge()
-                    ->formatStateUsing(fn (?string $state): string => filled($state) ? ucfirst($state) : 'One-time')
-                    ->colors([
-                        'success' => fn (?string $state): bool => is_null($state),
-                        'info' => fn (?string $state): bool => ! is_null($state),
-                    ]),
+                    ->visible(fn () => $this->getOwnerRecord()->isSubscription())
+                    ->formatStateUsing(fn (?string $state): string => filled($state) ? ucfirst($state) : 'Monthly')
+                    ->color('info'),
                 IconColumn::make('is_active')
                     ->boolean()
                     ->label('Active'),
                 IconColumn::make('is_default')
                     ->boolean()
                     ->label('Default'),
-                TextColumn::make('stripe_price_id')
-                    ->label('Stripe ID')
-                    ->placeholder('Not linked')
-                    ->copyable()
-                    ->copyMessage('Stripe Price ID copied')
-                    ->toggleable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -131,7 +124,8 @@ class PricesRelationManager extends RelationManager
                         'month' => 'Monthly',
                         'year' => 'Yearly',
                     ])
-                    ->placeholder('All Types'),
+                    ->placeholder('All Intervals')
+                    ->visible(fn () => $this->getOwnerRecord()->isSubscription()),
             ])
             ->headerActions([
                 CreateAction::make(),
