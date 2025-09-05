@@ -43,6 +43,10 @@ export function StoreProductRating({ product, onRatingAdded }: ProductRatingProp
                     setComment('');
                     onRatingAdded?.();
                 },
+                onError: (err) => {
+                    console.error('Error submitting rating:', err);
+                    toast.error(err.message || 'Unable to submit rating. Please try again.');
+                },
             },
         );
     };

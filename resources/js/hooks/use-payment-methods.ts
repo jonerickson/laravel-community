@@ -1,6 +1,7 @@
 import { useApiRequest } from '@/hooks/use-api-request';
 import { router } from '@inertiajs/react';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import { toast } from 'sonner';
 
 interface SetupIntent {
     id: string;
@@ -75,8 +76,10 @@ export function usePaymentMethods() {
                 },
             },
             {
-                onSuccess: () => {
-                    router.reload({ only: ['paymentMethods'] });
+                onSuccess: () => router.reload({ only: ['paymentMethods'] }),
+                onError: (err) => {
+                    console.error('Error deleting payment method:', err);
+                    toast.error(err.message || 'Unable to delete payment method. Please try again.');
                 },
             },
         );

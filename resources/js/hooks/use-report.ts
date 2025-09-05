@@ -19,8 +19,10 @@ export function useReport() {
                 data,
             },
             {
-                onSuccess: () => {
-                    toast.success('Report submitted successfully. Thank you for helping keep our community safe.');
+                onSuccess: () => toast.success('Report submitted successfully. Thank you for helping keep our community safe.'),
+                onError: (err) => {
+                    console.error('Error submitting report:', err);
+                    toast.error(err.message || 'Unable to submit report. Please try again.');
                 },
             },
         );

@@ -40,8 +40,9 @@ export default function CreateSupportTicket({ categories }: CreateSupportTicketP
                 reset();
                 toast.success('Your support ticket has been successfully created. Please check your email for updates.');
             },
-            onError: (error) => {
-                toast.error(error.message || 'Unable to create support ticket. Please try again.');
+            onError: (err) => {
+                console.error('Error creating ticket:', err);
+                toast.error(err.message || 'Unable to create support ticket. Please try again.');
             },
         });
     };

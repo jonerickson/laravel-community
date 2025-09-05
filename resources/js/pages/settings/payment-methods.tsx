@@ -16,6 +16,7 @@ import { useApiRequest } from '@/hooks/use-api-request';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { CreditCard, DollarSign, Link as LinkIcon, Plus, Smartphone } from 'lucide-react';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -68,11 +69,10 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
                 },
             },
             {
-                onSuccess: () => {
-                    router.reload({
-                        only: ['paymentMethods'],
-                        onSuccess: () => {},
-                    });
+                onSuccess: () => router.reload({ only: ['paymentMethods'] }),
+                onError: (err) => {
+                    console.error('Error updating payment method:', err);
+                    toast.error(err.message || 'Unable to update payment method. Please try again.');
                 },
             },
         );

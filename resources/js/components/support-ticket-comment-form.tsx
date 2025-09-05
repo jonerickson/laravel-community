@@ -31,10 +31,11 @@ export default function SupportTicketCommentForm({ ticket, onCancel, onSuccess }
             onSuccess: () => {
                 reset();
                 onSuccess?.();
-                toast.success('Comment added successfully!');
+                toast.success('Comment added successfully.');
             },
-            onError: () => {
-                toast.error('Failed to add comment. Please try again.');
+            onError: (err) => {
+                console.error('Error adding comment:', err);
+                toast.error(err.message || 'Failed to add comment. Please try again.');
             },
         });
     };

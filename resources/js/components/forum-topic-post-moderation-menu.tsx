@@ -45,7 +45,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
             {
                 onSuccess: () => toast.success(`The post has been deleted.`),
                 onError: (err) => {
-                    console.error(err);
+                    console.error('Error deleting post:', err);
                     toast.error(err.message || 'Unable to delete post. Please try again.');
                 },
             },
@@ -81,7 +81,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                     window.location.reload();
                 },
                 onError: (err) => {
-                    console.error(err);
+                    console.error('Error publishing/unpublishing post:', err);
                     toast.error(err.message || 'Unable to update post. Please try again.');
                 },
             },
@@ -112,8 +112,8 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                     window.location.reload();
                 },
                 onError: (err) => {
-                    console.error(err);
-                    toast.error(err.message || 'Unable to unpin post. Please try again.');
+                    console.error('Error pinning/unpinning post:', err);
+                    toast.error(err.message || 'Unable to update post. Please try again.');
                 },
             },
         );

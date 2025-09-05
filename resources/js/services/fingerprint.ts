@@ -22,8 +22,8 @@ class FingerprintService {
 
         try {
             this.fp = await FingerprintJS.load();
-        } catch (error) {
-            console.error('Failed to initialize FingerprintJS:', error);
+        } catch (err) {
+            console.error('Error initializing FingerprintJS:', err);
         }
     }
 
@@ -38,8 +38,8 @@ class FingerprintService {
             const result = await this.fp.get();
             this.fingerprintId = result.visitorId;
             return result;
-        } catch (error) {
-            console.error('Failed to get fingerprint:', error);
+        } catch (err) {
+            console.error('Error getting fingerprint:', err);
             return null;
         }
     }
@@ -67,8 +67,8 @@ class FingerprintService {
                     },
                 ),
             );
-        } catch (error: unknown) {
-            console.error('Failed to track fingerprint:', error);
+        } catch (err: unknown) {
+            console.error('Failed to track fingerprint:', err);
         }
     }
 }

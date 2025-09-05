@@ -1,7 +1,7 @@
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Comment, EmojiReactionResponse, Post } from '@/types';
-import { ApiError, apiRequest } from '@/utils/api';
+import { apiRequest } from '@/utils/api';
 import axios from 'axios';
 import { useState } from 'react';
 
@@ -75,8 +75,6 @@ export default function EmojiReactions({ post, comment, initialReactions = [], u
             setCurrentUserReactions(data.user_reactions || []);
         } catch (error) {
             console.error('Error toggling reaction:', error);
-            const apiError = error as ApiError;
-            console.error('API Error:', apiError.message);
 
             setReactions(initialReactions);
             setCurrentUserReactions(userReactions);

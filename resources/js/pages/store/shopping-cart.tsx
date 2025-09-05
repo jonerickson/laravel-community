@@ -11,6 +11,7 @@ import type { BreadcrumbItem, CartResponse, CheckoutResponse, Policy } from '@/t
 import { Head, Link, router } from '@inertiajs/react';
 import { ImageIcon, ShoppingCart as ShoppingCartIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface ShoppingCartProps {
     cartItems: CartResponse['cartItems'];
@@ -70,6 +71,10 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
             {
                 onSuccess: (data) => {
                     window.location.href = data.checkout_url;
+                },
+                onError: (err) => {
+                    console.error('Error checking out:', err);
+                    toast.error(err.message || 'Unable to fetch the checkout URL. Please try again.');
                 },
             },
         );

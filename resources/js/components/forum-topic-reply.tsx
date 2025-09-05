@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { useForm } from '@inertiajs/react';
 import { useEffect } from 'react';
+import { toast } from 'sonner';
 
 interface ForumTopicReplyProps {
     forumSlug: string;
@@ -35,6 +36,10 @@ export default function ForumTopicReply({ forumSlug, topicSlug, onCancel, onSucc
                 }
 
                 reset('content');
+            },
+            onError: (err) => {
+                console.error('Error creating reply:', err);
+                toast.error(err.message || 'Unable to add reply. Please try again.');
             },
         });
     };

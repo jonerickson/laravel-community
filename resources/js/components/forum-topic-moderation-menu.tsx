@@ -39,7 +39,7 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
             {
                 onSuccess: () => toast.success(`The topic has been deleted.`),
                 onError: (err) => {
-                    console.error(err);
+                    console.error('Error deleting topic:', err);
                     toast.error(err.message || 'Unable to delete topic. Please try again.');
                 },
             },
@@ -70,8 +70,8 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
                     window.location.reload();
                 },
                 onError: (err) => {
-                    console.error(err);
-                    toast.error(err.message || 'Unable to unpin topic. Please try again.');
+                    console.error('Error pinning/unpining topic:', err);
+                    toast.error(err.message || 'Unable to update topic. Please try again.');
                 },
             },
         );
@@ -101,8 +101,8 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
                     window.location.reload();
                 },
                 onError: (err) => {
-                    console.error(err);
-                    toast.error(err.message || 'Unable to lock/unlock topic. Please try again.');
+                    console.error('Error locking/unlocking topic:', err);
+                    toast.error(err.message || 'Unable to update topic. Please try again.');
                 },
             },
         );

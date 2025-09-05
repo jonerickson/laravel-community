@@ -43,6 +43,10 @@ export function useCartOperations(initialItems: CartResponse['cartItems'] = []) 
 
                     toast.success('Your cart has been successfully updated.');
                 },
+                onError: (err) => {
+                    console.error('Error updating cart:', err);
+                    toast.error(err.message || 'Unable to update your shopping cart. Please try again.');
+                },
                 onSettled: () => {
                     setLoading(null);
                 },
@@ -77,6 +81,10 @@ export function useCartOperations(initialItems: CartResponse['cartItems'] = []) 
                     );
 
                     toast.success('The item has been successfully added to your cart.');
+                },
+                onError: (err) => {
+                    console.error('Error adding item to cart:', err);
+                    toast.error(err.message || 'Unable to add the item to your cart. Please try again.');
                 },
                 onSettled: () => {
                     setLoading(null);
@@ -115,6 +123,10 @@ export function useCartOperations(initialItems: CartResponse['cartItems'] = []) 
                     );
 
                     toast.success('The item has been successfully removed from your cart.');
+                },
+                onError: (err) => {
+                    console.error('Error removing item from cart:', err);
+                    toast.error(err.message || 'Unable to remove the item from your cart. Please try again.');
                 },
                 onSettled: () => {
                     setLoading(null);

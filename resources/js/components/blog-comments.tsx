@@ -72,7 +72,10 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                 onReply(0);
                 toast.success('The reply has been successfully added.');
             },
-            onError: (error) => toast.error(error.message || 'Unable to add reply. Please try again.'),
+            onError: (err) => {
+                console.error('Error adding reply:', err);
+                toast.error(err.message || 'Unable to add reply. Please try again.');
+            },
         });
     };
 
@@ -87,7 +90,10 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
 
         deleteComment(route('blog.comments.destroy', { post, comment }), {
             onSuccess: () => toast.success('The comment has been successfully deleted.'),
-            onError: (error) => toast.error(error.message || 'Unable to delete comment. Please try again.'),
+            onError: (err) => {
+                console.error('Error deleting comment:', err);
+                toast.error(err.message || 'Unable to delete comment. Please try again.');
+            },
         });
     };
 
@@ -102,7 +108,10 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                 setIsEditing(false);
                 toast.success('The comment has been successfully updated.');
             },
-            onError: (error) => toast.error(error.message || 'Unable to update comment. Please try again.'),
+            onError: (err) => {
+                console.error('Error updating comment:', err);
+                toast.error(err.message || 'Unable to update comment. Please try again.');
+            },
         });
     };
 
@@ -247,7 +256,10 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
                 reset();
                 toast.success('The comment has been successfully added.');
             },
-            onError: (error) => toast.error(error.message || 'Unable to add comment. Please try again.'),
+            onError: (err) => {
+                console.error('Error adding comment:', err);
+                toast.error(err.message || 'Unable to add comment. Please try again.');
+            },
         });
     };
 

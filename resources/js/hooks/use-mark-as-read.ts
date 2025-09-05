@@ -1,5 +1,5 @@
 import type { SharedData } from '@/types';
-import { ApiError, apiRequest } from '@/utils/api';
+import { apiRequest } from '@/utils/api';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useEffect } from 'react';
@@ -29,8 +29,6 @@ export function useMarkAsRead({ id, type, isRead, enabled = true }: UseMarkAsRea
                 );
             } catch (error) {
                 console.error(`Error marking ${type} as read:`, error);
-                const apiError = error as ApiError;
-                console.error('API Error:', apiError.message);
             }
         };
 

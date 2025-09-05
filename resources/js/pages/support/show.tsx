@@ -62,7 +62,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                     router.reload({ only: ['ticket'] });
                 },
                 onError: (err) => {
-                    console.error(err);
+                    console.error('Error updating ticket:', err);
                     toast.error(err.message || 'Unable to close support ticket. Please try again.');
                 },
             },

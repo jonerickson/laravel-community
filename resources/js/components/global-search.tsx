@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Toggle } from '@/components/ui/toggle';
 import { currency } from '@/lib/utils';
-import { ApiError } from '@/utils/api';
 import axios from 'axios';
 import { Calendar, ChevronDown, FileText, MessageSquare, Search, Shield, ShoppingBag, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -116,9 +115,7 @@ export function GlobalSearch() {
                 setResults(data.data || []);
                 setMeta(data.meta || null);
             } catch (error) {
-                console.error('Search error:', error);
-                const apiError = error as ApiError;
-                console.error('API Error:', apiError.message);
+                console.error('Error searching:', error);
                 setResults([]);
                 setMeta(null);
             } finally {
