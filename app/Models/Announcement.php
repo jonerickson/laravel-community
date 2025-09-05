@@ -9,6 +9,7 @@ use App\Enums\AnnouncementType;
 use App\Traits\Activateable;
 use App\Traits\HasAuthor;
 use App\Traits\HasSlug;
+use App\Traits\Readable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -31,6 +32,9 @@ use Illuminate\Support\Str;
  * @property-read User $author
  * @property-read mixed $author_name
  * @property-read User $creator
+ * @property-read bool $is_read_by_user
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Read> $reads
+ * @property-read int $reads_count
  *
  * @method static Builder<static>|Announcement active()
  * @method static Builder<static>|Announcement current()
@@ -39,6 +43,8 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|Announcement newModelQuery()
  * @method static Builder<static>|Announcement newQuery()
  * @method static Builder<static>|Announcement query()
+ * @method static Builder<static>|Announcement read(?\App\Models\User $user = null)
+ * @method static Builder<static>|Announcement unread(?\App\Models\User $user = null)
  * @method static Builder<static>|Announcement whereContent($value)
  * @method static Builder<static>|Announcement whereCreatedAt($value)
  * @method static Builder<static>|Announcement whereCreatedBy($value)
@@ -60,6 +66,7 @@ class Announcement extends Model implements Sluggable
     use HasAuthor;
     use HasFactory;
     use HasSlug;
+    use Readable;
 
     protected $fillable = [
         'title',

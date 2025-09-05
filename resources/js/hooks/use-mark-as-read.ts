@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 
 interface UseMarkAsReadOptions {
     id: number;
-    type: 'topic' | 'post' | 'forum';
+    type: 'topic' | 'post' | 'forum' | 'announcement';
     isRead: boolean;
     enabled?: boolean;
 }

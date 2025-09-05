@@ -2,9 +2,11 @@ import AnnouncementsList from '@/components/announcements-list';
 import DashboardProductGrid from '@/components/dashboard-product-grid';
 import SupportTicketWidget from '@/components/support-ticket-widget';
 import WidgetLoading from '@/components/widget-loading';
+import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
 import { type Announcement, type BreadcrumbItem, type Product, type SupportTicket } from '@/types';
 import { Deferred, Head } from '@inertiajs/react';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,8 +24,17 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ newestProduct, popularProduct, featuredProduct, announcements = [], supportTickets = [] }: DashboardProps) {
+    const [dismissedAnnouncementId, setDismissedAnnouncementId] = useState<number | null>(null);
+
+    useMarkAsRead({
+        id: dismissedAnnouncementId || 0,
+        type: 'announcement',
+        isRead: false,
+        enabled: dismissedAnnouncementId !== null,
+    });
+
     const handleAnnouncementDismiss = (announcementId: number) => {
-        console.log('Dismissed announcement:', announcementId);
+        setDismissedAnnouncementId(announcementId);
     };
 
     return (

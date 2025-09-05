@@ -23,7 +23,9 @@ class DashboardController
 
     private function getAnnouncements(): Collection
     {
-        return Announcement::current()
+        return Announcement::query()
+            ->current()
+            ->unread()
             ->latest()
             ->get();
     }

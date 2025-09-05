@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Traits;
 
 use App\Models\Read;
+use App\Models\User;
 use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +20,24 @@ trait Readable
     public function reads(): MorphMany
     {
         return $this->morphMany(Read::class, 'readable');
+    }
+
+    public function scopeUnread(Builder $query, ?User $user = null): void
+    {
+        $user ??= Auth::user();
+
+        $query->whereDoesntHaveRelation('reads', function (Builder $query) use ($user) {
+            $query->whereBelongsTo($user, 'author');
+        });
+    }
+
+    public function scopeRead(Builder $query, ?User $user = null): void
+    {
+        $user ??= Auth::user();
+
+        $query->whereRelation('reads', function (Builder $query) use ($user) {
+            $query->whereBelongsTo($user, 'author');
+        });
     }
 
     public function userRead(?int $userId = null): ?Read
