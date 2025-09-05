@@ -84,7 +84,7 @@ export interface Product {
     is_featured: boolean;
     featured_image?: string | null;
     featured_image_url?: string | null;
-    stripe_product_id?: string | null;
+    external_product_id?: string | null;
     metadata?: Record<string, never> | null;
     prices?: ProductPrice[];
     default_price?: ProductPrice | null;

@@ -36,7 +36,7 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                             <ImageIcon className="h-16 w-16 text-muted-foreground" />
                         </div>
                     )}
-                    <div className="absolute inset-0 rounded-2xl ring-1 ring-gray-900/10 ring-inset" />
+                    <div className="absolute inset-0 rounded-2xl ring-1 ring-ring/20 ring-inset" />
                 </div>
                 <div className="mt-4 flex max-w-xl grow flex-col justify-between">
                     <div className="flex flex-row gap-2">

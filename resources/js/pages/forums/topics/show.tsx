@@ -167,8 +167,8 @@ export default function TopicShow({ forum, topic, posts, postsPagination, recent
                 <div className="flex flex-col items-start justify-between md:flex-row">
                     <div className="mb-4 flex-1">
                         <div className="mb-2 flex items-center gap-2">
-                            {topic.is_pinned && <Pin className="h-5 w-5 text-blue-500" />}
-                            {topic.is_locked && <Lock className="h-5 w-5 text-gray-500" />}
+                            {topic.is_pinned && <Pin className="h-5 w-5 text-info" />}
+                            {topic.is_locked && <Lock className="h-5 w-5 text-muted-foreground" />}
                             <h1 className="text-xl font-semibold tracking-tight">{topic.title}</h1>
                         </div>
 

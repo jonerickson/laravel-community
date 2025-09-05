@@ -75,7 +75,7 @@ function PricingCard({ plan, billingCycle, onSubscribe }: PricingCardProps) {
 
     return (
         <Card
-            className={`relative w-full max-w-sm ${plan.popular ? 'border-2 border-info shadow-lg' : ''} ${plan.current ? 'ring-2 ring-green-500' : ''}`}
+            className={`relative w-full max-w-sm ${plan.popular ? 'border-2 border-info shadow-lg' : ''} ${plan.current ? 'ring-2 ring-success' : ''}`}
         >
             <CardHeader className="pb-4 text-center">
                 <div className={`mx-auto mb-4 rounded-full bg-gradient-to-r p-3 ${color} w-fit text-white`}>

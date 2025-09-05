@@ -1,4 +1,5 @@
 import Heading from '@/components/heading';
+import RichEditorContent from '@/components/rich-editor-content';
 import SupportTicketCommentForm from '@/components/support-ticket-comment-form';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -101,9 +102,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                     <CardTitle className="flex items-center gap-2">Support Ticket #{ticket.id}</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="prose prose-sm dark:prose-invert max-w-none">
-                                        <p className="leading-relaxed whitespace-pre-wrap">{ticket.description}</p>
-                                    </div>
+                                    <RichEditorContent content={ticket.description} />
                                 </CardContent>
                             </Card>
 
@@ -131,9 +130,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                                                 {format(new Date(comment.created_at), 'PPp')}
                                                             </span>
                                                         </div>
-                                                        <div className="prose prose-sm dark:prose-invert max-w-none">
-                                                            <p className="whitespace-pre-wrap">{comment.content}</p>
-                                                        </div>
+                                                        <RichEditorContent content={comment.content} />
                                                     </div>
                                                 </div>
                                                 {index < ticket.comments!.length - 1 && <Separator className="my-4" />}

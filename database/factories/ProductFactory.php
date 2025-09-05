@@ -25,7 +25,7 @@ class ProductFactory extends Factory
             'description' => $this->faker->paragraph(),
             'type' => $type,
             'is_featured' => $this->faker->boolean(0.2),
-            'stripe_product_id' => $this->faker->optional(0.6)->regexify('prod_[A-Za-z0-9]{14}'),
+            'external_product_id' => $this->faker->optional(0.6)->regexify('prod_[A-Za-z0-9]{14}'),
             'featured_image' => $this->faker->optional(0.8)->imageUrl(800, 600, 'products'),
         ];
     }
@@ -51,14 +51,14 @@ class ProductFactory extends Factory
     public function withStripe(): static
     {
         return $this->state(fn (array $attributes) => [
-            'stripe_product_id' => $this->faker->regexify('prod_[A-Za-z0-9]{14}'),
+            'external_product_id' => $this->faker->regexify('prod_[A-Za-z0-9]{14}'),
         ]);
     }
 
     public function withoutStripe(): static
     {
         return $this->state(fn (array $attributes) => [
-            'stripe_product_id' => null,
+            'external_product_id' => null,
         ]);
     }
 

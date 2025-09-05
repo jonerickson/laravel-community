@@ -1,5 +1,6 @@
 import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
+import RichEditorContent from '@/components/rich-editor-content';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -70,7 +71,9 @@ export default function SupportTicketsIndex({ tickets, ticketsPagination }: Supp
                                                         #{ticket.id} - {ticket.subject}
                                                     </Link>
                                                 </CardTitle>
-                                                <CardDescription className="line-clamp-2">{ticket.description}</CardDescription>
+                                                <CardDescription className="line-clamp-2">
+                                                    <RichEditorContent content={ticket.description} />
+                                                </CardDescription>
                                             </div>
                                             <div className="flex shrink-0 items-center gap-2">
                                                 <Badge variant={getStatusVariant(ticket.status)}>

@@ -15,7 +15,7 @@ export default function StoreIndexFeatured({ products }: StoreFeaturedProps) {
     return (
         <div>
             <div className="sm:flex sm:items-baseline sm:justify-between">
-                <Heading title="Featured Products" description="Our most popular products" />
+                <Heading title="Featured products" description="Our most popular products" />
             </div>
 
             <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:grid-rows-2 sm:gap-x-6 lg:gap-8">

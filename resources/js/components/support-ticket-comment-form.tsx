@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import type { SupportTicket } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { MessageCircle } from 'lucide-react';
@@ -56,13 +56,10 @@ export default function SupportTicketCommentForm({ ticket, onCancel, onSuccess }
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid gap-2">
                         <Label htmlFor="content">Comment</Label>
-                        <Textarea
-                            id="content"
-                            value={data.content}
-                            onChange={(e) => setData('content', e.target.value)}
+                        <RichTextEditor
+                            content={data.content}
+                            onChange={(content) => setData('content', content)}
                             placeholder="Add your comment or update here..."
-                            rows={4}
-                            required
                         />
                         {errors.content && <p className="text-sm text-destructive">{errors.content}</p>}
                         <div className="text-xs text-muted-foreground">

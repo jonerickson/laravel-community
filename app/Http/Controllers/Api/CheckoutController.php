@@ -39,7 +39,7 @@ class CheckoutController
         $lineItems = [];
         foreach ($cartItems as $item) {
             $product = $item['product'];
-            if (! $product || ! $product->stripe_product_id) {
+            if (! $product || ! $product->external_product_id) {
                 return ApiResource::error(
                     message: "{$item['name']} is not available for purchase.",
                     errors: ['product' => ["{$item['name']} is not configured for purchase."]],

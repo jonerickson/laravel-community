@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, SupportTicketCategory } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
@@ -100,13 +100,10 @@ export default function CreateSupportTicket({ categories }: CreateSupportTicketP
 
                             <div className="grid gap-2">
                                 <Label htmlFor="description">Description</Label>
-                                <Textarea
-                                    id="description"
-                                    value={data.description}
-                                    onChange={(e) => setData('description', e.target.value)}
+                                <RichTextEditor
+                                    content={data.description}
+                                    onChange={(content) => setData('description', content)}
                                     placeholder="Please provide detailed information about your issue, including any steps to reproduce the problem, error messages you've encountered, or relevant context that might help us assist you better."
-                                    rows={8}
-                                    required
                                 />
                                 <InputError message={errors.description} />
                                 <div className="text-xs text-muted-foreground">

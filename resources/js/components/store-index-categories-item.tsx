@@ -14,7 +14,7 @@ export default function StoreIndexCategoriesItem({ item }: { item: ProductCatego
                     <span aria-hidden="true" className="absolute inset-0">
                         <img alt={item.imageAlt} src={item.imageUrl} className="size-full object-cover" />
                     </span>
-                    <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-gray-800 opacity-50" />
+                    <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-muted-foreground opacity-50" />
                     <span className="relative mt-auto text-center text-xl font-bold text-white">{item.name}</span>
                 </>
             ) : (

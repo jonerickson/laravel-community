@@ -68,7 +68,7 @@ export const columns: ColumnDef<Invoice>[] = [
             return (
                 <div className="text-right">
                     <Button variant="link" asChild>
-                        <Link href={row.getValue('invoice_url')}>Open Invoice</Link>
+                        <Link href={row.getValue('invoice_url')}>View</Link>
                     </Button>
                 </div>
             );

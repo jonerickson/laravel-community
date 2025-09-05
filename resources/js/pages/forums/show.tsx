@@ -208,7 +208,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                     {topics.map((topic) => (
                                         <TableRow
                                             key={topic.id}
-                                            className={`hover:bg-muted/50 ${selectedTopics.includes(topic.id) ? 'bg-blue-50' : ''}`}
+                                            className={`hover:bg-muted/50 ${selectedTopics.includes(topic.id) ? 'bg-info-foreground' : ''}`}
                                         >
                                             <TableCell className="p-4">
                                                 <div className="flex items-start gap-3">
@@ -244,10 +244,10 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                                     )}
                                                     <div className="min-w-0 flex-1">
                                                         <div className="mb-1 flex items-center gap-2">
-                                                            {!topic.is_read_by_user && <Circle className="h-3 w-3 fill-blue-500 text-blue-500" />}
+                                                            {!topic.is_read_by_user && <Circle className="h-3 w-3 fill-info text-info-foreground" />}
                                                             {topic.is_hot && <span className="text-sm">🔥</span>}
-                                                            {topic.is_pinned && <Pin className="h-4 w-4 text-blue-500" />}
-                                                            {topic.is_locked && <Lock className="h-4 w-4 text-gray-500" />}
+                                                            {topic.is_pinned && <Pin className="h-4 w-4 text-info" />}
+                                                            {topic.is_locked && <Lock className="h-4 w-4 text-muted-foreground" />}
                                                             <Link
                                                                 href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
                                                                 className={`hover:underline ${

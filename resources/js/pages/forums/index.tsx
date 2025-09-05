@@ -152,9 +152,11 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
                                                     <div key={topic.id} className="flex items-center gap-3">
                                                         <div className="min-w-0 flex-1">
                                                             <div className="flex items-center gap-2">
-                                                                {!topic.is_read_by_user && <Circle className="h-2 w-2 fill-blue-500 text-blue-500" />}
+                                                                {!topic.is_read_by_user && (
+                                                                    <Circle className="h-2 w-2 fill-info text-info-foreground" />
+                                                                )}
                                                                 {topic.is_hot && <span className="text-sm">🔥</span>}
-                                                                {topic.is_pinned && <Pin className="h-3 w-3 text-blue-500" />}
+                                                                {topic.is_pinned && <Pin className="h-3 w-3 text-info" />}
                                                                 <Link
                                                                     href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
                                                                     className={`truncate text-sm hover:underline ${

@@ -1,5 +1,4 @@
 <div class="space-y-6">
-    {{-- Reporter Information --}}
     <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
         <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Reporter Information</h3>
         <div class="space-y-2">
@@ -45,7 +44,7 @@
                     </span>
                 </div>
             </div>
-            
+
             @if($record->additional_info)
                 <div>
                     <span class="text-sm text-gray-600 dark:text-gray-400">Additional Information:</span>

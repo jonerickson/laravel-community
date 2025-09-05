@@ -51,7 +51,7 @@ class StripeDriver implements PaymentProcessor
             'active' => true,
         ]);
 
-        $product->stripe_product_id = $stripeProduct->id;
+        $product->external_product_id = $stripeProduct->id;
         $product->save();
 
         return $product;
@@ -62,7 +62,7 @@ class StripeDriver implements PaymentProcessor
      */
     public function getProduct(Product $product): Product
     {
-        $this->stripe->products->retrieve($product->stripe_product_id);
+        $this->stripe->products->retrieve($product->external_product_id);
 
         return $product;
     }
@@ -72,7 +72,7 @@ class StripeDriver implements PaymentProcessor
      */
     public function updateProduct(Product $product): Product
     {
-        $this->stripe->products->update($product->stripe_product_id, [
+        $this->stripe->products->update($product->external_product_id, [
             'name' => $product->name,
             'description' => $product->description,
             'metadata' => [
@@ -89,12 +89,12 @@ class StripeDriver implements PaymentProcessor
      */
     public function deleteProduct(Product $product): bool
     {
-        if (! $product->stripe_product_id) {
+        if (! $product->external_product_id) {
             return false;
         }
 
-        $this->stripe->products->delete($product->stripe_product_id);
-        $product->stripe_product_id = null;
+        $this->stripe->products->delete($product->external_product_id);
+        $product->external_product_id = null;
         $product->save();
 
         return true;
@@ -102,7 +102,7 @@ class StripeDriver implements PaymentProcessor
 
     public function listProducts(array $filters = []): Collection
     {
-        $query = Product::query()->whereNotNull('stripe_product_id');
+        $query = Product::query()->whereNotNull('external_product_id');
 
         if (isset($filters['limit'])) {
             $query->limit($filters['limit']);

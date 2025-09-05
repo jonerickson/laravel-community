@@ -31,7 +31,7 @@ class ProductSeeder extends Seeder
                     'name' => $name = "Product $sequence->index",
                     'slug' => Str::slug($name),
                     'featured_image' => "boilerplate/product-$sequence->index.jpg",
-                    'stripe_product_id' => env('STRIPE_PRODUCT_'.($sequence->index + 1)),
+                    'external_product_id' => env('STRIPE_PRODUCT_'.($sequence->index + 1)),
                 ],
             ))
             ->create();
@@ -83,7 +83,7 @@ class ProductSeeder extends Seeder
                     'name' => $name = "Subscription $sequence->index",
                     'slug' => Str::slug($name),
                     'featured_image' => null,
-                    'stripe_product_id' => null,
+                    'external_product_id' => null,
                 ],
             ))
             ->create();
