@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Contracts\Sluggable;
 use App\Traits\Activateable;
+use App\Traits\HasGroups;
 use App\Traits\HasSlug;
 use App\Traits\Orderable;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Carbon;
@@ -23,6 +25,7 @@ use Illuminate\Support\Str;
  * @property string $name
  * @property string $slug
  * @property string|null $description
+ * @property int|null $category_id
  * @property string|null $rules
  * @property string|null $icon
  * @property string $color
@@ -30,6 +33,9 @@ use Illuminate\Support\Str;
  * @property bool $is_active
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read ForumCategory|null $category
+ * @property-read Collection<int, Group> $groups
+ * @property-read int|null $groups_count
  * @property-read Collection<int, Topic> $latestTopics
  * @property-read int|null $latest_topics_count
  * @property-read Collection<int, Post> $posts
@@ -44,6 +50,7 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|Forum newQuery()
  * @method static Builder<static>|Forum ordered()
  * @method static Builder<static>|Forum query()
+ * @method static Builder<static>|Forum whereCategoryId($value)
  * @method static Builder<static>|Forum whereColor($value)
  * @method static Builder<static>|Forum whereCreatedAt($value)
  * @method static Builder<static>|Forum whereDescription($value)
@@ -62,12 +69,14 @@ class Forum extends Model implements Sluggable
 {
     use Activateable;
     use HasFactory;
+    use HasGroups;
     use HasSlug;
     use Orderable;
 
     protected $fillable = [
         'name',
         'description',
+        'category_id',
         'rules',
         'icon',
         'color',
@@ -76,6 +85,11 @@ class Forum extends Model implements Sluggable
     public function generateSlug(): ?string
     {
         return Str::slug($this->name);
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(ForumCategory::class);
     }
 
     public function topics(): HasMany

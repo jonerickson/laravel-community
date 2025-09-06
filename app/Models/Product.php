@@ -37,7 +37,7 @@ use Laravel\Scout\Searchable;
  * @property string $slug
  * @property string $description
  * @property ProductType $type
- * @property ProductTaxCode $tax_code
+ * @property ProductTaxCode|null $tax_code
  * @property bool $is_featured
  * @property string|null $featured_image
  * @property string|null $external_product_id

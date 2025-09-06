@@ -218,11 +218,26 @@ export interface Comment {
     updated_at: string;
 }
 
+export interface ForumCategory {
+    id: number;
+    name: string;
+    slug: string;
+    description?: string | null;
+    icon?: string | null;
+    color: string;
+    order: number;
+    is_active: boolean;
+    forums?: Forum[];
+    created_at: string;
+    updated_at: string;
+}
+
 export interface Forum {
     id: number;
     name: string;
     slug: string;
     description?: string | null;
+    category_id?: number | null;
     rules?: string | null;
     icon?: string | null;
     color: string;

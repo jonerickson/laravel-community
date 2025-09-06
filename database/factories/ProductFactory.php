@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\ProductTaxCode;
 use App\Enums\ProductType;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -24,6 +25,7 @@ class ProductFactory extends Factory
             'slug' => Str::slug($name),
             'description' => $this->faker->paragraph(),
             'type' => $type,
+            'tax_code' => $this->faker->randomElement(ProductTaxCode::class),
             'is_featured' => $this->faker->boolean(0.2),
             'external_product_id' => $this->faker->optional(0.6)->regexify('prod_[A-Za-z0-9]{14}'),
             'featured_image' => $this->faker->optional(0.8)->imageUrl(800, 600, 'products'),

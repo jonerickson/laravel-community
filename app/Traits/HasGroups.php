@@ -12,8 +12,9 @@ trait HasGroups
     public function groups(): BelongsToMany
     {
         $table = $this->getTable();
+        $groupsForeignPivotKey = $this->groupsForeignPivotKey ?? null;
 
-        return $this->belongsToMany(Group::class, "{$table}_groups");
+        return $this->belongsToMany(Group::class, "{$table}_groups", $groupsForeignPivotKey);
     }
 
     public function assignToGroup(Group $group): void

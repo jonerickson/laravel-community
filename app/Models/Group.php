@@ -40,6 +40,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read int|null $users_count
  *
  * @method static Builder<static>|Group active()
+ * @method static Builder<static>|Group defaultGuestGroups()
+ * @method static Builder<static>|Group defaultMemberGroups()
  * @method static \Database\Factories\GroupFactory factory($count = null, $state = [])
  * @method static Builder<static>|Group inactive()
  * @method static Builder<static>|Group newModelQuery()
@@ -90,11 +92,21 @@ class Group extends Model
         return $this->belongsToMany(User::class, 'users_groups');
     }
 
+    public function scopeDefaultMemberGroups(Builder $query): void
+    {
+        $query->where('is_default_member', true);
+    }
+
+    public function scopeDefaultGuestGroups(Builder $query): void
+    {
+        $query->where('is_default_guest', true);
+    }
+
     public function toggleDefaultGuestGroup(): void
     {
         $builder = static::query()
             ->whereKeyNot($this->id)
-            ->where('is_default_guest', true);
+            ->defaultGuestGroups();
 
         if ($builder->exists()) {
             $builder->update([
@@ -107,7 +119,7 @@ class Group extends Model
     {
         $builder = static::query()
             ->whereKeyNot($this->id)
-            ->where('is_default_member', true);
+            ->defaultMemberGroups();
 
         if ($builder->exists()) {
             $builder->update([

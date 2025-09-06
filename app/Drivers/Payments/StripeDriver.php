@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Drivers\Payments;
 
+use AllowDynamicProperties;
 use App\Contracts\PaymentProcessor;
 use App\Models\Product;
 use App\Models\ProductPrice;
@@ -11,12 +12,14 @@ use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Context;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Stripe;
 use Stripe\StripeClient;
 
+#[AllowDynamicProperties]
 class StripeDriver implements PaymentProcessor
 {
     protected StripeClient $stripe;
@@ -29,6 +32,10 @@ class StripeDriver implements PaymentProcessor
 
     public function __call(string $name, array $arguments): mixed
     {
+        if (Http::preventingStrayRequests()) {
+            return null;
+        }
+
         try {
             return $this->$name(...$arguments);
         } catch (ApiErrorException $exception) {

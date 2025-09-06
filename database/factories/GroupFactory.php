@@ -33,4 +33,18 @@ class GroupFactory extends Factory
             'is_active' => fake()->boolean(90),
         ];
     }
+
+    public function asDefaultMemberGroup(): self
+    {
+        return $this->state([
+            'is_default_member' => true,
+        ]);
+    }
+
+    public function asDefaultGuest(): self
+    {
+        return $this->state([
+            'is_default_guest' => true,
+        ]);
+    }
 }

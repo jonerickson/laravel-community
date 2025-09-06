@@ -15,6 +15,8 @@ import { Circle, Eye, LibraryBig, Lock, MessageSquare, Pin, Plus, Trash2 } from 
 import { useState } from 'react';
 import { toast } from 'sonner';
 import usePermissions from '../../hooks/use-permissions';
+import RichEditorContent from '@/components/rich-editor-content';
+import { stripCharacters } from '@/utils/truncate';
 
 interface ForumShowProps {
     forum: Forum;
@@ -187,11 +189,11 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                     </div>
                 </div>
 
-                {forum.rules && (
+                {forum.rules && stripCharacters(forum.rules).length > 0 && (
                     <Alert>
                         <AlertTitle>Forum Rules</AlertTitle>
                         <AlertDescription>
-                            <p className="prose prose-base" dangerouslySetInnerHTML={{ __html: forum.rules }} />
+                            <RichEditorContent content={forum.rules} />
                         </AlertDescription>
                     </Alert>
                 )}

@@ -18,6 +18,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -28,6 +29,7 @@ use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use UnitEnum;
@@ -60,7 +62,13 @@ class ForumResource extends Resource
                             ->required()
                             ->unique(Forum::class, 'slug', ignoreRecord: true)
                             ->maxLength(255)
-                            ->helperText('URL-friendly version of the name'),
+                            ->helperText('URL-friendly version of the name.'),
+                        Select::make('category_id')
+                            ->required()
+                            ->searchable()
+                            ->columnSpanFull()
+                            ->preload()
+                            ->relationship('category', 'name'),
                         Textarea::make('description')
                             ->helperText('A helpful description on what the forum is about.')
                             ->columnSpanFull()
@@ -72,10 +80,20 @@ class ForumResource extends Resource
                             ->helperText('Optional rules to display at the top of the forum.'),
                         TextInput::make('icon')
                             ->maxLength(255)
-                            ->helperText('Icon class or emoji'),
+                            ->helperText('Icon class or emoji.'),
                         ColorPicker::make('color')
                             ->required()
                             ->default('#3b82f6'),
+                    ]),
+                Section::make('Permissions')
+                    ->columnSpanFull()
+                    ->schema([
+                        Select::make('groups')
+                            ->relationship('groups', 'name')
+                            ->preload()
+                            ->searchable()
+                            ->multiple()
+                            ->helperText('The groups that are allowed to view this forum.'),
                     ]),
             ]);
     }
@@ -92,7 +110,13 @@ class ForumResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('description')
                     ->limit(50)
-                    ->toggleable(),
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('groups.name')
+                    ->badge(),
+                TextColumn::make('category.name')
+                    ->sortable()
+                    ->searchable(),
                 ColorColumn::make('color')
                     ->sortable(),
                 ToggleColumn::make('is_active')
@@ -122,6 +146,10 @@ class ForumResource extends Resource
                     ->falseLabel('Inactive forums only')
                     ->native(false),
             ])
+            ->groups([
+                Group::make('category.name')
+                    ->titlePrefixedWithLabel(false),
+            ])
             ->recordActions([
                 Action::make('view')
                     ->label('View')
@@ -149,7 +177,8 @@ class ForumResource extends Resource
                 ]),
             ])
             ->reorderable()
-            ->defaultSort('order');
+            ->defaultSort('order')
+            ->defaultGroup('category.name');
     }
 
     public static function getRelations(): array

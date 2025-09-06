@@ -5,60 +5,113 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Forum;
+use App\Models\ForumCategory;
+use App\Models\Group;
 use App\Models\Post;
 use App\Models\Topic;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Arr;
 
 class ForumSeeder extends Seeder
 {
     public function run(): void
     {
-        $forums = [
+        $categories = [
             [
-                'name' => 'General Discussion',
+                'name' => 'Community',
                 'description' => 'Talk about anything and everything',
                 'icon' => 'message-square',
                 'color' => '#3b82f6',
-                'order' => 1,
+                'forums' => [
+                    [
+                        'name' => 'General Discussion',
+                        'description' => 'Chat about anything related to our community and services.',
+                    ],
+                    [
+                        'name' => 'Feedback',
+                        'description' => 'Share your thoughts and suggestions to help us improve.',
+                    ],
+                    [
+                        'name' => 'Off Topic',
+                        'description' => 'Casual conversations about life, hobbies, and everything else.',
+                    ],
+                ],
             ],
             [
-                'name' => 'Support',
+                'name' => 'Help and Technical Support',
                 'description' => 'Get help with technical issues',
                 'icon' => 'help-circle',
                 'color' => '#10b981',
-                'order' => 2,
+                'forums' => [
+                    [
+                        'name' => 'General Questions',
+                        'description' => 'Ask questions and get help from our community members.',
+                    ],
+                    [
+                        'name' => 'Technical Problems',
+                        'description' => 'Troubleshoot technical issues and find solutions.',
+                    ],
+                    [
+                        'name' => 'Design and Customization',
+                        'description' => 'Get help with styling, themes, and visual customizations.',
+                    ],
+                ],
             ],
             [
-                'name' => 'Feature Requests',
+                'name' => 'Development',
                 'description' => 'Suggest new features and improvements',
                 'icon' => 'lightbulb',
                 'color' => '#f59e0b',
-                'order' => 3,
+                'forums' => [
+                    [
+                        'name' => 'Marketplace',
+                        'description' => 'Buy, sell, and trade products and services with the community.',
+                    ],
+                    [
+                        'name' => 'Requests',
+                        'description' => 'Request new features, improvements, or custom development work.',
+                    ],
+                    [
+                        'name' => 'Development Support',
+                        'description' => 'Get help with coding, APIs, integrations, and development questions.',
+                    ],
+                ],
             ],
         ];
 
-        $author = User::first() ?? User::factory();
+        $author = User::first() ?? User::factory()->create();
+        $group = Group::defaultMemberGroups()->first() ?? Group::factory()->asDefaultMemberGroup()->create();
 
-        Forum::factory()
-            ->count(count($forums))
-            ->state(new Sequence(...$forums))
-            ->create()
-            ->each(function (Forum $forum) use ($author) {
-                Topic::factory(5)
-                    ->for($forum)
-                    ->for($author, 'author')
+        foreach ($categories as $category) {
+            $forumCategory = ForumCategory::factory()
+                ->state(Arr::except($category, ['forums']))
+                ->hasAttached($group)
+                ->create();
+
+            foreach ($category['forums'] ?? [] as $forum) {
+                Forum::factory()
+                    ->state($forum)
+                    ->for($forumCategory, 'category')
+                    ->hasAttached($group)
                     ->create()
-                    ->each(function (Topic $topic) use ($author) {
-                        Post::factory()
-                            ->published()
-                            ->forum()
-                            ->for($topic)
+                    ->each(function (Forum $forum) use ($author) {
+                        Topic::factory(5)
+                            ->for($forum)
                             ->for($author, 'author')
-                            ->count(10)
-                            ->create();
+                            ->create()
+                            ->each(function (Topic $topic) use ($author) {
+                                Post::factory()
+                                    ->published()
+                                    ->forum()
+                                    ->for($topic)
+                                    ->for($author, 'author')
+                                    ->count(10)
+                                    ->create();
+                            });
                     });
-            });
+            }
+        }
+
     }
 }

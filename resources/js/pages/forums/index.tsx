@@ -1,16 +1,16 @@
 import ForumSelectionDialog from '@/components/forum-selection-dialog';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useCookie } from '@/hooks/use-cookie';
+import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
-import type { BreadcrumbItem, Forum, SharedData } from '@/types';
+import type { BreadcrumbItem, ForumCategory, SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
-import { Circle, Eye, Grid3X3, List, MessageSquare, Pin, Plus, Users } from 'lucide-react';
+import { Circle, MessageSquare, Pin, Plus } from 'lucide-react';
 import { useState } from 'react';
 import usePermissions from '../../hooks/use-permissions';
+import HeadingSmall from '@/components/heading-small';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -20,14 +20,15 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface ForumsIndexProps {
-    forums: Forum[];
+    categories: ForumCategory[];
 }
 
-export default function ForumsIndex({ forums }: ForumsIndexProps) {
+export default function ForumsIndex({ categories }: ForumsIndexProps) {
     const { can } = usePermissions();
     const { name: siteName } = usePage<SharedData>().props;
-    const [viewMode, setViewMode] = useCookie<'list' | 'grid'>('forum_view', 'list');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    const allForums = categories.flatMap(category => category.forums || []);
 
     const structuredData = {
         '@context': 'https://schema.org',
@@ -43,7 +44,7 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
             '@type': 'CollectionPage',
             name: 'Community Forums',
             description: 'Browse our community forums and discussions',
-            hasPart: forums.map((forum) => ({
+            hasPart: allForums.map((forum) => ({
                 '@type': 'WebPage',
                 name: forum.name,
                 description: forum.description,
@@ -77,24 +78,6 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
                 <div className="flex items-start justify-between">
                     <Heading title="Forums" description="Connect with our community and get support" />
                     <div className="flex items-center gap-3">
-                        <div className="hidden items-center gap-1 rounded-lg border p-1 md:flex">
-                            <Button
-                                variant={viewMode === 'list' ? 'default' : 'ghost'}
-                                size="sm"
-                                onClick={() => setViewMode('list')}
-                                className="h-8 px-3"
-                            >
-                                <List className="h-4 w-4" />
-                            </Button>
-                            <Button
-                                variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                                size="sm"
-                                onClick={() => setViewMode('grid')}
-                                className="h-8 px-3"
-                            >
-                                <Grid3X3 className="h-4 w-4" />
-                            </Button>
-                        </div>
                         {can('create_topics') && (
                             <Button onClick={() => setIsDialogOpen(true)}>
                                 <Plus className="mr-2 h-4 w-4" />
@@ -104,97 +87,102 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
                     </div>
                 </div>
 
-                {can('view_any_forums') && forums.length > 0 && (
-                    <div className={viewMode === 'grid' ? 'grid gap-6 md:grid-cols-2 lg:grid-cols-3' : 'grid gap-8'}>
-                        {forums.map((forum) => (
-                            <Card key={forum.id} className="transition-shadow hover:shadow-md">
-                                <CardHeader>
-                                    <div className="flex items-start gap-4">
-                                        <div
-                                            className="flex h-12 w-12 items-center justify-center rounded-lg text-white"
-                                            style={{ backgroundColor: forum.color }}
-                                        >
-                                            <MessageSquare className="h-6 w-6" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-2">
-                                                <CardTitle>
-                                                    <Link href={route('forums.show', { forum: forum.slug })} className="hover:underline">
-                                                        {forum.name}
-                                                    </Link>
-                                                </CardTitle>
-                                            </div>
-                                            {forum.description && <CardDescription className="mt-1">{forum.description}</CardDescription>}
-                                            <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
-                                                {can('view_any_topics') && (
-                                                    <div className="flex items-center gap-1">
-                                                        <MessageSquare className="h-4 w-4" />
-                                                        <span>{(forum.topics_count || 0) + ' ' + pluralize('topic', forum.topics_count || 0)}</span>
+                {can('view_any_forums') && categories.length > 0 && (
+                    <div className="grid gap-4">
+                        {categories.map((category) => (
+                            <Card key={category.id} className="transition-shadow hover:shadow-sm py-0 overflow-hidden">
+                                <CardContent className="p-0">
+                                    <div className="flex flex-col md:flex-row">
+                                        <div className="w-full md:w-64 bg-primary/5 px-6 py-4 md:border-r border-b md:border-b-0">
+                                            <div className="space-y-3">
+                                                <div>
+                                                    <Heading title={category.name} description={category.description}/>
+                                                    <div className="mt-2 text-sm text-muted-foreground">
+                                                        {category.forums?.reduce((total, forum) => total + (forum.topics_count || 0), 0) || 0} {pluralize('post', category.forums?.reduce((total, forum) => total + (forum.topics_count || 0), 0) || 0)}
+                                                    </div>
+                                                </div>
+                                                {category.forums && category.forums.length > 0 && (
+                                                    <div className="flex flex-wrap gap-3 md:flex-col md:space-y-2 md:gap-0">
+                                                        {category.forums.map((forum) => (
+                                                            <div key={forum.id} className="flex items-center gap-2">
+                                                                <div
+                                                                    className="w-2 h-2 rounded-full"
+                                                                    style={{ backgroundColor: forum.color }}
+                                                                />
+                                                                <Link
+                                                                    href={route('forums.show', { forum: forum.slug })}
+                                                                    className="text-sm hover:underline font-medium"
+                                                                >
+                                                                    {forum.name}
+                                                                </Link>
+                                                            </div>
+                                                        ))}
                                                     </div>
                                                 )}
-                                                {can('view_any_posts') && (
-                                                    <div className="flex items-center gap-1">
-                                                        <Users className="h-4 w-4" />
-                                                        <span>{(forum.posts_count || 0) + ' ' + pluralize('post', forum.posts_count || 0)}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex-1 py-3">
+                                            <div className="space-y-1">
+                                                {category.forums?.flatMap(forum =>
+                                                    (forum.latest_topics || []).slice(0, 5).map((topic) => (
+                                                        <div key={`${forum.id}-${topic.id}`} className="flex items-center gap-3 px-6 py-2 hover:bg-muted/30">
+                                                            <div className="flex-shrink-0">
+                                                                <div
+                                                                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium"
+                                                                    style={{ backgroundColor: forum.color }}
+                                                                >
+                                                                    {topic.author?.name?.charAt(0).toUpperCase() || 'U'}
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex items-center gap-2">
+                                                                    {!topic.is_read_by_user && (
+                                                                        <Circle className="h-2 w-2 fill-primary text-primary" />
+                                                                    )}
+                                                                    {topic.is_pinned && <Pin className="h-3 w-3 text-primary" />}
+                                                                    <Link
+                                                                        href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
+                                                                        className={`font-medium hover:underline truncate ${
+                                                                            topic.is_read_by_user ? 'text-muted-foreground' : 'text-foreground'
+                                                                        }`}
+                                                                    >
+                                                                        {topic.title}
+                                                                    </Link>
+                                                                </div>
+                                                                <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                                                                    <span>by {topic.author?.name}</span>
+                                                                    <span>•</span>
+                                                                    <span>{topic.last_reply_at ? formatDistanceToNow(new Date(topic.last_reply_at), { addSuffix: true }) : formatDistanceToNow(new Date(topic.created_at), { addSuffix: true })}</span>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex-shrink-0 text-right">
+                                                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                                    <div className="flex items-center gap-1">
+                                                                        <MessageSquare className="h-3 w-3" />
+                                                                        <span>{topic.posts_count}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                )}
+                                                {!category.forums?.some(forum => forum.latest_topics && forum.latest_topics.length > 0) && (
+                                                    <div className="text-center py-8 text-muted-foreground">
+                                                        <MessageSquare className="h-8 w-8 mx-auto mb-2" />
+                                                        <p>No recent topics in this category</p>
                                                     </div>
                                                 )}
                                             </div>
                                         </div>
                                     </div>
-                                </CardHeader>
-
-                                {forum.latest_topics && forum.latest_topics.length > 0 && can('view_any_topics') && (
-                                    <CardContent className="pt-0">
-                                        <div className="border-t pt-4">
-                                            <div className="mb-3 text-sm font-medium">Recent Topics</div>
-                                            <div className="space-y-3">
-                                                {forum.latest_topics.slice(0, 3).map((topic) => (
-                                                    <div key={topic.id} className="flex items-center gap-3">
-                                                        <div className="min-w-0 flex-1">
-                                                            <div className="flex items-center gap-2">
-                                                                {!topic.is_read_by_user && (
-                                                                    <Circle className="h-2 w-2 fill-info text-info-foreground" />
-                                                                )}
-                                                                {topic.is_hot && <span className="text-sm">🔥</span>}
-                                                                {topic.is_pinned && <Pin className="h-3 w-3 text-info" />}
-                                                                <Link
-                                                                    href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
-                                                                    className={`truncate text-sm hover:underline ${
-                                                                        topic.is_read_by_user ? 'font-normal text-muted-foreground' : 'font-medium'
-                                                                    }`}
-                                                                >
-                                                                    {topic.title}
-                                                                </Link>
-                                                            </div>
-                                                            <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
-                                                                <span>by {topic.author?.name}</span>
-                                                                <div className="flex items-center gap-1">
-                                                                    <Eye className="h-3 w-3" />
-                                                                    <span>{topic.views_count}</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-1">
-                                                                    <MessageSquare className="h-3 w-3" />
-                                                                    <span>{topic.posts_count}</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        {topic.last_reply_at && (
-                                                            <div className="text-xs text-muted-foreground">
-                                                                {formatDistanceToNow(new Date(topic.last_reply_at), { addSuffix: true })}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                )}
+                                </CardContent>
                             </Card>
                         ))}
                     </div>
                 )}
 
-                {forums.length === 0 && (
+                {categories.length === 0 && (
                     <Card>
                         <CardContent className="flex flex-col items-center justify-center py-12">
                             <MessageSquare className="mb-4 h-12 w-12 text-muted-foreground" />
@@ -204,7 +192,7 @@ export default function ForumsIndex({ forums }: ForumsIndexProps) {
                     </Card>
                 )}
 
-                <ForumSelectionDialog forums={forums} isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} />
+                <ForumSelectionDialog forums={allForums} isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} />
             </div>
         </AppLayout>
     );

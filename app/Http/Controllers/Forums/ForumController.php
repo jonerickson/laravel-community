@@ -6,8 +6,10 @@ namespace App\Http\Controllers\Forums;
 
 use App\Http\Controllers\Controller;
 use App\Models\Forum;
+use App\Models\ForumCategory;
 use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
@@ -26,18 +28,30 @@ class ForumController extends Controller
     {
         $this->authorize('viewAny', Forum::class);
 
-        $forums = Forum::active()
+        $categories = ForumCategory::query()
+            ->active()
             ->ordered()
-            ->withCount(['topics', 'posts'])
-            ->with(['latestTopics' => function ($query): void {
-                $query->with(['author', 'lastPost.author'])
-                    ->limit(3);
+            ->with(['forums' => function (HasMany|Forum $query): void {
+                $query
+                    ->active()
+                    ->ordered()
+                    ->withCount(['topics', 'posts'])
+                    ->with(['latestTopics' => function (HasMany|Topic $subQuery): void {
+                        $subQuery
+                            ->with(['author', 'lastPost.author'])
+                            ->limit(3);
+                    }]);
             }])
             ->get()
-            ->filter(fn (Forum $forum) => Auth::user()->can('view', $forum));
+            ->filter(fn (ForumCategory $category) => Auth::user()->can('view', $category))
+            ->map(function (ForumCategory $category) {
+                $category->setAttribute('forums', $category->forums->filter(fn (Forum $forum) => Auth::user()->can('view', $forum)));
+
+                return $category;
+            });
 
         return Inertia::render('forums/index', [
-            'forums' => $forums,
+            'categories' => $categories,
         ]);
     }
 

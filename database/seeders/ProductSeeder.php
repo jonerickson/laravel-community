@@ -7,12 +7,15 @@ namespace Database\Seeders;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductPrice;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
 {
+    use WithoutModelEvents;
+
     public function run(): void
     {
         $productCategory = ProductCategory::factory()->state([
