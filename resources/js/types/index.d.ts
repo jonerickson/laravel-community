@@ -33,7 +33,7 @@ export interface Auth {
     user: User;
     groups: Group[];
     isAdmin: boolean;
-    can?: Record<string, boolean>;
+    can: string[];
     roles?: string[];
 }
 

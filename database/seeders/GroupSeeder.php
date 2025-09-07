@@ -16,8 +16,17 @@ class GroupSeeder extends Seeder
             ->state(new Sequence(
                 ['name' => 'Members', 'is_default_member' => true],
                 ['name' => 'Guests', 'is_default_guest' => true],
+                ['name' => 'Administrators'],
             ))
-            ->count(2)
-            ->create();
+            ->count(3)
+            ->create()
+            ->each(function (Group $group) {
+                match ($group->name) {
+                    'Administrators' => $group->assignRole('super-admin'),
+                    'Members' => $group->assignRole('user'),
+                    'Guests' => $group->assignRole('guest'),
+                    default => null,
+                };
+            });
     }
 }

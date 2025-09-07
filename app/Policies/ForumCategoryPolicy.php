@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Models\Forum;
+use App\Models\ForumCategory;
 use App\Models\User;
+use App\Services\PermissionService;
 
 class ForumCategoryPolicy
 {
-    public function viewAny(User $user): bool
+    public function viewAny(?User $user): bool
     {
-        return $user->hasPermissionTo('view_any_forums_categories');
+        return PermissionService::hasPermissionTo('view_any_forums_categories', $user);
     }
 
-    public function view(User $user, Forum $forum): bool
+    public function view(?User $user, ForumCategory $category): bool
     {
-        return $user->hasPermissionTo('view_forums_category');
+        return PermissionService::hasPermissionTo('view_forums_category', $user);
     }
 }

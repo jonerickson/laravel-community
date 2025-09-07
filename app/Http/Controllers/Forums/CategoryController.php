@@ -11,7 +11,7 @@ use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -41,9 +41,9 @@ class CategoryController extends Controller
                     }]);
             }])
             ->get()
-            ->filter(fn (ForumCategory $category) => Auth::user()->can('view', $category))
+            ->filter(fn (ForumCategory $category) => Gate::check('view', $category))
             ->map(function (ForumCategory $category) {
-                $category->setAttribute('forums', $category->forums->filter(fn (Forum $forum) => Auth::user()->can('view', $forum)));
+                $category->setAttribute('forums', $category->forums->filter(fn (Forum $forum) => Gate::check('view', $forum)));
 
                 return $category;
             });
@@ -70,7 +70,7 @@ class CategoryController extends Controller
                     ->limit(3);
             }])
             ->get()
-            ->filter(fn (Forum $forum) => Auth::user()->can('view', $forum));
+            ->filter(fn (Forum $forum) => Gate::check('view', $forum));
 
         return Inertia::render('forums/categories/show', [
             'category' => $category,

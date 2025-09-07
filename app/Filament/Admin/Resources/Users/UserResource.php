@@ -181,6 +181,8 @@ class UserResource extends Resource
                     ->searchable(),
                 TextColumn::make('groups.name')
                     ->badge(),
+                TextColumn::make('roles.name')
+                    ->badge(),
                 IconColumn::make('is_banned')
                     ->label('Banned')
                     ->boolean()

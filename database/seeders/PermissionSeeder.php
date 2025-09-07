@@ -24,9 +24,13 @@ class PermissionSeeder extends Seeder
         $role = Role::firstOrCreate(['name' => 'super-admin']);
         $role->givePermissionTo(Permission::all());
 
-        Role::firstOrCreate(['name' => 'guests']);
-        Role::firstOrCreate(['name' => 'moderator']);
-        Role::firstOrCreate(['name' => 'user']);
+        $guestRole = Role::firstOrCreate(['name' => 'guest']);
+        $moderatorRole = Role::firstOrCreate(['name' => 'moderator']);
+        $userRole = Role::firstOrCreate(['name' => 'user']);
+
+        $this->seedGuestPermissions($guestRole);
+        $this->seedModeratorPermissions($moderatorRole);
+        $this->seedUserPermissions($userRole);
     }
 
     private function createPermissionsFromPolicies(): void
@@ -67,10 +71,66 @@ class PermissionSeeder extends Seeder
         $lines = array_slice(explode("\n", $source), $startLine, $endLine - $startLine + 1);
         $methodContent = implode("\n", $lines);
 
-        if (preg_match('/hasPermissionTo\([\'"]([^\'"]+)[\'"]\)/', $methodContent, $matches)) {
+        if (preg_match('/PermissionService::hasPermissionTo\([\'"]([^\'"]+)[\'"]/', $methodContent, $matches)) {
             return $matches[1];
         }
 
         return null;
+    }
+
+    private function seedGuestPermissions(Role $role): void
+    {
+        $role->givePermissionTo([
+            'view_any_comments',
+            'view_any_forums',
+            'view_any_forums_categories',
+            'view_any_posts',
+            'view_any_topics',
+            'view_comments',
+            'view_forums',
+            'view_forums_category',
+            'view_posts',
+            'view_topics',
+        ]);
+    }
+
+    private function seedModeratorPermissions(Role $role): void
+    {
+        $role->givePermissionTo([
+            'delete_comments',
+            'delete_posts',
+            'delete_topics',
+            'update_comments',
+            'update_posts',
+            'update_topics',
+            'pin_posts',
+            'publish_posts',
+            'pin_topics',
+            'lock_topics',
+        ]);
+    }
+
+    private function seedUserPermissions(Role $role): void
+    {
+        $role->givePermissionTo([
+            'create_comments',
+            'create_posts',
+            'create_topics',
+            'view_any_comments',
+            'view_any_forums',
+            'view_any_forums_categories',
+            'view_any_posts',
+            'view_any_topics',
+            'view_comments',
+            'view_forums',
+            'view_forums_category',
+            'view_posts',
+            'view_topics',
+            'like_comments',
+            'report_posts',
+            'like_posts',
+            'report_topics',
+            'reply_topics',
+        ]);
     }
 }

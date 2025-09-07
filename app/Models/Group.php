@@ -74,6 +74,8 @@ class Group extends Model
     use HasRoles;
     use Orderable;
 
+    protected string $guard_name = 'web';
+
     protected $fillable = [
         'name',
         'description',
@@ -126,6 +128,11 @@ class Group extends Model
                 'is_default_member' => false,
             ]);
         }
+    }
+
+    protected function getDefaultGuardName(): string
+    {
+        return 'web';
     }
 
     protected function casts(): array

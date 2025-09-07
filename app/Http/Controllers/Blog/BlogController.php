@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -37,7 +37,7 @@ class BlogController extends Controller
             );
 
         $posts->setCollection(
-            collection: $posts->getCollection()->filter(fn (Post $post) => Auth::user()->can('view', $post))
+            collection: $posts->getCollection()->filter(fn (Post $post) => Gate::check('view', $post))
         );
 
         return Inertia::render('blog/index', [

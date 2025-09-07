@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Models\Permission;
+use App\Services\PermissionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Inertia\Middleware;
@@ -23,7 +23,7 @@ class HandleInertiaRequests extends Middleware
                 'groups' => $user?->groups?->pluck(['id', 'name', 'color']),
                 'isAdmin' => $user?->hasRole('super-admin'),
                 'roles' => $user?->roles?->pluck('name'),
-                'can' => $user?->getPermissionsViaRoles()->mapWithKeys(fn (Permission $permission) => [$permission->name => $user->can($permission->name)])->toArray(),
+                'can' => PermissionService::mapFrontendPermissions($user),
             ],
             'cartCount' => $this->getCartCount(),
             'flash' => [

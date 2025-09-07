@@ -8,14 +8,14 @@ interface UsePermissionsReturn {
     hasAnyRole: (roles: string[]) => boolean;
     hasAllPermissions: (permissions: string[]) => boolean;
     hasAnyPermission: (permissions: string[]) => boolean;
-    permissions: Record<string, boolean>;
+    permissions: string[];
     roles: string[];
 }
 
 export function usePermissions(): UsePermissionsReturn {
     const { auth } = usePage<SharedData>().props;
     const can = (permission: string): boolean => {
-        return auth?.can?.[permission] === true;
+        return auth?.can.includes(permission);
     };
 
     const cannot = (permission: string): boolean => {
@@ -45,7 +45,7 @@ export function usePermissions(): UsePermissionsReturn {
         hasAnyRole,
         hasAllPermissions,
         hasAnyPermission,
-        permissions: auth?.can ?? {},
+        permissions: auth?.can ?? [],
         roles: auth?.roles ?? [],
     };
 }

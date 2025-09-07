@@ -6,59 +6,68 @@ namespace App\Policies;
 
 use App\Models\Topic;
 use App\Models\User;
+use App\Services\PermissionService;
 
 class TopicPolicy
 {
-    public function viewAny(User $user): bool
+    public function viewAny(?User $user): bool
     {
-        return $user->hasPermissionTo('view_any_topics');
+        return PermissionService::hasPermissionTo('view_any_topics', $user);
     }
 
-    public function view(User $user, Topic $topic): bool
+    public function view(?User $user, Topic $topic): bool
     {
-        return $user->hasPermissionTo('view_topics');
+        return PermissionService::hasPermissionTo('view_topics', $user);
     }
 
-    public function create(User $user): bool
+    public function create(?User $user): bool
     {
-        return $user->hasPermissionTo('create_topics');
+        return PermissionService::hasPermissionTo('create_topics', $user);
     }
 
-    public function update(User $user, Topic $topic): bool
+    public function update(?User $user, Topic $topic): bool
     {
-        if ($user->hasPermissionTo('update_topics')) {
+        if (PermissionService::hasPermissionTo('update_topics')) {
             return true;
+        }
+
+        if (! $user) {
+            return false;
         }
 
         return $topic->isAuthoredBy($user);
     }
 
-    public function delete(User $user, Topic $topic): bool
+    public function delete(?User $user, Topic $topic): bool
     {
-        if ($user->hasPermissionTo('delete_topics')) {
+        if (PermissionService::hasPermissionTo('delete_topics')) {
             return true;
+        }
+
+        if (! $user) {
+            return false;
         }
 
         return $topic->isAuthoredBy($user);
     }
 
-    public function reply(User $user, Topic $topic): bool
+    public function reply(?User $user, Topic $topic): bool
     {
-        return $user->hasPermissionTo('reply_topics');
+        return PermissionService::hasPermissionTo('reply_topics', $user);
     }
 
-    public function report(User $user, Topic $topic): bool
+    public function report(?User $user, Topic $topic): bool
     {
-        return $user->hasPermissionTo('report_topics');
+        return PermissionService::hasPermissionTo('report_topics', $user);
     }
 
-    public function pin(User $user, Topic $topic): bool
+    public function pin(?User $user, Topic $topic): bool
     {
-        return $user->hasPermissionTo('pin_topics');
+        return PermissionService::hasPermissionTo('pin_topics', $user);
     }
 
-    public function lock(User $user, Topic $topic): bool
+    public function lock(?User $user, Topic $topic): bool
     {
-        return $user->hasPermissionTo('lock_topics');
+        return PermissionService::hasPermissionTo('lock_topics', $user);
     }
 }

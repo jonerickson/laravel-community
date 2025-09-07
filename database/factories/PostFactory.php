@@ -18,7 +18,6 @@ class PostFactory extends Factory
     public function definition(): array
     {
         $title = $this->faker->sentence();
-        $publishedAt = $this->faker->optional(0.8)->dateTimeBetween('-1 year');
 
         return [
             'title' => $title,
@@ -26,9 +25,9 @@ class PostFactory extends Factory
             'excerpt' => $this->faker->optional(0.7)->paragraph(),
             'content' => $this->faker->paragraphs(rand(3, 8), true),
             'featured_image' => $this->faker->optional(0.6)->imageUrl(1200, 600, 'articles'),
-            'is_published' => $publishedAt !== null,
+            'is_published' => true,
             'is_featured' => $this->faker->boolean(20),
-            'published_at' => $publishedAt?->getTimestamp(),
+            'published_at' => now(),
             'created_by' => User::factory(),
             'metadata' => $this->faker->optional(0.3)->randomElements([
                 'seo_title' => $this->faker->sentence(),

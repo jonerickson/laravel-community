@@ -29,9 +29,19 @@ class DatabaseSeeder extends Seeder
         ])->create();
 
         User::factory()->create([
-            'name' => 'Test User',
+            'name' => 'Test Admin',
             'email' => 'test@deschutesdesigngroup.com',
         ])->assignRole('super-admin');
+
+        User::factory()->create([
+            'name' => 'Test Moderator',
+            'email' => 'moderator@deschutesdesigngroup.com',
+        ])->assignRole('moderator');
+
+        User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'user@deschutesdesigngroup.com',
+        ])->assignRole('user');
 
         $this->call([
             BlogSeeder::class,

@@ -6,44 +6,53 @@ namespace App\Policies;
 
 use App\Models\Comment;
 use App\Models\User;
+use App\Services\PermissionService;
 
 class CommentPolicy
 {
-    public function viewAny(User $user): bool
+    public function viewAny(?User $user): bool
     {
-        return $user->hasPermissionTo('view_any_comments');
+        return PermissionService::hasPermissionTo('view_any_comments', $user);
     }
 
-    public function view(User $user, Comment $comment): bool
+    public function view(?User $user, Comment $comment): bool
     {
-        return $user->hasPermissionTo('view_comments');
+        return PermissionService::hasPermissionTo('view_comments', $user);
     }
 
-    public function create(User $user): bool
+    public function create(?User $user): bool
     {
-        return $user->hasPermissionTo('create_comments');
+        return PermissionService::hasPermissionTo('create_comments', $user);
     }
 
-    public function update(User $user, Comment $comment): bool
+    public function update(?User $user, Comment $comment): bool
     {
-        if ($user->hasPermissionTo('update_comments')) {
+        if (PermissionService::hasPermissionTo('update_comments')) {
             return true;
+        }
+
+        if (! $user) {
+            return false;
         }
 
         return $comment->isAuthoredBy($user);
     }
 
-    public function delete(User $user, Comment $comment): bool
+    public function delete(?User $user, Comment $comment): bool
     {
-        if ($user->hasPermissionTo('delete_comments')) {
+        if (PermissionService::hasPermissionTo('delete_comments')) {
             return true;
+        }
+
+        if (! $user) {
+            return false;
         }
 
         return $comment->isAuthoredBy($user);
     }
 
-    public function like(User $user, Comment $comment): bool
+    public function like(?User $user, Comment $comment): bool
     {
-        return $user->hasPermissionTo('like_comments');
+        return PermissionService::hasPermissionTo('like_comments', $user);
     }
 }
