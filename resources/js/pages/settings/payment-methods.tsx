@@ -169,7 +169,7 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
 
                         {paymentMethods.length === 0 && (
                             <EmptyState
-                                icon={<CreditCard className="h-12 w-12" />}
+                                icon={<CreditCard />}
                                 title="No payment methods"
                                 description="Add a payment method to make purchases and manage subscriptions."
                                 buttonText="Add Your First Payment Method"

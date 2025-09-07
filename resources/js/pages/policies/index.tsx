@@ -17,7 +17,7 @@ interface PoliciesIndexProps {
     categories: PolicyCategory[];
 }
 
-export default function PoliciesIndex({ categories }: PoliciesIndexProps) {
+export default function PolicyCategoryIndex({ categories }: PoliciesIndexProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Policies" />

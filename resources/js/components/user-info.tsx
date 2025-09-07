@@ -25,9 +25,8 @@ export function UserInfo({ user, showEmail = false, showGroups = false }: { user
                 {showGroups && user.groups.length > 0 && (
                     <div className="flex text-xs font-medium">
                         {user.groups.map((group) => (
-                            <>
+                            <div key={group.id}>
                                 <span
-                                    key={group.id}
                                     style={{
                                         color: group.color || undefined,
                                     }}
@@ -42,7 +41,7 @@ export function UserInfo({ user, showEmail = false, showGroups = false }: { user
                                 >
                                     ,
                                 </span>
-                            </>
+                            </div>
                         ))}
                     </div>
                 )}

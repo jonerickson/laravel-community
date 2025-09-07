@@ -1,5 +1,6 @@
 import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
+import RichEditorContent from '@/components/rich-editor-content';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -9,14 +10,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useApiRequest } from '@/hooks/use-api-request';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Forum, PaginatedData, SharedData, Topic } from '@/types';
+import { stripCharacters } from '@/utils/truncate';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { Circle, Eye, LibraryBig, Lock, MessageSquare, Pin, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { route } from 'ziggy-js';
 import usePermissions from '../../hooks/use-permissions';
-import RichEditorContent from '@/components/rich-editor-content';
-import { stripCharacters } from '@/utils/truncate';
 
 interface ForumShowProps {
     forum: Forum;
@@ -31,9 +32,24 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
     const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
     const { loading: isDeleting, execute: executeBulkDelete } = useApiRequest();
 
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Forums',
+            href: route('forums.index'),
+        },
+        {
+            title: forum.category.name,
+            href: route('forums.categories.show', { category: forum.category.slug }),
+        },
+        {
+            title: forum.name,
+            href: route('forums.show', { forum: forum.slug }),
+        },
+    ];
+
     const structuredData = {
         '@context': 'https://schema.org',
-        '@type': 'WebPage',
+        '@type': 'CollectionPage',
         name: forum.name,
         description: forum.description || `Discussions and topics in ${forum.name}`,
         url: window.location.href,
@@ -41,42 +57,41 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
             '@type': 'Organization',
             name: siteName,
         },
-        mainEntity: {
-            '@type': 'CollectionPage',
-            name: forum.name,
-            description: forum.description || `Discussions and topics in ${forum.name}`,
+        breadcrumb: {
+            '@type': 'BreadcrumbList',
+            itemListElement: breadcrumbs.map((breadcrumb, index) => ({
+                '@type': 'ListItem',
+                position: index + 1,
+                name: breadcrumb.title,
+                item: breadcrumb.href,
+            })),
+        },
+        hasPart: topics.map((topic) => ({
+            '@type': 'DiscussionForumPosting',
+            headline: topic.title,
+            description: topic.description,
+            text: topic.last_post?.content,
+            dateCreated: topic.created_at,
+            dateModified: topic.updated_at,
+            author: {
+                '@type': 'Person',
+                name: topic.author.name,
+            },
+            url: route('forums.topics.show', { forum: forum.slug, topic: topic.slug }),
             interactionStatistic: [
                 {
                     '@type': 'InteractionCounter',
-                    interactionType: 'https://schema.org/CommentAction',
-                    userInteractionCount: topics.length,
+                    interactionType: 'https://schema.org/ViewAction',
+                    userInteractionCount: topic.views_count,
+                },
+                {
+                    '@type': 'InteractionCounter',
+                    interactionType: 'https://schema.org/ReplyAction',
+                    userInteractionCount: topic.posts_count,
                 },
             ],
-            hasPart: topics.map((topic) => ({
-                '@type': 'DiscussionForumPosting',
-                headline: topic.title,
-                description: topic.description,
-                dateCreated: topic.created_at,
-                dateModified: topic.updated_at,
-                author: {
-                    '@type': 'Person',
-                    name: topic.author?.name,
-                },
-                url: `/forums/${forum.slug}/${topic.slug}`,
-                interactionStatistic: [
-                    {
-                        '@type': 'InteractionCounter',
-                        interactionType: 'https://schema.org/ViewAction',
-                        userInteractionCount: topic.views_count,
-                    },
-                    {
-                        '@type': 'InteractionCounter',
-                        interactionType: 'https://schema.org/ReplyAction',
-                        userInteractionCount: topic.posts_count,
-                    },
-                ],
-            })),
-        },
+        })),
+        numberOfItems: topics.length,
     };
 
     const handleSelectTopic = (topicId: number, checked: boolean) => {
@@ -127,22 +142,11 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
         );
     };
 
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Forums',
-            href: '/forums',
-        },
-        {
-            title: forum.name,
-            href: `/forums/${forum.slug}`,
-        },
-    ];
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`${forum.name} - Forums`}>
+            <Head title={`Forums - ${forum.name}`}>
                 <meta name="description" content={forum.description || `Discussions and topics in ${forum.name}`} />
-                <meta property="og:title" content={`${forum.name} - Forums`} />
+                <meta property="og:title" content={`Forums - ${forum.name} - ${siteName}`} />
                 <meta property="og:description" content={forum.description || `Discussions and topics in ${forum.name}`} />
                 <meta property="og:type" content="website" />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
@@ -236,7 +240,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                                             ) : (
                                                                 <Avatar className="h-8 w-8 transition-opacity hover:opacity-75">
                                                                     <AvatarFallback className="text-xs">
-                                                                        {topic.author?.name.charAt(0).toUpperCase()}
+                                                                        {topic.author.name.charAt(0).toUpperCase()}
                                                                     </AvatarFallback>
                                                                 </Avatar>
                                                             )}
@@ -244,7 +248,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                                     ) : (
                                                         <Avatar className="h-8 w-8">
                                                             <AvatarFallback className="text-xs">
-                                                                {topic.author?.name.charAt(0).toUpperCase()}
+                                                                {topic.author.name.charAt(0).toUpperCase()}
                                                             </AvatarFallback>
                                                         </Avatar>
                                                     )}
@@ -269,7 +273,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                                             </p>
                                                         )}
                                                         <div className="text-xs text-muted-foreground">
-                                                            Started by {topic.author?.name} •{' '}
+                                                            Started by {topic.author.name} •{' '}
                                                             {formatDistanceToNow(new Date(topic.created_at), { addSuffix: true })}
                                                         </div>
                                                     </div>
@@ -318,11 +322,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
 
                 {topics.length === 0 && (
                     <div className="mt-2">
-                        <EmptyState
-                            icon={<LibraryBig className="h-12 w-12" />}
-                            title="No topics yet"
-                            description="Be the first to start a discussion in this forum."
-                        />
+                        <EmptyState icon={<LibraryBig />} title="No topics yet" description="Be the first to start a discussion in this forum." />
                     </div>
                 )}
             </div>

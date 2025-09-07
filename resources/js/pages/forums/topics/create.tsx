@@ -8,13 +8,14 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Forum } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { toast } from 'sonner';
+import { route } from 'ziggy-js';
 import usePermissions from '../../../hooks/use-permissions';
 
 interface CreateTopicProps {
     forum: Forum;
 }
 
-export default function CreateTopic({ forum }: CreateTopicProps) {
+export default function ForumTopicCreate({ forum }: CreateTopicProps) {
     const { can, cannot } = usePermissions();
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
@@ -25,15 +26,19 @@ export default function CreateTopic({ forum }: CreateTopicProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Forums',
-            href: '/forums',
+            href: route('forums.index'),
+        },
+        {
+            title: forum.category.name,
+            href: route('forums.categories.show', { category: forum.category.slug }),
         },
         {
             title: forum.name,
-            href: `/forums/${forum.slug}`,
+            href: route('forums.show', { forum: forum.slug }),
         },
         {
             title: 'Create Topic',
-            href: `/forums/${forum.slug}/create`,
+            href: route('forums.topics.create', { forum: forum.slug }),
         },
     ];
 
@@ -56,7 +61,12 @@ export default function CreateTopic({ forum }: CreateTopicProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Create Topic - ${forum.name} - Forums`} />
+            <Head title={`Forums - ${forum.name} - Create Topic`}>
+                <meta name="description" content={`Create topic in ${forum.name}`} />
+                <meta property="og:title" content={`Forums - ${forum.name} - Create Topic`} />
+                <meta property="og:description" content={`Create topic in ${forum.name}`} />
+                <meta property="og:type" content="website" />
+            </Head>
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <Heading title="Create New Topic" description={`Start a new discussion in ${forum.name}`} />
 

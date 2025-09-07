@@ -69,7 +69,8 @@ class PostController extends Controller
             message: 'Post not found.'
         );
 
-        $post->loadMissing(['author']);
+        $forum->loadMissing('category');
+        $post->loadMissing('author');
 
         return Inertia::render('forums/posts/edit', [
             'forum' => $forum,

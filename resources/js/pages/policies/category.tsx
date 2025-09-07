@@ -10,7 +10,7 @@ interface PoliciesCategoryProps {
     policies: Policy[];
 }
 
-export default function PoliciesCategory({ category, policies }: PoliciesCategoryProps) {
+export default function PolicyCategoryShow({ category, policies }: PoliciesCategoryProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Policies',

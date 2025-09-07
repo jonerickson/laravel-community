@@ -36,8 +36,11 @@ class TopicController extends Controller
 
         $topic->incrementViews();
 
+        $forum->loadMissing('category');
+
         /** @var LengthAwarePaginator $posts */
-        $posts = $topic->posts()
+        $posts = $topic
+            ->posts()
             ->with(['author', 'comments.author', 'comments.replies.author', 'reports'])
             ->latestActivity()
             ->paginate(10);
@@ -62,6 +65,8 @@ class TopicController extends Controller
     {
         $this->authorize('view', $forum);
         $this->authorize('create', Topic::class);
+
+        $forum->loadMissing('category');
 
         return Inertia::render('forums/topics/create', [
             'forum' => $forum,

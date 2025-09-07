@@ -6,6 +6,7 @@ import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Forum, Post, Topic } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 import usePermissions from '../../../hooks/use-permissions';
 
 interface EditPostProps {
@@ -14,7 +15,7 @@ interface EditPostProps {
     post: Post;
 }
 
-export default function Edit({ forum, topic, post }: EditPostProps) {
+export default function ForumPostEdit({ forum, topic, post }: EditPostProps) {
     const { can, cannot } = usePermissions();
     const { data, setData, patch, processing, errors } = useForm({
         content: post.content,
@@ -23,19 +24,23 @@ export default function Edit({ forum, topic, post }: EditPostProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Forums',
-            href: '/forums',
+            href: route('forums.index'),
+        },
+        {
+            title: forum.category.name,
+            href: route('forums.categories.show', { category: forum.category.slug }),
         },
         {
             title: forum.name,
-            href: `/forums/${forum.slug}`,
+            href: route('forums.show', { forum: forum.slug }),
         },
         {
             title: topic.title,
-            href: `/forums/${forum.slug}/topics/${topic.slug}`,
+            href: route('forums.topics.show', { forum: forum.slug, topic: topic.slug }),
         },
         {
             title: 'Edit Post',
-            href: `/forums/${forum.slug}/topics/${topic.slug}/posts/${post.id}/edit`,
+            href: route('forums.posts.update', { forum: forum.slug, topic: topic.slug, post: post.slug }),
         },
     ];
 
@@ -49,14 +54,19 @@ export default function Edit({ forum, topic, post }: EditPostProps) {
             route('forums.posts.update', {
                 forum: forum.slug,
                 topic: topic.slug,
-                post: post.id,
+                post: post.slug,
             }),
         );
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Edit Post - ${topic.title} - Forums`} />
+            <Head title={`Forums - ${topic.title} - Edit Post`}>
+                <meta name="description" content={`Edit post in ${topic.title}`} />
+                <meta property="og:title" content={`Forums - ${topic.title} - Edit Post`} />
+                <meta property="og:description" content={`Edit post in ${topic.title}`} />
+                <meta property="og:type" content="website" />
+            </Head>
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <Heading title="Edit Post" description={`Editing your post in "${topic.title}"`} />
 

@@ -13,14 +13,13 @@ interface ForgotPasswordProps {
     status?: string;
 }
 
-export default function ForgotPassword({ status }: ForgotPasswordProps) {
+export default function AuthForgotPassword({ status }: ForgotPasswordProps) {
     const { data, setData, post, processing, errors } = useForm<Required<{ email: string }>>({
         email: '',
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-
         post(route('password.email'));
     };
 

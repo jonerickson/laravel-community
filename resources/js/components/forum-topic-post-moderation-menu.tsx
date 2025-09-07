@@ -40,7 +40,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
             route('forums.posts.destroy', {
                 forum: forum.slug,
                 topic: topic.slug,
-                post: post.id,
+                post: post.slug,
             }),
             {
                 onSuccess: () => toast.success(`The post has been deleted.`),
@@ -134,7 +134,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                             href={route('forums.posts.edit', {
                                 forum: forum.slug,
                                 topic: topic.slug,
-                                post: post.id,
+                                post: post.slug,
                             })}
                         >
                             <Edit className="mr-2 h-4 w-4" />

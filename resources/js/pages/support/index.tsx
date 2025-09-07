@@ -51,7 +51,7 @@ export default function SupportTicketsIndex({ tickets, ticketsPagination }: Supp
 
                 {tickets.length === 0 ? (
                     <EmptyState
-                        icon={<Ticket className="h-12 w-12" />}
+                        icon={<Ticket />}
                         title="No support tickets found"
                         description="You haven't created any support tickets yet. Create one to get help from our support team."
                         buttonText="Create Your First Ticket"

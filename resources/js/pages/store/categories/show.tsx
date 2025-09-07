@@ -6,30 +6,63 @@ import type { BreadcrumbItem, Product, ProductCategory } from '@/types';
 import { Head } from '@inertiajs/react';
 import { ShoppingBag } from 'lucide-react';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Store',
-        href: '/store',
-    },
-];
-
 interface StoreCategoryShowProps {
     category: ProductCategory;
     products: Product[];
 }
 
 export default function StoreCategoryShow({ category, products }: StoreCategoryShowProps) {
-    const categoryBreadcrumbs: BreadcrumbItem[] = [
-        ...breadcrumbs,
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Store',
+            href: '/store',
+        },
         {
             title: category.name,
             href: `/store/categories/${category.slug}`,
         },
     ];
 
+    const structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: category.name,
+        description: category.description || `Products in ${category.name} category`,
+        url: window.location.href,
+        breadcrumb: {
+            '@type': 'BreadcrumbList',
+            itemListElement: breadcrumbs.map((breadcrumb, index) => ({
+                '@type': 'ListItem',
+                position: index + 1,
+                name: breadcrumb.title,
+                item: breadcrumb.href,
+            })),
+        },
+        hasPart: products.map((product) => ({
+            '@type': 'Product',
+            name: product.name,
+            description: product.description,
+            url: route('store.products.show', { product: product.slug }),
+            image: product.featured_image_url,
+            category: category.name,
+            offers: {
+                '@type': 'Offer',
+                price: product.price,
+                priceCurrency: 'USD',
+            },
+        })),
+        numberOfItems: products.length,
+    };
+
     return (
-        <AppLayout breadcrumbs={categoryBreadcrumbs}>
-            <Head title={`${category.name} - Store`} />
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title={`${category.name} - Store`}>
+                <meta name="description" content={category.description || `Products in ${category.name} category`} />
+                <meta property="og:title" content={`${category.name} - Store`} />
+                <meta property="og:description" content={category.description || `Products in ${category.name} category`} />
+                <meta property="og:type" content="website" />
+                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+            </Head>
             <div className="flex h-full flex-1 flex-col overflow-x-auto">
                 <Heading title={category.name} description={category.description} />
 
@@ -42,7 +75,7 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
                 ) : (
                     <div className="mt-8">
                         <EmptyState
-                            icon={<ShoppingBag className="h-12 w-12" />}
+                            icon={<ShoppingBag />}
                             title="No products found"
                             description={`No products are currently available in the ${category.name} category.`}
                         />

@@ -3,6 +3,7 @@ import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Comment, PaginatedData, Post, SharedData } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 interface RecentViewer {
     user: {
@@ -24,11 +25,16 @@ export default function BlogShow({ post, comments, commentsPagination, recentVie
     const { name: siteName } = usePage<SharedData>().props;
     const pageDescription = post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, '') + '...';
 
-    useMarkAsRead({
-        id: post.id,
-        type: 'post',
-        isRead: post.is_read_by_user,
-    });
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Blog',
+            href: route('blog.index'),
+        },
+        {
+            title: post.title,
+            href: route('blog.show', { post: post.slug }),
+        },
+    ];
 
     const structuredData = {
         '@context': 'https://schema.org',
@@ -43,6 +49,16 @@ export default function BlogShow({ post, comments, commentsPagination, recentVie
         publisher: {
             '@type': 'Organization',
             name: siteName,
+        },
+        breadcrumb: {
+            '@type': 'BreadcrumbList',
+            numberOfItems: breadcrumbs.length,
+            itemListElement: breadcrumbs.map((breadcrumb, index) => ({
+                '@type': 'ListItem',
+                position: index + 1,
+                name: breadcrumb.title,
+                item: breadcrumb.href,
+            })),
         },
         datePublished: post.published_at || post.created_at,
         dateModified: post.updated_at,
@@ -67,16 +83,11 @@ export default function BlogShow({ post, comments, commentsPagination, recentVie
         ],
     };
 
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Blog',
-            href: '/blog',
-        },
-        {
-            title: post.title,
-            href: `/blog/${post.slug}`,
-        },
-    ];
+    useMarkAsRead({
+        id: post.id,
+        type: 'post',
+        isRead: post.is_read_by_user,
+    });
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -89,7 +100,6 @@ export default function BlogShow({ post, comments, commentsPagination, recentVie
                 {post.featured_image_url && <meta property="og:image" content={post.featured_image_url} />}
                 <meta property="article:published_time" content={post.published_at || post.created_at} />
                 {post.author && <meta property="article:author" content={post.author.name} />}
-
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
 

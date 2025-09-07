@@ -18,7 +18,7 @@ Route::group(['as' => 'store.', 'prefix' => 'store'], function (): void {
     Route::get('cart', [ShoppingCartController::class, 'index'])->name('cart.index');
     Route::delete('cart', [ShoppingCartController::class, 'destroy'])->name('cart.destroy');
 
-    Route::middleware(['auth', 'verified'])->group(function (): void {
+    Route::group(['middleware' => ['auth', 'verified']], function (): void {
         Route::redirect('checkout/success', '/store/cart')->name('checkout.success');
         Route::redirect('checkout/cancel', '/store/cart')->name('checkout.cancel');
     });

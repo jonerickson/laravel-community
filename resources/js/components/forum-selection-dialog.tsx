@@ -55,7 +55,7 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumS
                 </ScrollArea>
                 {forums.length === 0 && (
                     <div className="py-6 text-center text-muted-foreground">
-                        <MessageSquare className="mx-auto mb-3 h-12 w-12 opacity-50" />
+                        <MessageSquare className="mx-auto mb-3 size-8 text-muted-foreground/50" />
                         <p className="text-sm">No forums available</p>
                     </div>
                 )}

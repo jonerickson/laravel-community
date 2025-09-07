@@ -13,6 +13,7 @@ import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowDown, ArrowLeft, Clock, Eye, Lock, MessageSquare, Pin, Reply, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { route } from 'ziggy-js';
 import usePermissions from '../../../hooks/use-permissions';
 
 interface RecentViewer {
@@ -32,7 +33,7 @@ interface TopicShowProps {
     recentViewers: RecentViewer[];
 }
 
-export default function TopicShow({ forum, topic, posts, postsPagination, recentViewers }: TopicShowProps) {
+export default function ForumTopicShow({ forum, topic, posts, postsPagination, recentViewers }: TopicShowProps) {
     const { can, cannot } = usePermissions();
     const { name: siteName } = usePage<SharedData>().props;
     const [showReplyForm, setShowReplyForm] = useState(false);
@@ -43,15 +44,19 @@ export default function TopicShow({ forum, topic, posts, postsPagination, recent
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Forums',
-            href: '/forums',
+            href: route('forums.index'),
+        },
+        {
+            title: forum.category.name,
+            href: route('forums.categories.show', { category: forum.category.slug }),
         },
         {
             title: forum.name,
-            href: `/forums/${forum.slug}`,
+            href: route('forums.show', { forum: forum.slug }),
         },
         {
             title: topic.title,
-            href: `/forums/${forum.slug}/${topic.slug}`,
+            href: route('forums.topics.show', { forum: forum.slug, topic: topic.slug }),
         },
     ];
 
@@ -110,45 +115,69 @@ export default function TopicShow({ forum, topic, posts, postsPagination, recent
         setQuotedAuthor('');
     };
 
+    const currentUrl = route('forums.topics.show', { forum: forum.slug, topic: topic.slug });
+
     const structuredData = {
         '@context': 'https://schema.org',
         '@type': 'DiscussionForumPosting',
+        '@id': currentUrl,
         headline: topic.title,
         description: topic.description || `Discussion topic: ${topic.title}`,
         dateCreated: topic.created_at,
         dateModified: topic.updated_at,
-        url: window.location.href,
+        url: currentUrl,
+        mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': currentUrl,
+        },
         author: {
             '@type': 'Person',
-            name: topic.author?.name,
+            name: topic.author.name,
         },
         publisher: {
             '@type': 'Organization',
             name: siteName,
         },
+        isPartOf: {
+            '@type': 'CollectionPage',
+            name: forum.name,
+            url: route('forums.show', { forum: forum.slug }),
+        },
+        breadcrumb: {
+            '@type': 'BreadcrumbList',
+            itemListElement: breadcrumbs.map((breadcrumb, index) => ({
+                '@type': 'ListItem',
+                position: index + 1,
+                name: breadcrumb.title,
+                '@id': breadcrumb.href,
+            })),
+        },
         interactionStatistic: [
             {
                 '@type': 'InteractionCounter',
                 interactionType: 'https://schema.org/ViewAction',
-                userInteractionCount: topic.views_count,
+                userInteractionCount: topic.views_count || 0,
             },
             {
                 '@type': 'InteractionCounter',
                 interactionType: 'https://schema.org/ReplyAction',
-                userInteractionCount: topic.posts_count,
+                userInteractionCount: topic.posts_count || 0,
             },
         ],
-        commentsCount: topic.posts_count,
-        comment: posts.map((post) => ({
-            '@type': 'Comment',
-            text: post.content,
-            dateCreated: post.created_at,
-            dateModified: post.updated_at,
-            author: {
-                '@type': 'Person',
-                name: post.author?.name,
-            },
-        })),
+        commentCount: topic.posts_count || 0,
+        comment: posts
+            .filter((post) => post.author)
+            .map((post) => ({
+                '@type': 'Comment',
+                '@id': `${currentUrl}#post-${post.id}`,
+                text: post.content,
+                dateCreated: post.created_at,
+                dateModified: post.updated_at,
+                author: {
+                    '@type': 'Person',
+                    name: post.author.name,
+                },
+            })),
     };
 
     return (
@@ -158,7 +187,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination, recent
                 <meta property="og:title" content={`${topic.title} - ${forum.name} - Forums`} />
                 <meta property="og:description" content={topic.description || `Discussion topic: ${topic.title}`} />
                 <meta property="og:type" content="article" />
-                <meta property="article:author" content={topic.author?.name} />
+                <meta property="article:author" content={topic.author.name} />
                 <meta property="article:published_time" content={topic.created_at} />
                 <meta property="article:modified_time" content={topic.updated_at} />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
@@ -193,7 +222,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination, recent
                 <div className="hidden items-center gap-4 text-sm text-muted-foreground sm:flex md:-mt-4">
                     <div className="flex items-center gap-1">
                         <User className="h-4 w-4" />
-                        <span>Started by {topic.author?.name}</span>
+                        <span>Started by {topic.author.name}</span>
                     </div>
                     <div className="flex items-center gap-1">
                         <Eye className="h-4 w-4" />
@@ -243,11 +272,7 @@ export default function TopicShow({ forum, topic, posts, postsPagination, recent
 
                 {posts.length === 0 && (
                     <div className="mt-2">
-                        <EmptyState
-                            icon={<MessageSquare className="h-12 w-12" />}
-                            title="No posts yet"
-                            description="This topic doesn't have any posts yet."
-                        />
+                        <EmptyState icon={<MessageSquare />} title="No posts yet" description="This topic doesn't have any posts yet." />
                     </div>
                 )}
 

@@ -87,7 +87,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                 <div className="flex h-full flex-1 flex-col overflow-x-auto">
                     <Heading title="Shopping Cart" description="Your cart is empty" />
                     <EmptyState
-                        icon={<ShoppingCartIcon className="h-12 w-12" />}
+                        icon={<ShoppingCartIcon />}
                         title="Your cart is empty"
                         description="No items in your cart yet. Start shopping to add products to your cart."
                         buttonText="Continue Shopping"

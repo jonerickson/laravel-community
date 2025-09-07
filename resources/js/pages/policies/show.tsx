@@ -9,7 +9,7 @@ interface PoliciesShowProps {
     policy: Policy;
 }
 
-export default function PoliciesShow({ category, policy }: PoliciesShowProps) {
+export default function PolicyShow({ category, policy }: PoliciesShowProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Policies',

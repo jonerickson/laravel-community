@@ -10,12 +10,11 @@ interface VerifyPasswordProps {
     status?: string;
 }
 
-export default function VerifyPassword({ status }: VerifyPasswordProps) {
+export default function AuthVerifyPassword({ status }: VerifyPasswordProps) {
     const { post, processing } = useForm({});
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-
         post(route('verification.send'));
     };
 

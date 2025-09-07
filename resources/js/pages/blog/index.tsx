@@ -9,13 +9,6 @@ import { Head, usePage, WhenVisible } from '@inertiajs/react';
 import { Newspaper } from 'lucide-react';
 import usePermissions from '../../hooks/use-permissions';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Blog',
-        href: '/blog',
-    },
-];
-
 interface BlogIndexProps {
     posts: Post[];
     postsPagination: PaginatedData;
@@ -24,6 +17,13 @@ interface BlogIndexProps {
 export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
     const { can } = usePermissions();
     const { name: siteName } = usePage<SharedData>().props;
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Blog',
+            href: route('blog.index'),
+        },
+    ];
 
     const structuredData = {
         '@context': 'https://schema.org',
@@ -34,6 +34,16 @@ export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
         publisher: {
             '@type': 'Organization',
             name: siteName,
+        },
+        breadcrumb: {
+            '@type': 'BreadcrumbList',
+            numberOfItems: breadcrumbs.length,
+            itemListElement: breadcrumbs.map((breadcrumb, index) => ({
+                '@type': 'ListItem',
+                position: index + 1,
+                name: breadcrumb.title,
+                item: breadcrumb.href,
+            })),
         },
         blogPost: posts.map((post) => ({
             '@type': 'BlogPosting',
@@ -46,7 +56,7 @@ export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
             datePublished: post.published_at || post.created_at,
             dateModified: post.updated_at,
             image: post.featured_image_url,
-            url: `/blog/${post.slug}`,
+            url: route('blog.show', { post: post.slug }),
             interactionStatistic: [
                 {
                     '@type': 'InteractionCounter',
@@ -70,9 +80,9 @@ export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Blog">
-                <meta name="description" content="Browse our latest blog posts and articles from Mountain Interactive" />
-                <meta property="og:title" content="Blog - Mountain Interactive" />
-                <meta property="og:description" content="Browse our latest blog posts and articles from Mountain Interactive" />
+                <meta name="description" content={`Browse our latest blog posts and articles from ${siteName}`} />
+                <meta property="og:title" content={`Blog - ${siteName}`} />
+                <meta property="og:description" content={`Browse our latest blog posts and articles from ${siteName}`} />
                 <meta property="og:type" content="website" />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
@@ -114,11 +124,7 @@ export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
 
                 {posts.length === 0 && (
                     <div className="-mt-8">
-                        <EmptyState
-                            icon={<Newspaper className="h-12 w-12" />}
-                            title="No blog posts"
-                            description="Check back later to catch the latest updates"
-                        />
+                        <EmptyState icon={<Newspaper />} title="No blog posts" description="Check back later to catch the latest updates" />
                     </div>
                 )}
             </div>

@@ -2,17 +2,16 @@ import HeadingSmall from '@/components/heading-small';
 import { StarRating } from '@/components/star-rating';
 import { Button } from '@/components/ui/button';
 import { useCartOperations } from '@/hooks/use-cart-operations';
-import { Product, ProductCategory } from '@/types';
+import { Product } from '@/types';
 import { stripCharacters, truncate } from '@/utils/truncate';
 import { Link, router } from '@inertiajs/react';
 import { ImageIcon } from 'lucide-react';
 
-export default function StoreCategoriesProductItem({ product }: { product: Product; category: ProductCategory }) {
+export default function StoreCategoriesProductItem({ product }: { product: Product }) {
     const { addItem, loading } = useCartOperations();
 
     const handleAddToCart = async () => {
         if (!product.default_price) {
-            // If no default price, redirect to product page to select price
             router.visit(route('store.products.show', { product: product.slug }));
             return;
         }
