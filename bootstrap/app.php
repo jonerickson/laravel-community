@@ -13,6 +13,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Laravel\Passport\Http\Middleware\CreateFreshApiToken;
 use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -28,13 +29,13 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
-        $middleware->statefulApi();
 
         $middleware->api([
             AddQueuedCookiesToResponse::class,
         ]);
 
         $middleware->web(append: [
+            CreateFreshApiToken::class,
             CheckBannedUser::class,
             HandleAppearance::class,
             HandleInertiaRequests::class,

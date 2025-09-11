@@ -7,6 +7,7 @@ namespace App\Filament\Admin\Resources\ApiTokens;
 use App\Filament\Admin\Resources\ApiTokens\Pages\CreateApiToken;
 use App\Filament\Admin\Resources\ApiTokens\Pages\EditApiToken;
 use App\Filament\Admin\Resources\ApiTokens\Pages\ListApiTokens;
+use App\Models\User;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -14,22 +15,22 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Laravel\Sanctum\PersonalAccessToken;
+use Laravel\Passport\Token;
 use UnitEnum;
 
 class ApiTokenResource extends Resource
 {
-    protected static ?string $model = PersonalAccessToken::class;
+    protected static ?string $model = Token::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-key';
 
@@ -50,14 +51,11 @@ class ApiTokenResource extends Resource
                             ->required()
                             ->maxLength(255),
                         Select::make('tokenable_id')
+                            ->disabled(fn ($operation) => $operation !== 'create')
+                            ->options(User::query()->orderBy('name')->pluck('name', 'id'))
+                            ->preload()
                             ->label('User')
-                            ->relationship('tokenable', 'name')
                             ->searchable()
-                            ->required(),
-                        Textarea::make('abilities')
-                            ->label('Abilities (JSON)')
-                            ->helperText('Enter abilities as JSON array, e.g., ["*"] for all abilities')
-                            ->default('["*"]')
                             ->required(),
                         DateTimePicker::make('expires_at')
                             ->label('Expires At')
@@ -71,28 +69,11 @@ class ApiTokenResource extends Resource
         return $table
             ->emptyStateDescription('There are no API keys available yet. Create your first one to get started.')
             ->columns([
-                TextColumn::make('tokenable.name')
-                    ->label('User')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('tokenable.email')
-                    ->label('Email')
-                    ->searchable()
-                    ->toggleable(),
                 TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('token')
-                    ->label('Token (First 10 chars)')
-                    ->formatStateUsing(fn (string $state): string => substr($state, 0, 10).'...')
-                    ->copyable()
-                    ->copyMessage('Token prefix copied')
-                    ->toggleable(),
-                TextColumn::make('abilities')
-                    ->formatStateUsing(fn (array $state): string => implode(', ', $state))
-                    ->limit(30)
-                    ->tooltip(fn (array $state): string => implode(', ', $state)),
                 TextColumn::make('last_used_at')
+                    ->since()
                     ->dateTime()
                     ->sortable()
                     ->toggleable(),
@@ -102,6 +83,8 @@ class ApiTokenResource extends Resource
                     ->badge()
                     ->color(fn ($state): string => $state && $state->isPast() ? 'danger' : 'success')
                     ->formatStateUsing(fn ($state) => $state ? $state->format('M j, Y H:i') : 'Never'),
+                IconColumn::make('revoked')
+                    ->boolean(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

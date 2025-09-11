@@ -36,10 +36,8 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Laravel\Cashier\Billable;
 use Laravel\Cashier\Subscription;
-use Laravel\Sanctum\HasApiTokens;
-use Laravel\Sanctum\PersonalAccessToken;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use Laravel\Passport\Contracts\OAuthenticatable;
+use Laravel\Passport\HasApiTokens;
 
 /**
  * @property int $id
@@ -74,6 +72,8 @@ use Spatie\Permission\Models\Role;
  * @property-read Collection<int, Report> $approvedReports
  * @property-read int|null $approved_reports_count
  * @property-read string|null $avatar_url
+ * @property-read Collection<int, \Laravel\Passport\Client> $clients
+ * @property-read int|null $clients_count
  * @property-read Collection<int, UserFingerprint> $fingerprints
  * @property-read int|null $fingerprints_count
  * @property-read Collection<int, Group> $groups
@@ -82,25 +82,21 @@ use Spatie\Permission\Models\Role;
  * @property-read bool $is_reported
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
- * @property-read Collection<int, \App\Models\Permission> $parentPermissions
- * @property-read int|null $parent_permissions_count
- * @property-read Collection<int, \App\Models\Role> $parentRoles
- * @property-read int|null $parent_roles_count
+ * @property-read Collection<int, \Laravel\Passport\Client> $oauthApps
+ * @property-read int|null $oauth_apps_count
  * @property-read Collection<int, Report> $pendingReports
  * @property-read int|null $pending_reports_count
- * @property-read Collection<int, \App\Models\Permission> $permissions
+ * @property-read Collection<int, Permission> $permissions
  * @property-read int|null $permissions_count
  * @property-read Collection<int, Report> $rejectedReports
  * @property-read int|null $rejected_reports_count
  * @property-read int $report_count
  * @property-read Collection<int, Report> $reports
  * @property-read int|null $reports_count
- * @property-read Collection<int, \App\Models\Role> $roles
+ * @property-read Collection<int, Role> $roles
  * @property-read int|null $roles_count
  * @property-read Collection<int, Subscription> $subscriptions
  * @property-read int|null $subscriptions_count
- * @property-read Collection<int, PersonalAccessToken> $tokens
- * @property-read int|null $tokens_count
  *
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static Builder<static>|User hasExpiredGenericTrial()
@@ -142,7 +138,7 @@ use Spatie\Permission\Models\Role;
  *
  * @mixin \Eloquent
  */
-class User extends Authenticatable implements EmailAuthenticationContract, FilamentAvatar, FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery, HasName, MustVerifyEmail
+class User extends Authenticatable implements EmailAuthenticationContract, FilamentAvatar, FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery, HasName, MustVerifyEmail, OAuthenticatable
 {
     use Billable;
     use HasApiTokens;

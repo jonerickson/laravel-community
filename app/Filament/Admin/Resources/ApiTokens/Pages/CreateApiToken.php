@@ -6,31 +6,25 @@ namespace App\Filament\Admin\Resources\ApiTokens\Pages;
 
 use App\Filament\Admin\Resources\ApiTokens\ApiTokenResource;
 use App\Models\User;
+use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Resources\Pages\CreateRecord;
-use Laravel\Sanctum\PersonalAccessToken;
+use Laravel\Passport\Token;
 
 class CreateApiToken extends CreateRecord
 {
+    use InteractsWithActions;
+
     protected static string $resource = ApiTokenResource::class;
 
-    protected function mutateFormDataBeforeCreate(array $data): array
-    {
-        $abilities = json_decode((string) $data['abilities'], true) ?? ['*'];
-        $data['abilities'] = $abilities;
-
-        return $data;
-    }
-
-    protected function handleRecordCreation(array $data): PersonalAccessToken
+    protected function handleRecordCreation(array $data): Token
     {
         $user = User::find($data['tokenable_id']);
-        $token = $user->createToken(
+        $result = $user->createToken(
             $data['name'],
-            $data['abilities'],
-            $data['expires_at'] ? now()->parse($data['expires_at']) : null
+            $data['abilities'] ?? ['*'],
         );
 
-        return $token->accessToken;
+        return $result->getToken();
     }
 
     protected function getRedirectUrl(): string

@@ -25,7 +25,9 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 use Laravel\Cashier\Cashier;
+use Laravel\Passport\Passport;
 use Laravel\Socialite\Facades\Socialite;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -75,5 +77,15 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(ProductPriceCreated::class, SyncProductPriceWithPaymentProvider::class);
         Event::listen(ProductPriceUpdated::class, SyncProductPriceWithPaymentProvider::class);
         Event::listen(ProductPriceDeleting::class, SyncProductPriceWithPaymentProvider::class);
+
+        Passport::authorizationView(
+            fn ($parameters) => Inertia::render('oauth/authorize', [
+                'request' => $parameters['request'],
+                'authToken' => $parameters['authToken'],
+                'client' => $parameters['client'],
+                'user' => $parameters['user'],
+                'scopes' => $parameters['scopes'],
+            ])
+        );
     }
 }
