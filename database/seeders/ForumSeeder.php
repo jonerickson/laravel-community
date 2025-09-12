@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use App\Models\Forum;
 use App\Models\ForumCategory;
 use App\Models\Group;
+use App\Models\Image;
 use App\Models\Post;
 use App\Models\Topic;
 use App\Models\User;
@@ -83,10 +84,13 @@ class ForumSeeder extends Seeder
         $author = User::first() ?? User::factory()->create();
         $group = Group::defaultMemberGroups()->first() ?? Group::factory()->asDefaultMemberGroup()->create();
 
-        foreach ($categories as $category) {
+        foreach (array_reverse($categories) as $category) {
             $forumCategory = ForumCategory::factory()
                 ->state(Arr::except($category, ['forums']))
                 ->hasAttached($group)
+                ->has(Image::factory()->state([
+                    'path' => 'boilerplate/forum-category-1.jpeg',
+                ]))
                 ->create();
 
             foreach ($category['forums'] ?? [] as $forum) {

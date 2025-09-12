@@ -41,7 +41,7 @@ class PostFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_published' => true,
-            'published_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
+            'published_at' => now(),
         ]);
     }
 
