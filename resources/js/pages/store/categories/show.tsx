@@ -18,8 +18,12 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
             href: '/store',
         },
         {
+            title: 'Categories',
+            href: route('store.categories.index'),
+        },
+        {
             title: category.name,
-            href: `/store/categories/${category.slug}`,
+            href: route('store.categories.show', { category: category.slug }),
         },
     ];
 
@@ -67,7 +71,7 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
                 <Heading title={category.name} description={category.description} />
 
                 {products.length > 0 ? (
-                    <div className="-my-6 grid grid-cols-2 sm:-mx-6 md:grid-cols-3 lg:grid-cols-4">
+                    <div className="-mt-6 grid grid-cols-2 sm:-mx-6 md:grid-cols-3 lg:grid-cols-4">
                         {products.map((product) => (
                             <StoreCategoriesProductItem product={product} />
                         ))}

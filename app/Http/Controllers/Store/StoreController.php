@@ -16,12 +16,13 @@ class StoreController extends Controller
     {
         return Inertia::render('store/index', [
             'categories' => ProductCategory::query()
+                ->with('image')
                 ->latest()
                 ->take(5)
                 ->get(),
             'featuredProducts' => Product::query()
                 ->featured()
-                ->with(['categories'])
+                ->with('categories')
                 ->latest()
                 ->take(6)
                 ->get(),

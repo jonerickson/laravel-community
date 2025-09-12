@@ -165,7 +165,7 @@ class PostResource extends Resource
                     ->alignCenter()
                     ->label('')
                     ->disk('public')
-                    ->size(60)
+                    ->imageSize(60)
                     ->square(),
                 TextColumn::make('title')
                     ->searchable()

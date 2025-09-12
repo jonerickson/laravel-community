@@ -19,7 +19,9 @@ use Illuminate\Support\Facades\Storage;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Model|Eloquent|null $imageable
+ * @property-read string|null $url
  *
+ * @method static \Database\Factories\ImageFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Image newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Image newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Image query()
@@ -53,6 +55,9 @@ class Image extends Model
 
     public function url(): Attribute
     {
-        return Attribute::get(fn () => Storage::disk('public')->url($this->path));
+        return Attribute::get(fn (): ?string => $this->path
+            ? Storage::disk('public')->url($this->path)
+            : null
+        )->shouldCache();
     }
 }

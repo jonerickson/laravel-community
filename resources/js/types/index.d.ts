@@ -299,8 +299,7 @@ export interface ProductCategory {
     name: string;
     slug: string;
     description?: string;
-    imageUrl: string;
-    imageAlt?: string;
+    image?: Image | null;
 }
 
 export interface ProductPrice {

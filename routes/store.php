@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['as' => 'store.', 'prefix' => 'store'], function (): void {
     Route::get('/', StoreController::class)->name('index');
-    Route::get('categories/{category:slug}', CategoryController::class)->name('categories.show');
+    Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::get('categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
     Route::get('products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
     Route::post('products/{product:slug}', [ProductController::class, 'store'])->name('products.store');
     Route::get('subscriptions', [SubscriptionsController::class, 'index'])->name('subscriptions');

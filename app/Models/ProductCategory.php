@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\Sluggable;
+use App\Traits\HasImages;
 use App\Traits\HasLogging;
 use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Builder;
@@ -24,6 +25,9 @@ use Illuminate\Support\Str;
  * @property Carbon|null $updated_at
  * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
+ * @property-read Image|null $image
+ * @property-read Collection<int, Image> $images
+ * @property-read int|null $images_count
  * @property-read Collection<int, Product> $products
  * @property-read int|null $products_count
  *
@@ -43,6 +47,7 @@ use Illuminate\Support\Str;
 class ProductCategory extends Model implements Sluggable
 {
     use HasFactory;
+    use HasImages;
     use HasLogging;
     use HasSlug;
 
@@ -51,6 +56,7 @@ class ProductCategory extends Model implements Sluggable
     protected $fillable = [
         'name',
         'slug',
+        'description',
     ];
 
     public function products(): BelongsToMany
@@ -75,7 +81,7 @@ class ProductCategory extends Model implements Sluggable
     {
         $name = $this->name ? " \"{$this->name}\"" : '';
 
-        return "Product category{$name} {$eventName}";
+        return "Product category $name $eventName";
     }
 
     public function getActivityLogName(): string

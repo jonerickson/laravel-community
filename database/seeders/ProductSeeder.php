@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Image;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductPrice;
@@ -21,7 +22,9 @@ class ProductSeeder extends Seeder
         $productCategory = ProductCategory::factory()->state([
             'name' => $name = 'Product Category 1',
             'slug' => Str::slug($name),
-        ])->create();
+        ])->has(Image::factory()->state([
+            'path' => 'boilerplate/product-category-1.jpg',
+        ]))->create();
 
         $products = Product::factory()
             ->count(5)

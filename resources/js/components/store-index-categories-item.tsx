@@ -3,19 +3,23 @@ import { Link } from '@inertiajs/react';
 import { ImageIcon } from 'lucide-react';
 
 export default function StoreIndexCategoriesItem({ item }: { item: ProductCategory }) {
+    console.log(item.image);
     return (
         <Link
             key={item.name}
             href={route('store.categories.show', { slug: item.slug })}
-            className="relative flex h-80 w-56 flex-col justify-center overflow-hidden rounded-lg bg-muted p-6 hover:opacity-75 xl:w-auto"
+            className="relative flex min-h-48 flex-col justify-center overflow-hidden rounded-lg bg-muted p-6 hover:opacity-75 xl:w-auto"
         >
-            {item.imageUrl ? (
+            {item.image?.url ? (
                 <>
                     <span aria-hidden="true" className="absolute inset-0">
-                        <img alt={item.imageAlt} src={item.imageUrl} className="size-full object-cover" />
+                        <img alt={`${item.name} category image`} src={item.image.url} className="size-full object-cover" />
                     </span>
-                    <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-muted-foreground opacity-50" />
-                    <span className="relative mt-auto text-center text-xl font-bold text-white">{item.name}</span>
+                    <span
+                        aria-hidden="true"
+                        className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent"
+                    />
+                    <span className="relative mt-auto text-center text-base font-bold text-nowrap text-white">{item.name}</span>
                 </>
             ) : (
                 <>
@@ -23,7 +27,7 @@ export default function StoreIndexCategoriesItem({ item }: { item: ProductCatego
                         <ImageIcon className="h-16 w-16 text-muted-foreground" />
                     </div>
                     <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-muted-foreground opacity-50" />
-                    <span className="relative mt-auto text-center text-xl font-bold text-white">{item.name}</span>
+                    <span className="relative mt-auto text-center text-base font-bold text-nowrap text-primary">{item.name}</span>
                 </>
             )}
         </Link>

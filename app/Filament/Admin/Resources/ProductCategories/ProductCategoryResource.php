@@ -13,11 +13,14 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
@@ -41,6 +44,7 @@ class ProductCategoryResource extends Resource
             ->components([
                 Section::make('Category Information')
                     ->columnSpanFull()
+                    ->columns()
                     ->schema([
                         TextInput::make('name')
                             ->required()
@@ -52,6 +56,32 @@ class ProductCategoryResource extends Resource
                             }),
                         TextInput::make('slug')
                             ->required(),
+                        Textarea::make('description')
+                            ->helperText('A helpful description on what the product category features.')
+                            ->columnSpanFull()
+                            ->maxLength(500)
+                            ->rows(3),
+                    ]),
+                Section::make('Image')
+                    ->columnSpanFull()
+                    ->relationship('image')
+                    ->schema([
+                        FileUpload::make('path')
+                            ->helperText('Add a category image to be displayed on the store index.')
+                            ->hiddenLabel()
+                            ->disk('public')
+                            ->directory('product-category-images')
+                            ->visibility('public')
+                            ->downloadable()
+                            ->previewable()
+                            ->openable()
+                            ->image()
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                                '16:9',
+                                '4:3',
+                                '1:1',
+                            ]),
                     ]),
             ]);
     }
@@ -60,6 +90,13 @@ class ProductCategoryResource extends Resource
     {
         return $table
             ->columns([
+                ImageColumn::make('image.path')
+                    ->grow(false)
+                    ->alignCenter()
+                    ->label('')
+                    ->disk('public')
+                    ->imageSize(60)
+                    ->square(),
                 TextColumn::make('name')
                     ->searchable(),
                 TextColumn::make('slug')

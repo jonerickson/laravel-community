@@ -10,8 +10,17 @@ use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
-    public function __invoke(ProductCategory $category)
+    public function index()
     {
+        return Inertia::render('store/categories/index', [
+            'categories' => ProductCategory::query()->with('image')->get(),
+        ]);
+    }
+
+    public function show(ProductCategory $category)
+    {
+        $category->loadMissing('image');
+
         return Inertia::render('store/categories/show', [
             'category' => $category,
             'products' => $category->products()->with(['prices', 'defaultPrice'])->get(),
