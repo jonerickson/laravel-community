@@ -24,6 +24,7 @@ class HandleInertiaRequests extends Middleware
                 'isAdmin' => $user?->hasRole('super-admin'),
                 'roles' => $user?->roles?->pluck('name'),
                 'can' => PermissionService::mapFrontendPermissions($user),
+                'mustVerifyEmail' => $user && ! $user->hasVerifiedEmail(),
             ],
             'cartCount' => $this->getCartCount(),
             'flash' => [

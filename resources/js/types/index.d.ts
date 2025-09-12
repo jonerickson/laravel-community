@@ -33,6 +33,7 @@ export interface Auth {
     user: User;
     groups: Group[];
     isAdmin: boolean;
+    mustVerifyEmail: boolean;
     can: string[];
     roles?: string[];
 }
