@@ -17,7 +17,7 @@ class SubscriptionCheckoutRequest extends FormRequest
     {
         return [
             'product_id' => ['required', 'integer', 'exists:products,id'],
-            'billing_cycle' => ['required', 'in:monthly,yearly'],
+            'price_id' => ['required', 'integer', 'exists:products_prices,id'],
         ];
     }
 
@@ -26,8 +26,7 @@ class SubscriptionCheckoutRequest extends FormRequest
         return [
             'product_id.required' => 'A product must be selected.',
             'product_id.exists' => 'The selected product is not available.',
-            'billing_cycle.required' => 'A billing cycle must be selected.',
-            'billing_cycle.in' => 'Billing cycle must be either monthly or yearly.',
+            'price_id.required' => 'A billing cycle must be selected.',
         ];
     }
 }

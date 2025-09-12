@@ -89,10 +89,14 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                 <meta property="og:type" content="website" />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
-            <div className="flex h-full flex-1 flex-col overflow-x-auto">
-                <div className="flex items-start justify-between">
-                    <Heading title="Forums" description="Connect with our community and get support" />
-                    <div className="flex items-center gap-3">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
+                <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start sm:gap-0">
+                    <div className="flex items-start gap-4">
+                        <div className="-mb-6">
+                            <Heading title="Forums" description="Connect with our community and get support" />
+                        </div>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2">
                         {can('create_topics') && (
                             <Button onClick={() => setIsDialogOpen(true)}>
                                 <Plus className="mr-2 h-4 w-4" />

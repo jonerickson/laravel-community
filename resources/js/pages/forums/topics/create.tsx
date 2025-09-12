@@ -102,7 +102,7 @@ export default function ForumTopicCreate({ forum }: CreateTopicProps) {
                                     <div className="text-xs text-muted-foreground">This will be the first post in your topic thread.</div>
                                 </div>
 
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-start gap-4">
                                     <Button type="submit" disabled={processing}>
                                         {processing ? 'Creating topic...' : 'Create topic'}
                                     </Button>

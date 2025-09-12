@@ -1,9 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Forum } from '@/types';
 import { router } from '@inertiajs/react';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, Search } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 interface ForumSelectionDialogProps {
     forums: Forum[];
@@ -12,10 +14,74 @@ interface ForumSelectionDialogProps {
 }
 
 export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumSelectionDialogProps) {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
     const handleForumSelect = (forum: Forum) => {
         onClose();
         router.get(route('forums.topics.create', { forum: forum.slug }));
     };
+
+    const filteredForums = forums.filter(
+        (forum) =>
+            forum.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (forum.description?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false),
+    );
+
+    useEffect(() => {
+        setSelectedIndex(0);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        if (isOpen && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [isOpen]);
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (filteredForums.length === 0) return;
+
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                setSelectedIndex((prev) => (prev + 1) % filteredForums.length);
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                setSelectedIndex((prev) => (prev - 1 + filteredForums.length) % filteredForums.length);
+                break;
+            case 'Tab':
+                if (!e.shiftKey) {
+                    e.preventDefault();
+                    setSelectedIndex((prev) => (prev + 1) % filteredForums.length);
+                } else {
+                    e.preventDefault();
+                    setSelectedIndex((prev) => (prev - 1 + filteredForums.length) % filteredForums.length);
+                }
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (filteredForums[selectedIndex]) {
+                    handleForumSelect(filteredForums[selectedIndex]);
+                }
+                break;
+            case 'Escape':
+                e.preventDefault();
+                onClose();
+                break;
+        }
+    };
+
+    useEffect(() => {
+        if (buttonRefs.current[selectedIndex]) {
+            buttonRefs.current[selectedIndex]?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+            });
+        }
+    }, [selectedIndex]);
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -24,16 +90,29 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumS
                     <DialogTitle>Select a forum</DialogTitle>
                     <DialogDescription>Choose which forum you'd like to create a new topic in.</DialogDescription>
                 </DialogHeader>
+                <div className="relative">
+                    <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                        ref={inputRef}
+                        placeholder="Search forums..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        className="pl-10"
+                    />
+                </div>
                 <ScrollArea className="max-h-[400px]">
                     <div className="space-y-2">
-                        {forums
+                        {filteredForums
                             .sort((a, b) => a.name.localeCompare(b.name))
-                            .map((forum) => (
+                            .map((forum, index) => (
                                 <Button
                                     key={forum.id}
+                                    ref={(el) => (buttonRefs.current[index] = el)}
                                     variant="ghost"
-                                    className="h-auto w-full justify-start p-4 text-left"
+                                    className={`h-auto w-full justify-start p-4 text-left ${selectedIndex === index ? 'bg-accent' : ''}`}
                                     onClick={() => handleForumSelect(forum)}
+                                    onMouseEnter={() => setSelectedIndex(index)}
                                 >
                                     <div className="flex w-full items-start gap-3">
                                         <div
@@ -57,6 +136,12 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumS
                             ))}
                     </div>
                 </ScrollArea>
+                {filteredForums.length === 0 && forums.length > 0 && (
+                    <div className="py-6 text-center text-muted-foreground">
+                        <Search className="mx-auto mb-3 size-8 text-muted-foreground/50" />
+                        <p className="text-sm">No forums found matching "{searchTerm}"</p>
+                    </div>
+                )}
                 {forums.length === 0 && (
                     <div className="py-6 text-center text-muted-foreground">
                         <MessageSquare className="mx-auto mb-3 size-8 text-muted-foreground/50" />

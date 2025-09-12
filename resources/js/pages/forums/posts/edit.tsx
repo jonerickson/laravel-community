@@ -89,7 +89,7 @@ export default function ForumPostEdit({ forum, topic, post }: EditPostProps) {
 
                                 <div className="flex items-center gap-4">
                                     <Button type="submit" disabled={processing}>
-                                        {processing ? 'Saving...' : 'Save Changes'}
+                                        {processing ? 'Saving...' : 'Save changes'}
                                     </Button>
                                     <Button variant="outline" type="button" disabled={processing}>
                                         <Link

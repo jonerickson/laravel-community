@@ -4,30 +4,54 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Store;
 
+use App\Enums\SubscriptionInterval;
 use App\Http\Controllers\Controller;
+use App\Managers\PaymentManager;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class SubscriptionsController extends Controller
 {
+    public function __construct(protected PaymentManager $paymentManager)
+    {
+        //
+    }
+
     public function index(): Response
     {
+        $user = Auth::user();
+
         $subscriptionProducts = Product::subscriptions()
             ->with('activePrices')
             ->with('categories')
             ->orderBy('name')
             ->get()
-            ->map(function (Product $product): array {
-                $monthlyPrice = $product->activePrices
-                    ->where('interval', 'month')
-                    ->where('interval_count', 1)
-                    ->first();
+            ->map(function (Product $product) use ($user): array {
+                $pricing = [];
+                $priceIds = [];
+                foreach (SubscriptionInterval::cases() as $interval) {
+                    $intervalValue = match ($interval) {
+                        SubscriptionInterval::Daily => 'day',
+                        SubscriptionInterval::Weekly => 'week',
+                        SubscriptionInterval::Monthly => 'month',
+                        SubscriptionInterval::Yearly => 'year',
+                    };
 
-                $yearlyPrice = $product->activePrices
-                    ->where('interval', 'year')
-                    ->where('interval_count', 1)
-                    ->first();
+                    $price = $product->activePrices
+                        ->where('interval', $intervalValue)
+                        ->where('interval_count', 1)
+                        ->first();
+
+                    $pricing[$interval->value] = $price?->amount ?? 0;
+                    $priceIds[$interval->value] = $price?->id;
+                }
+
+                $isCurrentPlan = false;
+                if ($user) {
+                    $isCurrentPlan = $this->paymentManager->isSubscribedToProduct($user, $product);
+                }
 
                 return [
                     'id' => $product->id,
@@ -35,12 +59,11 @@ class SubscriptionsController extends Controller
                     'description' => $product->description,
                     'slug' => $product->slug,
                     'featured_image_url' => $product->featured_image_url,
-                    'pricing' => [
-                        'monthly' => $monthlyPrice?->amount ?? 0,
-                        'yearly' => $yearlyPrice?->amount ?? 0,
-                    ],
+                    'pricing' => $pricing,
+                    'price_ids' => $priceIds,
                     'features' => $product->metadata['features'] ?? [],
                     'popular' => $product->metadata['popular'] ?? false,
+                    'current' => $isCurrentPlan,
                     'categories' => $product->categories->pluck('name')->toArray(),
                 ];
             });

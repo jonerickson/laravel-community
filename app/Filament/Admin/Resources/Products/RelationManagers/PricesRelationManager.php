@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Products\RelationManagers;
 
+use App\Enums\SubscriptionInterval;
 use App\Managers\PaymentManager;
 use App\Models\Product;
 use Filament\Actions\Action;
@@ -56,12 +57,7 @@ class PricesRelationManager extends RelationManager
                     ->default('USD')
                     ->required(),
                 Select::make('interval')
-                    ->options([
-                        'day' => 'Daily',
-                        'week' => 'Weekly',
-                        'month' => 'Monthly',
-                        'year' => 'Yearly',
-                    ])
+                    ->options(SubscriptionInterval::class)
                     ->nullable()
                     ->visible(fn () => $this->getOwnerRecord()->isSubscription())
                     ->helperText('Subscription billing interval.'),

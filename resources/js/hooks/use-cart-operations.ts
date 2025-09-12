@@ -123,6 +123,40 @@ export function useCartOperations(initialItems: CartResponse['cartItems'] = []) 
         );
     };
 
+    const clearCart = async () => {
+        if (!window.confirm('Are you sure you want to empty your entire cart?')) {
+            return;
+        }
+
+        setLoading(-1);
+
+        await executeApiRequest(
+            {
+                url: route('api.cart.clear'),
+                method: 'DELETE',
+            },
+            {
+                onSuccess: (data) => {
+                    setItems(data.cartItems);
+
+                    window.dispatchEvent(
+                        new CustomEvent('cart-updated', {
+                            detail: {
+                                cartCount: data.cartCount,
+                                cartItems: data.cartItems,
+                            },
+                        }),
+                    );
+
+                    toast.success('Your cart has been cleared.');
+                },
+                onSettled: () => {
+                    setLoading(null);
+                },
+            },
+        );
+    };
+
     const calculateTotals = (): CartTotals => {
         const subtotal = items.reduce((total, item) => {
             const price = item.selected_price || item.product?.default_price;
@@ -145,6 +179,7 @@ export function useCartOperations(initialItems: CartResponse['cartItems'] = []) 
         addItem,
         updateQuantity,
         removeItem,
+        clearCart,
         calculateTotals,
         loading,
     };

@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\ProductPrice;
 use App\Models\User;
 use Exception;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Laravel\Cashier\SubscriptionBuilder;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Stripe;
 use Stripe\StripeClient;
@@ -399,6 +401,74 @@ class StripeDriver implements PaymentProcessor
         }
 
         $user->deletePaymentMethod($paymentMethodId);
+
+        $this->clearUserCaches($user->id);
+
+        return true;
+    }
+
+    public function isSubscribedToProduct(User $user, Product $product, ?ProductPrice $price = null): bool
+    {
+        if ($price && $price->external_price_id) {
+            return $user->subscribedToPrice($price->external_price_id);
+        }
+
+        if (! $product->external_product_id) {
+            return false;
+        }
+
+        return $user->subscribedToProduct($product->external_product_id);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function startSubscription(User $user, Product $product, ProductPrice $price, string $returnUrl, bool $allowPromotionCodes = false, int $trialDays = 0): bool|Responsable
+    {
+        if ($product->external_product_id || $price->external_price_id) {
+            return false;
+        }
+
+        return $user
+            ->newSubscription('default', $product->external_product_id)
+            ->when($trialDays > 0, fn (SubscriptionBuilder $builder) => $builder->trialDays($trialDays))
+            ->when($allowPromotionCodes, fn (SubscriptionBuilder $builder) => $builder->allowPromotionCodes())
+            ->checkout([
+                'success_url' => $returnUrl,
+                'cancel_url' => $returnUrl,
+            ]);
+    }
+
+    public function cancelSubscription(User $user, Product $product): bool
+    {
+        // Get the product's active prices to find the subscription
+        $monthlyPrice = $product->activePrices
+            ->where('interval', 'month')
+            ->where('interval_count', 1)
+            ->first();
+
+        $yearlyPrice = $product->activePrices
+            ->where('interval', 'year')
+            ->where('interval_count', 1)
+            ->first();
+
+        // Find the active subscription for this product
+        $subscription = null;
+
+        if ($monthlyPrice?->external_price_id) {
+            $subscription = $user->subscription($monthlyPrice->external_price_id);
+        }
+
+        if (! $subscription && $yearlyPrice?->external_price_id) {
+            $subscription = $user->subscription($yearlyPrice->external_price_id);
+        }
+
+        if (! $subscription || ! $subscription->active()) {
+            return false;
+        }
+
+        // Cancel the subscription at the end of the current period
+        $subscription->cancel();
 
         $this->clearUserCaches($user->id);
 

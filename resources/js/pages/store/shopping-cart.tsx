@@ -9,7 +9,7 @@ import { useCartOperations } from '@/hooks/use-cart-operations';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, CartResponse, CheckoutResponse, Policy } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { ImageIcon, ShoppingCart as ShoppingCartIcon, XIcon } from 'lucide-react';
+import { ImageIcon, ShoppingCart as ShoppingCartIcon, Trash2, XIcon } from 'lucide-react';
 import { useState } from 'react';
 
 interface ShoppingCartProps {
@@ -24,7 +24,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
-    const { items, updateQuantity, removeItem, calculateTotals, loading } = useCartOperations(cartItems);
+    const { items, updateQuantity, removeItem, clearCart, calculateTotals, loading } = useCartOperations(cartItems);
     const { loading: checkoutLoading, execute: executeCheckout } = useApiRequest<CheckoutResponse>();
     const [policiesAgreed, setPoliciesAgreed] = useState(false);
 
@@ -97,7 +97,13 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Shopping cart" />
             <div className="flex h-full flex-1 flex-col overflow-x-auto">
-                <Heading title="Shopping cart" description={`${items.length} ${items.length === 1 ? 'item' : 'items'} in your cart`} />
+                <div className="flex items-start justify-between">
+                    <Heading title="Shopping cart" description={`${items.length} ${items.length === 1 ? 'item' : 'items'} in your cart`} />
+                    <Button variant="outline" onClick={clearCart} disabled={loading === -1}>
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        {loading === -1 ? 'Clearing...' : 'Empty cart'}
+                    </Button>
+                </div>
                 <form className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16">
                     <section aria-labelledby="cart-heading" className="lg:col-span-7">
                         <div className="sr-only" id="cart-heading">
@@ -106,7 +112,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
 
                         <ul role="list" className="divide-y divide-border border-t border-b border-border">
                             {items.map((item) => (
-                                <li key={item.product_id} className="flex items-center py-6 sm:py-10">
+                                <li key={item.product_id} className="flex items-start py-6">
                                     <div className="shrink-0">
                                         {item.product?.featured_image_url ? (
                                             <img

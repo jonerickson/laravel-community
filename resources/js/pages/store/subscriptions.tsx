@@ -25,7 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-type BillingCycle = 'monthly' | 'yearly';
+type BillingCycle = 'daily' | 'weekly' | 'monthly' | 'yearly';
 
 interface SubscriptionPlan {
     id: number;
@@ -34,8 +34,16 @@ interface SubscriptionPlan {
     slug: string;
     featured_image_url?: string;
     pricing: {
+        daily: number;
+        weekly: number;
         monthly: number;
         yearly: number;
+    };
+    price_ids: {
+        daily: number | null;
+        weekly: number | null;
+        monthly: number | null;
+        yearly: number | null;
     };
     features: string[];
     popular?: boolean;
@@ -66,7 +74,7 @@ const getColorForPlan = (plan: SubscriptionPlan): string => {
 interface PricingCardProps {
     plan: SubscriptionPlan;
     billingCycle: BillingCycle;
-    onSubscribe: (planId: number) => void;
+    onSubscribe: (planId: number, priceId: number | null) => void;
     loading?: boolean;
 }
 
@@ -74,12 +82,27 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
     const Icon = getIconForPlan(plan);
     const color = getColorForPlan(plan);
     const price = plan.pricing[billingCycle];
+    const priceId = plan.price_ids[billingCycle];
+
+    const getBillingPeriodLabel = (cycle: BillingCycle): string => {
+        switch (cycle) {
+            case 'daily':
+                return 'day';
+            case 'weekly':
+                return 'week';
+            case 'monthly':
+                return 'month';
+            case 'yearly':
+                return 'year';
+        }
+    };
+
     const yearlyDiscount =
         billingCycle === 'yearly' && plan.pricing.monthly > 0 ? Math.round((1 - plan.pricing.yearly / 12 / plan.pricing.monthly) * 100) : 0;
 
     return (
         <Card
-            className={`relative w-full max-w-sm ${plan.popular ? 'border-2 border-info shadow-lg' : ''} ${plan.current ? 'ring-2 ring-success' : ''}`}
+            className={`relative flex w-full max-w-sm flex-col ${plan.popular ? 'border-2 border-info shadow-lg' : ''} ${plan.current ? 'ring-2 ring-success' : ''}`}
         >
             <CardHeader className="pb-4 text-center">
                 <div className={`mx-auto mb-4 rounded-full bg-gradient-to-r p-3 ${color} w-fit text-white`}>
@@ -93,7 +116,7 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
                 <div className="mt-6">
                     <div className="flex items-baseline justify-center">
                         <span className="text-4xl font-bold">${price}</span>
-                        <span className="ml-1 text-muted-foreground">/{billingCycle === 'monthly' ? 'month' : 'year'}</span>
+                        <span className="ml-1 text-muted-foreground">/{getBillingPeriodLabel(billingCycle)}</span>
                     </div>
                     {billingCycle === 'yearly' && yearlyDiscount > 0 && (
                         <div className="mt-2">
@@ -106,7 +129,7 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
                 </div>
             </CardHeader>
 
-            <CardContent className="space-y-6">
+            <CardContent className="flex flex-1 flex-col space-y-6">
                 {plan.features.length > 0 && (
                     <div className="space-y-3">
                         <h4 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Features Included</h4>
@@ -121,17 +144,17 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
                     </div>
                 )}
 
-                <div className="pt-4">
+                <div className="mt-auto pt-4">
                     {plan.current ? (
                         <Button className="w-full" variant="outline" disabled>
                             <Check className="mr-2 h-4 w-4" />
-                            Current Plan
+                            Current plan
                         </Button>
                     ) : (
                         <Button
                             className={`w-full ${plan.popular ? 'bg-info hover:bg-info/80' : ''}`}
-                            onClick={() => onSubscribe(plan.id)}
-                            disabled={loading}
+                            onClick={() => onSubscribe(plan.id, priceId)}
+                            disabled={loading || !priceId}
                         >
                             {loading ? (
                                 <>
@@ -141,10 +164,12 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
                             ) : plan.popular ? (
                                 <>
                                     <Rocket className="mr-2 h-4 w-4" />
-                                    Upgrade Now
+                                    Upgrade now
                                 </>
+                            ) : !priceId ? (
+                                'Not available'
                             ) : (
-                                'Choose Plan'
+                                'Choose plan'
                             )}
                         </Button>
                     )}
@@ -158,14 +183,19 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
     const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
     const [loadingPlan, setLoadingPlan] = useState<number | null>(null);
 
-    const handleSubscribe = async (planId: number) => {
+    const handleSubscribe = async (planId: number, priceId: number | null) => {
+        if (!priceId) {
+            toast.error('No pricing available for this billing cycle.');
+            return;
+        }
+
         setLoadingPlan(planId);
 
         try {
             const response = (await apiRequest(
-                axios.post('/api/subscriptions/checkout', {
+                axios.post(route('api.subscriptions.checkout'), {
                     product_id: planId,
-                    billing_cycle: billingCycle,
+                    price_id: priceId,
                 }),
             )) as { checkout_url?: string };
 
@@ -199,7 +229,13 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
                     <div className="flex flex-col gap-8">
                         <div className="flex justify-center">
                             <Tabs value={billingCycle} onValueChange={(value) => setBillingCycle(value as BillingCycle)}>
-                                <TabsList className="grid w-full max-w-md grid-cols-2">
+                                <TabsList className="grid w-full max-w-2xl grid-cols-4">
+                                    <TabsTrigger value="daily" className="relative">
+                                        Daily
+                                    </TabsTrigger>
+                                    <TabsTrigger value="weekly" className="relative">
+                                        Weekly
+                                    </TabsTrigger>
                                     <TabsTrigger value="monthly" className="relative">
                                         Monthly
                                     </TabsTrigger>

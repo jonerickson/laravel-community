@@ -85,8 +85,11 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
-                <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg text-white" style={{ backgroundColor: category.color }}>
+                <div className="flex items-start gap-4">
+                    <div
+                        className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg text-white"
+                        style={{ backgroundColor: category.color }}
+                    >
                         <MessageSquare className="h-6 w-6" />
                     </div>
                     <div className="-mb-6">

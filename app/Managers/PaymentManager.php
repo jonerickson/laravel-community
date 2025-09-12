@@ -9,6 +9,7 @@ use App\Drivers\Payments\StripeDriver;
 use App\Models\Product;
 use App\Models\ProductPrice;
 use App\Models\User;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
@@ -88,6 +89,21 @@ class PaymentManager extends Manager implements PaymentProcessor
     public function deletePaymentMethod(User $user, string $paymentMethodId): bool
     {
         return $this->driver()->deletePaymentMethod($user, $paymentMethodId);
+    }
+
+    public function startSubscription(User $user, Product $product, ProductPrice $price, string $returnUrl, bool $allowPromotionCodes = false, int $trialDays = 0): bool|Responsable
+    {
+        return $this->driver()->startSubscription($user, $product, $price, $returnUrl, $allowPromotionCodes);
+    }
+
+    public function cancelSubscription(User $user, Product $product): bool
+    {
+        return $this->driver()->cancelSubscription($user, $product);
+    }
+
+    public function isSubscribedToProduct(User $user, Product $product, ?ProductPrice $price = null): bool
+    {
+        return $this->driver()->isSubscribedToProduct($user, $product, $price);
     }
 
     protected function createStripeDriver(): PaymentProcessor
