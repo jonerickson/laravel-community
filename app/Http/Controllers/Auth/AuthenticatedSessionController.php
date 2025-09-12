@@ -17,6 +17,10 @@ class AuthenticatedSessionController extends Controller
 {
     public function create(Request $request): Response
     {
+        if ($request->has('redirect') && $request->filled('redirect')) {
+            $request->session()->put('url.intended', urldecode($request->query('redirect')));
+        }
+
         return Inertia::render('auth/login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => $request->session()->get('status'),

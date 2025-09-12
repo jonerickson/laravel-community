@@ -69,10 +69,6 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
                     toast.success(message);
                     window.location.reload();
                 },
-                onError: (err) => {
-                    console.error('Error pinning/unpining topic:', err);
-                    toast.error(err.message || 'Unable to update topic. Please try again.');
-                },
             },
         );
     };
@@ -99,10 +95,6 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
                     const message = isCurrentlyLocked ? 'The topic has been unlocked.' : 'The topic has been locked.';
                     toast.success(message);
                     window.location.reload();
-                },
-                onError: (err) => {
-                    console.error('Error locking/unlocking topic:', err);
-                    toast.error(err.message || 'Unable to update topic. Please try again.');
                 },
             },
         );

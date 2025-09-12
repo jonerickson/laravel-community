@@ -134,10 +134,6 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                     setSelectedTopics([]);
                     toast.success('The post(s) have been successfully deleted.');
                 },
-                onError: (err) => {
-                    console.error('Error deleting posts:', err);
-                    toast.error(err.message || 'Unable to delete the posts. Please try again.');
-                },
             },
         );
     };

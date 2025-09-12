@@ -17,9 +17,10 @@ use App\Http\Controllers\Api\ShoppingCartController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\SupportTicketController;
 use App\Http\Controllers\Api\TopicController;
+use App\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['as' => 'api.'], function (): void {
+Route::group(['middleware' => [EnsureFrontendRequestsAreStateful::class], 'as' => 'api.'], function (): void {
     Route::put('/cart', [ShoppingCartController::class, 'update'])->name('cart.update');
     Route::delete('/cart', [ShoppingCartController::class, 'destroy'])->name('cart.destroy');
     Route::post('/fingerprint', FingerprintController::class)->name('fingerprint');

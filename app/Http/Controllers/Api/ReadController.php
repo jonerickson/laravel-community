@@ -31,7 +31,7 @@ class ReadController extends Controller
             ]);
         }
 
-        $user = Auth::guard('api')->user();
+        $user = Auth::user();
         $result = $readable->markAsRead($user->id);
 
         return new ApiResource(

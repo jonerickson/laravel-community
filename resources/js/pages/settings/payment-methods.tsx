@@ -73,10 +73,6 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
                     router.reload({ only: ['paymentMethods'] });
                     toast.success('Payment method updated successfully.');
                 },
-                onError: (err) => {
-                    console.error('Error updating payment method:', err);
-                    toast.error(err.message || 'Unable to update payment method. Please try again.');
-                },
             },
         );
     };

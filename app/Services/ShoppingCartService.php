@@ -6,14 +6,21 @@ namespace App\Services;
 
 use App\Models\Product;
 use App\Models\ProductPrice;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Session;
 
 class ShoppingCartService
 {
+    public function __construct(protected Request $request)
+    {
+        //
+    }
+
     public function getCartItems(): array
     {
-        $cart = Session::get('shopping_cart', []);
+        $cart = $this->request->session()->get('shopping_cart', []);
 
         if (empty($cart)) {
             return [];
@@ -35,16 +42,19 @@ class ShoppingCartService
 
     public function clearCart(): void
     {
-        Session::forget('shopping_cart');
+        $this->request->session()->forget('shopping_cart');
     }
 
     private function getProducts(array $productIds): Collection
     {
-        return Product::with(['prices' => function ($query): void {
-            $query->where('is_active', true)->orderBy('is_default', 'desc');
-        }, 'defaultPrice', 'policies' => function ($query): void {
-            $query->active()->effective()->orderBy('title');
-        }])
+        return Product::query()
+            ->with('defaultPrice')
+            ->with(['prices' => function (HasMany $query): void {
+                $query->active()->orderBy('is_default', 'desc');
+            }])
+            ->with(['policies' => function (BelongsToMany $query): void {
+                $query->active()->effective()->orderBy('title');
+            }])
             ->whereIn('id', $productIds)
             ->get()
             ->keyBy('id');

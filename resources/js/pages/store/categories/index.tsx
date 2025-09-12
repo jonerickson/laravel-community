@@ -26,7 +26,7 @@ export default function StoreCategoriesIndex({ categories }: StoreCategoriesInde
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Store Categories" />
             <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto">
-                <Heading title="All categories" description="Browse all product categories" />
+                <Heading title="All product categories" description="Browse all product categories" />
 
                 <div className="-mt-8">
                     {categories.length > 0 ? (

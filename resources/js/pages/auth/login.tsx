@@ -1,7 +1,7 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { IconBrandDiscord, IconRobot } from '@tabler/icons-react';
 import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useEffect } from 'react';
 
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
@@ -15,6 +15,7 @@ type LoginForm = {
     email: string;
     password: string;
     remember: boolean;
+    redirect?: string;
 };
 
 interface LoginProps {
@@ -23,11 +24,20 @@ interface LoginProps {
 }
 
 export default function AuthLogin({ status, canResetPassword }: LoginProps) {
-    const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>({
+    const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
         email: '',
         password: '',
         remember: false,
     });
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('redirect');
+
+        if (redirectUrl) {
+            setData('redirect', redirectUrl);
+        }
+    }, [setData]);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();

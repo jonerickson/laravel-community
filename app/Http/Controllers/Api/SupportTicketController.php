@@ -30,7 +30,7 @@ class SupportTicketController
         $ticket = SupportTicket::find($validated['ticket_id']);
 
         /** @var User $user */
-        $user = Auth::guard('api')->user();
+        $user = Auth::user();
 
         abort_unless($ticket->isAuthoredBy($user), 403);
 

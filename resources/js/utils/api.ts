@@ -1,6 +1,5 @@
 import type { ApiResponse } from '@/types';
 import axios, { type AxiosResponse } from 'axios';
-import { toast } from 'sonner';
 
 export class ApiError extends Error {
     constructor(
@@ -39,17 +38,11 @@ export function handleApiError(error: unknown): ApiError {
     return new ApiError(error instanceof Error ? error.message : 'An unexpected error occurred', 500);
 }
 
-export async function apiRequest<T>(requestPromise: Promise<AxiosResponse<ApiResponse<T>>>, showErrorToast: boolean = true): Promise<T> {
+export async function apiRequest<T>(requestPromise: Promise<AxiosResponse<ApiResponse<T>>>): Promise<T> {
     try {
         const response = await requestPromise;
         return handleApiResponse(response);
     } catch (error) {
-        const apiError = handleApiError(error);
-
-        if (showErrorToast) {
-            toast.error(apiError.message);
-        }
-
-        throw apiError;
+        throw handleApiError(error);
     }
 }

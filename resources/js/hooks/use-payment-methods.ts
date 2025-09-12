@@ -80,10 +80,6 @@ export function usePaymentMethods() {
                     router.reload({ only: ['paymentMethods'] });
                     toast.success('Payment method added successfully.');
                 },
-                onError: (err) => {
-                    console.error('Error adding payment method:', err);
-                    toast.error(err.message || 'Unable to add payment method. Please try again.');
-                },
             },
         );
     };
@@ -101,10 +97,6 @@ export function usePaymentMethods() {
                 onSuccess: () => {
                     router.reload({ only: ['paymentMethods'] });
                     toast.success('Payment method removed successfully.');
-                },
-                onError: (err) => {
-                    console.error('Error deleting payment method:', err);
-                    toast.error(err.message || 'Unable to delete payment method. Please try again.');
                 },
             },
         );

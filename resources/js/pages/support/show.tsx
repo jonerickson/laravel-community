@@ -14,7 +14,6 @@ import { Head, router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Calendar, CheckCircle, Clock, FileText, Flag, Lock, LockOpen, MessageCircle, Tag, Ticket, User } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
 
 interface SupportTicketShowProps {
     ticket: SupportTicket;
@@ -60,10 +59,6 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
             {
                 onSuccess: () => {
                     router.reload({ only: ['ticket'] });
-                },
-                onError: (err) => {
-                    console.error('Error updating ticket:', err);
-                    toast.error(err.message || 'Unable to close support ticket. Please try again.');
                 },
             },
         );

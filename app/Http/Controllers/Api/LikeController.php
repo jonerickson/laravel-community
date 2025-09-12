@@ -41,7 +41,7 @@ class LikeController extends Controller
 
         $this->authorize('like', $likeable);
 
-        $user = Auth::guard('api')->user();
+        $user = Auth::user();
         $result = $likeable->toggleLike($validated['emoji'], $user->id);
 
         $liked = $result instanceof Like;

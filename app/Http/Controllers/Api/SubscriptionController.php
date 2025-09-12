@@ -14,7 +14,7 @@ class SubscriptionController
 {
     public function __invoke(SubscriptionCheckoutRequest $request): ApiResource
     {
-        $user = Auth::guard('api')->user();
+        $user = Auth::user();
 
         if (! $user) {
             return ApiResource::error(

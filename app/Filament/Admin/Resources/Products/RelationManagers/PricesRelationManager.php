@@ -137,6 +137,7 @@ class PricesRelationManager extends RelationManager
                     ->color('gray')
                     ->label('Sync prices')
                     ->requiresConfirmation()
+                    ->visible(fn () => filled($this->getOwnerRecord()->external_product_id))
                     ->modalHeading('Sync Product Prices')
                     ->modalIcon(Heroicon::OutlinedArrowPath)
                     ->modalDescription('This will remove any existing prices for this product locally and pull in the latest product prices from your payment processor.')

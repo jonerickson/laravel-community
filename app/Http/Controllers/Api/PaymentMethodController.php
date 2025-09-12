@@ -15,7 +15,7 @@ class PaymentMethodController
 
     public function create(): ApiResource
     {
-        $user = Auth::guard('api')->user();
+        $user = Auth::user();
 
         return ApiResource::success(
             resource: $user->createSetupIntent()
@@ -28,7 +28,7 @@ class PaymentMethodController
             'method' => 'string|required',
         ]);
 
-        $user = Auth::guard('api')->user();
+        $user = Auth::user();
 
         $created = $this->paymentManager->createPaymentMethod(
             user: $user,
@@ -54,7 +54,7 @@ class PaymentMethodController
             'method' => 'string|required',
         ]);
 
-        $user = Auth::guard('api')->user();
+        $user = Auth::user();
 
         $deleted = $this->paymentManager->deletePaymentMethod(
             user: $user,
@@ -80,7 +80,7 @@ class PaymentMethodController
             'is_default' => 'required|boolean',
         ]);
 
-        $user = Auth::guard('api')->user();
+        $user = Auth::user();
 
         $updated = $this->paymentManager->updatePaymentMethod(
             user: $user,

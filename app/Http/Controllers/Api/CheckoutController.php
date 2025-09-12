@@ -19,7 +19,7 @@ class CheckoutController
 
     public function __invoke(Request $request): ApiResource
     {
-        $user = Auth::guard('api')->user();
+        $user = Auth::user();
 
         if (! $user) {
             return ApiResource::error(

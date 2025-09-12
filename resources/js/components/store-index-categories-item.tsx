@@ -17,7 +17,7 @@ export default function StoreIndexCategoriesItem({ item }: { item: ProductCatego
                     </span>
                     <span
                         aria-hidden="true"
-                        className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent"
+                        className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/20 to-transparent"
                     />
                     <span className="relative mt-auto text-center text-base font-bold text-nowrap text-white">{item.name}</span>
                 </>
@@ -26,8 +26,11 @@ export default function StoreIndexCategoriesItem({ item }: { item: ProductCatego
                     <div className="flex aspect-video w-full items-center justify-center rounded-2xl bg-muted sm:aspect-[2/1] lg:aspect-[3/2]">
                         <ImageIcon className="h-16 w-16 text-muted-foreground" />
                     </div>
-                    <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-muted-foreground opacity-50" />
-                    <span className="relative mt-auto text-center text-base font-bold text-nowrap text-primary">{item.name}</span>
+                    <span
+                        aria-hidden="true"
+                        className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/20 to-transparent"
+                    />
+                    <span className="relative mt-auto text-center text-base font-bold text-nowrap text-white">{item.name}</span>
                 </>
             )}
         </Link>

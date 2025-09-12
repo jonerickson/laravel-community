@@ -80,10 +80,6 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                     toast.success(message);
                     window.location.reload();
                 },
-                onError: (err) => {
-                    console.error('Error publishing/unpublishing post:', err);
-                    toast.error(err.message || 'Unable to update post. Please try again.');
-                },
             },
         );
     };
@@ -110,10 +106,6 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                     const message = isCurrentlyPinned ? 'The post has been unpinned.' : 'The post has been pinned.';
                     toast.success(message);
                     window.location.reload();
-                },
-                onError: (err) => {
-                    console.error('Error pinning/unpinning post:', err);
-                    toast.error(err.message || 'Unable to update post. Please try again.');
                 },
             },
         );

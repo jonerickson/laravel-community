@@ -160,6 +160,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         'email',
         'email_verified_at',
         'signature',
+        'password',
         'is_banned',
         'banned_at',
         'ban_reason',

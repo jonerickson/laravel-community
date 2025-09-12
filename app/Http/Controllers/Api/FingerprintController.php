@@ -21,12 +21,12 @@ class FingerprintController extends Controller
         ]);
 
         $fingerprint = UserFingerprint::trackFingerprint(
-            userId: Auth::guard('api')->id(),
+            userId: Auth::id(),
             fingerprintId: $request->input('fingerprint_id'),
             fingerprintData: $request->input('fingerprint_data'),
             ipAddress: $request->ip(),
             userAgent: $request->userAgent()
-        );
+        )->refresh();
 
         if ($fingerprint->isBanned()) {
             return ApiResource::error(

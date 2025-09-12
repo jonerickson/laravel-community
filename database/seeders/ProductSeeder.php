@@ -27,7 +27,7 @@ class ProductSeeder extends Seeder
         ]))->create();
 
         $products = Product::factory()
-            ->count(5)
+            ->count(4)
             ->featured()
             ->recycle($productCategory)
             ->hasAttached($productCategory, relationship: 'categories')
