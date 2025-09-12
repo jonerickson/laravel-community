@@ -145,6 +145,7 @@ CREATE TABLE `forums` (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `category_id` bigint unsigned DEFAULT NULL,
   `rules` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `color` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#3b82f6',
@@ -154,7 +155,50 @@ CREATE TABLE `forums` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `forums_slug_unique` (`slug`),
-  KEY `forums_is_active_order_index` (`is_active`,`order`)
+  KEY `forums_is_active_order_index` (`is_active`,`order`),
+  KEY `forums_category_id_foreign` (`category_id`),
+  CONSTRAINT `forums_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `forums_categories` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `forums_categories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `forums_categories` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `icon` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `color` varchar(7) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `order` int NOT NULL DEFAULT '0',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `forums_categories_groups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `forums_categories_groups` (
+  `category_id` bigint unsigned NOT NULL,
+  `group_id` bigint unsigned NOT NULL,
+  KEY `forums_categories_groups_category_id_foreign` (`category_id`),
+  KEY `forums_categories_groups_group_id_foreign` (`group_id`),
+  CONSTRAINT `forums_categories_groups_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `forums_categories` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `forums_categories_groups_group_id_foreign` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `forums_groups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `forums_groups` (
+  `forum_id` bigint unsigned NOT NULL,
+  `group_id` bigint unsigned NOT NULL,
+  KEY `forums_groups_forum_id_foreign` (`forum_id`),
+  KEY `forums_groups_group_id_foreign` (`group_id`),
+  CONSTRAINT `forums_groups_forum_id_foreign` FOREIGN KEY (`forum_id`) REFERENCES `forums` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `forums_groups_group_id_foreign` FOREIGN KEY (`group_id`) REFERENCES `forums_categories` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `groups`;
@@ -174,6 +218,20 @@ CREATE TABLE `groups` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `groups_is_active_order_index` (`is_active`,`order`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `images`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `images` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `imageable_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `imageable_id` bigint unsigned DEFAULT NULL,
+  `path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `images_imageable_type_imageable_id_index` (`imageable_type`,`imageable_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `invoices`;
@@ -268,6 +326,87 @@ CREATE TABLE `model_has_roles` (
   PRIMARY KEY (`role_id`,`model_id`,`model_type`),
   KEY `model_has_roles_model_id_model_type_index` (`model_id`,`model_type`),
   CONSTRAINT `model_has_roles_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `oauth_access_tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `oauth_access_tokens` (
+  `id` char(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `client_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `scopes` text COLLATE utf8mb4_unicode_ci,
+  `revoked` tinyint(1) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `expires_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `oauth_access_tokens_user_id_index` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `oauth_auth_codes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `oauth_auth_codes` (
+  `id` char(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` bigint unsigned NOT NULL,
+  `client_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scopes` text COLLATE utf8mb4_unicode_ci,
+  `revoked` tinyint(1) NOT NULL,
+  `expires_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `oauth_auth_codes_user_id_index` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `oauth_clients`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `oauth_clients` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `owner_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `owner_id` bigint unsigned DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `secret` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `provider` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `redirect_uris` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `grant_types` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `revoked` tinyint(1) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `oauth_clients_owner_type_owner_id_index` (`owner_type`,`owner_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `oauth_device_codes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `oauth_device_codes` (
+  `id` char(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `client_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_code` char(8) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scopes` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `revoked` tinyint(1) NOT NULL,
+  `user_approved_at` datetime DEFAULT NULL,
+  `last_polled_at` datetime DEFAULT NULL,
+  `expires_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `oauth_device_codes_user_code_unique` (`user_code`),
+  KEY `oauth_device_codes_user_id_index` (`user_id`),
+  KEY `oauth_device_codes_client_id_index` (`client_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `oauth_refresh_tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `oauth_refresh_tokens` (
+  `id` char(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `access_token_id` char(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `revoked` tinyint(1) NOT NULL,
+  `expires_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `oauth_refresh_tokens_access_token_id_index` (`access_token_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `password_reset_tokens`;
@@ -405,6 +544,7 @@ CREATE TABLE `products` (
   `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'storeProduct',
+  `tax_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_featured` tinyint(1) NOT NULL DEFAULT '0',
   `featured_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `external_product_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -853,3 +993,14 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (51,'2025_08_31_185
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (52,'2025_09_02_204613_create_roles_groups_table',15);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (53,'2025_09_02_205222_add_defaults_to_groups_table',15);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (54,'2025_09_03_213036_create_products_groups_table',16);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (55,'2025_09_06_211134_create_forum_categories_table',17);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (56,'2025_09_06_211237_create_forum_group_table',17);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (57,'2025_09_06_211311_create_forum_category_group_table',17);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (58,'2025_09_06_211439_add_category_id_to_forums',17);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (59,'2025_09_06_215703_add_tax_code_to_products',17);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (60,'2025_09_11_215327_create_oauth_auth_codes_table',17);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (61,'2025_09_11_215328_create_oauth_access_tokens_table',17);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (62,'2025_09_11_215329_create_oauth_refresh_tokens_table',17);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (63,'2025_09_11_215330_create_oauth_clients_table',17);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (64,'2025_09_11_215331_create_oauth_device_codes_table',17);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (65,'2025_09_12_034231_create_images_table',18);

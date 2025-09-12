@@ -6,6 +6,7 @@ namespace App\Filament\Admin\Resources\ForumCategories\Schemas;
 
 use App\Models\ForumCategory;
 use Filament\Forms\Components\ColorPicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -42,6 +43,27 @@ class ForumCategoryForm
                         ColorPicker::make('color')
                             ->required()
                             ->default('#3b82f6'),
+                    ]),
+                Section::make('Image')
+                    ->columnSpanFull()
+                    ->relationship('image')
+                    ->schema([
+                        FileUpload::make('path')
+                            ->helperText('Add a category image to be displayed on the forum index.')
+                            ->hiddenLabel()
+                            ->disk('public')
+                            ->directory('forum-category-images')
+                            ->visibility('public')
+                            ->downloadable()
+                            ->previewable()
+                            ->openable()
+                            ->image()
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                                '16:9',
+                                '4:3',
+                                '1:1',
+                            ]),
                     ]),
                 Section::make('Permissions')
                     ->columnSpanFull()

@@ -104,8 +104,11 @@ class PostResource extends Resource
                                 FileUpload::make('featured_image')
                                     ->label('Featured Image')
                                     ->disk('public')
-                                    ->directory('posts/featured-images')
+                                    ->directory('post-images')
                                     ->visibility('public')
+                                    ->downloadable()
+                                    ->previewable()
+                                    ->openable()
                                     ->image()
                                     ->imageEditor()
                                     ->imageEditorAspectRatios([

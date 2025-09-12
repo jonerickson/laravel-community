@@ -112,12 +112,23 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                                             <div className="space-y-3">
                                                 <Link href={route('forums.categories.show', { category: category.slug })}>
                                                     <Heading title={category.name} description={category.description || undefined} />
-                                                    <div className="-mt-4 text-sm text-muted-foreground">
-                                                        {category.forums?.reduce((total, forum) => total + (forum.topics_count || 0), 0) || 0}{' '}
-                                                        {pluralize(
-                                                            'post',
-                                                            category.forums?.reduce((total, forum) => total + (forum.topics_count || 0), 0) || 0,
+                                                    <div className="-mt-4">
+                                                        {category.image && (
+                                                            <div className="pb-4">
+                                                                <img
+                                                                    src={category.image.url}
+                                                                    alt={`${category.name} category image`}
+                                                                    className="h-48 w-full rounded-lg object-cover"
+                                                                />
+                                                            </div>
                                                         )}
+                                                        <div className="text-sm text-muted-foreground">
+                                                            {category.forums?.reduce((total, forum) => total + (forum.topics_count || 0), 0) || 0}{' '}
+                                                            {pluralize(
+                                                                'post',
+                                                                category.forums?.reduce((total, forum) => total + (forum.topics_count || 0), 0) || 0,
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </Link>
                                                 {category.forums && category.forums.length > 0 && (

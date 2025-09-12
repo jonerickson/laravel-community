@@ -134,6 +134,7 @@ export interface ForumCategory {
     order: number;
     is_active: boolean;
     forums?: Forum[];
+    image?: Image | null;
     created_at: string;
     updated_at: string;
 }
@@ -142,6 +143,16 @@ export interface Group {
     id: number;
     name: string;
     color: string;
+}
+
+export interface Image {
+    id: number;
+    imageable_type: string;
+    imageable_id: number;
+    path: string;
+    url: string;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface Invoice {

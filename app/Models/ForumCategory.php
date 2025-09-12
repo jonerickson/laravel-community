@@ -9,6 +9,7 @@ use App\Traits\Activateable;
 use App\Traits\HasColor;
 use App\Traits\HasGroups;
 use App\Traits\HasIcon;
+use App\Traits\HasImages;
 use App\Traits\HasSlug;
 use App\Traits\Orderable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -31,6 +32,9 @@ use Illuminate\Support\Str;
  * @property-read int|null $forums_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Group> $groups
  * @property-read int|null $groups_count
+ * @property-read Image|null $image
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Image> $images
+ * @property-read int|null $images_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory active()
  * @method static \Database\Factories\ForumCategoryFactory factory($count = null, $state = [])
@@ -59,6 +63,7 @@ class ForumCategory extends Model implements Sluggable
     use HasFactory;
     use HasGroups;
     use HasIcon;
+    use HasImages;
     use HasSlug;
     use Orderable;
 

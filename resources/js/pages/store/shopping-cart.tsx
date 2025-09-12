@@ -237,12 +237,12 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
 
                         <dl className="divide-shadow-muted mt-6 divide-y">
                             <div className="flex items-center justify-between py-3">
-                                <dt className="text-sm text-sidebar-primary">Subtotal</dt>
-                                <dd className="text-sm font-medium text-sidebar-accent-foreground">${subtotal.toFixed(2)}</dd>
+                                <dt className="text-sm text-muted-foreground">Subtotal</dt>
+                                <dd className="text-sm font-medium text-primary">${subtotal.toFixed(2)}</dd>
                             </div>
                             <div className="flex items-center justify-between py-3">
-                                <dt className="text-base font-medium text-sidebar-primary">Order total</dt>
-                                <dd className="text-base font-medium text-sidebar-accent-foreground">${total.toFixed(2)}</dd>
+                                <dt className="text-base font-medium text-muted-foreground">Order total</dt>
+                                <dd className="text-base font-medium text-primary">${total.toFixed(2)}</dd>
                             </div>
 
                             {policies.length > 0 && (

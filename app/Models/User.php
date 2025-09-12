@@ -97,6 +97,8 @@ use Laravel\Passport\HasApiTokens;
  * @property-read int|null $roles_count
  * @property-read Collection<int, Subscription> $subscriptions
  * @property-read int|null $subscriptions_count
+ * @property-read Collection<int, \Laravel\Passport\Token> $tokens
+ * @property-read int|null $tokens_count
  *
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static Builder<static>|User hasExpiredGenericTrial()
