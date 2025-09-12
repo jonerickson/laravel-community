@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\ReadController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\ShoppingCartController;
+use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\SupportTicketController;
 use App\Http\Controllers\Api\TopicController;
 use Illuminate\Support\Facades\Route;
@@ -26,10 +27,12 @@ Route::group(['as' => 'api.'], function (): void {
 
     Route::group(['middleware' => ['auth:api', 'verified']], function (): void {
         Route::post('/checkout', CheckoutController::class)->name('checkout');
+        Route::post('/subscriptions/checkout', SubscriptionController::class)->name('subscriptions.checkout');
         Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
         Route::delete('/forums/topics', [TopicController::class, 'destroy'])->name('forums.topics.destroy');
         Route::post('/like', LikeController::class)->name('like');
         Route::get('/payment-methods', [PaymentMethodController::class, 'create'])->name('payment-methods.create');
+        Route::post('/payment-methods', [PaymentMethodController::class, 'store'])->name('payment-methods.store');
         Route::patch('/payment-methods', [PaymentMethodController::class, 'update'])->name('payment-methods.update');
         Route::delete('/payment-methods', [PaymentMethodController::class, 'destroy'])->name('payment-methods.destroy');
         Route::post('/pin', [PinController::class, 'store'])->name('pin.store');

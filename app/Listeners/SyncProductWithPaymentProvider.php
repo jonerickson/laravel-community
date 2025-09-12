@@ -40,7 +40,12 @@ class SyncProductWithPaymentProvider implements ShouldQueue
 
     protected function handleProductCreated(ProductCreated $event): void
     {
+        if ($event->product->external_product_id) {
+            return;
+        }
+
         $this->paymentManager->createProduct($event->product);
+
         Log::info('Product created in payment provider', ['product_id' => $event->product->id]);
     }
 
@@ -51,6 +56,7 @@ class SyncProductWithPaymentProvider implements ShouldQueue
         }
 
         $this->paymentManager->updateProduct($event->product);
+
         Log::info('Product updated in payment provider', ['product_id' => $event->product->id]);
     }
 
@@ -61,6 +67,7 @@ class SyncProductWithPaymentProvider implements ShouldQueue
         }
 
         $this->paymentManager->deleteProduct($event->product);
+
         Log::info('Product deleted in payment provider', ['product_id' => $event->product->id]);
     }
 }

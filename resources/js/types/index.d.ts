@@ -146,8 +146,19 @@ export interface Group {
 
 export interface Invoice {
     id: string;
-    amount: number;
+    amount_due: number;
+    amount_paid: number;
+    amount_remaining: number;
+    currency: string;
     status: InvoiceStatus;
+    customer_id: string;
+    subscription_id?: string;
+    invoice_pdf?: string;
+    hosted_invoice_url?: string;
+    created: number;
+    due_date?: number;
+    paid_at?: number;
+    metadata: Record<string, any>;
 }
 
 export type InvoiceStatus = 'draft' | 'open' | 'paid' | 'uncollectible' | 'void';

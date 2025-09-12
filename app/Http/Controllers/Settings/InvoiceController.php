@@ -5,30 +5,24 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Managers\PaymentManager;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class InvoiceController extends Controller
 {
+    public function __construct(private readonly PaymentManager $paymentManager)
+    {
+        //
+    }
+
     public function __invoke(): Response
     {
+        $user = Auth::user();
+
         return Inertia::render('settings/invoices', [
-            'invoices' => [
-                [
-                    'id' => 1,
-                    'date' => now(),
-                    'amount' => 100,
-                    'status' => 'open',
-                    'invoice_url' => '',
-                ],
-                [
-                    'id' => 2,
-                    'date' => now()->addDays(30),
-                    'amount' => 150,
-                    'status' => 'paid',
-                    'invoice_url' => '',
-                ],
-            ],
+            'invoices' => $this->paymentManager->getInvoices($user),
         ]);
     }
 }

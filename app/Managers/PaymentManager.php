@@ -8,6 +8,7 @@ use App\Contracts\PaymentProcessor;
 use App\Drivers\Payments\StripeDriver;
 use App\Models\Product;
 use App\Models\ProductPrice;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
@@ -57,6 +58,36 @@ class PaymentManager extends Manager implements PaymentProcessor
     public function deletePrice(Product $product, ProductPrice $price): bool
     {
         return $this->driver()->deletePrice($product, $price);
+    }
+
+    public function listPrices(Product $product, array $filters = []): Collection
+    {
+        return $this->driver()->listPrices($product, $filters);
+    }
+
+    public function getInvoices(User $user, array $filters = []): Collection
+    {
+        return $this->driver()->getInvoices($user, $filters);
+    }
+
+    public function createPaymentMethod(User $user, string $paymentMethodId)
+    {
+        return $this->driver()->createPaymentMethod($user, $paymentMethodId);
+    }
+
+    public function getPaymentMethods(User $user): Collection
+    {
+        return $this->driver()->getPaymentMethods($user);
+    }
+
+    public function updatePaymentMethod(User $user, string $paymentMethodId, bool $isDefault): bool
+    {
+        return $this->driver()->updatePaymentMethod($user, $paymentMethodId, $isDefault);
+    }
+
+    public function deletePaymentMethod(User $user, string $paymentMethodId): bool
+    {
+        return $this->driver()->deletePaymentMethod($user, $paymentMethodId);
     }
 
     protected function createStripeDriver(): PaymentProcessor

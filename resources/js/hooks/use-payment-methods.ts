@@ -21,6 +21,7 @@ export function usePaymentMethods() {
     const elements = useElements();
     const { loading: setupLoading, execute: executeSetupIntent } = useApiRequest<SetupIntent>();
     const { loading: deleteLoading, execute: executeDelete } = useApiRequest();
+    const { loading: storeLoading, execute: executeStore } = useApiRequest();
 
     const addPaymentMethod = async (data: AddPaymentMethodData) => {
         if (!stripe || !elements) {
@@ -50,7 +51,10 @@ export function usePaymentMethods() {
 
         const { client_secret } = setupIntentResponse;
 
-        const { error: stripeError } = await stripe.confirmCardSetup(client_secret, {
+        const {
+            error: stripeError,
+            setupIntent: { payment_method },
+        } = await stripe.confirmCardSetup(client_secret, {
             payment_method: {
                 card: cardElement,
                 billing_details: {
@@ -63,7 +67,25 @@ export function usePaymentMethods() {
             throw new Error(stripeError.message || 'Failed to add payment method');
         }
 
-        router.reload({ only: ['paymentMethods'] });
+        await executeStore(
+            {
+                url: route('api.payment-methods.store'),
+                method: 'POST',
+                data: {
+                    method: payment_method,
+                },
+            },
+            {
+                onSuccess: () => {
+                    router.reload({ only: ['paymentMethods'] });
+                    toast.success('Payment method added successfully.');
+                },
+                onError: (err) => {
+                    console.error('Error adding payment method:', err);
+                    toast.error(err.message || 'Unable to add payment method. Please try again.');
+                },
+            },
+        );
     };
 
     const deletePaymentMethod = async (paymentMethodId: string) => {
@@ -76,7 +98,10 @@ export function usePaymentMethods() {
                 },
             },
             {
-                onSuccess: () => router.reload({ only: ['paymentMethods'] }),
+                onSuccess: () => {
+                    router.reload({ only: ['paymentMethods'] });
+                    toast.success('Payment method removed successfully.');
+                },
                 onError: (err) => {
                     console.error('Error deleting payment method:', err);
                     toast.error(err.message || 'Unable to delete payment method. Please try again.');
@@ -88,7 +113,7 @@ export function usePaymentMethods() {
     return {
         addPaymentMethod,
         deletePaymentMethod,
-        loading: setupLoading || deleteLoading,
+        loading: setupLoading || deleteLoading || storeLoading,
         addLoading: setupLoading,
         deleteLoading,
     };

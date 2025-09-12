@@ -1,7 +1,8 @@
 import { type BreadcrumbItem, Invoice, type SharedData } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 
 import { DataTable } from '@/components/data-table';
+import { EmptyState } from '@/components/empty-state';
 import HeadingSmall from '@/components/heading-small';
 import InvoiceStatus from '@/components/invoice-status';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,7 @@ import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { currency, date } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, ExternalLink, FileText } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -24,7 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export const columns: ColumnDef<Invoice>[] = [
     {
-        accessorKey: 'date',
+        accessorKey: 'created',
         header: ({ column }) => {
             return (
                 <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
@@ -33,7 +34,15 @@ export const columns: ColumnDef<Invoice>[] = [
                 </Button>
             );
         },
-        cell: ({ row }) => date(row.getValue('date')),
+        cell: ({ row }) => date(new Date((row.getValue('created') as number) * 1000).toISOString()),
+    },
+    {
+        accessorKey: 'id',
+        header: 'Invoice ID',
+        cell: ({ row }) => {
+            const id = row.getValue('id') as string;
+            return <div className="font-mono text-sm">{id.substring(0, 8)}...</div>;
+        },
     },
     {
         accessorKey: 'status',
@@ -43,33 +52,48 @@ export const columns: ColumnDef<Invoice>[] = [
         },
     },
     {
-        accessorKey: 'amount',
+        accessorKey: 'amount_due',
         header: ({ column }) => {
             return (
                 <div className="text-right">
                     <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                        Amount
+                        Amount Due
                         <ArrowUpDown className="ml-2 size-3" />
                     </Button>
                 </div>
             );
         },
         cell: ({ row }) => {
-            const amount = currency(row.getValue('amount'));
+            const amount = currency(row.getValue('amount_due')?.toString());
 
             return <div className="text-right font-medium">{amount}</div>;
         },
     },
     {
-        accessorKey: 'invoice_url',
+        id: 'actions',
         header: undefined,
-        size: 50,
+        size: 120,
         cell: ({ row }) => {
+            const invoice = row.original;
+
             return (
-                <div className="text-right">
-                    <Button variant="link" asChild>
-                        <Link href={row.getValue('invoice_url')}>View</Link>
-                    </Button>
+                <div className="flex justify-end gap-2">
+                    {invoice.hosted_invoice_url && (
+                        <Button variant="outline" size="sm" asChild>
+                            <a href={invoice.hosted_invoice_url} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="mr-1 h-4 w-4" />
+                                View
+                            </a>
+                        </Button>
+                    )}
+                    {invoice.invoice_pdf && (
+                        <Button variant="outline" size="sm" asChild>
+                            <a href={invoice.invoice_pdf} target="_blank" rel="noopener noreferrer">
+                                <FileText className="mr-1 h-4 w-4" />
+                                PDF
+                            </a>
+                        </Button>
+                    )}
                 </div>
             );
         },
@@ -86,7 +110,16 @@ export default function Invoices() {
             <SettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall title="Order information" description="View your current and past order information" />
-                    <DataTable columns={columns} data={invoices} />
+
+                    {invoices && invoices.length > 0 ? (
+                        <DataTable columns={columns} data={invoices} />
+                    ) : (
+                        <EmptyState
+                            icon={<FileText />}
+                            title="No invoices found"
+                            description="You don't have any invoices yet. Invoices will appear here when you make purchases or subscriptions."
+                        />
+                    )}
                 </div>
             </SettingsLayout>
         </AppLayout>

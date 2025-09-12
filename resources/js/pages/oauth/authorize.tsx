@@ -35,7 +35,11 @@ interface AuthorizeProps {
 }
 
 export default function OAuthAuthorize({ request, authToken, client, user, scopes }: AuthorizeProps) {
-    const { post, processing } = useForm({
+    const {
+        post,
+        delete: destroy,
+        processing,
+    } = useForm({
         state: request.state,
         client_id: request.client_id,
         auth_token: authToken,
@@ -48,9 +52,7 @@ export default function OAuthAuthorize({ request, authToken, client, user, scope
 
     const handleDeny: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('passport.authorizations.deny'), {
-            _method: 'delete',
-        });
+        destroy(route('passport.authorizations.deny'));
     };
 
     return (

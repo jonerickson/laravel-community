@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Products\RelationManagers;
 
+use App\Managers\PaymentManager;
+use App\Models\Product;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -15,12 +18,14 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Support\RawJs;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\DB;
 
 class PricesRelationManager extends RelationManager
 {
@@ -128,6 +133,37 @@ class PricesRelationManager extends RelationManager
                     ->visible(fn () => $this->getOwnerRecord()->isSubscription()),
             ])
             ->headerActions([
+                Action::make('sync')
+                    ->color('gray')
+                    ->label('Sync prices')
+                    ->requiresConfirmation()
+                    ->modalHeading('Sync Product Prices')
+                    ->modalIcon(Heroicon::OutlinedArrowPath)
+                    ->modalDescription('This will remove any existing prices for this product locally and pull in the latest product prices from your payment processor.')
+                    ->modalSubmitActionLabel('Sync')
+                    ->successNotificationTitle('The prices have been successfully synced.')
+                    ->failureNotificationTitle('There was an error syncing the prices. Please try again.')
+                    ->action(function (Action $action) {
+                        /** @var Product $product */
+                        $product = $this->getOwnerRecord();
+
+                        $result = DB::transaction(function () use ($product) {
+                            $paymentManager = app(PaymentManager::class);
+
+                            if ($prices = $paymentManager->listPrices($product)) {
+                                $product->prices()->delete();
+                                $product->prices()->saveMany($prices);
+                            }
+
+                            return true;
+                        });
+
+                        if ($result) {
+                            $action->success();
+                        } else {
+                            $action->failure();
+                        }
+                    }),
                 CreateAction::make(),
             ])
             ->recordActions([

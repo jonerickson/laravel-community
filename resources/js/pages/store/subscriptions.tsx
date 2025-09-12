@@ -7,9 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { apiRequest } from '@/utils/api';
 import { Head } from '@inertiajs/react';
+import axios from 'axios';
 import { Check, Crown, Package, Rocket, Shield, Star, Users, Zap } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -64,9 +67,10 @@ interface PricingCardProps {
     plan: SubscriptionPlan;
     billingCycle: BillingCycle;
     onSubscribe: (planId: number) => void;
+    loading?: boolean;
 }
 
-function PricingCard({ plan, billingCycle, onSubscribe }: PricingCardProps) {
+function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: PricingCardProps) {
     const Icon = getIconForPlan(plan);
     const color = getColorForPlan(plan);
     const price = plan.pricing[billingCycle];
@@ -124,8 +128,17 @@ function PricingCard({ plan, billingCycle, onSubscribe }: PricingCardProps) {
                             Current Plan
                         </Button>
                     ) : (
-                        <Button className={`w-full ${plan.popular ? 'hover:bg-info-1/80 bg-info' : ''}`} onClick={() => onSubscribe(plan.id)}>
-                            {plan.popular ? (
+                        <Button
+                            className={`w-full ${plan.popular ? 'bg-info hover:bg-info/80' : ''}`}
+                            onClick={() => onSubscribe(plan.id)}
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <>
+                                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-b-transparent" />
+                                    Processing...
+                                </>
+                            ) : plan.popular ? (
                                 <>
                                     <Rocket className="mr-2 h-4 w-4" />
                                     Upgrade Now
@@ -143,9 +156,31 @@ function PricingCard({ plan, billingCycle, onSubscribe }: PricingCardProps) {
 
 export default function Subscriptions({ subscriptionProducts }: SubscriptionsProps) {
     const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
+    const [loadingPlan, setLoadingPlan] = useState<number | null>(null);
 
-    const handleSubscribe = (planId: number) => {
-        console.log(`Subscribing to ${planId} with ${billingCycle} billing`);
+    const handleSubscribe = async (planId: number) => {
+        setLoadingPlan(planId);
+
+        try {
+            const response = (await apiRequest(
+                axios.post('/api/subscriptions/checkout', {
+                    product_id: planId,
+                    billing_cycle: billingCycle,
+                }),
+            )) as { checkout_url?: string };
+
+            if (response.checkout_url) {
+                window.location.href = response.checkout_url;
+            } else {
+                console.error('Failed to create checkout session');
+                toast.error('Failed to create checkout session. Please try again.');
+            }
+        } catch (err) {
+            console.error('Failed to initiate subscription checkout:', err);
+            toast.error('Failed to initiate subscription checkout. Please try again.');
+        } finally {
+            setLoadingPlan(null);
+        }
     };
 
     return (
@@ -177,7 +212,12 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                             {subscriptionProducts.map((plan: SubscriptionPlan) => (
                                 <div key={plan.id} className="flex justify-center">
-                                    <PricingCard plan={plan} billingCycle={billingCycle} onSubscribe={handleSubscribe} />
+                                    <PricingCard
+                                        plan={plan}
+                                        billingCycle={billingCycle}
+                                        onSubscribe={handleSubscribe}
+                                        loading={loadingPlan === plan.id}
+                                    />
                                 </div>
                             ))}
                         </div>
