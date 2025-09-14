@@ -9,6 +9,13 @@ import { Head, usePage, WhenVisible } from '@inertiajs/react';
 import { Newspaper } from 'lucide-react';
 import usePermissions from '../../hooks/use-permissions';
 
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Blog',
+        href: route('blog.index'),
+    },
+];
+
 interface BlogIndexProps {
     posts: Post[];
     postsPagination: PaginatedData;
@@ -17,13 +24,6 @@ interface BlogIndexProps {
 export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
     const { can } = usePermissions();
     const { name: siteName } = usePage<SharedData>().props;
-
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Blog',
-            href: route('blog.index'),
-        },
-    ];
 
     const structuredData = {
         '@context': 'https://schema.org',
@@ -124,7 +124,7 @@ export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
 
                 {posts.length === 0 && (
                     <div className="-mt-8">
-                        <EmptyState icon={<Newspaper />} title="No blog posts" description="Check back later to catch the latest updates" />
+                        <EmptyState icon={<Newspaper />} title="No blog posts" description="Check back later to catch the latest updates." />
                     </div>
                 )}
             </div>

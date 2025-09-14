@@ -5,14 +5,19 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Services\PermissionService;
+use App\Services\ShoppingCartService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
 
 class HandleInertiaRequests extends Middleware
 {
     protected $rootView = 'app';
+
+    public function __construct(protected ShoppingCartService $shoppingCartService)
+    {
+        //
+    }
 
     public function share(Request $request): array
     {
@@ -26,7 +31,7 @@ class HandleInertiaRequests extends Middleware
                 'can' => PermissionService::mapFrontendPermissions($user),
                 'mustVerifyEmail' => $user && ! $user->hasVerifiedEmail(),
             ],
-            'cartCount' => $this->getCartCount(),
+            'cartCount' => $this->shoppingCartService->getCartCount(),
             'flash' => [
                 'scrollToBottom' => fn () => $request->session()->pull('scrollToBottom'),
                 'message' => fn () => $request->session()->pull('message'),
@@ -39,12 +44,5 @@ class HandleInertiaRequests extends Middleware
                 'location' => $request->url(),
             ],
         ];
-    }
-
-    private function getCartCount(): int
-    {
-        $cart = Session::get('shopping_cart', []);
-
-        return collect($cart)->sum('quantity');
     }
 }

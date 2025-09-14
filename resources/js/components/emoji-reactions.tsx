@@ -1,8 +1,11 @@
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Comment, EmojiReactionResponse, Post } from '@/types';
 import { apiRequest } from '@/utils/api';
 import axios from 'axios';
+import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 
 interface EmojiReaction {
@@ -20,6 +23,8 @@ interface EmojiReactionsProps {
 }
 
 const AVAILABLE_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '😡'];
+const MOBILE_EMOJIS = ['👍', '❤️', '😂']; // Essential emojis for mobile
+const MOBILE_DROPDOWN_EMOJIS = ['😮', '😢', '😡']; // Additional emojis in dropdown
 
 export default function EmojiReactions({ post, comment, initialReactions = [], userReactions = [], className = '' }: EmojiReactionsProps) {
     const [reactions, setReactions] = useState<EmojiReaction[]>(initialReactions);
@@ -91,68 +96,130 @@ export default function EmojiReactions({ post, comment, initialReactions = [], u
         {} as Record<string, EmojiReaction>,
     );
 
+    const renderEmojiButton = (emoji: string, showTooltip = true) => {
+        const reaction = reactionMap[emoji];
+        const count = reaction?.count || 0;
+        const hasReactions = count > 0;
+        const isActive = currentUserReactions.includes(emoji);
+
+        const renderTooltipContent = () => {
+            if (!reaction?.users.length) {
+                return <p>React with {emoji}</p>;
+            }
+
+            const displayUsers = reaction.users.slice(0, 5);
+            const remainingCount = reaction.users.length - displayUsers.length;
+
+            return (
+                <div className="space-y-1">
+                    <div className="text-xs">
+                        {displayUsers.map((user, index) => (
+                            <div key={index}>{user}</div>
+                        ))}
+                        {remainingCount > 0 && <div className="text-muted-foreground">+{remainingCount} more</div>}
+                    </div>
+                </div>
+            );
+        };
+
+        const button = (
+            <ToggleGroupItem
+                value={emoji}
+                className={`px-2 py-1 text-sm transition-all hover:scale-105 ${hasReactions || isActive ? 'opacity-100' : 'opacity-60'}`}
+            >
+                <span className="mr-1">{emoji}</span>
+                {hasReactions && <span className="text-xs font-medium">{count}</span>}
+            </ToggleGroupItem>
+        );
+
+        if (!showTooltip) {
+            return button;
+        }
+
+        return (
+            <Tooltip key={emoji}>
+                <TooltipTrigger asChild>{button}</TooltipTrigger>
+                <TooltipContent className="max-w-xs">{renderTooltipContent()}</TooltipContent>
+            </Tooltip>
+        );
+    };
+
     return (
         <div className={`flex items-center gap-2 ${className}`}>
-            <ToggleGroup
-                type="multiple"
-                value={currentUserReactions}
-                onValueChange={(newValues) => {
-                    const added = newValues.find((val) => !currentUserReactions.includes(val));
-                    const removed = currentUserReactions.find((val) => !newValues.includes(val));
+            {/* Desktop - show all emojis */}
+            <div className="hidden md:flex">
+                <ToggleGroup
+                    type="multiple"
+                    value={currentUserReactions}
+                    onValueChange={(newValues) => {
+                        const added = newValues.find((val) => !currentUserReactions.includes(val));
+                        const removed = currentUserReactions.find((val) => !newValues.includes(val));
 
-                    if (added) {
-                        handleEmojiToggle(added);
-                    } else if (removed) {
-                        handleEmojiToggle(removed);
-                    }
-                }}
-                variant="default"
-                size="sm"
-                disabled={loading}
-                className="gap-0"
-            >
-                {AVAILABLE_EMOJIS.map((emoji) => {
-                    const reaction = reactionMap[emoji];
-                    const count = reaction?.count || 0;
-                    const hasReactions = count > 0;
-                    const isActive = currentUserReactions.includes(emoji);
-
-                    const renderTooltipContent = () => {
-                        if (!reaction?.users.length) {
-                            return <p>React with {emoji}</p>;
+                        if (added) {
+                            handleEmojiToggle(added);
+                        } else if (removed) {
+                            handleEmojiToggle(removed);
                         }
+                    }}
+                    variant="default"
+                    size="sm"
+                    disabled={loading}
+                    className="gap-0"
+                >
+                    {AVAILABLE_EMOJIS.map((emoji) => renderEmojiButton(emoji))}
+                </ToggleGroup>
+            </div>
 
-                        const displayUsers = reaction.users.slice(0, 5);
-                        const remainingCount = reaction.users.length - displayUsers.length;
+            {/* Mobile - show essential emojis + dropdown for others */}
+            <div className="flex items-center gap-1 md:hidden">
+                <ToggleGroup
+                    type="multiple"
+                    value={currentUserReactions}
+                    onValueChange={(newValues) => {
+                        const added = newValues.find((val) => !currentUserReactions.includes(val));
+                        const removed = currentUserReactions.find((val) => !newValues.includes(val));
 
-                        return (
-                            <div className="space-y-1">
-                                <div className="text-xs">
-                                    {displayUsers.map((user, index) => (
-                                        <div key={index}>{user}</div>
-                                    ))}
-                                    {remainingCount > 0 && <div className="text-muted-foreground">+{remainingCount} more</div>}
-                                </div>
-                            </div>
-                        );
-                    };
+                        if (added) {
+                            handleEmojiToggle(added);
+                        } else if (removed) {
+                            handleEmojiToggle(removed);
+                        }
+                    }}
+                    variant="default"
+                    size="sm"
+                    disabled={loading}
+                    className="gap-0"
+                >
+                    {MOBILE_EMOJIS.map((emoji) => renderEmojiButton(emoji))}
+                </ToggleGroup>
 
-                    return (
-                        <Tooltip key={emoji}>
-                            <TooltipTrigger asChild>
-                                <ToggleGroupItem
-                                    value={emoji}
-                                    className={`px-2 py-1 text-sm transition-all hover:scale-105 ${hasReactions || isActive ? 'opacity-100' : 'opacity-60'}`}
-                                >
-                                    <span className="mr-1">{emoji}</span>
-                                    {hasReactions && <span className="text-xs font-medium">{count}</span>}
-                                </ToggleGroupItem>
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-xs">{renderTooltipContent()}</TooltipContent>
-                        </Tooltip>
-                    );
-                })}
-            </ToggleGroup>
+                {/* Mobile dropdown for additional emojis */}
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="px-2 py-1" disabled={loading}>
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-32">
+                        {MOBILE_DROPDOWN_EMOJIS.map((emoji) => {
+                            const reaction = reactionMap[emoji];
+                            const count = reaction?.count || 0;
+                            const hasReactions = count > 0;
+                            const isActive = currentUserReactions.includes(emoji);
+
+                            return (
+                                <DropdownMenuItem key={emoji} onClick={() => handleEmojiToggle(emoji)} className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <span>{emoji}</span>
+                                        {hasReactions && <span className="rounded bg-muted px-1.5 py-0.5 text-xs font-medium">{count}</span>}
+                                    </div>
+                                    {isActive && <span className="text-xs text-primary">✓</span>}
+                                </DropdownMenuItem>
+                            );
+                        })}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
         </div>
     );
 }

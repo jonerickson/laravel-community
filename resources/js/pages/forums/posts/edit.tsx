@@ -61,14 +61,14 @@ export default function ForumPostEdit({ forum, topic, post }: EditPostProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Forums - ${topic.title} - Edit Post`}>
+            <Head title={`Forums - ${topic.title} - Edit post`}>
                 <meta name="description" content={`Edit post in ${topic.title}`} />
                 <meta property="og:title" content={`Forums - ${topic.title} - Edit Post`} />
                 <meta property="og:description" content={`Edit post in ${topic.title}`} />
                 <meta property="og:type" content="website" />
             </Head>
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
-                <Heading title="Edit Post" description={`Editing your post in "${topic.title}"`} />
+                <Heading title="Edit post" description={`Editing your post in "${topic.title}"`} />
 
                 {can('update_posts') && (
                     <Card className="-mt-8">

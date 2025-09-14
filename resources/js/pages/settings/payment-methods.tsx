@@ -21,11 +21,11 @@ import { toast } from 'sonner';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Settings',
-        href: '/settings',
+        href: route('settings'),
     },
     {
         title: 'Payment Methods',
-        href: '/settings/payment-methods',
+        href: route('settings.payment-methods'),
     },
 ];
 
@@ -88,7 +88,7 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
     return (
         <Elements stripe={stripePromise}>
             <AppLayout breadcrumbs={breadcrumbs}>
-                <Head title="Payment Methods" />
+                <Head title="Payment methods" />
 
                 <SettingsLayout>
                     <div className="space-y-8">

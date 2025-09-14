@@ -30,7 +30,7 @@ export default function RecentViewers({ viewers }: RecentViewersProps) {
                 </CardTitle>
                 <div className="mt-4 flex flex-wrap gap-2">
                     {viewers.map((viewer) => (
-                        <div key={viewer.user.id} className="flex items-center gap-2 rounded-md bg-muted/50 px-2 py-1 text-sm">
+                        <div key={viewer.user.id} className="flex items-center gap-2 rounded-md bg-muted/50 p-2 text-sm">
                             <Avatar className="h-6 w-6">
                                 <AvatarFallback className="text-xs">{viewer.user.name.charAt(0).toUpperCase()}</AvatarFallback>
                             </Avatar>

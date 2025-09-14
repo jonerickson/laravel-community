@@ -13,21 +13,21 @@ export default function PolicyShow({ category, policy }: PoliciesShowProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Policies',
-            href: '/policies',
+            href: route('policies.index'),
         },
         {
             title: category.name,
-            href: `/policies/${category.slug}`,
+            href: route('policies.categories.show', { category: category.slug }),
         },
         {
             title: policy.title,
-            href: `/policies/${category.slug}/${policy.slug}`,
+            href: route('policies.show', { category: category.slug, policy: policy.slug }),
         },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`${policy.title} - ${category.name} - Policies`} />
+            <Head title={`Policies - ${category.name} - ${policy.title}`} />
             <div className="flex h-full flex-1 flex-col overflow-x-auto">
                 <div className="mb-8">
                     <div className="-mb-4">

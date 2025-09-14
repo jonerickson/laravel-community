@@ -9,11 +9,11 @@ import { FolderIcon } from 'lucide-react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Store',
-        href: '/store',
+        href: route('store.index'),
     },
     {
         title: 'Categories',
-        href: '/store/categories',
+        href: route('store.categories.index'),
     },
 ];
 
@@ -24,7 +24,7 @@ interface StoreCategoriesIndexProps {
 export default function StoreCategoriesIndex({ categories }: StoreCategoriesIndexProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Store Categories" />
+            <Head title="Store" />
             <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto">
                 <Heading title="All product categories" description="Browse all product categories" />
 

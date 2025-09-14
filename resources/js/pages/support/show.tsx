@@ -66,7 +66,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Support Ticket #${ticket.id} - ${ticket.subject}`} />
+            <Head title={`Support ticket - #${ticket.id}`} />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center sm:gap-0">
                     <div className="flex items-start gap-4">

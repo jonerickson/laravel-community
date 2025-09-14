@@ -9,7 +9,7 @@ import { FileText, Folder } from 'lucide-react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Policies',
-        href: '/policies',
+        href: route('policies.index'),
     },
 ];
 

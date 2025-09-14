@@ -440,6 +440,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
         <>
             <div className={`border border-input rounded-md ${className}`}>
                 <div className="flex items-center gap-1 p-2 border-b">
+                    {/* Essential formatting tools - always visible */}
                     <ToolbarButton
                         action={() => editor.chain().focus().toggleBold().run()}
                         icon={Bold}
@@ -511,85 +512,195 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <ToolbarSeparator />
-                    <ToolbarButton
-                        action={() => editor.chain().focus().toggleBulletList().run()}
-                        icon={List}
-                        isActive={editor.isActive('bulletList')}
-                    />
-                    <ToolbarButton
-                        action={() => editor.chain().focus().toggleOrderedList().run()}
-                        icon={ListOrdered}
-                        isActive={editor.isActive('orderedList')}
-                    />
-                    <ToolbarButton
-                        action={() => editor.chain().focus().toggleBlockquote().run()}
-                        icon={Quote}
-                        isActive={editor.isActive('blockquote')}
-                    />
-                    <ToolbarSeparator />
-                    <ToolbarButton
-                        action={() => editor.chain().focus().setTextAlign('left').run()}
-                        icon={AlignLeft}
-                        isActive={editor.isActive({ textAlign: 'left' })}
-                    />
-                    <ToolbarButton
-                        action={() => editor.chain().focus().setTextAlign('center').run()}
-                        icon={AlignCenter}
-                        isActive={editor.isActive({ textAlign: 'center' })}
-                    />
-                    <ToolbarButton
-                        action={() => editor.chain().focus().setTextAlign('right').run()}
-                        icon={AlignRight}
-                        isActive={editor.isActive({ textAlign: 'right' })}
-                    />
-                    <ToolbarButton
-                        action={() => editor.chain().focus().setTextAlign('justify').run()}
-                        icon={AlignJustify}
-                        isActive={editor.isActive({ textAlign: 'justify' })}
-                    />
-                    <ToolbarSeparator />
-                    <ToolbarButton
-                        action={() => setLinkDialogOpen(true)}
-                        icon={LinkIcon}
-                        isActive={editor.isActive('link')}
-                    />
-                    <ToolbarButton
-                        action={() => setImageDialogOpen(true)}
-                        icon={ImageIcon}
-                    />
-                    <ToolbarButton
-                        action={() => setEmojiDialogOpen(true)}
-                        icon={Smile}
-                    />
-                    <ToolbarSeparator />
-                    <ToolbarButton
-                        action={() => editor.chain().focus().undo().run()}
-                        icon={Undo}
-                        disabled={!editor.can().chain().focus().undo().run()}
-                    />
-                    <ToolbarButton
-                        action={() => editor.chain().focus().redo().run()}
-                        icon={Redo}
-                        disabled={!editor.can().chain().focus().redo().run()}
-                    />
-                    <ToolbarSeparator />
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button type="button" variant="ghost" size="sm">
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                                onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-                                className="flex items-center gap-2"
-                            >
-                                <Code className="h-4 w-4" />
-                                Code Block
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+
+                    {/* Desktop-only tools - hidden on mobile */}
+                    <div className="hidden md:flex items-center gap-1">
+                        <ToolbarSeparator />
+                        <ToolbarButton
+                            action={() => editor.chain().focus().toggleBulletList().run()}
+                            icon={List}
+                            isActive={editor.isActive('bulletList')}
+                        />
+                        <ToolbarButton
+                            action={() => editor.chain().focus().toggleOrderedList().run()}
+                            icon={ListOrdered}
+                            isActive={editor.isActive('orderedList')}
+                        />
+                        <ToolbarButton
+                            action={() => editor.chain().focus().toggleBlockquote().run()}
+                            icon={Quote}
+                            isActive={editor.isActive('blockquote')}
+                        />
+                        <ToolbarSeparator />
+                        <ToolbarButton
+                            action={() => editor.chain().focus().setTextAlign('left').run()}
+                            icon={AlignLeft}
+                            isActive={editor.isActive({ textAlign: 'left' })}
+                        />
+                        <ToolbarButton
+                            action={() => editor.chain().focus().setTextAlign('center').run()}
+                            icon={AlignCenter}
+                            isActive={editor.isActive({ textAlign: 'center' })}
+                        />
+                        <ToolbarButton
+                            action={() => editor.chain().focus().setTextAlign('right').run()}
+                            icon={AlignRight}
+                            isActive={editor.isActive({ textAlign: 'right' })}
+                        />
+                        <ToolbarButton
+                            action={() => editor.chain().focus().setTextAlign('justify').run()}
+                            icon={AlignJustify}
+                            isActive={editor.isActive({ textAlign: 'justify' })}
+                        />
+                        <ToolbarSeparator />
+                        <ToolbarButton
+                            action={() => setLinkDialogOpen(true)}
+                            icon={LinkIcon}
+                            isActive={editor.isActive('link')}
+                        />
+                        <ToolbarButton
+                            action={() => setImageDialogOpen(true)}
+                            icon={ImageIcon}
+                        />
+                        <ToolbarButton
+                            action={() => setEmojiDialogOpen(true)}
+                            icon={Smile}
+                        />
+                        <ToolbarSeparator />
+                        <ToolbarButton
+                            action={() => editor.chain().focus().undo().run()}
+                            icon={Undo}
+                            disabled={!editor.can().chain().focus().undo().run()}
+                        />
+                        <ToolbarButton
+                            action={() => editor.chain().focus().redo().run()}
+                            icon={Redo}
+                            disabled={!editor.can().chain().focus().redo().run()}
+                        />
+                        <ToolbarSeparator />
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button type="button" variant="ghost" size="sm">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                    onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+                                    className="flex items-center gap-2"
+                                >
+                                    <Code className="h-4 w-4" />
+                                    Code Block
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+
+                    {/* Mobile-only "More" dropdown with all additional tools */}
+                    <div className="md:hidden ml-auto">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button type="button" variant="ghost" size="sm">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48">
+                                <DropdownMenuItem
+                                    onClick={() => editor.chain().focus().toggleBulletList().run()}
+                                    className="flex items-center gap-2"
+                                >
+                                    <List className="h-4 w-4" />
+                                    Bullet List
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                                    className="flex items-center gap-2"
+                                >
+                                    <ListOrdered className="h-4 w-4" />
+                                    Numbered List
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                                    className="flex items-center gap-2"
+                                >
+                                    <Quote className="h-4 w-4" />
+                                    Quote
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => editor.chain().focus().setTextAlign('left').run()}
+                                    className="flex items-center gap-2"
+                                >
+                                    <AlignLeft className="h-4 w-4" />
+                                    Align Left
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => editor.chain().focus().setTextAlign('center').run()}
+                                    className="flex items-center gap-2"
+                                >
+                                    <AlignCenter className="h-4 w-4" />
+                                    Align Center
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => editor.chain().focus().setTextAlign('right').run()}
+                                    className="flex items-center gap-2"
+                                >
+                                    <AlignRight className="h-4 w-4" />
+                                    Align Right
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+                                    className="flex items-center gap-2"
+                                >
+                                    <AlignJustify className="h-4 w-4" />
+                                    Justify
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => setLinkDialogOpen(true)}
+                                    className="flex items-center gap-2"
+                                >
+                                    <LinkIcon className="h-4 w-4" />
+                                    Insert Link
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => setImageDialogOpen(true)}
+                                    className="flex items-center gap-2"
+                                >
+                                    <ImageIcon className="h-4 w-4" />
+                                    Insert Image
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => setEmojiDialogOpen(true)}
+                                    className="flex items-center gap-2"
+                                >
+                                    <Smile className="h-4 w-4" />
+                                    Insert Emoji
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => editor.chain().focus().undo().run()}
+                                    disabled={!editor.can().chain().focus().undo().run()}
+                                    className="flex items-center gap-2"
+                                >
+                                    <Undo className="h-4 w-4" />
+                                    Undo
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => editor.chain().focus().redo().run()}
+                                    disabled={!editor.can().chain().focus().redo().run()}
+                                    className="flex items-center gap-2"
+                                >
+                                    <Redo className="h-4 w-4" />
+                                    Redo
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+                                    className="flex items-center gap-2"
+                                >
+                                    <Code className="h-4 w-4" />
+                                    Code Block
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                 </div>
                 <div className="p-3 min-h-[150px] cursor-text" onClick={() => editor?.chain().focus().run()}>
                     <EditorContent

@@ -11,6 +11,7 @@ use App\Traits\HasSlug;
 use App\Traits\Lockable;
 use App\Traits\Pinnable;
 use App\Traits\Readable;
+use App\Traits\Trendable;
 use App\Traits\Viewable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -49,11 +50,13 @@ use Laravel\Scout\Searchable;
  * @property-read int|null $posts_count
  * @property-read Collection<int, Read> $reads
  * @property-read int $reads_count
+ * @property-read float $trending_score
  * @property-read int $unique_views_count
  * @property-read Collection<int, View> $views
  * @property-read string|int $views_count
  *
  * @method static \Database\Factories\TopicFactory factory($count = null, $state = [])
+ * @method static Builder<static>|Topic hotTopics(?int $limit = null)
  * @method static Builder<static>|Topic latestActivity()
  * @method static Builder<static>|Topic locked()
  * @method static Builder<static>|Topic newModelQuery()
@@ -62,6 +65,9 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Topic pinned()
  * @method static Builder<static>|Topic query()
  * @method static Builder<static>|Topic read(?\App\Models\User $user = null)
+ * @method static Builder<static>|Topic risingTopics(?int $limit = null)
+ * @method static Builder<static>|Topic trending(?int $limit = null, ?\Illuminate\Support\Carbon $referenceTime = null)
+ * @method static Builder<static>|Topic trendingInTimeframe(string $timeframe = 'week', ?int $limit = null)
  * @method static Builder<static>|Topic unlocked()
  * @method static Builder<static>|Topic unread(?\App\Models\User $user = null)
  * @method static Builder<static>|Topic whereCreatedAt($value)
@@ -87,6 +93,7 @@ class Topic extends Model implements Sluggable
     use Pinnable;
     use Readable;
     use Searchable;
+    use Trendable;
     use Viewable;
 
     protected $fillable = [

@@ -170,7 +170,7 @@ export interface Invoice {
     created: number;
     due_date?: number;
     paid_at?: number;
-    metadata: Record<string, any>;
+    metadata: Record<string, unknown>;
 }
 
 export type InvoiceStatus = 'draft' | 'open' | 'paid' | 'uncollectible' | 'void';
@@ -380,12 +380,14 @@ export interface Topic {
     is_pinned: boolean;
     is_locked: boolean;
     views_count: number;
+    unique_views_count: number;
     order: number;
     posts_count: number;
     last_reply_at?: string | null;
     is_read_by_user: boolean;
     reads_count: number;
     is_hot: boolean;
+    trending_score: number;
     forum?: Forum;
     author: User;
     last_post?: Post;

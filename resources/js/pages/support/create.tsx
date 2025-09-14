@@ -11,6 +11,17 @@ import type { BreadcrumbItem, SupportTicketCategory } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { toast } from 'sonner';
 
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Support',
+        href: route('support.index'),
+    },
+    {
+        title: 'Create Ticket',
+        href: route('support.create'),
+    },
+];
+
 interface CreateSupportTicketProps {
     categories: SupportTicketCategory[];
 }
@@ -21,17 +32,6 @@ export default function CreateSupportTicket({ categories }: CreateSupportTicketP
         description: '',
         support_ticket_category_id: '',
     });
-
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Support',
-            href: route('support.index'),
-        },
-        {
-            title: 'Create Ticket',
-            href: route('support.create'),
-        },
-    ];
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -49,10 +49,10 @@ export default function CreateSupportTicket({ categories }: CreateSupportTicketP
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Create Support Ticket" />
+            <Head title="Create support ticket" />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <Heading
-                    title="Create Support Ticket"
+                    title="Create support ticket"
                     description="Need help? Create a support ticket and our team will get back to you as soon as possible."
                 />
 

@@ -20,6 +20,10 @@ class ShoppingCartService
 
     public function getCartItems(): array
     {
+        if (! $this->request->hasSession()) {
+            return [];
+        }
+
         $cart = $this->request->session()->get('shopping_cart', []);
 
         if (empty($cart)) {
@@ -42,6 +46,10 @@ class ShoppingCartService
 
     public function clearCart(): void
     {
+        if (! $this->request->hasSession()) {
+            return;
+        }
+
         $this->request->session()->forget('shopping_cart');
     }
 

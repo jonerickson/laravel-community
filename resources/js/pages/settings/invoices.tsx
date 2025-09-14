@@ -15,11 +15,11 @@ import { ArrowUpDown, ExternalLink, FileText } from 'lucide-react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Settings',
-        href: '/settings',
+        href: route('settings'),
     },
     {
         title: 'Orders',
-        href: '/settings/orders',
+        href: route('settings.invoices'),
     },
 ];
 

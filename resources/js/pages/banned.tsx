@@ -37,7 +37,7 @@ export default function Banned({ user, fingerprint, banReason, bannedAt, bannedB
 
     return (
         <AppLayout>
-            <Head title="Account Suspended" />
+            <Head title="Account suspended" />
 
             <div className="flex h-full min-h-[60vh] items-center justify-center">
                 <Card className="w-full max-w-2xl">

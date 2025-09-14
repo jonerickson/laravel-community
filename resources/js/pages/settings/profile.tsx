@@ -18,11 +18,11 @@ import SettingsLayout from '@/layouts/settings/layout';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Settings',
-        href: '/settings',
+        href: route('settings'),
     },
     {
         title: 'Account Information',
-        href: '/settings/account',
+        href: route('settings.profile.edit'),
     },
 ];
 

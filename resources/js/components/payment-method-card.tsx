@@ -45,7 +45,7 @@ export default function PaymentMethodCard({
     };
 
     return (
-        <Card className="w-full max-w-sm overflow-hidden p-0">
+        <Card className="w-full overflow-hidden p-0 sm:max-w-sm">
             <CardContent className="p-0">
                 <div className={`relative h-48 w-full bg-gradient-to-br ${getBrandColor(brand)} p-6 text-white shadow-lg`}>
                     <div className="absolute -top-8 -right-8 h-32 w-32 rounded-full bg-white/10"></div>
@@ -56,7 +56,7 @@ export default function PaymentMethodCard({
                         <div className="text-lg font-bold tracking-wider">{getBrandLogo(brand)}</div>
                     </div>
 
-                    <div className="mb-6 font-mono text-xl tracking-widest">•••• •••• •••• {last4}</div>
+                    <div className="mb-6 font-mono text-lg tracking-widest text-nowrap">•••• •••• •••• {last4}</div>
 
                     <div className="flex justify-between text-sm">
                         <div>

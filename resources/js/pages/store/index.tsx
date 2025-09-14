@@ -8,7 +8,7 @@ import { Head, WhenVisible } from '@inertiajs/react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Store',
-        href: '/store',
+        href: route('store.index'),
     },
 ];
 

@@ -48,7 +48,7 @@ use Laravel\Scout\Searchable;
  * @property int $created_by
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property \App\Enums\PostStatus $status
+ * @property \App\Enums\PublishableStatus $status
  * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Collection<int, Comment> $approvedComments
@@ -159,7 +159,7 @@ class Post extends Model implements Sluggable
     {
         return match ($this->type) {
             PostType::Blog => Str::slug($this->title),
-            PostType::Forum => null,
+            PostType::Forum => Str::of($this->content)->stripTags()->limit(20)->slug()->toString(),
         };
     }
 

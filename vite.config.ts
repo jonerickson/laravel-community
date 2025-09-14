@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import laravel from 'laravel-vite-plugin';
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
+import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 
 export default defineConfig({
     plugins: [
@@ -18,6 +19,7 @@ export default defineConfig({
         }),
         react(),
         tailwindcss(),
+        ViteImageOptimizer(),
     ],
     esbuild: {
         jsx: 'automatic',

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
-use App\Enums\PostStatus;
+use App\Enums\PublishableStatus;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -35,19 +35,19 @@ trait Publishable
 
     public function status(): Attribute
     {
-        return Attribute::get(function (): PostStatus {
+        return Attribute::get(function (): PublishableStatus {
             if ($this->isPublished()) {
-                return PostStatus::Published;
+                return PublishableStatus::Published;
             }
 
-            return PostStatus::Draft;
+            return PublishableStatus::Draft;
         })->shouldCache();
     }
 
     protected function initializePublishable(): void
     {
         $this->mergeCasts([
-            'status' => PostStatus::class,
+            'status' => PublishableStatus::class,
             'is_published' => 'boolean',
             'published_at' => 'datetime',
         ]);

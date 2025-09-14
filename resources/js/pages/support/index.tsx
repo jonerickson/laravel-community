@@ -12,22 +12,22 @@ import { Head, Link, router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Calendar, Clock, Flag, HelpCircle, Plus, Tag, Ticket, User } from 'lucide-react';
 
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Support',
+        href: route('support.index'),
+    },
+];
+
 interface SupportTicketsIndexProps {
     tickets: SupportTicket[];
     ticketsPagination: PaginatedData;
 }
 
 export default function SupportTicketsIndex({ tickets, ticketsPagination }: SupportTicketsIndexProps) {
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Support',
-            href: route('support.index'),
-        },
-    ];
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Support Tickets" />
+            <Head title="Support tickets" />
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center sm:gap-0">
                     <div className="flex items-start gap-4">
@@ -35,7 +35,7 @@ export default function SupportTicketsIndex({ tickets, ticketsPagination }: Supp
                             <HelpCircle className="h-6 w-6" />
                         </div>
                         <div className="-mb-6">
-                            <Heading title="Support Tickets" description="View and manage your support tickets" />
+                            <Heading title="Support tickets" description="View and manage your support tickets" />
                         </div>
                     </div>
 

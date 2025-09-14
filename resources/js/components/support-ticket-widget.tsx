@@ -1,7 +1,6 @@
 import HeadingSmall from '@/components/heading-small';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import type { SupportTicket } from '@/types';
 import { formatPriority, formatStatus, getPriorityVariant, getStatusVariant } from '@/utils/support-ticket';
@@ -18,9 +17,9 @@ export default function SupportTicketWidget({ tickets = [], className }: Support
     if (tickets.length === 0) {
         return (
             <div className={`relative ${className}`}>
-                <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                <div className="relative overflow-hidden rounded-xl border border-sidebar-border/70 py-12 dark:border-sidebar-border">
                     <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="relative flex items-center justify-center">
                         <div className="space-y-3 text-center">
                             <HeadingSmall title="Support Tickets" description="No active support tickets" />
                             <Button asChild variant="outline" size="sm">
@@ -37,32 +36,32 @@ export default function SupportTicketWidget({ tickets = [], className }: Support
     }
 
     return (
-        <Card className={className}>
-            <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <CardTitle className="flex items-center gap-2">
-                            <Ticket className="size-4" />
-                            Recent Support Tickets
-                        </CardTitle>
-                        <CardDescription>Your most recent active tickets</CardDescription>
-                    </div>
-                    <Button asChild variant="outline" size="sm">
-                        <Link href={route('support.index')}>View All</Link>
-                    </Button>
+        <div className={`space-y-4 ${className}`}>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="flex items-center gap-2 text-lg font-semibold">
+                        <Ticket className="size-4 text-info" />
+                        Recent Support Tickets
+                    </h2>
+                    <p className="text-sm text-muted-foreground">Your most recent active tickets</p>
                 </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
+                <Link href={route('support.index')} className="text-sm font-medium text-primary hover:underline">
+                    View all tickets
+                </Link>
+            </div>
+
+            <div className="space-y-3">
                 {tickets.slice(0, 3).map((ticket) => (
-                    <div
+                    <Link
                         key={ticket.id}
-                        className="flex items-start justify-between gap-3 rounded-lg border border-sidebar-border/50 bg-card/50 p-3 transition-colors hover:bg-card/80"
+                        href={route('support.show', ticket.id)}
+                        className="group block cursor-pointer rounded-lg border border-sidebar-border/50 bg-card/30 p-3 transition-all duration-200 hover:border-accent/30 hover:bg-accent/20 hover:shadow-sm"
                     >
-                        <div className="flex-1 space-y-1">
+                        <div className="space-y-1">
                             <div className="flex items-center gap-2">
-                                <Link href={route('support.show', ticket.id)} className="line-clamp-1 text-sm font-medium hover:underline">
+                                <span className="line-clamp-1 text-sm font-medium">
                                     #{ticket.id} - {ticket.subject}
-                                </Link>
+                                </span>
                             </div>
                             <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                 <div className="flex items-center gap-1">
@@ -78,7 +77,7 @@ export default function SupportTicketWidget({ tickets = [], className }: Support
                                 </Badge>
                             </div>
                         </div>
-                    </div>
+                    </Link>
                 ))}
 
                 {tickets.length > 3 && (
@@ -88,7 +87,7 @@ export default function SupportTicketWidget({ tickets = [], className }: Support
                         </Link>
                     </div>
                 )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 }

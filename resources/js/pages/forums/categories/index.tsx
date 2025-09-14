@@ -14,6 +14,13 @@ import { useState } from 'react';
 import { route } from 'ziggy-js';
 import usePermissions from '../../../hooks/use-permissions';
 
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Forums',
+        href: route('forums.index'),
+    },
+];
+
 interface ForumsIndexProps {
     categories: ForumCategory[];
 }
@@ -24,13 +31,6 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const allForums = categories.flatMap((category) => category.forums || []);
-
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Forums',
-            href: route('forums.index'),
-        },
-    ];
 
     const structuredData = {
         '@context': 'https://schema.org',

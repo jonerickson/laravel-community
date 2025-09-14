@@ -61,14 +61,14 @@ export default function ForumTopicCreate({ forum }: CreateTopicProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Forums - ${forum.name} - Create Topic`}>
+            <Head title={`Forums - ${forum.name} - Create topic`}>
                 <meta name="description" content={`Create topic in ${forum.name}`} />
                 <meta property="og:title" content={`Forums - ${forum.name} - Create Topic`} />
                 <meta property="og:description" content={`Create topic in ${forum.name}`} />
                 <meta property="og:type" content="website" />
             </Head>
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
-                <Heading title="Create New Topic" description={`Start a new discussion in ${forum.name}`} />
+                <Heading title="Create new topic" description={`Start a new discussion in ${forum.name}`} />
 
                 {can('create_topics') && (
                     <Card className="-mt-8">

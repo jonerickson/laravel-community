@@ -15,7 +15,7 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Store',
-            href: '/store',
+            href: route('store.index'),
         },
         {
             title: 'Categories',
@@ -60,7 +60,7 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`${category.name} - Store`}>
+            <Head title={`Store - ${category.name}`}>
                 <meta name="description" content={category.description || `Products in ${category.name} category`} />
                 <meta property="og:title" content={`${category.name} - Store`} />
                 <meta property="og:description" content={category.description || `Products in ${category.name} category`} />

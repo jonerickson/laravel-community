@@ -12,16 +12,20 @@ import { Head, Link, router } from '@inertiajs/react';
 import { ImageIcon, ShoppingCart as ShoppingCartIcon, Trash2, XIcon } from 'lucide-react';
 import { useState } from 'react';
 
-interface ShoppingCartProps {
-    cartItems: CartResponse['cartItems'];
-}
-
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Store',
-        href: '/store',
+        href: route('store.index'),
+    },
+    {
+        title: 'Shopping Cart',
+        href: route('store.cart.index'),
     },
 ];
+
+interface ShoppingCartProps {
+    cartItems: CartResponse['cartItems'];
+}
 
 export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
     const { items, updateQuantity, removeItem, clearCart, calculateTotals, loading } = useCartOperations(cartItems);

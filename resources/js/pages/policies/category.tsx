@@ -14,17 +14,17 @@ export default function PolicyCategoryShow({ category, policies }: PoliciesCateg
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Policies',
-            href: '/policies',
+            href: route('policies.index'),
         },
         {
             title: category.name,
-            href: `/policies/${category.slug}`,
+            href: route('policies.categories.show', { category: category.slug }),
         },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`${category.name} - Policies`} />
+            <Head title={`Policies - ${category.name}`} />
             <div className="flex h-full flex-1 flex-col overflow-x-auto">
                 <Heading title={category.name} description={category.description || `Browse ${category.name.toLowerCase()} and related documents`} />
 

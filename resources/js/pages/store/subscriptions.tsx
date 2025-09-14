@@ -17,11 +17,11 @@ import { toast } from 'sonner';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Store',
-        href: '/store',
+        href: route('store.index'),
     },
     {
         title: 'Subscriptions',
-        href: '/subscriptions',
+        href: route('store.subscriptions'),
     },
 ];
 

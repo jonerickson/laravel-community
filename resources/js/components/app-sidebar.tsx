@@ -81,16 +81,7 @@ const storeNavItems: NavItem[] = [
     },
 ];
 
-const adminNavItems: NavItem[] = [
-    {
-        title: 'Admin Panel',
-        href: '/admin',
-        icon: TowerControl,
-        target: '_blank',
-    },
-];
-
-const footerNavItems: NavItem[] = [
+const supportNavItems: NavItem[] = [
     {
         title: 'Policies',
         href: () => route('policies.index'),
@@ -102,6 +93,17 @@ const footerNavItems: NavItem[] = [
         icon: BookOpen,
     },
 ];
+
+const adminNavItems: NavItem[] = [
+    {
+        title: 'Admin Panel',
+        href: '/admin',
+        icon: TowerControl,
+        target: '_blank',
+    },
+];
+
+const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
     const { isAdmin } = usePage<SharedData>().props.auth;
@@ -124,6 +126,7 @@ export function AppSidebar() {
                 <NavMain title="Platform" items={mainNavItems} />
                 <NavMain title="Account" items={accountNavItems} />
                 <NavMain title="Store" items={storeNavItems} />
+                <NavMain title="Support" items={supportNavItems} />
                 {isAdmin && <NavMain title="Administration" items={adminNavItems} />}
             </SidebarContent>
 

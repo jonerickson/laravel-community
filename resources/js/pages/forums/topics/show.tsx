@@ -182,7 +182,7 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`${topic.title} - ${forum.name} - Forums`}>
+            <Head title={`Forums - ${forum.name} - ${topic.title}`}>
                 <meta name="description" content={topic.description || `Discussion topic: ${topic.title}`} />
                 <meta property="og:title" content={`${topic.title} - ${forum.name} - Forums`} />
                 <meta property="og:description" content={topic.description || `Discussion topic: ${topic.title}`} />

@@ -13,11 +13,11 @@ export default function StoreProductShow({ product, reviews, reviewsPagination }
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Store',
-            href: '/store',
+            href: route('store.index'),
         },
         {
             title: product.name,
-            href: `/store/products/${product.slug}`,
+            href: route('store.products.show', { product: product.slug }),
         },
     ];
 

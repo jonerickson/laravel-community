@@ -16,11 +16,11 @@ import SettingsLayout from '@/layouts/settings/layout';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Settings',
-        href: '/settings',
+        href: route('settings'),
     },
     {
         title: 'Billing Information',
-        href: '/settings/billing',
+        href: route('settings.billing'),
     },
 ];
 
