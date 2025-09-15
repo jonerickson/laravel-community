@@ -57,12 +57,13 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
     const pageNumbers = getPageNumbers();
 
     return (
-        <div className={`flex items-center justify-between ${className}`}>
+        <div className={`flex flex-col md:flex-row items-center justify-between gap-4 ${className || ''}`}>
             <div className="hidden md:block text-sm text-muted-foreground">
                 Showing {((current_page - 1) * per_page) + 1} to {Math.min(current_page * per_page, total)} of {total} {pluralize(entityLabel, total)}
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 w-full md:w-auto justify-center overflow-x-auto">
+                {/* Previous Button */}
                 {current_page > 1 ? (
                     <Link
                         href={`${baseUrl}?page=${current_page - 1}`}
@@ -80,6 +81,7 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
                     </Button>
                 )}
 
+                {/* Page Numbers */}
                 {pageNumbers.map((page, index) => (
                     page === '...' ? (
                         <span key={`ellipsis-${index}`} className="px-3 py-2 text-sm text-muted-foreground">
@@ -102,6 +104,7 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
                     )
                 ))}
 
+                {/* Next Button */}
                 {current_page < last_page ? (
                     <Link
                         href={`${baseUrl}?page=${current_page + 1}`}

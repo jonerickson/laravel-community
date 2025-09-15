@@ -19,7 +19,7 @@ export default function BlogPostsGrid({ posts = [], className }: BlogPostsGridPr
                     <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                     <div className="relative flex items-center justify-center">
                         <div className="space-y-3 text-center">
-                            <HeadingSmall title="Latest Blog Posts" description="No blog posts available right now" />
+                            <HeadingSmall title="Latest blog posts" description="No blog posts available right now" />
                             <Button asChild variant="outline" size="sm">
                                 <Link href={route('blog.index')}>
                                     <BookOpen className="size-4" />
@@ -39,7 +39,7 @@ export default function BlogPostsGrid({ posts = [], className }: BlogPostsGridPr
                 <div>
                     <h2 className="flex items-center gap-2 text-lg font-semibold">
                         <Rss className="size-4 text-success" />
-                        Latest Blog Posts
+                        Latest blog posts
                     </h2>
                     <p className="text-sm text-muted-foreground">Stay updated with our latest articles and insights</p>
                 </div>

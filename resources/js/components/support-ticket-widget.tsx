@@ -41,7 +41,7 @@ export default function SupportTicketWidget({ tickets = [], className }: Support
                 <div>
                     <h2 className="flex items-center gap-2 text-lg font-semibold">
                         <Ticket className="size-4 text-info" />
-                        Recent Support Tickets
+                        Recent support tickets
                     </h2>
                     <p className="text-sm text-muted-foreground">Your most recent active tickets</p>
                 </div>

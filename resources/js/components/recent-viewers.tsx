@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { formatDistanceToNow } from 'date-fns';
-import { Eye } from 'lucide-react';
 
 interface RecentViewer {
     user: {
@@ -24,10 +23,7 @@ export default function RecentViewers({ viewers }: RecentViewersProps) {
     return (
         <Card>
             <CardContent className="pt-0">
-                <CardTitle className="flex items-center gap-2 text-base">
-                    <Eye className="size-4" />
-                    Recently Viewed
-                </CardTitle>
+                <CardTitle className="flex items-center gap-2 text-base">Recently viewed</CardTitle>
                 <div className="mt-4 flex flex-wrap gap-2">
                     {viewers.map((viewer) => (
                         <div key={viewer.user.id} className="flex items-center gap-2 rounded-md bg-muted/50 p-2 text-sm">

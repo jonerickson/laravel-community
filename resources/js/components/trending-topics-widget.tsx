@@ -20,7 +20,7 @@ export default function TrendingTopicsWidget({ topics = [], className }: Trendin
                     <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                     <div className="relative flex items-center justify-center">
                         <div className="space-y-3 text-center">
-                            <HeadingSmall title="Trending Topics" description="No trending topics right now" />
+                            <HeadingSmall title="Trending topics" description="No trending topics right now" />
                             <Button asChild variant="outline" size="sm">
                                 <Link href={route('forums.index')}>
                                     <TrendingUp className="size-4" />
@@ -54,7 +54,7 @@ export default function TrendingTopicsWidget({ topics = [], className }: Trendin
                 <div>
                     <h2 className="flex items-center gap-2 text-lg font-semibold">
                         <Flame className="size-4 text-orange-400" />
-                        Trending Topics
+                        Trending topics
                     </h2>
                     <p className="text-sm text-muted-foreground">The most engaging forum discussions right now</p>
                 </div>
