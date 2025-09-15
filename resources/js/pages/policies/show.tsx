@@ -30,7 +30,7 @@ export default function PolicyShow({ category, policy }: PoliciesShowProps) {
             <Head title={`Policies - ${category.name} - ${policy.title}`} />
             <div className="flex h-full flex-1 flex-col overflow-x-auto">
                 <div className="mb-8">
-                    <div className="-mb-4">
+                    <div className="-mb-7">
                         <Heading title={policy.title} />
                     </div>
 
