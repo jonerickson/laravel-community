@@ -9,12 +9,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { Comment, PaginatedData, Product as ProductType, SharedData } from '@/types';
 import { Deferred, useForm, usePage } from '@inertiajs/react';
-import { CurrencyIcon, GlobeIcon, ImageIcon } from 'lucide-react';
+import { ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const policies = [
-    { name: 'International delivery', icon: GlobeIcon, description: 'Get your order in 2 years' },
-    { name: 'Loyalty rewards', icon: CurrencyIcon, description: "Don't look at other tees" },
+//     { name: 'International delivery', icon: GlobeIcon, description: 'Get your order in 2 years' },
+//     { name: 'Loyalty rewards', icon: CurrencyIcon, description: "Don't look at other tees" },
 ];
 
 interface ProductProps {
