@@ -51,7 +51,7 @@ export function StoreProductRating({ product, onRatingAdded }: ProductRatingProp
         <div className="space-y-4">
             <div className="space-y-3">
                 <div>
-                    <label className="mb-2 block text-sm font-medium">Add Rating</label>
+                    <label className="mb-2 block text-sm font-medium">Add rating</label>
                     <div className="flex items-center gap-1">
                         {Array.from({ length: 5 }, (_, index) => {
                             const starValue = index + 1;

@@ -12,6 +12,7 @@ use App\Models\Fingerprint;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\UserSocial;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -25,6 +26,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Flex;
@@ -32,6 +34,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
+use Filament\Support\Enums\Size;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -119,6 +122,39 @@ class UserResource extends Resource
                                 RichEditor::make('signature')
                                     ->nullable(),
                             ]),
+                        Section::make('Integrations')
+                            ->columnSpanFull()
+                            ->collapsible()
+                            ->persistCollapsed()
+                            ->components([
+                                RepeatableEntry::make('socials')
+                                    ->hiddenLabel()
+                                    ->columns(3)
+                                    ->contained(false)
+                                    ->components([
+                                        TextEntry::make('provider')
+                                            ->formatStateUsing(fn($state) => Str::ucfirst($state)),
+                                        TextEntry::make('provider_name')
+                                            ->copyable()
+                                            ->label('Provider Name'),
+                                        TextEntry::make('provider_id')
+                                            ->hintAction(
+                                                Action::make('delete')
+                                                    ->color('danger')
+                                                    ->size(Size::ExtraSmall)
+                                                    ->requiresConfirmation()
+                                                    ->successNotificationTitle('The integration has been removed.')
+                                                    ->modalSubmitActionLabel('Delete')
+                                                    ->modalHeading('Remove Integration')
+                                                    ->action(function (Action $action, User $record) {
+                                                        //$record->delete();
+                                                        $action->success();
+                                                    })
+                                            )
+                                            ->label('Provider ID')
+                                            ->copyable(),
+                                    ])
+                            ])
                     ]),
                 Group::make()
                     ->components([
@@ -157,9 +193,7 @@ class UserResource extends Resource
                         Section::make('Activity')
                             ->collapsible()
                             ->persistCollapsed()
-                            ->components([
-
-                            ]),
+                            ->components([]),
                     ]),
             ]);
     }

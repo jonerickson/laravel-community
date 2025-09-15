@@ -102,7 +102,7 @@ This is a Laravel + React application built using the Laravel React Starter Kit.
 - Uses modern React patterns with hooks and functional components
 - Git hooks in `.githooks/` directory ensure code quality and consistent formatting across the team
 - Events do not need manually registering in Laravel 12.
-- 
+
 ### React Component Guidelines
 - Always create individual, reusable components for UI elements rather than inline JSX
 - Focus on composability - components should be easily combined and reused
@@ -112,6 +112,8 @@ This is a Laravel + React application built using the Laravel React Starter Kit.
 - Always use Lucide React icons instead of Heroicons or other icon libraries
 - Always use the `apiRequest` wrapper from `@/utils/api` for API calls instead of direct axios calls
 - Import and use proper error handling: `import { ApiError, apiRequest } from '@/utils/api';`
+- All headings should be sentence case
+- All buttons should be sentence case unless a part of a page header or with an icon.
 
 ### Laravel Development Guidelines
 - Always use Facades instead of helper functions (e.g., `Auth::id()` not `auth()->id()`)
@@ -364,7 +366,6 @@ Forms\Components\Select::make('user_id')
 - Table columns: `Tables/Columns/`
 - Table filters: `Tables/Filters/`
 - Actions: `Actions/`
-
 
 === inertia-laravel/core rules ===
 

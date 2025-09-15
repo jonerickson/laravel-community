@@ -101,7 +101,7 @@ export default function Product({ product: productData, reviews, reviewsPaginati
 
                                         {auth?.user && (
                                             <div className="border-t border-muted pt-6">
-                                                <h3 className="mb-4 text-lg font-medium">Write a Review</h3>
+                                                <h3 className="mb-4 text-lg font-medium">Write a review</h3>
                                                 <StoreProductRating
                                                     product={productData}
                                                     onRatingAdded={() => {
