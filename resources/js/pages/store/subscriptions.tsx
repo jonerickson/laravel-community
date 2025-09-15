@@ -136,7 +136,7 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
                         <ul className="space-y-2">
                             {plan.features.map((feature, index) => (
                                 <li key={index} className="flex items-start">
-                                    <Check className="mt-0.5 mr-3 h-4 w-4 flex-shrink-0 text-success" />
+                                    <Check className="mt-0.5 mr-3 size-4 flex-shrink-0 text-success" />
                                     <span className="text-sm">{feature}</span>
                                 </li>
                             ))}
@@ -147,7 +147,7 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
                 <div className="mt-auto pt-4">
                     {plan.current ? (
                         <Button className="w-full" variant="outline" disabled>
-                            <Check className="mr-2 h-4 w-4" />
+                            <Check className="mr-2 size-4" />
                             Current plan
                         </Button>
                     ) : (
@@ -158,12 +158,12 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
                         >
                             {loading ? (
                                 <>
-                                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-b-transparent" />
+                                    <div className="mr-2 size-4 animate-spin rounded-full border-2 border-current border-b-transparent" />
                                     Processing...
                                 </>
                             ) : plan.popular ? (
                                 <>
-                                    <Rocket className="mr-2 h-4 w-4" />
+                                    <Rocket className="mr-2 size-4" />
                                     Upgrade now
                                 </>
                             ) : !priceId ? (

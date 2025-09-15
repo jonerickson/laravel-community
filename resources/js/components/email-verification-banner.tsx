@@ -25,7 +25,7 @@ export function EmailVerificationBanner() {
         <div className="border-b border-warning/30 bg-warning-foreground px-4 py-3">
             <div className="mx-auto flex max-w-7xl items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <Mail className="h-5 w-5 text-amber-800" />
+                    <Mail className="size-5 text-amber-800" />
                     <div className="text-sm">
                         <span className="font-medium text-amber-800">Please verify your email address.</span>
                         <span className="ml-2 text-amber-700">Check your inbox for a verification link.</span>
@@ -42,7 +42,7 @@ export function EmailVerificationBanner() {
                         {processing ? 'Sending...' : 'Resend'}
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => setDismissed(true)} className="text-amber-800 hover:bg-warning/10">
-                        <X className="h-4 w-4" />
+                        <X className="size-4" />
                     </Button>
                 </div>
             </div>

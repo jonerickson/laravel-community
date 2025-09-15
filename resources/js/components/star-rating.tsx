@@ -10,9 +10,9 @@ interface StarRatingProps {
 }
 
 const sizeClasses = {
-    sm: 'h-3 w-3',
-    md: 'h-4 w-4',
-    lg: 'h-5 w-5',
+    sm: 'size-3',
+    md: 'size-4',
+    lg: 'size-5',
 };
 
 export function StarRating({ rating, maxRating = 5, size = 'md', showValue = false, className }: StarRatingProps) {

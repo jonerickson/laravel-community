@@ -79,7 +79,7 @@ export default function PaymentMethodCard({
                         </div>
                         {isDefault && (
                             <Badge variant="secondary">
-                                <Star className="mr-1 h-3 w-3" />
+                                <Star className="mr-1 size-3" />
                                 Default
                             </Badge>
                         )}
@@ -87,18 +87,18 @@ export default function PaymentMethodCard({
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
-                                <MoreVertical className="h-4 w-4" />
+                                <MoreVertical className="size-4" />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             {!isDefault && (
                                 <DropdownMenuItem onClick={onSetDefault}>
-                                    <Star className="mr-2 h-4 w-4" />
+                                    <Star className="mr-2 size-4" />
                                     Set as default
                                 </DropdownMenuItem>
                             )}
                             <DropdownMenuItem onClick={onDelete} className="text-destructive">
-                                <Trash2 className="mr-2 h-4 w-4 text-destructive" />
+                                <Trash2 className="mr-2 size-4 text-destructive" />
                                 Remove
                             </DropdownMenuItem>
                         </DropdownMenuContent>

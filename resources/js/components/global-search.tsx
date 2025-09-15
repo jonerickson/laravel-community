@@ -206,7 +206,7 @@ export function GlobalSearch() {
                                 <TooltipContent>Topics</TooltipContent>
                                 <TooltipTrigger asChild>
                                     <div className="flex items-center gap-1">
-                                        <MessageSquare className="mr-1 h-3 w-3" />
+                                        <MessageSquare className="mr-1 size-3" />
                                         <span className="hidden sm:block">Topics</span>
                                     </div>
                                 </TooltipTrigger>
@@ -222,7 +222,7 @@ export function GlobalSearch() {
                                 <TooltipContent>Posts</TooltipContent>
                                 <TooltipTrigger asChild>
                                     <div className="flex items-center gap-1">
-                                        <FileText className="mr-1 h-3 w-3" />
+                                        <FileText className="mr-1 size-3" />
                                         <span className="hidden sm:block">Posts</span>
                                     </div>
                                 </TooltipTrigger>
@@ -238,7 +238,7 @@ export function GlobalSearch() {
                                 <TooltipContent>Policies</TooltipContent>
                                 <TooltipTrigger asChild>
                                     <div className="flex items-center gap-1">
-                                        <Shield className="mr-1 h-3 w-3" />
+                                        <Shield className="mr-1 size-3" />
                                         <span className="hidden sm:block">Policies</span>
                                     </div>
                                 </TooltipTrigger>
@@ -254,7 +254,7 @@ export function GlobalSearch() {
                                 <TooltipContent>Products</TooltipContent>
                                 <TooltipTrigger asChild>
                                     <div className="flex items-center gap-1">
-                                        <ShoppingBag className="mr-1 h-3 w-3" />
+                                        <ShoppingBag className="mr-1 size-3" />
                                         <span className="hidden sm:block">Products</span>
                                     </div>
                                 </TooltipTrigger>
@@ -262,9 +262,9 @@ export function GlobalSearch() {
                         </Toggle>
                         <CollapsibleTrigger asChild>
                             <Button variant="ghost" size="sm" className="ml-2 h-7 px-2 text-xs">
-                                <Calendar className="mr-1 h-3 w-3" />
+                                <Calendar className="mr-1 size-3" />
                                 Date Filters
-                                <ChevronDown className="ml-1 h-3 w-3" />
+                                <ChevronDown className="ml-1 size-3" />
                             </Button>
                         </CollapsibleTrigger>
                     </div>
@@ -358,7 +358,7 @@ export function GlobalSearch() {
                                         onSelect={() => handleSelect(result.url)}
                                         className="flex items-start gap-3 py-3"
                                     >
-                                        <Icon className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                                        <Icon className="mt-0.5 size-4 text-muted-foreground" />
                                         <div className="flex-1 space-y-1">
                                             <div className="flex items-center gap-2">
                                                 <div className="leading-none font-medium">{result.title}</div>
@@ -378,7 +378,7 @@ export function GlobalSearch() {
                                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                 {result.author_name && (
                                                     <div className="flex items-center gap-1">
-                                                        <User className="h-3 w-3" />
+                                                        <User className="size-3" />
                                                         {result.author_name}
                                                     </div>
                                                 )}
@@ -392,7 +392,7 @@ export function GlobalSearch() {
                                                 {result.effective_at ||
                                                     (result.created_at && (
                                                         <div className="flex items-center gap-1">
-                                                            <Calendar className="h-3 w-3" />
+                                                            <Calendar className="size-3" />
                                                             {formatDate(result.effective_at || result.created_at)}
                                                         </div>
                                                     ))}

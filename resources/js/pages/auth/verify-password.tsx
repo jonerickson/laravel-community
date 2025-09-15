@@ -30,7 +30,7 @@ export default function AuthVerifyPassword({ status }: VerifyPasswordProps) {
 
             <form onSubmit={submit} className="space-y-6 text-center">
                 <Button disabled={processing} variant="secondary">
-                    {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                    {processing && <LoaderCircle className="size-4 animate-spin" />}
                     Resend verification email
                 </Button>
 

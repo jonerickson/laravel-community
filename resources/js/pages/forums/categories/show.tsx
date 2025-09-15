@@ -117,7 +117,7 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                                                     className="flex h-10 w-10 items-center justify-center rounded-lg text-white"
                                                     style={{ backgroundColor: forum.color }}
                                                 >
-                                                    <MessageSquare className="h-5 w-5" />
+                                                    <MessageSquare className="size-5" />
                                                 </div>
                                                 <div className="min-w-0 flex-1">
                                                     <div className="mb-1">
@@ -134,13 +134,13 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                                         </TableCell>
                                         <TableCell className="p-4 text-center">
                                             <div className="flex items-center justify-center gap-1">
-                                                <MessageSquare className="h-4 w-4" />
+                                                <MessageSquare className="size-4" />
                                                 <span>{forum.topics_count || 0}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="p-4 text-center">
                                             <div className="flex items-center justify-center gap-1">
-                                                <Users className="h-4 w-4" />
+                                                <Users className="size-4" />
                                                 <span>{forum.posts_count || 0}</span>
                                             </div>
                                         </TableCell>
@@ -159,7 +159,7 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                                                         </Link>
                                                     </div>
                                                     <div className="flex items-center justify-end gap-2 text-xs text-muted-foreground">
-                                                        <Avatar className="h-4 w-4">
+                                                        <Avatar className="size-4">
                                                             <AvatarFallback className="text-xs">
                                                                 {forum.latest_topics[0].author?.name?.charAt(0).toUpperCase() || 'U'}
                                                             </AvatarFallback>

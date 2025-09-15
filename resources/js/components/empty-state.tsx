@@ -26,7 +26,7 @@ export function EmptyState({ icon, title, description, buttonText, onButtonClick
                 {onButtonClick && buttonText && (
                     <div className="mt-6">
                         <Button onClick={onButtonClick}>
-                            <Plus className="mr-2 h-4 w-4" />
+                            <Plus className="mr-2 size-4" />
                             {buttonText}
                         </Button>
                     </div>

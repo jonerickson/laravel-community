@@ -91,7 +91,7 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumS
                     <DialogDescription>Choose which forum you'd like to create a new topic in.</DialogDescription>
                 </DialogHeader>
                 <div className="relative">
-                    <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         ref={inputRef}
                         placeholder="Search forums..."
@@ -119,7 +119,7 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumS
                                             className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg text-white"
                                             style={{ backgroundColor: forum.color }}
                                         >
-                                            <MessageSquare className="h-5 w-5" />
+                                            <MessageSquare className="size-5" />
                                         </div>
                                         <div className="min-w-0 flex-1">
                                             <div className="text-sm font-medium">{forum.name}</div>

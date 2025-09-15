@@ -49,7 +49,7 @@ export default function PolicyCategoryShow({ category, policies }: PoliciesCateg
                                         <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
                                             {policy.effective_at && (
                                                 <div className="flex items-center gap-1">
-                                                    <Calendar className="h-4 w-4" />
+                                                    <Calendar className="size-4" />
                                                     <span>Effective {new Date(policy.effective_at).toLocaleDateString()}</span>
                                                 </div>
                                             )}

@@ -47,7 +47,7 @@ export default function DashboardProductCard({ product, type, className }: Dashb
             <CardHeader className="relative pb-2">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <IconComponent className="h-4 w-4 text-muted-foreground" />
+                        <IconComponent className="size-4 text-muted-foreground" />
                         <span className="text-sm font-medium text-muted-foreground">{config.title}</span>
                     </div>
                     <Badge variant={config.badgeVariant} className="text-xs">
@@ -81,7 +81,7 @@ export default function DashboardProductCard({ product, type, className }: Dashb
 
                         {product.rating && (
                             <div className="flex items-center gap-1">
-                                <StarIcon className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                <StarIcon className="size-4 fill-yellow-400 text-yellow-400" />
                                 <span className="text-sm text-muted-foreground">{product.rating.toFixed(1)}</span>
                             </div>
                         )}

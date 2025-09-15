@@ -49,7 +49,7 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                         </time>
 
                         <div className="flex items-center gap-1 text-muted-foreground">
-                            <Eye className="h-3 w-3" />
+                            <Eye className="size-3" />
                             <span>
                                 {post.views_count} {pluralize('view', post.views_count)}
                             </span>
@@ -57,7 +57,7 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
 
                         {can('view_any_comments') && post.comments_enabled && (
                             <div className="flex items-center gap-1 text-muted-foreground">
-                                <MessageCircle className="h-3 w-3" />
+                                <MessageCircle className="size-3" />
                                 <span>
                                     {post.comments_count} {pluralize('comment', post.comments_count)}
                                 </span>
@@ -66,7 +66,7 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
 
                         {post.reading_time && (
                             <div className="flex items-center gap-1 text-muted-foreground">
-                                <Clock className="h-3 w-3" />
+                                <Clock className="size-3" />
                                 <span>{post.reading_time} min read</span>
                             </div>
                         )}

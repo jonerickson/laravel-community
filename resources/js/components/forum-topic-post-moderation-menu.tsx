@@ -115,7 +115,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <MoreHorizontal className="h-4 w-4" />
+                    <MoreHorizontal className="size-4" />
                     <span className="sr-only">Open menu</span>
                 </Button>
             </DropdownMenuTrigger>
@@ -129,7 +129,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                                 post: post.slug,
                             })}
                         >
-                            <Edit className="mr-2 h-4 w-4" />
+                            <Edit className="mr-2 size-4" />
                             Edit Post
                         </Link>
                     </DropdownMenuItem>
@@ -138,7 +138,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                 {can('report_posts') && (
                     <ReportDialog reportableType="App\Models\Post" reportableId={post.id}>
                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <Flag className="mr-2 h-4 w-4" />
+                            <Flag className="mr-2 size-4" />
                             Report Post
                         </DropdownMenuItem>
                     </ReportDialog>
@@ -148,12 +148,12 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                     <DropdownMenuItem onClick={handleTogglePin} disabled={pinLoading}>
                         {post.is_pinned ? (
                             <>
-                                <PinOff className="mr-2 h-4 w-4" />
+                                <PinOff className="mr-2 size-4" />
                                 Unpin Post
                             </>
                         ) : (
                             <>
-                                <Pin className="mr-2 h-4 w-4" />
+                                <Pin className="mr-2 size-4" />
                                 Pin Post
                             </>
                         )}
@@ -164,12 +164,12 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                     <DropdownMenuItem onClick={handleTogglePublish}>
                         {post.is_published ? (
                             <>
-                                <EyeOff className="mr-2 h-4 w-4" />
+                                <EyeOff className="mr-2 size-4" />
                                 Unpublish Post
                             </>
                         ) : (
                             <>
-                                <Eye className="mr-2 h-4 w-4" />
+                                <Eye className="mr-2 size-4" />
                                 Publish Post
                             </>
                         )}
@@ -178,7 +178,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
 
                 {can('delete_posts') && (
                     <DropdownMenuItem onClick={handleDeletePost} className="text-destructive focus:text-destructive">
-                        <Trash className="mr-2 h-4 w-4 text-destructive" />
+                        <Trash className="mr-2 size-4 text-destructive" />
                         Delete Post
                     </DropdownMenuItem>
                 )}

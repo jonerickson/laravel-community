@@ -52,7 +52,7 @@ export default function Banned({ user, fingerprint, banReason, bannedAt, bannedB
                     <CardContent className="space-y-6">
                         <div className="rounded-lg border border-destructive/10 bg-destructive-foreground p-4">
                             <div className="flex items-start gap-3">
-                                <AlertTriangleIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-destructive" />
+                                <AlertTriangleIcon className="mt-0.5 size-5 flex-shrink-0 text-destructive" />
                                 <div className="space-y-2">
                                     <h3 className="font-semibold text-destructive">Ban Details</h3>
                                     <div className="space-y-1 text-sm text-destructive">
@@ -112,7 +112,7 @@ export default function Banned({ user, fingerprint, banReason, bannedAt, bannedB
                                 className="flex-1"
                                 onClick={() => window.open('mailto:support@mountaininteractive.com', '_blank')}
                             >
-                                <MailIcon className="mr-2 h-4 w-4" />
+                                <MailIcon className="mr-2 size-4" />
                                 Contact Support
                             </Button>
                             <Button variant="outline" className="flex-1" onClick={() => window.open('/policies', '_blank')}>

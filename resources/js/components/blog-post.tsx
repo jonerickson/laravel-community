@@ -66,14 +66,14 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
                     )}
 
                     <div className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" aria-hidden="true" />
+                        <Calendar className="size-4" aria-hidden="true" />
                         <time dateTime={post.published_at || post.created_at} itemProp="datePublished" aria-label={`Published on ${formattedDate}`}>
                             {formattedDate}
                         </time>
                     </div>
 
                     <div className="flex items-center gap-1">
-                        <Eye className="h-4 w-4" aria-hidden="true" />
+                        <Eye className="size-4" aria-hidden="true" />
                         <span aria-label={`Total views: ${post.views_count} views`}>
                             {post.views_count} {pluralize('view', post.views_count)}
                         </span>
@@ -81,7 +81,7 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
 
                     {post.comments_enabled && can('view_any_comments') && (
                         <div className="flex items-center gap-1">
-                            <MessageSquare className="h-4 w-4" aria-hidden="true" />
+                            <MessageSquare className="size-4" aria-hidden="true" />
                             <span aria-label={`Total comments: ${post.comments_count} comments`}>
                                 {post.comments_count} {pluralize('comment', post.comments_count)}
                             </span>
@@ -90,7 +90,7 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
 
                     {post.reading_time && (
                         <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" aria-hidden="true" />
+                            <Clock className="size-4" aria-hidden="true" />
                             <span aria-label={`Estimated reading time: ${post.reading_time} minutes`}>{post.reading_time} min read</span>
                         </div>
                     )}

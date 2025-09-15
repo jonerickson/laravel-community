@@ -164,12 +164,12 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center">
                                     <Button variant="ghost" size="sm" onClick={() => onReply(comment.id)} className="h-auto p-1 text-xs">
-                                        <Reply className="mr-1 h-3 w-3" />
+                                        <Reply className="mr-1 size-3" />
                                         Reply
                                     </Button>
                                     {can('update_comments') && (
                                         <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="h-auto p-1 text-xs">
-                                            <Edit className="mr-1 h-3 w-3" />
+                                            <Edit className="mr-1 size-3" />
                                             Edit
                                         </Button>
                                     )}
@@ -181,7 +181,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                                             disabled={deleting}
                                             className="h-auto p-1 text-xs text-destructive hover:text-destructive"
                                         >
-                                            <Trash className="mr-1 h-3 w-3" />
+                                            <Trash className="mr-1 size-3" />
                                             {deleting ? 'Deleting...' : 'Delete'}
                                         </Button>
                                     )}
@@ -269,7 +269,7 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
         return (
             <div className="space-y-6">
                 <div className="flex items-center gap-2">
-                    <MessageCircle className="h-5 w-5" />
+                    <MessageCircle className="size-5" />
                     <HeadingSmall title="Comments" />
                 </div>
                 <div className="py-8 text-center text-muted-foreground">
@@ -283,7 +283,7 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-2">
-                <MessageCircle className="h-5 w-5" />
+                <MessageCircle className="size-5" />
                 <HeadingSmall title={`Comments (${comments.length || 0})`} />
             </div>
 

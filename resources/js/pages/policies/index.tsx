@@ -39,7 +39,7 @@ export default function PolicyCategoryIndex({ categories }: PoliciesIndexProps) 
                                         </CardTitle>
                                         {category.description && <CardDescription className="mt-1">{category.description}</CardDescription>}
                                         <div className="mt-3 flex items-center gap-1 text-sm text-muted-foreground">
-                                            <FileText className="h-4 w-4" />
+                                            <FileText className="size-4" />
                                             <span>
                                                 {category.active_policies?.length || 0} {pluralize('policy', category.active_policies?.length || 0)}
                                             </span>

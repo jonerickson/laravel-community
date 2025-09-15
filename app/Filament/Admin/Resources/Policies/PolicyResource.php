@@ -16,6 +16,7 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
@@ -67,6 +68,10 @@ class PolicyResource extends Resource
                                 TextInput::make('version')
                                     ->nullable()
                                     ->maxLength(255),
+                                Textarea::make('description')
+                                    ->columnSpanFull()
+                                    ->nullable()
+                                    ->maxLength(65535),
                                 RichEditor::make('content')
                                     ->required()
                                     ->columnSpanFull(),

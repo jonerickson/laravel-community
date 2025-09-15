@@ -193,12 +193,13 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto">
-                <div className="flex flex-col items-start justify-between sm:flex-row">
-                    <div className="mb-4 flex w-full items-center justify-between gap-2">
+                <div className="flex flex-col items-start justify-between gap-2 sm:flex-row">
+                    <div className="mb-4 flex w-full items-start justify-between gap-2">
                         <div className="flex-1">
                             <div className="mb-2 flex items-center gap-2">
-                                {topic.is_pinned && <Pin className="h-5 w-5 text-info" />}
-                                {topic.is_locked && <Lock className="h-5 w-5 text-muted-foreground" />}
+                                {topic.is_hot && <span className="text-sm">🔥</span>}
+                                {topic.is_pinned && <Pin className="size-4 text-info" />}
+                                {topic.is_locked && <Lock className="size-4 text-muted-foreground" />}
                                 <h1 className="text-xl font-semibold tracking-tight">{topic.title}</h1>
                             </div>
 
@@ -209,12 +210,12 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                     </div>
                     <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row sm:items-center">
                         <Button onClick={goToLatestPost} variant="outline">
-                            <ArrowDown className="mr-2 h-4 w-4" />
+                            <ArrowDown className="mr-2 size-4" />
                             Latest
                         </Button>
                         {can('reply_topics') && !topic.is_locked && (
                             <Button onClick={() => setShowReplyForm(!showReplyForm)} variant={showReplyForm ? 'outline' : 'default'}>
-                                <Reply className="mr-2 h-4 w-4" />
+                                <Reply className="mr-2 size-4" />
                                 Reply
                             </Button>
                         )}
@@ -223,23 +224,23 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
 
                 <div className="hidden items-center gap-4 text-sm text-muted-foreground sm:flex md:-mt-4">
                     <div className="flex items-center gap-1">
-                        <User className="h-4 w-4" />
+                        <User className="size-4" />
                         <span>Started by {topic.author.name}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                        <Eye className="h-4 w-4" />
+                        <Eye className="size-4" />
                         <span>
                             {topic.views_count} {pluralize('view', topic.views_count)}
                         </span>
                     </div>
                     <div className="flex items-center gap-1">
-                        <MessageSquare className="h-4 w-4" />
+                        <MessageSquare className="size-4" />
                         <span>
                             {topic.posts_count} {pluralize('reply', topic.posts_count)}
                         </span>
                     </div>
                     <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
+                        <Clock className="size-4" />
                         <span>{formatDistanceToNow(new Date(topic.created_at), { addSuffix: true })}</span>
                     </div>
                 </div>
@@ -259,7 +260,7 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                     pagination={postsPagination}
                     baseUrl={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
                     entityLabel="post"
-                    className="hidden py-4 md:flex"
+                    className="hidden md:flex"
                 />
 
                 {posts.length > 0 && (
@@ -286,7 +287,7 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                     pagination={postsPagination}
                     baseUrl={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
                     entityLabel="post"
-                    className="py-4"
+                    className="pb-4"
                 />
 
                 <div className="flex justify-start py-4">
@@ -294,7 +295,7 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                         href={route('forums.show', { forum: forum.slug })}
                         className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
-                        <ArrowLeft className="h-4 w-4" />
+                        <ArrowLeft className="size-4" />
                         Back to {forum.name}
                     </Link>
                 </div>

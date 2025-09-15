@@ -75,6 +75,7 @@ class Policy extends Model implements Sluggable
 
     protected $fillable = [
         'title',
+        'description',
         'content',
         'version',
         'policy_category_id',

@@ -166,7 +166,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                 {selectedTopics.length > 0 && (
                                     <>
                                         <Button variant="destructive" onClick={handleBulkDelete} disabled={isDeleting}>
-                                            <Trash2 className="mr-2 h-4 w-4" />
+                                            <Trash2 className="mr-2 size-4" />
                                             Delete {selectedTopics.length} Topic{selectedTopics.length > 1 ? 's' : ''}
                                         </Button>
                                         <Button variant="outline" onClick={() => setSelectedTopics([])}>
@@ -184,7 +184,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                         {can('create_topics') && (
                             <Button asChild>
                                 <Link href={route('forums.topics.create', { forum: forum.slug })}>
-                                    <Plus className="mr-2 h-4 w-4" />
+                                    <Plus className="mr-2 size-4" />
                                     New Topic
                                 </Link>
                             </Button>
@@ -253,10 +253,10 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                                     )}
                                                     <div className="min-w-0 flex-1">
                                                         <div className="mb-1 flex items-center gap-2">
-                                                            {!topic.is_read_by_user && <Circle className="h-3 w-3 fill-info text-info-foreground" />}
+                                                            {!topic.is_read_by_user && <Circle className="size-3 fill-info text-info" />}
                                                             {topic.is_hot && <span className="text-sm">🔥</span>}
-                                                            {topic.is_pinned && <Pin className="h-4 w-4 text-info" />}
-                                                            {topic.is_locked && <Lock className="h-4 w-4 text-muted-foreground" />}
+                                                            {topic.is_pinned && <Pin className="size-4 text-info" />}
+                                                            {topic.is_locked && <Lock className="size-4 text-muted-foreground" />}
                                                             <Link
                                                                 href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
                                                                 className={`hover:underline ${
@@ -280,13 +280,13 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                             </TableCell>
                                             <TableCell className="p-4 text-center">
                                                 <div className="flex items-center justify-center gap-1">
-                                                    <MessageSquare className="h-4 w-4" />
+                                                    <MessageSquare className="size-4" />
                                                     <span>{topic.posts_count}</span>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="p-4 text-center">
                                                 <div className="flex items-center justify-center gap-1">
-                                                    <Eye className="h-4 w-4" />
+                                                    <Eye className="size-4" />
                                                     <span>{topic.views_count}</span>
                                                 </div>
                                             </TableCell>

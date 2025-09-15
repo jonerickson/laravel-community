@@ -75,19 +75,19 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                                 </time>
                                 {post.is_pinned && (
                                     <Badge variant="info">
-                                        <Pin className="mr-1 h-3 w-3" />
+                                        <Pin className="mr-1 size-3" />
                                         Pinned
                                     </Badge>
                                 )}
                                 {!post.is_published && (
                                     <Badge variant="warning">
-                                        <EyeOff className="mr-1 h-3 w-3" />
+                                        <EyeOff className="mr-1 size-3" />
                                         Unpublished
                                     </Badge>
                                 )}
                                 {post.is_reported && can('report_posts') && (
                                     <Badge variant="destructive">
-                                        <Flag className="mr-1 h-3 w-3" />
+                                        <Flag className="mr-1 size-3" />
                                         Reported {post.report_count && post.report_count > 1 ? `(${post.report_count})` : ''}
                                     </Badge>
                                 )}
@@ -101,10 +101,7 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                             <div className="mt-4 border-t border-muted pt-2">
                                 {post.author?.signature && (
                                     <div className="mt-2 text-xs text-muted-foreground">
-                                        <div
-                                            className="prose prose-xs max-w-none [&>*]:text-muted-foreground"
-                                            dangerouslySetInnerHTML={{ __html: post.author.signature }}
-                                        />
+                                        <RichEditorContent content={post.author.signature} />
                                     </div>
                                 )}
 

@@ -81,7 +81,7 @@ export const columns: ColumnDef<Invoice>[] = [
                     {invoice.hosted_invoice_url && (
                         <Button variant="outline" size="sm" asChild>
                             <a href={invoice.hosted_invoice_url} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="mr-1 h-4 w-4" />
+                                <ExternalLink className="mr-1 size-4" />
                                 View
                             </a>
                         </Button>
@@ -89,7 +89,7 @@ export const columns: ColumnDef<Invoice>[] = [
                     {invoice.invoice_pdf && (
                         <Button variant="outline" size="sm" asChild>
                             <a href={invoice.invoice_pdf} target="_blank" rel="noopener noreferrer">
-                                <FileText className="mr-1 h-4 w-4" />
+                                <FileText className="mr-1 size-4" />
                                 PDF
                             </a>
                         </Button>

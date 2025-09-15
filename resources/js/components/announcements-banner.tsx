@@ -44,7 +44,7 @@ export default function AnnouncementsBanner({ announcement, onDismiss }: Announc
 
     return (
         <Alert variant={config.variant}>
-            <IconComponent className="h-4 w-4" />
+            <IconComponent className="size-4" />
             <div className="flex-1">
                 <AlertTitle>{announcement.title}</AlertTitle>
                 <AlertDescription>
@@ -60,7 +60,7 @@ export default function AnnouncementsBanner({ announcement, onDismiss }: Announc
                     className="absolute top-2 right-2 h-6 w-6 p-0 hover:bg-black/10 dark:hover:bg-white/10"
                     aria-label="Dismiss announcement"
                 >
-                    <X className="h-4 w-4" />
+                    <X className="size-4" />
                 </Button>
             )}
         </Alert>

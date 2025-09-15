@@ -79,7 +79,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                         <Sheet>
                             <SheetTrigger asChild>
                                 <Button variant="ghost" size="icon" className="mr-2 h-[34px] w-[34px]">
-                                    <Menu className="h-5 w-5" />
+                                    <Menu className="size-5" />
                                 </Button>
                             </SheetTrigger>
                             <SheetContent side="left" className="flex h-full w-64 flex-col items-stretch justify-between bg-sidebar">
@@ -100,7 +100,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                         href={typeof item.href === 'function' ? item.href() : item.href}
                                                         className="flex items-center space-x-2 font-medium"
                                                     >
-                                                        {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
+                                                        {item.icon && <Icon iconNode={item.icon} className="size-5" />}
                                                         <span>{item.title}</span>
                                                     </Link>
                                                 ) : (
@@ -117,7 +117,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                     rel="noopener noreferrer"
                                                     className="flex items-center space-x-2 font-medium"
                                                 >
-                                                    {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
+                                                    {item.icon && <Icon iconNode={item.icon} className="size-5" />}
                                                     <span>{item.title}</span>
                                                 </a>
                                             ))}
@@ -148,7 +148,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                     'h-9 px-3',
                                                 )}
                                             >
-                                                {item.icon && <Icon iconNode={item.icon} className="mr-2 h-4 w-4" />}
+                                                {item.icon && <Icon iconNode={item.icon} className="mr-2 size-4" />}
                                                 {item.title}
                                             </Link>
                                             {page.url === (typeof item.href === 'function' ? item.href() : item.href) && (
@@ -165,8 +165,18 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 
                     <div className="ml-auto flex items-center space-x-2">
                         <div className="relative flex items-center space-x-1">
-                            <GlobalSearch />
-                            <ShoppingCartIcon />
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <GlobalSearch />
+                                </TooltipTrigger>
+                                <TooltipContent>Search</TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <ShoppingCartIcon />
+                                </TooltipTrigger>
+                                <TooltipContent>Shopping Cart</TooltipContent>
+                            </Tooltip>
                             <div className="hidden lg:flex">
                                 {rightNavItems.map((item) => (
                                     <TooltipProvider key={item.title} delayDuration={0}>

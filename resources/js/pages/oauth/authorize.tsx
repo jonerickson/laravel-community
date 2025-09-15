@@ -72,7 +72,7 @@ export default function OAuthAuthorize({ request, authToken, client, user, scope
 
                 <CardContent className="space-y-6">
                     <div className="flex items-center gap-3 rounded-lg bg-muted p-3">
-                        <UserCheck className="h-5 w-5 text-muted-foreground" />
+                        <UserCheck className="size-5 text-muted-foreground" />
                         <div className="flex-1">
                             <p className="text-sm font-medium">{user.name}</p>
                             <p className="text-xs text-muted-foreground">{user.email}</p>
@@ -99,7 +99,7 @@ export default function OAuthAuthorize({ request, authToken, client, user, scope
 
                     <div className="space-y-3">
                         <Button onClick={handleApprove} className="w-full" disabled={processing}>
-                            {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                            {processing && <LoaderCircle className="mr-2 size-4 animate-spin" />}
                             Authorize
                         </Button>
 

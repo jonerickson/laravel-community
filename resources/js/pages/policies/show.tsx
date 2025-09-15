@@ -36,13 +36,13 @@ export default function PolicyShow({ category, policy }: PoliciesShowProps) {
 
                     <div className="mt-4 flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
                         <div className="flex items-center gap-1">
-                            <FileText className="h-4 w-4" />
+                            <FileText className="size-4" />
                             <span>{category.name}</span>
                         </div>
 
                         {policy.effective_at && (
                             <div className="flex items-center gap-1">
-                                <Calendar className="h-4 w-4" />
+                                <Calendar className="size-4" />
                                 <span>Effective {new Date(policy.effective_at).toLocaleDateString()}</span>
                             </div>
                         )}
@@ -51,7 +51,7 @@ export default function PolicyShow({ category, policy }: PoliciesShowProps) {
 
                         {policy.created_by && (
                             <div className="flex items-center gap-1">
-                                <User className="h-4 w-4" />
+                                <User className="size-4" />
                                 <span>Published by {typeof policy.author === 'object' ? policy.author.name : 'Administrator'}</span>
                             </div>
                         )}

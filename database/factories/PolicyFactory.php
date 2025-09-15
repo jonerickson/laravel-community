@@ -17,6 +17,7 @@ class PolicyFactory extends Factory
     {
         return [
             'title' => $this->faker->words(2, true),
+            'description' => $this->faker->paragraph(),
             'content' => $this->faker->paragraphs(3, asText: true),
             'version' => $this->faker->numerify('v#.#.#'),
             'policy_category_id' => PolicyCategory::factory(),

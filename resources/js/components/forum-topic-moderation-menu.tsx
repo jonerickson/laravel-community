@@ -104,7 +104,7 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <MoreHorizontal className="h-4 w-4" />
+                    <MoreHorizontal className="size-4" />
                     <span className="sr-only">Open menu</span>
                 </Button>
             </DropdownMenuTrigger>
@@ -113,12 +113,12 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
                     <DropdownMenuItem onClick={handleTogglePin} disabled={pinLoading}>
                         {topic.is_pinned ? (
                             <>
-                                <PinOff className="mr-2 h-4 w-4" />
+                                <PinOff className="mr-2 size-4" />
                                 Unpin Topic
                             </>
                         ) : (
                             <>
-                                <Pin className="mr-2 h-4 w-4" />
+                                <Pin className="mr-2 size-4" />
                                 Pin Topic
                             </>
                         )}
@@ -129,12 +129,12 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
                     <DropdownMenuItem onClick={handleToggleLock} disabled={lockLoading}>
                         {topic.is_locked ? (
                             <>
-                                <LockOpen className="mr-2 h-4 w-4" />
+                                <LockOpen className="mr-2 size-4" />
                                 Unlock Topic
                             </>
                         ) : (
                             <>
-                                <Lock className="mr-2 h-4 w-4" />
+                                <Lock className="mr-2 size-4" />
                                 Lock Topic
                             </>
                         )}
@@ -143,7 +143,7 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
 
                 {can('delete_topics') && (
                     <DropdownMenuItem onClick={handleDeleteTopic} className="text-destructive focus:text-destructive">
-                        <Trash className="mr-2 h-4 w-4 text-destructive" />
+                        <Trash className="mr-2 size-4 text-destructive" />
                         Delete Topic
                     </DropdownMenuItem>
                 )}

@@ -25,7 +25,7 @@ export default function RecentViewers({ viewers }: RecentViewersProps) {
         <Card>
             <CardContent className="pt-0">
                 <CardTitle className="flex items-center gap-2 text-base">
-                    <Eye className="h-4 w-4" />
+                    <Eye className="size-4" />
                     Recently Viewed
                 </CardTitle>
                 <div className="mt-4 flex flex-wrap gap-2">

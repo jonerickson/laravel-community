@@ -387,7 +387,7 @@ function ToolbarButton({ action, icon: Icon, isActive, disabled }: {
             className={isActive ? 'bg-muted' : ''}
             disabled={disabled}
         >
-            <Icon className="h-4 w-4" />
+            <Icon className="size-4" />
         </Button>
     );
 }
@@ -464,7 +464,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button type="button" variant="ghost" size="sm">
-                                <Heading className="h-4 w-4" />
+                                <Heading className="size-4" />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -472,42 +472,42 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                                 onClick={() => editor.chain().focus().toggleHeading({level: 1}).run()}
                                 className="flex items-center gap-2"
                             >
-                                <Heading1 className="h-4 w-4" />
+                                <Heading1 className="size-4" />
                                 Heading 1
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={() => editor.chain().focus().toggleHeading({level: 2}).run()}
                                 className="flex items-center gap-2"
                             >
-                                <Heading2 className="h-4 w-4" />
+                                <Heading2 className="size-4" />
                                 Heading 2
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={() => editor.chain().focus().toggleHeading({level: 3}).run()}
                                 className="flex items-center gap-2"
                             >
-                                <Heading3 className="h-4 w-4" />
+                                <Heading3 className="size-4" />
                                 Heading 3
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={() => editor.chain().focus().toggleHeading({level: 4}).run()}
                                 className="flex items-center gap-2"
                             >
-                                <Heading4 className="h-4 w-4" />
+                                <Heading4 className="size-4" />
                                 Heading 4
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={() => editor.chain().focus().toggleHeading({level: 5}).run()}
                                 className="flex items-center gap-2"
                             >
-                                <Heading5 className="h-4 w-4" />
+                                <Heading5 className="size-4" />
                                 Heading 5
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={() => editor.chain().focus().toggleHeading({level: 6}).run()}
                                 className="flex items-center gap-2"
                             >
-                                <Heading6 className="h-4 w-4" />
+                                <Heading6 className="size-4" />
                                 Heading 6
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -581,7 +581,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button type="button" variant="ghost" size="sm">
-                                    <MoreHorizontal className="h-4 w-4" />
+                                    <MoreHorizontal className="size-4" />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
@@ -589,7 +589,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                                     onClick={() => editor.chain().focus().toggleCodeBlock().run()}
                                     className="flex items-center gap-2"
                                 >
-                                    <Code className="h-4 w-4" />
+                                    <Code className="size-4" />
                                     Code Block
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -601,7 +601,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button type="button" variant="ghost" size="sm">
-                                    <MoreHorizontal className="h-4 w-4" />
+                                    <MoreHorizontal className="size-4" />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48">
@@ -609,70 +609,70 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                                     onClick={() => editor.chain().focus().toggleBulletList().run()}
                                     className="flex items-center gap-2"
                                 >
-                                    <List className="h-4 w-4" />
+                                    <List className="size-4" />
                                     Bullet List
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => editor.chain().focus().toggleOrderedList().run()}
                                     className="flex items-center gap-2"
                                 >
-                                    <ListOrdered className="h-4 w-4" />
+                                    <ListOrdered className="size-4" />
                                     Numbered List
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => editor.chain().focus().toggleBlockquote().run()}
                                     className="flex items-center gap-2"
                                 >
-                                    <Quote className="h-4 w-4" />
+                                    <Quote className="size-4" />
                                     Quote
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => editor.chain().focus().setTextAlign('left').run()}
                                     className="flex items-center gap-2"
                                 >
-                                    <AlignLeft className="h-4 w-4" />
+                                    <AlignLeft className="size-4" />
                                     Align Left
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => editor.chain().focus().setTextAlign('center').run()}
                                     className="flex items-center gap-2"
                                 >
-                                    <AlignCenter className="h-4 w-4" />
+                                    <AlignCenter className="size-4" />
                                     Align Center
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => editor.chain().focus().setTextAlign('right').run()}
                                     className="flex items-center gap-2"
                                 >
-                                    <AlignRight className="h-4 w-4" />
+                                    <AlignRight className="size-4" />
                                     Align Right
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => editor.chain().focus().setTextAlign('justify').run()}
                                     className="flex items-center gap-2"
                                 >
-                                    <AlignJustify className="h-4 w-4" />
+                                    <AlignJustify className="size-4" />
                                     Justify
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => setLinkDialogOpen(true)}
                                     className="flex items-center gap-2"
                                 >
-                                    <LinkIcon className="h-4 w-4" />
+                                    <LinkIcon className="size-4" />
                                     Insert Link
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => setImageDialogOpen(true)}
                                     className="flex items-center gap-2"
                                 >
-                                    <ImageIcon className="h-4 w-4" />
+                                    <ImageIcon className="size-4" />
                                     Insert Image
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => setEmojiDialogOpen(true)}
                                     className="flex items-center gap-2"
                                 >
-                                    <Smile className="h-4 w-4" />
+                                    <Smile className="size-4" />
                                     Insert Emoji
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
@@ -680,7 +680,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                                     disabled={!editor.can().chain().focus().undo().run()}
                                     className="flex items-center gap-2"
                                 >
-                                    <Undo className="h-4 w-4" />
+                                    <Undo className="size-4" />
                                     Undo
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
@@ -688,14 +688,14 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                                     disabled={!editor.can().chain().focus().redo().run()}
                                     className="flex items-center gap-2"
                                 >
-                                    <Redo className="h-4 w-4" />
+                                    <Redo className="size-4" />
                                     Redo
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => editor.chain().focus().toggleCodeBlock().run()}
                                     className="flex items-center gap-2"
                                 >
-                                    <Code className="h-4 w-4" />
+                                    <Code className="size-4" />
                                     Code Block
                                 </DropdownMenuItem>
                             </DropdownMenuContent>

@@ -104,7 +104,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                 <div className="flex items-start justify-between">
                     <Heading title="Shopping cart" description={`${items.length} ${items.length === 1 ? 'item' : 'items'} in your cart`} />
                     <Button variant="outline" onClick={clearCart} disabled={loading === -1}>
-                        <Trash2 className="mr-2 h-4 w-4" />
+                        <Trash2 className="mr-2 size-4" />
                         {loading === -1 ? 'Clearing...' : 'Empty cart'}
                     </Button>
                 </div>

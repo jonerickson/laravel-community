@@ -5,7 +5,7 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import type { Topic } from '@/types';
 import { Link } from '@inertiajs/react';
 import { format, formatDistanceToNow } from 'date-fns';
-import { Clock, Eye, Flame, MessageSquare, TrendingUp, Users } from 'lucide-react';
+import { Clock, Eye, Flame, Lock, MessageSquare, Pin, TrendingUp, Users } from 'lucide-react';
 
 interface TrendingTopicsWidgetProps {
     topics?: Topic[];
@@ -75,18 +75,10 @@ export default function TrendingTopicsWidget({ topics = [], className }: Trendin
                                 <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-orange-500/10 text-xs font-bold text-orange-600 dark:text-orange-400">
                                     #{index + 1}
                                 </span>
+                                {topic.is_hot && <span className="text-sm">🔥</span>}
+                                {topic.is_pinned && <Pin className="size-4 text-info" />}
+                                {topic.is_locked && <Lock className="size-4 text-muted-foreground" />}
                                 <span className="line-clamp-1 text-sm font-medium">{topic.title}</span>
-                                {topic.is_hot && (
-                                    <Badge variant="destructive" className="px-1.5 py-0.5 text-xs">
-                                        <Flame className="mr-1 size-2" />
-                                        Hot
-                                    </Badge>
-                                )}
-                                {topic.is_pinned && (
-                                    <Badge variant="secondary" className="px-1.5 py-0.5 text-xs">
-                                        Pinned
-                                    </Badge>
-                                )}
                             </div>
                             <div className="text-xs text-muted-foreground">
                                 in <span className="font-medium">{topic.forum?.name}</span> by{' '}

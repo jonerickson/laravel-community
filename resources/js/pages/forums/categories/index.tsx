@@ -9,7 +9,7 @@ import { pluralize } from '@/lib/utils';
 import type { BreadcrumbItem, ForumCategory, SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
-import { Circle, MessageSquare, Pin, Plus } from 'lucide-react';
+import { Circle, Lock, MessageSquare, Pin, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { route } from 'ziggy-js';
 import usePermissions from '../../../hooks/use-permissions';
@@ -99,7 +99,7 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                     <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row sm:items-center">
                         {can('create_topics') && (
                             <Button onClick={() => setIsDialogOpen(true)}>
-                                <Plus className="mr-2 h-4 w-4" />
+                                <Plus className="mr-2 size-4" />
                                 New Topic
                             </Button>
                         )}
@@ -172,10 +172,10 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                                                             </div>
                                                             <div className="min-w-0 flex-1">
                                                                 <div className="flex items-center gap-2">
-                                                                    {!topic.is_read_by_user && (
-                                                                        <Circle className="h-2 w-2 fill-primary text-primary" />
-                                                                    )}
-                                                                    {topic.is_pinned && <Pin className="h-3 w-3 text-primary" />}
+                                                                    {!topic.is_read_by_user && <Circle className="size-3 fill-info text-info" />}
+                                                                    {topic.is_hot && <span className="text-sm">🔥</span>}
+                                                                    {topic.is_pinned && <Pin className="size-4 text-info" />}
+                                                                    {topic.is_locked && <Lock className="size-4 text-muted-foreground" />}
                                                                     <span
                                                                         className={`truncate font-medium ${
                                                                             topic.is_read_by_user ? 'text-muted-foreground' : 'text-foreground'
@@ -197,7 +197,7 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                                                             <div className="flex-shrink-0 text-right">
                                                                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                                     <div className="flex items-center gap-1">
-                                                                        <MessageSquare className="h-3 w-3" />
+                                                                        <MessageSquare className="size-3" />
                                                                         <span>{topic.posts_count}</span>
                                                                     </div>
                                                                 </div>

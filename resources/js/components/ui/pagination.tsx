@@ -69,13 +69,13 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
                         className="inline-flex"
                     >
                         <Button variant="outline" size="sm">
-                            <ChevronLeft className="h-4 w-4 mr-1" />
+                            <ChevronLeft className="size-4 mr-1" />
                             Previous
                         </Button>
                     </Link>
                 ) : (
                     <Button variant="outline" size="sm" disabled>
-                        <ChevronLeft className="h-4 w-4 mr-1" />
+                        <ChevronLeft className="size-4 mr-1" />
                         Previous
                     </Button>
                 )}
@@ -109,13 +109,13 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
                     >
                         <Button variant="outline" size="sm">
                             Next
-                            <ChevronRight className="h-4 w-4 ml-1" />
+                            <ChevronRight className="size-4 ml-1" />
                         </Button>
                     </Link>
                 ) : (
                     <Button variant="outline" size="sm" disabled>
                         Next
-                        <ChevronRight className="h-4 w-4 ml-1" />
+                        <ChevronRight className="size-4 ml-1" />
                     </Button>
                 )}
             </div>
