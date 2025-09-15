@@ -6,6 +6,7 @@ namespace App\Drivers\Payments;
 
 use AllowDynamicProperties;
 use App\Contracts\PaymentProcessor;
+use App\Enums\SubscriptionInterval;
 use App\Models\Product;
 use App\Models\ProductPrice;
 use App\Models\User;
@@ -170,7 +171,7 @@ class StripeDriver implements PaymentProcessor
 
         if ($price->isRecurring()) {
             $stripeParams['recurring'] = [
-                'interval' => $price->interval,
+                'interval' => $price->interval?->value,
                 'interval_count' => $price->interval_count,
             ];
         }
@@ -286,7 +287,7 @@ class StripeDriver implements PaymentProcessor
                 $productPrice->name = $stripePrice->nickname ?? 'Unnamed Price';
                 $productPrice->amount = $stripePrice->unit_amount / 100;
                 $productPrice->currency = strtoupper($stripePrice->currency);
-                $productPrice->interval = $stripePrice->recurring->interval ?? null;
+                $productPrice->interval = SubscriptionInterval::tryFrom((string) $stripePrice->recurring->interval ?? null);
                 $productPrice->interval_count = $stripePrice->recurring->interval_count ?? 1;
                 $productPrice->is_active = $stripePrice->active;
                 $productPrice->is_default = false;

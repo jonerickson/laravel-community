@@ -51,7 +51,7 @@ class ActivityLogResource extends Resource
                         'auth' => 'danger',
                         'blog' => 'success',
                         'forum' => 'warning',
-                        'ecommerce' => 'primary',
+                        'store' => 'primary',
                         'marketplace' => 'secondary',
                         default => 'gray',
                     })
@@ -101,7 +101,7 @@ class ActivityLogResource extends Resource
                         'auth' => 'Authentication',
                         'blog' => 'Blog',
                         'forum' => 'Forum',
-                        'ecommerce' => 'E-commerce',
+                        'store' => 'Store',
                         'marketplace' => 'Marketplace',
                     ]),
 

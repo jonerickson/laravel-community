@@ -228,7 +228,7 @@ class Post extends Model implements Sluggable
         $type = $this->type?->value ?? 'post';
         $title = $this->title ? " \"{$this->title}\"" : '';
 
-        return ucfirst($type).$title." {$eventName}";
+        return ucfirst($type).$title." $eventName";
     }
 
     public function getActivityLogName(): string
@@ -236,7 +236,6 @@ class Post extends Model implements Sluggable
         return match ($this->type) {
             PostType::Blog => 'blog',
             PostType::Forum => 'forum',
-            default => 'post',
         };
     }
 

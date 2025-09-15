@@ -217,14 +217,13 @@ class Product extends Model implements Sluggable
     public function getActivityDescription(string $eventName): string
     {
         $type = $this->type?->value ?? 'product';
-        $name = $this->name ? " \"{$this->name}\"" : '';
 
-        return ucfirst($type).$name." {$eventName}";
+        return ucfirst($type)." $this->name $eventName";
     }
 
     public function getActivityLogName(): string
     {
-        return 'ecommerce';
+        return 'store';
     }
 
     protected function casts(): array

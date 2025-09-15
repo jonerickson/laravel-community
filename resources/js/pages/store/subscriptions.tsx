@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, ProductPrice } from '@/types';
 import { apiRequest } from '@/utils/api';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
@@ -33,18 +33,7 @@ interface SubscriptionPlan {
     description: string;
     slug: string;
     featured_image_url?: string;
-    pricing: {
-        daily: number;
-        weekly: number;
-        monthly: number;
-        yearly: number;
-    };
-    price_ids: {
-        daily: number | null;
-        weekly: number | null;
-        monthly: number | null;
-        yearly: number | null;
-    };
+    prices: Record<string, ProductPrice>;
     features: string[];
     popular?: boolean;
     current?: boolean;
@@ -81,24 +70,25 @@ interface PricingCardProps {
 function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: PricingCardProps) {
     const Icon = getIconForPlan(plan);
     const color = getColorForPlan(plan);
-    const price = plan.pricing[billingCycle];
-    const priceId = plan.price_ids[billingCycle];
 
-    const getBillingPeriodLabel = (cycle: BillingCycle): string => {
-        switch (cycle) {
-            case 'daily':
-                return 'day';
-            case 'weekly':
-                return 'week';
-            case 'monthly':
-                return 'month';
-            case 'yearly':
-                return 'year';
-        }
+    const intervalMap: Record<BillingCycle, string> = {
+        daily: 'day',
+        weekly: 'week',
+        monthly: 'month',
+        yearly: 'year'
     };
 
+    const interval = intervalMap[billingCycle];
+    const priceData = plan.prices[interval];
+    const price = priceData ? priceData.amount : 0; // Convert from cents
+    const priceId = priceData?.id || null;
+
+    const monthlyPrice = plan.prices.month;
+    const yearlyPrice = plan.prices.year;
     const yearlyDiscount =
-        billingCycle === 'yearly' && plan.pricing.monthly > 0 ? Math.round((1 - plan.pricing.yearly / 12 / plan.pricing.monthly) * 100) : 0;
+        billingCycle === 'yearly' && monthlyPrice && yearlyPrice
+            ? Math.round((1 - (yearlyPrice.amount / 12) / monthlyPrice.amount) * 100)
+            : 0;
 
     return (
         <Card
@@ -116,15 +106,12 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
                 <div className="mt-6">
                     <div className="flex items-baseline justify-center">
                         <span className="text-4xl font-bold">${price}</span>
-                        <span className="ml-1 text-muted-foreground">/{getBillingPeriodLabel(billingCycle)}</span>
+                        <span className="ml-1 text-muted-foreground">/ {billingCycle}</span>
                     </div>
                     {billingCycle === 'yearly' && yearlyDiscount > 0 && (
                         <div className="mt-2">
                             <Badge variant="secondary">Save {yearlyDiscount}% annually</Badge>
                         </div>
-                    )}
-                    {billingCycle === 'monthly' && plan.pricing.yearly > 0 && (
-                        <p className="mt-2 text-sm text-muted-foreground">${plan.pricing.yearly.toFixed(2)} billed annually</p>
                     )}
                 </div>
             </CardHeader>
@@ -183,6 +170,19 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
     const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
     const [loadingPlan, setLoadingPlan] = useState<number | null>(null);
 
+    // Filter available intervals based on what prices exist across all plans
+    const intervalMap: Record<BillingCycle, string> = {
+        daily: 'day',
+        weekly: 'week',
+        monthly: 'month',
+        yearly: 'year'
+    };
+
+    const availableIntervals = (Object.keys(intervalMap) as BillingCycle[]).filter(cycle => {
+        const interval = intervalMap[cycle];
+        return subscriptionProducts.some(plan => plan.prices[interval]);
+    });
+
     const handleSubscribe = async (planId: number, priceId: number | null) => {
         if (!priceId) {
             toast.error('No pricing available for this billing cycle.');
@@ -227,24 +227,19 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
 
                 {subscriptionProducts.length > 0 ? (
                     <div className="flex flex-col gap-8">
-                        <div className="flex justify-center">
-                            <Tabs value={billingCycle} onValueChange={(value) => setBillingCycle(value as BillingCycle)}>
-                                <TabsList className="grid w-full max-w-2xl grid-cols-4">
-                                    <TabsTrigger value="daily" className="relative">
-                                        Daily
-                                    </TabsTrigger>
-                                    <TabsTrigger value="weekly" className="relative">
-                                        Weekly
-                                    </TabsTrigger>
-                                    <TabsTrigger value="monthly" className="relative">
-                                        Monthly
-                                    </TabsTrigger>
-                                    <TabsTrigger value="yearly" className="relative">
-                                        Yearly
-                                    </TabsTrigger>
-                                </TabsList>
-                            </Tabs>
-                        </div>
+                        {availableIntervals.length > 1 && (
+                            <div className="flex justify-center">
+                                <Tabs value={billingCycle} onValueChange={(value) => setBillingCycle(value as BillingCycle)}>
+                                    <TabsList className={`grid w-full max-w-2xl grid-cols-${availableIntervals.length}`}>
+                                        {availableIntervals.map((interval) => (
+                                            <TabsTrigger key={interval} value={interval} className="relative">
+                                                {interval.charAt(0).toUpperCase() + interval.slice(1)}
+                                            </TabsTrigger>
+                                        ))}
+                                    </TabsList>
+                                </Tabs>
+                            </div>
+                        )}
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                             {subscriptionProducts.map((plan: SubscriptionPlan) => (
                                 <div key={plan.id} className="flex justify-center">

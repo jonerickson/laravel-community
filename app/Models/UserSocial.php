@@ -77,7 +77,7 @@ class UserSocial extends Model
 
     public function getActivityDescription(string $eventName): string
     {
-        return "User integration {$eventName}";
+        return "User integration $eventName";
     }
 
     public function getActivityLogName(): string

@@ -100,7 +100,6 @@ class PricesRelationManager extends RelationManager
                 TextColumn::make('interval')
                     ->badge()
                     ->visible(fn () => $this->getOwnerRecord()->isSubscription())
-                    ->formatStateUsing(fn (?string $state): string => filled($state) ? ucfirst($state) : 'Monthly')
                     ->color('info'),
                 IconColumn::make('is_active')
                     ->boolean()
@@ -119,12 +118,7 @@ class PricesRelationManager extends RelationManager
                 TernaryFilter::make('is_default')
                     ->label('Default Price'),
                 SelectFilter::make('interval')
-                    ->options([
-                        'day' => 'Daily',
-                        'week' => 'Weekly',
-                        'month' => 'Monthly',
-                        'year' => 'Yearly',
-                    ])
+                    ->options(SubscriptionInterval::class)
                     ->placeholder('All Intervals')
                     ->visible(fn () => $this->getOwnerRecord()->isSubscription()),
             ])

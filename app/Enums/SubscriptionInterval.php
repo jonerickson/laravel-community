@@ -10,10 +10,10 @@ use Illuminate\Support\Str;
 
 enum SubscriptionInterval: string implements HasLabel
 {
-    case Daily = 'daily';
-    case Weekly = 'weekly';
-    case Monthly = 'monthly';
-    case Yearly = 'yearly';
+    case Daily = 'day';
+    case Weekly = 'week';
+    case Monthly = 'month';
+    case Yearly = 'year';
 
     public function getLabel(): string|Htmlable|null
     {

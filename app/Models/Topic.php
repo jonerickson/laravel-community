@@ -212,7 +212,7 @@ class Topic extends Model implements Sluggable
     {
         $title = $this->title ? " \"{$this->title}\"" : '';
 
-        return "Forum topic{$title} {$eventName}";
+        return "Forum topic{$title} $eventName";
     }
 
     public function getActivityLogName(): string

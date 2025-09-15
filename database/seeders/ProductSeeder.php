@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\SubscriptionInterval;
 use App\Models\Image;
 use App\Models\Product;
 use App\Models\ProductCategory;
@@ -69,7 +70,7 @@ class ProductSeeder extends Seeder
                     ->create([
                         'name' => 'Yearly',
                         'interval_count' => 1,
-                        'interval' => 'year',
+                        'interval' => SubscriptionInterval::Yearly,
                     ]);
             }
         }
@@ -121,7 +122,7 @@ class ProductSeeder extends Seeder
                     ->create([
                         'name' => 'Yearly',
                         'interval_count' => 1,
-                        'interval' => 'year',
+                        'interval' => SubscriptionInterval::Yearly,
                     ]);
             }
         }

@@ -29,24 +29,6 @@ class SubscriptionsController extends Controller
             ->orderBy('name')
             ->get()
             ->map(function (Product $product) use ($user): array {
-                $pricing = [];
-                $priceIds = [];
-                foreach (SubscriptionInterval::cases() as $interval) {
-                    $intervalValue = match ($interval) {
-                        SubscriptionInterval::Daily => 'day',
-                        SubscriptionInterval::Weekly => 'week',
-                        SubscriptionInterval::Monthly => 'month',
-                        SubscriptionInterval::Yearly => 'year',
-                    };
-
-                    $price = $product->activePrices
-                        ->where('interval', $intervalValue)
-                        ->where('interval_count', 1)
-                        ->first();
-
-                    $pricing[$interval->value] = $price?->amount ?? 0;
-                    $priceIds[$interval->value] = $price?->id;
-                }
 
                 $isCurrentPlan = false;
                 if ($user) {
@@ -59,8 +41,7 @@ class SubscriptionsController extends Controller
                     'description' => $product->description,
                     'slug' => $product->slug,
                     'featured_image_url' => $product->featured_image_url,
-                    'pricing' => $pricing,
-                    'price_ids' => $priceIds,
+                    'prices' => $product->prices->keyBy('interval')->toArray(),
                     'features' => $product->metadata['features'] ?? [],
                     'popular' => $product->metadata['popular'] ?? false,
                     'current' => $isCurrentPlan,

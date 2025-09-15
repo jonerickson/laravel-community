@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\SubscriptionInterval;
 use App\Events\ProductPriceCreated;
 use App\Events\ProductPriceDeleted;
 use App\Events\ProductPriceDeleting;
@@ -23,7 +24,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $description
  * @property numeric $amount
  * @property string $currency
- * @property string|null $interval
+ * @property SubscriptionInterval|null $interval
  * @property int $interval_count
  * @property bool $is_active
  * @property bool $is_default
@@ -163,6 +164,7 @@ class ProductPrice extends Model
     {
         return [
             'amount' => 'decimal:2',
+            'interval' => SubscriptionInterval::class,
             'is_default' => 'boolean',
         ];
     }

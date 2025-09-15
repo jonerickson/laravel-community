@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\SubscriptionInterval;
 use App\Models\Product;
 use App\Models\ProductPrice;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -16,7 +17,6 @@ class ProductPriceFactory extends Factory
     public function definition(): array
     {
         $isRecurring = $this->faker->boolean(40);
-        $intervals = ['day', 'week', 'month', 'year'];
 
         return [
             'product_id' => Product::factory(),
@@ -30,7 +30,7 @@ class ProductPriceFactory extends Factory
             ]),
             'amount' => $this->faker->randomFloat(2, 5, 299),
             'currency' => 'USD',
-            'interval' => $isRecurring ? $this->faker->randomElement($intervals) : null,
+            'interval' => $isRecurring ? $this->faker->randomElement(SubscriptionInterval::cases()) : null,
             'interval_count' => $isRecurring ? $this->faker->numberBetween(1, 12) : 1,
             'external_price_id' => $this->faker->optional(0.7)->regexify('price_[A-Za-z0-9]{14}'),
             'is_active' => $this->faker->boolean(85),
@@ -55,7 +55,7 @@ class ProductPriceFactory extends Factory
     public function recurring(): static
     {
         return $this->state(fn (array $attributes) => [
-            'interval' => $this->faker->randomElement(['month', 'year']),
+            'interval' => $this->faker->randomElement(SubscriptionInterval::cases()),
             'interval_count' => $this->faker->numberBetween(1, 12),
         ]);
     }
@@ -63,7 +63,7 @@ class ProductPriceFactory extends Factory
     public function monthly(): static
     {
         return $this->state(fn (array $attributes) => [
-            'interval' => 'month',
+            'interval' => SubscriptionInterval::Monthly,
             'interval_count' => 1,
         ]);
     }
@@ -71,7 +71,7 @@ class ProductPriceFactory extends Factory
     public function yearly(): static
     {
         return $this->state(fn (array $attributes) => [
-            'interval' => 'year',
+            'interval' => SubscriptionInterval::Yearly,
             'interval_count' => 1,
         ]);
     }
