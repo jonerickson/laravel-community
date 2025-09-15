@@ -73,7 +73,7 @@ export default function ForumTopicCreate({ forum }: CreateTopicProps) {
                 {can('create_topics') && (
                     <Card className="-mt-8">
                         <CardHeader>
-                            <CardTitle>Topic Details</CardTitle>
+                            <CardTitle>Topic details</CardTitle>
                             <CardDescription>
                                 Provide a clear title and description for your topic to help others understand what you're discussing.
                             </CardDescription>
@@ -117,14 +117,13 @@ export default function ForumTopicCreate({ forum }: CreateTopicProps) {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Community Guidelines</CardTitle>
+                        <CardTitle>Community guidelines</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <ul className="space-y-1 text-sm text-muted-foreground">
                             <li>• Be respectful and civil in all discussions</li>
                             <li>• Search for existing topics before creating a new one</li>
                             <li>• Use clear, descriptive titles</li>
-                            <li>• Stay on topic and provide constructive feedback</li>
                             <li>• Follow all community rules and guidelines</li>
                         </ul>
                     </CardContent>

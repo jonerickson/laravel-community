@@ -117,26 +117,25 @@ export default function SupportTicketsIndex({ tickets, ticketsPagination }: Supp
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Need Help?</CardTitle>
+                        <CardTitle>Need help?</CardTitle>
                         <CardDescription>Here are some resources that might help you find answers quickly.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="grid gap-3 sm:grid-cols-2">
                             <div className="space-y-2">
-                                <h4 className="text-sm font-medium">Before Creating a Ticket</h4>
+                                <h4 className="text-sm font-medium">Before creating a ticket:</h4>
                                 <ul className="space-y-1 text-sm text-muted-foreground">
-                                    <li>• Check our FAQ for common questions</li>
+                                    <li>• Check our forums for common questions</li>
                                     <li>• Search existing tickets for similar issues</li>
                                     <li>• Try basic troubleshooting steps</li>
                                 </ul>
                             </div>
                             <div className="space-y-2">
-                                <h4 className="text-sm font-medium">What to Include</h4>
+                                <h4 className="text-sm font-medium">What to include:</h4>
                                 <ul className="space-y-1 text-sm text-muted-foreground">
                                     <li>• Detailed description of the problem</li>
                                     <li>• Steps to reproduce the issue</li>
                                     <li>• Screenshots or error messages</li>
-                                    <li>• Your browser and device information</li>
                                 </ul>
                             </div>
                         </div>

@@ -58,7 +58,7 @@ export default function CreateSupportTicket({ categories }: CreateSupportTicketP
 
                 <Card className="-mt-8">
                     <CardHeader>
-                        <CardTitle>Support Request Details</CardTitle>
+                        <CardTitle>Support request details</CardTitle>
                         <CardDescription>
                             Please provide as much detail as possible to help us understand and resolve your issue quickly.
                         </CardDescription>
@@ -126,7 +126,7 @@ export default function CreateSupportTicket({ categories }: CreateSupportTicketP
                         <CardTitle>What happens next?</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ul className="space-y-2 text-sm text-muted-foreground">
+                        <ul className="space-y-1 text-sm text-muted-foreground">
                             <li>• You'll receive a confirmation email with your ticket number</li>
                             <li>• Our support team will review your request and respond within 24 hours</li>
                             <li>• You can track the status of your ticket and add additional information if needed</li>

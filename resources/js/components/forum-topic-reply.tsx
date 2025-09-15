@@ -47,7 +47,7 @@ export default function ForumTopicReply({ forumSlug, topicSlug, onCancel, onSucc
     return (
         <Card data-reply-form>
             <CardHeader>
-                <CardTitle>Reply to Topic</CardTitle>
+                <CardTitle>Reply to topic</CardTitle>
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleReply} className="space-y-4">

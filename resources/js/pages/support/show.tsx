@@ -94,7 +94,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                         <div className="flex flex-col space-y-4">
                             <Card>
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">Support Ticket #{ticket.id}</CardTitle>
+                                    <CardTitle className="flex items-center gap-2">Support ticket #{ticket.id}</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <RichEditorContent content={ticket.description} />
@@ -104,11 +104,8 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                             {ticket.comments && ticket.comments.length > 0 && (
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle className="flex items-center gap-2">
-                                            <MessageCircle className="size-4" />
-                                            Comments ({ticket.comments.length})
-                                        </CardTitle>
-                                        <CardDescription>Conversation history and updates</CardDescription>
+                                        <CardTitle className="flex items-center gap-2">Conversation history ({ticket.comments.length})</CardTitle>
+                                        <CardDescription>Comment history and updates</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         {ticket.comments.map((comment: Comment, index: number) => (
@@ -148,7 +145,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                     <div className="space-y-4">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-base">Ticket Details</CardTitle>
+                                <CardTitle className="text-base">Ticket details</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-3">

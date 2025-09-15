@@ -45,7 +45,7 @@ export default function Banned({ user, fingerprint, banReason, bannedAt, bannedB
                         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive-foreground">
                             <ShieldXIcon className="size-8 text-destructive" />
                         </div>
-                        <CardTitle>Device Banned</CardTitle>
+                        <CardTitle>Device banned</CardTitle>
                         <CardDescription>This device has been banned from accessing this platform.</CardDescription>
                     </CardHeader>
 

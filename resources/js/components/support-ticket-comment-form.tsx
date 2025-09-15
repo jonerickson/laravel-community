@@ -1,10 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import type { SupportTicket } from '@/types';
 import { useForm } from '@inertiajs/react';
-import { MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface SupportTicketCommentFormProps {
@@ -48,15 +46,11 @@ export default function SupportTicketCommentForm({ ticket, onCancel, onSuccess }
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <MessageCircle className="size-4" />
-                    Add Comment
-                </CardTitle>
+                <CardTitle className="flex items-center gap-2">Add comment</CardTitle>
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid gap-2">
-                        <Label htmlFor="content">Comment</Label>
                         <RichTextEditor
                             content={data.content}
                             onChange={(content) => setData('content', content)}

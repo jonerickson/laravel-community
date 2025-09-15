@@ -73,7 +73,7 @@ export default function ForumPostEdit({ forum, topic, post }: EditPostProps) {
                 {can('update_posts') && (
                     <Card className="-mt-8">
                         <CardHeader>
-                            <CardTitle>Post Content</CardTitle>
+                            <CardTitle>Post content</CardTitle>
                             <CardDescription>Make your changes to the post content below.</CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -109,7 +109,7 @@ export default function ForumPostEdit({ forum, topic, post }: EditPostProps) {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Editing Guidelines</CardTitle>
+                        <CardTitle>Editing guidelines</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <ul className="space-y-1 text-sm text-muted-foreground">
