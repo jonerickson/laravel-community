@@ -157,8 +157,9 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                                             <div className="space-y-1">
                                                 {category.forums?.flatMap((forum) =>
                                                     (forum.latest_topics || []).slice(0, 5).map((topic) => (
-                                                        <div
+                                                        <Link
                                                             key={`${forum.id}-${topic.id}`}
+                                                            href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
                                                             className="flex items-center gap-3 px-6 py-2 hover:bg-muted/30"
                                                         >
                                                             <div className="flex-shrink-0">
@@ -175,14 +176,13 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                                                                         <Circle className="h-2 w-2 fill-primary text-primary" />
                                                                     )}
                                                                     {topic.is_pinned && <Pin className="h-3 w-3 text-primary" />}
-                                                                    <Link
-                                                                        href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
-                                                                        className={`truncate font-medium hover:underline ${
+                                                                    <span
+                                                                        className={`truncate font-medium ${
                                                                             topic.is_read_by_user ? 'text-muted-foreground' : 'text-foreground'
                                                                         }`}
                                                                     >
                                                                         {topic.title}
-                                                                    </Link>
+                                                                    </span>
                                                                 </div>
                                                                 <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
                                                                     <span>by {topic.author.name}</span>
@@ -202,7 +202,7 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
+                                                        </Link>
                                                     )),
                                                 )}
                                                 {!category.forums?.some((forum) => forum.latest_topics && forum.latest_topics.length > 0) && (

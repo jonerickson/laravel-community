@@ -43,7 +43,7 @@ export default function AddPaymentMethodDialog({ open, onOpenChange }: AddPaymen
         <Dialog open={open} onOpenChange={handleClose}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Add Payment Method</DialogTitle>
+                    <DialogTitle>Add a payment method</DialogTitle>
                     <DialogDescription>Add a new credit or debit card to your account.</DialogDescription>
                 </DialogHeader>
 

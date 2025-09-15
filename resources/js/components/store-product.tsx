@@ -5,7 +5,7 @@ import { StarRating } from '@/components/star-rating';
 import { StoreProductRating } from '@/components/store-product-rating';
 import { StoreProductReviewsList } from '@/components/store-product-reviews-list';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { Comment, PaginatedData, Product as ProductType, SharedData } from '@/types';
 import { Deferred, useForm, usePage } from '@inertiajs/react';
@@ -93,7 +93,8 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                                 </DialogTrigger>
                                 <DialogContent className="max-h-[80vh] min-w-[90vh] overflow-y-auto">
                                     <DialogHeader>
-                                        <DialogTitle>Product Reviews</DialogTitle>
+                                        <DialogTitle>Product reviews</DialogTitle>
+                                        <DialogDescription>View the latest product reviews and ratings.</DialogDescription>
                                     </DialogHeader>
                                     <div className="pt-4">
                                         <StoreProductReviewsList reviews={reviews || []} reviewsPagination={reviewsPagination} />

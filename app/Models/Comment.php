@@ -20,7 +20,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $commentable_type
  * @property int $commentable_id
- * @property string $content
+ * @property string|null $content
  * @property int|null $rating
  * @property bool $is_approved
  * @property int|null $parent_id

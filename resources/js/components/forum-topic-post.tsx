@@ -62,6 +62,9 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                             <ForumUserInfo user={post.author} isAuthor={index === 0} />
                             <meta itemProp="name" content={post.author?.name || ''} />
                         </div>
+                        <div className="md:hidden">
+                            <ForumTopicPostModerationMenu post={post} forum={forum} topic={topic} />
+                        </div>
                     </div>
 
                     <div className="min-w-0 flex-1">

@@ -7,6 +7,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ApiResource;
 use App\Models\Comment;
+use App\Models\Post;
+use App\Models\Product;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
@@ -23,7 +25,7 @@ class CommentController extends Controller
         $this->authorize('create', Comment::class);
 
         $validated = $request->validate([
-            'commentable_type' => 'required|string',
+            'commentable_type' => 'required|string|in:post,comment,product',
             'commentable_id' => 'required|integer',
             'content' => 'nullable|string',
             'rating' => 'nullable|integer|min:1|max:5',
@@ -34,8 +36,14 @@ class CommentController extends Controller
             return ApiResource::error('Either content or rating must be provided', [], 422);
         }
 
+        $commentableType = match ($validated['commentable_type']) {
+            'post' => Post::class,
+            'comment' => Comment::class,
+            'product' => Product::class,
+        };
+
         $comment = Comment::create([
-            'commentable_type' => $validated['commentable_type'],
+            'commentable_type' => $commentableType,
             'commentable_id' => $validated['commentable_id'],
             'content' => $validated['content'],
             'rating' => $validated['rating'] ?? null,

@@ -64,7 +64,7 @@ export function ReportDialog({ reportableType, reportableId, trigger, children }
                 <DialogHeader>
                     <div className="flex items-center gap-2">
                         <AlertTriangleIcon className="size-5 text-amber-500" />
-                        <DialogTitle>Report Content</DialogTitle>
+                        <DialogTitle>Report content</DialogTitle>
                     </div>
                     <DialogDescription>
                         Help us keep our community safe by reporting inappropriate content. All reports are reviewed by our moderation team.

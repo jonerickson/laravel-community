@@ -58,7 +58,7 @@ export default function DeletePaymentMethodDialog({ open, onOpenChange, paymentM
         <Dialog open={open} onOpenChange={handleClose}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Delete Payment Method</DialogTitle>
+                    <DialogTitle>Delete payment method</DialogTitle>
                     <DialogDescription>Are you sure you want to delete this payment method? This action cannot be undone.</DialogDescription>
                 </DialogHeader>
 
