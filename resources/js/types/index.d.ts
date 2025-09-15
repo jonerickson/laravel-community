@@ -354,7 +354,7 @@ export interface SupportTicket {
     created_at: string;
     updated_at: string;
     comments?: Comment[];
-    files?: { id: string; name: string }[];
+    files?: { id: string; name: string; url: string }[];
     is_active: boolean;
 }
 

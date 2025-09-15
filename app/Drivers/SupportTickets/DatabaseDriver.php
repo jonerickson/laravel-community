@@ -112,10 +112,25 @@ class DatabaseDriver implements SupportTicketService
         return $ticket->updateStatus($status);
     }
 
+    public function openTicket(SupportTicket $ticket): bool
+    {
+        if ($ticket->updateStatus(SupportTicketStatus::Open)) {
+            $ticket->update([
+                'resolved_at' => null,
+                'closed_at' => null,
+            ]);
+
+            return true;
+        }
+
+        return false;
+    }
+
     public function closeTicket(SupportTicket $ticket): bool
     {
         if ($ticket->updateStatus(SupportTicketStatus::Closed)) {
             $ticket->update([
+                'resolved_at' => null,
                 'closed_at' => now(),
             ]);
 
@@ -129,6 +144,7 @@ class DatabaseDriver implements SupportTicketService
     {
         if ($ticket->updateStatus(SupportTicketStatus::Resolved)) {
             $ticket->update([
+                'closed_at' => null,
                 'resolved_at' => now(),
             ]);
 

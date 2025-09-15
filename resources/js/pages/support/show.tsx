@@ -1,5 +1,6 @@
 import Heading from '@/components/heading';
 import RichEditorContent from '@/components/rich-editor-content';
+import SupportTicketAttachmentForm from '@/components/support-ticket-attachment-form';
 import SupportTicketCommentForm from '@/components/support-ticket-comment-form';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +13,7 @@ import type { BreadcrumbItem, Comment, SupportTicket } from '@/types';
 import { formatPriority, formatStatus, getPriorityVariant, getStatusVariant } from '@/utils/support-ticket';
 import { Head, router } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { Calendar, CheckCircle, Clock, FileText, Flag, Lock, LockOpen, MessageCircle, Tag, Ticket, User } from 'lucide-react';
+import { Calendar, CheckCircle, Clock, FileText, Flag, Lock, LockOpen, MessageCircle, Paperclip, Tag, Ticket, Trash2, User } from 'lucide-react';
 import { useState } from 'react';
 
 interface SupportTicketShowProps {
@@ -21,6 +22,7 @@ interface SupportTicketShowProps {
 
 export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
     const [showCommentForm, setShowCommentForm] = useState(false);
+    const [showAttachmentForm, setShowAttachmentForm] = useState(false);
     const { execute: updateTicket, loading: ticketUpdating } = useApiRequest();
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -39,6 +41,11 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
 
     const handleCommentSuccess = () => {
         setShowCommentForm(false);
+        router.reload({ only: ['ticket'] });
+    };
+
+    const handleAttachmentSuccess = () => {
+        setShowAttachmentForm(false);
         router.reload({ only: ['ticket'] });
     };
 
@@ -62,6 +69,18 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                 },
             },
         );
+    };
+
+    const handleDeleteAttachment = (fileId: string, fileName: string) => {
+        if (!window.confirm(`Are you sure you want to delete "${fileName}"?`)) {
+            return;
+        }
+
+        router.delete(route('support.attachments.destroy', [ticket.id, fileId]), {
+            onSuccess: () => {
+                router.reload({ only: ['ticket'] });
+            },
+        });
     };
 
     return (
@@ -139,6 +158,14 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                     onSuccess={handleCommentSuccess}
                                 />
                             )}
+
+                            {showAttachmentForm && (
+                                <SupportTicketAttachmentForm
+                                    ticket={ticket}
+                                    onCancel={() => setShowAttachmentForm(false)}
+                                    onSuccess={handleAttachmentSuccess}
+                                />
+                            )}
                         </div>
                     </div>
 
@@ -208,9 +235,29 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                 <CardContent>
                                     <div className="space-y-2">
                                         {ticket.files.map((file) => (
-                                            <div key={file.id} className="flex items-center gap-2 text-sm">
-                                                <FileText className="size-4 text-muted-foreground" />
-                                                <span>{file.name}</span>
+                                            <div key={file.id} className="flex items-center justify-between rounded-lg border p-2">
+                                                <div className="flex min-w-0 flex-1 items-center gap-2">
+                                                    <FileText className="size-4 shrink-0 text-muted-foreground" />
+                                                    <a
+                                                        href={file.url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="truncate text-sm font-medium text-primary hover:underline"
+                                                        title={file.name}
+                                                    >
+                                                        {file.name}
+                                                    </a>
+                                                </div>
+                                                {ticket.is_active && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleDeleteAttachment(file.id, file.name)}
+                                                        className="h-auto shrink-0 p-1 text-destructive hover:text-destructive"
+                                                    >
+                                                        <Trash2 className="size-4" />
+                                                    </Button>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
@@ -233,6 +280,15 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                         >
                                             <MessageCircle className="size-4" />
                                             {showCommentForm ? 'Cancel comment' : 'Add comment'}
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="w-full justify-start"
+                                            onClick={() => setShowAttachmentForm(!showAttachmentForm)}
+                                        >
+                                            <Paperclip className="size-4" />
+                                            {showAttachmentForm ? 'Cancel attachment' : 'Add attachment'}
                                         </Button>
                                         <Button
                                             variant="outline"

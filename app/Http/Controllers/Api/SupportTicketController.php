@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
-use App\Enums\SupportTicketStatus;
 use App\Http\Resources\ApiResource;
 use App\Managers\SupportTicketManager;
 use App\Models\SupportTicket;
@@ -75,7 +74,7 @@ class SupportTicketController
 
     private function open(SupportTicket $ticket): ApiResource
     {
-        $result = $this->supportTicketManager->updateStatus($ticket, SupportTicketStatus::Open);
+        $result = $this->supportTicketManager->openTicket($ticket);
 
         if (! $result) {
             return ApiResource::error(

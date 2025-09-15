@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -47,7 +48,19 @@ class File extends Model
         'size',
     ];
 
-    protected static function booted()
+    protected $appends = [
+        'url',
+    ];
+
+    public function url(): Attribute
+    {
+        return Attribute::get(fn (): ?string => $this->path
+            ? Storage::temporaryUrl($this->path, now()->addHour())
+            : null
+        )->shouldCache();
+    }
+
+    protected static function booted(): void
     {
         static::creating(function (File $model): void {
             if ($model->path) {
@@ -55,6 +68,12 @@ class File extends Model
                     'size' => Storage::fileSize($model->path),
                     'mime' => Storage::mimeType($model->path),
                 ]);
+            }
+        });
+
+        static::deleting(function (File $model): void {
+            if ($model->path && Storage::exists($model->path)) {
+                Storage::delete($model->path);
             }
         });
     }

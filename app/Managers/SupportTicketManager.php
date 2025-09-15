@@ -84,6 +84,11 @@ class SupportTicketManager extends Manager implements SupportTicketService
         return $this->driver()->updateStatus($ticket, $status);
     }
 
+    public function openTicket(SupportTicket $ticket): bool
+    {
+        return $this->driver()->openTicket($ticket);
+    }
+
     public function closeTicket(SupportTicket $ticket): bool
     {
         return $this->driver()->closeTicket($ticket);

@@ -37,6 +37,8 @@ interface SupportTicketService
 
     public function updateStatus(SupportTicket $ticket, SupportTicketStatus $status): bool;
 
+    public function openTicket(SupportTicket $ticket): bool;
+
     public function closeTicket(SupportTicket $ticket): bool;
 
     public function resolveTicket(SupportTicket $ticket): bool;
