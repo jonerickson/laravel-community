@@ -49,15 +49,7 @@ export default function SupportTicketsIndex({ tickets, ticketsPagination }: Supp
                     </div>
                 </div>
 
-                {tickets.length === 0 ? (
-                    <EmptyState
-                        icon={<Ticket />}
-                        title="No support tickets found"
-                        description="You haven't created any support tickets yet. Create one to get help from our support team."
-                        buttonText="Create Your First Ticket"
-                        onButtonClick={() => router.get(route('support.create'))}
-                    />
-                ) : (
+                {tickets.length > 0 ? (
                     <>
                         <div className="grid gap-4">
                             {tickets.map((ticket) => (
@@ -113,6 +105,14 @@ export default function SupportTicketsIndex({ tickets, ticketsPagination }: Supp
 
                         <Pagination pagination={ticketsPagination} baseUrl={''} entityLabel={'ticket'} />
                     </>
+                ) : (
+                    <EmptyState
+                        icon={<Ticket />}
+                        title="No support tickets found"
+                        description="You haven't created any support tickets yet. Create one to get help from our support team."
+                        buttonText="Create Your First Ticket"
+                        onButtonClick={() => router.get(route('support.create'))}
+                    />
                 )}
 
                 <Card>

@@ -23,7 +23,7 @@ class CategoryController extends Controller
 
         return Inertia::render('store/categories/show', [
             'category' => $category,
-            'products' => $category->products()->with(['prices', 'defaultPrice'])->get(),
+            'products' => $category->products()->with(['prices', 'defaultPrice'])->where('is_subscription_only', false)->get(),
         ]);
     }
 }

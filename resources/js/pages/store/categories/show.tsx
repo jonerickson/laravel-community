@@ -77,13 +77,11 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
                         ))}
                     </div>
                 ) : (
-                    <div className="mt-8">
-                        <EmptyState
-                            icon={<ShoppingBag />}
-                            title="No products found"
-                            description={`No products are currently available in the ${category.name} category.`}
-                        />
-                    </div>
+                    <EmptyState
+                        icon={<ShoppingBag />}
+                        title="No products found"
+                        description={`No products are currently available in the ${category.name} category.`}
+                    />
                 )}
             </div>
         </AppLayout>

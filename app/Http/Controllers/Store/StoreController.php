@@ -21,6 +21,7 @@ class StoreController extends Controller
                 ->take(5)
                 ->get(),
             'featuredProducts' => Product::query()
+                ->products()
                 ->featured()
                 ->with('categories')
                 ->latest()

@@ -97,7 +97,7 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                     </div>
                 </div>
 
-                {can('view_any_forums') && forums.length > 0 && (
+                {can('view_any_forums') && forums.length > 0 ? (
                     <div className="rounded-md border">
                         <Table>
                             <TableHeader>
@@ -186,12 +186,8 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                             </TableBody>
                         </Table>
                     </div>
-                )}
-
-                {forums.length === 0 && (
-                    <div className="mt-2">
-                        <EmptyState icon={<LibraryBig />} title="No forums available" description="There are no forums in this category yet." />
-                    </div>
+                ) : (
+                    <EmptyState icon={<LibraryBig />} title="No forums available" description="There are no forums in this category yet." />
                 )}
             </div>
         </AppLayout>

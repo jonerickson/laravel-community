@@ -91,6 +91,14 @@ class ProductSeeder extends Seeder
                     'slug' => Str::slug($name),
                     'featured_image' => null,
                     'external_product_id' => null,
+                    'is_subscription_only' => true,
+                    'metadata' => [
+                        'features' => [
+                            'An example of feature 1.',
+                            'An example of feature 2.',
+                            'An example of feature 3.',
+                        ],
+                    ],
                 ],
             ))
             ->create();

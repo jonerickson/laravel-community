@@ -39,6 +39,7 @@ use Laravel\Scout\Searchable;
  * @property ProductType $type
  * @property ProductTaxCode|null $tax_code
  * @property bool $is_featured
+ * @property bool $is_subscription_only
  * @property string|null $featured_image
  * @property string|null $external_product_id
  * @property array<array-key, mixed>|null $metadata
@@ -80,6 +81,7 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Product whereFeaturedImage($value)
  * @method static Builder<static>|Product whereId($value)
  * @method static Builder<static>|Product whereIsFeatured($value)
+ * @method static Builder<static>|Product whereIsSubscriptionOnly($value)
  * @method static Builder<static>|Product whereMetadata($value)
  * @method static Builder<static>|Product whereName($value)
  * @method static Builder<static>|Product whereSlug($value)
@@ -110,6 +112,7 @@ class Product extends Model implements Sluggable
         'description',
         'type',
         'tax_code',
+        'is_subscription_only',
         'external_product_id',
     ];
 
@@ -231,6 +234,7 @@ class Product extends Model implements Sluggable
         return [
             'type' => ProductType::class,
             'tax_code' => ProductTaxCode::class,
+            'is_subscription_only' => 'boolean',
         ];
     }
 }

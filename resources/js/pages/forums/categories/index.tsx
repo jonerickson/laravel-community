@@ -106,7 +106,7 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                     </div>
                 </div>
 
-                {can('view_any_forums_categories') && categories.length > 0 && (
+                {can('view_any_forums_categories') && categories.length > 0 ? (
                     <div className="grid gap-4">
                         {categories.map((category) => (
                             <Card key={category.id} className="overflow-hidden py-0 transition-shadow hover:shadow-sm">
@@ -218,9 +218,7 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                             </Card>
                         ))}
                     </div>
-                )}
-
-                {categories.length === 0 && (
+                ) : (
                     <EmptyState icon={<MessageSquare />} title="No forums available" description="Check back later for community discussions." />
                 )}
 

@@ -121,7 +121,7 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
                             </div>
                         )}
 
-                        {alternativeMethods.length > 0 && (
+                        {alternativeMethods.length > 0 ? (
                             <div className="space-y-4">
                                 <h3 className="text-lg font-semibold">Digital Wallets & Alternative Methods</h3>
                                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -137,6 +137,14 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
                                     ))}
                                 </div>
                             </div>
+                        ) : (
+                            <EmptyState
+                                icon={<CreditCard />}
+                                title="No payment methods"
+                                description="Add a payment method to make purchases and manage subscriptions."
+                                buttonText="Add Your First Payment Method"
+                                onButtonClick={() => setShowAddDialog(true)}
+                            />
                         )}
 
                         <Card>
@@ -165,16 +173,6 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
                                 </div>
                             </CardContent>
                         </Card>
-
-                        {paymentMethods.length === 0 && (
-                            <EmptyState
-                                icon={<CreditCard />}
-                                title="No payment methods"
-                                description="Add a payment method to make purchases and manage subscriptions."
-                                buttonText="Add Your First Payment Method"
-                                onButtonClick={() => setShowAddDialog(true)}
-                            />
-                        )}
 
                         <AddPaymentMethodDialog open={showAddDialog} onOpenChange={setShowAddDialog} />
 

@@ -91,42 +91,40 @@ export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
                     <Heading title="Blog" description="Browse our latest blog posts and articles" />
                 </div>
 
-                {can('view_any_posts') && posts.length > 0 && (
-                    <>
-                        <div className="mx-auto -my-8 grid max-w-2xl grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-                            {posts.map((post) => (
-                                <BlogIndexItem key={post.id} post={post} />
-                            ))}
-                        </div>
+                <div className="-mt-8">
+                    {can('view_any_posts') && posts.length > 0 ? (
+                        <>
+                            <div className="mx-auto grid max-w-2xl grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+                                {posts.map((post) => (
+                                    <BlogIndexItem key={post.id} post={post} />
+                                ))}
+                            </div>
 
-                        <WhenVisible
-                            fallback={<></>}
-                            always={postsPagination.current_page < postsPagination.last_page}
-                            params={{
-                                data: {
-                                    page: postsPagination.current_page + 1,
-                                },
-                                only: ['posts', 'postsPagination'],
-                            }}
-                        >
-                            {postsPagination.current_page >= postsPagination.last_page ? (
-                                <div className="flex items-center justify-center py-8 text-center">
-                                    <HeadingSmall title="There are no more blog posts." description="Check back later." />
-                                </div>
-                            ) : (
-                                <div className="flex items-center justify-center py-8">
-                                    <Spinner />
-                                </div>
-                            )}
-                        </WhenVisible>
-                    </>
-                )}
-
-                {posts.length === 0 && (
-                    <div className="-mt-8">
+                            <WhenVisible
+                                fallback={<></>}
+                                always={postsPagination.current_page < postsPagination.last_page}
+                                params={{
+                                    data: {
+                                        page: postsPagination.current_page + 1,
+                                    },
+                                    only: ['posts', 'postsPagination'],
+                                }}
+                            >
+                                {postsPagination.current_page >= postsPagination.last_page ? (
+                                    <div className="flex items-center justify-center py-8 text-center">
+                                        <HeadingSmall title="There are no more blog posts." description="Check back later." />
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center justify-center py-8">
+                                        <Spinner />
+                                    </div>
+                                )}
+                            </WhenVisible>
+                        </>
+                    ) : (
                         <EmptyState icon={<Newspaper />} title="No blog posts" description="Check back later to catch the latest updates." />
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </AppLayout>
     );

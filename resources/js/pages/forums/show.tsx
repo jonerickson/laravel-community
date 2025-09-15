@@ -201,7 +201,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                     </Alert>
                 )}
 
-                {can('view_any_topics') && topics.length > 0 && (
+                {can('view_any_topics') && topics.length > 0 ? (
                     <>
                         <div className="rounded-md border">
                             <Table>
@@ -317,12 +317,8 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                             className="py-4"
                         />
                     </>
-                )}
-
-                {topics.length === 0 && (
-                    <div className="mt-2">
-                        <EmptyState icon={<LibraryBig />} title="No topics yet" description="Be the first to start a discussion in this forum." />
-                    </div>
+                ) : (
+                    <EmptyState icon={<LibraryBig />} title="No topics yet" description="Be the first to start a discussion in this forum." />
                 )}
             </div>
         </AppLayout>

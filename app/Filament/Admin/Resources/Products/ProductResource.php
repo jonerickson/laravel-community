@@ -17,7 +17,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
@@ -27,6 +26,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Group as GroupSchema;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
@@ -61,6 +61,7 @@ class ProductResource extends Resource
                             ->columns()
                             ->schema([
                                 Radio::make('type')
+                                    ->live()
                                     ->columnSpanFull()
                                     ->required()
                                     ->options(ProductType::class)
@@ -147,9 +148,10 @@ class ProductResource extends Resource
                                     ->label('Featured product')
                                     ->helperText('Mark this product as featured to display it prominently on the store page.')
                                     ->columnSpanFull(),
-                                Toggle::make('metadata.popular')
-                                    ->label('Popular product')
-                                    ->helperText('Mark this product as popular.')
+                                Toggle::make('is_subscription_only')
+                                    ->visible(fn (Get $get) => $get('type') === ProductType::Subscription)
+                                    ->label('Subscription only')
+                                    ->helperText('Only show this product on the subscriptions page - not in the store.')
                                     ->columnSpanFull(),
                             ]),
                         Section::make('Compliance')
@@ -164,10 +166,10 @@ class ProductResource extends Resource
                             ]),
                         Section::make('Metadata')
                             ->components([
-                                KeyValue::make('metadata.features')
-                                    ->keyLabel('Feature')
-                                    ->valueLabel('Description')
-                                    ->nullable(),
+                                Repeater::make('metadata.features')
+                                    ->visible(fn (Get $get) => $get('type') === ProductType::Subscription)
+                                    ->addActionLabel('Add a new feature')
+                                    ->simple(TextInput::make('feature')),
                             ]),
                     ]),
             ]);

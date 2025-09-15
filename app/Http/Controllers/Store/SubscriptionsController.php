@@ -22,7 +22,8 @@ class SubscriptionsController extends Controller
     {
         $user = Auth::user();
 
-        $subscriptionProducts = Product::subscriptions()
+        $subscriptionProducts = Product::query()
+            ->subscriptions()
             ->with('activePrices')
             ->with('categories')
             ->orderBy('name')

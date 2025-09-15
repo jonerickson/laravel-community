@@ -263,18 +263,14 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                     className="hidden md:flex"
                 />
 
-                {posts.length > 0 && (
+                {posts.length > 0 ? (
                     <div className="grid gap-4">
                         {posts.map((post, index) => (
                             <ForumTopicPost key={post.id} post={post} index={index} forum={forum} topic={topic} onQuote={handleQuotePost} />
                         ))}
                     </div>
-                )}
-
-                {posts.length === 0 && (
-                    <div className="mt-2">
-                        <EmptyState icon={<MessageSquare />} title="No posts yet" description="This topic doesn't have any posts yet." />
-                    </div>
+                ) : (
+                    <EmptyState icon={<MessageSquare />} title="No posts yet" description="This topic doesn't have any posts yet." />
                 )}
 
                 <Deferred fallback={null} data="recentViewers">

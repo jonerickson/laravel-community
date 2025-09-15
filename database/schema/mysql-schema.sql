@@ -575,6 +575,7 @@ CREATE TABLE `products` (
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'storeProduct',
   `tax_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_featured` tinyint(1) NOT NULL DEFAULT '0',
+  `is_subscription_only` tinyint(1) NOT NULL DEFAULT '0',
   `featured_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `external_product_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `metadata` json DEFAULT NULL,
@@ -915,6 +916,25 @@ CREATE TABLE `users_groups` (
   CONSTRAINT `users_groups_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `users_socials`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users_socials` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `provider` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `provider_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `provider_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `provider_email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `provider_avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_socials_provider_id_unique` (`provider_id`),
+  KEY `users_socials_user_id_foreign` (`user_id`),
+  CONSTRAINT `users_socials_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `views`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -1004,3 +1024,4 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (62,'2025_09_11_215
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (63,'2025_09_11_215330_create_oauth_clients_table',17);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (64,'2025_09_11_215331_create_oauth_device_codes_table',17);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (65,'2025_09_12_034231_create_images_table',18);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (66,'2025_09_15_161847_create_users_socials_table',19);

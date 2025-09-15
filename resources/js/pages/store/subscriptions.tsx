@@ -80,8 +80,10 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
 
     const interval = intervalMap[billingCycle];
     const priceData = plan.prices[interval];
-    const price = priceData ? priceData.amount : 0; // Convert from cents
+    const price = priceData ? priceData.amount : 0;
     const priceId = priceData?.id || null;
+
+    console.log(plan.features);
 
     const monthlyPrice = plan.prices.month;
     const yearlyPrice = plan.prices.year;
@@ -282,13 +284,11 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
                         </div>
                     </div>
                 ) : (
-                    <div className="mb-12">
-                        <EmptyState
-                            icon={<Package className="h-12 w-12" />}
-                            title="No subscription plans available"
-                            description="We're currently working on our subscription offerings. Check back soon for exciting plans and features!"
-                        />
-                    </div>
+                    <EmptyState
+                        icon={<Package className="h-12 w-12" />}
+                        title="No subscription plans available"
+                        description="We're currently working on our subscription offerings. Check back soon for exciting plans and features!"
+                    />
                 )}
             </div>
         </AppLayout>
