@@ -16,7 +16,6 @@ class SubscriptionCheckoutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_id' => ['required', 'integer', 'exists:products,id'],
             'price_id' => ['required', 'integer', 'exists:products_prices,id'],
         ];
     }
@@ -24,9 +23,7 @@ class SubscriptionCheckoutRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'product_id.required' => 'A product must be selected.',
-            'product_id.exists' => 'The selected product is not available.',
-            'price_id.required' => 'A billing cycle must be selected.',
+            'price_id.required' => 'A product price must be selected.',
         ];
     }
 }

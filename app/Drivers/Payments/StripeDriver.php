@@ -11,7 +11,6 @@ use App\Models\Product;
 use App\Models\ProductPrice;
 use App\Models\User;
 use Exception;
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
@@ -19,6 +18,7 @@ use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Laravel\Cashier\Subscription;
 use Laravel\Cashier\SubscriptionBuilder;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Stripe;
@@ -408,12 +408,8 @@ class StripeDriver implements PaymentProcessor
         return true;
     }
 
-    public function isSubscribedToProduct(User $user, Product $product, ?ProductPrice $price = null): bool
+    public function isSubscribedToProduct(User $user, Product $product): bool
     {
-        if ($price && $price->external_price_id) {
-            return $user->subscribedToPrice($price->external_price_id);
-        }
-
         if (! $product->external_product_id) {
             return false;
         }
@@ -421,54 +417,48 @@ class StripeDriver implements PaymentProcessor
         return $user->subscribedToProduct($product->external_product_id);
     }
 
+    public function isSubscribedToPrice(User $user, ProductPrice $price): bool
+    {
+        if (! $price->external_price_id) {
+            return false;
+        }
+
+        return $user->subscribedToPrice($price->external_price_id);
+    }
+
     /**
      * @throws Exception
      */
-    public function startSubscription(User $user, Product $product, ProductPrice $price, string $returnUrl, bool $allowPromotionCodes = false, int $trialDays = 0): bool|Responsable
+    public function startSubscription(User $user, ProductPrice $price, string $returnUrl, bool $allowPromotionCodes = false, int $trialDays = 0): bool|string
     {
-        if ($product->external_product_id || $price->external_price_id) {
+        if (! $price->external_price_id) {
             return false;
         }
 
         return $user
-            ->newSubscription('default', $product->external_product_id)
+            ->newSubscription('default', $price->external_price_id)
             ->when($trialDays > 0, fn (SubscriptionBuilder $builder) => $builder->trialDays($trialDays))
             ->when($allowPromotionCodes, fn (SubscriptionBuilder $builder) => $builder->allowPromotionCodes())
             ->checkout([
                 'success_url' => $returnUrl,
                 'cancel_url' => $returnUrl,
-            ]);
+            ])->asStripeCheckoutSession()->url;
     }
 
-    public function cancelSubscription(User $user, Product $product): bool
+    public function cancelSubscription(User $user, ProductPrice $price): bool
     {
-        // Get the product's active prices to find the subscription
-        $monthlyPrice = $product->activePrices
-            ->where('interval', 'month')
-            ->where('interval_count', 1)
-            ->first();
-
-        $yearlyPrice = $product->activePrices
-            ->where('interval', 'year')
-            ->where('interval_count', 1)
-            ->first();
-
-        // Find the active subscription for this product
-        $subscription = null;
-
-        if ($monthlyPrice?->external_price_id) {
-            $subscription = $user->subscription($monthlyPrice->external_price_id);
-        }
-
-        if (! $subscription && $yearlyPrice?->external_price_id) {
-            $subscription = $user->subscription($yearlyPrice->external_price_id);
-        }
-
-        if (! $subscription || ! $subscription->active()) {
+        if (! $this->isSubscribedToPrice($user, $price)) {
             return false;
         }
 
-        // Cancel the subscription at the end of the current period
+        $subscription = $user->subscriptions->first(function (Subscription $subscription) use ($price) {
+            return $subscription->hasPrice($price->external_price_id);
+        });
+
+        if (blank($subscription)) {
+            return false;
+        }
+
         $subscription->cancel();
 
         $this->clearUserCaches($user->id);

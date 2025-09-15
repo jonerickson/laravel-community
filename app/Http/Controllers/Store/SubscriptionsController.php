@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Store;
 
-use App\Enums\SubscriptionInterval;
 use App\Http\Controllers\Controller;
 use App\Managers\PaymentManager;
 use App\Models\Product;

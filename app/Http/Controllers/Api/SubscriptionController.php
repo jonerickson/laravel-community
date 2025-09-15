@@ -7,7 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Requests\Api\SubscriptionCheckoutRequest;
 use App\Http\Resources\ApiResource;
 use App\Managers\PaymentManager;
-use App\Models\Product;
+use App\Models\ProductPrice;
 use Illuminate\Support\Facades\Auth;
 
 class SubscriptionController
@@ -30,28 +30,32 @@ class SubscriptionController
         }
 
         $validated = $request->validated();
-        $productId = $validated['product_id'];
 
-        /** @var Product $product */
-        $product = Product::query()
-            ->where('id', $productId)
-            ->where('type', 'subscription')
-            ->whereNotNull('external_product_id')
-            ->first();
-
-        if (! $product) {
+        if (! $price = ProductPrice::find($validated['price_id'])) {
             return ApiResource::error(
-                message: 'Subscription product not found.',
-                errors: ['product' => ['The selected product is not available for subscription.']],
-                status: 404
+                message: 'Unable to find product price.',
+                errors: ['price_id' => ['Unable to find product price.']],
+                status: 400
             );
         }
 
-        return $this->paymentManager->startSubscription(
+        $result = $this->paymentManager->startSubscription(
             user: $user,
-            product: $product,
-            price: $validated['price'],
+            price: $price,
             returnUrl: route('store.subscriptions')
+        );
+
+        if (! $result) {
+            return ApiResource::error(
+                message: 'Unable to start subscription.',
+                errors: ['price_id' => ['Unable to start subscription. Please try again later.']],
+                status: 400
+            );
+        }
+
+        return ApiResource::success(
+            resource: $result,
+            message: 'Subscription started successfully.',
         );
     }
 }

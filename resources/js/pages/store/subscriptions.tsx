@@ -63,7 +63,7 @@ const getColorForPlan = (plan: SubscriptionPlan): string => {
 interface PricingCardProps {
     plan: SubscriptionPlan;
     billingCycle: BillingCycle;
-    onSubscribe: (planId: number, priceId: number | null) => void;
+    onSubscribe: (planId: number | null, priceId: number | null) => void;
     loading?: boolean;
 }
 
@@ -75,7 +75,7 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
         daily: 'day',
         weekly: 'week',
         monthly: 'month',
-        yearly: 'year'
+        yearly: 'year',
     };
 
     const interval = intervalMap[billingCycle];
@@ -86,9 +86,7 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
     const monthlyPrice = plan.prices.month;
     const yearlyPrice = plan.prices.year;
     const yearlyDiscount =
-        billingCycle === 'yearly' && monthlyPrice && yearlyPrice
-            ? Math.round((1 - (yearlyPrice.amount / 12) / monthlyPrice.amount) * 100)
-            : 0;
+        billingCycle === 'yearly' && monthlyPrice && yearlyPrice ? Math.round((1 - yearlyPrice.amount / 12 / monthlyPrice.amount) * 100) : 0;
 
     return (
         <Card
@@ -170,20 +168,19 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
     const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
     const [loadingPlan, setLoadingPlan] = useState<number | null>(null);
 
-    // Filter available intervals based on what prices exist across all plans
     const intervalMap: Record<BillingCycle, string> = {
         daily: 'day',
         weekly: 'week',
         monthly: 'month',
-        yearly: 'year'
+        yearly: 'year',
     };
 
-    const availableIntervals = (Object.keys(intervalMap) as BillingCycle[]).filter(cycle => {
+    const availableIntervals = (Object.keys(intervalMap) as BillingCycle[]).filter((cycle) => {
         const interval = intervalMap[cycle];
-        return subscriptionProducts.some(plan => plan.prices[interval]);
+        return subscriptionProducts.some((plan) => plan.prices[interval]);
     });
 
-    const handleSubscribe = async (planId: number, priceId: number | null) => {
+    const handleSubscribe = async (planId: number | null, priceId: number | null) => {
         if (!priceId) {
             toast.error('No pricing available for this billing cycle.');
             return;
@@ -194,13 +191,12 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
         try {
             const response = (await apiRequest(
                 axios.post(route('api.subscriptions.checkout'), {
-                    product_id: planId,
                     price_id: priceId,
                 }),
-            )) as { checkout_url?: string };
+            )) as string | null | undefined;
 
-            if (response.checkout_url) {
-                window.location.href = response.checkout_url;
+            if (response) {
+                window.location.href = response;
             } else {
                 console.error('Failed to create checkout session');
                 toast.error('Failed to create checkout session. Please try again.');

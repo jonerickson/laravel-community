@@ -9,7 +9,6 @@ use App\Drivers\Payments\StripeDriver;
 use App\Models\Product;
 use App\Models\ProductPrice;
 use App\Models\User;
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
@@ -91,19 +90,24 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deletePaymentMethod($user, $paymentMethodId);
     }
 
-    public function startSubscription(User $user, Product $product, ProductPrice $price, string $returnUrl, bool $allowPromotionCodes = false, int $trialDays = 0): bool|Responsable
+    public function startSubscription(User $user, ProductPrice $price, string $returnUrl, bool $allowPromotionCodes = false, int $trialDays = 0): bool|string
     {
-        return $this->driver()->startSubscription($user, $product, $price, $returnUrl, $allowPromotionCodes);
+        return $this->driver()->startSubscription($user, $price, $returnUrl, $allowPromotionCodes);
     }
 
-    public function cancelSubscription(User $user, Product $product): bool
+    public function cancelSubscription(User $user, ProductPrice $price): bool
     {
-        return $this->driver()->cancelSubscription($user, $product);
+        return $this->driver()->cancelSubscription($user, $price);
     }
 
-    public function isSubscribedToProduct(User $user, Product $product, ?ProductPrice $price = null): bool
+    public function isSubscribedToProduct(User $user, Product $product): bool
     {
-        return $this->driver()->isSubscribedToProduct($user, $product, $price);
+        return $this->driver()->isSubscribedToProduct($user, $product);
+    }
+
+    public function isSubscribedToPrice(User $user, ProductPrice $price): bool
+    {
+        return $this->driver()->isSubscribedToPrice($user, $price);
     }
 
     protected function createStripeDriver(): PaymentProcessor

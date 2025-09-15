@@ -13,8 +13,8 @@ import { ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const policies = [
-//     { name: 'International delivery', icon: GlobeIcon, description: 'Get your order in 2 years' },
-//     { name: 'Loyalty rewards', icon: CurrencyIcon, description: "Don't look at other tees" },
+    //     { name: 'International delivery', icon: GlobeIcon, description: 'Get your order in 2 years' },
+    //     { name: 'Loyalty rewards', icon: CurrencyIcon, description: "Don't look at other tees" },
 ];
 
 interface ProductProps {

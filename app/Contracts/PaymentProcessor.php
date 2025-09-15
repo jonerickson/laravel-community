@@ -7,7 +7,6 @@ namespace App\Contracts;
 use App\Models\Product;
 use App\Models\ProductPrice;
 use App\Models\User;
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Collection;
 
 interface PaymentProcessor
@@ -40,9 +39,11 @@ interface PaymentProcessor
 
     public function deletePaymentMethod(User $user, string $paymentMethodId): bool;
 
-    public function startSubscription(User $user, Product $product, ProductPrice $price, string $returnUrl, bool $allowPromotionCodes = false, int $trialDays = 0): bool|Responsable;
+    public function startSubscription(User $user, ProductPrice $price, string $returnUrl, bool $allowPromotionCodes = false, int $trialDays = 0): bool|string;
 
-    public function cancelSubscription(User $user, Product $product): bool;
+    public function cancelSubscription(User $user, ProductPrice $price): bool;
 
-    public function isSubscribedToProduct(User $user, Product $product, ?ProductPrice $price = null): bool;
+    public function isSubscribedToProduct(User $user, Product $product): bool;
+
+    public function isSubscribedToPrice(User $user, ProductPrice $price): bool;
 }
