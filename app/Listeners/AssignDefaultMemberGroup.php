@@ -11,12 +11,12 @@ class AssignDefaultMemberGroup
 {
     public function handle(UserCreated $event): void
     {
-        $group = Group::query()->where('is_default_member', true)->first();
+        $groups = Group::query()->defaultMemberGroups()->first();
 
-        if (blank($group)) {
+        if (blank($groups)) {
             return;
         }
 
-        $event->user->assignToGroup($group);
+        $groups->each(fn (Group $group) => $event->user->assignToGroup($group));
     }
 }

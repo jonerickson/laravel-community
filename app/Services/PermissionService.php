@@ -36,7 +36,13 @@ class PermissionService
     public static function mapFrontendPermissions(?User $user = null): array
     {
         if (blank($user) && ($guestGroup = Group::query()->defaultGuestGroups()->first())) {
-            return $guestGroup->getAllPermissions()->map(fn (Permission $permission) => $permission->name)->toArray();
+            return $guestGroup
+                ->getAllPermissions()
+                ->map(fn (Permission $permission) => $permission->name)
+                ->filter()
+                ->unique()
+                ->values()
+                ->toArray();
         }
 
         if (blank($user)) {
@@ -44,6 +50,8 @@ class PermissionService
         }
 
         $permissions = $user->getAllPermissions();
+
+        $user->loadMissing('groups');
 
         foreach ($user->groups as $group) {
             $permissions->push(...$group->getAllPermissions());
@@ -53,6 +61,7 @@ class PermissionService
             ->map(fn (Permission $permission) => $permission->name)
             ->filter()
             ->unique()
+            ->values()
             ->toArray();
     }
 }

@@ -15,7 +15,7 @@ interface UsePermissionsReturn {
 export function usePermissions(): UsePermissionsReturn {
     const { auth } = usePage<SharedData>().props;
     const can = (permission: string): boolean => {
-        return auth?.can.includes(permission);
+        return Array.isArray(auth?.can) && auth.can.includes(permission);
     };
 
     const cannot = (permission: string): boolean => {
@@ -23,7 +23,7 @@ export function usePermissions(): UsePermissionsReturn {
     };
 
     const hasRole = (role: string): boolean => {
-        return auth?.roles?.includes(role) ?? false;
+        return Array.isArray(auth?.roles) && auth?.roles?.includes(role);
     };
 
     const hasAnyRole = (roles: string[]): boolean => {

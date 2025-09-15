@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Storage;
  * @property string|null $size
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read string|null $url
  *
  * @method static Builder<static>|File newModelQuery()
  * @method static Builder<static>|File newQuery()

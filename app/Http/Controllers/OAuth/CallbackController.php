@@ -20,10 +20,20 @@ class CallbackController extends Controller
             'email' => $socialUser->getEmail(),
         ], [
             'name' => $socialUser->getName(),
+            'email_verified_at' => now(),
+        ]);
+
+        $user->socials()->updateOrCreate([
+            'provider' => $provider,
+            'provider_id' => $socialUser->getId(),
+        ], [
+            'provider_name' => $socialUser->getName(),
+            'provider_email' => $socialUser->getEmail(),
+            'provider_avatar' => $socialUser->getAvatar(),
         ]);
 
         Auth::login($user);
 
-        return redirect()->intended('/dashboard');
+        return redirect()->intended(route('dashboard', absolute: false));
     }
 }

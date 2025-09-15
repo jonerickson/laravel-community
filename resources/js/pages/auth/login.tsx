@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { IconBrandDiscord, IconRobot } from '@tabler/icons-react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler, useEffect } from 'react';
@@ -114,17 +114,17 @@ export default function AuthLogin({ status, canResetPassword }: LoginProps) {
 
                     <div className="flex flex-col gap-4">
                         <Button className="w-full bg-[#424549] text-white" tabIndex={4} size="icon" asChild>
-                            <Link href={route('oauth.redirect', { provider: 'discord' })}>
+                            <a href={route('oauth.redirect', { provider: 'discord' })}>
                                 <IconBrandDiscord />
                                 Login with Discord
-                            </Link>
+                            </a>
                         </Button>
 
                         <Button className="w-full bg-[#FF0000] text-white" tabIndex={4} size="icon" asChild>
-                            <Link href={route('oauth.redirect', { provider: 'roblox' })}>
+                            <a href={route('oauth.redirect', { provider: 'roblox' })}>
                                 <IconRobot />
                                 Login with Roblox
-                            </Link>
+                            </a>
                         </Button>
                     </div>
                 </div>

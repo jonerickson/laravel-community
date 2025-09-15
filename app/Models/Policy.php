@@ -24,6 +24,7 @@ use Laravel\Scout\Searchable;
  * @property string $title
  * @property string $slug
  * @property string|null $version
+ * @property string|null $description
  * @property string $content
  * @property int $policy_category_id
  * @property int $order
@@ -51,6 +52,7 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Policy whereContent($value)
  * @method static Builder<static>|Policy whereCreatedAt($value)
  * @method static Builder<static>|Policy whereCreatedBy($value)
+ * @method static Builder<static>|Policy whereDescription($value)
  * @method static Builder<static>|Policy whereEffectiveAt($value)
  * @method static Builder<static>|Policy whereId($value)
  * @method static Builder<static>|Policy whereIsActive($value)

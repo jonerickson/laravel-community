@@ -19,7 +19,7 @@ return [
     'discord' => [
         'client_id' => env('DISCORD_CLIENT_ID'),
         'client_secret' => env('DISCORD_CLIENT_SECRET'),
-        'redirect' => 'http://example.com/callback-url',
+        'redirect' => env('DISCORD_REDIRECT_URI'),
     ],
 
     'postmark' => [
@@ -39,7 +39,7 @@ return [
     'roblox' => [
         'client_id' => env('ROBLOX_CLIENT_ID'),
         'client_secret' => env('ROBLOX_CLIENT_SECRET'),
-        'redirect' => 'http://example.com/callback-url',
+        'redirect' => env('ROBLOX_REDIRECT_URI'),
     ],
 
     'stripe' => [

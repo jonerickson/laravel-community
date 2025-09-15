@@ -45,7 +45,7 @@ use Laravel\Passport\HasApiTokens;
  * @property string $email
  * @property Carbon|null $email_verified_at
  * @property string|null $signature
- * @property string $password
+ * @property string|null $password
  * @property string|null $remember_token
  * @property string|null $app_authentication_secret
  * @property array<array-key, mixed>|null $app_authentication_recovery_codes
@@ -95,6 +95,8 @@ use Laravel\Passport\HasApiTokens;
  * @property-read int|null $reports_count
  * @property-read Collection<int, Role> $roles
  * @property-read int|null $roles_count
+ * @property-read Collection<int, UserSocial> $socials
+ * @property-read int|null $socials_count
  * @property-read Collection<int, Subscription> $subscriptions
  * @property-read int|null $subscriptions_count
  * @property-read Collection<int, \Laravel\Passport\Token> $tokens
@@ -225,6 +227,11 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     public function fingerprints(): HasMany
     {
         return $this->hasMany(Fingerprint::class);
+    }
+
+    public function socials(): HasMany
+    {
+        return $this->hasMany(UserSocial::class);
     }
 
     public function isBanned(): Attribute
