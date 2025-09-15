@@ -361,7 +361,7 @@ function EmojiDialog({ editor, isOpen, onOpenChange }: EmojiDialogProps) {
                             variant="ghost"
                             size="sm"
                             onClick={() => insertEmoji(emoji)}
-                            className="h-12 w-12 text-xl hover:bg-muted"
+                            className="size-12 text-xl hover:bg-muted"
                         >
                             {emoji}
                         </Button>

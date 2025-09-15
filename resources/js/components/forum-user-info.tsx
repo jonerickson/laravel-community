@@ -7,7 +7,7 @@ export default function ForumUserInfo({ user, isAuthor = false }: { user: User; 
     const { auth } = usePage<SharedData>().props;
     return (
         <div className="flex flex-row items-center gap-4 md:flex-col md:gap-2 md:px-8">
-            <Avatar className="h-12 w-12">
+            <Avatar className="size-12">
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>

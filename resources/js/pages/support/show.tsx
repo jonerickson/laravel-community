@@ -89,7 +89,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center sm:gap-0">
                     <div className="flex items-start gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-white">
+                        <div className="flex size-12 items-center justify-center rounded-lg bg-primary text-white">
                             <Ticket className="h-6 w-6" />
                         </div>
                         <div className="-mb-6">

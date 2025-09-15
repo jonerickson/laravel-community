@@ -66,7 +66,7 @@ export default function DashboardProductCard({ product, type, className }: Dashb
                         />
                     ) : (
                         <div className="flex h-full w-full items-center justify-center text-muted-foreground">
-                            <IconComponent className="h-12 w-12" />
+                            <IconComponent className="size-12" />
                         </div>
                     )}
                 </div>

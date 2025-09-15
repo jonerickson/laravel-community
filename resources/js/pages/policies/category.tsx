@@ -33,7 +33,7 @@ export default function PolicyCategoryShow({ category, policies }: PoliciesCateg
                         <Card key={policy.id} className="transition-shadow hover:shadow-md">
                             <CardHeader>
                                 <div className="flex items-start gap-4">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                    <div className="flex size-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                         <FileText className="h-6 w-6" />
                                     </div>
                                     <div className="flex-1">
@@ -65,7 +65,7 @@ export default function PolicyCategoryShow({ category, policies }: PoliciesCateg
                 {policies.length === 0 && (
                     <Card>
                         <CardContent className="flex flex-col items-center justify-center py-12">
-                            <FileText className="mb-4 h-12 w-12 text-muted-foreground" />
+                            <FileText className="mb-4 size-12 text-muted-foreground" />
                             <CardTitle className="mb-2">No Policies Available</CardTitle>
                             <CardDescription>No policies are currently available in this category.</CardDescription>
                         </CardContent>

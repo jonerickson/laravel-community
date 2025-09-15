@@ -83,8 +83,6 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
     const price = priceData ? priceData.amount : 0;
     const priceId = priceData?.id || null;
 
-    console.log(plan.features);
-
     const monthlyPrice = plan.prices.month;
     const yearlyPrice = plan.prices.year;
     const yearlyDiscount =
@@ -254,7 +252,7 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                             <Card>
                                 <CardContent className="p-6 text-center">
-                                    <Shield className="mx-auto mb-4 h-12 w-12 text-info" />
+                                    <Shield className="mx-auto mb-4 size-12 text-info" />
                                     <h3 className="mb-2 font-semibold">Secure payments</h3>
                                     <p className="text-sm text-muted-foreground">
                                         All payments are processed securely through Stripe with industry-standard encryption.
@@ -264,7 +262,7 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
 
                             <Card>
                                 <CardContent className="p-6 text-center">
-                                    <Users className="mx-auto mb-4 h-12 w-12 text-success" />
+                                    <Users className="mx-auto mb-4 size-12 text-success" />
                                     <h3 className="mb-2 font-semibold">24/7 support</h3>
                                     <p className="text-sm text-muted-foreground">
                                         Get help when you need it with our dedicated support team available around the clock.
@@ -274,7 +272,7 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
 
                             <Card>
                                 <CardContent className="p-6 text-center">
-                                    <Rocket className="mx-auto mb-4 h-12 w-12 text-destructive" />
+                                    <Rocket className="mx-auto mb-4 size-12 text-destructive" />
                                     <h3 className="mb-2 font-semibold">Cancel anytime</h3>
                                     <p className="text-sm text-muted-foreground">
                                         No long-term commitments. Cancel your subscription at any time with just a few clicks.
@@ -285,7 +283,7 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
                     </div>
                 ) : (
                     <EmptyState
-                        icon={<Package className="h-12 w-12" />}
+                        icon={<Package className="size-12" />}
                         title="No subscription plans available"
                         description="We're currently working on our subscription offerings. Check back soon for exciting plans and features!"
                     />

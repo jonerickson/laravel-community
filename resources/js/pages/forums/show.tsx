@@ -151,7 +151,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                 <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start sm:gap-0">
                     <div className="flex items-start gap-4">
                         <div
-                            className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg text-white"
+                            className="flex size-12 flex-shrink-0 items-center justify-center rounded-lg text-white"
                             style={{ backgroundColor: forum.color }}
                         >
                             <MessageSquare className="h-6 w-6" />

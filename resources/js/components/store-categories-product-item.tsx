@@ -45,7 +45,7 @@ export default function StoreCategoriesProductItem({ product }: { product: Produ
                 <img alt={product.name} src={product.featured_image_url} className="aspect-square rounded-lg object-cover" />
             ) : (
                 <div className="flex aspect-square items-center justify-center rounded-lg bg-muted">
-                    <ImageIcon className="h-12 w-12 text-muted-foreground" />
+                    <ImageIcon className="size-12 text-muted-foreground" />
                 </div>
             )}
             <div className="flex flex-1 flex-col pt-6 pb-4">

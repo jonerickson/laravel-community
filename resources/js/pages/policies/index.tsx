@@ -28,7 +28,7 @@ export default function PolicyCategoryIndex({ categories }: PoliciesIndexProps) 
                         <Card key={category.id} className="transition-shadow hover:shadow-md">
                             <CardHeader>
                                 <div className="flex items-start gap-4">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                    <div className="flex size-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                         <Folder className="h-6 w-6" />
                                     </div>
                                     <div className="flex-1">
@@ -74,7 +74,7 @@ export default function PolicyCategoryIndex({ categories }: PoliciesIndexProps) 
                 {categories.length === 0 && (
                     <Card>
                         <CardContent className="flex flex-col items-center justify-center py-12">
-                            <FileText className="mb-4 h-12 w-12 text-muted-foreground" />
+                            <FileText className="mb-4 size-12 text-muted-foreground" />
                             <CardTitle className="mb-2">No Policies Available</CardTitle>
                             <CardDescription>Policy documents will be available here when published.</CardDescription>
                         </CardContent>

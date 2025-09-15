@@ -87,7 +87,7 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex items-start gap-4">
                     <div
-                        className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg text-white"
+                        className="flex size-12 flex-shrink-0 items-center justify-center rounded-lg text-white"
                         style={{ backgroundColor: category.color }}
                     >
                         <MessageSquare className="h-6 w-6" />
