@@ -48,7 +48,7 @@ trait Readable
             return null;
         }
 
-        return $this->reads()->where('created_by', $userId)->first();
+        return $this->reads()->whereCreatedBy($userId)->first();
     }
 
     public function isReadBy(?int $userId = null): bool
@@ -71,9 +71,7 @@ trait Readable
             return $existingRead;
         }
 
-        return $this->reads()->create([
-            'created_by' => $userId,
-        ]);
+        return $this->reads()->updateOrCreate([]);
     }
 
     public function markAsUnread(?int $userId = null): bool

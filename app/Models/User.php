@@ -74,7 +74,7 @@ use Laravel\Passport\HasApiTokens;
  * @property-read string|null $avatar_url
  * @property-read Collection<int, \Laravel\Passport\Client> $clients
  * @property-read int|null $clients_count
- * @property-read Collection<int, UserFingerprint> $fingerprints
+ * @property-read Collection<int, Fingerprint> $fingerprints
  * @property-read int|null $fingerprints_count
  * @property-read Collection<int, Group> $groups
  * @property-read int|null $groups_count
@@ -224,7 +224,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
 
     public function fingerprints(): HasMany
     {
-        return $this->hasMany(UserFingerprint::class);
+        return $this->hasMany(Fingerprint::class);
     }
 
     public function isBanned(): Attribute

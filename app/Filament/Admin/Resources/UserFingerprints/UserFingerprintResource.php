@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\UserFingerprints;
 
 use App\Filament\Admin\Resources\UserFingerprints\Pages\ListUserFingerprints;
-use App\Models\UserFingerprint;
+use App\Models\Fingerprint;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -32,7 +32,7 @@ use UnitEnum;
 
 class UserFingerprintResource extends Resource
 {
-    protected static ?string $model = UserFingerprint::class;
+    protected static ?string $model = Fingerprint::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-device-phone-mobile';
 
@@ -153,14 +153,14 @@ class UserFingerprintResource extends Resource
                     ->label('Ban Device')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (UserFingerprint $record): bool => ! $record->is_banned)
+                    ->visible(fn (Fingerprint $record): bool => ! $record->is_banned)
                     ->schema([
                         Textarea::make('ban_reason')
                             ->label('Ban Reason')
                             ->required()
                             ->maxLength(1000),
                     ])
-                    ->action(function (UserFingerprint $record, array $data): void {
+                    ->action(function (Fingerprint $record, array $data): void {
                         $record->banFingerprint($data['ban_reason'], Filament::auth()->user());
                     })
                     ->requiresConfirmation()
@@ -171,8 +171,8 @@ class UserFingerprintResource extends Resource
                     ->label('Unban Device')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (UserFingerprint $record): bool => $record->is_banned)
-                    ->action(fn (UserFingerprint $record) => $record->unbanFingerprint())
+                    ->visible(fn (Fingerprint $record): bool => $record->is_banned)
+                    ->action(fn (Fingerprint $record) => $record->unbanFingerprint())
                     ->requiresConfirmation()
                     ->modalHeading('Unban Device')
                     ->modalDescription('Are you sure you want to unban this device?')

@@ -8,10 +8,10 @@ use App\Filament\Admin\Resources\Users\Pages\CreateUser;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Filament\Admin\Resources\Users\Pages\ListUsers;
 use App\Filament\Admin\Resources\Users\RelationManagers\FingerprintsRelationManager;
+use App\Models\Fingerprint;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
-use App\Models\UserFingerprint;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -244,7 +244,7 @@ class UserResource extends Resource
                             ->required()
                             ->maxLength(1000),
                     ])
-                    ->action(fn (User $record, array $data) => $record->fingerprints()->each(fn (UserFingerprint $fingerprint) => $fingerprint->banFingerprint($data['ban_reason'], Filament::auth()->user())))
+                    ->action(fn (User $record, array $data) => $record->fingerprints()->each(fn (Fingerprint $fingerprint) => $fingerprint->banFingerprint($data['ban_reason'], Filament::auth()->user())))
                     ->requiresConfirmation()
                     ->modalHeading('Ban User')
                     ->modalDescription('Are you sure you want to ban this user? They will be immediately logged out and unable to access the site.')
@@ -254,7 +254,7 @@ class UserResource extends Resource
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->visible(fn (User $record): bool => $record->is_banned && $record->fingerprints->count())
-                    ->action(fn (User $record) => $record->fingerprints()->each(fn (UserFingerprint $fingerprint) => $fingerprint->unbanFingerprint()))
+                    ->action(fn (User $record) => $record->fingerprints()->each(fn (Fingerprint $fingerprint) => $fingerprint->unbanFingerprint()))
                     ->requiresConfirmation()
                     ->modalHeading('Unban User')
                     ->modalDescription('Are you sure you want to unban this user?')

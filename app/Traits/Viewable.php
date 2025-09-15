@@ -8,7 +8,6 @@ use App\Models\View;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Support\Facades\Auth;
 
 trait Viewable
 {
@@ -17,31 +16,31 @@ trait Viewable
         return $this->morphMany(View::class, 'viewable');
     }
 
-    public function userView(?int $userId = null): ?View
+    public function fingerprintView(?string $fingerprintId = null): ?View
     {
-        $userId ??= Auth::id();
+        $fingerprintId ??= $this->getCurrentFingerprintId();
 
-        if (! $userId) {
+        if (! $fingerprintId) {
             return null;
         }
 
-        return $this->views()->where('created_by', $userId)->first();
+        return $this->views()->where('fingerprint_id', $fingerprintId)->first();
     }
 
-    public function isViewedBy(?int $userId = null): bool
+    public function isViewedByFingerprint(?string $fingerprintId = null): bool
     {
-        return $this->userView($userId) !== null;
+        return $this->fingerprintView($fingerprintId) !== null;
     }
 
-    public function recordView(?int $userId = null): Model|bool
+    public function recordView(?string $fingerprintId = null): Model|bool
     {
-        $userId ??= Auth::id();
+        $fingerprintId ??= $this->getCurrentFingerprintId();
 
-        if (! $userId) {
+        if (! $fingerprintId) {
             return false;
         }
 
-        $existingView = $this->userView($userId);
+        $existingView = $this->fingerprintView($fingerprintId);
         if ($existingView) {
             $existingView->increment('count');
 
@@ -49,7 +48,9 @@ trait Viewable
         }
 
         return $this->views()->updateOrCreate([
-            'created_by' => $userId,
+            'fingerprint_id' => $fingerprintId,
+        ], [
+            'count' => 1,
         ]);
     }
 
@@ -63,13 +64,19 @@ trait Viewable
     public function uniqueViewsCount(): Attribute
     {
         return Attribute::make(
-            get: fn (): int => $this->views()->distinct('created_by')->count('created_by'),
+            get: fn (): int => $this->views()->distinct(['fingerprint_id'])->count('fingerprint_id'),
         )->shouldCache();
     }
 
     public function incrementViews(): void
     {
         $this->recordView();
+    }
+
+    protected function getCurrentFingerprintId(): ?string
+    {
+        return request()->header('X-Fingerprint-ID')
+            ?? request()->cookie('fingerprint_id');
     }
 
     protected function initializeViewable(): void

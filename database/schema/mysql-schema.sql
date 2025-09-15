@@ -137,6 +137,34 @@ CREATE TABLE `files` (
   KEY `files_resource_type_resource_id_index` (`resource_type`,`resource_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `fingerprints`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `fingerprints` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `fingerprint_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fingerprint_data` json DEFAULT NULL,
+  `ip_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_banned` tinyint(1) NOT NULL DEFAULT '0',
+  `ban_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `banned_by` bigint unsigned DEFAULT NULL,
+  `banned_at` timestamp NULL DEFAULT NULL,
+  `first_seen_at` timestamp NOT NULL,
+  `last_seen_at` timestamp NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_fingerprints_user_id_fingerprint_id_unique` (`user_id`,`fingerprint_id`),
+  KEY `users_fingerprints_banned_by_foreign` (`banned_by`),
+  KEY `users_fingerprints_fingerprint_id_last_seen_at_index` (`fingerprint_id`,`last_seen_at`),
+  KEY `users_fingerprints_fingerprint_id_is_banned_index` (`fingerprint_id`,`is_banned`),
+  KEY `users_fingerprints_fingerprint_id_index` (`fingerprint_id`),
+  CONSTRAINT `users_fingerprints_banned_by_foreign` FOREIGN KEY (`banned_by`) REFERENCES `users` (`id`),
+  CONSTRAINT `users_fingerprints_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `forums`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -874,34 +902,6 @@ CREATE TABLE `users` (
   KEY `users_stripe_id_index` (`stripe_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `users_fingerprints`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `users_fingerprints` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` bigint unsigned DEFAULT NULL,
-  `fingerprint_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `fingerprint_data` json DEFAULT NULL,
-  `ip_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `is_banned` tinyint(1) NOT NULL DEFAULT '0',
-  `ban_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `banned_by` bigint unsigned DEFAULT NULL,
-  `banned_at` timestamp NULL DEFAULT NULL,
-  `first_seen_at` timestamp NOT NULL,
-  `last_seen_at` timestamp NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `users_fingerprints_user_id_fingerprint_id_unique` (`user_id`,`fingerprint_id`),
-  KEY `users_fingerprints_banned_by_foreign` (`banned_by`),
-  KEY `users_fingerprints_fingerprint_id_last_seen_at_index` (`fingerprint_id`,`last_seen_at`),
-  KEY `users_fingerprints_fingerprint_id_is_banned_index` (`fingerprint_id`,`is_banned`),
-  KEY `users_fingerprints_fingerprint_id_index` (`fingerprint_id`),
-  CONSTRAINT `users_fingerprints_banned_by_foreign` FOREIGN KEY (`banned_by`) REFERENCES `users` (`id`),
-  CONSTRAINT `users_fingerprints_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `users_groups`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -921,15 +921,14 @@ CREATE TABLE `views` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `viewable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `viewable_id` bigint unsigned NOT NULL,
-  `created_by` bigint unsigned NOT NULL,
+  `fingerprint_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `count` int unsigned NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `views_viewable_type_viewable_id_created_by_unique` (`viewable_type`,`viewable_id`,`created_by`),
+  UNIQUE KEY `views_viewable_type_viewable_id_fingerprint_id_unique` (`viewable_type`,`viewable_id`,`fingerprint_id`),
   KEY `views_viewable_type_viewable_id_index` (`viewable_type`,`viewable_id`),
-  KEY `views_created_by_index` (`created_by`),
-  CONSTRAINT `views_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE
+  KEY `views_fingerprint_id_index` (`fingerprint_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

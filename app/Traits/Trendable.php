@@ -56,7 +56,7 @@ trait Trendable
                     SELECT
                         `viewable_id`,
                         SUM(`count`) as total_views,
-                        COUNT(DISTINCT `created_by`) as unique_views
+                        COUNT(DISTINCT `fingerprint_id`) as unique_views
                     FROM `views`
                     WHERE `viewable_type` = '$modelClass'
                     GROUP BY `viewable_id`

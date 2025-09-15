@@ -27,31 +27,29 @@ use Illuminate\Support\Carbon;
  * @property-read User|null $bannedBy
  * @property-read User|null $user
  *
- * @method static Builder<static>|UserFingerprint banned()
- * @method static Builder<static>|UserFingerprint newModelQuery()
- * @method static Builder<static>|UserFingerprint newQuery()
- * @method static Builder<static>|UserFingerprint query()
- * @method static Builder<static>|UserFingerprint whereBanReason($value)
- * @method static Builder<static>|UserFingerprint whereBannedAt($value)
- * @method static Builder<static>|UserFingerprint whereBannedBy($value)
- * @method static Builder<static>|UserFingerprint whereCreatedAt($value)
- * @method static Builder<static>|UserFingerprint whereFingerprintData($value)
- * @method static Builder<static>|UserFingerprint whereFingerprintId($value)
- * @method static Builder<static>|UserFingerprint whereFirstSeenAt($value)
- * @method static Builder<static>|UserFingerprint whereId($value)
- * @method static Builder<static>|UserFingerprint whereIpAddress($value)
- * @method static Builder<static>|UserFingerprint whereIsBanned($value)
- * @method static Builder<static>|UserFingerprint whereLastSeenAt($value)
- * @method static Builder<static>|UserFingerprint whereUpdatedAt($value)
- * @method static Builder<static>|UserFingerprint whereUserAgent($value)
- * @method static Builder<static>|UserFingerprint whereUserId($value)
+ * @method static Builder<static>|Fingerprint banned()
+ * @method static Builder<static>|Fingerprint newModelQuery()
+ * @method static Builder<static>|Fingerprint newQuery()
+ * @method static Builder<static>|Fingerprint query()
+ * @method static Builder<static>|Fingerprint whereBanReason($value)
+ * @method static Builder<static>|Fingerprint whereBannedAt($value)
+ * @method static Builder<static>|Fingerprint whereBannedBy($value)
+ * @method static Builder<static>|Fingerprint whereCreatedAt($value)
+ * @method static Builder<static>|Fingerprint whereFingerprintData($value)
+ * @method static Builder<static>|Fingerprint whereFingerprintId($value)
+ * @method static Builder<static>|Fingerprint whereFirstSeenAt($value)
+ * @method static Builder<static>|Fingerprint whereId($value)
+ * @method static Builder<static>|Fingerprint whereIpAddress($value)
+ * @method static Builder<static>|Fingerprint whereIsBanned($value)
+ * @method static Builder<static>|Fingerprint whereLastSeenAt($value)
+ * @method static Builder<static>|Fingerprint whereUpdatedAt($value)
+ * @method static Builder<static>|Fingerprint whereUserAgent($value)
+ * @method static Builder<static>|Fingerprint whereUserId($value)
  *
  * @mixin \Eloquent
  */
-class UserFingerprint extends Model
+class Fingerprint extends Model
 {
-    protected $table = 'users_fingerprints';
-
     protected $fillable = [
         'user_id',
         'fingerprint_id',

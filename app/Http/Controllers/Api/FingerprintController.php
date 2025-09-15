@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ApiResource;
-use App\Models\UserFingerprint;
+use App\Models\Fingerprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
@@ -20,7 +20,7 @@ class FingerprintController extends Controller
             'fingerprint_data' => 'nullable|array',
         ]);
 
-        $fingerprint = UserFingerprint::trackFingerprint(
+        $fingerprint = Fingerprint::trackFingerprint(
             userId: Auth::id(),
             fingerprintId: $request->input('fingerprint_id'),
             fingerprintData: $request->input('fingerprint_data'),

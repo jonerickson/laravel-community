@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Exceptions\BannedException;
+use App\Models\Fingerprint;
 use App\Models\User;
-use App\Models\UserFingerprint;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -22,7 +22,7 @@ class CheckBannedUser
     {
         $fingerprintId = $request->header('X-Fingerprint-ID') ?? $request->cookie('fingerprint_id');
 
-        $fingerprints = UserFingerprint::query()
+        $fingerprints = Fingerprint::query()
             ->when($request->user(), fn (Builder $query, User $user) => $query->whereBelongsTo($user))
             ->when($fingerprintId, fn (Builder $query, string $fingerprintId) => $query->where('fingerprint_id', $fingerprintId))
             ->get();

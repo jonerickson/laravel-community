@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Traits\HasAuthor;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Carbon;
 
@@ -16,13 +16,11 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $viewable_type
  * @property int $viewable_id
- * @property int $created_by
+ * @property string $fingerprint_id
  * @property int $count
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read User $author
- * @property-read mixed $author_name
- * @property-read User $creator
+ * @property-read Fingerprint|null $fingerprint
  * @property-read Model|Eloquent $viewable
  *
  * @method static Builder<static>|View newModelQuery()
@@ -30,7 +28,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|View query()
  * @method static Builder<static>|View whereCount($value)
  * @method static Builder<static>|View whereCreatedAt($value)
- * @method static Builder<static>|View whereCreatedBy($value)
+ * @method static Builder<static>|View whereFingerprintId($value)
  * @method static Builder<static>|View whereId($value)
  * @method static Builder<static>|View whereUpdatedAt($value)
  * @method static Builder<static>|View whereViewableId($value)
@@ -40,16 +38,33 @@ use Illuminate\Support\Carbon;
  */
 class View extends Model
 {
-    use HasAuthor;
     use HasFactory;
+
+    protected $attributes = [
+        'count' => 1,
+    ];
 
     protected $fillable = [
         'viewable_type',
         'viewable_id',
+        'fingerprint_id',
+        'count',
     ];
 
     public function viewable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function fingerprint(): BelongsTo
+    {
+        return $this->belongsTo(Fingerprint::class, 'fingerprint_id', 'session_id');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'count' => 'integer',
+        ];
     }
 }
