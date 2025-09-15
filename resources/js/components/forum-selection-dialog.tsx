@@ -101,7 +101,7 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumS
                         className="pl-10"
                     />
                 </div>
-                <ScrollArea className="max-h-[400px]">
+                <ScrollArea className="max-h-[400px] overflow-hidden">
                     <div className="space-y-2">
                         {filteredForums
                             .sort((a, b) => a.name.localeCompare(b.name))

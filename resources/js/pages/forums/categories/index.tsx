@@ -96,7 +96,7 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                             <Heading title="Forums" description="Connect with our community and get support" />
                         </div>
                     </div>
-                    <div className="flex shrink-0 items-center gap-2">
+                    <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row sm:items-center">
                         {can('create_topics') && (
                             <Button onClick={() => setIsDialogOpen(true)}>
                                 <Plus className="mr-2 h-4 w-4" />

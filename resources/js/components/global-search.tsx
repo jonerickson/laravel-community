@@ -5,6 +5,7 @@ import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, C
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Toggle } from '@/components/ui/toggle';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { currency } from '@/lib/utils';
 import axios from 'axios';
 import { Calendar, ChevronDown, FileText, MessageSquare, Search, Shield, ShoppingBag, User } from 'lucide-react';
@@ -194,15 +195,22 @@ export function GlobalSearch() {
 
                 <Collapsible open={dateFiltersOpen} onOpenChange={setDateFiltersOpen}>
                     <div className="flex items-center gap-2 border-b px-3 py-2">
-                        <span className="mr-2 text-sm text-muted-foreground">Filter by:</span>
+                        <span className="mr-2 text-sm text-nowrap text-muted-foreground">Filter by:</span>
                         <Toggle
                             pressed={selectedTypes.includes('topic')}
                             onPressedChange={() => toggleType('topic')}
                             size="sm"
                             className="h-7 px-2 text-xs"
                         >
-                            <MessageSquare className="mr-1 h-3 w-3" />
-                            Topics
+                            <Tooltip>
+                                <TooltipContent>Topics</TooltipContent>
+                                <TooltipTrigger asChild>
+                                    <div className="flex items-center gap-1">
+                                        <MessageSquare className="mr-1 h-3 w-3" />
+                                        <span className="hidden sm:block">Topics</span>
+                                    </div>
+                                </TooltipTrigger>
+                            </Tooltip>
                         </Toggle>
                         <Toggle
                             pressed={selectedTypes.includes('post')}
@@ -210,8 +218,15 @@ export function GlobalSearch() {
                             size="sm"
                             className="h-7 px-2 text-xs"
                         >
-                            <FileText className="mr-1 h-3 w-3" />
-                            Posts
+                            <Tooltip>
+                                <TooltipContent>Posts</TooltipContent>
+                                <TooltipTrigger asChild>
+                                    <div className="flex items-center gap-1">
+                                        <FileText className="mr-1 h-3 w-3" />
+                                        <span className="hidden sm:block">Posts</span>
+                                    </div>
+                                </TooltipTrigger>
+                            </Tooltip>
                         </Toggle>
                         <Toggle
                             pressed={selectedTypes.includes('policy')}
@@ -219,8 +234,15 @@ export function GlobalSearch() {
                             size="sm"
                             className="h-7 px-2 text-xs"
                         >
-                            <Shield className="mr-1 h-3 w-3" />
-                            Policies
+                            <Tooltip>
+                                <TooltipContent>Policies</TooltipContent>
+                                <TooltipTrigger asChild>
+                                    <div className="flex items-center gap-1">
+                                        <Shield className="mr-1 h-3 w-3" />
+                                        <span className="hidden sm:block">Policies</span>
+                                    </div>
+                                </TooltipTrigger>
+                            </Tooltip>
                         </Toggle>
                         <Toggle
                             pressed={selectedTypes.includes('product')}
@@ -228,8 +250,15 @@ export function GlobalSearch() {
                             size="sm"
                             className="h-7 px-2 text-xs"
                         >
-                            <ShoppingBag className="mr-1 h-3 w-3" />
-                            Products
+                            <Tooltip>
+                                <TooltipContent>Products</TooltipContent>
+                                <TooltipTrigger asChild>
+                                    <div className="flex items-center gap-1">
+                                        <ShoppingBag className="mr-1 h-3 w-3" />
+                                        <span className="hidden sm:block">Products</span>
+                                    </div>
+                                </TooltipTrigger>
+                            </Tooltip>
                         </Toggle>
                         <CollapsibleTrigger asChild>
                             <Button variant="ghost" size="sm" className="ml-2 h-7 px-2 text-xs">

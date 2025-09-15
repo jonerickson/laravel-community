@@ -39,7 +39,7 @@ export default function SupportTicketsIndex({ tickets, ticketsPagination }: Supp
                         </div>
                     </div>
 
-                    <div className="flex shrink-0 items-center gap-2">
+                    <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row sm:items-center">
                         <Button asChild>
                             <Link href={route('support.create')}>
                                 <Plus className="size-4" />

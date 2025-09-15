@@ -160,7 +160,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                             <Heading title={forum.name} description={forum.description ?? ''} />
                         </div>
                     </div>
-                    <div className="flex shrink-0 items-center gap-2">
+                    <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row sm:items-center">
                         {hasAnyPermission(['delete_topics']) && (
                             <>
                                 {selectedTopics.length > 0 && (
