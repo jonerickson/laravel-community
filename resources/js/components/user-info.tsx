@@ -23,9 +23,9 @@ export function UserInfo({ user, showEmail = false, showGroups = false }: { user
                     {showEmail && <span className="truncate text-xs text-muted-foreground">{user.email}</span>}
                 </div>
                 {showGroups && user.groups.length > 0 && (
-                    <div className="flex text-xs font-medium">
+                    <ul className="flex text-xs font-medium">
                         {user.groups.map((group) => (
-                            <div key={group.id}>
+                            <li key={group.id} className="after:mr-1 after:text-muted-foreground after:content-[','] last:after:hidden">
                                 <span
                                     style={{
                                         color: group.color || undefined,
@@ -33,17 +33,9 @@ export function UserInfo({ user, showEmail = false, showGroups = false }: { user
                                 >
                                     {group.name}
                                 </span>
-                                <span
-                                    className="mr-1 last:hidden"
-                                    style={{
-                                        color: group.color || "var('--text-primary')",
-                                    }}
-                                >
-                                    ,
-                                </span>
-                            </div>
+                            </li>
                         ))}
-                    </div>
+                    </ul>
                 )}
             </div>
         </div>

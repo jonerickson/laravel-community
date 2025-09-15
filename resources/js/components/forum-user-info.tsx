@@ -11,24 +11,28 @@ export default function ForumUserInfo({ user, isAuthor = false }: { user: User; 
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
-            <div className="text-left md:text-center">
-                <div className="text-sm font-medium">{user.name}</div>
-                <div className="text-xs text-muted-foreground">{isAuthor ? 'Author' : ''}</div>
-            </div>
-            {user.groups.length > 0 && (
-                <div className="mt-4 hidden text-xs font-medium md:block">
-                    {user.groups.map((group) => (
-                        <div
-                            key={group.id}
-                            style={{
-                                color: group.color || undefined,
-                            }}
-                        >
-                            {group.name}
-                        </div>
-                    ))}
+            <div className="flex flex-col">
+                <div className="text-left md:text-center">
+                    <div className="text-sm font-medium">{user.name}</div>
+                    <div className="text-xs text-muted-foreground">{isAuthor ? 'Author' : ''}</div>
                 </div>
-            )}
+
+                {user.groups.length > 0 && (
+                    <ul className="flex flex-row text-xs font-medium md:mt-4 md:block md:flex-col md:text-center">
+                        {user.groups.map((group) => (
+                            <li
+                                className="after:mr-1 after:text-muted-foreground after:content-[','] last:after:hidden md:after:hidden"
+                                key={group.id}
+                                style={{
+                                    color: group.color || undefined,
+                                }}
+                            >
+                                {group.name}
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
 
             {auth.user && auth.user.id !== user.id && (
                 <div className="mt-2 hidden md:block">
