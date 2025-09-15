@@ -12,7 +12,6 @@ use App\Models\Fingerprint;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
-use App\Models\UserSocial;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -133,7 +132,7 @@ class UserResource extends Resource
                                     ->contained(false)
                                     ->components([
                                         TextEntry::make('provider')
-                                            ->formatStateUsing(fn($state) => Str::ucfirst($state)),
+                                            ->formatStateUsing(fn ($state) => Str::ucfirst($state)),
                                         TextEntry::make('provider_name')
                                             ->copyable()
                                             ->label('Provider Name'),
@@ -147,14 +146,14 @@ class UserResource extends Resource
                                                     ->modalSubmitActionLabel('Delete')
                                                     ->modalHeading('Remove Integration')
                                                     ->action(function (Action $action, User $record) {
-                                                        //$record->delete();
+                                                        // $record->delete();
                                                         $action->success();
                                                     })
                                             )
                                             ->label('Provider ID')
                                             ->copyable(),
-                                    ])
-                            ])
+                                    ]),
+                            ]),
                     ]),
                 Group::make()
                     ->components([

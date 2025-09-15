@@ -16,6 +16,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Phiki\Grammar\Grammar;
 use Spatie\Activitylog\Models\Activity;
@@ -73,22 +74,16 @@ class ActivityLogResource extends Resource
                     ->default('System')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('subject_type')
-                    ->label('Subject Type')
-                    ->formatStateUsing(fn (?string $state): string => $state !== null && $state !== '' && $state !== '0' ? class_basename($state) : 'N/A')
-                    ->sortable(),
                 TextColumn::make('event')
                     ->label('Event')
                     ->badge()
+                    ->formatStateUsing(fn ($state) => is_string($state) ? Str::title($state) : $state)
+                    ->default(new HtmlString('&ndash;'))
                     ->color(fn (?string $state): string => match ($state) {
-                        'created' => 'success',
-                        'updated' => 'warning',
-                        'deleted' => 'danger',
-                        'login' => 'success',
+                        'created', 'login', 'email_verified' => 'success',
+                        'updated', 'password_reset' => 'warning',
+                        'deleted', 'failed_login' => 'danger',
                         'logout' => 'info',
-                        'failed_login' => 'danger',
-                        'password_reset' => 'warning',
-                        'email_verified' => 'success',
                         default => 'gray',
                     })
                     ->sortable(),

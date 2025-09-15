@@ -39,6 +39,8 @@ class CallbackController extends Controller
             'provider_avatar' => $socialUser->getAvatar(),
         ]);
 
+        $user->logSocialLogin($provider);
+
         if (! Auth::check()) {
             Auth::login($user);
         }

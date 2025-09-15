@@ -90,6 +90,7 @@ class UserFingerprintResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateDescription('There are no fingerprints to display.')
             ->columns([
                 TextColumn::make('fingerprint_id')
                     ->label('Fingerprint ID')

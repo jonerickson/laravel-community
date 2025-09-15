@@ -111,6 +111,30 @@ trait LogsAuthActivity
         );
     }
 
+    public function logSocialConnected(string $provider): void
+    {
+        $this->logAuthActivity(
+            description: 'Social account connected',
+            properties: [
+                'provider' => $provider,
+                'login_method' => 'social',
+            ],
+            userId: $this->id
+        );
+    }
+
+    public function logSocialDisconnected(string $provider): void
+    {
+        $this->logAuthActivity(
+            description: 'Social account disconnected',
+            properties: [
+                'provider' => $provider,
+                'login_method' => 'social',
+            ],
+            userId: $this->id
+        );
+    }
+
     public function logAccountLocked(?string $reason = null): void
     {
         $this->logAuthActivity(
@@ -192,7 +216,7 @@ trait LogsAuthActivity
             description: 'Permission changed',
             properties: [
                 'permission' => $permission,
-                'action' => $action, // 'granted' or 'revoked'
+                'action' => $action,
             ],
             userId: $this->id
         );
@@ -204,7 +228,7 @@ trait LogsAuthActivity
             description: 'Role changed',
             properties: [
                 'role' => $role,
-                'action' => $action, // 'assigned' or 'removed'
+                'action' => $action,
             ],
             userId: $this->id
         );

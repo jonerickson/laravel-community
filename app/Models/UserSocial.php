@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Events\UserSocialCreated;
+use App\Events\UserSocialDeleted;
+use App\Traits\HasLogging;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
@@ -16,6 +20,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $provider_avatar
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read User $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSocial newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserSocial newQuery()
@@ -34,6 +41,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class UserSocial extends Model
 {
+    use HasLogging;
+
     protected $table = 'users_socials';
 
     protected $fillable = [
@@ -44,4 +53,35 @@ class UserSocial extends Model
         'provider_email',
         'provider_avatar',
     ];
+
+    protected $dispatchesEvents = [
+        'created' => UserSocialCreated::class,
+        'deleting' => UserSocialDeleted::class,
+    ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function getLoggedAttributes(): array
+    {
+        return [
+            'provider',
+            'provider_id',
+            'provider_name',
+            'provider_email',
+            'provider_avatar',
+        ];
+    }
+
+    public function getActivityDescription(string $eventName): string
+    {
+        return "User integration {$eventName}";
+    }
+
+    public function getActivityLogName(): string
+    {
+        return 'auth';
+    }
 }
