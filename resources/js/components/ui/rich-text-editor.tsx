@@ -197,7 +197,7 @@ function LinkDialog({ editor, isOpen, onOpenChange }: LinkDialogProps) {
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
                 <DialogHeader>
-                    <DialogTitle>Add Link</DialogTitle>
+                    <DialogTitle>Add link</DialogTitle>
                 </DialogHeader>
                 <div className="grid gap-4 pb-4">
                     <div className="grid gap-2">
@@ -291,7 +291,7 @@ function ImageDialog({ editor, isOpen, onOpenChange }: ImageDialogProps) {
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
                 <DialogHeader>
-                    <DialogTitle>Insert Image</DialogTitle>
+                    <DialogTitle>Insert image</DialogTitle>
                 </DialogHeader>
                 <div className="grid gap-4 pb-4">
                     <div className="grid gap-2">
@@ -351,7 +351,7 @@ function EmojiDialog({ editor, isOpen, onOpenChange }: EmojiDialogProps) {
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Insert Emoji</DialogTitle>
+                    <DialogTitle>Insert emoji</DialogTitle>
                 </DialogHeader>
                 <div className="grid grid-cols-5 gap-2 pb-4">
                     {emojis.map((emoji) => (

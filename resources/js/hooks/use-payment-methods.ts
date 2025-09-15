@@ -51,10 +51,7 @@ export function usePaymentMethods() {
 
         const { client_secret } = setupIntentResponse;
 
-        const {
-            error: stripeError,
-            setupIntent: { payment_method },
-        } = await stripe.confirmCardSetup(client_secret, {
+        const { error: stripeError, setupIntent } = await stripe.confirmCardSetup(client_secret, {
             payment_method: {
                 card: cardElement,
                 billing_details: {
@@ -67,12 +64,16 @@ export function usePaymentMethods() {
             throw new Error(stripeError.message || 'Failed to add payment method');
         }
 
+        if (!setupIntent?.payment_method) {
+            throw new Error('Failed to create payment method');
+        }
+
         await executeStore(
             {
                 url: route('api.payment-methods.store'),
                 method: 'POST',
                 data: {
-                    method: payment_method,
+                    method: setupIntent.payment_method,
                 },
             },
             {

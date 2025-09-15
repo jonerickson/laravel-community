@@ -36,13 +36,13 @@ Route::middleware('guest')->group(function (): void {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
+});
 
-    Route::group(['prefix' => 'oauth'], function (): void {
-        Route::get('redirect/{provider}', RedirectController::class)
-            ->name('oauth.redirect');
-        Route::get('callback/{provider}', CallbackController::class)
-            ->name('oauth.callback');
-    });
+Route::group(['prefix' => 'oauth'], function (): void {
+    Route::get('redirect/{provider}', RedirectController::class)
+        ->name('oauth.redirect');
+    Route::get('callback/{provider}', CallbackController::class)
+        ->name('oauth.callback');
 });
 
 Route::middleware('auth')->group(function (): void {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Settings\AppearanceController;
 use App\Http\Controllers\Settings\BillingController;
+use App\Http\Controllers\Settings\IntegrationsController;
 use App\Http\Controllers\Settings\InvoiceController;
 use App\Http\Controllers\Settings\PaymentMethodController;
 use App\Http\Controllers\Settings\ProfileController;
@@ -15,6 +16,9 @@ Route::group(['middleware' => ['auth', 'verified']], function (): void {
     Route::get('settings/account', [ProfileController::class, 'edit'])->name('settings.profile.edit');
     Route::post('settings/account', [ProfileController::class, 'update'])->name('settings.profile.update');
     Route::delete('settings/account', [ProfileController::class, 'destroy'])->name('settings.profile.destroy');
+
+    Route::get('settings/integrations', [IntegrationsController::class, 'index'])->name('settings.integrations.index');
+    Route::delete('settings/integrations/{social}', [IntegrationsController::class, 'destroy'])->name('settings.integrations.destroy');
 
     Route::get('settings/appearance', AppearanceController::class)->name('settings.appearance');
 

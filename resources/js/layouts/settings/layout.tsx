@@ -23,6 +23,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Integrations',
+        href: '/settings/integrations',
+        icon: null,
+    },
+    {
         title: 'Orders',
         href: '/settings/orders',
         icon: null,

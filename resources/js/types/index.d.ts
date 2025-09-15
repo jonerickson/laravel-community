@@ -408,3 +408,15 @@ export interface User {
     updated_at: string;
     [key: string]: unknown;
 }
+
+export interface UserSocial {
+    id: number;
+    user_id: number;
+    provider: string;
+    provider_id: string;
+    provider_name?: string | null;
+    provider_email?: string | null;
+    provider_avatar?: string | null;
+    created_at: string;
+    updated_at: string;
+}

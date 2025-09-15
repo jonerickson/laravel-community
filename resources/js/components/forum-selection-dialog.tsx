@@ -101,14 +101,16 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumS
                         className="pl-10"
                     />
                 </div>
-                <ScrollArea className="max-h-[400px] overflow-hidden">
+                <ScrollArea className="max-h-[400px]">
                     <div className="space-y-2">
                         {filteredForums
                             .sort((a, b) => a.name.localeCompare(b.name))
                             .map((forum, index) => (
                                 <Button
                                     key={forum.id}
-                                    ref={(el) => (buttonRefs.current[index] = el)}
+                                    ref={(el) => {
+                                        buttonRefs.current[index] = el;
+                                    }}
                                     variant="ghost"
                                     className={`h-auto w-full justify-start p-4 text-left ${selectedIndex === index ? 'bg-accent' : ''}`}
                                     onClick={() => handleForumSelect(forum)}
@@ -121,10 +123,12 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumS
                                         >
                                             <MessageSquare className="size-5" />
                                         </div>
-                                        <div className="min-w-0 flex-1">
+                                        <div className="flex min-w-0 flex-1 flex-col items-start">
                                             <div className="text-sm font-medium">{forum.name}</div>
                                             {forum.description && (
-                                                <div className="mt-1 truncate text-xs text-muted-foreground">{forum.description}</div>
+                                                <div className="text-left text-xs text-wrap break-words text-muted-foreground">
+                                                    {forum.description}
+                                                </div>
                                             )}
                                             <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
                                                 <span>{forum.topics_count || 0} topics</span>
