@@ -10,7 +10,8 @@ import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { currency, date } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, ExternalLink, FileText } from 'lucide-react';
+import { ArrowUpDown, Copy, ExternalLink, FileText } from 'lucide-react';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -23,96 +24,137 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export const columns: ColumnDef<Order>[] = [
-    {
-        accessorKey: 'created_at',
-        header: ({ column }) => {
-            return (
-                <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                    Date
-                    <ArrowUpDown className="ml-2 size-3" />
-                </Button>
-            );
-        },
-        cell: ({ row }) => date(row.getValue('created_at') as string),
-    },
-    {
-        accessorKey: 'order_number',
-        header: 'Order Number',
-        cell: ({ row }) => {
-            const orderNumber = row.getValue('order_number') as number;
-            return <div className="font-mono text-sm">{orderNumber || `N/A`}</div>;
-        },
-    },
-    {
-        id: 'products',
-        header: 'Products',
-        cell: ({ row }) => {
-            const order = row.original;
-            const productNames =
-                order.items
-                    ?.map((item) => item.product?.name)
-                    .filter(Boolean)
-                    .join(', ') || 'N/A';
-
-            return (
-                <div className="max-w-[200px] truncate" title={productNames}>
-                    {productNames}
-                </div>
-            );
-        },
-    },
-    {
-        accessorKey: 'status',
-        header: 'Status',
-        cell: ({ row }) => {
-            return <OrderStatus status={row.getValue('status')} />;
-        },
-    },
-    {
-        accessorKey: 'amount',
-        header: ({ column }) => {
-            return (
-                <div className="text-right">
-                    <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                        Amount
-                        <ArrowUpDown className="ml-2 size-3" />
-                    </Button>
-                </div>
-            );
-        },
-        cell: ({ row }) => {
-            const amount = row.getValue('amount') as number | null;
-            const formattedAmount = amount ? currency((amount / 100).toString()) : 'N/A';
-
-            return <div className="text-right font-medium">{formattedAmount}</div>;
-        },
-    },
-    {
-        id: 'actions',
-        header: undefined,
-        size: 120,
-        cell: ({ row }) => {
-            const order = row.original;
-
-            return (
-                <div className="flex justify-end gap-2">
-                    {order.invoice_url && (
-                        <Button variant="outline" size="sm" asChild>
-                            <a href={order.invoice_url} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="mr-1 size-4" />
-                                View
-                            </a>
-                        </Button>
-                    )}
-                </div>
-            );
-        },
-    },
-];
-
 export default function Orders() {
     const { orders } = usePage<SharedData>().props as unknown as { orders: Order[] };
+
+    const copyToClipboard = async (text: string, label: string) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            toast.success(`${label} copied to clipboard.`);
+        } catch {
+            toast.error('Unable to copy to clipboard.');
+        }
+    };
+
+    const columns: ColumnDef<Order>[] = [
+        {
+            accessorKey: 'created_at',
+            header: ({ column }) => {
+                return (
+                    <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+                        Date
+                        <ArrowUpDown className="ml-2 size-3" />
+                    </Button>
+                );
+            },
+            cell: ({ row }) => date(row.getValue('created_at') as string),
+        },
+        {
+            accessorKey: 'reference_id',
+            header: 'Order Number',
+            cell: ({ row }) => {
+                const orderNumber = row.getValue('reference_id') as string;
+                if (!orderNumber || orderNumber === 'N/A') {
+                    return <div className="font-mono text-sm">N/A</div>;
+                }
+                return (
+                    <button
+                        onClick={() => copyToClipboard(orderNumber, 'Order number')}
+                        className="group flex items-center gap-2 font-mono text-sm hover:text-primary focus:text-primary focus:outline-none"
+                        title="Click to copy"
+                    >
+                        {orderNumber}
+                        <Copy className="size-3 opacity-0 transition-opacity group-hover:opacity-100" />
+                    </button>
+                );
+            },
+        },
+        {
+            accessorKey: 'invoice_number',
+            header: 'Invoice Number',
+            cell: ({ row }) => {
+                const invoiceNumber = row.getValue('invoice_number') as string;
+                if (!invoiceNumber || invoiceNumber === 'N/A') {
+                    return <div className="font-mono text-sm">N/A</div>;
+                }
+                return (
+                    <button
+                        onClick={() => copyToClipboard(invoiceNumber, 'Invoice number')}
+                        className="group flex items-center gap-2 font-mono text-sm hover:text-primary focus:text-primary focus:outline-none"
+                        title="Click to copy"
+                    >
+                        {invoiceNumber}
+                        <Copy className="size-3 opacity-0 transition-opacity group-hover:opacity-100" />
+                    </button>
+                );
+            },
+        },
+        {
+            id: 'products',
+            header: 'Products',
+            cell: ({ row }) => {
+                const order = row.original;
+                const productNames =
+                    order.items
+                        ?.map((item) => item.product?.name)
+                        .filter(Boolean)
+                        .join(', ') || 'N/A';
+
+                return (
+                    <div className="max-w-[200px] truncate" title={productNames}>
+                        {productNames}
+                    </div>
+                );
+            },
+        },
+        {
+            accessorKey: 'status',
+            header: 'Status',
+            cell: ({ row }) => {
+                return <OrderStatus status={row.getValue('status')} />;
+            },
+        },
+        {
+            accessorKey: 'amount',
+            header: ({ column }) => {
+                return (
+                    <div className="text-right">
+                        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+                            Amount
+                            <ArrowUpDown className="ml-2 size-3" />
+                        </Button>
+                    </div>
+                );
+            },
+            cell: ({ row }) => {
+                const amount = row.getValue('amount') as number | null;
+                const formattedAmount = amount ? currency((amount / 100).toString()) : 'N/A';
+
+                return <div className="text-right font-medium">{formattedAmount}</div>;
+            },
+        },
+        {
+            id: 'actions',
+            header: undefined,
+            size: 120,
+            cell: ({ row }) => {
+                const order = row.original;
+
+                return (
+                    <div className="flex justify-end gap-2">
+                        {order.invoice_url && (
+                            <Button variant="outline" size="sm" asChild>
+                                <a href={order.invoice_url} target="_blank" rel="noopener noreferrer">
+                                    <ExternalLink className="mr-1 size-4" />
+                                    View
+                                </a>
+                            </Button>
+                        )}
+                    </div>
+                );
+            },
+        },
+    ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

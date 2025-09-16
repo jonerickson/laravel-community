@@ -39,7 +39,7 @@ interface PaymentProcessor
 
     public function deletePaymentMethod(User $user, string $paymentMethodId): bool;
 
-    public function startSubscription(User $user, Order $order, bool $allowPromotionCodes = false, int $trialDays = 0): bool|string;
+    public function startSubscription(User $user, Order $order): bool|string;
 
     public function cancelSubscription(User $user, Price $price): bool;
 
@@ -47,7 +47,7 @@ interface PaymentProcessor
 
     public function isSubscribedToPrice(User $user, Price $price): bool;
 
-    public function redirectToCheckout(User $user, Order $order, Price|array $prices, bool $allowPromotionCodes = false): bool|string;
+    public function redirectToCheckout(User $user, Order $order): bool|string;
 
     public function processCheckoutSuccess(Request $request, Order $order): bool;
 

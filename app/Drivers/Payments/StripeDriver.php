@@ -369,23 +369,49 @@ class StripeDriver implements PaymentProcessor
     /**
      * @throws Exception
      */
-    public function startSubscription(User $user, Order $order, bool $allowPromotionCodes = false, int $trialDays = 0): bool|string
+    public function startSubscription(User $user, Order $order): bool|string
     {
-        /** @var ?OrderItem $orderItem */
-        $orderItem = $order->items()->first();
+        $lineItems = [];
 
-        if (! $orderItem || ! $orderItem->price || ! $orderItem->price->external_price_id) {
+        foreach ($order->items as $orderItem) {
+            if (! $priceId = $orderItem->price->external_price_id) {
+                continue;
+            }
+
+            $lineItems[] = $priceId;
+        }
+
+        if (blank($lineItems)) {
             return false;
         }
 
+        /** @var ?OrderItem $allowPromotionCodes */
+        $allowPromotionCodes = $order->items()->with('product')->get()->firstWhere('product.allow_promotion_codes', true);
+
+        /** @var ?OrderItem $trialDays */
+        $trialDays = $order->items()->with('product')->get()->firstWhere('product.trial_days', '>', 0);
+
         $checkoutSession = $user
-            ->newSubscription('default', $orderItem->price->external_price_id)
-            ->when($trialDays > 0, fn (SubscriptionBuilder $builder) => $builder->trialDays($trialDays))
-            ->when($allowPromotionCodes, fn (SubscriptionBuilder $builder) => $builder->allowPromotionCodes())
+            ->newSubscription('default', $lineItems)
+            ->when(filled($trialDays), fn (SubscriptionBuilder $builder) => $builder->trialDays($trialDays->product->trial_days))
+            ->when(filled($allowPromotionCodes), fn (SubscriptionBuilder $builder) => $builder->allowPromotionCodes())
             ->withMetadata([
-                'laravel_order_id' => (string) $order->id,
+                'order_id' => $order->reference_id,
             ])
             ->checkout([
+                'client_reference_id' => $order->reference_id,
+                'origin_context' => 'web',
+                'consent_collection' => [
+                    'terms_of_service' => 'required',
+                ],
+                'custom_text' => [
+                    'terms_of_service_acceptance' => [
+                        'message' => 'I accept the Terms of Service outlined by '.config('app.name'),
+                    ],
+                    'submit' => [
+                        'message' => "Order Number: $order->reference_id",
+                    ],
+                ],
                 'success_url' => URL::signedRoute('store.checkout.success', [
                     'order' => $order,
                     'redirect' => route('store.subscriptions', absolute: false),
@@ -422,22 +448,18 @@ class StripeDriver implements PaymentProcessor
         return true;
     }
 
-    public function redirectToCheckout(User $user, Order $order, Price|array $prices, bool $allowPromotionCodes = false): bool|string
+    public function redirectToCheckout(User $user, Order $order): bool|string
     {
-        $prices = Arr::wrap($prices);
-
-        $finalPrices = [];
         $lineItems = [];
 
-        foreach ($prices as $price) {
-            if (! $price->external_price_id) {
+        foreach ($order->items as $orderItem) {
+            if (! $priceId = $orderItem->price->external_price_id) {
                 continue;
             }
 
-            $finalPrices[] = $price;
             $lineItems[] = [
-                'price' => $price->external_price_id,
-                'quantity' => 1,
+                'price' => $priceId,
+                'quantity' => $orderItem->quantity,
             ];
         }
 
@@ -445,29 +467,52 @@ class StripeDriver implements PaymentProcessor
             return false;
         }
 
+        /** @var ?OrderItem $allowPromotionCodes */
+        $allowPromotionCodes = $order->items()->with('product')->get()->firstWhere('product.allow_promotion_codes', true);
+
         $checkoutSession = $user->checkout($lineItems, [
+            'client_reference_id' => $order->reference_id,
             'success_url' => URL::signedRoute('store.checkout.success', [
                 'order' => $order,
             ]),
             'cancel_url' => URL::signedRoute('store.checkout.cancel', [
                 'order' => $order,
             ]),
+            'allow_promotion_codes' => filled($allowPromotionCodes),
             'mode' => 'payment',
+            'origin_context' => 'web',
+            'consent_collection' => [
+                'terms_of_service' => 'required',
+            ],
+            'custom_text' => [
+                'terms_of_service_acceptance' => [
+                    'message' => 'I accept the Terms of Service outlined by '.config('app.name'),
+                ],
+                'submit' => [
+                    'message' => "Order Number: $order->reference_id",
+                ],
+            ],
             'metadata' => [
-                'laravel_price_ids' => Collection::make($finalPrices)->pluck('id')->toJson(),
+                'order_id' => $order->reference_id,
             ],
             'invoice_creation' => [
                 'enabled' => true,
                 'invoice_data' => [
+                    'custom_fields' => [
+                        [
+                            'name' => 'Order number',
+                            'value' => $order->reference_id,
+                        ],
+                    ],
                     'metadata' => [
-                        'laravel_price_ids' => Collection::make($finalPrices)->pluck('id')->toJson(),
+                        'order_id' => $order->reference_id,
                     ],
                 ],
             ],
             'payment_intent_data' => [
                 'receipt_email' => $user->email,
                 'metadata' => [
-                    'laravel_price_ids' => Collection::make($finalPrices)->pluck('id')->toJson(),
+                    'order_id' => $order->reference_id,
                 ],
             ],
         ])->asStripeCheckoutSession();
@@ -507,7 +552,7 @@ class StripeDriver implements PaymentProcessor
             'status' => $paymentIntent ? (OrderStatus::tryFrom($paymentIntent->status) ?? OrderStatus::Processing) : OrderStatus::Processing,
             'amount' => $paymentIntent?->amount ?? null,
             'invoice_url' => $invoice?->hosted_invoice_url ?? null,
-            'order_number' => $invoice?->number ?? null,
+            'invoice_number' => $invoice?->number ?? null,
         ]);
 
         return true;

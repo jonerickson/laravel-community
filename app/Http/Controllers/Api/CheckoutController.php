@@ -96,7 +96,6 @@ class CheckoutController
         $result = $this->paymentManager->redirectToCheckout(
             user: $user,
             order: $order,
-            prices: $productPrices
         );
 
         if (! $result) {

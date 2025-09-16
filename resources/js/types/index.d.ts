@@ -181,7 +181,8 @@ export interface Order {
     status: OrderStatus;
     amount?: number | null;
     invoice_url?: string | null;
-    order_number?: string | null;
+    reference_id?: string | null;
+    invoice_number?: string | null;
     external_checkout_id?: string | null;
     external_order_id?: string | null;
     external_payment_id?: string | null;
@@ -204,6 +205,7 @@ export interface OrderItem {
 }
 
 export type OrderStatus =
+    | 'pending'
     | 'canceled'
     | 'processing'
     | 'requires_action'

@@ -6,6 +6,7 @@ namespace App\Enums;
 
 enum OrderStatus: string
 {
+    case Pending = 'pending';
     case Cancelled = 'canceled';
     case Processing = 'processing';
     case RequiresAction = 'requires_action';

@@ -40,6 +40,8 @@ use Laravel\Scout\Searchable;
  * @property ProductTaxCode|null $tax_code
  * @property bool $is_featured
  * @property bool $is_subscription_only
+ * @property int $trial_days
+ * @property bool $allow_promotion_codes
  * @property string|null $featured_image
  * @property string|null $external_product_id
  * @property array<array-key, mixed>|null $metadata
@@ -77,6 +79,7 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Product products()
  * @method static Builder<static>|Product query()
  * @method static Builder<static>|Product subscriptions()
+ * @method static Builder<static>|Product whereAllowPromotionCodes($value)
  * @method static Builder<static>|Product whereCreatedAt($value)
  * @method static Builder<static>|Product whereDescription($value)
  * @method static Builder<static>|Product whereExternalProductId($value)
@@ -88,6 +91,7 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Product whereName($value)
  * @method static Builder<static>|Product whereSlug($value)
  * @method static Builder<static>|Product whereTaxCode($value)
+ * @method static Builder<static>|Product whereTrialDays($value)
  * @method static Builder<static>|Product whereType($value)
  * @method static Builder<static>|Product whereUpdatedAt($value)
  * @method static Builder<static>|Product withExternalProduct()
@@ -109,16 +113,19 @@ class Product extends Model implements Sluggable
     use Reviewable;
     use Searchable;
 
+    protected $attributes = [
+        'allow_promotion_codes' => false,
+        'trial_days' => 0,
+    ];
+
     protected $fillable = [
         'name',
         'description',
         'type',
         'tax_code',
         'is_subscription_only',
-        'external_product_id',
-    ];
-
-    protected $hidden = [
+        'allow_promotion_codes',
+        'trial_days',
         'external_product_id',
     ];
 
@@ -220,6 +227,8 @@ class Product extends Model implements Sluggable
             'description',
             'type',
             'is_featured',
+            'allow_promotion_codes',
+            'trial_days',
             'external_product_id',
         ];
     }
@@ -242,6 +251,8 @@ class Product extends Model implements Sluggable
             'type' => ProductType::class,
             'tax_code' => ProductTaxCode::class,
             'is_subscription_only' => 'boolean',
+            'allow_promotion_codes' => 'boolean',
+            'trial_days' => 'integer',
         ];
     }
 }

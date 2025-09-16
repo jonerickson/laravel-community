@@ -17,6 +17,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
@@ -158,10 +159,23 @@ class ProductResource extends Resource
                                     ->helperText('Only show this product on the subscriptions page - not in the store.')
                                     ->columnSpanFull(),
                             ]),
+                        Section::make('Purchasing')
+                            ->components([
+                                Toggle::make('allow_promotion_codes')
+                                    ->helperText('Allow customers to use promotion codes when purchasing this product.')
+                                    ->columnSpanFull(),
+                                TextInput::make('trial_days')
+                                    ->default(0)
+                                    ->visible(fn (Get $get) => $get('type') === ProductType::Subscription)
+                                    ->label('Trial mode')
+                                    ->suffix('days')
+                                    ->helperText('Enable trial mode for this product by providing the number of days the trial is active.')
+                                    ->columnSpanFull(),
+                            ]),
                         Section::make('Compliance')
                             ->components([
                                 Select::make('policies')
-                                    ->label('Required Policies')
+                                    ->label('Required policies')
                                     ->helperText('Select policies that customers must agree to when purchasing this product.')
                                     ->columnSpanFull()
                                     ->preload()
@@ -170,7 +184,13 @@ class ProductResource extends Resource
                             ]),
                         Section::make('Metadata')
                             ->components([
+                                KeyValue::make('metadata')
+                                    ->dehydrated(fn (Get $get) => $get('type') === ProductType::Subscription)
+                                    ->visible(fn (Get $get) => $get('type') === ProductType::Product)
+                                    ->helperText('Meta data will be merged with any external payment processor that is used.')
+                                    ->hiddenLabel(),
                                 Repeater::make('metadata.features')
+                                    ->dehydrated(fn (Get $get) => $get('type') === ProductType::Product)
                                     ->visible(fn (Get $get) => $get('type') === ProductType::Subscription)
                                     ->addActionLabel('Add a new feature')
                                     ->simple(TextInput::make('feature')),

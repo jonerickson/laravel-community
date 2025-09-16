@@ -13,6 +13,7 @@ use App\Traits\HasGroups;
 use App\Traits\HasLogging;
 use App\Traits\HasMultiFactorAuthentication;
 use App\Traits\HasPermissions;
+use App\Traits\HasReferenceId;
 use App\Traits\LogsAuthActivity;
 use App\Traits\Reportable;
 use Exception;
@@ -42,6 +43,7 @@ use Laravel\Passport\HasApiTokens;
 
 /**
  * @property int $id
+ * @property string $reference_id
  * @property string $name
  * @property string $email
  * @property Carbon|null $email_verified_at
@@ -136,6 +138,7 @@ use Laravel\Passport\HasApiTokens;
  * @method static Builder<static>|User wherePmExpiration($value)
  * @method static Builder<static>|User wherePmLastFour($value)
  * @method static Builder<static>|User wherePmType($value)
+ * @method static Builder<static>|User whereReferenceId($value)
  * @method static Builder<static>|User whereRememberToken($value)
  * @method static Builder<static>|User whereSignature($value)
  * @method static Builder<static>|User whereStripeId($value)
@@ -158,6 +161,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     use HasLogging;
     use HasMultiFactorAuthentication;
     use HasPermissions;
+    use HasReferenceId;
     use LogsAuthActivity;
     use Notifiable;
     use Reportable;

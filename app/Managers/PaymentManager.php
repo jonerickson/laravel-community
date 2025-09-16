@@ -87,9 +87,9 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deletePaymentMethod($user, $paymentMethodId);
     }
 
-    public function startSubscription(User $user, Order $order, bool $allowPromotionCodes = false, int $trialDays = 0): bool|string
+    public function startSubscription(User $user, Order $order): bool|string
     {
-        return $this->driver()->startSubscription($user, $order, $allowPromotionCodes);
+        return $this->driver()->startSubscription($user, $order);
     }
 
     public function cancelSubscription(User $user, Price $price): bool
@@ -107,9 +107,9 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->isSubscribedToPrice($user, $price);
     }
 
-    public function redirectToCheckout(User $user, Order $order, Price|array $prices, bool $allowPromotionCodes = false): bool|string
+    public function redirectToCheckout(User $user, Order $order): bool|string
     {
-        return $this->driver()->redirectToCheckout($user, $order, $prices, $allowPromotionCodes);
+        return $this->driver()->redirectToCheckout($user, $order);
     }
 
     public function processCheckoutSuccess(Request $request, Order $order): bool

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\OrderStatus;
+use App\Traits\HasReferenceId;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,10 +14,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
+ * @property string $reference_id
  * @property int $user_id
- * @property string|null $order_number
  * @property OrderStatus $status
  * @property int|null $amount
+ * @property string|null $invoice_number
  * @property string|null $invoice_url
  * @property string|null $external_invoice_id
  * @property string|null $external_checkout_id
@@ -41,8 +43,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static Builder<static>|Order whereExternalOrderId($value)
  * @method static Builder<static>|Order whereExternalPaymentId($value)
  * @method static Builder<static>|Order whereId($value)
+ * @method static Builder<static>|Order whereInvoiceNumber($value)
  * @method static Builder<static>|Order whereInvoiceUrl($value)
- * @method static Builder<static>|Order whereOrderNumber($value)
+ * @method static Builder<static>|Order whereReferenceId($value)
  * @method static Builder<static>|Order whereStatus($value)
  * @method static Builder<static>|Order whereUpdatedAt($value)
  * @method static Builder<static>|Order whereUserId($value)
@@ -52,16 +55,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Order extends Model
 {
     use HasFactory;
+    use HasReferenceId;
 
     protected $attributes = [
-        'status' => OrderStatus::RequiresCapture,
+        'status' => OrderStatus::Pending,
     ];
 
     protected $fillable = [
         'user_id',
         'status',
         'amount',
-        'order_number',
+        'invoice_number',
         'external_order_id',
         'external_checkout_id',
         'external_payment_id',

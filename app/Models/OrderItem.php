@@ -13,8 +13,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $order_id
  * @property int|null $product_id
  * @property int|null $price_id
+ * @property int $quantity
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read Order $order
  * @property-read Price|null $price
  * @property-read Product|null $product
  *
@@ -27,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem wherePriceId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereQuantity($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereUpdatedAt($value)
  *
  * @mixin \Eloquent
@@ -37,12 +40,21 @@ class OrderItem extends Model
 
     protected $table = 'orders_items';
 
+    protected $attributes = [
+        'quantity' => 1,
+    ];
+
     protected $fillable = [
         'order_id',
         'product_id',
         'price_id',
         'quantity',
     ];
+
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
+    }
 
     public function product(): BelongsTo
     {
@@ -52,5 +64,12 @@ class OrderItem extends Model
     public function price(): BelongsTo
     {
         return $this->belongsTo(Price::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'quantity' => 'integer',
+        ];
     }
 }
