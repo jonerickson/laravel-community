@@ -46,7 +46,7 @@ class DownloadsController extends Controller
                 $downloads->push(DownloadData::from([
                     'id' => (string) $file->id,
                     'name' => $file->name,
-                    'description' => "File from $product->name",
+                    'description' => $file->description ?? "File from $product->name",
                     'file_size' => Number::fileSize((int) $file->size ?? 0),
                     'file_type' => $file->mime ?? 'application/octet-stream',
                     'download_url' => $file->url,

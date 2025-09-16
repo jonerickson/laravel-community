@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Banknote, CreditCard, DollarSign, Link as LinkIcon, MoreVertical, Smartphone, Star, Trash2 } from 'lucide-react';
+import { CreditCard, DollarSign, Link as LinkIcon, MoreVertical, Smartphone, Star, Trash2 } from 'lucide-react';
 
 interface PaymentMethodAlternativeProps {
     type: string;
@@ -19,43 +19,36 @@ export default function PaymentMethodAlternative({ type, email, isDefault, onSet
                 return {
                     name: 'Cash App Pay',
                     icon: DollarSign,
-                    color: 'text-green-600',
-                    bgColor: 'bg-green-50 border-green-200',
+                    color: 'text-success',
+                    bgColor: 'bg-success-foreground border-success/10',
                 };
             case 'link':
                 return {
                     name: 'Link',
                     icon: LinkIcon,
-                    color: 'text-blue-600',
-                    bgColor: 'bg-blue-50 border-blue-200',
-                };
-            case 'paypal':
-                return {
-                    name: 'PayPal',
-                    icon: Banknote,
-                    color: 'text-blue-600',
-                    bgColor: 'bg-blue-50 border-blue-200',
+                    color: 'text-info',
+                    bgColor: 'bg-info-foreground border-info/10',
                 };
             case 'apple_pay':
                 return {
                     name: 'Apple Pay',
                     icon: Smartphone,
-                    color: 'text-gray-800',
-                    bgColor: 'bg-gray-50 border-gray-200',
+                    color: 'text-primary',
+                    bgColor: 'bg-primary bg-primary/10',
                 };
             case 'google_pay':
                 return {
                     name: 'Google Pay',
                     icon: Smartphone,
-                    color: 'text-blue-600',
-                    bgColor: 'bg-blue-50 border-blue-200',
+                    color: 'text-primary',
+                    bgColor: 'bg-primary bg-primary/10',
                 };
             default:
                 return {
                     name: type.charAt(0).toUpperCase() + type.slice(1),
                     icon: CreditCard,
-                    color: 'text-gray-600',
-                    bgColor: 'bg-gray-50 border-gray-200',
+                    color: 'text-info',
+                    bgColor: 'bg-info-foreground border-info/10',
                 };
         }
     };
@@ -65,44 +58,46 @@ export default function PaymentMethodAlternative({ type, email, isDefault, onSet
 
     return (
         <Card className={`w-full max-w-sm border-2 ${methodInfo.bgColor} p-0`}>
-            <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                        <div className={`rounded-full p-2 ${methodInfo.bgColor}`}>
+            <CardContent className="p-4">
+                <div className="flex items-center justify-between gap-2">
+                    <div className="flex min-w-0 flex-1 items-center space-x-3">
+                        <div className={`rounded-full p-2 ${methodInfo.bgColor} flex-shrink-0`}>
                             <Icon className={`h-6 w-6 ${methodInfo.color}`} />
                         </div>
-                        <div>
-                            <div className="flow-row flex items-center gap-2">
-                                <h3 className="font-semibold">{methodInfo.name}</h3>
+                        <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <h3 className="truncate font-semibold">{methodInfo.name}</h3>
                                 {isDefault && (
-                                    <Badge variant="secondary">
+                                    <Badge variant="secondary" className="flex-shrink-0">
                                         <Star className="mr-1 size-3" />
                                         Default
                                     </Badge>
                                 )}
                             </div>
-                            {email && <p className="text-sm text-muted-foreground">{email}</p>}
+                            {email && <p className="truncate text-sm text-muted-foreground">{email}</p>}
                         </div>
                     </div>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                                <MoreVertical className="size-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            {!isDefault && (
-                                <DropdownMenuItem onClick={onSetDefault}>
-                                    <Star className="mr-2 size-4" />
-                                    Set as default
+                    <div className="flex-shrink-0">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <MoreVertical className="size-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                {!isDefault && (
+                                    <DropdownMenuItem onClick={onSetDefault}>
+                                        <Star className="mr-2 size-4" />
+                                        Set as default
+                                    </DropdownMenuItem>
+                                )}
+                                <DropdownMenuItem onClick={onDelete} className="text-destructive">
+                                    <Trash2 className="mr-2 size-4 text-destructive" />
+                                    Remove
                                 </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem onClick={onDelete} className="text-destructive">
-                                <Trash2 className="mr-2 size-4 text-destructive" />
-                                Remove
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                 </div>
             </CardContent>
         </Card>

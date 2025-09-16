@@ -21,6 +21,7 @@ use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
@@ -133,6 +134,10 @@ class ProductResource extends Resource
                                             ->maxLength(255)
                                             ->helperText('The name of the downloadable file.')
                                             ->label('Name'),
+                                        Textarea::make('description')
+                                            ->helperText('An optional description.')
+                                            ->maxLength(65535)
+                                            ->nullable(),
                                         FileUpload::make('path')
                                             ->visibility('private')
                                             ->hiddenLabel(),

@@ -61,6 +61,8 @@ use Laravel\Scout\Searchable;
  * @property-read int|null $files_count
  * @property-read Collection<int, Group> $groups
  * @property-read int|null $groups_count
+ * @property-read Collection<int, OrderItem> $orderItems
+ * @property-read int|null $order_items_count
  * @property-read Collection<int, Policy> $policies
  * @property-read int|null $policies_count
  * @property-read Collection<int, Price> $prices

@@ -11,11 +11,10 @@ import HeadingSmall from '@/components/heading-small';
 import PaymentMethodAlternative from '@/components/payment-method-alternative';
 import PaymentMethodCard from '@/components/payment-method-card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useApiRequest } from '@/hooks/use-api-request';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { CreditCard, DollarSign, Link as LinkIcon, Plus, Smartphone } from 'lucide-react';
+import { CreditCard, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -146,33 +145,6 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
                                 onButtonClick={() => setShowAddDialog(true)}
                             />
                         )}
-
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Add a new payment method</CardTitle>
-                                <CardDescription>Choose from various payment options supported by Stripe</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                                    <Button variant="outline" className="h-20 flex-col" onClick={() => setShowAddDialog(true)}>
-                                        <CreditCard className="mb-2 h-6 w-6" />
-                                        <span className="text-xs">Credit Card</span>
-                                    </Button>
-                                    <Button variant="outline" className="h-20 flex-col" disabled>
-                                        <DollarSign className="mb-2 h-6 w-6" />
-                                        <span className="text-xs">Cash App</span>
-                                    </Button>
-                                    <Button variant="outline" className="h-20 flex-col" disabled>
-                                        <LinkIcon className="mb-2 h-6 w-6" />
-                                        <span className="text-xs">Link</span>
-                                    </Button>
-                                    <Button variant="outline" className="h-20 flex-col" disabled>
-                                        <Smartphone className="mb-2 h-6 w-6" />
-                                        <span className="text-xs">Apple Pay</span>
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
 
                         <AddPaymentMethodDialog open={showAddDialog} onOpenChange={setShowAddDialog} />
 

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
  * @property string|null $resource_type
  * @property int|null $resource_id
  * @property string $name
+ * @property string|null $description
  * @property string $path
  * @property string|null $filename
  * @property string|null $mime
@@ -27,6 +28,7 @@ use Illuminate\Support\Facades\Storage;
  * @method static Builder<static>|File newQuery()
  * @method static Builder<static>|File query()
  * @method static Builder<static>|File whereCreatedAt($value)
+ * @method static Builder<static>|File whereDescription($value)
  * @method static Builder<static>|File whereFilename($value)
  * @method static Builder<static>|File whereId($value)
  * @method static Builder<static>|File whereMime($value)
@@ -43,6 +45,7 @@ class File extends Model
 {
     protected $fillable = [
         'name',
+        'description',
         'filename',
         'path',
         'mime',
