@@ -1,34 +1,6 @@
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 
-export interface Announcement {
-    id: number;
-    title: string;
-    slug: string;
-    content: string;
-    type: AnnouncementType;
-    is_active: boolean;
-    is_dismissible: boolean;
-    created_by: number;
-    author?: User;
-    starts_at?: string | null;
-    ends_at?: string | null;
-    created_at: string;
-    updated_at: string;
-}
-
-export interface ApiResponse<T = unknown> {
-    success: boolean;
-    message: string;
-    data: T;
-    meta: {
-        timestamp: string;
-        version: string;
-        [key: string]: unknown;
-    };
-    errors?: Record<string, string[]> | null;
-}
-
 export interface Auth {
     user: User;
     groups: Group[];
@@ -43,25 +15,6 @@ export interface BreadcrumbItem {
     href: string;
 }
 
-export interface CartResponse {
-    cartCount: number;
-    cartItems: {
-        product_id: number;
-        price_id?: number | null;
-        name: string;
-        slug: string;
-        quantity: number;
-        product: Product | null;
-        selected_price?: ProductPrice | null;
-        available_prices?: ProductPrice[];
-        added_at: string;
-    }[];
-}
-
-export interface CheckoutResponse {
-    checkout_url: string;
-}
-
 export interface Comment {
     id: number;
     commentable_type: string;
@@ -72,7 +25,7 @@ export interface Comment {
     parent_id?: number | null;
     rating?: number | null;
     likes_count: number;
-    likes_summary: EmojiReaction[];
+    likes_summary: App.Data.LikeData[];
     user_reaction?: string | null;
     user_reactions: string[];
     user?: User;
@@ -81,23 +34,6 @@ export interface Comment {
     replies?: Comment[];
     created_at: string;
     updated_at: string;
-}
-
-export interface EmojiReaction {
-    emoji: string;
-    count: number;
-    users: string[];
-}
-
-export interface EmojiReactionResponse {
-    likes_summary: EmojiReaction[];
-    user_reactions: string[];
-}
-
-export interface FingerprintTrackingResponse {
-    fingerprint_id: string;
-    first_seen: string;
-    last_seen: string;
 }
 
 export interface FlashData {
@@ -227,7 +163,7 @@ export interface Post {
     comments_enabled: boolean;
     comments_count: number;
     likes_count: number;
-    likes_summary: EmojiReaction[];
+    likes_summary: App.Data.LikeData[];
     user_reaction?: string | null;
     user_reactions: string[];
     topic_id?: number;
@@ -386,16 +322,4 @@ export interface User {
     created_at: string;
     updated_at: string;
     [key: string]: unknown;
-}
-
-export interface UserSocial {
-    id: number;
-    user_id: number;
-    provider: string;
-    provider_id: string;
-    provider_name?: string | null;
-    provider_email?: string | null;
-    provider_avatar?: string | null;
-    created_at: string;
-    updated_at: string;
 }

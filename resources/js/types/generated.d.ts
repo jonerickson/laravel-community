@@ -1,4 +1,49 @@
 declare namespace App.Data {
+    export type AnnouncementData = {
+        id: number;
+        title: string;
+        slug: string;
+        content: string;
+        type: App.Enums.AnnouncementType;
+        isActive: boolean;
+        isDismissible: boolean;
+        createdBy: number;
+        author: App.Data.UserData | null;
+        startsAt: string | null;
+        endsAt: string | null;
+        createdAt: string | null;
+        updatedAt: string | null;
+    };
+    export type ApiData = {
+        success: boolean;
+        message: string;
+        data: any;
+        meta: App.Data.ApiMetaData;
+        errors: { [key: string]: Array<string> } | null;
+    };
+    export type ApiMetaData = {
+        timestamp: string | null;
+        version: string;
+        additional: Array<any>;
+    };
+    export type CartData = {
+        cartCount: number;
+        cartItems: Array<App.Data.CartItemData>;
+    };
+    export type CartItemData = {
+        productId: number;
+        priceId: number | null;
+        name: string;
+        slug: string;
+        quantity: number;
+        product: App.Data.ProductData | null;
+        selectedPrice: App.Data.PriceData | null;
+        availablePrices: Array<App.Data.PriceData>;
+        addedAt: string | null;
+    };
+    export type CheckoutData = {
+        checkoutUrl: string;
+    };
     export type DownloadData = {
         id: string;
         name: string;
@@ -9,6 +54,20 @@ declare namespace App.Data {
         productName: string | null;
         createdAt: string;
     };
+    export type FingerprintData = {
+        fingerprintId: string;
+        firstSeen: string | null;
+        lastSeen: string | null;
+    };
+    export type LikeData = {
+        emoji: string;
+        count: number;
+        users: Array<string>;
+    };
+    export type LikeSummaryData = {
+        likesSummary: Array<App.Data.LikeData>;
+        userReactions: Array<string>;
+    };
     export type PaymentMethodData = {
         id: string;
         type: string;
@@ -16,8 +75,8 @@ declare namespace App.Data {
         last4: string | null;
         expMonth: string | null;
         expYear: string | null;
-        holderName: string;
-        holderEmail: string;
+        holderName: string | null;
+        holderEmail: string | null;
         isDefault: boolean;
     };
     export type PolicyCategoryData = {
@@ -37,8 +96,8 @@ declare namespace App.Data {
         description: string | null;
         content: string;
         isActive: boolean;
-        author: App.Data.UserData;
-        category: App.Data.PolicyCategoryData;
+        author: App.Data.UserData | null;
+        category: App.Data.PolicyCategoryData | null;
         effectiveAt: string | null;
         createdAt: string | null;
         updatedAt: string | null;
@@ -57,6 +116,30 @@ declare namespace App.Data {
         name: string;
         slug: string;
     };
+    export type ProductData = {
+        id: number;
+        name: string;
+        slug: string;
+        description: string;
+        type: App.Enums.ProductType;
+        taxCode: App.Enums.ProductTaxCode | null;
+        isFeatured: boolean;
+        isSubscriptionOnly: boolean;
+        trialDays: number;
+        allowPromotionCodes: boolean;
+        featuredImage: string | null;
+        featuredImageUrl: string | null;
+        externalProductId: string | null;
+        metadata: Array<any> | null;
+        prices: Array<App.Data.PriceData>;
+        defaultPrice: App.Data.PriceData | null;
+        averageRating: number | null;
+        reviewsCount: number;
+        categories: Array<App.Data.ProductCategoryData>;
+        policies: Array<App.Data.PolicyData>;
+        createdAt: string | null;
+        updatedAt: string | null;
+    };
     export type SubscriptionData = {
         id: number;
         name: string;
@@ -72,6 +155,17 @@ declare namespace App.Data {
     export type UserData = {
         id: string;
         name: string;
+    };
+    export type UserSocialData = {
+        id: number;
+        userId: number;
+        provider: string;
+        providerId: string;
+        providerName: string | null;
+        providerEmail: string | null;
+        providerAvatar: string | null;
+        createdAt: string | null;
+        updatedAt: string | null;
     };
 }
 declare namespace App.Enums {

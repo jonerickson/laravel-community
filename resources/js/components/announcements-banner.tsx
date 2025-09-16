@@ -1,11 +1,10 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import type { Announcement } from '@/types';
 import { CheckCircle, Info, TriangleAlert, X, XCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface AnnouncementBannerProps {
-    announcement: Announcement;
+    announcement: App.Data.AnnouncementData;
     onDismiss?: (announcementId: number) => void;
 }
 
@@ -52,7 +51,7 @@ export default function AnnouncementsBanner({ announcement, onDismiss }: Announc
                 </AlertDescription>
             </div>
 
-            {announcement.is_dismissible && (
+            {announcement.isDismissible && (
                 <Button
                     variant="ghost"
                     size="sm"

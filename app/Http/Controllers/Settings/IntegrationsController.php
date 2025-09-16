@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Settings;
 
+use App\Data\UserSocialData;
 use App\Http\Controllers\Controller;
 use App\Models\UserSocial;
 use Illuminate\Support\Facades\Auth;
@@ -18,11 +19,11 @@ class IntegrationsController extends Controller
         $user = Auth::user();
 
         $connectedAccounts = $user->socials()
-            ->select(['id', 'provider', 'provider_name', 'provider_email', 'provider_avatar', 'created_at'])
+            ->select(['id', 'user_id', 'provider', 'provider_id', 'provider_name', 'provider_email', 'provider_avatar', 'created_at', 'updated_at'])
             ->get();
 
         return Inertia::render('settings/integrations', [
-            'connectedAccounts' => $connectedAccounts,
+            'connectedAccounts' => UserSocialData::collect($connectedAccounts),
         ]);
     }
 

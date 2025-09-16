@@ -1,5 +1,4 @@
 import { useApiRequest } from '@/hooks/use-api-request';
-import type { CartResponse } from '@/types';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -10,10 +9,10 @@ interface CartTotals {
     total: number;
 }
 
-export function useCartOperations(initialItems: CartResponse['cartItems'] = []) {
-    const [items, setItems] = useState<CartResponse['cartItems']>(initialItems);
+export function useCartOperations(initialItems: App.Data.CartItemData[] = []) {
+    const [items, setItems] = useState<App.Data.CartItemData[]>(initialItems);
     const [loading, setLoading] = useState<number | null>(null);
-    const { execute: executeApiRequest } = useApiRequest<CartResponse>();
+    const { execute: executeApiRequest } = useApiRequest<App.Data.CartData>();
 
     const updateQuantity = async (productId: number, quantity: number, priceId?: number | null) => {
         setLoading(productId);
@@ -159,7 +158,7 @@ export function useCartOperations(initialItems: CartResponse['cartItems'] = []) 
 
     const calculateTotals = (): CartTotals => {
         const subtotal = items.reduce((total, item) => {
-            const price = item.selected_price || item.product?.default_price;
+            const price = item.selectedPrice || item.product?.defaultPrice;
             if (price) {
                 return total + price.amount * item.quantity;
             }

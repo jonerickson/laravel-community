@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useApiRequest } from '@/hooks';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type CheckoutResponse } from '@/types';
+import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Check, Crown, Package, Rocket, Shield, Star, Users, Zap } from 'lucide-react';
 import { useState } from 'react';
@@ -172,7 +172,7 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
     const [billingCycle, setBillingCycle] = useState<App.Enums.SubscriptionInterval>('month');
     const [loadingPlan, setLoadingPlan] = useState<number | null>(null);
     const [policiesAgreed, setPoliciesAgreed] = useState<Record<number, boolean>>({});
-    const { execute: executeCheckout } = useApiRequest<CheckoutResponse>();
+    const { execute: executeCheckout } = useApiRequest<App.Data.CheckoutData>();
 
     const availableIntervals = Object.values(['day', 'week', 'month', 'year']).filter((cycle) => {
         return subscriptionProducts.some((plan) => plan.activePrices.some((price) => price.interval === cycle));
@@ -203,7 +203,7 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
             },
             {
                 onSuccess: (data) => {
-                    window.location.href = data.checkout_url;
+                    window.location.href = data.checkoutUrl;
                 },
                 onSettled: () => setLoadingPlan(null),
             },

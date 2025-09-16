@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useApiRequest } from '@/hooks/use-api-request';
 import { useCartOperations } from '@/hooks/use-cart-operations';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, CartResponse, CheckoutResponse } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { ImageIcon, ShoppingCart as ShoppingCartIcon, Trash2, XIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -24,12 +24,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface ShoppingCartProps {
-    cartItems: CartResponse['cartItems'];
+    cartItems: App.Data.CartItemData[];
 }
 
 export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
     const { items, updateQuantity, removeItem, clearCart, calculateTotals, loading } = useCartOperations(cartItems);
-    const { loading: checkoutLoading, execute: executeCheckout } = useApiRequest<CheckoutResponse>();
+    const { loading: checkoutLoading, execute: executeCheckout } = useApiRequest<App.Data.CheckoutData>();
     const [policiesAgreed, setPoliciesAgreed] = useState(false);
 
     const { subtotal, total } = calculateTotals();
@@ -59,7 +59,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
     };
 
     const handleRemoveItem = (productId: number, priceId?: number | null) => {
-        const item = items.find((i) => i.product_id === productId);
+        const item = items.find((i) => i.productId === productId);
         if (!item) return;
 
         removeItem(productId, item.name, priceId);
@@ -73,7 +73,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
             },
             {
                 onSuccess: (data) => {
-                    window.location.href = data.checkout_url;
+                    window.location.href = data.checkoutUrl;
                 },
             },
         );
@@ -102,12 +102,12 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
 
                             <ul role="list" className="divide-y divide-border border-t border-b border-border">
                                 {items.map((item) => (
-                                    <li key={item.product_id} className="flex items-start py-6">
+                                    <li key={item.productId} className="flex items-start py-6">
                                         <div className="shrink-0">
-                                            {item.product?.featured_image_url ? (
+                                            {item.product?.featuredImageUrl ? (
                                                 <img
                                                     alt={item.name}
-                                                    src={item.product.featured_image_url}
+                                                    src={item.product.featuredImageUrl}
                                                     className="size-32 rounded-md object-cover sm:size-64"
                                                 />
                                             ) : (
@@ -143,34 +143,34 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                                             ></p>
                                                         </div>
                                                         <p className="mt-3 text-sm font-medium text-foreground">
-                                                            {item.selected_price
-                                                                ? `$${item.selected_price.amount} ${item.selected_price.currency}${item.selected_price.interval ? ` / ${item.selected_price.interval}` : ''}`
-                                                                : item.product?.default_price
-                                                                  ? `$${item.product.default_price.amount} ${item.product.default_price.currency}${item.product.default_price.interval ? ` / ${item.product.default_price.interval}` : ''}`
+                                                            {item.selectedPrice
+                                                                ? `$${item.selectedPrice.amount} ${item.selectedPrice.currency}${item.selectedPrice.interval ? ` / ${item.selectedPrice.interval}` : ''}`
+                                                                : item.product?.defaultPrice
+                                                                  ? `$${item.product.defaultPrice.amount} ${item.product.defaultPrice.currency}${item.product.defaultPrice.interval ? ` / ${item.product.defaultPrice.interval}` : ''}`
                                                                   : 'Price TBD'}
                                                         </p>
                                                     </div>
 
                                                     <div className="mt-auto space-y-3">
-                                                        {item.available_prices && item.available_prices.length > 1 && (
+                                                        {item.availablePrices && item.availablePrices.length > 1 && (
                                                             <div>
                                                                 <label className="mb-1 block text-xs font-medium text-foreground">Price:</label>
                                                                 <Select
                                                                     value={
-                                                                        item.selected_price?.id?.toString() ||
-                                                                        item.available_prices.find((p) => p.is_default)?.id?.toString() ||
+                                                                        item.selectedPrice?.id?.toString() ||
+                                                                        item.availablePrices.find((p) => p.isDefault)?.id?.toString() ||
                                                                         ''
                                                                     }
                                                                     onValueChange={(value) => {
                                                                         const newPriceId = parseInt(value);
-                                                                        handleUpdateQuantity(item.product_id, item.quantity, newPriceId);
+                                                                        handleUpdateQuantity(item.productId, item.quantity, newPriceId);
                                                                     }}
                                                                 >
                                                                     <SelectTrigger className="w-full">
                                                                         <SelectValue placeholder="Select price" />
                                                                     </SelectTrigger>
                                                                     <SelectContent>
-                                                                        {item.available_prices.map((price) => (
+                                                                        {item.availablePrices.map((price) => (
                                                                             <SelectItem key={price.id} value={price.id.toString()}>
                                                                                 {price.name} - ${price.amount} {price.currency}
                                                                                 {price.interval && ` / ${price.interval}`}
@@ -186,9 +186,9 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                                             <Select
                                                                 value={item.quantity.toString()}
                                                                 onValueChange={(value) =>
-                                                                    handleUpdateQuantity(item.product_id, parseInt(value), item.price_id)
+                                                                    handleUpdateQuantity(item.productId, parseInt(value), item.priceId)
                                                                 }
-                                                                disabled={loading === item.product_id}
+                                                                disabled={loading === item.productId}
                                                             >
                                                                 <SelectTrigger className="w-full">
                                                                     <SelectValue placeholder="Qty" />
@@ -208,8 +208,8 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                                 <div className="absolute top-0 right-0">
                                                     <button
                                                         type="button"
-                                                        onClick={() => handleRemoveItem(item.product_id, item.price_id)}
-                                                        disabled={loading === item.product_id}
+                                                        onClick={() => handleRemoveItem(item.productId, item.priceId)}
+                                                        disabled={loading === item.productId}
                                                         className="-m-2 inline-flex p-2 text-gray-400 hover:text-gray-500 disabled:opacity-50"
                                                     >
                                                         <span className="sr-only">Remove</span>

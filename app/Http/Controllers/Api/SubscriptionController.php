@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Data\CheckoutData;
 use App\Http\Requests\Api\SubscriptionCheckoutRequest;
 use App\Http\Resources\ApiResource;
 use App\Managers\PaymentManager;
@@ -62,10 +63,12 @@ class SubscriptionController
             );
         }
 
+        $checkoutData = CheckoutData::from([
+            'checkoutUrl' => $result,
+        ]);
+
         return ApiResource::success(
-            resource: [
-                'checkout_url' => $result,
-            ],
+            resource: $checkoutData,
             message: 'Subscription started successfully.',
         );
     }

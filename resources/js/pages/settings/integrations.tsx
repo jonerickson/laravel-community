@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { BreadcrumbItem, UserSocial } from '@/types';
+import { BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Link2, Plus, Trash2, User } from 'lucide-react';
@@ -45,7 +45,7 @@ const availableIntegrations: Integration[] = [
 ];
 
 interface ConnectedAccountsProps {
-    connectedAccounts: UserSocial[];
+    connectedAccounts: App.Data.UserSocialData[];
 }
 
 export default function Integrations({ connectedAccounts }: ConnectedAccountsProps) {
@@ -121,11 +121,11 @@ export default function Integrations({ connectedAccounts }: ConnectedAccountsPro
                                             <div
                                                 className={`flex h-10 w-10 items-center justify-center rounded-full text-white ${getProviderColor(account.provider)}`}
                                             >
-                                                {account.provider_avatar ? (
+                                                {account.providerAvatar ? (
                                                     <Avatar className="h-10 w-10">
-                                                        <AvatarImage src={account.provider_avatar} alt={account.provider_name || ''} />
+                                                        <AvatarImage src={account.providerAvatar} alt={account.providerName || ''} />
                                                         <AvatarFallback>
-                                                            {(account.provider_name || account.provider).charAt(0).toUpperCase()}
+                                                            {(account.providerName || account.provider).charAt(0).toUpperCase()}
                                                         </AvatarFallback>
                                                     </Avatar>
                                                 ) : (
@@ -137,9 +137,11 @@ export default function Integrations({ connectedAccounts }: ConnectedAccountsPro
                                                     <h3 className="font-semibold">{getProviderDisplayName(account.provider)}</h3>
                                                 </div>
                                                 <div className="flex flex-col gap-1 text-sm text-muted-foreground">
-                                                    {account.provider_name && <span>{account.provider_name}</span>}
-                                                    {account.provider_email && <span>{account.provider_email}</span>}
-                                                    <span>Connected {format(new Date(account.created_at), 'PPP')}</span>
+                                                    {account.providerName && <span>{account.providerName}</span>}
+                                                    {account.providerEmail && <span>{account.providerEmail}</span>}
+                                                    <span>
+                                                        Connected {account.createdAt ? format(new Date(account.createdAt), 'PPP') : 'Unknown'}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>

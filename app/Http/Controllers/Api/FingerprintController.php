@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Data\FingerprintData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ApiResource;
 use App\Models\Fingerprint;
@@ -40,12 +41,14 @@ class FingerprintController extends Controller
             value: $fingerprint->fingerprint_id,
         );
 
+        $fingerprintData = FingerprintData::from([
+            'fingerprintId' => $fingerprint->fingerprint_id,
+            'firstSeen' => $fingerprint->first_seen_at,
+            'lastSeen' => $fingerprint->last_seen_at,
+        ]);
+
         return ApiResource::success(
-            resource: [
-                'fingerprint_id' => $fingerprint->fingerprint_id,
-                'first_seen' => $fingerprint->first_seen_at,
-                'last_seen' => $fingerprint->last_seen_at,
-            ],
+            resource: $fingerprintData,
             message: 'Fingerprint tracked successfully.'
         );
     }

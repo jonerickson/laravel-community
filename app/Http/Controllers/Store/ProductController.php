@@ -49,7 +49,7 @@ class ProductController extends Controller
                 'name' => $product->name,
                 'slug' => $product->slug,
                 'quantity' => $quantity,
-                'added_at' => now()->toISOString(),
+                'added_at' => now(),
             ];
         }
 

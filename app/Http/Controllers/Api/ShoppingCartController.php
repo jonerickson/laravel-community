@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Data\CartData;
+use App\Data\CartItemData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ApiResource;
 use App\Models\Product;
@@ -46,18 +48,20 @@ class ShoppingCartController extends Controller
             'name' => $product->name,
             'slug' => $product->slug,
             'quantity' => $quantity,
-            'added_at' => now()->toISOString(),
+            'added_at' => now(),
         ];
 
         Session::put('shopping_cart', $cart);
 
         $cartItems = $this->cartService->getCartItems();
 
+        $cartResponse = CartData::from([
+            'cartCount' => count($cartItems),
+            'cartItems' => CartItemData::collect($cartItems),
+        ]);
+
         return ApiResource::updated(
-            resource: [
-                'cartItems' => $cartItems,
-                'cartCount' => count($cartItems),
-            ],
+            resource: $cartResponse,
             message: 'Cart updated successfully.'
         );
     }
@@ -81,11 +85,13 @@ class ShoppingCartController extends Controller
 
         $cartItems = $this->cartService->getCartItems();
 
+        $cartResponse = CartData::from([
+            'cartCount' => count($cartItems),
+            'cartItems' => CartItemData::collect($cartItems),
+        ]);
+
         return ApiResource::success(
-            resource: [
-                'cartItems' => $cartItems,
-                'cartCount' => count($cartItems),
-            ],
+            resource: $cartResponse,
             message: 'Item removed from cart successfully.'
         );
     }

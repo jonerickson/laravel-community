@@ -2,22 +2,16 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Comment, EmojiReactionResponse, Post } from '@/types';
-import { apiRequest } from '@/utils/api';
-import axios from 'axios';
+import { useApiRequest } from '@/hooks/use-api-request';
+import { Comment, Post } from '@/types';
 import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
-
-interface EmojiReaction {
-    emoji: string;
-    count: number;
-    users: string[];
-}
+import { route } from 'ziggy-js';
 
 interface EmojiReactionsProps {
     post?: Post;
     comment?: Comment;
-    initialReactions?: EmojiReaction[];
+    initialReactions?: App.Data.LikeData[];
     userReactions?: string[];
     className?: string;
 }
@@ -27,14 +21,12 @@ const MOBILE_EMOJIS = ['👍', '❤️', '😂']; // Essential emojis for mobile
 const MOBILE_DROPDOWN_EMOJIS = ['😮', '😢', '😡']; // Additional emojis in dropdown
 
 export default function EmojiReactions({ post, comment, initialReactions = [], userReactions = [], className = '' }: EmojiReactionsProps) {
-    const [reactions, setReactions] = useState<EmojiReaction[]>(initialReactions);
+    const [reactions, setReactions] = useState<App.Data.LikeData[]>(initialReactions);
     const [currentUserReactions, setCurrentUserReactions] = useState<string[]>(userReactions);
-    const [loading, setLoading] = useState(false);
+    const { loading, execute } = useApiRequest<App.Data.LikeSummaryData>();
 
     const handleEmojiToggle = async (emoji: string) => {
         if (loading) return;
-
-        setLoading(true);
 
         const wasActive = currentUserReactions.includes(emoji);
         let newUserReactions: string[];
@@ -67,25 +59,27 @@ export default function EmojiReactions({ post, comment, initialReactions = [], u
 
         setReactions(updatedReactions.filter((r) => r.count > 0));
 
-        try {
-            const data = await apiRequest<EmojiReactionResponse>(
-                axios.post(route('api.like'), {
+        await execute(
+            {
+                url: route('api.like'),
+                method: 'POST',
+                data: {
                     type: post ? 'post' : 'comment',
                     id: post ? post.id : comment?.id,
                     emoji,
-                }),
-            );
-
-            setReactions(data.likes_summary || []);
-            setCurrentUserReactions(data.user_reactions || []);
-        } catch (error) {
-            console.error('Error toggling reaction:', error);
-
-            setReactions(initialReactions);
-            setCurrentUserReactions(userReactions);
-        } finally {
-            setLoading(false);
-        }
+                },
+            },
+            {
+                onSuccess: (responseData) => {
+                    setReactions(responseData.likesSummary || []);
+                    setCurrentUserReactions(responseData.userReactions || []);
+                },
+                onError: () => {
+                    setReactions(initialReactions);
+                    setCurrentUserReactions(userReactions);
+                },
+            },
+        );
     };
 
     const reactionMap = reactions.reduce(
@@ -93,7 +87,7 @@ export default function EmojiReactions({ post, comment, initialReactions = [], u
             acc[reaction.emoji] = reaction;
             return acc;
         },
-        {} as Record<string, EmojiReaction>,
+        {} as Record<string, App.Data.LikeData>,
     );
 
     const renderEmojiButton = (emoji: string, showTooltip = true) => {
@@ -113,7 +107,7 @@ export default function EmojiReactions({ post, comment, initialReactions = [], u
             return (
                 <div className="space-y-1">
                     <div className="text-xs">
-                        {displayUsers.map((user, index) => (
+                        {displayUsers.map((user: string, index: number) => (
                             <div key={index}>{user}</div>
                         ))}
                         {remainingCount > 0 && <div className="text-muted-foreground">+{remainingCount} more</div>}
@@ -146,7 +140,6 @@ export default function EmojiReactions({ post, comment, initialReactions = [], u
 
     return (
         <div className={`flex items-center gap-2 ${className}`}>
-            {/* Desktop - show all emojis */}
             <div className="hidden md:flex">
                 <ToggleGroup
                     type="multiple"
@@ -170,7 +163,6 @@ export default function EmojiReactions({ post, comment, initialReactions = [], u
                 </ToggleGroup>
             </div>
 
-            {/* Mobile - show essential emojis + dropdown for others */}
             <div className="flex items-center gap-1 md:hidden">
                 <ToggleGroup
                     type="multiple"
@@ -193,7 +185,6 @@ export default function EmojiReactions({ post, comment, initialReactions = [], u
                     {MOBILE_EMOJIS.map((emoji) => renderEmojiButton(emoji))}
                 </ToggleGroup>
 
-                {/* Mobile dropdown for additional emojis */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm" className="px-2 py-1" disabled={loading}>

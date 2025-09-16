@@ -1,5 +1,7 @@
+import { useApiRequest } from '@/hooks/use-api-request';
 import FingerprintService from '@/services/fingerprint';
 import { useEffect, useState } from 'react';
+import { route } from 'ziggy-js';
 
 interface UseFingerprintReturn {
     fingerprintId: string | null;
@@ -11,6 +13,7 @@ export function useFingerprint(): UseFingerprintReturn {
     const [fingerprintId, setFingerprintId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { execute } = useApiRequest<App.Data.FingerprintData>();
 
     useEffect(() => {
         const initializeFingerprint = async () => {
@@ -20,7 +23,20 @@ export function useFingerprint(): UseFingerprintReturn {
 
                 if (fingerprint) {
                     setFingerprintId(fingerprint.visitorId);
-                    await service.trackFingerprint();
+
+                    await execute({
+                        url: route('api.fingerprint'),
+                        method: 'POST',
+                        data: {
+                            fingerprint_id: fingerprint.visitorId,
+                            fingerprint_data: fingerprint.components,
+                        },
+                        config: {
+                            headers: {
+                                'X-Fingerprint-ID': fingerprint.visitorId,
+                            },
+                        },
+                    });
                 } else {
                     setError('Failed to generate fingerprint');
                 }
@@ -32,7 +48,7 @@ export function useFingerprint(): UseFingerprintReturn {
         };
 
         initializeFingerprint();
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return { fingerprintId, isLoading, error };
 }

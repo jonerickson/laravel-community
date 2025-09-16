@@ -12,27 +12,21 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 #[TypeScript]
 #[MapInputName(SnakeCaseMapper::class)]
-class PolicyData extends Data
+class UserSocialData extends Data
 {
     public int $id;
 
-    public string $title;
+    public int $userId;
 
-    public string $slug;
+    public string $provider;
 
-    public ?string $version;
+    public string $providerId;
 
-    public ?string $description;
+    public ?string $providerName;
 
-    public string $content;
+    public ?string $providerEmail;
 
-    public bool $isActive;
-
-    public ?UserData $author;
-
-    public ?PolicyCategoryData $category;
-
-    public ?CarbonImmutable $effectiveAt;
+    public ?string $providerAvatar;
 
     public ?CarbonImmutable $createdAt;
 

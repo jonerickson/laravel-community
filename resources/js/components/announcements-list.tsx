@@ -1,8 +1,7 @@
 import AnnouncementsBanner from '@/components/announcements-banner';
-import type { Announcement } from '@/types';
 
 interface AnnouncementsListProps {
-    announcements: Announcement[];
+    announcements: App.Data.AnnouncementData[];
     onDismiss?: (announcementId: number) => void;
 }
 

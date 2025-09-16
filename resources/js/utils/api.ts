@@ -1,4 +1,3 @@
-import type { ApiResponse } from '@/types';
 import axios, { type AxiosResponse } from 'axios';
 
 export class ApiError extends Error {
@@ -13,7 +12,7 @@ export class ApiError extends Error {
     }
 }
 
-export function handleApiResponse<T>(response: AxiosResponse<ApiResponse<T>>): T {
+export function handleApiResponse<T>(response: AxiosResponse<App.Data.ApiData>): T {
     if (response.data.success) {
         return response.data.data;
     }
@@ -38,7 +37,7 @@ export function handleApiError(error: unknown): ApiError {
     return new ApiError(error instanceof Error ? error.message : 'An unexpected error occurred', 500);
 }
 
-export async function apiRequest<T>(requestPromise: Promise<AxiosResponse<ApiResponse<T>>>): Promise<T> {
+export async function apiRequest<T>(requestPromise: Promise<AxiosResponse<App.Data.ApiData>>): Promise<T> {
     try {
         const response = await requestPromise;
         return handleApiResponse(response);

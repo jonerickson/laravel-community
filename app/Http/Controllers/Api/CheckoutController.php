@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Data\CheckoutData;
 use App\Http\Resources\ApiResource;
 use App\Managers\PaymentManager;
 use App\Models\Order;
@@ -100,14 +101,16 @@ class CheckoutController
 
         if (! $result) {
             return ApiResource::error(
-                message: 'Failed to create checkout session'
+                message: 'Failed to create checkout session.'
             );
         }
 
+        $checkoutData = CheckoutData::from([
+            'checkoutUrl' => $result,
+        ]);
+
         return ApiResource::success(
-            resource: [
-                'checkout_url' => $result,
-            ],
+            resource: $checkoutData,
             message: 'Checkout session created successfully.',
         );
     }

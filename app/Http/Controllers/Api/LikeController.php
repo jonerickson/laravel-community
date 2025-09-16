@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Data\LikeSummaryData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ApiResource;
 use App\Models\Comment;
-use App\Models\Like;
 use App\Models\Post;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -42,19 +42,15 @@ class LikeController extends Controller
         $this->authorize('like', $likeable);
 
         $user = Auth::user();
-        $result = $likeable->toggleLike($validated['emoji'], $user->id);
+        $likeable->toggleLike($validated['emoji'], $user->id);
 
-        $liked = $result instanceof Like;
+        $likeSummaryData = LikeSummaryData::from([
+            'likesSummary' => $likeable->likes_summary,
+            'userReactions' => $likeable->user_reactions,
+        ]);
 
         return new ApiResource(
-            resource: [
-                'liked' => $liked,
-                'likes_count' => $likeable->likes_count,
-                'likes_summary' => $likeable->likes_summary,
-                'user_reactions' => $likeable->user_reactions,
-                'type' => $validated['type'],
-                'id' => $validated['id'],
-            ],
+            resource: $likeSummaryData,
             message: 'Item liked successfully.'
         );
     }

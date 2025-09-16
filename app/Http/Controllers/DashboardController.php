@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Data\AnnouncementData;
 use App\Models\Announcement;
 use App\Models\Post;
 use App\Models\SupportTicket;
@@ -18,21 +19,24 @@ class DashboardController
     public function __invoke(): Response
     {
         return Inertia::render('dashboard', [
-            'announcements' => Inertia::defer(fn (): Collection => $this->getAnnouncements()),
+            'announcements' => Inertia::defer(fn () => $this->getAnnouncements()),
             'supportTickets' => Inertia::defer(fn (): Collection => $this->getSupportTickets()),
             'trendingTopics' => Inertia::defer(fn (): Collection => $this->getTrendingTopics()),
             'latestBlogPosts' => Inertia::defer(fn (): Collection => $this->getLatestBlogPosts()),
         ]);
     }
 
-    private function getAnnouncements(): Collection
+    private function getAnnouncements()
     {
-        return Announcement::query()
+        $announcements = Announcement::query()
+            ->with('author')
             ->with('reads')
             ->current()
             ->unread()
             ->latest()
             ->get();
+
+        return AnnouncementData::collect($announcements);
     }
 
     private function getSupportTickets(): Collection

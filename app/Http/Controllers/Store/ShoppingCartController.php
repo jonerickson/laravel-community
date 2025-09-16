@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Store;
 
+use App\Data\CartItemData;
 use App\Http\Controllers\Controller;
 use App\Services\ShoppingCartService;
 use Illuminate\Http\RedirectResponse;
@@ -18,8 +19,10 @@ class ShoppingCartController extends Controller
 
     public function index(): Response
     {
+        $cartItems = $this->cartService->getCartItems();
+
         return Inertia::render('store/shopping-cart', [
-            'cartItems' => $this->cartService->getCartItems(),
+            'cartItems' => CartItemData::collect($cartItems),
             'cartCount' => $this->cartService->getCartCount(),
         ]);
     }
