@@ -12,11 +12,6 @@ import { Deferred, useForm, usePage } from '@inertiajs/react';
 import { ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-const policies = [
-    //     { name: 'International delivery', icon: GlobeIcon, description: 'Get your order in 2 years' },
-    //     { name: 'Loyalty rewards', icon: CurrencyIcon, description: "Don't look at other tees" },
-];
-
 interface ProductProps {
     product: ProductType;
     reviews: Comment[];
@@ -228,18 +223,18 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                             Our Policies
                         </h2>
 
-                        <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                            {policies.map((policy) => (
-                                <div key={policy.name} className="rounded-lg border border-border bg-accent p-6 text-center">
-                                    <dt>
-                                        <policy.icon aria-hidden="true" className="mx-auto size-6 shrink-0 text-sidebar-accent-foreground" />
-                                        <div className="mt-2">
-                                            <HeadingSmall title={policy.name} description={policy.description} />
-                                        </div>
-                                    </dt>
-                                </div>
-                            ))}
-                        </dl>
+                        {/*<dl className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">*/}
+                        {/*    {policies.map((policy) => (*/}
+                        {/*        <div key={policy.name} className="rounded-lg border border-border bg-accent p-6 text-center">*/}
+                        {/*            <dt>*/}
+                        {/*                <policy.icon aria-hidden="true" className="mx-auto size-6 shrink-0 text-sidebar-accent-foreground" />*/}
+                        {/*                <div className="mt-2">*/}
+                        {/*                    <HeadingSmall title={policy.name} description={policy.description} />*/}
+                        {/*                </div>*/}
+                        {/*            </dt>*/}
+                        {/*        </div>*/}
+                        {/*    ))}*/}
+                        {/*</dl>*/}
                     </section>
                 </div>
             </div>

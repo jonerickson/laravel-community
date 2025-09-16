@@ -184,13 +184,10 @@ class ProductResource extends Resource
                             ]),
                         Section::make('Metadata')
                             ->components([
-                                KeyValue::make('metadata')
-                                    ->dehydrated(fn (Get $get) => $get('type') === ProductType::Subscription)
-                                    ->visible(fn (Get $get) => $get('type') === ProductType::Product)
-                                    ->helperText('Meta data will be merged with any external payment processor that is used.')
+                                KeyValue::make('metadata.metadata')
+                                    ->helperText('Metadata will be merged with any external payment processor that is used.')
                                     ->hiddenLabel(),
                                 Repeater::make('metadata.features')
-                                    ->dehydrated(fn (Get $get) => $get('type') === ProductType::Product)
                                     ->visible(fn (Get $get) => $get('type') === ProductType::Subscription)
                                     ->addActionLabel('Add a new feature')
                                     ->simple(TextInput::make('feature')),

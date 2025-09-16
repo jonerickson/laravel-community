@@ -3,27 +3,81 @@ declare namespace App.Data {
         id: string;
         name: string;
         description: string | null;
-        file_size: string | null;
-        file_type: string | null;
-        download_url: string;
-        product_name: string | null;
-        created_at: string;
+        fileSize: string | null;
+        fileType: string | null;
+        downloadUrl: string;
+        productName: string | null;
+        createdAt: string;
     };
     export type PaymentMethodData = {
-        id: string | number;
+        id: string;
         type: string;
         brand: string | null;
         last4: string | null;
-        expMonth: string | number | null;
-        expYear: string | number | null;
-        holderName: string | null;
-        holderEmail: string | null;
+        expMonth: string | null;
+        expYear: string | null;
+        holderName: string;
+        holderEmail: string;
         isDefault: boolean;
+    };
+    export type PolicyCategoryData = {
+        id: number;
+        name: string;
+        slug: string;
+        description: string | null;
+        activePolicies: Array<App.Data.PolicyData>;
+        createdAt: string | null;
+        updatedAt: string | null;
+    };
+    export type PolicyData = {
+        id: number;
+        title: string;
+        slug: string;
+        version: string | null;
+        description: string | null;
+        content: string;
+        isActive: boolean;
+        author: App.Data.UserData;
+        category: App.Data.PolicyCategoryData;
+        effectiveAt: string | null;
+        createdAt: string | null;
+        updatedAt: string | null;
+    };
+    export type PriceData = {
+        id: number;
+        name: string;
+        amount: number;
+        currency: string;
+        interval: App.Enums.SubscriptionInterval;
+        isDefault: boolean;
+        isActive: boolean;
+    };
+    export type ProductCategoryData = {
+        id: number;
+        name: string;
+        slug: string;
+    };
+    export type SubscriptionData = {
+        id: number;
+        name: string;
+        description: string;
+        slug: string;
+        featuredImageUrl: string | null;
+        current: boolean;
+        metadata: { [key: string]: any };
+        activePrices: Array<App.Data.PriceData>;
+        categories: Array<App.Data.ProductCategoryData>;
+        policies: Array<App.Data.PolicyData>;
+    };
+    export type UserData = {
+        id: string;
+        name: string;
     };
 }
 declare namespace App.Enums {
     export type AnnouncementType = 'info' | 'success' | 'warning' | 'error';
     export type OrderStatus =
+        | 'pending'
         | 'canceled'
         | 'processing'
         | 'requires_action'

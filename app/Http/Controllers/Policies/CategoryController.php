@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Policies;
 
+use App\Data\PolicyCategoryData;
+use App\Data\PolicyData;
 use App\Http\Controllers\Controller;
 use App\Models\PolicyCategory;
 use Inertia\Inertia;
@@ -21,7 +23,7 @@ class CategoryController extends Controller
             ->get();
 
         return Inertia::render('policies/index', [
-            'categories' => $categories,
+            'categories' => PolicyCategoryData::collect($categories),
         ]);
     }
 
@@ -36,8 +38,8 @@ class CategoryController extends Controller
             ->get();
 
         return Inertia::render('policies/category', [
-            'category' => $category,
-            'policies' => $policies,
+            'category' => PolicyCategoryData::from($category),
+            'policies' => PolicyData::collect($policies),
         ]);
     }
 }

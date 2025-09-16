@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Policies;
 
+use App\Data\PolicyCategoryData;
+use App\Data\PolicyData;
 use App\Http\Controllers\Controller;
 use App\Models\Policy;
 use App\Models\PolicyCategory;
@@ -22,9 +24,11 @@ class PolicyController extends Controller
             abort(404);
         }
 
+        $policy->loadMissing(['author', 'category']);
+
         return Inertia::render('policies/show', [
-            'category' => $category,
-            'policy' => $policy,
+            'category' => PolicyCategoryData::from($category),
+            'policy' => PolicyData::from($policy),
         ]);
     }
 }

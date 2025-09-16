@@ -6,7 +6,7 @@ export interface Announcement {
     title: string;
     slug: string;
     content: string;
-    type: 'info' | 'success' | 'warning' | 'error';
+    type: AnnouncementType;
     is_active: boolean;
     is_dismissible: boolean;
     created_by: number;
@@ -156,25 +156,6 @@ export interface Image {
     updated_at: string;
 }
 
-export interface Invoice {
-    id: string;
-    amount_due: number;
-    amount_paid: number;
-    amount_remaining: number;
-    currency: string;
-    status: InvoiceStatus;
-    customer_id: string;
-    subscription_id?: string;
-    invoice_pdf?: string;
-    hosted_invoice_url?: string;
-    created: number;
-    due_date?: number;
-    paid_at?: number;
-    metadata: Record<string, unknown>;
-}
-
-export type InvoiceStatus = 'draft' | 'open' | 'paid' | 'uncollectible' | 'void';
-
 export interface Order {
     id: number;
     user_id: number;
@@ -202,27 +183,6 @@ export interface OrderItem {
     updated_at: string;
     product?: Product | null;
     price?: ProductPrice | null;
-}
-
-export type OrderStatus =
-    | 'pending'
-    | 'canceled'
-    | 'processing'
-    | 'requires_action'
-    | 'requires_capture'
-    | 'requires_confirmation'
-    | 'requires_payment_method'
-    | 'succeeded';
-
-export interface Download {
-    id: string;
-    name: string;
-    description?: string;
-    file_size?: string;
-    file_type?: string;
-    download_url: string;
-    product_name?: string;
-    created_at: string;
 }
 
 export interface NavGroup {
@@ -254,41 +214,9 @@ export interface PaginatedData {
     };
 }
 
-export interface Policy {
-    id: number;
-    title: string;
-    slug: string;
-    description?: string | null;
-    content: string;
-    version?: string | null;
-    is_active: boolean;
-    effective_at?: string | null;
-    order: number;
-    policy_category_id: number;
-    category?: PolicyCategory;
-    created_by: number;
-    author?: User;
-    created_at: string;
-    updated_at: string;
-}
-
-export interface PolicyCategory {
-    id: number;
-    name: string;
-    slug: string;
-    description?: string | null;
-    is_active: boolean;
-    order: number;
-    active_policies?: Policy[];
-    created_by: number;
-    author?: User;
-    created_at: string;
-    updated_at: string;
-}
-
 export interface Post {
     id: number;
-    type: 'forum' | 'blog';
+    type: PostType;
     title: string;
     slug: string;
     excerpt?: string | null;
@@ -325,7 +253,8 @@ export interface Product {
     name: string;
     slug: string;
     description: string;
-    type: 'product' | 'subscription';
+    type: ProductType;
+    tax_code: ProductTaxCode;
     is_featured: boolean;
     featured_image?: string | null;
     featured_image_url?: string | null;
@@ -388,10 +317,10 @@ export interface SupportTicket {
     id: number;
     subject: string;
     description: string;
-    status: 'new' | 'open' | 'in_progress' | 'resolved' | 'closed';
-    priority: 'low' | 'medium' | 'high' | 'critical';
+    status: App.Enums.SupportTicketStatus;
+    priority: App.Enums.SupportTicketPriority;
     support_ticket_category_id: number;
-    category?: SupportTicketCategory;
+    category?: App.Enums.SupportTicketCategory;
     assigned_to?: number | null;
     assignedTo?: User | null;
     created_by: number;

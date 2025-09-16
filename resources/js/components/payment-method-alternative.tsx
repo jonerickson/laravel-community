@@ -5,14 +5,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { CreditCard, DollarSign, Link as LinkIcon, MoreVertical, Smartphone, Star, Trash2 } from 'lucide-react';
 
 interface PaymentMethodAlternativeProps {
-    type: string;
-    email?: string;
-    isDefault: boolean;
+    paymentMethod: App.Data.PaymentMethodData;
     onSetDefault: () => void;
     onDelete: () => void;
 }
 
-export default function PaymentMethodAlternative({ type, email, isDefault, onSetDefault, onDelete }: PaymentMethodAlternativeProps) {
+export default function PaymentMethodAlternative({ paymentMethod, onSetDefault, onDelete }: PaymentMethodAlternativeProps) {
     const getMethodInfo = (type: string) => {
         switch (type) {
             case 'cashapp':
@@ -53,7 +51,7 @@ export default function PaymentMethodAlternative({ type, email, isDefault, onSet
         }
     };
 
-    const methodInfo = getMethodInfo(type);
+    const methodInfo = getMethodInfo(paymentMethod.type);
     const Icon = methodInfo.icon;
 
     return (
@@ -67,14 +65,14 @@ export default function PaymentMethodAlternative({ type, email, isDefault, onSet
                         <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-2">
                                 <h3 className="truncate font-semibold">{methodInfo.name}</h3>
-                                {isDefault && (
+                                {paymentMethod.isDefault && (
                                     <Badge variant="secondary" className="flex-shrink-0">
                                         <Star className="mr-1 size-3" />
                                         Default
                                     </Badge>
                                 )}
                             </div>
-                            {email && <p className="truncate text-sm text-muted-foreground">{email}</p>}
+                            {paymentMethod.holderEmail && <p className="truncate text-sm text-muted-foreground">{paymentMethod.holderEmail}</p>}
                         </div>
                     </div>
                     <div className="flex-shrink-0">
@@ -85,7 +83,7 @@ export default function PaymentMethodAlternative({ type, email, isDefault, onSet
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                {!isDefault && (
+                                {!paymentMethod.isDefault && (
                                     <DropdownMenuItem onClick={onSetDefault}>
                                         <Star className="mr-2 size-4" />
                                         Set as default

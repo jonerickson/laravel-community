@@ -7,13 +7,7 @@ import { useState } from 'react';
 interface DeletePaymentMethodDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    paymentMethod: {
-        id: string;
-        type: string;
-        brand?: string;
-        last4?: string;
-        email?: string;
-    } | null;
+    paymentMethod: App.Data.PaymentMethodData | null;
 }
 
 export default function DeletePaymentMethodDialog({ open, onOpenChange, paymentMethod }: DeletePaymentMethodDialogProps) {
@@ -47,8 +41,8 @@ export default function DeletePaymentMethodDialog({ open, onOpenChange, paymentM
             return `${paymentMethod.brand?.toUpperCase()} ending in ${paymentMethod.last4}`;
         }
 
-        if (paymentMethod.email) {
-            return `${paymentMethod.type} (${paymentMethod.email})`;
+        if (paymentMethod.holderEmail) {
+            return `${paymentMethod.type} (${paymentMethod.holderEmail})`;
         }
 
         return paymentMethod.type;

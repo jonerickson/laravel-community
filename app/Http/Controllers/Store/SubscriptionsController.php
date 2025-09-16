@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Store;
 
+use App\Data\SubscriptionData;
 use App\Http\Controllers\Controller;
 use App\Managers\PaymentManager;
 use App\Models\Product;
@@ -26,27 +27,20 @@ class SubscriptionsController extends Controller
             ->subscriptions()
             ->with('activePrices')
             ->with('categories')
+            ->with('policies.category')
             ->orderBy('name')
             ->get()
-            ->map(function (Product $product) use ($user): array {
+            ->map(function (Product $product) use ($user): SubscriptionData {
 
                 $isCurrentPlan = false;
                 if ($user) {
                     $isCurrentPlan = $this->paymentManager->isSubscribedToProduct($user, $product);
                 }
 
-                return [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'description' => $product->description,
-                    'slug' => $product->slug,
-                    'featured_image_url' => $product->featured_image_url,
-                    'prices' => $product->prices->keyBy('interval')->toArray(),
-                    'features' => $product->metadata['features'] ?? [],
-                    'popular' => $product->metadata['popular'] ?? false,
-                    'current' => $isCurrentPlan,
-                    'categories' => $product->categories->pluck('name')->toArray(),
-                ];
+                $subscriptionData = SubscriptionData::from($product);
+                $subscriptionData->current = $isCurrentPlan;
+
+                return $subscriptionData;
             });
 
         return Inertia::render('store/subscriptions', [

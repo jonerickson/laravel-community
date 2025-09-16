@@ -391,13 +391,15 @@ class StripeDriver implements PaymentProcessor
         /** @var ?OrderItem $trialDays */
         $trialDays = $order->items()->with('product')->get()->firstWhere('product.trial_days', '>', 0);
 
+        $metadata = array_merge_recursive([
+            'order_id' => $order->reference_id,
+        ], ...$order->items->map(fn (OrderItem $orderItem) => data_get($orderItem->product->metadata, 'metadata', []))->toArray());
+
         $checkoutSession = $user
             ->newSubscription('default', $lineItems)
             ->when(filled($trialDays), fn (SubscriptionBuilder $builder) => $builder->trialDays($trialDays->product->trial_days))
             ->when(filled($allowPromotionCodes), fn (SubscriptionBuilder $builder) => $builder->allowPromotionCodes())
-            ->withMetadata([
-                'order_id' => $order->reference_id,
-            ])
+            ->withMetadata($metadata)
             ->checkout([
                 'client_reference_id' => $order->reference_id,
                 'origin_context' => 'web',
@@ -470,6 +472,10 @@ class StripeDriver implements PaymentProcessor
         /** @var ?OrderItem $allowPromotionCodes */
         $allowPromotionCodes = $order->items()->with('product')->get()->firstWhere('product.allow_promotion_codes', true);
 
+        $metadata = array_merge_recursive([
+            'order_id' => $order->reference_id,
+        ], ...$order->items->map(fn (OrderItem $orderItem) => data_get($orderItem->product->metadata, 'metadata', []))->toArray());
+
         $checkoutSession = $user->checkout($lineItems, [
             'client_reference_id' => $order->reference_id,
             'success_url' => URL::signedRoute('store.checkout.success', [
@@ -492,9 +498,7 @@ class StripeDriver implements PaymentProcessor
                     'message' => "Order Number: $order->reference_id",
                 ],
             ],
-            'metadata' => [
-                'order_id' => $order->reference_id,
-            ],
+            'metadata' => $metadata,
             'invoice_creation' => [
                 'enabled' => true,
                 'invoice_data' => [
@@ -504,16 +508,12 @@ class StripeDriver implements PaymentProcessor
                             'value' => $order->reference_id,
                         ],
                     ],
-                    'metadata' => [
-                        'order_id' => $order->reference_id,
-                    ],
+                    'metadata' => $metadata,
                 ],
             ],
             'payment_intent_data' => [
                 'receipt_email' => $user->email,
-                'metadata' => [
-                    'order_id' => $order->reference_id,
-                ],
+                'metadata' => $metadata,
             ],
         ])->asStripeCheckoutSession();
 

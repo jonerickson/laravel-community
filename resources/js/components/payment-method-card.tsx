@@ -5,26 +5,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { CreditCard, MoreVertical, Star, Trash2 } from 'lucide-react';
 
 interface PaymentMethodCardProps {
-    brand: string;
-    last4: string;
-    expMonth: number;
-    expYear: number;
-    holderName: string;
-    isDefault: boolean;
+    paymentMethod: App.Data.PaymentMethodData;
     onSetDefault: () => void;
     onDelete: () => void;
 }
 
-export default function PaymentMethodCard({
-    brand,
-    last4,
-    expMonth,
-    expYear,
-    holderName,
-    isDefault,
-    onSetDefault,
-    onDelete,
-}: PaymentMethodCardProps) {
+export default function PaymentMethodCard({ paymentMethod, onSetDefault, onDelete }: PaymentMethodCardProps) {
     const getBrandColor = (brand: string) => {
         switch (brand.toLowerCase()) {
             case 'visa':
@@ -47,26 +33,26 @@ export default function PaymentMethodCard({
     return (
         <Card className="w-full overflow-hidden p-0 sm:max-w-sm">
             <CardContent className="p-0">
-                <div className={`relative h-48 w-full bg-gradient-to-br ${getBrandColor(brand)} p-6 text-white shadow-lg`}>
+                <div className={`relative h-48 w-full bg-gradient-to-br ${getBrandColor(paymentMethod.brand || '')} p-6 text-white shadow-lg`}>
                     <div className="absolute -top-8 -right-8 h-32 w-32 rounded-full bg-white/10"></div>
                     <div className="absolute -top-4 -right-4 h-20 w-20 rounded-full bg-white/5"></div>
 
                     <div className="mb-8 flex items-start justify-between">
                         <CreditCard className="h-8 w-8" />
-                        <div className="text-lg font-bold tracking-wider">{getBrandLogo(brand)}</div>
+                        <div className="text-lg font-bold tracking-wider">{getBrandLogo(paymentMethod.brand || '')}</div>
                     </div>
 
-                    <div className="mb-6 font-mono text-lg tracking-widest text-nowrap">•••• •••• •••• {last4}</div>
+                    <div className="mb-6 font-mono text-lg tracking-widest text-nowrap">•••• •••• •••• {paymentMethod.last4}</div>
 
                     <div className="flex justify-between text-sm">
                         <div>
                             <div className="text-xs text-white/70">CARDHOLDER</div>
-                            <div className="font-medium">{holderName}</div>
+                            <div className="font-medium">{paymentMethod.holderName}</div>
                         </div>
                         <div>
                             <div className="text-xs text-white/70">EXPIRES</div>
                             <div className="font-medium">
-                                {String(expMonth).padStart(2, '0')}/{String(expYear).slice(-2)}
+                                {String(paymentMethod.expMonth).padStart(2, '0')}/{String(paymentMethod.expYear).slice(-2)}
                             </div>
                         </div>
                     </div>
@@ -75,9 +61,10 @@ export default function PaymentMethodCard({
                 <div className="flex items-center justify-between p-4">
                     <div className="flex items-center gap-2">
                         <div className="text-sm text-muted-foreground">
-                            {brand.charAt(0).toUpperCase() + brand.slice(1)} ending in {last4}
+                            {(paymentMethod.brand || '').charAt(0).toUpperCase() + (paymentMethod.brand || '').slice(1)} ending in{' '}
+                            {paymentMethod.last4}
                         </div>
-                        {isDefault && (
+                        {paymentMethod.isDefault && (
                             <Badge variant="secondary">
                                 <Star className="mr-1 size-3" />
                                 Default
@@ -91,7 +78,7 @@ export default function PaymentMethodCard({
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            {!isDefault && (
+                            {!paymentMethod.isDefault && (
                                 <DropdownMenuItem onClick={onSetDefault}>
                                     <Star className="mr-2 size-4" />
                                     Set as default

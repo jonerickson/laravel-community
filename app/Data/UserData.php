@@ -11,21 +11,9 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 #[TypeScript]
 #[MapInputName(SnakeCaseMapper::class)]
-class DownloadData extends Data
+class UserData extends Data
 {
     public string $id;
 
     public string $name;
-
-    public ?string $description;
-
-    public ?string $fileSize;
-
-    public ?string $fileType;
-
-    public string $downloadUrl;
-
-    public ?string $productName;
-
-    public string $createdAt;
 }

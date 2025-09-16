@@ -9,21 +9,33 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-#[MapInputName(SnakeCaseMapper::class)]
 #[TypeScript]
+#[MapInputName(SnakeCaseMapper::class)]
 class PaymentMethodData extends Data
 {
-    public function __construct(
-        public string|int $id,
-        public string $type,
-        public ?string $brand,
-        public ?string $last4,
-        public string|int|null $expMonth,
-        public string|int|null $expYear,
-        public ?string $holderName,
-        public ?string $holderEmail,
-        public bool $isDefault = false,
-    ) {
-        //
+    public string $id;
+
+    public string $type;
+
+    public ?string $brand;
+
+    public ?string $last4;
+
+    public ?string $expMonth;
+
+    public ?string $expYear;
+
+    public ?string $holderName;
+
+    public ?string $holderEmail;
+
+    public bool $isDefault = false;
+
+    public function __construct()
+    {
+        $this->brand ??= 'Unknown';
+        $this->last4 ??= '0000';
+        $this->expMonth ??= '0';
+        $this->expYear ??= '0';
     }
 }

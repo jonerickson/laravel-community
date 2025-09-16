@@ -1,13 +1,13 @@
 import Heading from '@/components/heading';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Policy, PolicyCategory } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Calendar, FileText } from 'lucide-react';
 
 interface PoliciesCategoryProps {
-    category: PolicyCategory;
-    policies: Policy[];
+    category: App.Data.PolicyCategoryData;
+    policies: App.Data.PolicyData[];
 }
 
 export default function PolicyCategoryShow({ category, policies }: PoliciesCategoryProps) {
@@ -47,10 +47,10 @@ export default function PolicyCategoryShow({ category, policies }: PoliciesCateg
                                         </CardTitle>
                                         {policy.description && <CardDescription className="mt-1">{policy.description}</CardDescription>}
                                         <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
-                                            {policy.effective_at && (
+                                            {policy.effectiveAt && (
                                                 <div className="flex items-center gap-1">
                                                     <Calendar className="size-4" />
-                                                    <span>Effective {new Date(policy.effective_at).toLocaleDateString()}</span>
+                                                    <span>Effective {new Date(policy.effectiveAt).toLocaleDateString()}</span>
                                                 </div>
                                             )}
                                             {policy.version && <span>Version {policy.version}</span>}

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use App\Enums\SubscriptionInterval;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
@@ -11,21 +12,19 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 #[TypeScript]
 #[MapInputName(SnakeCaseMapper::class)]
-class DownloadData extends Data
+class PriceData extends Data
 {
-    public string $id;
+    public int $id;
 
     public string $name;
 
-    public ?string $description;
+    public int $amount;
 
-    public ?string $fileSize;
+    public string $currency;
 
-    public ?string $fileType;
+    public SubscriptionInterval $interval;
 
-    public string $downloadUrl;
+    public bool $isDefault;
 
-    public ?string $productName;
-
-    public string $createdAt;
+    public bool $isActive;
 }

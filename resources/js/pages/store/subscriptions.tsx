@@ -4,10 +4,11 @@ import RichEditorContent from '@/components/rich-editor-content';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useApiRequest } from '@/hooks';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type CheckoutResponse, ProductPrice } from '@/types';
+import { type BreadcrumbItem, type CheckoutResponse } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Check, Crown, Package, Rocket, Shield, Star, Users, Zap } from 'lucide-react';
 import { useState } from 'react';
@@ -24,26 +25,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-type BillingCycle = 'daily' | 'weekly' | 'monthly' | 'yearly';
-
-interface SubscriptionPlan {
-    id: number;
-    name: string;
-    description: string;
-    slug: string;
-    featured_image_url?: string;
-    prices: Record<string, ProductPrice>;
-    features: string[];
-    popular?: boolean;
-    current?: boolean;
-    categories: string[];
-}
-
 interface SubscriptionsProps {
-    subscriptionProducts: SubscriptionPlan[];
+    subscriptionProducts: App.Data.SubscriptionData[];
 }
 
-const getIconForPlan = (plan: SubscriptionPlan): React.ElementType => {
+const getIconForPlan = (plan: App.Data.SubscriptionData): React.ElementType => {
     const planName = plan.name.toLowerCase();
     if (planName.includes('starter') || planName.includes('basic')) return Star;
     if (planName.includes('professional') || planName.includes('pro')) return Zap;
@@ -51,7 +37,7 @@ const getIconForPlan = (plan: SubscriptionPlan): React.ElementType => {
     return Rocket;
 };
 
-const getColorForPlan = (plan: SubscriptionPlan): string => {
+const getColorForPlan = (plan: App.Data.SubscriptionData): string => {
     const planName = plan.name.toLowerCase();
     if (planName.includes('starter') || planName.includes('basic')) return 'from-blue-500 to-blue-600';
     if (planName.includes('professional') || planName.includes('pro')) return 'from-purple-500 to-purple-600';
@@ -60,37 +46,28 @@ const getColorForPlan = (plan: SubscriptionPlan): string => {
 };
 
 interface PricingCardProps {
-    plan: SubscriptionPlan;
-    billingCycle: BillingCycle;
+    plan: App.Data.SubscriptionData;
+    billingCycle: App.Enums.SubscriptionInterval;
     onSubscribe: (planId: number | null, priceId: number | null) => void;
     loading?: boolean;
+    policiesAgreed: Record<number, boolean>;
+    onPolicyAgreementChange: (planId: number, agreed: boolean) => void;
 }
 
-function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: PricingCardProps) {
+function PricingCard({ plan, billingCycle, onSubscribe, loading = false, policiesAgreed, onPolicyAgreementChange }: PricingCardProps) {
     const Icon = getIconForPlan(plan);
     const color = getColorForPlan(plan);
-
-    const intervalMap: Record<BillingCycle, string> = {
-        daily: 'day',
-        weekly: 'week',
-        monthly: 'month',
-        yearly: 'year',
-    };
-
-    const interval = intervalMap[billingCycle];
-    const priceData = plan.prices[interval];
+    const priceData = plan.activePrices.find((price) => price.interval === billingCycle);
     const price = priceData ? priceData.amount : 0;
     const priceId = priceData?.id || null;
 
-    const monthlyPrice = plan.prices.month;
-    const yearlyPrice = plan.prices.year;
+    const monthlyPrice = plan.activePrices.find((price) => price.interval === 'month');
+    const yearlyPrice = plan.activePrices.find((price) => price.interval === 'year');
     const yearlyDiscount =
-        billingCycle === 'yearly' && monthlyPrice && yearlyPrice ? Math.round((1 - yearlyPrice.amount / 12 / monthlyPrice.amount) * 100) : 0;
+        billingCycle === 'year' && monthlyPrice && yearlyPrice ? Math.round((1 - yearlyPrice.amount / 12 / monthlyPrice.amount) * 100) : 0;
 
     return (
-        <Card
-            className={`relative flex w-full max-w-sm flex-col ${plan.popular ? 'border-2 border-info shadow-lg' : ''} ${plan.current ? 'ring-2 ring-success' : ''}`}
-        >
+        <Card className={`relative flex w-full max-w-sm flex-col ${plan.current ? 'ring-2 ring-success' : ''}`}>
             <CardHeader className="pb-4 text-center">
                 <div className={`mx-auto mb-4 rounded-full bg-gradient-to-r p-3 ${color} w-fit text-white`}>
                     <Icon className="h-8 w-8" />
@@ -105,7 +82,7 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
                         <span className="text-4xl font-bold">${price}</span>
                         <span className="ml-1 text-muted-foreground">/ {billingCycle}</span>
                     </div>
-                    {billingCycle === 'yearly' && yearlyDiscount > 0 && (
+                    {billingCycle === 'year' && yearlyDiscount > 0 && (
                         <div className="mt-2">
                             <Badge variant="secondary">Save {yearlyDiscount}% annually</Badge>
                         </div>
@@ -114,17 +91,48 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
             </CardHeader>
 
             <CardContent className="flex flex-1 flex-col space-y-6">
-                {plan.features.length > 0 && (
+                {plan.metadata.features?.length > 0 && (
                     <div className="space-y-3">
                         <h4 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Features Included</h4>
                         <ul className="space-y-2">
-                            {plan.features.map((feature, index) => (
+                            {plan.metadata.features.map((feature: string, index: number) => (
                                 <li key={index} className="flex items-start">
                                     <Check className="mt-0.5 mr-3 size-4 flex-shrink-0 text-success" />
                                     <span className="text-sm">{feature}</span>
                                 </li>
                             ))}
                         </ul>
+                    </div>
+                )}
+
+                {plan.policies && plan.policies.length > 0 && !plan.current && (
+                    <div className="space-y-3 border-t border-border pt-4">
+                        <h4 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Policies</h4>
+                        <div className="space-y-2">
+                            {plan.policies.map((policy) => (
+                                <a
+                                    key={policy.id}
+                                    href={policy.category?.slug && policy.slug ? route('policies.show', [policy.category.slug, policy.slug]) : '#'}
+                                    className="block text-xs text-blue-600 underline hover:text-blue-800"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    {policy.title}
+                                    {policy.version && ` (v${policy.version})`}
+                                </a>
+                            ))}
+                        </div>
+                        <div className="flex items-start space-x-2">
+                            <Checkbox
+                                id={`policies-agreement-${plan.id}`}
+                                checked={policiesAgreed[plan.id] || false}
+                                onCheckedChange={(checked) => onPolicyAgreementChange(plan.id, checked === true)}
+                                className="mt-0.5"
+                            />
+                            <label htmlFor={`policies-agreement-${plan.id}`} className="cursor-pointer text-xs leading-relaxed text-muted-foreground">
+                                I agree to the above policies and understand that I must comply with them.
+                            </label>
+                        </div>
                     </div>
                 )}
 
@@ -136,20 +144,17 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
                         </Button>
                     ) : (
                         <Button
-                            className={`w-full ${plan.popular ? 'bg-info hover:bg-info/80' : ''}`}
+                            className="w-full"
                             onClick={() => onSubscribe(plan.id, priceId)}
-                            disabled={loading || !priceId}
+                            disabled={loading || !priceId || (plan.policies && plan.policies.length > 0 && !policiesAgreed[plan.id])}
                         >
                             {loading ? (
                                 <>
                                     <div className="mr-2 size-4 animate-spin rounded-full border-2 border-current border-b-transparent" />
                                     Processing...
                                 </>
-                            ) : plan.popular ? (
-                                <>
-                                    <Rocket className="mr-2 size-4" />
-                                    Upgrade now
-                                </>
+                            ) : plan.policies && plan.policies.length > 0 && !policiesAgreed[plan.id] ? (
+                                'Agree to policies to subscribe'
                             ) : !priceId ? (
                                 'Not available'
                             ) : (
@@ -164,21 +169,21 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
 }
 
 export default function Subscriptions({ subscriptionProducts }: SubscriptionsProps) {
-    const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
+    const [billingCycle, setBillingCycle] = useState<App.Enums.SubscriptionInterval>('month');
     const [loadingPlan, setLoadingPlan] = useState<number | null>(null);
+    const [policiesAgreed, setPoliciesAgreed] = useState<Record<number, boolean>>({});
     const { execute: executeCheckout } = useApiRequest<CheckoutResponse>();
 
-    const intervalMap: Record<BillingCycle, string> = {
-        daily: 'day',
-        weekly: 'week',
-        monthly: 'month',
-        yearly: 'year',
-    };
-
-    const availableIntervals = (Object.keys(intervalMap) as BillingCycle[]).filter((cycle) => {
-        const interval = intervalMap[cycle];
-        return subscriptionProducts.some((plan) => plan.prices[interval]);
+    const availableIntervals = Object.values(['day', 'week', 'month', 'year']).filter((cycle) => {
+        return subscriptionProducts.some((plan) => plan.activePrices.some((price) => price.interval === cycle));
     });
+
+    const handlePolicyAgreementChange = (planId: number, agreed: boolean) => {
+        setPoliciesAgreed((prev) => ({
+            ...prev,
+            [planId]: agreed,
+        }));
+    };
 
     const handleSubscribe = async (planId: number | null, priceId: number | null) => {
         if (!priceId) {
@@ -221,7 +226,7 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
                     <div className="flex flex-col gap-8">
                         {availableIntervals.length > 1 && (
                             <div className="flex justify-center">
-                                <Tabs value={billingCycle} onValueChange={(value) => setBillingCycle(value as BillingCycle)}>
+                                <Tabs value={billingCycle} onValueChange={(value) => setBillingCycle(value as App.Enums.SubscriptionInterval)}>
                                     <TabsList className={`grid w-full max-w-2xl grid-cols-${availableIntervals.length}`}>
                                         {availableIntervals.map((interval) => (
                                             <TabsTrigger key={interval} value={interval} className="relative">
@@ -233,13 +238,15 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
                             </div>
                         )}
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                            {subscriptionProducts.map((plan: SubscriptionPlan) => (
+                            {subscriptionProducts.map((plan: App.Data.SubscriptionData) => (
                                 <div key={plan.id} className="flex justify-center">
                                     <PricingCard
                                         plan={plan}
                                         billingCycle={billingCycle}
                                         onSubscribe={handleSubscribe}
                                         loading={loadingPlan === plan.id}
+                                        policiesAgreed={policiesAgreed}
+                                        onPolicyAgreementChange={handlePolicyAgreementChange}
                                     />
                                 </div>
                             ))}

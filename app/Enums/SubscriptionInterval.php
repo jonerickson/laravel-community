@@ -7,7 +7,9 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasLabel;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
+use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
+#[TypeScript]
 enum SubscriptionInterval: string implements HasLabel
 {
     case Daily = 'day';

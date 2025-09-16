@@ -9,7 +9,7 @@ interface AnnouncementBannerProps {
     onDismiss?: (announcementId: number) => void;
 }
 
-const typeConfig = {
+const typeConfig: Record<App.Enums.AnnouncementType, { icon: React.ElementType; variant: 'default' | 'success' | 'warning' | 'destructive' }> = {
     info: {
         icon: Info,
         variant: 'default' as const,
@@ -26,11 +26,11 @@ const typeConfig = {
         icon: XCircle,
         variant: 'destructive' as const,
     },
-} as const;
+};
 
 export default function AnnouncementsBanner({ announcement, onDismiss }: AnnouncementBannerProps) {
     const [isDismissed, setIsDismissed] = useState(false);
-    const config = typeConfig[announcement.type];
+    const config = typeConfig[announcement.type as App.Enums.AnnouncementType];
     const IconComponent = config.icon;
 
     if (isDismissed) {

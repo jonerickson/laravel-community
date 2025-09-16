@@ -1,12 +1,12 @@
 import Heading from '@/components/heading';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Policy, PolicyCategory } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Calendar, FileText, User } from 'lucide-react';
 
 interface PoliciesShowProps {
-    category: PolicyCategory;
-    policy: Policy;
+    category: App.Data.PolicyCategoryData;
+    policy: App.Data.PolicyData;
 }
 
 export default function PolicyShow({ category, policy }: PoliciesShowProps) {
@@ -40,16 +40,16 @@ export default function PolicyShow({ category, policy }: PoliciesShowProps) {
                             <span>{category.name}</span>
                         </div>
 
-                        {policy.effective_at && (
+                        {policy.effectiveAt && (
                             <div className="flex items-center gap-1">
                                 <Calendar className="size-4" />
-                                <span>Effective {new Date(policy.effective_at).toLocaleDateString()}</span>
+                                <span>Effective {new Date(policy.effectiveAt).toLocaleDateString()}</span>
                             </div>
                         )}
 
                         {policy.version && <span>Version {policy.version}</span>}
 
-                        {policy.created_by && (
+                        {policy.author && (
                             <div className="flex items-center gap-1">
                                 <User className="size-4" />
                                 <span>Published by {typeof policy.author === 'object' ? policy.author.name : 'Administrator'}</span>
@@ -60,8 +60,8 @@ export default function PolicyShow({ category, policy }: PoliciesShowProps) {
 
                 <div className="prose prose-slate dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: policy.content }} />
 
-                {policy.updated_at && policy.updated_at !== policy.created_at && (
-                    <div className="mt-6 text-sm text-muted-foreground">Last updated on {new Date(policy.updated_at).toLocaleDateString()}</div>
+                {policy.updatedAt && policy.updatedAt !== policy.createdAt && (
+                    <div className="mt-6 text-sm text-muted-foreground">Last updated on {new Date(policy.updatedAt).toLocaleDateString()}</div>
                 )}
             </div>
         </AppLayout>

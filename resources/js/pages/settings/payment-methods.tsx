@@ -30,27 +30,15 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
 
-interface PaymentMethod {
-    id: string;
-    type: string;
-    brand?: string;
-    last4?: string;
-    expMonth?: number;
-    expYear?: number;
-    holderName?: string;
-    holderEmail?: string;
-    isDefault: boolean;
-}
-
 interface PaymentMethodsPageProps {
-    paymentMethods: PaymentMethod[];
+    paymentMethods: App.Data.PaymentMethodData[];
 }
 
 export default function PaymentMethods({ paymentMethods: initialPaymentMethods }: PaymentMethodsPageProps) {
-    const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>(initialPaymentMethods);
+    const [paymentMethods, setPaymentMethods] = useState<App.Data.PaymentMethodData[]>(initialPaymentMethods);
     const [showAddDialog, setShowAddDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<App.Data.PaymentMethodData | null>(null);
     const { execute: executeSetDefault } = useApiRequest();
 
     useEffect(() => {
@@ -76,7 +64,7 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
         );
     };
 
-    const handleDeleteClick = (paymentMethod: PaymentMethod) => {
+    const handleDeleteClick = (paymentMethod: App.Data.PaymentMethodData) => {
         setSelectedPaymentMethod(paymentMethod);
         setShowDeleteDialog(true);
     };
@@ -105,13 +93,7 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
                                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                                     {cards.map((card) => (
                                         <PaymentMethodCard
-                                            key={card.id}
-                                            brand={card.brand || 'unknown'}
-                                            last4={card.last4 || '0000'}
-                                            expMonth={card.expMonth || 0}
-                                            expYear={card.expYear || 0}
-                                            holderName={card.holderName || 'Unknown'}
-                                            isDefault={card.isDefault}
+                                            paymentMethod={card}
                                             onSetDefault={() => handleSetDefault(card.id)}
                                             onDelete={() => handleDeleteClick(card)}
                                         />
@@ -126,10 +108,7 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
                                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                                     {alternativeMethods.map((method) => (
                                         <PaymentMethodAlternative
-                                            key={method.id}
-                                            type={method.type}
-                                            email={method.holderEmail}
-                                            isDefault={method.isDefault}
+                                            paymentMethod={method}
                                             onSetDefault={() => handleSetDefault(method.id)}
                                             onDelete={() => handleDeleteClick(method)}
                                         />

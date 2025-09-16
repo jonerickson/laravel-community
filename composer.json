@@ -131,7 +131,8 @@
         "tf": "@test-filter",
         "tl": "@test-lint",
         "ts": "@test-suite",
-        "tt": "@test-types"
+        "tt": "@test-types",
+        "types": "@php artisan  typescript:transform --format"
     },
     "extra": {
         "laravel": {

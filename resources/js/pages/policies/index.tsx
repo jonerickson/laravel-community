@@ -2,7 +2,7 @@ import Heading from '@/components/heading';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
-import type { BreadcrumbItem, PolicyCategory } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { FileText, Folder } from 'lucide-react';
 
@@ -14,7 +14,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface PoliciesIndexProps {
-    categories: PolicyCategory[];
+    categories: App.Data.PolicyCategoryData[];
 }
 
 export default function PolicyCategoryIndex({ categories }: PoliciesIndexProps) {
@@ -41,19 +41,19 @@ export default function PolicyCategoryIndex({ categories }: PoliciesIndexProps) 
                                         <div className="mt-3 flex items-center gap-1 text-sm text-muted-foreground">
                                             <FileText className="size-4" />
                                             <span>
-                                                {category.active_policies?.length || 0} {pluralize('policy', category.active_policies?.length || 0)}
+                                                {category.activePolicies?.length || 0} {pluralize('policy', category.activePolicies?.length || 0)}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                             </CardHeader>
 
-                            {category.active_policies && category.active_policies.length > 0 && (
+                            {category.activePolicies && category.activePolicies.length > 0 && (
                                 <CardContent className="pt-0">
                                     <div className="border-t pt-4">
                                         <div className="mb-3 text-sm font-medium">Recent Policies</div>
                                         <div className="space-y-2">
-                                            {category.active_policies.slice(0, 3).map((policy) => (
+                                            {category.activePolicies.slice(0, 3).map((policy) => (
                                                 <div key={policy.id}>
                                                     <Link
                                                         href={route('policies.show', { category: category.slug, policy: policy.slug })}

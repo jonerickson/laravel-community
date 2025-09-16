@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useApiRequest } from '@/hooks/use-api-request';
 import { useCartOperations } from '@/hooks/use-cart-operations';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, CartResponse, CheckoutResponse, Policy } from '@/types';
+import type { BreadcrumbItem, CartResponse, CheckoutResponse } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { ImageIcon, ShoppingCart as ShoppingCartIcon, Trash2, XIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -34,8 +34,8 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
 
     const { subtotal, total } = calculateTotals();
 
-    const getAllPolicies = (): Policy[] => {
-        const allPolicies: Policy[] = [];
+    const getAllPolicies = (): App.Data.PolicyData[] => {
+        const allPolicies: App.Data.PolicyData[] = [];
         const seenPolicyIds = new Set<number>();
 
         items.forEach((item) => {
