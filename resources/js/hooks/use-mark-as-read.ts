@@ -1,8 +1,8 @@
+import { useApiRequest } from '@/hooks/use-api-request';
 import type { SharedData } from '@/types';
-import { apiRequest } from '@/utils/api';
 import { usePage } from '@inertiajs/react';
-import axios from 'axios';
 import { useEffect } from 'react';
+import { route } from 'ziggy-js';
 
 interface UseMarkAsReadOptions {
     id: number;
@@ -13,6 +13,7 @@ interface UseMarkAsReadOptions {
 
 export function useMarkAsRead({ id, type, isRead, enabled = true }: UseMarkAsReadOptions) {
     const { auth } = usePage<SharedData>().props;
+    const { execute } = useApiRequest<App.Data.ReadData>();
 
     useEffect(() => {
         if (!enabled || !auth?.user) {
@@ -20,18 +21,17 @@ export function useMarkAsRead({ id, type, isRead, enabled = true }: UseMarkAsRea
         }
 
         const markAsRead = async () => {
-            try {
-                await apiRequest(
-                    axios.post(route('api.read'), {
-                        type,
-                        id,
-                    }),
-                );
-            } catch (error) {
-                console.error(`Error marking ${type} as read:`, error);
-            }
+            await execute({
+                url: route('api.read'),
+                method: 'POST',
+                data: {
+                    type,
+                    id,
+                },
+            });
         };
 
         markAsRead();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id, type, isRead, enabled, auth?.user]);
 }

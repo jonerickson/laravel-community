@@ -59,6 +59,11 @@ declare namespace App.Data {
         firstSeen: string | null;
         lastSeen: string | null;
     };
+    export type FlashData = {
+        scrollToBottom: boolean | null;
+        message: string | null;
+        messageVariant: string | null;
+    };
     export type LikeData = {
         emoji: string;
         count: number;
@@ -78,6 +83,14 @@ declare namespace App.Data {
         holderName: string | null;
         holderEmail: string | null;
         isDefault: boolean;
+    };
+    export type PaymentSetupIntentData = {
+        id: string;
+        clientSecret: string;
+        status: string;
+        customer: string;
+        paymentMethodTypes: Array<string>;
+        usage: string;
     };
     export type PolicyCategoryData = {
         id: number;
@@ -139,6 +152,12 @@ declare namespace App.Data {
         policies: Array<App.Data.PolicyData>;
         createdAt: string | null;
         updatedAt: string | null;
+    };
+    export type ReadData = {
+        markedAsRead: boolean;
+        isReadByUser: boolean;
+        type: string;
+        id: number;
     };
     export type SubscriptionData = {
         id: number;

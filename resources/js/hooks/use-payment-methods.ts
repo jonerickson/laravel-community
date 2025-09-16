@@ -2,15 +2,7 @@ import { useApiRequest } from '@/hooks/use-api-request';
 import { router } from '@inertiajs/react';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { toast } from 'sonner';
-
-interface SetupIntent {
-    id: string;
-    client_secret: string;
-    status: string;
-    customer: string;
-    payment_method_types: string[];
-    usage: string;
-}
+import { route } from 'ziggy-js';
 
 interface AddPaymentMethodData {
     holderName: string;
@@ -19,7 +11,7 @@ interface AddPaymentMethodData {
 export function usePaymentMethods() {
     const stripe = useStripe();
     const elements = useElements();
-    const { loading: setupLoading, execute: executeSetupIntent } = useApiRequest<SetupIntent>();
+    const { loading: setupLoading, execute: executeSetupIntent } = useApiRequest<App.Data.PaymentSetupIntentData>();
     const { loading: deleteLoading, execute: executeDelete } = useApiRequest();
     const { loading: storeLoading, execute: executeStore } = useApiRequest();
 
@@ -37,7 +29,7 @@ export function usePaymentMethods() {
             throw new Error('Card element not found');
         }
 
-        const setupIntentResponse = await executeSetupIntent(
+        const setupIntentData = await executeSetupIntent(
             {
                 url: route('api.payment-methods.create'),
                 method: 'GET',
@@ -45,13 +37,13 @@ export function usePaymentMethods() {
             {},
         );
 
-        if (!setupIntentResponse?.client_secret) {
+        if (!setupIntentData?.clientSecret) {
             throw new Error('Failed to get setup intent from server');
         }
 
-        const { client_secret } = setupIntentResponse;
+        const { clientSecret } = setupIntentData;
 
-        const { error: stripeError, setupIntent } = await stripe.confirmCardSetup(client_secret, {
+        const { error: stripeError, setupIntent } = await stripe.confirmCardSetup(clientSecret, {
             payment_method: {
                 card: cardElement,
                 billing_details: {

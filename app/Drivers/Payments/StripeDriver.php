@@ -288,11 +288,11 @@ class StripeDriver implements PaymentProcessor
         return new Collection($prices->all());
     }
 
-    public function createPaymentMethod(User $user, string $paymentMethodId): object
+    public function createPaymentMethod(User $user, string $paymentMethodId): PaymentMethodData
     {
         $paymentMethod = $user->addPaymentMethod($paymentMethodId);
 
-        return (object) [
+        return PaymentMethodData::from([
             'id' => $paymentMethod->id,
             'type' => $paymentMethod->type,
             'brand' => $paymentMethod->card->brand ?? null,
@@ -302,7 +302,7 @@ class StripeDriver implements PaymentProcessor
             'holder_name' => $paymentMethod->billing_details->name ?? null,
             'email' => $paymentMethod->billing_details->email ?? null,
             'is_default' => $user->defaultPaymentMethod()?->id === $paymentMethod->id,
-        ];
+        ]);
     }
 
     public function getPaymentMethods(User $user): Collection

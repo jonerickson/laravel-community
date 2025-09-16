@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Data\FlashData;
 use App\Services\PermissionService;
 use App\Services\ShoppingCartService;
 use Illuminate\Http\Request;
@@ -32,11 +33,11 @@ class HandleInertiaRequests extends Middleware
                 'mustVerifyEmail' => $user && ! $user->hasVerifiedEmail(),
             ],
             'cartCount' => $this->shoppingCartService->getCartCount(),
-            'flash' => [
-                'scrollToBottom' => fn () => $request->session()->pull('scrollToBottom'),
-                'message' => fn () => $request->session()->pull('message'),
-                'messageVariant' => fn () => $request->session()->pull('messageVariant'),
-            ],
+            'flash' => fn () => FlashData::from([
+                'scrollToBottom' => $request->session()->pull('scrollToBottom'),
+                'message' => $request->session()->pull('message'),
+                'messageVariant' => $request->session()->pull('messageVariant'),
+            ]),
             'name' => config('app.name'),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'ziggy' => fn (): array => [

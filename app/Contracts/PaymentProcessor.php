@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Contracts;
 
+use App\Data\PaymentMethodData;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
@@ -31,7 +32,7 @@ interface PaymentProcessor
 
     public function listPrices(Product $product, array $filters = []): Collection;
 
-    public function createPaymentMethod(User $user, string $paymentMethodId);
+    public function createPaymentMethod(User $user, string $paymentMethodId): PaymentMethodData;
 
     public function getPaymentMethods(User $user): Collection;
 

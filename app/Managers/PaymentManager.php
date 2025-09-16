@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Managers;
 
 use App\Contracts\PaymentProcessor;
+use App\Data\PaymentMethodData;
 use App\Drivers\Payments\StripeDriver;
 use App\Models\Order;
 use App\Models\Price;
@@ -67,7 +68,7 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->listPrices($product, $filters);
     }
 
-    public function createPaymentMethod(User $user, string $paymentMethodId)
+    public function createPaymentMethod(User $user, string $paymentMethodId): PaymentMethodData
     {
         return $this->driver()->createPaymentMethod($user, $paymentMethodId);
     }

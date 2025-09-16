@@ -36,12 +36,6 @@ export interface Comment {
     updated_at: string;
 }
 
-export interface FlashData {
-    scrollToBottom?: boolean;
-    message?: string | null;
-    messageVariant?: string | null;
-}
-
 export interface Forum {
     id: number;
     name: string;
@@ -239,7 +233,7 @@ export interface SharedData {
     auth: Auth;
     name: string;
     cartCount?: number;
-    flash?: FlashData;
+    flash?: App.Data.FlashData;
     sidebarOpen: boolean;
     ziggy: Config & { location: string };
     quote?: {

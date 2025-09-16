@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Data\ReadData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ApiResource;
 use App\Models\Announcement;
@@ -34,13 +35,15 @@ class ReadController extends Controller
         $user = Auth::user();
         $result = $readable->markAsRead($user->id);
 
+        $readData = ReadData::from([
+            'markedAsRead' => ! is_bool($result),
+            'isReadByUser' => $readable->fresh()->is_read_by_user,
+            'type' => $validated['type'],
+            'id' => $validated['id'],
+        ]);
+
         return new ApiResource(
-            resource: [
-                'marked_as_read' => ! is_bool($result),
-                'is_read_by_user' => $readable->fresh()->is_read_by_user,
-                'type' => $validated['type'],
-                'id' => $validated['id'],
-            ],
+            resource: $readData,
             message: 'Item read successfully.'
         );
     }
