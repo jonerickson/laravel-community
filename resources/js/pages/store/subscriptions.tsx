@@ -91,7 +91,7 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false, policie
             </CardHeader>
 
             <CardContent className="flex flex-1 flex-col space-y-6">
-                {plan.metadata.features?.length > 0 && (
+                {plan.metadata && plan.metadata.features?.length > 0 && (
                     <div className="space-y-3">
                         <h4 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Features Included</h4>
                         <ul className="space-y-2">

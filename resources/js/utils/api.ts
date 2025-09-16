@@ -14,7 +14,7 @@ export class ApiError extends Error {
 
 export function handleApiResponse<T>(response: AxiosResponse<App.Data.ApiData>): T {
     if (response.data.success) {
-        return response.data.data;
+        return response.data.data as T;
     }
 
     throw new ApiError(response.data.message, response.status, response.data.errors, response);

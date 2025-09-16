@@ -10,6 +10,7 @@ use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
+use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 #[TypeScript]
@@ -42,6 +43,7 @@ class ProductData extends Data
 
     public ?string $externalProductId;
 
+    #[LiteralTypeScriptType('Array<string, unknown> | null')]
     public ?array $metadata;
 
     /** @var PriceData[] */

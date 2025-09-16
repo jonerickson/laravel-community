@@ -17,14 +17,14 @@ declare namespace App.Data {
     export type ApiData = {
         success: boolean;
         message: string;
-        data: any;
+        data: unknown;
         meta: App.Data.ApiMetaData;
         errors: { [key: string]: Array<string> } | null;
     };
     export type ApiMetaData = {
         timestamp: string | null;
         version: string;
-        additional: Array<any>;
+        additional: Array<unknown>;
     };
     export type CartData = {
         cartCount: number;
@@ -143,7 +143,7 @@ declare namespace App.Data {
         featuredImage: string | null;
         featuredImageUrl: string | null;
         externalProductId: string | null;
-        metadata: Array<any> | null;
+        metadata: Array<string, unknown> | null;
         prices: Array<App.Data.PriceData>;
         defaultPrice: App.Data.PriceData | null;
         averageRating: number | null;
@@ -166,7 +166,7 @@ declare namespace App.Data {
         slug: string;
         featuredImageUrl: string | null;
         current: boolean;
-        metadata: { [key: string]: any };
+        metadata: Array<string, unknown> | null;
         activePrices: Array<App.Data.PriceData>;
         categories: Array<App.Data.ProductCategoryData>;
         policies: Array<App.Data.PolicyData>;

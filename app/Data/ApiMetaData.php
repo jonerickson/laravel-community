@@ -8,6 +8,7 @@ use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
+use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 #[TypeScript]
@@ -18,6 +19,7 @@ class ApiMetaData extends Data
 
     public string $version;
 
+    #[LiteralTypeScriptType('Array<unknown>')]
     /** @var mixed[] */
     public array $additional = [];
 }

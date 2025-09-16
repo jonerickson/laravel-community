@@ -7,6 +7,7 @@ namespace App\Data;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
+use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 #[TypeScript]
@@ -17,6 +18,7 @@ class ApiData extends Data
 
     public string $message;
 
+    #[LiteralTypeScriptType('unknown')]
     public mixed $data;
 
     public ApiMetaData $meta;
