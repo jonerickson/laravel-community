@@ -120,25 +120,24 @@ class ProductResource extends Resource
                                         '1:1',
                                     ]),
                             ]),
-                        //                        Section::make('Files')
-                        //                            ->columnSpanFull()
-                        //                            ->description('Add files the customer will have access to if they have purchased this product.')
-                        //                            ->schema([
-                        //                                Repeater::make('files')
-                        //                                    ->hiddenLabel()
-                        //                                    ->dehydrated(false)
-                        //                                    ->relationship('files')
-                        //                                    ->addActionLabel('Add file')
-                        //                                    ->schema([
-                        //                                        FileUpload::make('files')
-                        //                                            ->dehydrated(false)
-                        //                                            ->visibility('private')
-                        //                                            ->helperText('Files the customer will have access to after purchasing the product.')
-                        //                                            ->label('Downloads')
-                        //                                            ->multiple(),
-                        //                                    ]),
-                        //
-                        //                            ]),
+                        Section::make('Files')
+                            ->columnSpanFull()
+                            ->description('Add files the customer will have access to if they have purchased this product.')
+                            ->schema([
+                                Repeater::make('files')
+                                    ->hiddenLabel()
+                                    ->relationship('files')
+                                    ->addActionLabel('Add file')
+                                    ->schema([
+                                        TextInput::make('name')
+                                            ->maxLength(255)
+                                            ->helperText('The name of the downloadable file.')
+                                            ->label('Name'),
+                                        FileUpload::make('path')
+                                            ->visibility('private')
+                                            ->hiddenLabel(),
+                                    ]),
+                            ]),
                     ]),
                 GroupSchema::make()
                     ->components([

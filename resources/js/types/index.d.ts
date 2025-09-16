@@ -175,6 +175,54 @@ export interface Invoice {
 
 export type InvoiceStatus = 'draft' | 'open' | 'paid' | 'uncollectible' | 'void';
 
+export interface Order {
+    id: number;
+    user_id: number;
+    status: OrderStatus;
+    amount?: number | null;
+    invoice_url?: string | null;
+    order_number?: string | null;
+    external_checkout_id?: string | null;
+    external_order_id?: string | null;
+    external_payment_id?: string | null;
+    external_invoice_id?: string | null;
+    created_at: string;
+    updated_at: string;
+    items?: OrderItem[];
+}
+
+export interface OrderItem {
+    id: number;
+    order_id: number;
+    product_id?: number | null;
+    price_id?: number | null;
+    quantity?: number;
+    created_at: string;
+    updated_at: string;
+    product?: Product | null;
+    price?: ProductPrice | null;
+}
+
+export type OrderStatus =
+    | 'canceled'
+    | 'processing'
+    | 'requires_action'
+    | 'requires_capture'
+    | 'requires_confirmation'
+    | 'requires_payment_method'
+    | 'succeeded';
+
+export interface Download {
+    id: string;
+    name: string;
+    description?: string;
+    file_size?: string;
+    file_type?: string;
+    download_url: string;
+    product_name?: string;
+    created_at: string;
+}
+
 export interface NavGroup {
     title: string;
     items: NavItem[];

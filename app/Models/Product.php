@@ -45,7 +45,7 @@ use Laravel\Scout\Searchable;
  * @property array<array-key, mixed>|null $metadata
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read Collection<int, ProductPrice> $activePrices
+ * @property-read Collection<int, Price> $activePrices
  * @property-read int|null $active_prices_count
  * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
@@ -54,7 +54,7 @@ use Laravel\Scout\Searchable;
  * @property-read int|null $categories_count
  * @property-read Collection<int, Comment> $comments
  * @property-read int|null $comments_count
- * @property-read ProductPrice|null $defaultPrice
+ * @property-read Price|null $defaultPrice
  * @property-read string|null $featured_image_url
  * @property-read File|null $file
  * @property-read Collection<int, File> $files
@@ -63,7 +63,7 @@ use Laravel\Scout\Searchable;
  * @property-read int|null $groups_count
  * @property-read Collection<int, Policy> $policies
  * @property-read int|null $policies_count
- * @property-read Collection<int, ProductPrice> $prices
+ * @property-read Collection<int, Price> $prices
  * @property-read int|null $prices_count
  * @property-read Collection<int, Comment> $reviews
  * @property-read int|null $reviews_count
@@ -139,7 +139,7 @@ class Product extends Model implements Sluggable
 
     public function prices(): HasMany
     {
-        return $this->hasMany(ProductPrice::class);
+        return $this->hasMany(Price::class);
     }
 
     public function activePrices(): HasMany
@@ -149,11 +149,16 @@ class Product extends Model implements Sluggable
 
     public function defaultPrice(): HasOne
     {
-        return $this->hasOne(ProductPrice::class)->ofMany([
+        return $this->hasOne(Price::class)->ofMany([
             'id' => 'max',
-        ], function (Builder|ProductPrice $query): void {
+        ], function (Builder|Price $query): void {
             $query->default()->active();
         });
+    }
+
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
     }
 
     public function generateSlug(): ?string

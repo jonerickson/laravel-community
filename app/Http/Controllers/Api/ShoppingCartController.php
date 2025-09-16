@@ -22,7 +22,7 @@ class ShoppingCartController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'price_id' => 'nullable|exists:products_prices,id',
+            'price_id' => 'nullable|exists:prices,id',
             'quantity' => 'required|integer|min:1|max:99',
         ]);
 
@@ -66,7 +66,7 @@ class ShoppingCartController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'price_id' => 'nullable|exists:products_prices,id',
+            'price_id' => 'nullable|exists:prices,id',
         ]);
 
         $cart = Session::get('shopping_cart', []);

@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Illuminate\Contracts\Container\Container getContainer()
  * @method static \App\Managers\PaymentManager setContainer(\Illuminate\Contracts\Container\Container $container)
  * @method static \App\Managers\PaymentManager forgetDrivers()
+ * @method static \Illuminate\Database\Eloquent\Collection getPurchasedProducts(\App\Models\User $user, array $filters = [])
  *
  * @see \App\Managers\PaymentManager
  */

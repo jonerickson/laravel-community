@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Contracts;
 
+use App\Models\Order;
+use App\Models\Price;
 use App\Models\Product;
-use App\Models\ProductPrice;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 
 interface PaymentProcessor
 {
@@ -21,15 +23,13 @@ interface PaymentProcessor
 
     public function listProducts(array $filters = []): Collection;
 
-    public function createPrice(Product $product, ProductPrice $price): ProductPrice;
+    public function createPrice(Product $product, Price $price): Price;
 
-    public function updatePrice(Product $product, ProductPrice $price): ProductPrice;
+    public function updatePrice(Product $product, Price $price): Price;
 
-    public function deletePrice(Product $product, ProductPrice $price): bool;
+    public function deletePrice(Product $product, Price $price): bool;
 
     public function listPrices(Product $product, array $filters = []): Collection;
-
-    public function getInvoices(User $user, array $filters = []): Collection;
 
     public function createPaymentMethod(User $user, string $paymentMethodId);
 
@@ -39,11 +39,17 @@ interface PaymentProcessor
 
     public function deletePaymentMethod(User $user, string $paymentMethodId): bool;
 
-    public function startSubscription(User $user, ProductPrice $price, string $returnUrl, bool $allowPromotionCodes = false, int $trialDays = 0): bool|string;
+    public function startSubscription(User $user, Order $order, bool $allowPromotionCodes = false, int $trialDays = 0): bool|string;
 
-    public function cancelSubscription(User $user, ProductPrice $price): bool;
+    public function cancelSubscription(User $user, Price $price): bool;
 
     public function isSubscribedToProduct(User $user, Product $product): bool;
 
-    public function isSubscribedToPrice(User $user, ProductPrice $price): bool;
+    public function isSubscribedToPrice(User $user, Price $price): bool;
+
+    public function redirectToCheckout(User $user, Order $order, Price|array $prices, bool $allowPromotionCodes = false): bool|string;
+
+    public function processCheckoutSuccess(Request $request, Order $order): bool;
+
+    public function processCheckoutCancel(Request $request, Order $order): bool;
 }

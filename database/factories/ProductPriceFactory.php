@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Enums\SubscriptionInterval;
+use App\Models\Price;
 use App\Models\Product;
-use App\Models\ProductPrice;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<ProductPrice>
+ * @extends Factory<Price>
  */
 class ProductPriceFactory extends Factory
 {

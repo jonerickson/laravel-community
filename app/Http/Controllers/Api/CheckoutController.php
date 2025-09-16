@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\ApiResource;
+use App\Managers\PaymentManager;
+use App\Models\Order;
 use App\Models\Product;
 use App\Services\ShoppingCartService;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CheckoutController
 {
     public function __construct(
-        private readonly ShoppingCartService $cartService
+        private readonly ShoppingCartService $cartService,
+        private readonly PaymentManager $paymentManager,
     ) {}
 
     public function __invoke(Request $request): ApiResource
@@ -40,8 +42,6 @@ class CheckoutController
         }
 
         $productPrices = [];
-        $lineItems = [];
-
         foreach ($cartItems as $item) {
             /** @var Product $product */
             $product = $item['product'];
@@ -72,13 +72,9 @@ class CheckoutController
             }
 
             $productPrices[] = $selectedPrice;
-            $lineItems[] = [
-                'price' => $selectedPrice->external_price_id,
-                'quantity' => $item['quantity'],
-            ];
         }
 
-        if (empty($productPrices) || empty($lineItems)) {
+        if (empty($productPrices)) {
             return ApiResource::error(
                 message: 'Cart is empty.',
                 errors: ['cart' => ['Cart cannot be empty.']],
@@ -86,32 +82,34 @@ class CheckoutController
             );
         }
 
-        try {
-            $checkout = $user->checkout($lineItems, [
-                'success_url' => route('store.checkout.success').'?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => route('store.cart.index'),
-                'mode' => $productPrices[0]->product->isSubscription() ? 'subscription' : 'payment',
-                'metadata' => [
-                    'cart_items' => json_encode(array_map(fn (array $item): array => [
-                        'product_id' => $item['product_id'],
-                        'quantity' => $item['quantity'],
-                    ], $cartItems)),
-                ],
-            ]);
+        $order = Order::create([
+            'user_id' => $user->id,
+        ]);
 
-            return ApiResource::success(
-                resource: [
-                    'checkout_url' => $checkout->url,
-                ],
-                message: 'Checkout session created successfully.',
-                meta: [
-                    'session_id' => $checkout->id,
-                ]
-            );
-        } catch (Exception $e) {
-            return ApiResource::error('Failed to create checkout session: '.$e->getMessage(), [
-                'checkout' => [$e->getMessage()],
+        foreach ($productPrices as $price) {
+            $order->items()->create([
+                'product_id' => $price->product_id,
+                'price_id' => $price->id,
             ]);
         }
+
+        $result = $this->paymentManager->redirectToCheckout(
+            user: $user,
+            order: $order,
+            prices: $productPrices
+        );
+
+        if (! $result) {
+            return ApiResource::error(
+                message: 'Failed to create checkout session'
+            );
+        }
+
+        return ApiResource::success(
+            resource: [
+                'checkout_url' => $result,
+            ],
+            message: 'Checkout session created successfully.',
+        );
     }
 }

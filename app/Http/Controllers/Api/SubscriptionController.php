@@ -7,12 +7,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Requests\Api\SubscriptionCheckoutRequest;
 use App\Http\Resources\ApiResource;
 use App\Managers\PaymentManager;
-use App\Models\ProductPrice;
+use App\Models\Order;
+use App\Models\Price;
 use Illuminate\Support\Facades\Auth;
 
 class SubscriptionController
 {
-    public function __construct(protected PaymentManager $paymentManager)
+    public function __construct(private readonly PaymentManager $paymentManager)
     {
         //
     }
@@ -31,7 +32,7 @@ class SubscriptionController
 
         $validated = $request->validated();
 
-        if (! $price = ProductPrice::find($validated['price_id'])) {
+        if (! $price = Price::find($validated['price_id'])) {
             return ApiResource::error(
                 message: 'Unable to find product price.',
                 errors: ['price_id' => ['Unable to find product price.']],
@@ -39,10 +40,18 @@ class SubscriptionController
             );
         }
 
+        $order = Order::create([
+            'user_id' => $user->id,
+        ]);
+
+        $order->items()->create([
+            'product_id' => $price->product_id,
+            'price_id' => $price->id,
+        ]);
+
         $result = $this->paymentManager->startSubscription(
             user: $user,
-            price: $price,
-            returnUrl: route('store.subscriptions')
+            order: $order,
         );
 
         if (! $result) {
@@ -54,7 +63,9 @@ class SubscriptionController
         }
 
         return ApiResource::success(
-            resource: $result,
+            resource: [
+                'checkout_url' => $result,
+            ],
             message: 'Subscription started successfully.',
         );
     }

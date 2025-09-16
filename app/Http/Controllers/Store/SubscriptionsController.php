@@ -13,7 +13,7 @@ use Inertia\Response;
 
 class SubscriptionsController extends Controller
 {
-    public function __construct(protected PaymentManager $paymentManager)
+    public function __construct(private readonly PaymentManager $paymentManager)
     {
         //
     }

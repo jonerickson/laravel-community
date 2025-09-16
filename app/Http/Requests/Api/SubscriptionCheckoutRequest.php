@@ -16,7 +16,7 @@ class SubscriptionCheckoutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'price_id' => ['required', 'integer', 'exists:products_prices,id'],
+            'price_id' => ['required', 'integer', 'exists:prices,id'],
         ];
     }
 

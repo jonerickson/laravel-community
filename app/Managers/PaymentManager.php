@@ -6,10 +6,12 @@ namespace App\Managers;
 
 use App\Contracts\PaymentProcessor;
 use App\Drivers\Payments\StripeDriver;
+use App\Models\Order;
+use App\Models\Price;
 use App\Models\Product;
-use App\Models\ProductPrice;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
 
@@ -45,17 +47,17 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->listProducts($filters);
     }
 
-    public function createPrice(Product $product, ProductPrice $price): ProductPrice
+    public function createPrice(Product $product, Price $price): Price
     {
         return $this->driver()->createPrice($product, $price);
     }
 
-    public function updatePrice(Product $product, ProductPrice $price): ProductPrice
+    public function updatePrice(Product $product, Price $price): Price
     {
         return $this->driver()->updatePrice($product, $price);
     }
 
-    public function deletePrice(Product $product, ProductPrice $price): bool
+    public function deletePrice(Product $product, Price $price): bool
     {
         return $this->driver()->deletePrice($product, $price);
     }
@@ -63,11 +65,6 @@ class PaymentManager extends Manager implements PaymentProcessor
     public function listPrices(Product $product, array $filters = []): Collection
     {
         return $this->driver()->listPrices($product, $filters);
-    }
-
-    public function getInvoices(User $user, array $filters = []): Collection
-    {
-        return $this->driver()->getInvoices($user, $filters);
     }
 
     public function createPaymentMethod(User $user, string $paymentMethodId)
@@ -90,12 +87,12 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deletePaymentMethod($user, $paymentMethodId);
     }
 
-    public function startSubscription(User $user, ProductPrice $price, string $returnUrl, bool $allowPromotionCodes = false, int $trialDays = 0): bool|string
+    public function startSubscription(User $user, Order $order, bool $allowPromotionCodes = false, int $trialDays = 0): bool|string
     {
-        return $this->driver()->startSubscription($user, $price, $returnUrl, $allowPromotionCodes);
+        return $this->driver()->startSubscription($user, $order, $allowPromotionCodes);
     }
 
-    public function cancelSubscription(User $user, ProductPrice $price): bool
+    public function cancelSubscription(User $user, Price $price): bool
     {
         return $this->driver()->cancelSubscription($user, $price);
     }
@@ -105,9 +102,24 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->isSubscribedToProduct($user, $product);
     }
 
-    public function isSubscribedToPrice(User $user, ProductPrice $price): bool
+    public function isSubscribedToPrice(User $user, Price $price): bool
     {
         return $this->driver()->isSubscribedToPrice($user, $price);
+    }
+
+    public function redirectToCheckout(User $user, Order $order, Price|array $prices, bool $allowPromotionCodes = false): bool|string
+    {
+        return $this->driver()->redirectToCheckout($user, $order, $prices, $allowPromotionCodes);
+    }
+
+    public function processCheckoutSuccess(Request $request, Order $order): bool
+    {
+        return $this->driver()->processCheckoutSuccess($request, $order);
+    }
+
+    public function processCheckoutCancel(Request $request, Order $order): bool
+    {
+        return $this->driver()->processCheckoutCancel($request, $order);
     }
 
     protected function createStripeDriver(): PaymentProcessor

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Price;
 use App\Models\Product;
-use App\Models\ProductPrice;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
@@ -13,7 +13,7 @@ use Illuminate\Support\Collection;
 
 class ShoppingCartService
 {
-    public function __construct(protected Request $request)
+    public function __construct(private readonly Request $request)
     {
         //
     }
@@ -72,7 +72,7 @@ class ShoppingCartService
     {
         return blank($priceIds)
             ? collect()
-            : ProductPrice::whereIn('id', $priceIds)->get()->keyBy('id');
+            : Price::whereIn('id', $priceIds)->get()->keyBy('id');
     }
 
     private function mapCartItems(array $cart, Collection $products, Collection $prices): array

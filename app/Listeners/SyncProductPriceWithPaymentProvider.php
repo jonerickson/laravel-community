@@ -17,7 +17,10 @@ class SyncProductPriceWithPaymentProvider implements ShouldQueue
 {
     use InteractsWithQueue;
 
-    public function __construct(public PaymentManager $paymentManager) {}
+    public function __construct(private readonly PaymentManager $paymentManager)
+    {
+        //
+    }
 
     public function handle(ProductPriceCreated|ProductPriceUpdated|ProductPriceDeleting $event): void
     {

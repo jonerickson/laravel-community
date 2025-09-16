@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Store\CategoryController;
+use App\Http\Controllers\Store\CheckoutCancelController;
+use App\Http\Controllers\Store\CheckoutSuccessController;
 use App\Http\Controllers\Store\ProductController;
 use App\Http\Controllers\Store\ShoppingCartController;
 use App\Http\Controllers\Store\StoreController;
@@ -19,8 +21,8 @@ Route::group(['as' => 'store.', 'prefix' => 'store'], function (): void {
     Route::get('cart', [ShoppingCartController::class, 'index'])->name('cart.index');
     Route::delete('cart', [ShoppingCartController::class, 'destroy'])->name('cart.destroy');
 
-    Route::group(['middleware' => ['auth', 'verified']], function (): void {
-        Route::redirect('checkout/success', '/store/cart')->name('checkout.success');
-        Route::redirect('checkout/cancel', '/store/cart')->name('checkout.cancel');
+    Route::group(['middleware' => ['auth', 'verified', 'signed']], function (): void {
+        Route::get('checkout/success/{order}', CheckoutSuccessController::class)->name('checkout.success');
+        Route::get('checkout/cancel/{order}', CheckoutCancelController::class)->name('checkout.cancel');
     });
 });

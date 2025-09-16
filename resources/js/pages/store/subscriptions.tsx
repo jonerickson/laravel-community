@@ -5,11 +5,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useApiRequest } from '@/hooks';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, ProductPrice } from '@/types';
-import { apiRequest } from '@/utils/api';
+import { type BreadcrumbItem, type CheckoutResponse, ProductPrice } from '@/types';
 import { Head } from '@inertiajs/react';
-import axios from 'axios';
 import { Check, Crown, Package, Rocket, Shield, Star, Users, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -167,6 +166,7 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false }: Prici
 export default function Subscriptions({ subscriptionProducts }: SubscriptionsProps) {
     const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
     const [loadingPlan, setLoadingPlan] = useState<number | null>(null);
+    const { execute: executeCheckout } = useApiRequest<CheckoutResponse>();
 
     const intervalMap: Record<BillingCycle, string> = {
         daily: 'day',
@@ -188,25 +188,21 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
 
         setLoadingPlan(planId);
 
-        try {
-            const response = (await apiRequest(
-                axios.post(route('api.subscriptions.checkout'), {
+        await executeCheckout(
+            {
+                url: route('api.subscriptions.checkout'),
+                method: 'POST',
+                data: {
                     price_id: priceId,
-                }),
-            )) as string | null | undefined;
-
-            if (response) {
-                window.location.href = response;
-            } else {
-                console.error('Failed to create checkout session');
-                toast.error('Failed to create checkout session. Please try again.');
-            }
-        } catch (err) {
-            console.error('Failed to initiate subscription checkout:', err);
-            toast.error('Failed to initiate subscription checkout. Please try again.');
-        } finally {
-            setLoadingPlan(null);
-        }
+                },
+            },
+            {
+                onSuccess: (data) => {
+                    window.location.href = data.checkout_url;
+                },
+                onSettled: () => setLoadingPlan(null),
+            },
+        );
     };
 
     return (

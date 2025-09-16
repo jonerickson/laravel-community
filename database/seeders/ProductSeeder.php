@@ -6,9 +6,9 @@ namespace Database\Seeders;
 
 use App\Enums\SubscriptionInterval;
 use App\Models\Image;
+use App\Models\Price;
 use App\Models\Product;
 use App\Models\ProductCategory;
-use App\Models\ProductPrice;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Seeder;
@@ -48,7 +48,7 @@ class ProductSeeder extends Seeder
             $priceKey2 = 'STRIPE_PRODUCT_'.($index + 1).'_PRICE_2';
 
             if (env($priceKey1)) {
-                ProductPrice::factory()
+                Price::factory()
                     ->for($product)
                     ->withStripePriceId($priceKey1)
                     ->oneTime()
@@ -62,7 +62,7 @@ class ProductSeeder extends Seeder
             }
 
             if (env($priceKey2)) {
-                ProductPrice::factory()
+                Price::factory()
                     ->for($product)
                     ->withStripePriceId($priceKey2)
                     ->oneTime()
@@ -108,7 +108,7 @@ class ProductSeeder extends Seeder
             $priceKey2 = 'STRIPE_SUBSCRIPTION_'.($index + 1).'_PRICE_2';
 
             if (env($priceKey1)) {
-                ProductPrice::factory()
+                Price::factory()
                     ->for($subscription)
                     ->withStripePriceId($priceKey1)
                     ->monthly()
@@ -122,7 +122,7 @@ class ProductSeeder extends Seeder
             }
 
             if (env($priceKey2)) {
-                ProductPrice::factory()
+                Price::factory()
                     ->for($subscription)
                     ->withStripePriceId($priceKey2)
                     ->yearly()

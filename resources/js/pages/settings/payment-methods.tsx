@@ -36,11 +36,11 @@ interface PaymentMethod {
     type: string;
     brand?: string;
     last4?: string;
-    exp_month?: number;
-    exp_year?: number;
-    holder_name?: string;
-    email?: string;
-    is_default: boolean;
+    expMonth?: number;
+    expYear?: number;
+    holderName?: string;
+    holderEmail?: string;
+    isDefault: boolean;
 }
 
 interface PaymentMethodsPageProps {
@@ -109,10 +109,10 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
                                             key={card.id}
                                             brand={card.brand || 'unknown'}
                                             last4={card.last4 || '0000'}
-                                            expMonth={card.exp_month || 0}
-                                            expYear={card.exp_year || 0}
-                                            holderName={card.holder_name || 'Unknown'}
-                                            isDefault={card.is_default}
+                                            expMonth={card.expMonth || 0}
+                                            expYear={card.expYear || 0}
+                                            holderName={card.holderName || 'Unknown'}
+                                            isDefault={card.isDefault}
                                             onSetDefault={() => handleSetDefault(card.id)}
                                             onDelete={() => handleDeleteClick(card)}
                                         />
@@ -129,8 +129,8 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
                                         <PaymentMethodAlternative
                                             key={method.id}
                                             type={method.type}
-                                            email={method.email}
-                                            isDefault={method.is_default}
+                                            email={method.holderEmail}
+                                            isDefault={method.isDefault}
                                             onSetDefault={() => handleSetDefault(method.id)}
                                             onDelete={() => handleDeleteClick(method)}
                                         />

@@ -23,7 +23,7 @@ class ProductController extends Controller
     public function store(Request $request, Product $product): RedirectResponse
     {
         $request->validate([
-            'price_id' => 'required|exists:products_prices,id',
+            'price_id' => 'required|exists:prices,id',
             'quantity' => 'integer|min:1|max:99',
         ]);
 

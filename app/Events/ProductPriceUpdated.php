@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Events;
 
-use App\Models\ProductPrice;
+use App\Models\Price;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -12,5 +12,5 @@ class ProductPriceUpdated
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public ProductPrice $productPrice) {}
+    public function __construct(public Price $productPrice) {}
 }

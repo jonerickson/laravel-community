@@ -52,7 +52,7 @@ const accountNavItems: NavItem[] = [
     },
     {
         title: 'Orders',
-        href: () => route('settings.invoices'),
+        href: () => route('settings.orders'),
         icon: CircleDollarSign,
     },
     {

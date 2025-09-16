@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
@@ -84,10 +85,14 @@ use Laravel\Passport\HasApiTokens;
  * @property-read int|null $notifications_count
  * @property-read Collection<int, \Laravel\Passport\Client> $oauthApps
  * @property-read int|null $oauth_apps_count
+ * @property-read Collection<int, Order> $orders
+ * @property-read int|null $orders_count
  * @property-read Collection<int, Report> $pendingReports
  * @property-read int|null $pending_reports_count
  * @property-read Collection<int, Permission> $permissions
  * @property-read int|null $permissions_count
+ * @property-read Collection<int, Product> $products
+ * @property-read int|null $products_count
  * @property-read Collection<int, Report> $rejectedReports
  * @property-read int|null $rejected_reports_count
  * @property-read int $report_count
@@ -227,6 +232,16 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     public function fingerprints(): HasMany
     {
         return $this->hasMany(Fingerprint::class);
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function products(): HasManyThrough
+    {
+        return $this->hasManyThrough(Product::class, Order::class);
     }
 
     public function socials(): HasMany

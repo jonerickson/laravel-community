@@ -14,7 +14,7 @@ class HandleInertiaRequests extends Middleware
 {
     protected $rootView = 'app';
 
-    public function __construct(protected ShoppingCartService $shoppingCartService)
+    public function __construct(private readonly ShoppingCartService $shoppingCartService)
     {
         //
     }
