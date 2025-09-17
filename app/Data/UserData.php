@@ -20,7 +20,7 @@ class UserData extends Data
 
     public string $email;
 
-    public ?string $avatar;
+    public ?string $avatarUrl;
 
     public ?string $signature;
 

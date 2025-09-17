@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool deleteComment(\App\Models\SupportTicket $ticket, \App\Models\Comment $comment)
  * @method static bool assignTicket(\App\Models\SupportTicket $ticket, string|null $externalUserId = null)
  * @method static bool updateStatus(\App\Models\SupportTicket $ticket, \App\Enums\SupportTicketStatus $status)
+ * @method static bool openTicket(\App\Models\SupportTicket $ticket)
  * @method static bool closeTicket(\App\Models\SupportTicket $ticket)
  * @method static bool resolveTicket(\App\Models\SupportTicket $ticket)
  * @method static array|null uploadAttachment(\App\Models\SupportTicket $ticket, string $filePath, string $filename)

@@ -21,6 +21,11 @@ Route::group(['as' => 'store.', 'prefix' => 'store'], function (): void {
     Route::get('cart', [ShoppingCartController::class, 'index'])->name('cart.index');
     Route::delete('cart', [ShoppingCartController::class, 'destroy'])->name('cart.destroy');
 
+    Route::group(['middleware' => 'auth'], function () {
+        Route::post('subscriptions', [SubscriptionsController::class, 'store'])->name('subscriptions.store');
+        Route::delete('subscriptions', [SubscriptionsController::class, 'destroy'])->name('subscriptions.destroy');
+    });
+
     Route::group(['middleware' => ['auth', 'verified', 'signed']], function (): void {
         Route::get('checkout/success/{order}', CheckoutSuccessController::class)->name('checkout.success');
         Route::get('checkout/cancel/{order}', CheckoutCancelController::class)->name('checkout.cancel');

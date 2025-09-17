@@ -195,7 +195,7 @@ declare namespace App.Data {
         id: number;
         name: string;
         email: string;
-        avatar: string | null;
+        avatarUrl: string | null;
         signature: string | null;
         emailVerifiedAt: string | null;
         groups: Array<App.Data.GroupData>;

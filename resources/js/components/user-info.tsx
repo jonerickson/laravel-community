@@ -11,7 +11,7 @@ export function UserInfo({ user, showEmail = false, showGroups = false }: { user
     return (
         <div className="flex flex-row items-center gap-2">
             <Avatar className="h-8 w-8 overflow-hidden rounded-full">
-                {user.avatar && <AvatarImage src={user.avatar} alt={user.name} />}
+                {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name} />}
                 <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                     {getInitials(user.name)}
                 </AvatarFallback>

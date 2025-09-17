@@ -14,7 +14,6 @@ use App\Http\Controllers\Api\ReadController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\ShoppingCartController;
-use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\SupportTicketController;
 use App\Http\Controllers\Api\TopicController;
 use App\Http\Middleware\EnsureFrontendRequestsAreStateful;
@@ -28,7 +27,6 @@ Route::group(['middleware' => [EnsureFrontendRequestsAreStateful::class], 'as' =
 
     Route::group(['middleware' => ['auth:api', 'verified']], function (): void {
         Route::post('/checkout', CheckoutController::class)->name('checkout');
-        Route::post('/subscriptions/checkout', SubscriptionController::class)->name('subscriptions.checkout');
         Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
         Route::delete('/forums/topics', [TopicController::class, 'destroy'])->name('forums.topics.destroy');
         Route::post('/like', LikeController::class)->name('like');

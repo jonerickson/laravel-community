@@ -184,8 +184,8 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 <TooltipContent>Shopping Cart</TooltipContent>
                             </Tooltip>
                             <div className="hidden lg:flex">
-                                {rightNavItems.map((item) => (
-                                    <TooltipProvider key={item.title} delayDuration={0}>
+                                {rightNavItems.map((item, index) => (
+                                    <TooltipProvider key={index} delayDuration={0}>
                                         <Tooltip>
                                             <TooltipTrigger>
                                                 <a
@@ -210,7 +210,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" className="size-10 rounded-full p-1">
                                         <Avatar className="size-8 overflow-hidden rounded-full">
-                                            {auth.user.avatar && <AvatarImage src={auth.user.avatar} alt={auth.user.name} />}
+                                            {auth.user.avatarUrl && <AvatarImage src={auth.user.avatarUrl} alt={auth.user.name} />}
                                             <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                                                 {getInitials(auth.user.name)}
                                             </AvatarFallback>

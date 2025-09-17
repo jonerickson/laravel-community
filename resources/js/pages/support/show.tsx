@@ -132,8 +132,8 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                                 <div className="flex items-start gap-3">
                                                     {comment.author && (
                                                         <Avatar className="size-8">
-                                                            {comment.author.avatar && (
-                                                                <AvatarImage src={comment.author.avatar} alt={comment.author.name} />
+                                                            {comment.author.avatarUrl && (
+                                                                <AvatarImage src={comment.author.avatarUrl} alt={comment.author.name} />
                                                             )}
                                                             <AvatarFallback>{comment.author.name.charAt(0)?.toUpperCase()}</AvatarFallback>
                                                         </Avatar>

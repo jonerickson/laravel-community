@@ -26,7 +26,7 @@ export function StoreProductReviewsList({ reviews, reviewsPagination }: ProductR
                         <div className="flex items-start gap-3">
                             {review.author && (
                                 <Avatar className="h-10 w-10">
-                                    {review.author.avatar && <AvatarImage src={review.author.avatar} />}
+                                    {review.author.avatarUrl && <AvatarImage src={review.author.avatarUrl} />}
                                     <AvatarFallback>{review.author.name.charAt(0).toUpperCase()}</AvatarFallback>
                                 </Avatar>
                             )}

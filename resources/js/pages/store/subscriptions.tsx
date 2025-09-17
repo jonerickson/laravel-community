@@ -6,11 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useApiRequest } from '@/hooks';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
-import { Check, Crown, Package, Rocket, Shield, Star, Users, Zap } from 'lucide-react';
+import { Head, useForm } from '@inertiajs/react';
+import { Check, Crown, Package, Rocket, Shield, Star, Users, X, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -49,12 +48,23 @@ interface PricingCardProps {
     plan: App.Data.SubscriptionData;
     billingCycle: App.Enums.SubscriptionInterval;
     onSubscribe: (planId: number | null, priceId: number | null) => void;
-    loading?: boolean;
+    onCancel: (priceId: number) => void;
+    isSubscribing?: boolean;
+    isCancelling?: boolean;
     policiesAgreed: Record<number, boolean>;
     onPolicyAgreementChange: (planId: number, agreed: boolean) => void;
 }
 
-function PricingCard({ plan, billingCycle, onSubscribe, loading = false, policiesAgreed, onPolicyAgreementChange }: PricingCardProps) {
+function PricingCard({
+    plan,
+    billingCycle,
+    onSubscribe,
+    onCancel,
+    isSubscribing = false,
+    isCancelling = false,
+    policiesAgreed,
+    onPolicyAgreementChange,
+}: PricingCardProps) {
     const Icon = getIconForPlan(plan);
     const color = getColorForPlan(plan);
     const priceData = plan.activePrices.find((price) => price.interval === billingCycle);
@@ -136,19 +146,36 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false, policie
                     </div>
                 )}
 
-                <div className="mt-auto pt-4">
+                <div className="mt-auto space-y-2 pt-4">
                     {plan.current ? (
-                        <Button className="w-full" variant="outline" disabled>
-                            <Check className="mr-2 size-4" />
-                            Current plan
-                        </Button>
+                        <>
+                            <Button className="w-full" variant="outline" disabled>
+                                <Check className="mr-2 size-4" />
+                                Current plan
+                            </Button>
+                            {priceId && (
+                                <Button className="w-full" variant="destructive" size="sm" onClick={() => onCancel(priceId)} disabled={isCancelling}>
+                                    {isCancelling ? (
+                                        <>
+                                            <div className="mr-2 size-4 animate-spin rounded-full border-2 border-current border-b-transparent" />
+                                            Cancelling...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <X className="mr-2 size-4" />
+                                            Cancel subscription
+                                        </>
+                                    )}
+                                </Button>
+                            )}
+                        </>
                     ) : (
                         <Button
                             className="w-full"
                             onClick={() => onSubscribe(plan.id, priceId)}
-                            disabled={loading || !priceId || (plan.policies && plan.policies.length > 0 && !policiesAgreed[plan.id])}
+                            disabled={isSubscribing || !priceId || (plan.policies && plan.policies.length > 0 && !policiesAgreed[plan.id])}
                         >
-                            {loading ? (
+                            {isSubscribing ? (
                                 <>
                                     <div className="mr-2 size-4 animate-spin rounded-full border-2 border-current border-b-transparent" />
                                     Processing...
@@ -170,9 +197,23 @@ function PricingCard({ plan, billingCycle, onSubscribe, loading = false, policie
 
 export default function Subscriptions({ subscriptionProducts }: SubscriptionsProps) {
     const [billingCycle, setBillingCycle] = useState<App.Enums.SubscriptionInterval>('month');
-    const [loadingPlan, setLoadingPlan] = useState<number | null>(null);
     const [policiesAgreed, setPoliciesAgreed] = useState<Record<number, boolean>>({});
-    const { execute: executeCheckout } = useApiRequest<App.Data.CheckoutData>();
+
+    const {
+        post: subscribeToPrice,
+        processing: subscribeProcessing,
+        transform: transformSubscribe,
+    } = useForm({
+        price_id: 0,
+    });
+
+    const {
+        delete: cancelSubscription,
+        processing: cancelProcessing,
+        transform: transformCancel,
+    } = useForm({
+        price_id: 0,
+    });
 
     const availableIntervals = Object.values(['day', 'week', 'month', 'year']).filter((cycle) => {
         return subscriptionProducts.some((plan) => plan.activePrices.some((price) => price.interval === cycle));
@@ -185,29 +226,43 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
         }));
     };
 
-    const handleSubscribe = async (planId: number | null, priceId: number | null) => {
+    const handleSubscribe = (planId: number | null, priceId: number | null) => {
         if (!priceId) {
             toast.error('No pricing available for this billing cycle.');
             return;
         }
 
-        setLoadingPlan(planId);
+        transformSubscribe((data) => ({
+            ...data,
+            price_id: priceId,
+        }));
 
-        await executeCheckout(
-            {
-                url: route('api.subscriptions.checkout'),
-                method: 'POST',
-                data: {
-                    price_id: priceId,
-                },
+        subscribeToPrice(route('store.subscriptions.store'), {
+            onError: () => {
+                toast.error('Failed to start subscription. Please try again.');
             },
-            {
-                onSuccess: (data) => {
-                    window.location.href = data.checkoutUrl;
-                },
-                onSettled: () => setLoadingPlan(null),
+        });
+    };
+
+    const handleCancel = (priceId: number) => {
+        if (!confirm('Are you sure you want to cancel your subscription? This action cannot be undone.')) {
+            return;
+        }
+
+        transformCancel((data) => ({
+            ...data,
+            price_id: priceId,
+        }));
+
+        cancelSubscription(route('store.subscriptions.destroy'), {
+            onSuccess: () => {
+                toast.success('Subscription cancelled successfully.');
             },
-        );
+            onError: (err) => {
+                console.log('Failed to cancel subscription:', err);
+                toast.error('Failed to cancel subscription. Please try again.');
+            },
+        });
     };
 
     return (
@@ -244,7 +299,9 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
                                         plan={plan}
                                         billingCycle={billingCycle}
                                         onSubscribe={handleSubscribe}
-                                        loading={loadingPlan === plan.id}
+                                        onCancel={handleCancel}
+                                        isSubscribing={subscribeProcessing}
+                                        isCancelling={cancelProcessing}
                                         policiesAgreed={policiesAgreed}
                                         onPolicyAgreementChange={handlePolicyAgreementChange}
                                     />

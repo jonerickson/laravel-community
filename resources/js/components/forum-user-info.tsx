@@ -7,7 +7,7 @@ export default function ForumUserInfo({ user, isAuthor = false }: { user: App.Da
     return (
         <div className="flex flex-row items-center gap-4 md:flex-col md:gap-2 md:px-8">
             <Avatar className="size-12">
-                {user.avatar && <AvatarImage src={user.avatar} alt={user.name} />}
+                {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name} />}
                 <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">

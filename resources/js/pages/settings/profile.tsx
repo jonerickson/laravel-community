@@ -84,7 +84,7 @@ export default function Profile() {
                             <Label>Profile Picture</Label>
                             <div className="flex items-center gap-4">
                                 <Avatar className="h-20 w-20">
-                                    {auth.user.avatar && <AvatarImage src={previewUrl || auth.user.avatar || undefined} alt={auth.user.name} />}
+                                    {auth.user.avatarUrl && <AvatarImage src={previewUrl || auth.user.avatarUrl || undefined} alt={auth.user.name} />}
                                     <AvatarFallback className="text-lg">{getInitials(auth.user.name || '')}</AvatarFallback>
                                 </Avatar>
                                 <div className="flex flex-col gap-2">
