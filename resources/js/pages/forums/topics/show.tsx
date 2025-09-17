@@ -8,7 +8,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
-import type { BreadcrumbItem, Forum, PaginatedData, Post, SharedData, Topic } from '@/types';
+import type { BreadcrumbItem, Forum, PaginatedData, Post, Topic } from '@/types';
 import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowDown, ArrowLeft, Clock, Eye, Lock, MessageSquare, Pin, Reply, User } from 'lucide-react';
@@ -35,11 +35,11 @@ interface TopicShowProps {
 
 export default function ForumTopicShow({ forum, topic, posts, postsPagination, recentViewers }: TopicShowProps) {
     const { can, cannot } = usePermissions();
-    const { name: siteName } = usePage<SharedData>().props;
+    const { name: siteName } = usePage<App.Data.SharedData>().props;
     const [showReplyForm, setShowReplyForm] = useState(false);
     const [quotedContent, setQuotedContent] = useState<string>('');
     const [quotedAuthor, setQuotedAuthor] = useState<string>('');
-    const scrollToBottom = usePage<SharedData>().props.flash?.scrollToBottom;
+    const scrollToBottom = usePage<App.Data.SharedData>().props.flash?.scrollToBottom;
 
     const breadcrumbs: BreadcrumbItem[] = [
         {

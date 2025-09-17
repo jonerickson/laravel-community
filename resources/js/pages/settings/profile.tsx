@@ -1,4 +1,4 @@
-import { type BreadcrumbItem, type SharedData } from '@/types';
+import { type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler, useRef, useState } from 'react';
@@ -34,7 +34,7 @@ type ProfileForm = {
 };
 
 export default function Profile() {
-    const { auth } = usePage<SharedData>().props;
+    const { auth } = usePage<App.Data.SharedData>().props;
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const getInitials = useInitials();

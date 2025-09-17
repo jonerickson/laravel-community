@@ -4,7 +4,7 @@ import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
 import { Spinner } from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, PaginatedData, Post, SharedData } from '@/types';
+import type { BreadcrumbItem, PaginatedData, Post } from '@/types';
 import { Head, usePage, WhenVisible } from '@inertiajs/react';
 import { Newspaper } from 'lucide-react';
 import usePermissions from '../../hooks/use-permissions';
@@ -23,7 +23,7 @@ interface BlogIndexProps {
 
 export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
     const { can } = usePermissions();
-    const { name: siteName } = usePage<SharedData>().props;
+    const { name: siteName } = usePage<App.Data.SharedData>().props;
 
     const structuredData = {
         '@context': 'https://schema.org',

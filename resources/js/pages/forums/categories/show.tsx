@@ -3,7 +3,7 @@ import Heading from '@/components/heading';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Forum, ForumCategory, SharedData } from '@/types';
+import type { BreadcrumbItem, Forum, ForumCategory } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { LibraryBig, MessageSquare, Users } from 'lucide-react';
@@ -17,7 +17,7 @@ interface CategoryShowProps {
 
 export default function ForumCategoryShow({ category, forums }: CategoryShowProps) {
     const { can } = usePermissions();
-    const { name: siteName } = usePage<SharedData>().props;
+    const { name: siteName } = usePage<App.Data.SharedData>().props;
 
     const breadcrumbs: BreadcrumbItem[] = [
         {

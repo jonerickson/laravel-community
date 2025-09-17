@@ -1,4 +1,4 @@
-import { type BreadcrumbItem, Order, type SharedData } from '@/types';
+import { type BreadcrumbItem, Order } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 
 import { DataTable } from '@/components/data-table';
@@ -25,7 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Orders() {
-    const { orders } = usePage<SharedData>().props as unknown as { orders: Order[] };
+    const { orders } = usePage<App.Data.SharedData>().props as unknown as { orders: Order[] };
 
     const copyToClipboard = async (text: string, label: string) => {
         try {

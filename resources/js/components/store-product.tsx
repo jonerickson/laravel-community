@@ -7,7 +7,7 @@ import { StoreProductReviewsList } from '@/components/store-product-reviews-list
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { Comment, PaginatedData, Product as ProductType, SharedData } from '@/types';
+import type { Comment, PaginatedData, Product as ProductType } from '@/types';
 import { Deferred, useForm, usePage } from '@inertiajs/react';
 import { ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -19,7 +19,7 @@ interface ProductProps {
 }
 
 export default function Product({ product: productData, reviews, reviewsPagination }: ProductProps) {
-    const { auth } = usePage<SharedData>().props;
+    const { auth } = usePage<App.Data.SharedData>().props;
     const [selectedPriceId, setSelectedPriceId] = useState<number | null>(productData?.default_price?.id || null);
     const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
 

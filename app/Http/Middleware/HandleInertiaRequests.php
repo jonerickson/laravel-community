@@ -6,6 +6,7 @@ namespace App\Http\Middleware;
 
 use App\Data\AuthData;
 use App\Data\FlashData;
+use App\Data\SharedData;
 use App\Data\UserData;
 use App\Services\PermissionService;
 use App\Services\ShoppingCartService;
@@ -24,8 +25,7 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request): array
     {
-        return [
-            ...parent::share($request),
+        $sharedData = SharedData::from([
             'auth' => AuthData::from([
                 'user' => ($user = $request->user()) ? UserData::from($user) : null,
                 'isAdmin' => $user?->hasRole('super-admin') ?? false,
@@ -34,13 +34,20 @@ class HandleInertiaRequests extends Middleware
                 'mustVerifyEmail' => $user && ! $user->hasVerifiedEmail(),
             ]),
             'cartCount' => $this->shoppingCartService->getCartCount(),
+            'flash' => null,
+            'name' => config('app.name'),
+            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'ziggy' => [],
+        ]);
+
+        return [
+            ...parent::share($request),
+            ...$sharedData->toArray(),
             'flash' => fn () => FlashData::from([
                 'scrollToBottom' => $request->session()->pull('scrollToBottom'),
                 'message' => $request->session()->pull('message'),
                 'messageVariant' => $request->session()->pull('messageVariant'),
             ]),
-            'name' => config('app.name'),
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),

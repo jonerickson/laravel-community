@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
-import type { BreadcrumbItem, ForumCategory, SharedData } from '@/types';
+import type { BreadcrumbItem, ForumCategory } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { Circle, Lock, MessageSquare, Pin, Plus } from 'lucide-react';
@@ -27,7 +27,7 @@ interface ForumsIndexProps {
 
 export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
     const { can } = usePermissions();
-    const { name: siteName } = usePage<SharedData>().props;
+    const { name: siteName } = usePage<App.Data.SharedData>().props;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const allForums = categories.flatMap((category) => category.forums || []);

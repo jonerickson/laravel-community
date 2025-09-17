@@ -3,11 +3,10 @@ import { Mail, X } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { SharedData } from '@/types';
 import { toast } from 'sonner';
 
 export function EmailVerificationBanner() {
-    const { auth } = usePage<SharedData>().props;
+    const { auth } = usePage<App.Data.SharedData>().props;
     const [dismissed, setDismissed] = useState(false);
     const { post, processing } = useForm({});
 
@@ -17,7 +16,7 @@ export function EmailVerificationBanner() {
         });
     };
 
-    if (!auth.mustVerifyEmail || dismissed) {
+    if (!auth || !auth.mustVerifyEmail || dismissed) {
         return null;
     }
 

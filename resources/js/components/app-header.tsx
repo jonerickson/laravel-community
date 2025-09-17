@@ -11,9 +11,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
-import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
+import { type BreadcrumbItem, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, Grid, Home, LibraryBig, Menu, Newspaper, ShoppingCart } from 'lucide-react';
+import { BookOpen, CalendarSync, Folder, Grid, Home, LibraryBig, Menu, Newspaper, ShoppingCart } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
@@ -46,6 +46,11 @@ const mainNavItems: NavItem[] = [
         href: () => route('store.index'),
         icon: ShoppingCart,
     },
+    {
+        title: 'Subscriptions',
+        href: () => route('store.subscriptions'),
+        icon: CalendarSync,
+    },
 ];
 
 const rightNavItems: NavItem[] = [
@@ -68,9 +73,10 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
-    const page = usePage<SharedData>();
+    const page = usePage<App.Data.SharedData>();
     const { auth } = page.props;
     const getInitials = useInitials();
+
     return (
         <>
             <div className="border-b border-sidebar-border/80">

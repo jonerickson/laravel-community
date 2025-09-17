@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApiRequest } from '@/hooks/use-api-request';
 import usePermissions from '@/hooks/use-permissions';
-import type { Forum, Post, SharedData, Topic } from '@/types';
+import type { Forum, Post, Topic } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { Edit, Eye, EyeOff, Flag, MoreHorizontal, Pin, PinOff, Trash } from 'lucide-react';
 import { toast } from 'sonner';
@@ -16,7 +16,7 @@ interface ForumTopicPostModerationMenuProps {
 
 export default function ForumTopicPostModerationMenu({ post, forum, topic }: ForumTopicPostModerationMenuProps) {
     const { can, cannot, hasAnyPermission } = usePermissions();
-    const { auth } = usePage<SharedData>().props;
+    const { auth } = usePage<App.Data.SharedData>().props;
     const { delete: deletePost } = useForm({
         is_published: post.is_published,
     });

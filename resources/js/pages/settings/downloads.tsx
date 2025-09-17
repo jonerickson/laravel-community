@@ -1,4 +1,4 @@
-import { type BreadcrumbItem, type SharedData } from '@/types';
+import { type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 
 import { EmptyState } from '@/components/empty-state';
@@ -25,7 +25,7 @@ interface DownloadsPageProps {
 }
 
 export default function Downloads() {
-    const { downloads } = usePage<SharedData>().props as unknown as DownloadsPageProps;
+    const { downloads } = usePage<App.Data.SharedData>().props as unknown as DownloadsPageProps;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

@@ -9,7 +9,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useApiRequest } from '@/hooks/use-api-request';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Forum, PaginatedData, SharedData, Topic } from '@/types';
+import type { BreadcrumbItem, Forum, PaginatedData, Topic } from '@/types';
 import { stripCharacters } from '@/utils/truncate';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
@@ -27,7 +27,7 @@ interface ForumShowProps {
 
 export default function ForumShow({ forum, topics: initialTopics, topicsPagination }: ForumShowProps) {
     const { can, cannot, hasAnyPermission } = usePermissions();
-    const { name: siteName } = usePage<SharedData>().props;
+    const { name: siteName } = usePage<App.Data.SharedData>().props;
     const [topics, setTopics] = useState<Topic[]>(initialTopics);
     const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
     const { loading: isDeleting, execute: executeBulkDelete } = useApiRequest();

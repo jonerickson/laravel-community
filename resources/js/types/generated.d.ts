@@ -171,6 +171,14 @@ declare namespace App.Data {
         type: string;
         id: number;
     };
+    export type SharedData = {
+        auth: App.Data.AuthData;
+        name: string;
+        cartCount: number | null;
+        flash: App.Data.FlashData | null;
+        sidebarOpen: boolean;
+        ziggy: Config & { location: string };
+    };
     export type SubscriptionData = {
         id: number;
         name: string;

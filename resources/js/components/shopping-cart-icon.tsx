@@ -1,7 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ShoppingCart } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -11,7 +10,7 @@ interface ShoppingCartIconProps {
 }
 
 export function ShoppingCartIcon({ className }: ShoppingCartIconProps) {
-    const page = usePage<SharedData>();
+    const page = usePage<App.Data.SharedData>();
     const initialCount = page.props.cartCount || 0;
     const [cartCount, setCartCount] = useState(initialCount);
 

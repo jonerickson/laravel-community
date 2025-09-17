@@ -1,7 +1,7 @@
 import BlogPost from '@/components/blog-post';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Comment, PaginatedData, Post, SharedData } from '@/types';
+import type { BreadcrumbItem, Comment, PaginatedData, Post } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 
@@ -22,7 +22,7 @@ interface BlogShowProps {
 }
 
 export default function BlogShow({ post, comments, commentsPagination, recentViewers }: BlogShowProps) {
-    const { name: siteName } = usePage<SharedData>().props;
+    const { name: siteName } = usePage<App.Data.SharedData>().props;
     const pageDescription = post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, '') + '...';
 
     const breadcrumbs: BreadcrumbItem[] = [
