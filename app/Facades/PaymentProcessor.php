@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool updatePaymentMethod(\App\Models\User $user, string $paymentMethodId, bool $isDefault)
  * @method static bool deletePaymentMethod(\App\Models\User $user, string $paymentMethodId)
  * @method static string|bool startSubscription(\App\Models\User $user, \App\Models\Order $order)
- * @method static bool cancelSubscription(\App\Models\User $user, \App\Models\Price $price)
+ * @method static bool cancelSubscription(\App\Models\User $user, \App\Models\Price $price, bool $cancelNow = false)
  * @method static bool isSubscribedToProduct(\App\Models\User $user, \App\Models\Product $product)
  * @method static bool isSubscribedToPrice(\App\Models\User $user, \App\Models\Price $price)
  * @method static string|bool redirectToCheckout(\App\Models\User $user, \App\Models\Order $order)

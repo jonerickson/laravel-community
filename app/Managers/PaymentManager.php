@@ -93,9 +93,9 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->startSubscription($user, $order);
     }
 
-    public function cancelSubscription(User $user, Price $price): bool
+    public function cancelSubscription(User $user, Price $price, bool $cancelNow = false): bool
     {
-        return $this->driver()->cancelSubscription($user, $price);
+        return $this->driver()->cancelSubscription($user, $price, $cancelNow);
     }
 
     public function isSubscribedToProduct(User $user, Product $product): bool

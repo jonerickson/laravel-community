@@ -42,7 +42,7 @@ interface PaymentProcessor
 
     public function startSubscription(User $user, Order $order): bool|string;
 
-    public function cancelSubscription(User $user, Price $price): bool;
+    public function cancelSubscription(User $user, Price $price, bool $cancelNow = false): bool;
 
     public function isSubscribedToProduct(User $user, Product $product): bool;
 

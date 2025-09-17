@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Collection;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
@@ -38,4 +39,10 @@ class SubscriptionData extends Data
 
     /** @var PolicyData[] */
     public Collection $policies;
+
+    public ?CarbonImmutable $endsAt;
+
+    public ?CarbonImmutable $createdAt;
+
+    public ?CarbonImmutable $updatedAt;
 }

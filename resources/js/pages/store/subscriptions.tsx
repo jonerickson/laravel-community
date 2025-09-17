@@ -9,7 +9,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { Check, Crown, Package, Rocket, Shield, Star, Users, X, Zap } from 'lucide-react';
+import { Check, Crown, Package, RefreshCw, Rocket, Shield, Star, Users, X, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -154,19 +154,49 @@ function PricingCard({
                                 Current plan
                             </Button>
                             {priceId && (
-                                <Button className="w-full" variant="destructive" size="sm" onClick={() => onCancel(priceId)} disabled={isCancelling}>
-                                    {isCancelling ? (
-                                        <>
-                                            <div className="mr-2 size-4 animate-spin rounded-full border-2 border-current border-b-transparent" />
-                                            Cancelling...
-                                        </>
+                                <>
+                                    {plan.endsAt ? (
+                                        <Button
+                                            className="w-full"
+                                            variant="secondary"
+                                            size="sm"
+                                            onClick={() => onCancel(priceId)}
+                                            disabled={isCancelling}
+                                        >
+                                            {isCancelling ? (
+                                                <>
+                                                    <div className="mr-2 size-4 animate-spin rounded-full border-2 border-current border-b-transparent" />
+                                                    Cancelling...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <RefreshCw className="mr-2 size-4" />
+                                                    Continue subscription
+                                                </>
+                                            )}
+                                        </Button>
                                     ) : (
-                                        <>
-                                            <X className="mr-2 size-4" />
-                                            Cancel subscription
-                                        </>
+                                        <Button
+                                            className="w-full"
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={() => onCancel(priceId)}
+                                            disabled={isCancelling}
+                                        >
+                                            {isCancelling ? (
+                                                <>
+                                                    <div className="mr-2 size-4 animate-spin rounded-full border-2 border-current border-b-transparent" />
+                                                    Cancelling...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <X className="mr-2 size-4" />
+                                                    Cancel subscription
+                                                </>
+                                            )}
+                                        </Button>
                                     )}
-                                </Button>
+                                </>
                             )}
                         </>
                     ) : (

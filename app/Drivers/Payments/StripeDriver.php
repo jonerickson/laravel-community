@@ -431,7 +431,7 @@ class StripeDriver implements PaymentProcessor
         return $checkoutSession->url;
     }
 
-    public function cancelSubscription(User $user, Price $price): bool
+    public function cancelSubscription(User $user, Price $price, bool $cancelNow = false): bool
     {
         if (! $this->isSubscribedToPrice($user, $price)) {
             return false;
@@ -445,7 +445,11 @@ class StripeDriver implements PaymentProcessor
             return false;
         }
 
-        $subscription->cancel();
+        if ($cancelNow) {
+            $subscription->cancelNow();
+        } else {
+            $subscription->cancel();
+        }
 
         return true;
     }

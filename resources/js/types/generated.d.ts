@@ -190,6 +190,9 @@ declare namespace App.Data {
         activePrices: Array<App.Data.PriceData>;
         categories: Array<App.Data.ProductCategoryData>;
         policies: Array<App.Data.PolicyData>;
+        endsAt: string | null;
+        createdAt: string | null;
+        updatedAt: string | null;
     };
     export type UserData = {
         id: number;
