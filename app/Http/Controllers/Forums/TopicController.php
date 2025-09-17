@@ -7,13 +7,13 @@ namespace App\Http\Controllers\Forums;
 use App\Actions\Forums\DeleteTopicAction;
 use App\Enums\PostType;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Forums\StoreTopicRequest;
 use App\Models\Forum;
 use App\Models\Post;
 use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -76,16 +76,12 @@ class TopicController extends Controller
     /**
      * @throws Throwable
      */
-    public function store(Request $request, Forum $forum): RedirectResponse
+    public function store(StoreTopicRequest $request, Forum $forum): RedirectResponse
     {
         $this->authorize('view', $forum);
         $this->authorize('create', Topic::class);
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string|max:500',
-            'content' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
         $topic = DB::transaction(function () use ($validated, $forum) {
             $topic = Topic::create([

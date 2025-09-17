@@ -2,13 +2,19 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Store;
 
 use App\Models\Price;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
-class CancelSubscriptionRequest extends FormRequest
+class SubscriptionUpdateRequest extends FormRequest
 {
+    public function authorize(): bool
+    {
+        return Auth::check();
+    }
+
     public function rules(): array
     {
         return [

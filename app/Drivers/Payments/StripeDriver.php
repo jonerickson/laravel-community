@@ -6,6 +6,7 @@ namespace App\Drivers\Payments;
 
 use App\Contracts\PaymentProcessor;
 use App\Data\PaymentMethodData;
+use App\Data\SubscriptionData;
 use App\Enums\OrderStatus;
 use App\Enums\SubscriptionInterval;
 use App\Models\Order;
@@ -22,7 +23,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
-use Laravel\Cashier\Subscription;
 use Laravel\Cashier\SubscriptionBuilder;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Stripe;
@@ -348,24 +348,6 @@ class StripeDriver implements PaymentProcessor
         return true;
     }
 
-    public function isSubscribedToProduct(User $user, Product $product): bool
-    {
-        if (! $product->external_product_id) {
-            return false;
-        }
-
-        return $user->subscribedToProduct($product->external_product_id);
-    }
-
-    public function isSubscribedToPrice(User $user, Price $price): bool
-    {
-        if (! $price->external_price_id) {
-            return false;
-        }
-
-        return $user->subscribedToPrice($price->external_price_id);
-    }
-
     /**
      * @throws Exception
      */
@@ -431,17 +413,15 @@ class StripeDriver implements PaymentProcessor
         return $checkoutSession->url;
     }
 
-    public function cancelSubscription(User $user, Price $price, bool $cancelNow = false): bool
+    public function cancelSubscription(User $user, bool $cancelNow = false): bool
     {
-        if (! $this->isSubscribedToPrice($user, $price)) {
+        $subscription = $user->subscription();
+
+        if (blank($subscription)) {
             return false;
         }
 
-        $subscription = $user->subscriptions->first(function (Subscription $subscription) use ($price) {
-            return $subscription->hasPrice($price->external_price_id);
-        });
-
-        if (blank($subscription)) {
+        if (! $subscription->valid()) {
             return false;
         }
 
@@ -452,6 +432,45 @@ class StripeDriver implements PaymentProcessor
         }
 
         return true;
+    }
+
+    public function continueSubscription(User $user): bool
+    {
+        $subscription = $user->subscription();
+
+        if (blank($subscription)) {
+            return false;
+        }
+
+        if ($subscription->canceled() && $subscription->onGracePeriod()) {
+            $subscription->resume();
+
+            return true;
+        }
+
+        return true;
+    }
+
+    public function currentSubscription(User $user): ?SubscriptionData
+    {
+        if (! $subscription = $user->subscription()) {
+            return null;
+        }
+
+        if (! $subscription->valid()) {
+            return null;
+        }
+
+        if (! $price = Price::query()->where('external_price_id', $subscription->stripe_price)->first()) {
+            return null;
+        }
+
+        $subscriptionData = SubscriptionData::from($price->product);
+        $subscriptionData->current = true;
+        $subscriptionData->trialEndsAt = $subscription->trial_ends_at?->toImmutable();
+        $subscriptionData->endsAt = $subscription->ends_at?->toImmutable();
+
+        return $subscriptionData;
     }
 
     public function redirectToCheckout(User $user, Order $order): bool|string

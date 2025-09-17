@@ -6,6 +6,7 @@ namespace App\Managers;
 
 use App\Contracts\PaymentProcessor;
 use App\Data\PaymentMethodData;
+use App\Data\SubscriptionData;
 use App\Drivers\Payments\StripeDriver;
 use App\Models\Order;
 use App\Models\Price;
@@ -93,19 +94,19 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->startSubscription($user, $order);
     }
 
-    public function cancelSubscription(User $user, Price $price, bool $cancelNow = false): bool
+    public function cancelSubscription(User $user, bool $cancelNow = false): bool
     {
-        return $this->driver()->cancelSubscription($user, $price, $cancelNow);
+        return $this->driver()->cancelSubscription($user, $cancelNow);
     }
 
-    public function isSubscribedToProduct(User $user, Product $product): bool
+    public function continueSubscription(User $user): bool
     {
-        return $this->driver()->isSubscribedToProduct($user, $product);
+        return $this->driver()->continueSubscription($user);
     }
 
-    public function isSubscribedToPrice(User $user, Price $price): bool
+    public function currentSubscription(User $user): ?SubscriptionData
     {
-        return $this->driver()->isSubscribedToPrice($user, $price);
+        return $this->driver()->currentSubscription($user);
     }
 
     public function redirectToCheckout(User $user, Order $order): bool|string

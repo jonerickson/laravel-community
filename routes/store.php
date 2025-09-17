@@ -23,6 +23,7 @@ Route::group(['as' => 'store.', 'prefix' => 'store'], function (): void {
 
     Route::group(['middleware' => 'auth'], function () {
         Route::post('subscriptions', [SubscriptionsController::class, 'store'])->name('subscriptions.store');
+        Route::put('subscriptions', [SubscriptionsController::class, 'update'])->name('subscriptions.update');
         Route::delete('subscriptions', [SubscriptionsController::class, 'destroy'])->name('subscriptions.destroy');
     });
 

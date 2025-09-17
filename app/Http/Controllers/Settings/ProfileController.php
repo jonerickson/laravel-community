@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Settings\UpdateProfileRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -21,17 +22,13 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(UpdateProfileRequest $request): RedirectResponse
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'signature' => ['nullable', 'string', 'max:500'],
-            'avatar' => ['nullable', 'image', 'max:2048'],
-        ]);
+        $validated = $request->validated();
 
         $data = [
-            'name' => $request->name,
-            'signature' => $request->signature,
+            'name' => $validated['name'],
+            'signature' => $validated['signature'],
         ];
 
         if ($request->hasFile('avatar')) {

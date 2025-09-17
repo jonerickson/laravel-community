@@ -6,13 +6,14 @@ namespace App\Http\Controllers\Forums;
 
 use App\Enums\PostType;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Forums\StorePostRequest;
+use App\Http\Requests\Forums\UpdatePostRequest;
 use App\Models\Forum;
 use App\Models\Post;
 use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -23,17 +24,13 @@ class PostController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function store(Request $request, Forum $forum, Topic $topic): RedirectResponse
+    public function store(StorePostRequest $request, Forum $forum, Topic $topic): RedirectResponse
     {
         $this->authorize('view', $forum);
         $this->authorize('view', $topic);
         $this->authorize('create', Post::class);
 
-        $validated = $request->validate([
-            'content' => 'required|string',
-        ], [
-            'content.required' => 'Please provide a reply before posting.',
-        ]);
+        $validated = $request->validated();
 
         $topic->posts()->create([
             'type' => PostType::Forum,
@@ -57,7 +54,7 @@ class PostController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function edit(Request $request, Forum $forum, Topic $topic, Post $post): Response
+    public function edit(Forum $forum, Topic $topic, Post $post): Response
     {
         $this->authorize('view', $forum);
         $this->authorize('view', $topic);
@@ -82,7 +79,7 @@ class PostController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function update(Request $request, Forum $forum, Topic $topic, Post $post): RedirectResponse
+    public function update(UpdatePostRequest $request, Forum $forum, Topic $topic, Post $post): RedirectResponse
     {
         $this->authorize('view', $forum);
         $this->authorize('view', $topic);
@@ -94,11 +91,7 @@ class PostController extends Controller
             message: 'Post not found.'
         );
 
-        $validated = $request->validate([
-            'content' => 'required|string',
-        ], [
-            'content.required' => 'Post content cannot be empty.',
-        ]);
+        $validated = $request->validated();
 
         $post->update($validated);
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Store\StoreProductRequest;
 use App\Models\Product;
 use App\Services\ShoppingCartService;
 use Illuminate\Http\RedirectResponse;
@@ -20,15 +21,12 @@ class ProductController extends Controller
         private readonly ShoppingCartService $cartService
     ) {}
 
-    public function store(Request $request, Product $product): RedirectResponse
+    public function store(StoreProductRequest $request, Product $product): RedirectResponse
     {
-        $request->validate([
-            'price_id' => 'required|exists:prices,id',
-            'quantity' => 'integer|min:1|max:99',
-        ]);
+        $validated = $request->validated();
 
-        $priceId = $request->input('price_id');
-        $quantity = $request->input('quantity', 1);
+        $priceId = $validated['price_id'];
+        $quantity = $validated['quantity'] ?? 1;
 
         if (! $priceId) {
             $defaultPrice = $product->defaultPrice;

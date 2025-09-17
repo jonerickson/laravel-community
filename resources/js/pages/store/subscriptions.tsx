@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -26,6 +27,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface SubscriptionsProps {
     subscriptionProducts: App.Data.SubscriptionData[];
+    currentSubscription: App.Data.SubscriptionData | null;
 }
 
 const getIconForPlan = (plan: App.Data.SubscriptionData): React.ElementType => {
@@ -49,10 +51,14 @@ interface PricingCardProps {
     billingCycle: App.Enums.SubscriptionInterval;
     onSubscribe: (planId: number | null, priceId: number | null) => void;
     onCancel: (priceId: number) => void;
-    isSubscribing?: boolean;
-    isCancelling?: boolean;
+    onContinue: (priceId: number) => void;
+    isCurrentPlan: boolean;
+    isSubscribing: boolean;
+    isCancelling: boolean;
+    isContinuing: boolean;
     policiesAgreed: Record<number, boolean>;
     onPolicyAgreementChange: (planId: number, agreed: boolean) => void;
+    currentSubscription: App.Data.SubscriptionData | null;
 }
 
 function PricingCard({
@@ -60,10 +66,14 @@ function PricingCard({
     billingCycle,
     onSubscribe,
     onCancel,
-    isSubscribing = false,
-    isCancelling = false,
+    onContinue,
+    isCurrentPlan,
+    isSubscribing,
+    isCancelling,
+    isContinuing,
     policiesAgreed,
     onPolicyAgreementChange,
+    currentSubscription,
 }: PricingCardProps) {
     const Icon = getIconForPlan(plan);
     const color = getColorForPlan(plan);
@@ -77,7 +87,7 @@ function PricingCard({
         billingCycle === 'year' && monthlyPrice && yearlyPrice ? Math.round((1 - yearlyPrice.amount / 12 / monthlyPrice.amount) * 100) : 0;
 
     return (
-        <Card className={`relative flex w-full max-w-sm flex-col ${plan.current ? 'ring-2 ring-success' : ''}`}>
+        <Card className={`relative flex w-full max-w-sm flex-col ${isCurrentPlan ? 'ring-2 ring-success' : ''}`}>
             <CardHeader className="pb-4 text-center">
                 <div className={`mx-auto mb-4 rounded-full bg-gradient-to-r p-3 ${color} w-fit text-white`}>
                     <Icon className="h-8 w-8" />
@@ -115,7 +125,7 @@ function PricingCard({
                     </div>
                 )}
 
-                {plan.policies && plan.policies.length > 0 && !plan.current && (
+                {plan.policies && plan.policies.length > 0 && !isCurrentPlan && (
                     <div className="space-y-3 border-t border-border pt-4">
                         <h4 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Policies</h4>
                         <div className="space-y-2">
@@ -147,26 +157,43 @@ function PricingCard({
                 )}
 
                 <div className="mt-auto space-y-2 pt-4">
-                    {plan.current ? (
+                    {isCurrentPlan ? (
                         <>
                             <Button className="w-full" variant="outline" disabled>
                                 <Check className="mr-2 size-4" />
                                 Current plan
                             </Button>
+
+                            {currentSubscription?.trialEndsAt && new Date(currentSubscription.trialEndsAt) > new Date() && (
+                                <div className="rounded-md bg-info/10 p-3 text-center">
+                                    <p className="text-sm font-medium text-info">Trial Active</p>
+                                    <p className="text-xs text-muted-foreground">
+                                        Trial ends {new Date(currentSubscription.trialEndsAt).toLocaleDateString()}
+                                    </p>
+                                </div>
+                            )}
+
+                            {currentSubscription?.endsAt && new Date(currentSubscription.endsAt) > new Date() && (
+                                <div className="rounded-md bg-warning/10 p-3 text-center">
+                                    <p className="text-sm font-medium text-warning">Subscription Ending</p>
+                                    <p className="text-xs text-muted-foreground">Ends {new Date(currentSubscription.endsAt).toLocaleDateString()}</p>
+                                </div>
+                            )}
+
                             {priceId && (
                                 <>
-                                    {plan.endsAt ? (
+                                    {currentSubscription?.endsAt && new Date(currentSubscription.endsAt) > new Date() ? (
                                         <Button
                                             className="w-full"
                                             variant="secondary"
                                             size="sm"
-                                            onClick={() => onCancel(priceId)}
-                                            disabled={isCancelling}
+                                            onClick={() => onContinue(priceId)}
+                                            disabled={isContinuing}
                                         >
-                                            {isCancelling ? (
+                                            {isContinuing ? (
                                                 <>
                                                     <div className="mr-2 size-4 animate-spin rounded-full border-2 border-current border-b-transparent" />
-                                                    Cancelling...
+                                                    Continuing...
                                                 </>
                                             ) : (
                                                 <>
@@ -225,23 +252,25 @@ function PricingCard({
     );
 }
 
-export default function Subscriptions({ subscriptionProducts }: SubscriptionsProps) {
+export default function Subscriptions({ subscriptionProducts, currentSubscription }: SubscriptionsProps) {
     const [billingCycle, setBillingCycle] = useState<App.Enums.SubscriptionInterval>('month');
     const [policiesAgreed, setPoliciesAgreed] = useState<Record<number, boolean>>({});
+    const [processingPriceId, setProcessingPriceId] = useState<number | null>(null);
+    const [cancellingPriceId, setCancellingPriceId] = useState<number | null>(null);
+    const [continuingPriceId, setContinuingPriceId] = useState<number | null>(null);
+    const [showCancelDialog, setShowCancelDialog] = useState(false);
+    const [pendingCancelPriceId, setPendingCancelPriceId] = useState<number | null>(null);
 
-    const {
-        post: subscribeToPrice,
-        processing: subscribeProcessing,
-        transform: transformSubscribe,
-    } = useForm({
+    const { post: subscribeToPrice, transform: transformSubscribe } = useForm({
         price_id: 0,
     });
 
-    const {
-        delete: cancelSubscription,
-        processing: cancelProcessing,
-        transform: transformCancel,
-    } = useForm({
+    const { delete: cancelSubscription, transform: transformCancel } = useForm({
+        price_id: 0,
+        immediate: false,
+    });
+
+    const { put: continueSubscription, transform: transformContinue } = useForm({
         price_id: 0,
     });
 
@@ -262,6 +291,8 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
             return;
         }
 
+        setProcessingPriceId(priceId);
+
         transformSubscribe((data) => ({
             ...data,
             price_id: priceId,
@@ -271,26 +302,61 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
             onError: () => {
                 toast.error('Failed to start subscription. Please try again.');
             },
+            onFinish: () => {
+                setProcessingPriceId(null);
+            },
         });
     };
 
     const handleCancel = (priceId: number) => {
-        if (!confirm('Are you sure you want to cancel your subscription? This action cannot be undone.')) {
-            return;
-        }
+        setPendingCancelPriceId(priceId);
+        setShowCancelDialog(true);
+    };
+
+    const confirmCancel = (immediate: boolean) => {
+        if (!pendingCancelPriceId) return;
+
+        setShowCancelDialog(false);
+        setCancellingPriceId(pendingCancelPriceId);
 
         transformCancel((data) => ({
             ...data,
-            price_id: priceId,
+            price_id: pendingCancelPriceId,
+            immediate,
         }));
 
         cancelSubscription(route('store.subscriptions.destroy'), {
             onSuccess: () => {
-                toast.success('Subscription cancelled successfully.');
+                toast.success(`Subscription ${immediate ? 'cancelled immediately' : 'scheduled to cancel at end of billing cycle'}.`);
             },
             onError: (err) => {
                 console.log('Failed to cancel subscription:', err);
                 toast.error('Failed to cancel subscription. Please try again.');
+            },
+            onFinish: () => {
+                setCancellingPriceId(null);
+                setPendingCancelPriceId(null);
+            },
+        });
+    };
+
+    const handleContinue = (priceId: number) => {
+        setContinuingPriceId(priceId);
+
+        transformContinue((data) => ({
+            ...data,
+            price_id: priceId,
+        }));
+
+        continueSubscription(route('store.subscriptions.update'), {
+            onSuccess: () => {
+                toast.success('Subscription continued successfully.');
+            },
+            onError: () => {
+                toast.error('Failed to continue subscription. Please try again.');
+            },
+            onFinish: () => {
+                setContinuingPriceId(null);
             },
         });
     };
@@ -323,20 +389,33 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
                             </div>
                         )}
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                            {subscriptionProducts.map((plan: App.Data.SubscriptionData) => (
-                                <div key={plan.id} className="flex justify-center">
-                                    <PricingCard
-                                        plan={plan}
-                                        billingCycle={billingCycle}
-                                        onSubscribe={handleSubscribe}
-                                        onCancel={handleCancel}
-                                        isSubscribing={subscribeProcessing}
-                                        isCancelling={cancelProcessing}
-                                        policiesAgreed={policiesAgreed}
-                                        onPolicyAgreementChange={handlePolicyAgreementChange}
-                                    />
-                                </div>
-                            ))}
+                            {subscriptionProducts.map((plan: App.Data.SubscriptionData) => {
+                                const priceData = plan.activePrices.find((price) => price.interval === billingCycle);
+                                const priceId = priceData?.id || null;
+                                const isCurrentPlan = currentSubscription?.id === plan.id;
+                                const isSubscribing = processingPriceId === priceId && priceId !== null;
+                                const isCancelling = cancellingPriceId === priceId && priceId !== null;
+                                const isContinuing = continuingPriceId === priceId && priceId !== null;
+
+                                return (
+                                    <div key={plan.id} className="flex justify-center">
+                                        <PricingCard
+                                            plan={plan}
+                                            billingCycle={billingCycle}
+                                            onSubscribe={handleSubscribe}
+                                            onCancel={handleCancel}
+                                            onContinue={handleContinue}
+                                            isCurrentPlan={isCurrentPlan}
+                                            isSubscribing={isSubscribing}
+                                            isCancelling={isCancelling}
+                                            isContinuing={isContinuing}
+                                            policiesAgreed={policiesAgreed}
+                                            onPolicyAgreementChange={handlePolicyAgreementChange}
+                                            currentSubscription={currentSubscription}
+                                        />
+                                    </div>
+                                );
+                            })}
                         </div>
 
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -379,6 +458,47 @@ export default function Subscriptions({ subscriptionProducts }: SubscriptionsPro
                     />
                 )}
             </div>
+
+            <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+                <DialogContent className="mx-4 max-w-lg">
+                    <DialogHeader>
+                        <DialogTitle>Cancel subscription</DialogTitle>
+                        <DialogDescription className="text-sm">Choose when you'd like your subscription to end.</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-3">
+                            <h4 className="text-sm font-medium">Cancellation options:</h4>
+                            <div className="space-y-3 text-sm text-muted-foreground">
+                                <div className="flex flex-col space-y-1">
+                                    <p>
+                                        <strong>End of billing cycle:</strong>
+                                    </p>
+                                    <p>Keep access until your current billing period ends</p>
+                                </div>
+                                <div className="flex flex-col space-y-1">
+                                    <p>
+                                        <strong>Cancel immediately:</strong>
+                                    </p>
+                                    <p>End access right now and stop future charges</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <div className="flex w-full flex-col gap-2">
+                            <Button variant="outline" onClick={() => setShowCancelDialog(false)} className="w-full">
+                                Keep subscription
+                            </Button>
+                            <Button variant="secondary" onClick={() => confirmCancel(false)} className="w-full">
+                                Cancel at end of cycle
+                            </Button>
+                            <Button variant="destructive" onClick={() => confirmCancel(true)} className="w-full">
+                                Cancel immediately
+                            </Button>
+                        </div>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </AppLayout>
     );
 }

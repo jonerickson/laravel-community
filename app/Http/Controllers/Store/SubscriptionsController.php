@@ -6,8 +6,9 @@ namespace App\Http\Controllers\Store;
 
 use App\Data\SubscriptionData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CancelSubscriptionRequest;
+use App\Http\Requests\Store\SubscriptionCancelRequest;
 use App\Http\Requests\Store\SubscriptionCheckoutRequest;
+use App\Http\Requests\Store\SubscriptionUpdateRequest;
 use App\Managers\PaymentManager;
 use App\Models\Order;
 use App\Models\Product;
@@ -33,22 +34,11 @@ class SubscriptionsController extends Controller
             ->with('categories')
             ->with('policies.category')
             ->orderBy('name')
-            ->get()
-            ->map(function (Product $product) use ($user): SubscriptionData {
-
-                $isCurrentPlan = false;
-                if ($user) {
-                    $isCurrentPlan = $this->paymentManager->isSubscribedToProduct($user, $product);
-                }
-
-                $subscriptionData = SubscriptionData::from($product);
-                $subscriptionData->current = $isCurrentPlan;
-
-                return $subscriptionData;
-            });
+            ->get();
 
         return Inertia::render('store/subscriptions', [
-            'subscriptionProducts' => $subscriptionProducts,
+            'subscriptionProducts' => SubscriptionData::collect($subscriptionProducts),
+            'currentSubscription' => $user ? $this->paymentManager->currentSubscription($user) : null,
         ]);
     }
 
@@ -78,16 +68,37 @@ class SubscriptionsController extends Controller
         return Inertia::location($result);
     }
 
-    public function destroy(CancelSubscriptionRequest $request): RedirectResponse
+    public function update(SubscriptionUpdateRequest $request): RedirectResponse
     {
         $user = Auth::user();
-        $price = $request->getPrice();
 
-        $success = $this->paymentManager->cancelSubscription($user, $price);
+        $success = $this->paymentManager->continueSubscription($user);
 
         if ($success) {
             return to_route('store.subscriptions')
-                ->with('message', 'Subscription cancelled successfully.');
+                ->with('message', 'Subscription continued successfully.');
+        }
+
+        return back()->with('message', 'Failed to continue subscription.');
+    }
+
+    public function destroy(SubscriptionCancelRequest $request): RedirectResponse
+    {
+        $user = Auth::user();
+        $immediate = $request->isImmediate();
+
+        $success = $this->paymentManager->cancelSubscription(
+            user: $user,
+            cancelNow: $immediate
+        );
+
+        if ($success) {
+            $message = $immediate
+                ? 'Subscription cancelled immediately.'
+                : 'Subscription scheduled to cancel at end of billing cycle.';
+
+            return to_route('store.subscriptions')
+                ->with('message', $message);
         }
 
         return back()->with('message', 'Failed to cancel subscription.');

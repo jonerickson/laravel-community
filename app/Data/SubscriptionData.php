@@ -40,9 +40,7 @@ class SubscriptionData extends Data
     /** @var PolicyData[] */
     public Collection $policies;
 
+    public ?CarbonImmutable $trialEndsAt;
+
     public ?CarbonImmutable $endsAt;
-
-    public ?CarbonImmutable $createdAt;
-
-    public ?CarbonImmutable $updatedAt;
 }

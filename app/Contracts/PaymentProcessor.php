@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Contracts;
 
 use App\Data\PaymentMethodData;
+use App\Data\SubscriptionData;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
@@ -42,11 +43,11 @@ interface PaymentProcessor
 
     public function startSubscription(User $user, Order $order): bool|string;
 
-    public function cancelSubscription(User $user, Price $price, bool $cancelNow = false): bool;
+    public function cancelSubscription(User $user, bool $cancelNow = false): bool;
 
-    public function isSubscribedToProduct(User $user, Product $product): bool;
+    public function continueSubscription(User $user): bool;
 
-    public function isSubscribedToPrice(User $user, Price $price): bool;
+    public function currentSubscription(User $user): ?SubscriptionData;
 
     public function redirectToCheckout(User $user, Order $order): bool|string;
 
