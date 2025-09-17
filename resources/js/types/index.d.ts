@@ -1,15 +1,6 @@
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 
-export interface Auth {
-    user: User;
-    groups: Group[];
-    isAdmin: boolean;
-    mustVerifyEmail: boolean;
-    can: string[];
-    roles?: string[];
-}
-
 export interface BreadcrumbItem {
     title: string;
     href: string;
@@ -28,8 +19,8 @@ export interface Comment {
     likes_summary: App.Data.LikeData[];
     user_reaction?: string | null;
     user_reactions: string[];
-    user?: User;
-    author?: User;
+    user?: App.Data.UserData;
+    author?: App.Data.UserData;
     parent?: Comment;
     replies?: Comment[];
     created_at: string;
@@ -68,12 +59,6 @@ export interface ForumCategory {
     image?: Image | null;
     created_at: string;
     updated_at: string;
-}
-
-export interface Group {
-    id: number;
-    name: string;
-    color: string;
 }
 
 export interface Image {
@@ -126,7 +111,7 @@ export interface NavItem {
     icon?: LucideIcon | null;
     isActive?: boolean;
     target?: string;
-    shouldShow?: boolean | ((auth: Auth) => boolean);
+    shouldShow?: boolean | ((auth: App.Data.AuthData) => boolean);
 }
 
 export interface PaginatedData {
@@ -169,7 +154,7 @@ export interface Post {
     views_count: number;
     is_read_by_user: boolean;
     reads_count: number;
-    author: User;
+    author: App.Data.UserData;
     metadata?: Record<string, never> | null;
     created_at: string;
     updated_at: string;
@@ -230,7 +215,7 @@ export interface ProductPrice {
 }
 
 export interface SharedData {
-    auth: Auth;
+    auth: App.Data.AuthData;
     name: string;
     cartCount?: number;
     flash?: App.Data.FlashData;
@@ -252,9 +237,9 @@ export interface SupportTicket {
     support_ticket_category_id: number;
     category?: App.Enums.SupportTicketCategory;
     assigned_to?: number | null;
-    assignedTo?: User | null;
+    assignedTo?: App.Data.UserData | null;
     created_by: number;
-    author?: User;
+    author?: App.Data.UserData;
     external_id?: string | null;
     external_url?: string | null;
     last_synced_at?: string | null;
@@ -298,22 +283,9 @@ export interface Topic {
     is_hot: boolean;
     trending_score: number;
     forum?: Forum;
-    author: User;
+    author: App.Data.UserData;
     last_post?: Post;
     posts?: Post[];
     created_at: string;
     updated_at: string;
-}
-
-export interface User {
-    id: number;
-    name: string;
-    email: string;
-    avatar?: string;
-    signature?: string;
-    email_verified_at: string | null;
-    groups: Group[];
-    created_at: string;
-    updated_at: string;
-    [key: string]: unknown;
 }

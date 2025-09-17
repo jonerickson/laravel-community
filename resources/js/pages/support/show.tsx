@@ -130,10 +130,14 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                         {ticket.comments.map((comment: Comment, index: number) => (
                                             <div key={comment.id}>
                                                 <div className="flex items-start gap-3">
-                                                    <Avatar className="size-8">
-                                                        <AvatarImage src={comment.author?.avatar} alt={comment.author?.name} />
-                                                        <AvatarFallback>{comment.author?.name?.charAt(0)?.toUpperCase()}</AvatarFallback>
-                                                    </Avatar>
+                                                    {comment.author && (
+                                                        <Avatar className="size-8">
+                                                            {comment.author.avatar && (
+                                                                <AvatarImage src={comment.author.avatar} alt={comment.author.name} />
+                                                            )}
+                                                            <AvatarFallback>{comment.author.name.charAt(0)?.toUpperCase()}</AvatarFallback>
+                                                        </Avatar>
+                                                    )}
                                                     <div className="flex-1 space-y-2">
                                                         <div className="flex items-center gap-2 text-sm">
                                                             <span className="font-medium">{comment.author?.name}</span>

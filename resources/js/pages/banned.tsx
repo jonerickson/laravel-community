@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import type { User } from '@/types';
 import { Head } from '@inertiajs/react';
 import { AlertTriangleIcon, MailIcon, ShieldXIcon } from 'lucide-react';
 
@@ -16,7 +15,7 @@ interface UserFingerprint {
 }
 
 interface BannedProps {
-    user: User;
+    user: App.Data.UserData;
     fingerprint?: UserFingerprint;
     banReason?: string;
     bannedAt?: string;

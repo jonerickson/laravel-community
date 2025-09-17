@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Data\AuthData;
 use App\Data\FlashData;
+use App\Data\UserData;
 use App\Services\PermissionService;
 use App\Services\ShoppingCartService;
 use Illuminate\Http\Request;
@@ -24,14 +26,13 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
-            'auth' => [
-                'user' => $user = $request->user(),
-                'groups' => $user?->groups?->pluck(['id', 'name', 'color']),
-                'isAdmin' => $user?->hasRole('super-admin'),
-                'roles' => $user?->roles?->pluck('name'),
+            'auth' => AuthData::from([
+                'user' => ($user = $request->user()) ? UserData::from($user) : null,
+                'isAdmin' => $user?->hasRole('super-admin') ?? false,
+                'roles' => $user?->roles?->pluck('name')->toArray() ?? [],
                 'can' => PermissionService::mapFrontendPermissions($user),
                 'mustVerifyEmail' => $user && ! $user->hasVerifiedEmail(),
-            ],
+            ]),
             'cartCount' => $this->shoppingCartService->getCartCount(),
             'flash' => fn () => FlashData::from([
                 'scrollToBottom' => $request->session()->pull('scrollToBottom'),

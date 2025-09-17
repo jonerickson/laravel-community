@@ -24,10 +24,12 @@ export function StoreProductReviewsList({ reviews, reviewsPagination }: ProductR
                 {reviews.map((review) => (
                     <div key={review.id} className="pb-6 last:pb-0">
                         <div className="flex items-start gap-3">
-                            <Avatar className="h-10 w-10">
-                                <AvatarImage src={review.author?.avatar || review.user?.avatar} />
-                                <AvatarFallback>{(review.author?.name || review.user?.name || 'Anonymous').charAt(0).toUpperCase()}</AvatarFallback>
-                            </Avatar>
+                            {review.author && (
+                                <Avatar className="h-10 w-10">
+                                    {review.author.avatar && <AvatarImage src={review.author.avatar} />}
+                                    <AvatarFallback>{review.author.name.charAt(0).toUpperCase()}</AvatarFallback>
+                                </Avatar>
+                            )}
                             <div className="min-w-0 flex-1">
                                 <div className="mb-1 flex items-center gap-2">
                                     <h4 className="text-sm font-medium">{review.author?.name || review.user?.name || 'Anonymous'}</h4>

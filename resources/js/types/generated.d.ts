@@ -26,6 +26,13 @@ declare namespace App.Data {
         version: string;
         additional: Array<unknown>;
     };
+    export type AuthData = {
+        user: App.Data.UserData | null;
+        isAdmin: boolean;
+        mustVerifyEmail: boolean;
+        can: Array<string>;
+        roles: Array<string>;
+    };
     export type CartData = {
         cartCount: number;
         cartItems: Array<App.Data.CartItemData>;
@@ -63,6 +70,11 @@ declare namespace App.Data {
         scrollToBottom: boolean | null;
         message: string | null;
         messageVariant: string | null;
+    };
+    export type GroupData = {
+        id: number;
+        name: string;
+        color: string;
     };
     export type LikeData = {
         emoji: string;
@@ -172,8 +184,15 @@ declare namespace App.Data {
         policies: Array<App.Data.PolicyData>;
     };
     export type UserData = {
-        id: string;
+        id: number;
         name: string;
+        email: string;
+        avatar: string | null;
+        signature: string | null;
+        emailVerifiedAt: string | null;
+        groups: Array<App.Data.GroupData>;
+        createdAt: string | null;
+        updatedAt: string | null;
     };
     export type UserSocialData = {
         id: number;

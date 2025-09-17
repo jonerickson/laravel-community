@@ -1,14 +1,14 @@
 import { ReportDialog } from '@/components/report-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { SharedData, User } from '@/types';
+import { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 
-export default function ForumUserInfo({ user, isAuthor = false }: { user: User; isAuthor?: boolean }) {
+export default function ForumUserInfo({ user, isAuthor = false }: { user: App.Data.UserData; isAuthor?: boolean }) {
     const { auth } = usePage<SharedData>().props;
     return (
         <div className="flex flex-row items-center gap-4 md:flex-col md:gap-2 md:px-8">
             <Avatar className="size-12">
-                <AvatarImage src={user.avatar} alt={user.name} />
+                {user.avatar && <AvatarImage src={user.avatar} alt={user.name} />}
                 <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">

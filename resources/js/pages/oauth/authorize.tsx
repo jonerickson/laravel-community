@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import AuthLayout from '@/layouts/auth-layout';
-import { User } from '@/types';
 
 interface OAuthClient {
     id: string;
@@ -27,7 +26,7 @@ interface AuthorizeProps {
     };
     authToken: string;
     client: OAuthClient;
-    user: User;
+    user: App.Data.UserData;
     scopes: Array<{
         id: string;
         description: string;

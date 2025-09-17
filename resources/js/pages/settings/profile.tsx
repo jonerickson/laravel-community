@@ -40,11 +40,15 @@ export default function Profile() {
     const getInitials = useInitials();
 
     const { data, setData, post, errors, processing, recentlySuccessful } = useForm<ProfileForm>({
-        name: auth.user.name,
-        email: auth.user.email,
-        signature: auth.user.signature || '',
+        name: auth.user?.name || '',
+        email: auth.user?.email || '',
+        signature: auth.user?.signature || '',
         avatar: null,
     });
+
+    if (!auth.user) {
+        return null;
+    }
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] || null;
@@ -80,8 +84,8 @@ export default function Profile() {
                             <Label>Profile Picture</Label>
                             <div className="flex items-center gap-4">
                                 <Avatar className="h-20 w-20">
-                                    <AvatarImage src={previewUrl || auth.user.avatar || undefined} alt={auth.user.name} />
-                                    <AvatarFallback className="text-lg">{getInitials(auth.user.name)}</AvatarFallback>
+                                    {auth.user.avatar && <AvatarImage src={previewUrl || auth.user.avatar || undefined} alt={auth.user.name} />}
+                                    <AvatarFallback className="text-lg">{getInitials(auth.user.name || '')}</AvatarFallback>
                                 </Avatar>
                                 <div className="flex flex-col gap-2">
                                     <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
