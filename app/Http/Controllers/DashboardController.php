@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Data\AnnouncementData;
 use App\Models\Announcement;
 use App\Models\Post;
+use App\Models\Product;
 use App\Models\SupportTicket;
 use App\Models\Topic;
 use Illuminate\Database\Eloquent\Collection;
@@ -19,6 +20,9 @@ class DashboardController
     public function __invoke(): Response
     {
         return Inertia::render('dashboard', [
+            'newestProduct' => $this->getNewestProduct(),
+            'popularProduct' => $this->getPopularProduct(),
+            'featuredProduct' => $this->getFeaturedProduct(),
             'announcements' => Inertia::defer(fn () => $this->getAnnouncements()),
             'supportTickets' => Inertia::defer(fn (): Collection => $this->getSupportTickets()),
             'trendingTopics' => Inertia::defer(fn (): Collection => $this->getTrendingTopics()),
@@ -69,5 +73,36 @@ class DashboardController
             ->latest('published_at')
             ->limit(3)
             ->get();
+    }
+
+    private function getNewestProduct(): ?Product
+    {
+        return Product::query()
+            ->with('defaultPrice')
+            ->with('prices')
+            ->with('categories')
+            ->latest()
+            ->first();
+    }
+
+    private function getPopularProduct(): ?Product
+    {
+        return Product::query()
+            ->with('defaultPrice')
+            ->with('prices')
+            ->with('categories')
+            ->trending()
+            ->first();
+    }
+
+    private function getFeaturedProduct(): ?Product
+    {
+        return Product::query()
+            ->featured()
+            ->with('defaultPrice')
+            ->with('prices')
+            ->with('categories')
+            ->inRandomOrder()
+            ->first();
     }
 }

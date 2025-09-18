@@ -6,8 +6,8 @@ namespace App\Filament\Admin\Resources\Orders\Schemas;
 
 use App\Enums\OrderStatus;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class OrderForm
@@ -16,24 +16,57 @@ class OrderForm
     {
         return $schema
             ->components([
-                TextInput::make('reference_id')
-                    ->label('Order Number')
-                    ->required(),
-                Select::make('user_id')
-                    ->relationship('user', 'name')
-                    ->required(),
-                Select::make('status')
-                    ->options(OrderStatus::class)
-                    ->required(),
-                TextInput::make('amount')
-                    ->numeric(),
-                TextInput::make('invoice_number'),
-                Textarea::make('invoice_url')
-                    ->columnSpanFull(),
-                TextInput::make('external_invoice_id'),
-                TextInput::make('external_checkout_id'),
-                TextInput::make('external_order_id'),
-                TextInput::make('external_payment_id'),
+                Section::make('Order Information')
+                    ->columnSpanFull()
+                    ->columns()
+                    ->schema([
+                        TextInput::make('reference_id')
+                            ->copyable()
+                            ->disabled()
+                            ->label('Order Number'),
+                        TextInput::make('invoice_number')
+                            ->copyable()
+                            ->disabled(),
+                        Select::make('user_id')
+                            ->preload()
+                            ->searchable()
+                            ->relationship('user', 'name')
+                            ->required(),
+                        Select::make('status')
+                            ->default(OrderStatus::Pending)
+                            ->searchable()
+                            ->options(OrderStatus::class)
+                            ->required(),
+                        TextInput::make('amount')
+                            ->numeric()
+                            ->columnSpanFull()
+                            ->suffix('USD')
+                            ->prefix('$')
+                            ->helperText('The amount in cents.'),
+
+                    ]),
+                Section::make('Payment Processor')
+                    ->columnSpanFull()
+                    ->columns()
+                    ->schema([
+                        TextInput::make('external_invoice_id')
+                            ->disabled(fn ($operation) => $operation === 'edit')
+                            ->label('External Invoice ID'),
+                        TextInput::make('external_checkout_id')
+                            ->disabled(fn ($operation) => $operation === 'edit')
+                            ->label('External Checkout ID'),
+                        TextInput::make('external_order_id')
+                            ->disabled(fn ($operation) => $operation === 'edit')
+                            ->label('External Order ID'),
+                        TextInput::make('external_payment_id')
+                            ->disabled(fn ($operation) => $operation === 'edit')
+                            ->label('External Payment ID'),
+                        TextInput::make('invoice_url')
+                            ->label('Invoice URL')
+                            ->url()
+                            ->nullable()
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 }

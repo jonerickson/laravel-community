@@ -74,10 +74,13 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                         title={productData.name}
                         description={
                             productData
-                                ? productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price
-                                    ? `$${(productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price)?.amount} ${(productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price)?.currency}${(productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price)?.interval ? ` / ${(productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price)?.interval}` : ''}`
-                                    : 'Price TBD'
-                                : '0.00'
+                                ? (() => {
+                                      const selectedPrice = productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price;
+                                      return selectedPrice?.amount
+                                          ? `$${(selectedPrice.amount / 100).toFixed(2)} ${selectedPrice.currency}${selectedPrice.interval ? ` / ${selectedPrice.interval}` : ''}`
+                                          : 'Price TBD';
+                                  })()
+                                : '$0.00'
                         }
                     />
                     <div className="-mt-2 flex items-center gap-4">
@@ -173,7 +176,7 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                                             <SelectContent>
                                                 {productData.prices.map((price) => (
                                                     <SelectItem key={price.id} value={price.id.toString()}>
-                                                        {price.name} - ${price.amount} {price.currency}
+                                                        {price.name} - ${(price.amount / 100).toFixed(2)} {price.currency}
                                                         {price.interval && ` / ${price.interval}`}
                                                     </SelectItem>
                                                 ))}

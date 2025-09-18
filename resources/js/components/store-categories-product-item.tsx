@@ -21,11 +21,11 @@ export default function StoreCategoriesProductItem({ product }: { product: Produ
 
     const getPriceDisplay = () => {
         if (product.default_price) {
-            return `$${product.default_price.amount}`;
+            return `$${(product.default_price.amount / 100).toFixed(2)}`;
         }
 
         if (product.prices && product.prices.length > 0) {
-            const amounts = product.prices.map((price) => parseFloat(price.amount.toString()));
+            const amounts = product.prices.map((price) => price.amount / 100);
             const minPrice = Math.min(...amounts);
             const maxPrice = Math.max(...amounts);
 

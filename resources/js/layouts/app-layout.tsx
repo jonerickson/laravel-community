@@ -24,8 +24,8 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
         <LayoutComponent breadcrumbs={breadcrumbs} {...props}>
             <div
                 className={clsx({
-                    'px-6 py-6 lg:px-8': LayoutComponent === AppSidebarLayout,
-                    'px-6 py-6 lg:px-4': LayoutComponent === AppHeaderLayout,
+                    'px-6 pt-6 pb-12 lg:px-8': LayoutComponent === AppSidebarLayout,
+                    'px-6 pt-6 pb-12 lg:px-4': LayoutComponent === AppHeaderLayout,
                 })}
             >
                 {children}

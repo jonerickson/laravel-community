@@ -152,7 +152,7 @@ class StripeDriver implements PaymentProcessor
 
         $stripeParams = [
             'product' => $product->external_product_id,
-            'unit_amount' => (int) ($price->amount * 100), // Convert to cents
+            'unit_amount' => $price->amount,
             'currency' => strtolower($price->currency),
             'metadata' => Arr::dot([
                 'laravel_product_id' => $product->id,
@@ -274,7 +274,7 @@ class StripeDriver implements PaymentProcessor
             $productPrice->product_id = $product->id;
             $productPrice->external_price_id = $stripePrice->id;
             $productPrice->name = $stripePrice->nickname ?? 'Unnamed Price';
-            $productPrice->amount = $stripePrice->unit_amount / 100;
+            $productPrice->amount = $stripePrice->unit_amount;
             $productPrice->currency = strtoupper($stripePrice->currency);
             $productPrice->interval = $stripePrice->recurring ? SubscriptionInterval::tryFrom($stripePrice->recurring->interval) : null;
             $productPrice->interval_count = $stripePrice->recurrin ? $stripePrice->recurring->interval_count : 1;

@@ -158,7 +158,7 @@ export function useCartOperations(initialItems: App.Data.CartItemData[] = []) {
         const subtotal = items.reduce((total, item) => {
             const price = item.selectedPrice || item.product?.defaultPrice;
             if (price) {
-                return total + price.amount * item.quantity;
+                return total + (price.amount / 100) * item.quantity;
             }
             return total;
         }, 0);

@@ -150,6 +150,12 @@ class UserResource extends Resource
                                             ->copyable(),
                                     ]),
                             ]),
+                        Section::make('Subscription')
+                            ->collapsible()
+                            ->persistCollapsed()
+                            ->schema([
+
+                            ]),
                     ]),
                 Group::make()
                     ->components([

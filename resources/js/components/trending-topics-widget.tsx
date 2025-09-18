@@ -5,7 +5,7 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import type { Topic } from '@/types';
 import { Link } from '@inertiajs/react';
 import { format, formatDistanceToNow } from 'date-fns';
-import { Clock, Eye, Flame, Lock, MessageSquare, Pin, TrendingUp, Users } from 'lucide-react';
+import { Eye, Flame, Lock, MessageSquare, Pin, TrendingUp } from 'lucide-react';
 
 interface TrendingTopicsWidgetProps {
     topics?: Topic[];
@@ -63,72 +63,84 @@ export default function TrendingTopicsWidget({ topics = [], className }: Trendin
                 </Link>
             </div>
 
-            <div className="space-y-3">
-                {topics.slice(0, 5).map((topic, index) => (
-                    <Link
-                        key={topic.id}
-                        href={route('forums.topics.show', [topic.forum?.slug, topic.slug])}
-                        className="group block grid cursor-pointer grid-cols-12 gap-4 rounded-lg border border-sidebar-border/50 bg-card/30 p-4 transition-all duration-200 hover:border-accent/30 hover:bg-accent/20 hover:shadow-sm"
-                    >
-                        <div className="col-span-8 space-y-2">
-                            <div className="flex flex-wrap items-center gap-2">
-                                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-orange-500/10 text-xs font-bold text-orange-600 dark:text-orange-400">
-                                    #{index + 1}
-                                </span>
-                                {topic.is_hot && <span className="text-sm">🔥</span>}
-                                {topic.is_pinned && <Pin className="size-4 text-info" />}
-                                {topic.is_locked && <Lock className="size-4 text-muted-foreground" />}
-                                <span className="line-clamp-1 text-sm font-medium">{topic.title}</span>
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                                in <span className="font-medium">{topic.forum?.name}</span> by{' '}
-                                <span className="font-medium">{topic.author.name}</span> • <span>{format(new Date(topic.created_at), 'MMM d')}</span>
-                            </div>
-                        </div>
-
-                        <div className="col-span-4 flex items-start justify-end">
-                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                                <div className="flex items-center gap-1">
-                                    <TrendingUp className="size-3" />
-                                    <Badge variant={getTrendingScoreVariant(topic.trending_score)} className="px-1.5 py-0.5 text-xs">
-                                        {formatTrendingScore(topic.trending_score)}
-                                    </Badge>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <Eye className="size-3" />
-                                    <span>{topic.views_count}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <MessageSquare className="size-3" />
-                                    <span>{topic.posts_count}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <Users className="size-3" />
-                                    <span>{topic.unique_views_count}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {topic.last_post && (
-                            <div className="col-span-12 space-y-1 border-t border-sidebar-border/30 pt-2">
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <Clock className="size-3" />
-                                    <span>
-                                        <span className="font-medium">{topic.last_post.author.name}</span> replied{' '}
-                                        {formatDistanceToNow(new Date(topic.last_post.created_at), { addSuffix: true })}
-                                    </span>
-                                </div>
-                                <div className="line-clamp-2 text-xs text-muted-foreground/80 italic">
-                                    "{topic.last_post.content.replace(/<[^>]*>/g, '').substring(0, 200)}
-                                    {topic.last_post.content.length > 200 ? '...' : ''}"
-                                </div>
-                            </div>
-                        )}
-                    </Link>
-                ))}
+            <div className="overflow-hidden rounded-lg border border-sidebar-border/50">
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead className="bg-muted/50">
+                            <tr className="border-b border-sidebar-border/50">
+                                <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground uppercase">#</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground uppercase">Topic</th>
+                                <th className="px-4 py-3 text-center text-xs font-medium tracking-wider text-muted-foreground uppercase">Score</th>
+                                <th className="px-4 py-3 text-center text-xs font-medium tracking-wider text-muted-foreground uppercase">Views</th>
+                                <th className="px-4 py-3 text-center text-xs font-medium tracking-wider text-muted-foreground uppercase">Replies</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground uppercase">Last Reply</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-sidebar-border/30">
+                            {topics.slice(0, 5).map((topic, index) => (
+                                <tr key={topic.id} className="group transition-colors hover:bg-accent/20">
+                                    <td className="px-4 py-3">
+                                        <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-orange-500/10 text-xs font-bold text-orange-600 dark:text-orange-400">
+                                            {index + 1}
+                                        </span>
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <Link
+                                            href={route('forums.topics.show', [topic.forum?.slug, topic.slug])}
+                                            className="block space-y-1 transition-colors group-hover:text-primary"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                {topic.is_hot && <span className="text-sm">🔥</span>}
+                                                {topic.is_pinned && <Pin className="size-3 text-info" />}
+                                                {topic.is_locked && <Lock className="size-3 text-muted-foreground" />}
+                                                <span className="line-clamp-1 text-sm font-medium">{topic.title}</span>
+                                            </div>
+                                            <div className="text-xs text-muted-foreground">
+                                                in <span className="font-medium">{topic.forum?.name}</span> by{' '}
+                                                <span className="font-medium">{topic.author.name}</span>
+                                            </div>
+                                        </Link>
+                                    </td>
+                                    <td className="px-4 py-3 text-center">
+                                        <Badge variant={getTrendingScoreVariant(topic.trending_score)} className="px-2 py-1 text-xs">
+                                            <TrendingUp className="mr-1 size-3" />
+                                            {formatTrendingScore(topic.trending_score)}
+                                        </Badge>
+                                    </td>
+                                    <td className="px-4 py-3 text-center">
+                                        <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
+                                            <Eye className="size-3" />
+                                            <span>{topic.views_count}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-3 text-center">
+                                        <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
+                                            <MessageSquare className="size-3" />
+                                            <span>{topic.posts_count}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        {topic.last_post ? (
+                                            <div className="space-y-1">
+                                                <div className="text-xs text-muted-foreground">
+                                                    <span className="font-medium">{topic.last_post.author.name}</span>
+                                                </div>
+                                                <div className="text-xs text-muted-foreground/80">
+                                                    {formatDistanceToNow(new Date(topic.last_post.created_at), { addSuffix: true })}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="text-xs text-muted-foreground">{format(new Date(topic.created_at), 'MMM d')}</div>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
 
                 {topics.length > 5 && (
-                    <div className="border-t border-sidebar-border/50 pt-2">
+                    <div className="border-t border-sidebar-border/50 bg-muted/30 px-4 py-2">
                         <Link href={route('forums.index')} className="text-xs text-muted-foreground transition-colors hover:text-foreground">
                             +{topics.length - 5} more trending topics
                         </Link>

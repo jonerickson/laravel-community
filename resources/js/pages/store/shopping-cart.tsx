@@ -144,9 +144,9 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                                         </div>
                                                         <p className="mt-3 text-sm font-medium text-foreground">
                                                             {item.selectedPrice
-                                                                ? `$${item.selectedPrice.amount} ${item.selectedPrice.currency}${item.selectedPrice.interval ? ` / ${item.selectedPrice.interval}` : ''}`
+                                                                ? `$${(item.selectedPrice.amount / 100).toFixed(2)} ${item.selectedPrice.currency}${item.selectedPrice.interval ? ` / ${item.selectedPrice.interval}` : ''}`
                                                                 : item.product?.defaultPrice
-                                                                  ? `$${item.product.defaultPrice.amount} ${item.product.defaultPrice.currency}${item.product.defaultPrice.interval ? ` / ${item.product.defaultPrice.interval}` : ''}`
+                                                                  ? `$${(item.product.defaultPrice.amount / 100).toFixed(2)} ${item.product.defaultPrice.currency}${item.product.defaultPrice.interval ? ` / ${item.product.defaultPrice.interval}` : ''}`
                                                                   : 'Price TBD'}
                                                         </p>
                                                     </div>
@@ -172,7 +172,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                                                     <SelectContent>
                                                                         {item.availablePrices.map((price) => (
                                                                             <SelectItem key={price.id} value={price.id.toString()}>
-                                                                                {price.name} - ${price.amount} {price.currency}
+                                                                                {price.name} - ${(price.amount / 100).toFixed(2)} {price.currency}
                                                                                 {price.interval && ` / ${price.interval}`}
                                                                             </SelectItem>
                                                                         ))}

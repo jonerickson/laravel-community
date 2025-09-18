@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Orders\Tables;
 
+use App\Filament\Admin\Resources\Orders\Actions\CancelAction;
+use App\Filament\Admin\Resources\Orders\Actions\RefundAction;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -32,8 +34,7 @@ class OrdersTable
                     ->badge()
                     ->searchable(),
                 TextColumn::make('amount')
-                    ->money()
-                    ->formatStateUsing(fn ($state) => $state > 0 ? $state / 100 : $state)
+                    ->money('USD', divideBy: 100)
                     ->sortable(),
                 TextColumn::make('external_order_id')
                     ->copyable()
@@ -51,9 +52,12 @@ class OrdersTable
                 //
             ])
             ->recordActions([
-                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
+                ActionGroup::make([
+                    CancelAction::make(),
+                    RefundAction::make(),
+                ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

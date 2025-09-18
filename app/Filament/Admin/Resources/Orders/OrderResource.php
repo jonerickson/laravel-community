@@ -7,7 +7,7 @@ namespace App\Filament\Admin\Resources\Orders;
 use App\Filament\Admin\Resources\Orders\Pages\CreateOrder;
 use App\Filament\Admin\Resources\Orders\Pages\EditOrder;
 use App\Filament\Admin\Resources\Orders\Pages\ListOrders;
-use App\Filament\Admin\Resources\Orders\Pages\ViewOrder;
+use App\Filament\Admin\Resources\Orders\RelationManagers\ItemsRelationManager;
 use App\Filament\Admin\Resources\Orders\Schemas\OrderForm;
 use App\Filament\Admin\Resources\Orders\Schemas\OrderInfolist;
 use App\Filament\Admin\Resources\Orders\Tables\OrdersTable;
@@ -41,12 +41,18 @@ class OrderResource extends Resource
         return OrdersTable::configure($table);
     }
 
+    public static function getRelations(): array
+    {
+        return [
+            ItemsRelationManager::make(),
+        ];
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => ListOrders::route('/'),
             'create' => CreateOrder::route('/create'),
-            'view' => ViewOrder::route('/{record}'),
             'edit' => EditOrder::route('/{record}/edit'),
         ];
     }

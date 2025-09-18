@@ -28,7 +28,7 @@ class ProductPriceFactory extends Factory
                 'Enterprise',
                 'Starter',
             ]),
-            'amount' => $this->faker->randomFloat(2, 5, 299),
+            'amount' => $this->faker->numberBetween(1000, 9999),
             'currency' => 'USD',
             'interval' => $isRecurring ? $this->faker->randomElement(SubscriptionInterval::cases()) : null,
             'interval_count' => $isRecurring ? $this->faker->numberBetween(1, 12) : 1,

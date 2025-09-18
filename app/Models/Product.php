@@ -20,6 +20,7 @@ use App\Traits\HasMetadata;
 use App\Traits\HasSlug;
 use App\Traits\LogsMarketplaceActivity;
 use App\Traits\Reviewable;
+use App\Traits\Trendable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -71,14 +72,19 @@ use Laravel\Scout\Searchable;
  * @property-read int|null $prices_count
  * @property-read Collection<int, Comment> $reviews
  * @property-read int|null $reviews_count
+ * @property-read float $trending_score
  *
  * @method static \Database\Factories\ProductFactory factory($count = null, $state = [])
  * @method static Builder<static>|Product featured()
+ * @method static Builder<static>|Product hotTopics(?int $limit = null)
  * @method static Builder<static>|Product newModelQuery()
  * @method static Builder<static>|Product newQuery()
  * @method static Builder<static>|Product products()
  * @method static Builder<static>|Product query()
+ * @method static Builder<static>|Product risingTopics(?int $limit = null)
  * @method static Builder<static>|Product subscriptions()
+ * @method static Builder<static>|Product trending(?int $limit = null, ?\Illuminate\Support\Carbon $referenceTime = null)
+ * @method static Builder<static>|Product trendingInTimeframe(string $timeframe = 'week', ?int $limit = null)
  * @method static Builder<static>|Product whereAllowPromotionCodes($value)
  * @method static Builder<static>|Product whereCreatedAt($value)
  * @method static Builder<static>|Product whereDescription($value)
@@ -112,6 +118,7 @@ class Product extends Model implements Sluggable
     use LogsMarketplaceActivity;
     use Reviewable;
     use Searchable;
+    use Trendable;
 
     protected $attributes = [
         'allow_promotion_codes' => false,

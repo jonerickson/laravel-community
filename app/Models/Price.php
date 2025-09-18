@@ -22,7 +22,7 @@ use Illuminate\Support\Carbon;
  * @property int $product_id
  * @property string $name
  * @property string|null $description
- * @property numeric $amount
+ * @property int $amount
  * @property string $currency
  * @property SubscriptionInterval|null $interval
  * @property int $interval_count
@@ -148,10 +148,10 @@ class Price extends Model
     {
         if ($this->isRecurring()) {
             $interval = $this->interval_count > 1
-                ? "{$this->interval_count} {$this->interval}s"
+                ? "$this->interval_count {$this->interval}s"
                 : $this->interval;
 
-            return "{$this->name} (per {$interval})";
+            return "$this->name (per $interval)";
         }
 
         return $this->name;
@@ -160,7 +160,7 @@ class Price extends Model
     protected function casts(): array
     {
         return [
-            'amount' => 'decimal:2',
+            'amount' => 'integer',
             'interval' => SubscriptionInterval::class,
             'is_default' => 'boolean',
         ];
