@@ -351,7 +351,7 @@ class StripeDriver implements PaymentProcessor
     /**
      * @throws Exception
      */
-    public function startSubscription(User $user, Order $order): bool|string
+    public function startSubscription(User $user, Order $order, bool $chargeNow = true): bool|string
     {
         $lineItems = [];
 
@@ -367,6 +367,20 @@ class StripeDriver implements PaymentProcessor
             return false;
         }
 
+        if (($subscription = $user->subscription()) && $subscription->valid()) {
+            if ($chargeNow) {
+                $subscription->swapAndInvoice(
+                    prices: $lineItems,
+                );
+            } else {
+                $subscription->swap(
+                    prices: $lineItems,
+                );
+            }
+
+            return route('store.subscriptions');
+        }
+
         /** @var ?OrderItem $allowPromotionCodes */
         $allowPromotionCodes = $order->items()->with('product')->get()->firstWhere('product.allow_promotion_codes', true);
 
@@ -379,6 +393,7 @@ class StripeDriver implements PaymentProcessor
 
         $checkoutSession = $user
             ->newSubscription('default', $lineItems)
+            ->when(! $chargeNow, fn (SubscriptionBuilder $builder) => $builder->createAndSendInvoice())
             ->when(filled($trialDays), fn (SubscriptionBuilder $builder) => $builder->trialDays($trialDays->product->trial_days))
             ->when(filled($allowPromotionCodes), fn (SubscriptionBuilder $builder) => $builder->allowPromotionCodes())
             ->withMetadata($metadata)

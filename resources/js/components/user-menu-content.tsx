@@ -2,14 +2,15 @@ import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSep
 import { UserInfo } from '@/components/user-info';
 import { useLayout } from '@/hooks';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
-import { Link, router } from '@inertiajs/react';
-import { CircleDollarSign, CircleUser, CreditCard, DollarSign, LogOut, Settings } from 'lucide-react';
+import { Link, router, usePage } from '@inertiajs/react';
+import { CircleDollarSign, CircleUser, CreditCard, DollarSign, LogOut, Settings, TowerControl } from 'lucide-react';
 
 interface UserMenuContentProps {
     user: App.Data.UserData;
 }
 
 export function UserMenuContent({ user }: UserMenuContentProps) {
+    const { isAdmin } = usePage<App.Data.SharedData>().props.auth;
     const cleanup = useMobileNavigation();
     const { layout } = useLayout();
 
@@ -58,6 +59,14 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                 </>
             )}
             <DropdownMenuGroup>
+                {isAdmin && (
+                    <DropdownMenuItem asChild>
+                        <a className="block w-full" href="/admin" target="__blank">
+                            <TowerControl className="mr-2" />
+                            Administration
+                        </a>
+                    </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                     <Link className="block w-full" href={route('settings.profile.edit')} as="button" prefetch onClick={cleanup}>
                         <Settings className="mr-2" />

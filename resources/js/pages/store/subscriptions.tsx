@@ -260,6 +260,8 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
     const [continuingPriceId, setContinuingPriceId] = useState<number | null>(null);
     const [showCancelDialog, setShowCancelDialog] = useState(false);
     const [pendingCancelPriceId, setPendingCancelPriceId] = useState<number | null>(null);
+    const [showChangeDialog, setShowChangeDialog] = useState(false);
+    const [pendingChangePlan, setPendingChangePlan] = useState<{ planId: number; priceId: number; planName: string } | null>(null);
 
     const { post: subscribeToPrice, transform: transformSubscribe } = useForm({
         price_id: 0,
@@ -286,11 +288,24 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
     };
 
     const handleSubscribe = (planId: number | null, priceId: number | null) => {
-        if (!priceId) {
+        if (!priceId || !planId) {
             toast.error('No pricing available for this billing cycle.');
             return;
         }
 
+        if (currentSubscription && currentSubscription.id !== planId) {
+            const plan = subscriptionProducts.find((p) => p.id === planId);
+            if (plan) {
+                setPendingChangePlan({ planId, priceId, planName: plan.name });
+                setShowChangeDialog(true);
+                return;
+            }
+        }
+
+        processSubscriptionChange(priceId);
+    };
+
+    const processSubscriptionChange = (priceId: number) => {
         setProcessingPriceId(priceId);
 
         transformSubscribe((data) => ({
@@ -306,6 +321,14 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
                 setProcessingPriceId(null);
             },
         });
+    };
+
+    const confirmSubscriptionChange = () => {
+        if (!pendingChangePlan) return;
+
+        setShowChangeDialog(false);
+        processSubscriptionChange(pendingChangePlan.priceId);
+        setPendingChangePlan(null);
     };
 
     const handleCancel = (priceId: number) => {
@@ -463,7 +486,9 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
                 <DialogContent className="mx-4 max-w-lg">
                     <DialogHeader>
                         <DialogTitle>Cancel subscription</DialogTitle>
-                        <DialogDescription className="text-sm">Choose when you'd like your subscription to end.</DialogDescription>
+                        <DialogDescription className="text-sm">
+                            Please confirm you would like to cancel your current subscription. Choose when you'd like your subscription to end.
+                        </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-3">
@@ -494,6 +519,48 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
                             </Button>
                             <Button variant="destructive" onClick={() => confirmCancel(true)} className="w-full">
                                 Cancel immediately
+                            </Button>
+                        </div>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={showChangeDialog} onOpenChange={setShowChangeDialog}>
+                <DialogContent className="mx-4 max-w-lg">
+                    <DialogHeader>
+                        <DialogTitle>Change subscription plan</DialogTitle>
+                        <DialogDescription className="text-sm">
+                            You're about to change your subscription plan. Your billing will be adjusted accordingly.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-3">
+                            <h4 className="text-sm font-medium">Subscription change details:</h4>
+                            <div className="space-y-3 text-sm text-muted-foreground">
+                                <div className="flex justify-between">
+                                    <span>Current plan:</span>
+                                    <span className="font-medium text-foreground">{currentSubscription?.name}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span>New plan:</span>
+                                    <span className="font-medium text-foreground">{pendingChangePlan?.planName}</span>
+                                </div>
+                            </div>
+                            <div className="rounded-md bg-info-foreground p-3">
+                                <p className="text-xs text-info">
+                                    Your billing will be prorated based on the time remaining in your current billing cycle. The change will take
+                                    effect immediately.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <div className="flex w-full flex-col gap-2">
+                            <Button variant="outline" onClick={() => setShowChangeDialog(false)} className="w-full">
+                                Keep current plan
+                            </Button>
+                            <Button onClick={confirmSubscriptionChange} className="w-full">
+                                Confirm plan change
                             </Button>
                         </div>
                     </DialogFooter>
