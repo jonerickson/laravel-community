@@ -20,6 +20,7 @@ export default function AuthForgotPassword({ status }: ForgotPasswordProps) {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+
         post(route('password.email'));
     };
 

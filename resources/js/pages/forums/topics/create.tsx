@@ -43,11 +43,12 @@ export default function ForumTopicCreate({ forum }: CreateTopicProps) {
     ];
 
     const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
         if (cannot('create_topics')) {
             return;
         }
 
-        e.preventDefault();
         post(route('forums.topics.store', { forum: forum.slug }), {
             onSuccess: () => {
                 reset();

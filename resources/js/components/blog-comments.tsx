@@ -61,11 +61,12 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
     const { delete: deleteComment, processing: deleting } = useForm();
 
     const handleReplySubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
         if (cannot('create_comments')) {
             return;
         }
 
-        e.preventDefault();
         submitComment(route('blog.comments.store', { post }), {
             onSuccess: () => {
                 reset();
@@ -96,11 +97,12 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
     };
 
     const handleEditSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
         if (cannot('update_comments')) {
             return;
         }
 
-        e.preventDefault();
         updateComment(route('blog.comments.update', { post, comment }), {
             onSuccess: () => {
                 setIsEditing(false);
@@ -243,11 +245,12 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
     });
 
     const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
         if (cannot('create_comments')) {
             return;
         }
 
-        e.preventDefault();
         submitComment(route('blog.comments.store', { post }), {
             onSuccess: () => {
                 reset();

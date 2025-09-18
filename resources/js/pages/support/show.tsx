@@ -7,11 +7,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { useApiRequest } from '@/hooks/use-api-request';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Comment, SupportTicket } from '@/types';
 import { formatPriority, formatStatus, getPriorityVariant, getStatusVariant } from '@/utils/support-ticket';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Calendar, CheckCircle, Clock, FileText, Flag, Lock, LockOpen, MessageCircle, Paperclip, Tag, Ticket, Trash2, User } from 'lucide-react';
 import { useState } from 'react';
@@ -23,7 +22,12 @@ interface SupportTicketShowProps {
 export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
     const [showCommentForm, setShowCommentForm] = useState(false);
     const [showAttachmentForm, setShowAttachmentForm] = useState(false);
-    const { execute: updateTicket, loading: ticketUpdating } = useApiRequest();
+
+    const updateForm = useForm({
+        action: '',
+    });
+
+    const deleteAttachmentForm = useForm({});
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -49,26 +53,20 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
         router.reload({ only: ['ticket'] });
     };
 
-    const handleTicketAction = async (action: string) => {
+    const handleTicketAction = (action: string) => {
         if (!window.confirm(`Are you sure you want to ${action} this ticket?`)) {
             return;
         }
 
-        await updateTicket(
-            {
-                url: route('api.support'),
-                method: 'POST',
-                data: {
-                    ticket_id: ticket.id,
-                    action: action,
-                },
+        updateForm.transform(() => ({
+            action: action,
+        }));
+
+        updateForm.patch(route('support.update', ticket.id), {
+            onSuccess: () => {
+                router.reload({ only: ['ticket'] });
             },
-            {
-                onSuccess: () => {
-                    router.reload({ only: ['ticket'] });
-                },
-            },
-        );
+        });
     };
 
     const handleDeleteAttachment = (fileId: string, fileName: string) => {
@@ -76,7 +74,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
             return;
         }
 
-        router.delete(route('support.attachments.destroy', [ticket.id, fileId]), {
+        deleteAttachmentForm.delete(route('support.attachments.destroy', [ticket.id, fileId]), {
             onSuccess: () => {
                 router.reload({ only: ['ticket'] });
             },
@@ -176,7 +174,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                     <div className="space-y-4">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-base">Ticket details</CardTitle>
+                                <CardTitle className="text-base">Details</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-3">
@@ -301,7 +299,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                             onClick={() => handleTicketAction('close')}
                                         >
                                             <Lock className="size-4" />
-                                            {ticketUpdating ? 'Closing...' : 'Close ticket'}
+                                            {updateForm.processing ? 'Closing...' : 'Close ticket'}
                                         </Button>
                                         <Button
                                             variant="outline"
@@ -310,13 +308,13 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                             onClick={() => handleTicketAction('resolve')}
                                         >
                                             <CheckCircle className="size-4" />
-                                            {ticketUpdating ? 'Resolving...' : 'Resolve ticket'}
+                                            {updateForm.processing ? 'Resolving...' : 'Resolve ticket'}
                                         </Button>
                                     </>
                                 ) : (
                                     <Button variant="outline" size="sm" className="w-full justify-start" onClick={() => handleTicketAction('open')}>
                                         <LockOpen className="size-4" />
-                                        {ticketUpdating ? 'Opening...' : 'Re-open ticket'}
+                                        {updateForm.processing ? 'Opening...' : 'Re-open ticket'}
                                     </Button>
                                 )}
                             </CardContent>

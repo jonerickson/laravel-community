@@ -15,6 +15,7 @@ export default function AuthVerifyPassword({ status }: VerifyPasswordProps) {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+
         post(route('verification.send'));
     };
 

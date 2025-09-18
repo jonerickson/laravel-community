@@ -46,11 +46,13 @@ export default function OAuthAuthorize({ request, authToken, client, user, scope
 
     const handleApprove: FormEventHandler = (e) => {
         e.preventDefault();
+
         post(route('passport.authorizations.approve'));
     };
 
     const handleDeny: FormEventHandler = (e) => {
         e.preventDefault();
+
         destroy(route('passport.authorizations.deny'));
     };
 

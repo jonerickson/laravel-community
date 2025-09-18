@@ -56,6 +56,7 @@ export default function Product({ product: productData, reviews, reviewsPaginati
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
         if (!productData || !data.price_id) return;
 
         post(

@@ -45,11 +45,12 @@ export default function ForumPostEdit({ forum, topic, post }: EditPostProps) {
     ];
 
     const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
         if (cannot('update_posts')) {
             return;
         }
 
-        e.preventDefault();
         patch(
             route('forums.posts.update', {
                 forum: forum.slug,

@@ -104,6 +104,9 @@ class TopicController extends Controller
         return to_route('forums.topics.show', [
             'forum' => $forum,
             'topic' => $topic,
+        ])->with([
+            'message' => 'Your topic was successfully created.',
+            'messageVariant' => 'success',
         ]);
     }
 

@@ -20,6 +20,7 @@ export default function AddPaymentMethodDialog({ open, onOpenChange }: AddPaymen
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
         setError(null);
 
         try {

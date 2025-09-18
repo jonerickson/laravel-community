@@ -35,6 +35,7 @@ export default function CreateSupportTicket({ categories }: CreateSupportTicketP
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
         post(route('support.store'), {
             onSuccess: () => {
                 reset();

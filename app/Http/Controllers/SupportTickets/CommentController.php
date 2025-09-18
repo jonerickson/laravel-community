@@ -31,7 +31,7 @@ class CommentController extends Controller
         );
 
         return to_route('support.show', $ticket)
-            ->with('message', 'Your reply was successfully created.');
+            ->with('message', 'Your reply was successfully added.');
     }
 
     public function destroy(SupportTicket $ticket, Comment $comment): RedirectResponse

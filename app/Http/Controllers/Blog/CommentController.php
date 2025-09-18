@@ -41,7 +41,7 @@ class CommentController extends Controller
         ]);
 
         return to_route('blog.show', [$post])
-            ->with('message', 'Your comment was successfully created.');
+            ->with('message', 'Your comment was successfully added.');
     }
 
     /**

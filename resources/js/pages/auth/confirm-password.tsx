@@ -15,6 +15,7 @@ export default function AuthConfirmPassword() {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+
         post(route('password.confirm'), {
             onFinish: () => reset('password'),
         });

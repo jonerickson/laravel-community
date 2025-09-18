@@ -29,6 +29,7 @@ export default function ForumTopicReply({ forumSlug, topicSlug, onCancel, onSucc
 
     const handleReply = (e: React.FormEvent) => {
         e.preventDefault();
+
         post(route('forums.posts.store', { forum: forumSlug, topic: topicSlug }), {
             onSuccess: () => {
                 if (onSuccess) {
