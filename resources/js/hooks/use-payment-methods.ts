@@ -1,7 +1,6 @@
 import { useApiRequest } from '@/hooks/use-api-request';
-import { router } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import { toast } from 'sonner';
 import { route } from 'ziggy-js';
 
 interface AddPaymentMethodData {
@@ -12,8 +11,14 @@ export function usePaymentMethods() {
     const stripe = useStripe();
     const elements = useElements();
     const { loading: setupLoading, execute: executeSetupIntent } = useApiRequest<App.Data.PaymentSetupIntentData>();
-    const { loading: deleteLoading, execute: executeDelete } = useApiRequest();
-    const { loading: storeLoading, execute: executeStore } = useApiRequest();
+
+    const storeForm = useForm({
+        method: '',
+    });
+
+    const deleteForm = useForm({
+        method: '',
+    });
 
     const addPaymentMethod = async (data: AddPaymentMethodData) => {
         if (!stripe || !elements) {
@@ -60,46 +65,46 @@ export function usePaymentMethods() {
             throw new Error('Failed to create payment method');
         }
 
-        await executeStore(
-            {
-                url: route('api.payment-methods.store'),
-                method: 'POST',
-                data: {
-                    method: setupIntent.payment_method,
-                },
-            },
-            {
+        return new Promise((resolve, reject) => {
+            storeForm.transform(() => ({
+                method: setupIntent.payment_method as string,
+            }));
+
+            storeForm.post(route('settings.payment-methods.store'), {
                 onSuccess: () => {
                     router.reload({ only: ['paymentMethods'] });
-                    toast.success('Payment method added successfully.');
+                    resolve(undefined);
                 },
-            },
-        );
+                onError: () => {
+                    reject(new Error('Failed to store payment method'));
+                },
+            });
+        });
     };
 
     const deletePaymentMethod = async (paymentMethodId: string) => {
-        await executeDelete(
-            {
-                url: route('api.payment-methods.destroy'),
-                method: 'DELETE',
-                data: {
-                    method: paymentMethodId,
-                },
-            },
-            {
+        return new Promise<void>((resolve, reject) => {
+            deleteForm.transform(() => ({
+                method: paymentMethodId,
+            }));
+
+            deleteForm.delete(route('settings.payment-methods.destroy'), {
                 onSuccess: () => {
                     router.reload({ only: ['paymentMethods'] });
-                    toast.success('Payment method removed successfully.');
+                    resolve();
                 },
-            },
-        );
+                onError: () => {
+                    reject(new Error('Failed to delete payment method'));
+                },
+            });
+        });
     };
 
     return {
         addPaymentMethod,
         deletePaymentMethod,
-        loading: setupLoading || deleteLoading || storeLoading,
-        addLoading: setupLoading,
-        deleteLoading,
+        loading: setupLoading || storeForm.processing || deleteForm.processing,
+        addLoading: setupLoading || storeForm.processing,
+        deleteLoading: deleteForm.processing,
     };
 }

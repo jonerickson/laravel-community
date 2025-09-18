@@ -28,5 +28,8 @@ Route::group(['middleware' => ['auth', 'verified']], function (): void {
 
     Route::get('settings/orders', OrderController::class)->name('settings.orders');
     Route::get('settings/downloads', DownloadsController::class)->name('settings.downloads');
-    Route::get('settings/payment-methods', PaymentMethodController::class)->name('settings.payment-methods');
+    Route::get('settings/payment-methods', [PaymentMethodController::class, 'index'])->name('settings.payment-methods');
+    Route::post('settings/payment-methods', [PaymentMethodController::class, 'store'])->name('settings.payment-methods.store');
+    Route::patch('settings/payment-methods', [PaymentMethodController::class, 'update'])->name('settings.payment-methods.update');
+    Route::delete('settings/payment-methods', [PaymentMethodController::class, 'destroy'])->name('settings.payment-methods.destroy');
 });

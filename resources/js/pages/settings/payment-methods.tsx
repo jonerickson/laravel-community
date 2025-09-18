@@ -1,5 +1,5 @@
 import { type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useState } from 'react';
@@ -11,7 +11,6 @@ import HeadingSmall from '@/components/heading-small';
 import PaymentMethodAlternative from '@/components/payment-method-alternative';
 import PaymentMethodCard from '@/components/payment-method-card';
 import { Button } from '@/components/ui/button';
-import { useApiRequest } from '@/hooks/use-api-request';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { CreditCard, Plus } from 'lucide-react';
@@ -38,26 +37,27 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
     const [showAddDialog, setShowAddDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<App.Data.PaymentMethodData | null>(null);
-    const { execute: executeSetDefault } = useApiRequest();
+
+    const updateForm = useForm({
+        method: '',
+        is_default: true,
+    });
 
     useEffect(() => {
         setPaymentMethods(initialPaymentMethods);
     }, [initialPaymentMethods]);
 
-    const handleSetDefault = async (id: string) => {
-        await executeSetDefault(
-            {
-                url: route('api.payment-methods.update'),
-                method: 'PATCH',
-                data: {
-                    method: id,
-                    is_default: true,
-                },
+    const handleSetDefault = (id: string) => {
+        updateForm.transform(() => ({
+            method: id,
+            is_default: true,
+        }));
+
+        updateForm.patch(route('settings.payment-methods.update'), {
+            onSuccess: () => {
+                router.reload({ only: ['paymentMethods'] });
             },
-            {
-                onSuccess: () => router.reload({ only: ['paymentMethods'] }),
-            },
-        );
+        });
     };
 
     const handleDeleteClick = (paymentMethod: App.Data.PaymentMethodData) => {
