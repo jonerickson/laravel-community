@@ -7,7 +7,9 @@
       "mcp__playwright__browser_take_screenshot",
       "mcp__playwright__browser_navigate",
       "Read(//Users/jonerickson/Downloads/**)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "mcp__laravel-boost__browser-logs",
+      "mcp__laravel-boost__tinker"
     ],
     "deny": []
   },

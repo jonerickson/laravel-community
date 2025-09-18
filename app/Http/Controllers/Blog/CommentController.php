@@ -40,7 +40,8 @@ class CommentController extends Controller
             'is_approved' => true,
         ]);
 
-        return to_route('blog.show', [$post]);
+        return to_route('blog.show', [$post])
+            ->with('message', 'Your comment was successfully created.');
     }
 
     /**
@@ -62,7 +63,8 @@ class CommentController extends Controller
 
         $comment->update($validated);
 
-        return to_route('blog.show', [$post]);
+        return to_route('blog.show', [$post])
+            ->with('message', 'The comment has been successfully updated.');
     }
 
     /**
@@ -80,6 +82,7 @@ class CommentController extends Controller
 
         $comment->delete();
 
-        return to_route('blog.show', [$post]);
+        return to_route('blog.show', [$post])
+            ->with('message', 'The comment was successfully deleted.');
     }
 }

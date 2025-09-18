@@ -29,6 +29,7 @@ class CheckoutCancelController extends Controller
             return redirect(urldecode($redirect));
         }
 
-        return to_route('store.cart.index');
+        return to_route('store.cart.index')
+            ->with('message', 'The order was successfully cancelled.');
     }
 }

@@ -43,7 +43,6 @@ export default function SupportTicketAttachmentForm({ ticket, onCancel, onSucces
             onSuccess: () => {
                 reset();
                 onSuccess?.();
-                toast.success('Attachment uploaded successfully.');
             },
             onError: (err) => {
                 console.error('Error uploading attachment:', err);

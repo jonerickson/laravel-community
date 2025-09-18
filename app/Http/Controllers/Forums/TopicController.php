@@ -118,9 +118,6 @@ class TopicController extends Controller
         DeleteTopicAction::execute($topic, $forum);
 
         return to_route('forums.show', ['forum' => $forum])
-            ->with([
-                'message' => 'Topic deleted successfully.',
-                'messageVariant' => 'success',
-            ]);
+            ->with('message', 'The topic was successfully deleted.');
     }
 }

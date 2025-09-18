@@ -349,9 +349,6 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
         }));
 
         cancelSubscription(route('store.subscriptions.destroy'), {
-            onSuccess: () => {
-                toast.success(`Subscription ${immediate ? 'cancelled immediately' : 'scheduled to cancel at end of billing cycle'}.`);
-            },
             onError: (err) => {
                 console.log('Failed to cancel subscription:', err);
                 toast.error('Failed to cancel subscription. Please try again.');
@@ -372,9 +369,6 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
         }));
 
         continueSubscription(route('store.subscriptions.update'), {
-            onSuccess: () => {
-                toast.success('Subscription continued successfully.');
-            },
             onError: () => {
                 toast.error('Failed to continue subscription. Please try again.');
             },

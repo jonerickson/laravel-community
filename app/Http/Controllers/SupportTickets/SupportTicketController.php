@@ -23,7 +23,10 @@ class SupportTicketController extends Controller
 
     public function index(): Response
     {
-        $tickets = SupportTicket::with(['category', 'author', 'assignedTo'])
+        $tickets = SupportTicket::query()
+            ->with('category')
+            ->with('author')
+            ->with('assignedTo')
             ->whereBelongsTo(Auth::user(), 'author')
             ->latest()
             ->paginate(15);
@@ -50,7 +53,7 @@ class SupportTicketController extends Controller
         $ticket = $this->supportTicketManager->createTicket($validated);
 
         return to_route('support.show', $ticket)
-            ->with('message', 'Support ticket created successfully!');
+            ->with('message', 'Your support ticket was successfully created. Please check your email for updates.');
     }
 
     public function show(SupportTicket $ticket): Response

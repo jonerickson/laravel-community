@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Store;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Store\StoreProductRequest;
 use App\Models\Product;
-use App\Services\ShoppingCartService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -17,10 +16,6 @@ use Inertia\Response;
 
 class ProductController extends Controller
 {
-    public function __construct(
-        private readonly ShoppingCartService $cartService
-    ) {}
-
     public function store(StoreProductRequest $request, Product $product): RedirectResponse
     {
         $validated = $request->validated();
@@ -55,7 +50,7 @@ class ProductController extends Controller
 
         return to_route('store.products.show', [
             'product' => $product,
-        ]);
+        ])->with('message', 'The item was successfully added to your shopping cart.');
     }
 
     public function show(Request $request, Product $product): Response

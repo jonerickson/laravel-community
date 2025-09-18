@@ -34,6 +34,6 @@ class BillingController extends Controller
         $user = Auth::user();
         $user->update($request->validated());
 
-        return back()->with('message', 'Billing information updated successfully!');
+        return back()->with('message', 'Your billing information was updated successfully.');
     }
 }

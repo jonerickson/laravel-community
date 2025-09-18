@@ -37,7 +37,6 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
                 topic: topic.slug,
             }),
             {
-                onSuccess: () => toast.success(`The topic has been deleted.`),
                 onError: (err) => {
                     console.error('Error deleting topic:', err);
                     toast.error(err.message || 'Unable to delete topic. Please try again.');

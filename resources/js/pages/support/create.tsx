@@ -38,7 +38,6 @@ export default function CreateSupportTicket({ categories }: CreateSupportTicketP
         post(route('support.store'), {
             onSuccess: () => {
                 reset();
-                toast.success('Your support ticket has been successfully created. Please check your email for updates.');
             },
             onError: (err) => {
                 console.error('Error creating ticket:', err);

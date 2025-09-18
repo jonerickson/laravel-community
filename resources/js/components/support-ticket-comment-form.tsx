@@ -29,7 +29,6 @@ export default function SupportTicketCommentForm({ ticket, onCancel, onSuccess }
             onSuccess: () => {
                 reset();
                 onSuccess?.();
-                toast.success('Comment added successfully.');
             },
             onError: (err) => {
                 console.error('Error adding comment:', err);

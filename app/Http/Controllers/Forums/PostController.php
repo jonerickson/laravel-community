@@ -48,7 +48,7 @@ class PostController extends Controller
             'forum' => $forum,
             'topic' => $topic,
             'page' => $lastPage,
-        ])->with('scrollToBottom', true);
+        ])->with('scrollToBottom', true)->with('message', 'Your reply was successfully added.');
     }
 
     /**
@@ -96,10 +96,7 @@ class PostController extends Controller
         $post->update($validated);
 
         return to_route('forums.topics.show', ['forum' => $forum, 'topic' => $topic])
-            ->with([
-                'message' => 'Post updated successfully.',
-                'messageVariant' => 'success',
-            ]);
+            ->with('message', 'The post was successfully updated.');
     }
 
     /**
@@ -119,10 +116,6 @@ class PostController extends Controller
 
         $post->delete();
 
-        return to_route('forums.topics.show', ['forum' => $forum, 'topic' => $topic, 'post' => $post])
-            ->with([
-                'message' => 'Post deleted successfully.',
-                'messageVariant' => 'success',
-            ]);
+        return back()->with('message', 'The post was successfully deleted.');
     }
 }

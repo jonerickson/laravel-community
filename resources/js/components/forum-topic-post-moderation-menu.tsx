@@ -43,7 +43,6 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                 post: post.slug,
             }),
             {
-                onSuccess: () => toast.success(`The post has been deleted.`),
                 onError: (err) => {
                     console.error('Error deleting post:', err);
                     toast.error(err.message || 'Unable to delete post. Please try again.');

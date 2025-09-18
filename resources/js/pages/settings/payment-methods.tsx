@@ -15,7 +15,6 @@ import { useApiRequest } from '@/hooks/use-api-request';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { CreditCard, Plus } from 'lucide-react';
-import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -56,10 +55,7 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
                 },
             },
             {
-                onSuccess: () => {
-                    router.reload({ only: ['paymentMethods'] });
-                    toast.success('Payment method updated successfully.');
-                },
+                onSuccess: () => router.reload({ only: ['paymentMethods'] }),
             },
         );
     };

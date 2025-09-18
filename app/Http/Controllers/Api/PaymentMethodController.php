@@ -46,16 +46,16 @@ class PaymentMethodController
             paymentMethodId: $validated['method']
         );
 
-        if (! $created) {
+        if (blank($created)) {
             return ApiResource::error(
-                message: 'Payment method creation failed.',
+                message: 'The payment method creation failed. Please try again later.',
                 status: 404
             );
         }
 
         return ApiResource::success(
             resource: $created,
-            message: 'Payment method successfully added.',
+            message: 'Your payment method was successfully added.',
         );
     }
 
@@ -74,13 +74,13 @@ class PaymentMethodController
 
         if (! $deleted) {
             return ApiResource::error(
-                message: 'Payment method not found.',
+                message: 'The payment method was not found. Please try again later.',
                 status: 404
             );
         }
 
         return ApiResource::success(
-            message: 'Payment method successfully deleted.',
+            message: 'The payment method was successfully deleted.',
         );
     }
 
@@ -101,13 +101,13 @@ class PaymentMethodController
 
         if (! $updated) {
             return ApiResource::error(
-                message: 'Payment method not found.',
+                message: 'The payment method was not found. Please try again later.',
                 status: 404
             );
         }
 
         return ApiResource::success(
-            message: 'Payment method updated successfully.',
+            message: 'The payment method was updated successfully.',
         );
     }
 }

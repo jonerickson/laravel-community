@@ -1,7 +1,10 @@
 import { AbstractBackgroundPattern } from '@/components/ui/abstract-background-pattern';
+import { useFlashMessages } from '@/hooks/use-flash-messages';
 import AuthLayoutTemplate from '@/layouts/auth/auth-simple-layout';
 
 export default function AuthLayout({ children, title, description, ...props }: { children: React.ReactNode; title: string; description: string }) {
+    useFlashMessages();
+
     return (
         <div className="relative overflow-hidden">
             <div className="pointer-events-none absolute right-0 bottom-0 z-10">

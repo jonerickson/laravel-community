@@ -378,7 +378,7 @@ class StripeDriver implements PaymentProcessor
                 );
             }
 
-            return route('store.subscriptions');
+            return true;
         }
 
         /** @var ?OrderItem $allowPromotionCodes */

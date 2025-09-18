@@ -112,8 +112,6 @@ export function useCartOperations(initialItems: App.Data.CartItemData[] = []) {
                             },
                         }),
                     );
-
-                    toast.success('The item has been successfully removed from your cart.');
                 },
                 onSettled: () => {
                     setLoading(null);

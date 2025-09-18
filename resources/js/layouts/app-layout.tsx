@@ -1,3 +1,4 @@
+import { useFlashMessages } from '@/hooks/use-flash-messages';
 import { useLayout } from '@/hooks/use-layout';
 import AppHeaderLayout from '@/layouts/app/app-header-layout';
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
@@ -14,6 +15,8 @@ interface AppLayoutProps {
 export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
     const { auth } = usePage<App.Data.SharedData>().props;
     const { layout } = useLayout();
+
+    useFlashMessages();
 
     const LayoutComponent = layout === 'header' || !auth?.user ? AppHeaderLayout : AppSidebarLayout;
 

@@ -62,7 +62,13 @@ class SubscriptionsController extends Controller
         );
 
         if (! $result) {
-            return back()->with('message', 'Unable to start subscription. Please try again later.');
+            return back()
+                ->with('message', 'We were unable to start your subscription. Please try again later.');
+        }
+
+        if ($result === true) {
+            return to_route('store.subscriptions')
+                ->with('message', 'Your subscription was successfully updated.');
         }
 
         return Inertia::location($result);
@@ -76,10 +82,10 @@ class SubscriptionsController extends Controller
 
         if ($success) {
             return to_route('store.subscriptions')
-                ->with('message', 'Subscription continued successfully.');
+                ->with('message', 'Your subscription has resumed successfully.');
         }
 
-        return back()->with('message', 'Failed to continue subscription.');
+        return back()->with('message', 'We were unable to resume your subscription. Please try again later.');
     }
 
     public function destroy(SubscriptionCancelRequest $request): RedirectResponse
@@ -92,15 +98,15 @@ class SubscriptionsController extends Controller
             cancelNow: $immediate
         );
 
-        if ($success) {
-            $message = $immediate
-                ? 'Subscription cancelled immediately.'
-                : 'Subscription scheduled to cancel at end of billing cycle.';
-
-            return to_route('store.subscriptions')
-                ->with('message', $message);
+        if (! $success) {
+            return back()->with('message', 'Your subscription failed to cancel. Please try again later.');
         }
 
-        return back()->with('message', 'Failed to cancel subscription.');
+        $message = $immediate
+            ? 'Your subscription has been cancelled immediately.'
+            : 'Your subscription has been scheduled to cancel at the end of the billing cycle.';
+
+        return to_route('store.subscriptions')
+            ->with('message', $message);
     }
 }

@@ -31,6 +31,6 @@ class ShoppingCartController extends Controller
     {
         $this->cartService->clearCart();
 
-        return to_route('store.cart.index')->with('success', 'Cart cleared');
+        return back()->with('message', 'The item was successfully removed from your shopping cart.');
     }
 }

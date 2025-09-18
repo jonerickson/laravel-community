@@ -12,7 +12,7 @@ export function EmailVerificationBanner() {
 
     const handleResendVerification = () => {
         post(route('verification.send'), {
-            onSuccess: () => toast.success('Email verification successfully resent.'),
+            onSuccess: () => toast.success('The email verification was successfully resent.'),
         });
     };
 

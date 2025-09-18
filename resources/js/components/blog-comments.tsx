@@ -70,7 +70,6 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
             onSuccess: () => {
                 reset();
                 onReply(0);
-                toast.success('The reply has been successfully added.');
             },
             onError: (err) => {
                 console.error('Error adding reply:', err);
@@ -89,7 +88,6 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
         }
 
         deleteComment(route('blog.comments.destroy', { post, comment }), {
-            onSuccess: () => toast.success('The comment has been successfully deleted.'),
             onError: (err) => {
                 console.error('Error deleting comment:', err);
                 toast.error(err.message || 'Unable to delete comment. Please try again.');
@@ -106,7 +104,6 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
         updateComment(route('blog.comments.update', { post, comment }), {
             onSuccess: () => {
                 setIsEditing(false);
-                toast.success('The comment has been successfully updated.');
             },
             onError: (err) => {
                 console.error('Error updating comment:', err);
@@ -254,7 +251,6 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
         submitComment(route('blog.comments.store', { post }), {
             onSuccess: () => {
                 reset();
-                toast.success('The comment has been successfully added.');
             },
             onError: (err) => {
                 console.error('Error adding comment:', err);

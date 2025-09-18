@@ -29,7 +29,9 @@ class BlogController extends Controller
         /** @var LengthAwarePaginator $posts */
         $posts = Post::query()
             ->blog()
-            ->with(['comments', 'author', 'reads'])
+            ->with('comments')
+            ->with('author')
+            ->with('reads')
             ->published()
             ->latest()
             ->paginate(

@@ -62,7 +62,7 @@ class ShoppingCartController extends Controller
 
         return ApiResource::updated(
             resource: $cartResponse,
-            message: 'Cart updated successfully.'
+            message: 'Your cart has been successfully updated.'
         );
     }
 

@@ -33,6 +33,6 @@ class IntegrationsController extends Controller
 
         $social->delete();
 
-        return to_route('settings.integrations.index');
+        return back()->with('message', 'The integration was successfully deleted.');
     }
 }

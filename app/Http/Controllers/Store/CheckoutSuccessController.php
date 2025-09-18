@@ -33,6 +33,7 @@ class CheckoutSuccessController extends Controller
             return redirect(urldecode($redirect));
         }
 
-        return to_route('settings.orders');
+        return to_route('settings.orders')
+            ->with('message', 'The order was successfully processed.');
     }
 }

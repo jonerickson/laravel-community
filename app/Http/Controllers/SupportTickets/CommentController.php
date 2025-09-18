@@ -31,7 +31,7 @@ class CommentController extends Controller
         );
 
         return to_route('support.show', $ticket)
-            ->with('message', 'Comment added successfully!');
+            ->with('message', 'Your reply was successfully created.');
     }
 
     public function destroy(SupportTicket $ticket, Comment $comment): RedirectResponse
@@ -42,6 +42,6 @@ class CommentController extends Controller
         $this->supportTicketManager->deleteComment($ticket, $comment);
 
         return to_route('support.show', $ticket)
-            ->with('message', 'Comment deleted successfully!');
+            ->with('message', 'The reply was successfully deleted.');
     }
 }

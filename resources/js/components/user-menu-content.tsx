@@ -3,7 +3,7 @@ import { UserInfo } from '@/components/user-info';
 import { useLayout } from '@/hooks';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { Link, router, usePage } from '@inertiajs/react';
-import { CircleDollarSign, CircleUser, CreditCard, DollarSign, LogOut, Settings, TowerControl } from 'lucide-react';
+import { BookOpen, CircleDollarSign, CircleUser, CreditCard, DollarSign, LogOut, Settings, TowerControl } from 'lucide-react';
 
 interface UserMenuContentProps {
     user: App.Data.UserData;
@@ -71,6 +71,12 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                     <Link className="block w-full" href={route('settings.profile.edit')} as="button" prefetch onClick={cleanup}>
                         <Settings className="mr-2" />
                         Settings
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link className="block w-full" href={route('support.index')} as="button" prefetch onClick={cleanup}>
+                        <BookOpen className="mr-2" />
+                        Support
                     </Link>
                 </DropdownMenuItem>
             </DropdownMenuGroup>
