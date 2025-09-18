@@ -36,7 +36,7 @@ export function usePaymentMethods() {
 
         const setupIntentData = await executeSetupIntent(
             {
-                url: route('api.payment-methods.create'),
+                url: route('api.payment-methods'),
                 method: 'GET',
             },
             {},

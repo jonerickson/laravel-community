@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class PaymentMethodController
 {
-    public function create(): ApiResource
+    public function __invoke(): ApiResource
     {
         $user = Auth::user();
         $setupIntent = $user->createSetupIntent();
