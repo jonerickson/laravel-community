@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Illuminate\Database\Eloquent\Collection getPaymentMethods(\App\Models\User $user)
  * @method static bool updatePaymentMethod(\App\Models\User $user, string $paymentMethodId, bool $isDefault)
  * @method static bool deletePaymentMethod(\App\Models\User $user, string $paymentMethodId)
- * @method static string|bool startSubscription(\App\Models\User $user, \App\Models\Order $order)
+ * @method static string|bool startSubscription(\App\Models\User $user, \App\Models\Order $order, bool $chargeNow = true)
  * @method static bool cancelSubscription(\App\Models\User $user, bool $cancelNow = false)
  * @method static bool continueSubscription(\App\Models\User $user)
  * @method static \App\Data\SubscriptionData|null currentSubscription(\App\Models\User $user)

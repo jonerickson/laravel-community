@@ -41,7 +41,7 @@ interface PaymentProcessor
 
     public function deletePaymentMethod(User $user, string $paymentMethodId): bool;
 
-    public function startSubscription(User $user, Order $order): bool|string;
+    public function startSubscription(User $user, Order $order, bool $chargeNow = true): bool|string;
 
     public function cancelSubscription(User $user, bool $cancelNow = false): bool;
 
