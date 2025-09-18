@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Contracts\SupportTicketService;
+use App\Contracts\SupportTicketProvider;
 use App\Drivers\SupportTickets\DatabaseDriver;
 use App\Enums\SupportTicketStatus;
 use App\Models\SupportTicket;
@@ -10,7 +10,7 @@ use App\Models\SupportTicketCategory;
 use App\Models\User;
 
 beforeEach(function (): void {
-    $this->driver = app(SupportTicketService::class);
+    $this->driver = app(SupportTicketProvider::class);
 });
 
 it('can create ticket through driver', function (): void {
@@ -120,7 +120,7 @@ it('returns correct driver name', function (): void {
 });
 
 it('can resolve driver from container', function (): void {
-    $driver = app(SupportTicketService::class);
+    $driver = app(SupportTicketProvider::class);
 
     expect($driver)->toBeInstanceOf(DatabaseDriver::class)
         ->and($driver->getDriverName())->toBe('database');

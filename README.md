@@ -15,18 +15,22 @@ A modern Laravel + React marketplace application built with Inertia.js, featurin
 
 - **Backend**: Laravel 12, PHP 8.2+
 - **Frontend**: React 19, TypeScript, Inertia.js
-- **Styling**: Tailwind CSS, shadcn/ui, Radix UI
+- **Styling**: Tailwind CSS v4, shadcn/ui, Lucide React
 - **Database**: SQLite (development), MySQL/PostgreSQL (production)
-- **Payment Processing**: Stripe via Laravel Cashier
-- **Admin Interface**: Filament
-- **Build Tools**: Vite, Laravel Mix
+- **Payment Processing**: Stripe via Laravel Cashier or custom implementation
+- **Support Tickets**: Default database driver or custom implementation
+- **Admin Interface**: Filament v4
+- **User Marketplace Interface**: Filament v4
+- **Build Tools**: Vite
+- **Code Quality**: Laravel Pint, PHPStan, Rector, ESLint, Prettier
+- **Testing**: Pest
 
 ## Getting Started
 
 ### Prerequisites
 
 - PHP 8.2+
-- Node.js 18+
+- Node.js 22+
 - Composer
 - SQLite (for development)
 
@@ -103,16 +107,26 @@ This project includes automated code quality tools:
 - `composer cs-fix` - Fix code style with Pint
 - `composer analyze` - Run PHPStan analysis
 - `composer ide` - Generate IDE helper files
+- `composer facades` - Generate Facade documentation
 
 **JavaScript/TypeScript:**
 - `npm run lint` - Run ESLint
 - `npm run format` - Format with Prettier
 - `npm run types` - TypeScript type checking
+- `composer types` - Generate typescript definitions
 
 **Testing:**
 - `composer test` - Run all tests
-- `composer test-coverage` - Run tests with coverage
-- Uses Pest testing framework
+- `composer tf` - Run tests with coverage
+- `composer tc` - Run test suite with type coverage
+
+## Webhooks
+
+When using Stripe as the payment processor, you can listen for webhooks locally with:
+
+```bash
+stripe listen --forward-to=https://mi.test/stripe/webhook --events="customer.subscription.created,customer.subscription.updated,customer.subscription.deleted,customer.updated,customer.deleted,payment_method.automatically_updated,invoice.payment_action_required,invoice.payment_succeeded"
+```
 
 ## Project Structure
 
@@ -125,18 +139,55 @@ app/
 └── Providers/             # Service providers
 
 resources/
+├── css/
+│   └── filament/
+│       ├── admin/        # Admin panel styles
+│       └── marketplace/  # Marketplace panel styles
 ├── js/
-│   ├── components/        # React components
+│   ├── components/
+│   │   └── ui/           # shadcn/ui component library
+│   ├── hooks/            # Custom React hooks
+│   ├── layouts/
+│   │   ├── app/          # Main application layout
+│   │   ├── auth/         # Authentication layout
+│   │   └── settings/     # Settings layout
+│   ├── lib/              # Utility libraries
 │   ├── pages/            # Inertia.js pages
-│   ├── layouts/          # Page layouts
-│   └── hooks/            # Custom React hooks
-└── css/                  # Stylesheets
+│   │   ├── auth/         # Authentication pages
+│   │   ├── blog/         # Blog pages
+│   │   ├── forums/       # Forum pages
+│   │   │   ├── categories/
+│   │   │   ├── posts/
+│   │   │   └── topics/
+│   │   ├── oauth/        # OAuth callback pages
+│   │   ├── policies/     # Policy pages
+│   │   ├── settings/     # User settings pages
+│   │   ├── store/        # Store pages
+│   │   │   ├── categories/
+│   │   │   └── products/
+│   │   └── support/      # Support ticket pages
+│   ├── services/         # Service classes
+│   ├── types/            # TypeScript type definitions
+│   └── utils/            # Utility functions
+└── views/
+    ├── errors/           # Error page templates
+    └── filament/
+        ├── admin/
+        │   ├── pages/    # Custom admin pages
+        │   └── reports/  # Report templates
+        └── components/   # Custom Filament components
 
 routes/
-├── web.php               # Web routes
+├── web.php               # Main web routes
+├── api.php               # API routes
 ├── auth.php              # Authentication routes
-├── store.php             # Marketplace routes
-└── settings.php          # User settings routes
+├── blog.php              # Blog routes
+├── console.php           # Console commands
+├── forums.php            # Forum routes
+├── policies.php          # Policy routes
+├── settings.php          # User settings routes
+├── store.php             # Store routes
+└── support.php           # Support ticket routes
 ```
 
 ## Key Features
@@ -164,6 +215,21 @@ routes/
 - User and role management
 - Product and category administration
 - Permission-based access control
+
+### Payment Processing
+- Modular payment processor architecture using the Manager pattern
+- Default Stripe driver implementation
+- Any payment processor can be implemented by creating a driver that implements the `PaymentProcessor` contract
+- Supports product/price management, payment methods, subscriptions, and checkout flows
+- Configure payment driver in `config/payment.default`
+
+### Support Ticket Management
+- Flexible support ticket system using the Manager pattern
+- Default database driver for local ticket storage
+- External service integration capability through driver implementation
+- Any support service can be integrated by implementing the `SupportTicketProvider` contract
+- Features include ticket CRUD, comments, assignments, status management, and file attachments
+- Configure support driver in `config/support-tickets.default`
 
 ## Environment Configuration
 

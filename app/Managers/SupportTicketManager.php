@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Managers;
 
-use App\Contracts\SupportTicketService;
+use App\Contracts\SupportTicketProvider;
 use App\Drivers\SupportTickets\DatabaseDriver;
 use App\Enums\SupportTicketStatus;
 use App\Models\Comment;
@@ -12,7 +12,7 @@ use App\Models\SupportTicket;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Manager;
 
-class SupportTicketManager extends Manager implements SupportTicketService
+class SupportTicketManager extends Manager implements SupportTicketProvider
 {
     public function getDefaultDriver(): string
     {
@@ -109,7 +109,7 @@ class SupportTicketManager extends Manager implements SupportTicketService
         return $this->driver()->getDriverName();
     }
 
-    protected function createDatabaseDriver(): SupportTicketService
+    protected function createDatabaseDriver(): SupportTicketProvider
     {
         return new DatabaseDriver($this->container);
     }

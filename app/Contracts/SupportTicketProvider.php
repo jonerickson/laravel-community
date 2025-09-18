@@ -9,7 +9,7 @@ use App\Models\Comment;
 use App\Models\SupportTicket;
 use Illuminate\Support\Collection;
 
-interface SupportTicketService
+interface SupportTicketProvider
 {
     public function createTicket(array $data): SupportTicket;
 
