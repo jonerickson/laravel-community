@@ -132,11 +132,23 @@ stripe listen --forward-to=https://mi.test/stripe/webhook --events="customer.sub
 
 ```
 app/
-├── Filament/Resources/     # Admin panel resources
-├── Http/Controllers/       # API and web controllers
+├── Actions/               # Action classes
+├── Contracts/             # Interface contracts
+├── Data/                  # Data transfer objects
+├── Drivers/               # Driver implementations (Payments, SupportTickets)
+├── Enums/                 # Application enumerations
+├── Events/                # Event classes
+├── Exceptions/            # Custom exception classes
+├── Facades/               # Application facades
+├── Filament/              # Filament admin and marketplace resources
+├── Http/                  # Controllers, middleware, requests, resources
+├── Listeners/             # Event listeners
+├── Managers/              # Service managers (Payment, SupportTicket)
 ├── Models/                # Eloquent models
 ├── Policies/              # Authorization policies
-└── Providers/             # Service providers
+├── Providers/             # Service providers
+├── Services/              # Business logic services
+└── Traits/                # Reusable traits
 
 resources/
 ├── css/
