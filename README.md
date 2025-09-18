@@ -4,13 +4,15 @@ A modern Laravel + React marketplace application built with Inertia.js, featurin
 
 ## Features
 
-- **User Management**: Registration, authentication, email verification, and social login (Discord, Roblox)
+- **User Management**: Registration, authentication, email verification, and extensible social login providers
 - **E-Commerce Store**: Product catalog with categories, user-generated content, and file attachments
 - **User Marketplace**: User-provided products for customers to purchase with management dashboard
 - **Blog System**: Content management with posts and categories
 - **Forum Platform**: Community discussions with topics, posts, and categories
-- **Subscription Billing**: Stripe integration with Laravel Cashier for payments and subscriptions
-- **Admin Panel**: Filament-powered admin interface for managing products, categories, and users
+- **Policy System**: Terms of service, privacy policies, and other legal documents with categorization
+- **Social Integrations**: Extensible OAuth authentication system with custom provider support
+- **Subscription Billing**: Modular payment system with Stripe as default (custom payment processors supported)
+- **Admin Panel**: Filament-powered admin interface for managing products, categories, users, posts and subscriptions
 - **Role-Based Access**: Permission system using Spatie Laravel Permission
 - **Modern Frontend**: React 19 with TypeScript, Tailwind CSS, and shadcn/ui components
 
@@ -20,8 +22,8 @@ A modern Laravel + React marketplace application built with Inertia.js, featurin
 - **Frontend**: React 19, TypeScript, Inertia.js
 - **Styling**: Tailwind CSS v4, shadcn/ui, Lucide React
 - **Database**: SQLite (development), MySQL/PostgreSQL (production)
-- **Payment Processing**: Stripe via Laravel Cashier or custom implementation
-- **Support Tickets**: Default database driver or custom implementation
+- **Payment Processing**: Modular payment processor system (default: Stripe, supports custom drivers)
+- **Support Tickets**: Modular ticket system (default: database, supports external services)
 - **Admin Interface**: Filament v4
 - **User Marketplace Interface**: Filament v4
 - **Build Tools**: Vite
@@ -125,7 +127,7 @@ This project includes automated code quality tools:
 
 ## Webhooks
 
-When using Stripe as the payment processor, you can listen for webhooks locally with:
+When using the default Stripe payment processor, you can listen for webhooks locally with:
 
 ```bash
 stripe listen --forward-to=https://mi.test/stripe/webhook --events="customer.subscription.created,customer.subscription.updated,customer.subscription.deleted,customer.updated,customer.deleted,payment_method.automatically_updated,invoice.payment_action_required,invoice.payment_succeeded"
@@ -210,17 +212,19 @@ routes/
 ### Authentication
 - Email/password registration and login
 - Email verification
-- Social authentication (Discord, Roblox)
+- Extensible social authentication providers
 - Password reset functionality
 
-### Store
-- Product catalog with categories
-- File uploads and attachments
-- User-generated storeProduct listings
-- Search and filtering
+### Store & User Marketplace
+- Product catalog with categories and search/filtering
+- File uploads and attachments for products
+- User marketplace where third-party sellers can submit products for sale
+- Automated seller payouts using extensible payout system (default: Stripe Connect)
+- Marketplace management dashboard for sellers
+- Revenue sharing and commission tracking
 
 ### Billing & Subscriptions
-- Stripe payment processing
+- Modular payment processing (default: Stripe, custom processors supported)
 - Subscription management
 - Invoice generation
 - Payment method management
@@ -239,35 +243,12 @@ routes/
 - Configure payment driver in `config/payment.default`
 
 ### Support Ticket Management
-- Flexible support ticket system using the Manager pattern
+- Modular support ticket system using the Manager pattern
 - Default database driver for local ticket storage
-- External service integration capability through driver implementation
+- External service integration (Zendesk, etc.) through custom drivers
 - Any support service can be integrated by implementing the `SupportTicketProvider` contract
 - Features include ticket CRUD, comments, assignments, status management, and file attachments
 - Configure support driver in `config/support-tickets.default`
-
-## Environment Configuration
-
-Key environment variables:
-
-```env
-APP_NAME="Mountain Interactive"
-APP_URL=http://mi.test
-
-# Database
-DB_CONNECTION=sqlite
-
-# Stripe
-STRIPE_KEY=your-stripe-key
-STRIPE_SECRET=your-stripe-secret
-STRIPE_WEBHOOK_SECRET=your-stripe-webhook-secret
-
-# Social Authentication
-DISCORD_CLIENT_ID=
-DISCORD_CLIENT_SECRET=
-ROBLOX_CLIENT_ID=
-ROBLOX_CLIENT_SECRET=
-```
 
 ## Contributing
 
