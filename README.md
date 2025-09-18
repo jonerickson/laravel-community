@@ -5,7 +5,10 @@ A modern Laravel + React marketplace application built with Inertia.js, featurin
 ## Features
 
 - **User Management**: Registration, authentication, email verification, and social login (Discord, Roblox)
-- **Product Marketplace**: Product catalog with categories, user-generated content, and file attachments
+- **E-Commerce Store**: Product catalog with categories, user-generated content, and file attachments
+- **User Marketplace**: User-provided products for customers to purchase with management dashboard
+- **Blog System**: Content management with posts and categories
+- **Forum Platform**: Community discussions with topics, posts, and categories
 - **Subscription Billing**: Stripe integration with Laravel Cashier for payments and subscriptions
 - **Admin Panel**: Filament-powered admin interface for managing products, categories, and users
 - **Role-Based Access**: Permission system using Spatie Laravel Permission
@@ -210,7 +213,7 @@ routes/
 - Social authentication (Discord, Roblox)
 - Password reset functionality
 
-### Marketplace
+### Store
 - Product catalog with categories
 - File uploads and attachments
 - User-generated storeProduct listings
