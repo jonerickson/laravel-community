@@ -32,17 +32,12 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
-use UnitEnum;
 
 class ForumResource extends Resource
 {
     protected static ?string $model = Forum::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
-
-    protected static string|UnitEnum|null $navigationGroup = 'Forums';
-
-    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {
@@ -141,7 +136,7 @@ class ForumResource extends Resource
             ])
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label('Status')
+                    ->label('Active')
                     ->trueLabel('Active forums only')
                     ->falseLabel('Inactive forums only')
                     ->native(false),

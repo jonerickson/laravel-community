@@ -32,8 +32,6 @@ class ActivityLogResource extends Resource
 
     protected static ?string $navigationLabel = 'Logs';
 
-    protected static ?int $navigationSort = 6;
-
     protected static ?string $label = 'log';
 
     public static function table(Table $table): Table

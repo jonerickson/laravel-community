@@ -28,8 +28,6 @@ class ClientResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'System';
 
-    protected static ?int $navigationSort = 6;
-
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Schema $schema): Schema
@@ -45,13 +43,6 @@ class ClientResource extends Resource
     public static function table(Table $table): Table
     {
         return ClientsTable::configure($table);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
     }
 
     public static function getEloquentQuery(): Builder

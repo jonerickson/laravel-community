@@ -38,17 +38,12 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
-use UnitEnum;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Store';
-
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shopping-cart';
-
-    protected static ?int $navigationSort = 4;
 
     public static function form(Schema $schema): Schema
     {
@@ -150,7 +145,7 @@ class ProductResource extends Resource
                         Section::make('Publishing')
                             ->components([
                                 Toggle::make('is_featured')
-                                    ->label('Featured product')
+                                    ->label('Featured')
                                     ->helperText('Mark this product as featured to display it prominently on the store page.')
                                     ->columnSpanFull(),
                                 Toggle::make('is_subscription_only')

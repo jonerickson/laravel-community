@@ -36,8 +36,6 @@ class ApiTokenResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'System';
 
-    protected static ?int $navigationSort = 6;
-
     protected static ?string $label = 'API Key';
 
     public static function form(Schema $schema): Schema

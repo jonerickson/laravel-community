@@ -17,50 +17,59 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
-use UnitEnum;
 
 class PolicyCategoryResource extends Resource
 {
     protected static ?string $model = PolicyCategory::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-folder';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFolder;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Policies';
-
-    protected static ?string $label = 'category';
-
-    protected static ?int $navigationSort = 3;
+    protected static ?string $label = 'policy category';
 
     public static function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(3)
             ->components([
-                Section::make('Category Information')
-                    ->columnSpanFull()
-                    ->columns()
+                Group::make()
+                    ->columnSpan(['lg' => 2])
                     ->schema([
-                        TextInput::make('name')
-                            ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $context, $state, Set $set): mixed => $context === 'create' ? $set('slug', Str::slug($state)) : null),
-                        TextInput::make('slug')
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(ignoreRecord: true),
-                        Textarea::make('description')
-                            ->columnSpanFull(),
-                        Toggle::make('is_active')
-                            ->helperText('Enable the category for viewing.')
-                            ->default(true)
-                            ->required(),
+                        Section::make('Category Information')
+                            ->columnSpanFull()
+                            ->columns()
+                            ->schema([
+                                TextInput::make('name')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(fn (string $context, $state, Set $set): mixed => $context === 'create' ? $set('slug', Str::slug($state)) : null),
+                                TextInput::make('slug')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->unique(ignoreRecord: true),
+                                Textarea::make('description')
+                                    ->columnSpanFull(),
+                            ]),
+                    ]),
+                Group::make()
+                    ->schema([
+                        Section::make('Publishing')
+                            ->schema([
+                                Toggle::make('is_active')
+                                    ->label('Active')
+                                    ->helperText('Enable the category for viewing.')
+                                    ->required()
+                                    ->default(true),
+                            ]),
                     ]),
             ]);
     }

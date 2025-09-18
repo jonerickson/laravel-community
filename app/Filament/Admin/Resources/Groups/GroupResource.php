@@ -34,17 +34,12 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
-use UnitEnum;
 
 class GroupResource extends Resource
 {
     protected static ?string $model = Group::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
-
-    protected static string|UnitEnum|null $navigationGroup = 'Users';
-
-    protected static ?int $navigationSort = 5;
 
     public static function form(Schema $schema): Schema
     {

@@ -52,6 +52,7 @@ class CommentsRelationManager extends RelationManager
                     ->nullable()
                     ->helperText('Select a parent comment if this is a reply.'),
                 Toggle::make('is_approved')
+                    ->label('Approved')
                     ->default(false)
                     ->helperText('Approve this comment to make it visible to users.'),
             ]);

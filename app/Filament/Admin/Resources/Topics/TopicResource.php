@@ -7,9 +7,7 @@ namespace App\Filament\Admin\Resources\Topics;
 use App\Filament\Admin\Resources\Topics\Pages\CreateTopic;
 use App\Filament\Admin\Resources\Topics\Pages\EditTopic;
 use App\Filament\Admin\Resources\Topics\Pages\ListTopics;
-use App\Models\Forum;
 use App\Models\Topic;
-use App\Models\User;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -20,13 +18,14 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use UnitEnum;
 
 class TopicResource extends Resource
 {
@@ -34,34 +33,50 @@ class TopicResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-pencil-square';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Forums';
-
-    protected static ?int $navigationSort = 2;
-
     public static function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(3)
             ->components([
-                Select::make('forum_id')
-                    ->label('Forum')
-                    ->options(Forum::active()->pluck('name', 'id'))
-                    ->required()
-                    ->searchable(),
-                TextInput::make('title')
-                    ->required()
-                    ->maxLength(255),
-                Textarea::make('description')
-                    ->maxLength(500)
-                    ->rows(3),
-                Select::make('created_by')
-                    ->label('Author')
-                    ->options(User::pluck('name', 'id'))
-                    ->required()
-                    ->searchable(),
-                Toggle::make('is_pinned')
-                    ->label('Pinned'),
-                Toggle::make('is_locked')
-                    ->label('Locked'),
+                Group::make()
+                    ->columnSpan(['lg' => 2])
+                    ->schema([
+                        Section::make('Topic Information')
+                            ->columnSpanFull()
+                            ->schema([
+                                Select::make('forum_id')
+                                    ->label('Forum')
+                                    ->relationship('forum', 'name')
+                                    ->preload()
+                                    ->required()
+                                    ->searchable(),
+                                TextInput::make('title')
+                                    ->required()
+                                    ->maxLength(255),
+                                Textarea::make('description')
+                                    ->maxLength(500)
+                                    ->rows(3),
+                                Select::make('created_by')
+                                    ->label('Author')
+                                    ->relationship('author', 'name')
+                                    ->preload()
+                                    ->required()
+                                    ->searchable(),
+                            ]),
+                    ]),
+                Group::make()
+                    ->schema([
+                        Section::make('Publishing')
+                            ->columns(1)
+                            ->schema([
+                                Toggle::make('is_pinned')
+                                    ->helperText('Toggle to pin/unpin this topic.')
+                                    ->label('Pinned'),
+                                Toggle::make('is_locked')
+                                    ->helperText('Toggle to lock/unlock this topic.')
+                                    ->label('Locked'),
+                            ]),
+                    ]),
             ]);
     }
 

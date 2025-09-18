@@ -39,17 +39,12 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use UnitEnum;
 
 class PostResource extends Resource
 {
     protected static ?string $model = Post::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Blog';
-
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
-
-    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {
@@ -125,12 +120,14 @@ class PostResource extends Resource
                             ->columns(1)
                             ->schema([
                                 Toggle::make('is_featured')
+                                    ->label('Featured')
                                     ->default(false)
                                     ->helperText('Feature this post on the homepage.'),
                                 Toggle::make('comments_enabled')
                                     ->default(true)
                                     ->helperText('Allow users to comment on this post.'),
                                 Toggle::make('is_published')
+                                    ->label('Published')
                                     ->default(true)
                                     ->live()
                                     ->helperText('Publish this post immediately.'),

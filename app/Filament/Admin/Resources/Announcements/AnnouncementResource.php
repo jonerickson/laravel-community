@@ -22,6 +22,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
@@ -44,71 +45,76 @@ class AnnouncementResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(3)
             ->components([
-                Section::make('Announcement Details')
-                    ->columnSpanFull()
+                Group::make()
+                    ->columnSpan(['lg' => 2])
                     ->schema([
-                        TextInput::make('title')
-                            ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $context, $state, Set $set): mixed => $context === 'create' ? $set('slug', Str::slug($state)) : null),
-                        TextInput::make('slug')
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(ignoreRecord: true)
-                            ->rules(['alpha_dash']),
-                        Select::make('type')
-                            ->required()
-                            ->options(AnnouncementType::class)
-                            ->default(AnnouncementType::Info->value)
-                            ->native(false),
-                        RichEditor::make('content')
-                            ->required()
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(2),
-
-                Section::make('Settings')
-                    ->columnSpanFull()
+                        Section::make('Announcement Details')
+                            ->columnSpanFull()
+                            ->columns()
+                            ->schema([
+                                TextInput::make('title')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(fn (string $context, $state, Set $set): mixed => $context === 'create' ? $set('slug', Str::slug($state)) : null),
+                                TextInput::make('slug')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->unique(ignoreRecord: true)
+                                    ->rules(['alpha_dash']),
+                                Select::make('type')
+                                    ->columnSpanFull()
+                                    ->required()
+                                    ->options(AnnouncementType::class)
+                                    ->default(AnnouncementType::Info->value)
+                                    ->native(false),
+                                RichEditor::make('content')
+                                    ->required()
+                                    ->columnSpanFull(),
+                            ]),
+                        Section::make('Schedule')
+                            ->columnSpanFull()
+                            ->columns()
+                            ->schema([
+                                DateTimePicker::make('starts_at')
+                                    ->label('Start Date & Time')
+                                    ->helperText('Leave empty to display immediately.')
+                                    ->native(false),
+                                DateTimePicker::make('ends_at')
+                                    ->label('End Date & Time')
+                                    ->helperText('Leave empty to display indefinitely.')
+                                    ->after('starts_at')
+                                    ->native(false),
+                            ]),
+                    ]),
+                Group::make()
                     ->schema([
-                        Toggle::make('is_active')
-                            ->label('Active')
-                            ->default(true)
-                            ->helperText('Only active announcements will be displayed to users.'),
-                        Toggle::make('is_dismissible')
-                            ->label('Dismissible')
-                            ->default(true)
-                            ->helperText('Allow users to dismiss this announcement.'),
-                    ])
-                    ->columns(2),
-
-                Section::make('Schedule')
-                    ->columnSpanFull()
-                    ->schema([
-                        DateTimePicker::make('starts_at')
-                            ->label('Start Date & Time')
-                            ->helperText('Leave empty to display immediately.')
-                            ->native(false),
-                        DateTimePicker::make('ends_at')
-                            ->label('End Date & Time')
-                            ->helperText('Leave empty to display indefinitely.')
-                            ->after('starts_at')
-                            ->native(false),
-                    ])
-                    ->columns(2),
-
-                Section::make('Author')
-                    ->columnSpanFull()
-                    ->schema([
-                        Select::make('created_by')
-                            ->relationship('author', 'name')
-                            ->required()
-                            ->default(Auth::id())
-                            ->preload()
-                            ->searchable(),
-                    ])
-                    ->collapsed(),
+                        Section::make('Settings')
+                            ->columnSpanFull()
+                            ->schema([
+                                Toggle::make('is_active')
+                                    ->label('Active')
+                                    ->default(true)
+                                    ->helperText('Only active announcements will be displayed to users.'),
+                                Toggle::make('is_dismissible')
+                                    ->label('Dismissible')
+                                    ->default(true)
+                                    ->helperText('Allow users to dismiss this announcement.'),
+                            ]),
+                        Section::make('Author')
+                            ->columnSpanFull()
+                            ->schema([
+                                Select::make('created_by')
+                                    ->relationship('author', 'name')
+                                    ->required()
+                                    ->default(Auth::id())
+                                    ->preload()
+                                    ->searchable(),
+                            ])
+                            ->collapsed(),
+                    ]),
             ]);
     }
 

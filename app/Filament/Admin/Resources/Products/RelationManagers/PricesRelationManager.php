@@ -70,6 +70,7 @@ class PricesRelationManager extends RelationManager
                     ->visible(fn () => $this->getOwnerRecord()->isSubscription())
                     ->helperText('Number of intervals (e.g., every 2 months).'),
                 Toggle::make('is_active')
+                    ->label('Active')
                     ->default(true)
                     ->helperText('Whether this price is available for purchase.'),
                 Toggle::make('is_default')

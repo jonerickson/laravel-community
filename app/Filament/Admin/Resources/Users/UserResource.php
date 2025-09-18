@@ -8,6 +8,7 @@ use App\Filament\Admin\Resources\Users\Pages\CreateUser;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Filament\Admin\Resources\Users\Pages\ListUsers;
 use App\Filament\Admin\Resources\Users\RelationManagers\FingerprintsRelationManager;
+use App\Filament\Admin\Resources\Users\RelationManagers\OrdersRelationManager;
 use App\Models\Fingerprint;
 use App\Models\Permission;
 use App\Models\Role;
@@ -42,17 +43,12 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use UnitEnum;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
-
-    protected static string|UnitEnum|null $navigationGroup = 'Users';
-
-    protected static ?int $navigationSort = 5;
 
     public static function form(Schema $schema): Schema
     {
@@ -324,6 +320,7 @@ class UserResource extends Resource
     {
         return [
             FingerprintsRelationManager::make(),
+            OrdersRelationManager::make(),
         ];
     }
 

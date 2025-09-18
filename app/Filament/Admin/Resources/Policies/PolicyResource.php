@@ -28,17 +28,12 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
-use UnitEnum;
 
 class PolicyResource extends Resource
 {
     protected static ?string $model = Policy::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
-
-    protected static string|UnitEnum|null $navigationGroup = 'Policies';
-
-    protected static ?int $navigationSort = 3;
 
     public static function form(Schema $schema): Schema
     {
@@ -82,6 +77,7 @@ class PolicyResource extends Resource
                         Section::make('Publishing')
                             ->schema([
                                 Toggle::make('is_active')
+                                    ->label('Active')
                                     ->helperText('Enable the policy for viewing.')
                                     ->required()
                                     ->default(true),
