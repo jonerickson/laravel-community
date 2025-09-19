@@ -155,8 +155,8 @@ declare namespace App.Data {
         lastPage: number;
         perPage: number;
         total: number;
-        from: number;
-        to: number;
+        from: number | null;
+        to: number | null;
         links: App.Data.PaginatedLinkData;
     };
     export type PaginatedLinkData = {

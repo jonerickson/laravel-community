@@ -21,9 +21,9 @@ class PaginatedData extends Data
 
     public int $total;
 
-    public int $from;
+    public ?int $from;
 
-    public int $to;
+    public ?int $to;
 
     public PaginatedLinkData $links;
 }

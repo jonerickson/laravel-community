@@ -80,7 +80,6 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
                     </Button>
                 )}
 
-                {/* Page Numbers */}
                 {pageNumbers.map((page, index) => (
                     page === '...' ? (
                         <span key={`ellipsis-${index}`} className="px-3 py-2 text-sm text-muted-foreground">
@@ -103,7 +102,6 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
                     )
                 ))}
 
-                {/* Next Button */}
                 {currentPage < lastPage ? (
                     <Link
                         href={`${baseUrl}?page=${currentPage + 1}`}

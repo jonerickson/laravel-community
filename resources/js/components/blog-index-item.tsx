@@ -22,17 +22,17 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
     });
 
     return (
-        <Link href={route('blog.show', { post: post.slug })}>
+        <Link href={route('blog.show', { post: post.slug })} className="group">
             <article className="flex flex-col items-start justify-between">
-                <div className="relative w-full">
+                <div className="relative w-full overflow-hidden rounded-2xl">
                     {post.featured_image_url ? (
                         <img
                             alt={post.title}
                             src={post.featured_image_url}
-                            className="aspect-video w-full rounded-2xl bg-muted object-cover sm:aspect-[2/1] lg:aspect-[3/2]"
+                            className="aspect-video w-full rounded-2xl bg-muted object-cover transition-transform group-hover:scale-105 group-hover:shadow-lg sm:aspect-[2/1] lg:aspect-[3/2]"
                         />
                     ) : (
-                        <div className="flex aspect-video w-full items-center justify-center rounded-2xl bg-muted sm:aspect-[2/1] lg:aspect-[3/2]">
+                        <div className="flex aspect-video w-full items-center justify-center rounded-2xl bg-muted transition-transform group-hover:scale-105 group-hover:shadow-lg sm:aspect-[2/1] lg:aspect-[3/2]">
                             <ImageIcon className="h-16 w-16 text-muted-foreground" />
                         </div>
                     )}
