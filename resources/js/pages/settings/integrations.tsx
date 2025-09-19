@@ -123,7 +123,7 @@ export default function Integrations({ connectedAccounts }: ConnectedAccountsPro
                                             >
                                                 {account.providerAvatar ? (
                                                     <Avatar className="h-10 w-10">
-                                                        <AvatarImage src={account.providerAvatar} alt={account.providerName || ''} />
+                                                        <AvatarImage src={account.providerAvatar} alt={account.providerName || undefined} />
                                                         <AvatarFallback>
                                                             {(account.providerName || account.provider).charAt(0).toUpperCase()}
                                                         </AvatarFallback>

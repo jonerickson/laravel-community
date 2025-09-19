@@ -2,19 +2,18 @@ import HeadingSmall from '@/components/heading-small';
 import { Badge } from '@/components/ui/badge';
 import { UserInfo } from '@/components/user-info';
 import { pluralize } from '@/lib/utils';
-import { Post } from '@/types';
 import { stripCharacters, truncate } from '@/utils/truncate';
 import { Link } from '@inertiajs/react';
 import { Clock, Eye, ImageIcon, MessageCircle } from 'lucide-react';
 import usePermissions from '../hooks/use-permissions';
 
 interface BlogIndexItemProps {
-    post: Post;
+    post: App.Data.PostData;
 }
 
 export default function BlogIndexItem({ post }: BlogIndexItemProps) {
     const { can } = usePermissions();
-    const publishedDate = new Date(post.published_at || post.created_at);
+    const publishedDate = new Date(post.publishedAt || post.createdAt || new Date());
     const formattedDate = publishedDate.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -25,10 +24,10 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
         <Link href={route('blog.show', { post: post.slug })} className="group">
             <article className="flex flex-col items-start justify-between">
                 <div className="relative w-full overflow-hidden rounded-2xl">
-                    {post.featured_image_url ? (
+                    {post.featuredImageUrl ? (
                         <img
                             alt={post.title}
-                            src={post.featured_image_url}
+                            src={post.featuredImageUrl}
                             className="aspect-video w-full rounded-2xl bg-muted object-cover transition-transform group-hover:scale-105 group-hover:shadow-lg sm:aspect-[2/1] lg:aspect-[3/2]"
                         />
                     ) : (
@@ -40,34 +39,34 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                 </div>
                 <div className="mt-4 flex max-w-xl grow flex-col justify-between">
                     <div className="flex flex-row gap-2">
-                        {post.is_featured && <Badge variant="secondary">Featured</Badge>}
-                        {!post.is_read_by_user && <Badge variant="default">New</Badge>}
+                        {post.isFeatured && <Badge variant="secondary">Featured</Badge>}
+                        {!post.isReadByUser && <Badge variant="default">New</Badge>}
                     </div>
                     <div className="mt-2 flex items-center gap-x-4 text-xs">
-                        <time dateTime={post.published_at || post.created_at} className="text-muted-foreground">
+                        <time dateTime={post.publishedAt || post.createdAt || undefined} className="text-muted-foreground">
                             {formattedDate}
                         </time>
 
                         <div className="flex items-center gap-1 text-muted-foreground">
                             <Eye className="size-3" />
                             <span>
-                                {post.views_count} {pluralize('view', post.views_count)}
+                                {post.viewsCount} {pluralize('view', post.viewsCount)}
                             </span>
                         </div>
 
-                        {can('view_any_comments') && post.comments_enabled && (
+                        {can('view_any_comments') && post.commentsEnabled && (
                             <div className="flex items-center gap-1 text-muted-foreground">
                                 <MessageCircle className="size-3" />
                                 <span>
-                                    {post.comments_count} {pluralize('comment', post.comments_count)}
+                                    {post.commentsCount} {pluralize('comment', post.commentsCount)}
                                 </span>
                             </div>
                         )}
 
-                        {post.reading_time && (
+                        {post.readingTime && (
                             <div className="flex items-center gap-1 text-muted-foreground">
                                 <Clock className="size-3" />
-                                <span>{post.reading_time} min read</span>
+                                <span>{post.readingTime} min read</span>
                             </div>
                         )}
                     </div>

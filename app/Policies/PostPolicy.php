@@ -17,8 +17,8 @@ class PostPolicy
 
     public function view(?User $user, Post $post): bool
     {
-        return PermissionService::hasPermissionTo('view_posts', $user) &&
-            $post->is_published;
+        return PermissionService::hasPermissionTo('view_posts', $user)
+            && $post->is_published;
     }
 
     public function create(?User $user): bool
@@ -36,7 +36,8 @@ class PostPolicy
             return false;
         }
 
-        return $post->isAuthoredBy($user);
+        return $post->isAuthoredBy($user)
+            && $post->is_published;
     }
 
     public function delete(?User $user, Post $post): bool

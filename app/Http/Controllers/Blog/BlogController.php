@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Blog;
 
 use App\Data\CommentData;
 use App\Data\PaginatedData;
+use App\Data\PostData;
 use App\Data\RecentViewerData;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
@@ -46,7 +47,7 @@ class BlogController extends Controller
         );
 
         return Inertia::render('blog/index', [
-            'posts' => Inertia::merge(fn () => $posts->items()),
+            'posts' => Inertia::merge(fn () => PostData::collect($posts->items())),
             'postsPagination' => PaginatedData::from(Arr::except($posts->toArray(), ['data'])),
         ]);
     }
@@ -67,7 +68,7 @@ class BlogController extends Controller
         );
 
         return Inertia::render('blog/show', [
-            'post' => $post->loadMissing(['author']),
+            'post' => PostData::from($post->loadMissing(['author'])),
             'comments' => Inertia::defer(fn () => CommentData::collect($comments->items())),
             'commentsPagination' => PaginatedData::from(Arr::except($comments->toArray(), ['data'])),
             'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($post->getRecentViewers())),

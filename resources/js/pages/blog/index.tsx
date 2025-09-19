@@ -4,7 +4,7 @@ import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
 import { Spinner } from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Post } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head, usePage, WhenVisible } from '@inertiajs/react';
 import { Newspaper } from 'lucide-react';
 import usePermissions from '../../hooks/use-permissions';
@@ -17,7 +17,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface BlogIndexProps {
-    posts: Post[];
+    posts: App.Data.PostData[];
     postsPagination: App.Data.PaginatedData;
 }
 
@@ -53,25 +53,25 @@ export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
                 '@type': 'Person',
                 name: post.author?.name,
             },
-            datePublished: post.published_at || post.created_at,
-            dateModified: post.updated_at,
-            image: post.featured_image_url,
+            datePublished: post.publishedAt || post.createdAt,
+            dateModified: post.updatedAt,
+            image: post.featuredImageUrl,
             url: route('blog.show', { post: post.slug }),
             interactionStatistic: [
                 {
                     '@type': 'InteractionCounter',
                     interactionType: 'https://schema.org/CommentAction',
-                    userInteractionCount: post.comments_count || 0,
+                    userInteractionCount: post.commentsCount || 0,
                 },
                 {
                     '@type': 'InteractionCounter',
                     interactionType: 'https://schema.org/LikeAction',
-                    userInteractionCount: post.likes_count || 0,
+                    userInteractionCount: post.likesCount || 0,
                 },
                 {
                     '@type': 'InteractionCounter',
                     interactionType: 'https://schema.org/ViewAction',
-                    userInteractionCount: post.views_count || 0,
+                    userInteractionCount: post.viewsCount || 0,
                 },
             ],
         })),

@@ -5,14 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Forum } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { toast } from 'sonner';
 import { route } from 'ziggy-js';
 import usePermissions from '../../../hooks/use-permissions';
 
 interface CreateTopicProps {
-    forum: Forum;
+    forum: App.Data.ForumData;
 }
 
 export default function ForumTopicCreate({ forum }: CreateTopicProps) {

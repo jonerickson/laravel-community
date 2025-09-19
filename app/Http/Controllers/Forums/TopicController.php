@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Forums;
 
 use App\Actions\Forums\DeleteTopicAction;
+use App\Data\ForumData;
 use App\Data\PaginatedData;
+use App\Data\PostData;
 use App\Data\RecentViewerData;
+use App\Data\TopicData;
 use App\Enums\PostType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Forums\StoreTopicRequest;
@@ -52,9 +55,9 @@ class TopicController extends Controller
         );
 
         return Inertia::render('forums/topics/show', [
-            'forum' => $forum,
-            'topic' => $topic->load(['author', 'forum']),
-            'posts' => Inertia::merge(fn () => $posts->items()),
+            'forum' => ForumData::from($forum),
+            'topic' => TopicData::from($topic->load(['author', 'forum'])),
+            'posts' => Inertia::merge(fn () => PostData::collect($posts->items())),
             'postsPagination' => PaginatedData::from(Arr::except($posts->toArray(), ['data'])),
             'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($topic->getRecentViewers())),
         ]);
@@ -71,7 +74,7 @@ class TopicController extends Controller
         $forum->loadMissing('category');
 
         return Inertia::render('forums/topics/create', [
-            'forum' => $forum,
+            'forum' => ForumData::from($forum),
         ]);
     }
 

@@ -1,12 +1,12 @@
 import BlogPost from '@/components/blog-post';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Post } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 
 interface BlogShowProps {
-    post: Post;
+    post: App.Data.PostData;
     comments: App.Data.CommentData[];
     commentsPagination: App.Data.PaginatedData;
     recentViewers: App.Data.RecentViewerData[];
@@ -32,7 +32,7 @@ export default function BlogShow({ post, comments, commentsPagination, recentVie
         '@type': 'BlogPosting',
         headline: post.title,
         description: pageDescription,
-        image: post.featured_image_url,
+        image: post.featuredImageUrl,
         author: {
             '@type': 'Person',
             name: post.author?.name,
@@ -51,25 +51,25 @@ export default function BlogShow({ post, comments, commentsPagination, recentVie
                 item: breadcrumb.href,
             })),
         },
-        datePublished: post.published_at || post.created_at,
-        dateModified: post.updated_at,
+        datePublished: post.publishedAt || post.createdAt,
+        dateModified: post.updatedAt,
         wordCount: post.content.split(' ').length,
-        timeRequired: `PT${post.reading_time}M`,
+        timeRequired: `PT${post.readingTime}M`,
         interactionStatistic: [
             {
                 '@type': 'InteractionCounter',
                 interactionType: 'https://schema.org/CommentAction',
-                userInteractionCount: post.comments_count || 0,
+                userInteractionCount: post.commentsCount || 0,
             },
             {
                 '@type': 'InteractionCounter',
                 interactionType: 'https://schema.org/LikeAction',
-                userInteractionCount: post.likes_count || 0,
+                userInteractionCount: post.likesCount || 0,
             },
             {
                 '@type': 'InteractionCounter',
                 interactionType: 'https://schema.org/ViewAction',
-                userInteractionCount: post.views_count || 0,
+                userInteractionCount: post.viewsCount || 0,
             },
         ],
     };
@@ -77,7 +77,7 @@ export default function BlogShow({ post, comments, commentsPagination, recentVie
     useMarkAsRead({
         id: post.id,
         type: 'post',
-        isRead: post.is_read_by_user,
+        isRead: post.isReadByUser,
     });
 
     return (
@@ -88,8 +88,8 @@ export default function BlogShow({ post, comments, commentsPagination, recentVie
                 <meta property="og:title" content={post.title} />
                 <meta property="og:description" content={pageDescription} />
                 <meta property="og:type" content="article" />
-                {post.featured_image_url && <meta property="og:image" content={post.featured_image_url} />}
-                <meta property="article:published_time" content={post.published_at || post.created_at} />
+                {post.featuredImageUrl && <meta property="og:image" content={post.featuredImageUrl} />}
+                <meta property="article:published_time" content={post.publishedAt || post.createdAt || undefined} />
                 {post.author && <meta property="article:author" content={post.author.name} />}
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>

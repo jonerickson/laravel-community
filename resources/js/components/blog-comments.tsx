@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
 import { Textarea } from '@/components/ui/textarea';
 import { UserInfo } from '@/components/user-info';
-import { Post } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { Edit, MessageCircle, Reply, Trash } from 'lucide-react';
 import { useState } from 'react';
@@ -13,13 +12,13 @@ import { toast } from 'sonner';
 import usePermissions from '../hooks/use-permissions';
 
 interface BlogCommentsProps {
-    post: Post;
+    post: App.Data.PostData;
     comments: App.Data.CommentData[];
     commentsPagination: App.Data.PaginatedData;
 }
 
 interface CommentItemProps {
-    post: Post;
+    post: App.Data.PostData;
     comment: App.Data.CommentData;
     onReply: (parentId: number) => void;
     replyingTo: number | null;
@@ -264,7 +263,7 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
 
     const approvedComments = comments.filter((comment) => comment.isApproved && !comment.parentId) || [];
 
-    if (!post.comments_enabled) {
+    if (!post.commentsEnabled) {
         return (
             <div className="space-y-6">
                 <div className="flex items-center gap-2">

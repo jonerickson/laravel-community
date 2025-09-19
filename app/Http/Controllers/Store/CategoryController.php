@@ -20,11 +20,12 @@ class CategoryController extends Controller
     {
         $this->authorize('viewAny', ProductCategory::class);
 
+        $categories = ProductCategory::query()
+            ->with('image')
+            ->get();
+
         return Inertia::render('store/categories/index', [
-            'categories' => ProductCategoryData::collect(ProductCategory::query()
-                ->with('image')
-                ->get()
-            ),
+            'categories' => ProductCategoryData::collect($categories),
         ]);
     }
 
@@ -34,17 +35,18 @@ class CategoryController extends Controller
 
         $category->loadMissing('image');
 
+        $products = $category
+            ->products()
+            ->with('defaultPrice')
+            ->with(['prices' => function (HasMany $query) {
+                $query->active();
+            }])
+            ->where('is_subscription_only', false)
+            ->get();
+
         return Inertia::render('store/categories/show', [
             'category' => ProductCategoryData::from($category),
-            'products' => ProductData::collect($category
-                ->products()
-                ->with('defaultPrice')
-                ->with(['prices' => function (HasMany $query) {
-                    $query->active();
-                }])
-                ->where('is_subscription_only', false)
-                ->get()
-            ),
+            'products' => ProductData::collect($products),
         ]);
     }
 }

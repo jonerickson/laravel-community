@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Forums;
 
+use App\Data\ForumData;
 use App\Data\PaginatedData;
+use App\Data\TopicData;
 use App\Http\Controllers\Controller;
 use App\Models\Forum;
 use App\Models\Topic;
@@ -41,8 +43,8 @@ class ForumController extends Controller
         );
 
         return Inertia::render('forums/show', [
-            'forum' => $forum,
-            'topics' => Inertia::merge(fn () => $topics->items()),
+            'forum' => ForumData::from($forum),
+            'topics' => Inertia::merge(fn () => TopicData::collect($topics->items())),
             'topicsPagination' => PaginatedData::from(Arr::except($topics->toArray(), ['data'])),
         ]);
     }

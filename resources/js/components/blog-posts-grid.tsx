@@ -2,12 +2,11 @@ import BlogIndexItem from '@/components/blog-index-item';
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import type { Post } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Rss } from 'lucide-react';
 
 interface BlogPostsGridProps {
-    posts?: Post[];
+    posts?: App.Data.PostData[];
     className?: string;
 }
 

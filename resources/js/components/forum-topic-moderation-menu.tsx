@@ -1,15 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApiRequest } from '@/hooks/use-api-request';
-import type { Forum, Topic } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { Lock, LockOpen, MoreHorizontal, Pin, PinOff, Trash } from 'lucide-react';
 import { toast } from 'sonner';
 import usePermissions from '../hooks/use-permissions';
 
 interface ForumTopicModerationMenuProps {
-    topic: Topic;
-    forum: Forum;
+    topic: App.Data.TopicData;
+    forum: App.Data.ForumData;
 }
 
 export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicModerationMenuProps) {
@@ -50,7 +49,7 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
             return;
         }
 
-        const isCurrentlyPinned = topic.is_pinned;
+        const isCurrentlyPinned = topic.isPinned;
         const url = isCurrentlyPinned ? route('api.pin.destroy') : route('api.pin.store');
         const method = isCurrentlyPinned ? 'DELETE' : 'POST';
 
@@ -77,7 +76,7 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
             return;
         }
 
-        const isCurrentlyLocked = topic.is_locked;
+        const isCurrentlyLocked = topic.isLocked;
         const url = isCurrentlyLocked ? route('api.lock.destroy') : route('api.lock.store');
         const method = isCurrentlyLocked ? 'DELETE' : 'POST';
 
@@ -110,7 +109,7 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
             <DropdownMenuContent align="end">
                 {can('pin_topics') && (
                     <DropdownMenuItem onClick={handleTogglePin} disabled={pinLoading}>
-                        {topic.is_pinned ? (
+                        {topic.isPinned ? (
                             <>
                                 <PinOff className="mr-2 size-4" />
                                 Unpin Topic
@@ -126,7 +125,7 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
 
                 {can('lock_topics') && (
                     <DropdownMenuItem onClick={handleToggleLock} disabled={lockLoading}>
-                        {topic.is_locked ? (
+                        {topic.isLocked ? (
                             <>
                                 <LockOpen className="mr-2 size-4" />
                                 Unlock Topic

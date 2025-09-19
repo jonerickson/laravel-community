@@ -21,13 +21,8 @@ class CommentController extends Controller
      */
     public function store(Request $request, Post $post): RedirectResponse
     {
+        $this->authorize('update', $post);
         $this->authorize('create', Comment::class);
-
-        abort_if(
-            boolean: ! $post->is_published,
-            code: 404,
-            message: 'Post not found.'
-        );
 
         $validated = $request->validate([
             'content' => 'required|string',
@@ -49,13 +44,8 @@ class CommentController extends Controller
      */
     public function update(Request $request, Post $post, Comment $comment): RedirectResponse
     {
+        $this->authorize('update', $post);
         $this->authorize('update', $comment);
-
-        abort_if(
-            boolean: ! $post->is_published,
-            code: 404,
-            message: 'Post not found.'
-        );
 
         $validated = $request->validate([
             'content' => 'required|string',
@@ -72,13 +62,8 @@ class CommentController extends Controller
      */
     public function destroy(Post $post, Comment $comment): RedirectResponse
     {
+        $this->authorize('update', $post);
         $this->authorize('delete', $comment);
-
-        abort_if(
-            boolean: ! $post->is_published,
-            code: 404,
-            message: 'Post not found.'
-        );
 
         $comment->delete();
 

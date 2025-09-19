@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Forums;
 
+use App\Data\ForumCategoryData;
+use App\Data\ForumData;
 use App\Http\Controllers\Controller;
 use App\Models\Forum;
 use App\Models\ForumCategory;
@@ -50,7 +52,7 @@ class CategoryController extends Controller
             });
 
         return Inertia::render('forums/categories/index', [
-            'categories' => $categories,
+            'categories' => ForumCategoryData::collect($categories),
         ]);
     }
 
@@ -74,8 +76,8 @@ class CategoryController extends Controller
             ->filter(fn (Forum $forum) => Gate::check('view', $forum));
 
         return Inertia::render('forums/categories/show', [
-            'category' => $category,
-            'forums' => $forums,
+            'category' => ForumCategoryData::from($category),
+            'forums' => ForumData::collect($forums),
         ]);
     }
 }

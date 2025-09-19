@@ -6,32 +6,31 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import type { Forum, Post, Topic } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 import { EyeOff, Flag, Pin, Quote } from 'lucide-react';
 import usePermissions from '../hooks/use-permissions';
 
 interface ForumTopicPostProps {
-    post: Post;
+    post: App.Data.PostData;
     index: number;
-    forum: Forum;
-    topic: Topic;
+    forum: App.Data.ForumData;
+    topic: App.Data.TopicData;
     onQuote?: (content: string, authorName: string) => void;
 }
 
 export default function ForumTopicPost({ post, index, forum, topic, onQuote }: ForumTopicPostProps) {
     const { can, cannot, hasAnyPermission, hasAllPermissions } = usePermissions();
 
-    const isHiddenForUser = (post.is_reported || !post.is_published) && !hasAllPermissions(['report_posts', 'publish_posts']);
+    const isHiddenForUser = (post.isReported || !post.isPublished) && !hasAllPermissions(['report_posts', 'publish_posts']);
 
     if (isHiddenForUser) {
         return null;
     }
 
     const getCardClassName = () => {
-        if (post.is_pinned) return 'border-info-foreground/10 bg-info/10';
-        if (!post.is_published && can('publish_posts')) return 'border-warning/10 bg-warning/10';
-        if (post.is_reported && can('report_posts')) return 'border-destructive/10 bg-destructive/10';
+        if (post.isPinned) return 'border-info-foreground/10 bg-info/10';
+        if (!post.isPublished && can('publish_posts')) return 'border-warning/10 bg-warning/10';
+        if (post.isReported && can('report_posts')) return 'border-destructive/10 bg-destructive/10';
         return '';
     };
 
@@ -60,7 +59,7 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                     >
                         <div>
                             <ForumUserInfo user={post.author} isAuthor={index === 0} />
-                            <meta itemProp="name" content={post.author?.name || ''} />
+                            <meta itemProp="name" content={post.author?.name || undefined} />
                         </div>
                         <div className="md:hidden">
                             <ForumTopicPostModerationMenu post={post} forum={forum} topic={topic} />
@@ -70,25 +69,25 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                     <div className="min-w-0 flex-1">
                         <div className="mb-4 hidden items-center justify-between md:flex">
                             <div className="flex items-center gap-2">
-                                <time className="text-sm text-muted-foreground" itemProp="dateCreated" dateTime={post.created_at}>
-                                    Posted {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                                <time className="text-sm text-muted-foreground" itemProp="dateCreated" dateTime={post.createdAt || undefined}>
+                                    Posted {post.createdAt ? formatDistanceToNow(new Date(post.createdAt), { addSuffix: true }) : 'N/A'}
                                 </time>
-                                {post.is_pinned && (
+                                {post.isPinned && (
                                     <Badge variant="info">
                                         <Pin className="mr-1 size-3" />
                                         Pinned
                                     </Badge>
                                 )}
-                                {!post.is_published && (
+                                {!post.isPublished && (
                                     <Badge variant="warning">
                                         <EyeOff className="mr-1 size-3" />
                                         Unpublished
                                     </Badge>
                                 )}
-                                {post.is_reported && can('report_posts') && (
+                                {post.isReported && can('report_posts') && (
                                     <Badge variant="destructive">
                                         <Flag className="mr-1 size-3" />
-                                        Reported {post.report_count && post.report_count > 1 ? `(${post.report_count})` : ''}
+                                        Reported {post.reportCount && post.reportCount > 1 ? `(${post.reportCount})` : ''}
                                     </Badge>
                                 )}
                             </div>
@@ -116,7 +115,7 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                                             )}
                                         </div>
                                         {can('like_posts') && (
-                                            <EmojiReactions post={post} initialReactions={post.likes_summary} userReactions={post.user_reactions} />
+                                            <EmojiReactions post={post} initialReactions={post.likesSummary} userReactions={post.userReactions} />
                                         )}
                                     </div>
                                 )}

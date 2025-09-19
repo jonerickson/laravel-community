@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Data\AnnouncementData;
+use App\Data\PostData;
 use App\Data\ProductData;
+use App\Data\SupportTicketData;
+use App\Data\TopicData;
 use App\Models\Announcement;
 use App\Models\Post;
 use App\Models\Product;
 use App\Models\SupportTicket;
 use App\Models\Topic;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -32,49 +35,47 @@ class DashboardController
         ]);
     }
 
-    private function getAnnouncements()
+    private function getAnnouncements(): Collection
     {
-        $announcements = Announcement::query()
+        return AnnouncementData::collect(Announcement::query()
             ->with('author')
             ->with('reads')
             ->current()
             ->unread()
             ->latest()
-            ->get();
-
-        return AnnouncementData::collect($announcements);
+            ->get());
     }
 
     private function getSupportTickets(): Collection
     {
-        return SupportTicket::query()
+        return SupportTicketData::collect(SupportTicket::query()
             ->with('category')
             ->with('author')
             ->whereBelongsTo(Auth::user(), 'author')
             ->active()
             ->latest()
             ->limit(5)
-            ->get();
+            ->get());
     }
 
     private function getTrendingTopics(): Collection
     {
-        return Topic::trending(5)
+        return TopicData::collect(Topic::trending(5)
             ->with('forum')
             ->with('author')
             ->with('lastPost.author')
-            ->get();
+            ->get());
     }
 
     private function getLatestBlogPosts(): Collection
     {
-        return Post::query()
+        return PostData::collect(Post::query()
             ->blog()
             ->published()
             ->with('author')
             ->latest('published_at')
             ->limit(3)
-            ->get();
+            ->get());
     }
 
     private function getNewestProduct(): ?ProductData

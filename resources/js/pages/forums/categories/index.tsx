@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
-import type { BreadcrumbItem, ForumCategory } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { Circle, Lock, MessageSquare, Pin, Plus } from 'lucide-react';
@@ -22,7 +22,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface ForumsIndexProps {
-    categories: ForumCategory[];
+    categories: App.Data.ForumCategoryData[];
 }
 
 export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
@@ -67,12 +67,12 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                         {
                             '@type': 'InteractionCounter',
                             interactionType: 'https://schema.org/CommentAction',
-                            userInteractionCount: forum.topics_count || 0,
+                            userInteractionCount: forum.topicsCount || 0,
                         },
                         {
                             '@type': 'InteractionCounter',
                             interactionType: 'https://schema.org/ReplyAction',
-                            userInteractionCount: forum.posts_count || 0,
+                            userInteractionCount: forum.postsCount || 0,
                         },
                     ],
                 })) || [],
@@ -127,10 +127,10 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                                                             </div>
                                                         )}
                                                         <div className="text-sm text-muted-foreground">
-                                                            {category.forums?.reduce((total, forum) => total + (forum.topics_count || 0), 0) || 0}{' '}
+                                                            {category.forums?.reduce((total, forum) => total + (forum.topicsCount || 0), 0) || 0}{' '}
                                                             {pluralize(
                                                                 'post',
-                                                                category.forums?.reduce((total, forum) => total + (forum.topics_count || 0), 0) || 0,
+                                                                category.forums?.reduce((total, forum) => total + (forum.topicsCount || 0), 0) || 0,
                                                             )}
                                                         </div>
                                                     </div>
@@ -156,7 +156,7 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                                         <div className="flex-1 py-3">
                                             <div className="space-y-1">
                                                 {category.forums?.flatMap((forum) =>
-                                                    (forum.latest_topics || []).slice(0, 5).map((topic) => (
+                                                    (forum.latestTopics || []).slice(0, 5).map((topic) => (
                                                         <Link
                                                             key={`${forum.id}-${topic.id}`}
                                                             href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
@@ -172,13 +172,13 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                                                             </div>
                                                             <div className="min-w-0 flex-1">
                                                                 <div className="flex items-center gap-2">
-                                                                    {!topic.is_read_by_user && <Circle className="size-3 fill-info text-info" />}
-                                                                    {topic.is_hot && <span className="text-sm">🔥</span>}
-                                                                    {topic.is_pinned && <Pin className="size-4 text-info" />}
-                                                                    {topic.is_locked && <Lock className="size-4 text-muted-foreground" />}
+                                                                    {!topic.isReadByUser && <Circle className="size-3 fill-info text-info" />}
+                                                                    {topic.isHot && <span className="text-sm">🔥</span>}
+                                                                    {topic.isPinned && <Pin className="size-4 text-info" />}
+                                                                    {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
                                                                     <span
                                                                         className={`truncate font-medium ${
-                                                                            topic.is_read_by_user ? 'text-muted-foreground' : 'text-foreground'
+                                                                            topic.isReadByUser ? 'text-muted-foreground' : 'text-foreground'
                                                                         }`}
                                                                     >
                                                                         {topic.title}
@@ -188,9 +188,11 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                                                                     <span>by {topic.author.name}</span>
                                                                     <span>•</span>
                                                                     <span>
-                                                                        {topic.last_reply_at
-                                                                            ? formatDistanceToNow(new Date(topic.last_reply_at), { addSuffix: true })
-                                                                            : formatDistanceToNow(new Date(topic.created_at), { addSuffix: true })}
+                                                                        {topic.lastReplyAt
+                                                                            ? formatDistanceToNow(new Date(topic.lastReplyAt), { addSuffix: true })
+                                                                            : topic.createdAt
+                                                                              ? formatDistanceToNow(new Date(topic.createdAt), { addSuffix: true })
+                                                                              : 'N/A'}
                                                                     </span>
                                                                 </div>
                                                             </div>
@@ -198,14 +200,14 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                                                                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                                     <div className="flex items-center gap-1">
                                                                         <MessageSquare className="size-3" />
-                                                                        <span>{topic.posts_count}</span>
+                                                                        <span>{topic.postsCount}</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </Link>
                                                     )),
                                                 )}
-                                                {!category.forums?.some((forum) => forum.latest_topics && forum.latest_topics.length > 0) && (
+                                                {!category.forums?.some((forum) => forum.latestTopics && forum.latestTopics.length > 0) && (
                                                     <div className="flex flex-col items-center justify-center py-14 text-center">
                                                         <MessageSquare className="mb-2 size-8 text-muted-foreground/50" />
                                                         <HeadingSmall title={'No topics'} description={'There are no recent topics to show.'} />

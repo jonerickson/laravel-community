@@ -8,7 +8,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
-import type { BreadcrumbItem, Forum, Post, Topic } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowDown, ArrowLeft, Clock, Eye, Lock, MessageSquare, Pin, Reply, User } from 'lucide-react';
@@ -17,9 +17,9 @@ import { route } from 'ziggy-js';
 import usePermissions from '../../../hooks/use-permissions';
 
 interface TopicShowProps {
-    forum: Forum;
-    topic: Topic;
-    posts: Post[];
+    forum: App.Data.ForumData;
+    topic: App.Data.TopicData;
+    posts: App.Data.PostData[];
     postsPagination: App.Data.PaginatedData;
     recentViewers: App.Data.RecentViewerData[];
 }
@@ -54,7 +54,7 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
     useMarkAsRead({
         id: topic.id,
         type: 'topic',
-        isRead: topic.is_read_by_user,
+        isRead: topic.isReadByUser,
     });
 
     useEffect(() => {
@@ -114,8 +114,8 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
         '@id': currentUrl,
         headline: topic.title,
         description: topic.description || `Discussion topic: ${topic.title}`,
-        dateCreated: topic.created_at,
-        dateModified: topic.updated_at,
+        dateCreated: topic.createdAt,
+        dateModified: topic.updatedAt,
         url: currentUrl,
         mainEntityOfPage: {
             '@type': 'WebPage',
@@ -147,23 +147,23 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
             {
                 '@type': 'InteractionCounter',
                 interactionType: 'https://schema.org/ViewAction',
-                userInteractionCount: topic.views_count || 0,
+                userInteractionCount: topic.viewsCount || 0,
             },
             {
                 '@type': 'InteractionCounter',
                 interactionType: 'https://schema.org/ReplyAction',
-                userInteractionCount: topic.posts_count || 0,
+                userInteractionCount: topic.postsCount || 0,
             },
         ],
-        commentCount: topic.posts_count || 0,
+        commentCount: topic.postsCount || 0,
         comment: posts
             .filter((post) => post.author)
             .map((post) => ({
                 '@type': 'Comment',
                 '@id': `${currentUrl}#post-${post.id}`,
                 text: post.content,
-                dateCreated: post.created_at,
-                dateModified: post.updated_at,
+                dateCreated: post.createdAt,
+                dateModified: post.updatedAt,
                 author: {
                     '@type': 'Person',
                     name: post.author.name,
@@ -179,8 +179,8 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                 <meta property="og:description" content={topic.description || `Discussion topic: ${topic.title}`} />
                 <meta property="og:type" content="article" />
                 <meta property="article:author" content={topic.author.name} />
-                <meta property="article:published_time" content={topic.created_at} />
-                <meta property="article:modified_time" content={topic.updated_at} />
+                <meta property="article:published_time" content={topic.createdAt || undefined} />
+                <meta property="article:modified_time" content={topic.updatedAt || undefined} />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto">
@@ -188,9 +188,9 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                     <div className="mb-4 flex w-full items-start justify-between gap-2">
                         <div className="flex-1">
                             <div className="mb-2 flex items-center gap-2">
-                                {topic.is_hot && <span className="text-sm">🔥</span>}
-                                {topic.is_pinned && <Pin className="size-4 text-info" />}
-                                {topic.is_locked && <Lock className="size-4 text-muted-foreground" />}
+                                {topic.isHot && <span className="text-sm">🔥</span>}
+                                {topic.isPinned && <Pin className="size-4 text-info" />}
+                                {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
                                 <h1 className="text-xl font-semibold tracking-tight">{topic.title}</h1>
                             </div>
 
@@ -204,7 +204,7 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                             <ArrowDown className="mr-2 size-4" />
                             Latest
                         </Button>
-                        {can('reply_topics') && !topic.is_locked && (
+                        {can('reply_topics') && !topic.isLocked && (
                             <Button onClick={() => setShowReplyForm(!showReplyForm)} variant={showReplyForm ? 'outline' : 'default'}>
                                 <Reply className="mr-2 size-4" />
                                 Reply
@@ -221,18 +221,18 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                     <div className="flex items-center gap-1">
                         <Eye className="size-4" />
                         <span>
-                            {topic.views_count} {pluralize('view', topic.views_count)}
+                            {topic.viewsCount} {pluralize('view', topic.viewsCount)}
                         </span>
                     </div>
                     <div className="flex items-center gap-1">
                         <MessageSquare className="size-4" />
                         <span>
-                            {topic.posts_count} {pluralize('reply', topic.posts_count)}
+                            {topic.postsCount} {pluralize('reply', topic.postsCount)}
                         </span>
                     </div>
                     <div className="flex items-center gap-1">
                         <Clock className="size-4" />
-                        <span>{formatDistanceToNow(new Date(topic.created_at), { addSuffix: true })}</span>
+                        <span>{topic.createdAt ? formatDistanceToNow(new Date(topic.createdAt), { addSuffix: true }) : 'N/A'}</span>
                     </div>
                 </div>
 
@@ -268,7 +268,7 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                     <RecentViewers viewers={recentViewers} />
                 </Deferred>
 
-                {!topic.is_locked && posts.length > 0 && can('reply_topics') && <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} />}
+                {!topic.isLocked && posts.length > 0 && can('reply_topics') && <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} />}
 
                 <Pagination
                     pagination={postsPagination}

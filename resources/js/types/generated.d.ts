@@ -100,6 +100,38 @@ declare namespace App.Data {
         message: string | null;
         messageVariant: string | null;
     };
+    export type ForumCategoryData = {
+        id: number;
+        name: string;
+        slug: string;
+        description: string | null;
+        icon: string | null;
+        color: string;
+        order: number;
+        isActive: boolean;
+        forums: Array<App.Data.ForumData> | null;
+        image: App.Data.ImageData | null;
+        createdAt: string | null;
+        updatedAt: string | null;
+    };
+    export type ForumData = {
+        id: number;
+        name: string;
+        slug: string;
+        description: string | null;
+        categoryId: number | null;
+        rules: string | null;
+        icon: string | null;
+        color: string;
+        order: number;
+        isActive: boolean;
+        topicsCount: number | null;
+        postsCount: number | null;
+        latestTopics: Array<App.Data.TopicData> | null;
+        category: App.Data.ForumCategoryData;
+        createdAt: string | null;
+        updatedAt: string | null;
+    };
     export type GroupData = {
         id: number;
         name: string;
@@ -113,6 +145,11 @@ declare namespace App.Data {
         url: string;
         createdAt: string | null;
         updatedAt: string | null;
+    };
+    export type InvoiceData = {
+        externalInvoiceId: string;
+        amount: number;
+        invoiceUrl: string | null;
     };
     export type LikeData = {
         emoji: string;
@@ -206,6 +243,39 @@ declare namespace App.Data {
         effectiveAt: string | null;
         createdAt: string | null;
         updatedAt: string | null;
+    };
+    export type PostData = {
+        id: number;
+        type: App.Enums.PostType;
+        title: string;
+        slug: string;
+        excerpt: string | null;
+        content: string;
+        isPublished: boolean;
+        isFeatured: boolean;
+        isPinned: boolean;
+        commentsEnabled: boolean;
+        commentsCount: number;
+        likesCount: number;
+        likesSummary: Array<App.Data.LikeData>;
+        userReaction: string | null;
+        userReactions: Array<string>;
+        topicId: number | null;
+        featuredImage: string | null;
+        featuredImageUrl: string | null;
+        readingTime: number | null;
+        publishedAt: string | null;
+        createdBy: number;
+        viewsCount: number;
+        isReadByUser: boolean;
+        readsCount: number;
+        author: App.Data.UserData;
+        metadata: Array<string, unknown> | null;
+        createdAt: string | null;
+        updatedAt: string | null;
+        comments: Array<App.Data.CommentData> | null;
+        isReported: boolean | null;
+        reportCount: number | null;
     };
     export type PriceData = {
         id: number;
@@ -317,6 +387,31 @@ declare namespace App.Data {
         comments: Array<App.Data.CommentData>;
         files: Array<App.Data.FileData>;
         isActive: boolean;
+    };
+    export type TopicData = {
+        id: number;
+        title: string;
+        slug: string;
+        description: string | null;
+        forumId: number;
+        createdBy: number;
+        isPinned: boolean;
+        isLocked: boolean;
+        viewsCount: number;
+        uniqueViewsCount: number;
+        order: number;
+        postsCount: number;
+        lastReplyAt: string | null;
+        isReadByUser: boolean;
+        readsCount: number;
+        isHot: boolean;
+        trendingScore: number;
+        forum: App.Data.ForumData | null;
+        author: App.Data.UserData;
+        lastPost: App.Data.PostData | null;
+        posts: Array<App.Data.PostData> | null;
+        createdAt: string | null;
+        updatedAt: string | null;
     };
     export type UserData = {
         id: number;

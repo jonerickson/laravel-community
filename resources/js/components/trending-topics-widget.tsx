@@ -2,13 +2,12 @@ import HeadingSmall from '@/components/heading-small';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import type { Topic } from '@/types';
 import { Link } from '@inertiajs/react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { Eye, Flame, Lock, MessageSquare, Pin, TrendingUp } from 'lucide-react';
 
 interface TrendingTopicsWidgetProps {
-    topics?: Topic[];
+    topics?: App.Data.TopicData[];
     className?: string;
 }
 
@@ -90,9 +89,9 @@ export default function TrendingTopicsWidget({ topics = [], className }: Trendin
                                             className="block space-y-1 transition-colors group-hover:text-primary"
                                         >
                                             <div className="flex items-center gap-2">
-                                                {topic.is_hot && <span className="text-sm">🔥</span>}
-                                                {topic.is_pinned && <Pin className="size-3 text-info" />}
-                                                {topic.is_locked && <Lock className="size-3 text-muted-foreground" />}
+                                                {topic.isHot && <span className="text-sm">🔥</span>}
+                                                {topic.isPinned && <Pin className="size-3 text-info" />}
+                                                {topic.isLocked && <Lock className="size-3 text-muted-foreground" />}
                                                 <span className="line-clamp-1 text-sm font-medium">{topic.title}</span>
                                             </div>
                                             <div className="text-xs text-muted-foreground">
@@ -102,35 +101,39 @@ export default function TrendingTopicsWidget({ topics = [], className }: Trendin
                                         </Link>
                                     </td>
                                     <td className="px-4 py-3 text-center">
-                                        <Badge variant={getTrendingScoreVariant(topic.trending_score)} className="px-2 py-1 text-xs">
+                                        <Badge variant={getTrendingScoreVariant(topic.trendingScore)} className="px-2 py-1 text-xs">
                                             <TrendingUp className="mr-1 size-3" />
-                                            {formatTrendingScore(topic.trending_score)}
+                                            {formatTrendingScore(topic.trendingScore)}
                                         </Badge>
                                     </td>
                                     <td className="px-4 py-3 text-center">
                                         <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
                                             <Eye className="size-3" />
-                                            <span>{topic.views_count}</span>
+                                            <span>{topic.viewsCount}</span>
                                         </div>
                                     </td>
                                     <td className="px-4 py-3 text-center">
                                         <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
                                             <MessageSquare className="size-3" />
-                                            <span>{topic.posts_count}</span>
+                                            <span>{topic.postsCount}</span>
                                         </div>
                                     </td>
                                     <td className="px-4 py-3">
-                                        {topic.last_post ? (
+                                        {topic.lastPost ? (
                                             <div className="space-y-1">
                                                 <div className="text-xs text-muted-foreground">
-                                                    <span className="font-medium">{topic.last_post.author.name}</span>
+                                                    <span className="font-medium">{topic.lastPost.author.name}</span>
                                                 </div>
                                                 <div className="text-xs text-muted-foreground/80">
-                                                    {formatDistanceToNow(new Date(topic.last_post.created_at), { addSuffix: true })}
+                                                    {topic.lastPost.createdAt
+                                                        ? formatDistanceToNow(new Date(topic.lastPost.createdAt), { addSuffix: true })
+                                                        : 'N/A'}
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="text-xs text-muted-foreground">{format(new Date(topic.created_at), 'MMM d')}</div>
+                                            <div className="text-xs text-muted-foreground">
+                                                {topic.createdAt ? format(new Date(topic.createdAt), 'MMM d') : 'N/A'}
+                                            </div>
                                         )}
                                     </td>
                                 </tr>

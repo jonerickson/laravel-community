@@ -3,7 +3,7 @@ import Heading from '@/components/heading';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Forum, ForumCategory } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { LibraryBig, MessageSquare, Users } from 'lucide-react';
@@ -11,8 +11,8 @@ import { route } from 'ziggy-js';
 import usePermissions from '../../../hooks/use-permissions';
 
 interface CategoryShowProps {
-    category: ForumCategory;
-    forums: Forum[];
+    category: App.Data.ForumCategoryData;
+    forums: App.Data.ForumData[];
 }
 
 export default function ForumCategoryShow({ category, forums }: CategoryShowProps) {
@@ -63,12 +63,12 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                     {
                         '@type': 'InteractionCounter',
                         interactionType: 'https://schema.org/CommentAction',
-                        userInteractionCount: forum.topics_count || 0,
+                        userInteractionCount: forum.topicsCount || 0,
                     },
                     {
                         '@type': 'InteractionCounter',
                         interactionType: 'https://schema.org/ReplyAction',
-                        userInteractionCount: forum.posts_count || 0,
+                        userInteractionCount: forum.postsCount || 0,
                     },
                 ],
             })),
@@ -93,7 +93,7 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                         <MessageSquare className="h-6 w-6" />
                     </div>
                     <div className="-mb-6">
-                        <Heading title={category.name} description={category.description || ''} />
+                        <Heading title={category.name} description={category.description || undefined} />
                     </div>
                 </div>
 
@@ -135,45 +135,47 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                                         <TableCell className="p-4 text-center">
                                             <div className="flex items-center justify-center gap-1">
                                                 <MessageSquare className="size-4" />
-                                                <span>{forum.topics_count || 0}</span>
+                                                <span>{forum.topicsCount || 0}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="p-4 text-center">
                                             <div className="flex items-center justify-center gap-1">
                                                 <Users className="size-4" />
-                                                <span>{forum.posts_count || 0}</span>
+                                                <span>{forum.postsCount || 0}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="p-4 text-right">
-                                            {forum.latest_topics && forum.latest_topics.length > 0 ? (
+                                            {forum.latestTopics && forum.latestTopics.length > 0 ? (
                                                 <div className="text-sm">
                                                     <div className="mb-1">
                                                         <Link
                                                             href={route('forums.topics.show', {
                                                                 forum: forum.slug,
-                                                                topic: forum.latest_topics[0].slug,
+                                                                topic: forum.latestTopics[0].slug,
                                                             })}
                                                             className="font-medium hover:underline"
                                                         >
-                                                            {forum.latest_topics[0].title}
+                                                            {forum.latestTopics[0].title}
                                                         </Link>
                                                     </div>
                                                     <div className="flex items-center justify-end gap-2 text-xs text-muted-foreground">
                                                         <Avatar className="size-4">
                                                             <AvatarFallback className="text-xs">
-                                                                {forum.latest_topics[0].author?.name?.charAt(0).toUpperCase() || 'U'}
+                                                                {forum.latestTopics[0].author?.name?.charAt(0).toUpperCase() || 'U'}
                                                             </AvatarFallback>
                                                         </Avatar>
-                                                        <span>by {forum.latest_topics[0].author?.name}</span>
+                                                        <span>by {forum.latestTopics[0].author?.name}</span>
                                                         <span>•</span>
                                                         <span>
-                                                            {forum.latest_topics[0].last_reply_at
-                                                                ? formatDistanceToNow(new Date(forum.latest_topics[0].last_reply_at), {
+                                                            {forum.latestTopics[0].lastReplyAt
+                                                                ? formatDistanceToNow(new Date(forum.latestTopics[0].lastReplyAt), {
                                                                       addSuffix: true,
                                                                   })
-                                                                : formatDistanceToNow(new Date(forum.latest_topics[0].created_at), {
-                                                                      addSuffix: true,
-                                                                  })}
+                                                                : forum.latestTopics[0].createdAt
+                                                                  ? formatDistanceToNow(new Date(forum.latestTopics[0].createdAt), {
+                                                                        addSuffix: true,
+                                                                    })
+                                                                  : 'N/A'}
                                                         </span>
                                                     </div>
                                                 </div>

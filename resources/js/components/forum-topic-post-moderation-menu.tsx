@@ -3,27 +3,26 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApiRequest } from '@/hooks/use-api-request';
 import usePermissions from '@/hooks/use-permissions';
-import type { Forum, Post, Topic } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { Edit, Eye, EyeOff, Flag, MoreHorizontal, Pin, PinOff, Trash } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ForumTopicPostModerationMenuProps {
-    post: Post;
-    forum: Forum;
-    topic: Topic;
+    post: App.Data.PostData;
+    forum: App.Data.ForumData;
+    topic: App.Data.TopicData;
 }
 
 export default function ForumTopicPostModerationMenu({ post, forum, topic }: ForumTopicPostModerationMenuProps) {
     const { can, cannot, hasAnyPermission } = usePermissions();
     const { auth } = usePage<App.Data.SharedData>().props;
     const { delete: deletePost } = useForm({
-        is_published: post.is_published,
+        is_published: post.isPublished,
     });
     const { execute: pinPost, loading: pinLoading } = useApiRequest();
     const { execute: publishPost } = useApiRequest();
 
-    if (!hasAnyPermission(['report_posts', 'delete_posts', 'publish_posts', 'pin_posts', 'update_posts']) && post.created_by !== auth?.user?.id) {
+    if (!hasAnyPermission(['report_posts', 'delete_posts', 'publish_posts', 'pin_posts', 'update_posts']) && post.createdBy !== auth?.user?.id) {
         return null;
     }
 
@@ -56,7 +55,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
             return;
         }
 
-        const isCurrentlyPublished = post.is_published;
+        const isCurrentlyPublished = post.isPublished;
         const action = isCurrentlyPublished ? 'unpublish' : 'publish';
         const url = isCurrentlyPublished ? route('api.publish.destroy') : route('api.publish.store');
         const method = isCurrentlyPublished ? 'DELETE' : 'POST';
@@ -88,7 +87,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
             return;
         }
 
-        const isCurrentlyPinned = post.is_pinned;
+        const isCurrentlyPinned = post.isPinned;
         const url = isCurrentlyPinned ? route('api.pin.destroy') : route('api.pin.store');
         const method = isCurrentlyPinned ? 'DELETE' : 'POST';
 
@@ -145,7 +144,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
 
                 {can('pin_posts') && (
                     <DropdownMenuItem onClick={handleTogglePin} disabled={pinLoading}>
-                        {post.is_pinned ? (
+                        {post.isPinned ? (
                             <>
                                 <PinOff className="mr-2 size-4" />
                                 Unpin Post
@@ -161,7 +160,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
 
                 {can('publish_posts') && (
                     <DropdownMenuItem onClick={handleTogglePublish}>
-                        {post.is_published ? (
+                        {post.isPublished ? (
                             <>
                                 <EyeOff className="mr-2 size-4" />
                                 Unpublish Post

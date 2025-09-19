@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Forums;
 
+use App\Data\ForumData;
+use App\Data\PostData;
+use App\Data\TopicData;
 use App\Enums\PostType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Forums\StorePostRequest;
@@ -60,19 +63,13 @@ class PostController extends Controller
         $this->authorize('view', $topic);
         $this->authorize('update', $post);
 
-        abort_if(
-            boolean: $post->topic_id !== $topic->id,
-            code: 404,
-            message: 'Post not found.'
-        );
-
         $forum->loadMissing('category');
         $post->loadMissing('author');
 
         return Inertia::render('forums/posts/edit', [
-            'forum' => $forum,
-            'topic' => $topic,
-            'post' => $post,
+            'forum' => ForumData::from($forum),
+            'topic' => TopicData::from($topic),
+            'post' => PostData::from($post),
         ]);
     }
 
@@ -84,12 +81,6 @@ class PostController extends Controller
         $this->authorize('view', $forum);
         $this->authorize('view', $topic);
         $this->authorize('update', $post);
-
-        abort_if(
-            boolean: $post->topic_id !== $topic->id,
-            code: 404,
-            message: 'Post not found.'
-        );
 
         $validated = $request->validated();
 
@@ -107,12 +98,6 @@ class PostController extends Controller
         $this->authorize('view', $forum);
         $this->authorize('view', $topic);
         $this->authorize('delete', $post);
-
-        abort_if(
-            boolean: $post->topic_id !== $topic->id,
-            code: 404,
-            message: 'Post not found.'
-        );
 
         $post->delete();
 

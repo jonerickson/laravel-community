@@ -14,7 +14,6 @@ use App\Http\Controllers\Api\ReadController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\ShoppingCartController;
-use App\Http\Controllers\Api\SupportTicketController;
 use App\Http\Controllers\Api\TopicController;
 use App\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Illuminate\Support\Facades\Route;
@@ -39,8 +38,5 @@ Route::group(['middleware' => [EnsureFrontendRequestsAreStateful::class], 'as' =
         Route::delete('/lock', [LockController::class, 'destroy'])->name('lock.destroy');
         Route::post('/read', ReadController::class)->name('read');
         Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
-        Route::post('/support-tickets', SupportTicketController::class)->name('support');
-
-        Route::get('/me', fn () => auth()->guard('api')->user())->name('me');
     });
 });

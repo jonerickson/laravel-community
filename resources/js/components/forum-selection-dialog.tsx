@@ -2,13 +2,12 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import type { Forum } from '@/types';
 import { router } from '@inertiajs/react';
 import { MessageSquare, Search } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 interface ForumSelectionDialogProps {
-    forums: Forum[];
+    forums: App.Data.ForumData[];
     isOpen: boolean;
     onClose: () => void;
 }
@@ -19,7 +18,7 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumS
     const inputRef = useRef<HTMLInputElement>(null);
     const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-    const handleForumSelect = (forum: Forum) => {
+    const handleForumSelect = (forum: App.Data.ForumData) => {
         onClose();
         router.get(route('forums.topics.create', { forum: forum.slug }));
     };
@@ -131,8 +130,8 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumS
                                                 </div>
                                             )}
                                             <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-                                                <span>{forum.topics_count || 0} topics</span>
-                                                <span>{forum.posts_count || 0} posts</span>
+                                                <span>{forum.topicsCount || 0} topics</span>
+                                                <span>{forum.postsCount || 0} posts</span>
                                             </div>
                                         </div>
                                     </div>

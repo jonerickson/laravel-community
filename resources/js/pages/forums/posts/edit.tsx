@@ -4,15 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Forum, Post, Topic } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import usePermissions from '../../../hooks/use-permissions';
 
 interface EditPostProps {
-    forum: Forum;
-    topic: Topic;
-    post: Post;
+    forum: App.Data.ForumData;
+    topic: App.Data.TopicData;
+    post: App.Data.PostData;
 }
 
 export default function ForumPostEdit({ forum, topic, post }: EditPostProps) {

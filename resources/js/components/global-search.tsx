@@ -354,7 +354,7 @@ export function GlobalSearch() {
                                 return (
                                     <CommandItem
                                         key={`${result.type}-${result.id}`}
-                                        value={`${result.title} ${result.description || result.excerpt || ''}`}
+                                        value={`${result.title} ${result.description || result.excerpt || undefined}`}
                                         onSelect={() => handleSelect(result.url)}
                                         className="flex items-start gap-3 py-3"
                                     >

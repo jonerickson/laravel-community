@@ -3,13 +3,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useApiRequest } from '@/hooks/use-api-request';
-import { Post } from '@/types';
 import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 import { route } from 'ziggy-js';
 
 interface EmojiReactionsProps {
-    post?: Post;
+    post?: App.Data.PostData;
     comment?: App.Data.CommentData;
     initialReactions?: App.Data.LikeData[];
     userReactions?: string[];

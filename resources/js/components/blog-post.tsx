@@ -6,13 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { UserInfo } from '@/components/user-info';
 import { pluralize } from '@/lib/utils';
-import { Post } from '@/types';
 import { Deferred } from '@inertiajs/react';
 import { Calendar, Clock, Eye, MessageSquare } from 'lucide-react';
 import usePermissions from '../hooks/use-permissions';
 
 interface BlogPostProps {
-    post: Post;
+    post: App.Data.PostData;
     comments: App.Data.CommentData[];
     commentsPagination: App.Data.PaginatedData;
     recentViewers: App.Data.RecentViewerData[];
@@ -20,7 +19,7 @@ interface BlogPostProps {
 
 export default function BlogPost({ post, comments, commentsPagination, recentViewers }: BlogPostProps) {
     const { can } = usePermissions();
-    const publishedDate = new Date(post.published_at || post.created_at);
+    const publishedDate = new Date(post.publishedAt || post.createdAt || new Date());
     const formattedDate = publishedDate.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
@@ -30,7 +29,7 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
     return (
         <article className="mx-auto max-w-4xl" itemScope itemType="https://schema.org/BlogPosting">
             <header className="mb-8">
-                {post.is_featured && (
+                {post.isFeatured && (
                     <div className="mb-4" role="banner">
                         <Badge aria-label="Featured blog post" variant="secondary">
                             Featured Post
@@ -58,44 +57,48 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
 
                     <div className="flex items-center gap-1">
                         <Calendar className="size-4" aria-hidden="true" />
-                        <time dateTime={post.published_at || post.created_at} itemProp="datePublished" aria-label={`Published on ${formattedDate}`}>
+                        <time
+                            dateTime={post.publishedAt || post.createdAt || undefined}
+                            itemProp="datePublished"
+                            aria-label={`Published on ${formattedDate}`}
+                        >
                             {formattedDate}
                         </time>
                     </div>
 
                     <div className="flex items-center gap-1">
                         <Eye className="size-4" aria-hidden="true" />
-                        <span aria-label={`Total views: ${post.views_count} views`}>
-                            {post.views_count} {pluralize('view', post.views_count)}
+                        <span aria-label={`Total views: ${post.viewsCount} views`}>
+                            {post.viewsCount} {pluralize('view', post.viewsCount)}
                         </span>
                     </div>
 
-                    {post.comments_enabled && can('view_any_comments') && (
+                    {post.commentsEnabled && can('view_any_comments') && (
                         <div className="flex items-center gap-1">
                             <MessageSquare className="size-4" aria-hidden="true" />
-                            <span aria-label={`Total comments: ${post.comments_count} comments`}>
-                                {post.comments_count} {pluralize('comment', post.comments_count)}
+                            <span aria-label={`Total comments: ${post.commentsCount} comments`}>
+                                {post.commentsCount} {pluralize('comment', post.commentsCount)}
                             </span>
                         </div>
                     )}
 
-                    {post.reading_time && (
+                    {post.readingTime && (
                         <div className="flex items-center gap-1">
                             <Clock className="size-4" aria-hidden="true" />
-                            <span aria-label={`Estimated reading time: ${post.reading_time} minutes`}>{post.reading_time} min read</span>
+                            <span aria-label={`Estimated reading time: ${post.readingTime} minutes`}>{post.readingTime} min read</span>
                         </div>
                     )}
                 </div>
 
-                <meta itemProp="dateModified" content={post.updated_at} />
+                <meta itemProp="dateModified" content={post.updatedAt || undefined} />
                 <meta itemProp="url" content={window.location.href} />
             </header>
 
             <figure className="mb-8" itemProp="image" itemScope itemType="https://schema.org/ImageObject">
-                {post.featured_image_url && (
+                {post.featuredImageUrl && (
                     <>
                         <img
-                            src={post.featured_image_url}
+                            src={post.featuredImageUrl}
                             alt={`Featured image for ${post.title}`}
                             className="aspect-video w-full rounded-lg object-cover"
                             itemProp="url"
@@ -112,7 +115,7 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
             <footer className="mt-4">
                 {can('like_posts') && (
                     <section aria-label="Post reactions">
-                        <EmojiReactions post={post} initialReactions={post.likes_summary} userReactions={post.user_reactions} className="mb-4" />
+                        <EmojiReactions post={post} initialReactions={post.likesSummary} userReactions={post.userReactions} className="mb-4" />
                     </section>
                 )}
 
@@ -122,7 +125,7 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
                     </div>
                 </Deferred>
 
-                {post.comments_enabled && can('view_any_comments') && (
+                {post.commentsEnabled && can('view_any_comments') && (
                     <section className="mt-8 border-t pt-6" aria-label="Comments section">
                         <Deferred
                             fallback={

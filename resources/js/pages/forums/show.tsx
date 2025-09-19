@@ -9,7 +9,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useApiRequest } from '@/hooks/use-api-request';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Forum, Topic } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { stripCharacters } from '@/utils/truncate';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
@@ -20,15 +20,15 @@ import { route } from 'ziggy-js';
 import usePermissions from '../../hooks/use-permissions';
 
 interface ForumShowProps {
-    forum: Forum;
-    topics: Topic[];
+    forum: App.Data.ForumData;
+    topics: App.Data.TopicData[];
     topicsPagination: App.Data.PaginatedData;
 }
 
 export default function ForumShow({ forum, topics: initialTopics, topicsPagination }: ForumShowProps) {
     const { can, cannot, hasAnyPermission } = usePermissions();
     const { name: siteName } = usePage<App.Data.SharedData>().props;
-    const [topics, setTopics] = useState<Topic[]>(initialTopics);
+    const [topics, setTopics] = useState<App.Data.TopicData[]>(initialTopics);
     const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
     const { loading: isDeleting, execute: executeBulkDelete } = useApiRequest();
 
@@ -70,9 +70,9 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
             '@type': 'DiscussionForumPosting',
             headline: topic.title,
             description: topic.description,
-            text: topic.last_post?.content,
-            dateCreated: topic.created_at,
-            dateModified: topic.updated_at,
+            text: topic.lastPost?.content,
+            dateCreated: topic.createdAt,
+            dateModified: topic.updatedAt,
             author: {
                 '@type': 'Person',
                 name: topic.author.name,
@@ -82,12 +82,12 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                 {
                     '@type': 'InteractionCounter',
                     interactionType: 'https://schema.org/ViewAction',
-                    userInteractionCount: topic.views_count,
+                    userInteractionCount: topic.viewsCount,
                 },
                 {
                     '@type': 'InteractionCounter',
                     interactionType: 'https://schema.org/ReplyAction',
-                    userInteractionCount: topic.posts_count,
+                    userInteractionCount: topic.postsCount,
                 },
             ],
         })),
@@ -253,14 +253,14 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                                     )}
                                                     <div className="min-w-0 flex-1">
                                                         <div className="mb-1 flex items-center gap-2">
-                                                            {!topic.is_read_by_user && <Circle className="size-3 fill-info text-info" />}
-                                                            {topic.is_hot && <span className="text-sm">🔥</span>}
-                                                            {topic.is_pinned && <Pin className="size-4 text-info" />}
-                                                            {topic.is_locked && <Lock className="size-4 text-muted-foreground" />}
+                                                            {!topic.isReadByUser && <Circle className="size-3 fill-info text-info" />}
+                                                            {topic.isHot && <span className="text-sm">🔥</span>}
+                                                            {topic.isPinned && <Pin className="size-4 text-info" />}
+                                                            {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
                                                             <Link
                                                                 href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
                                                                 className={`hover:underline ${
-                                                                    topic.is_read_by_user ? 'font-normal text-muted-foreground' : 'font-medium'
+                                                                    topic.isReadByUser ? 'font-normal text-muted-foreground' : 'font-medium'
                                                                 }`}
                                                             >
                                                                 {topic.title}
@@ -273,7 +273,9 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                                         )}
                                                         <div className="text-xs text-muted-foreground">
                                                             Started by {topic.author.name} •{' '}
-                                                            {formatDistanceToNow(new Date(topic.created_at), { addSuffix: true })}
+                                                            {topic.createdAt
+                                                                ? formatDistanceToNow(new Date(topic.createdAt), { addSuffix: true })
+                                                                : 'Unknown time'}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -281,22 +283,22 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                             <TableCell className="p-4 text-center">
                                                 <div className="flex items-center justify-center gap-1">
                                                     <MessageSquare className="size-4" />
-                                                    <span>{topic.posts_count}</span>
+                                                    <span>{topic.postsCount}</span>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="p-4 text-center">
                                                 <div className="flex items-center justify-center gap-1">
                                                     <Eye className="size-4" />
-                                                    <span>{topic.views_count}</span>
+                                                    <span>{topic.viewsCount}</span>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="p-4 text-right">
-                                                {topic.last_post ? (
+                                                {topic.lastPost ? (
                                                     <div className="text-sm">
-                                                        <div className="font-medium">{topic.last_post.author?.name}</div>
-                                                        {topic.last_reply_at && (
+                                                        <div className="font-medium">{topic.lastPost.author?.name}</div>
+                                                        {topic.lastReplyAt && (
                                                             <div className="text-xs text-muted-foreground">
-                                                                {formatDistanceToNow(new Date(topic.last_reply_at), { addSuffix: true })}
+                                                                {formatDistanceToNow(new Date(topic.lastReplyAt), { addSuffix: true })}
                                                             </div>
                                                         )}
                                                     </div>

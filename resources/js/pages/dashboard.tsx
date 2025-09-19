@@ -6,7 +6,7 @@ import TrendingTopicsWidget from '@/components/trending-topics-widget';
 import WidgetLoading from '@/components/widget-loading';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type Post, type Topic } from '@/types';
+import { type BreadcrumbItem } from '@/types';
 import { Deferred, Head } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -23,8 +23,8 @@ interface DashboardProps {
     featuredProduct?: App.Data.ProductData;
     announcements?: App.Data.AnnouncementData[];
     supportTickets?: App.Data.SupportTicketData[];
-    trendingTopics?: Topic[];
-    latestBlogPosts?: Post[];
+    trendingTopics?: App.Data.TopicData[];
+    latestBlogPosts?: App.Data.PostData[];
 }
 
 export default function Dashboard({

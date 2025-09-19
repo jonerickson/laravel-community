@@ -13,7 +13,6 @@ use App\Http\Requests\SupportTickets\UpdateSupportTicketRequest;
 use App\Managers\SupportTicketManager;
 use App\Models\SupportTicket;
 use App\Models\SupportTicketCategory;
-use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Arr;
@@ -86,11 +85,6 @@ class SupportTicketController extends Controller
         $this->authorize('update', $ticket);
 
         $validated = $request->validated();
-
-        /** @var User $user */
-        $user = Auth::user();
-
-        abort_unless($ticket->isAuthoredBy($user), 403);
 
         $result = match ($validated['action']) {
             'close' => $this->closeTicket($ticket),
