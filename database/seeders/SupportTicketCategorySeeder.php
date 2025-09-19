@@ -11,7 +11,7 @@ class SupportTicketCategorySeeder extends Seeder
 {
     public function run(): void
     {
-        $categories = [
+        SupportTicketCategory::factory()->createMany([
             [
                 'name' => 'Technical Support',
                 'description' => 'Issues related to technical problems, bugs, or system errors',
@@ -54,13 +54,6 @@ class SupportTicketCategorySeeder extends Seeder
                 'order' => 6,
                 'is_active' => true,
             ],
-        ];
-
-        foreach ($categories as $category) {
-            SupportTicketCategory::firstOrCreate(
-                ['slug' => \Illuminate\Support\Str::slug($category['name'])],
-                $category
-            );
-        }
+        ]);
     }
 }
