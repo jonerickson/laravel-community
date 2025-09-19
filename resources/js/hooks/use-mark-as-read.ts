@@ -1,5 +1,4 @@
 import { useApiRequest } from '@/hooks/use-api-request';
-import type { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { route } from 'ziggy-js';
@@ -12,7 +11,7 @@ interface UseMarkAsReadOptions {
 }
 
 export function useMarkAsRead({ id, type, isRead, enabled = true }: UseMarkAsReadOptions) {
-    const { auth } = usePage<SharedData>().props;
+    const { auth } = usePage<App.Data.SharedData>().props;
     const { execute } = useApiRequest<App.Data.ReadData>();
 
     useEffect(() => {

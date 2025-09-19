@@ -51,6 +51,26 @@ declare namespace App.Data {
     export type CheckoutData = {
         checkoutUrl: string;
     };
+    export type CommentData = {
+        id: number;
+        commentableType: string;
+        commentableId: number;
+        content: string;
+        isApproved: boolean;
+        createdBy: number;
+        parentId: number | null;
+        rating: number | null;
+        likesCount: number;
+        likesSummary: Array<App.Data.LikeData>;
+        userReaction: string | null;
+        userReactions: Array<string>;
+        user: App.Data.UserData | null;
+        author: App.Data.UserData | null;
+        parent: App.Data.CommentData | null;
+        replies: Array<App.Data.CommentData> | null;
+        createdAt: string | null;
+        updatedAt: string | null;
+    };
     export type DownloadData = {
         id: string;
         name: string;
@@ -60,6 +80,15 @@ declare namespace App.Data {
         downloadUrl: string;
         productName: string | null;
         createdAt: string;
+    };
+    export type FileData = {
+        id: string;
+        name: string;
+        url: string;
+        size: number | null;
+        mimeType: string | null;
+        createdAt: string | null;
+        updatedAt: string | null;
     };
     export type FingerprintData = {
         fingerprintId: string;
@@ -76,6 +105,15 @@ declare namespace App.Data {
         name: string;
         color: string;
     };
+    export type ImageData = {
+        id: number;
+        imageableType: string;
+        imageableId: number;
+        path: string;
+        url: string;
+        createdAt: string | null;
+        updatedAt: string | null;
+    };
     export type LikeData = {
         emoji: string;
         count: number;
@@ -84,6 +122,33 @@ declare namespace App.Data {
     export type LikeSummaryData = {
         likesSummary: Array<App.Data.LikeData>;
         userReactions: Array<string>;
+    };
+    export type OrderData = {
+        id: number;
+        userId: number;
+        status: App.Enums.OrderStatus;
+        amount: number | null;
+        invoiceUrl: string | null;
+        referenceId: string | null;
+        invoiceNumber: string | null;
+        externalCheckoutId: string | null;
+        externalOrderId: string | null;
+        externalPaymentId: string | null;
+        externalInvoiceId: string | null;
+        items: Array<App.Data.OrderItemData>;
+        createdAt: string | null;
+        updatedAt: string | null;
+    };
+    export type OrderItemData = {
+        id: number;
+        orderId: number;
+        productId: number | null;
+        priceId: number | null;
+        quantity: number;
+        product: App.Data.ProductData | null;
+        price: App.Data.PriceData | null;
+        createdAt: string | null;
+        updatedAt: string | null;
     };
     export type PaymentMethodData = {
         id: string;
@@ -140,6 +205,8 @@ declare namespace App.Data {
         id: number;
         name: string;
         slug: string;
+        description: string | null;
+        image: App.Data.ImageData | null;
     };
     export type ProductData = {
         id: number;
@@ -192,6 +259,40 @@ declare namespace App.Data {
         policies: Array<App.Data.PolicyData>;
         trialEndsAt: string | null;
         endsAt: string | null;
+    };
+    export type SupportTicketCategoryData = {
+        id: number;
+        name: string;
+        slug: string;
+        description: string | null;
+        color: string | null;
+        order: number;
+        isActive: boolean;
+        createdAt: string | null;
+        updatedAt: string | null;
+    };
+    export type SupportTicketData = {
+        id: number;
+        subject: string;
+        description: string;
+        status: App.Enums.SupportTicketStatus;
+        priority: App.Enums.SupportTicketPriority;
+        supportTicketCategoryId: number;
+        category: App.Data.SupportTicketCategoryData | null;
+        assignedTo: number | null;
+        assignedToUser: App.Data.UserData | null;
+        createdBy: number;
+        author: App.Data.UserData | null;
+        externalId: string | null;
+        externalUrl: string | null;
+        lastSyncedAt: string | null;
+        resolvedAt: string | null;
+        closedAt: string | null;
+        createdAt: string | null;
+        updatedAt: string | null;
+        comments: Array<App.Data.CommentData>;
+        files: Array<App.Data.FileData>;
+        isActive: boolean;
     };
     export type UserData = {
         id: number;

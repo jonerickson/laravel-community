@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Settings;
 
+use App\Data\OrderData;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
@@ -17,12 +18,12 @@ class OrderController extends Controller
         $user = Auth::user();
 
         return Inertia::render('settings/orders', [
-            'orders' => Order::query()
+            'orders' => OrderData::collect(Order::query()
                 ->whereBelongsTo($user)
                 ->readyToView()
                 ->with(['items.product'])
                 ->latest()
-                ->get(),
+                ->get()),
         ]);
     }
 }

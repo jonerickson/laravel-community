@@ -1,11 +1,11 @@
 import Product from '@/components/store-product';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Comment, PaginatedData, Product as ProductType } from '@/types';
+import type { BreadcrumbItem, PaginatedData } from '@/types';
 import { Head } from '@inertiajs/react';
 
 interface ProductPageProps {
-    product: ProductType;
-    reviews: Comment[];
+    product: App.Data.ProductData;
+    reviews: App.Data.CommentData[];
     reviewsPagination: PaginatedData;
 }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Data\AnnouncementData;
+use App\Data\ProductData;
 use App\Models\Announcement;
 use App\Models\Post;
 use App\Models\Product;
@@ -75,34 +76,34 @@ class DashboardController
             ->get();
     }
 
-    private function getNewestProduct(): ?Product
+    private function getNewestProduct(): ?ProductData
     {
-        return Product::query()
+        return ProductData::from(Product::query()
             ->with('defaultPrice')
             ->with('prices')
             ->with('categories')
             ->latest()
-            ->first();
+            ->first());
     }
 
-    private function getPopularProduct(): ?Product
+    private function getPopularProduct(): ?ProductData
     {
-        return Product::query()
+        return ProductData::from(Product::query()
             ->with('defaultPrice')
             ->with('prices')
             ->with('categories')
             ->trending()
-            ->first();
+            ->first());
     }
 
-    private function getFeaturedProduct(): ?Product
+    private function getFeaturedProduct(): ?ProductData
     {
-        return Product::query()
+        return ProductData::from(Product::query()
             ->featured()
             ->with('defaultPrice')
             ->with('prices')
             ->with('categories')
             ->inRandomOrder()
-            ->first();
+            ->first());
     }
 }

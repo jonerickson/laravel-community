@@ -1,4 +1,4 @@
-import { type BreadcrumbItem, Order } from '@/types';
+import { type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 
 import { DataTable } from '@/components/data-table';
@@ -25,7 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Orders() {
-    const { orders } = usePage<App.Data.SharedData>().props as unknown as { orders: Order[] };
+    const { orders } = usePage<App.Data.SharedData>().props as unknown as { orders: App.Data.OrderData[] };
 
     const copyToClipboard = async (text: string, label: string) => {
         try {
@@ -36,9 +36,9 @@ export default function Orders() {
         }
     };
 
-    const columns: ColumnDef<Order>[] = [
+    const columns: ColumnDef<App.Data.OrderData>[] = [
         {
-            accessorKey: 'created_at',
+            accessorKey: 'createdAt',
             header: ({ column }) => {
                 return (
                     <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
@@ -47,13 +47,13 @@ export default function Orders() {
                     </Button>
                 );
             },
-            cell: ({ row }) => date(row.getValue('created_at') as string),
+            cell: ({ row }) => date(row.getValue('createdAt') as string),
         },
         {
-            accessorKey: 'reference_id',
+            accessorKey: 'referenceId',
             header: 'Order Number',
             cell: ({ row }) => {
-                const orderNumber = row.getValue('reference_id') as string;
+                const orderNumber = row.getValue('referenceId') as string;
                 if (!orderNumber || orderNumber === 'N/A') {
                     return <div className="font-mono text-sm">N/A</div>;
                 }
@@ -70,10 +70,10 @@ export default function Orders() {
             },
         },
         {
-            accessorKey: 'invoice_number',
+            accessorKey: 'invoiceNumber',
             header: 'Invoice Number',
             cell: ({ row }) => {
-                const invoiceNumber = row.getValue('invoice_number') as string;
+                const invoiceNumber = row.getValue('invoiceNumber') as string;
                 if (!invoiceNumber || invoiceNumber === 'N/A') {
                     return <div className="font-mono text-sm">N/A</div>;
                 }
@@ -142,9 +142,9 @@ export default function Orders() {
 
                 return (
                     <div className="flex justify-end gap-2">
-                        {order.invoice_url && (
+                        {order.invoiceUrl && (
                             <Button variant="outline" size="sm" asChild>
-                                <a href={order.invoice_url} target="_blank" rel="noopener noreferrer">
+                                <a href={order.invoiceUrl} target="_blank" rel="noopener noreferrer">
                                     <ExternalLink className="mr-1 size-4" />
                                     View
                                 </a>

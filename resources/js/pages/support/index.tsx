@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pagination } from '@/components/ui/pagination';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, PaginatedData, SupportTicket } from '@/types';
+import type { BreadcrumbItem, PaginatedData } from '@/types';
 import { formatPriority, formatStatus, getPriorityVariant, getStatusVariant } from '@/utils/support-ticket';
 import { Head, Link, router } from '@inertiajs/react';
 import { format } from 'date-fns';
@@ -20,7 +20,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface SupportTicketsIndexProps {
-    tickets: SupportTicket[];
+    tickets: App.Data.SupportTicketData[];
     ticketsPagination: PaginatedData;
 }
 
@@ -91,11 +91,11 @@ export default function SupportTicketsIndex({ tickets, ticketsPagination }: Supp
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <Calendar className="size-4" />
-                                                <span>{format(new Date(ticket.created_at), 'MMM d, yyyy')}</span>
+                                                <span>{ticket.createdAt ? format(new Date(ticket.createdAt), 'MMM d, yyyy') : 'N/A'}</span>
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <Clock className="size-4" />
-                                                <span>Updated {format(new Date(ticket.updated_at), 'MMM d, yyyy')}</span>
+                                                <span>Updated {ticket.updatedAt ? format(new Date(ticket.updatedAt), 'MMM d, yyyy') : 'N/A'}</span>
                                             </div>
                                         </div>
                                     </CardContent>

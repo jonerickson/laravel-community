@@ -1,4 +1,3 @@
-import type { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 
 interface UsePermissionsReturn {
@@ -13,7 +12,7 @@ interface UsePermissionsReturn {
 }
 
 export function usePermissions(): UsePermissionsReturn {
-    const { auth } = usePage<SharedData>().props;
+    const { auth } = usePage<App.Data.SharedData>().props;
     const can = (permission: string): boolean => {
         return Array.isArray(auth?.can) && auth.can.includes(permission);
     };

@@ -7,20 +7,20 @@ import { StoreProductReviewsList } from '@/components/store-product-reviews-list
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { Comment, PaginatedData, Product as ProductType } from '@/types';
+import type { PaginatedData } from '@/types';
 import { Deferred, useForm, usePage } from '@inertiajs/react';
 import { ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface ProductProps {
-    product: ProductType;
-    reviews: Comment[];
+    product: App.Data.ProductData;
+    reviews: App.Data.CommentData[];
     reviewsPagination: PaginatedData;
 }
 
 export default function Product({ product: productData, reviews, reviewsPagination }: ProductProps) {
     const { auth } = usePage<App.Data.SharedData>().props;
-    const [selectedPriceId, setSelectedPriceId] = useState<number | null>(productData?.default_price?.id || null);
+    const [selectedPriceId, setSelectedPriceId] = useState<number | null>(productData?.defaultPrice?.id || null);
     const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
@@ -33,15 +33,15 @@ export default function Product({ product: productData, reviews, reviewsPaginati
 
         if (productData?.prices && productData.prices.length === 1) {
             newPriceId = productData.prices[0].id;
-        } else if (productData?.default_price) {
-            newPriceId = productData.default_price.id;
+        } else if (productData?.defaultPrice) {
+            newPriceId = productData.defaultPrice.id;
         }
 
         if (newPriceId && newPriceId !== selectedPriceId) {
             setSelectedPriceId(newPriceId);
             setData('price_id', newPriceId);
         }
-    }, [productData?.default_price, productData?.prices, selectedPriceId, setData]);
+    }, [productData?.defaultPrice, productData?.prices, selectedPriceId, setData]);
 
     const handlePriceChange = (value: string) => {
         const priceId = value ? parseInt(value) : null;
@@ -75,7 +75,7 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                         description={
                             productData
                                 ? (() => {
-                                      const selectedPrice = productData.prices?.find((p) => p.id === selectedPriceId) || productData.default_price;
+                                      const selectedPrice = productData.prices?.find((p) => p.id === selectedPriceId) || productData.defaultPrice;
                                       return selectedPrice?.amount
                                           ? `$${(selectedPrice.amount / 100).toFixed(2)} ${selectedPrice.currency}${selectedPrice.interval ? ` / ${selectedPrice.interval}` : ''}`
                                           : 'Price TBD';
@@ -84,11 +84,11 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                         }
                     />
                     <div className="-mt-2 flex items-center gap-4">
-                        <StarRating rating={productData.average_rating || 0} showValue={true} />
+                        <StarRating rating={productData.averageRating || 0} showValue={true} />
                         <Deferred fallback={<div className="text-sm text-primary">Loading reviews...</div>} data="reviews">
                             <Dialog open={isRatingModalOpen} onOpenChange={setIsRatingModalOpen}>
                                 <DialogTrigger asChild>
-                                    <button className="text-sm text-primary hover:underline">See all {productData.reviews_count || 0} reviews</button>
+                                    <button className="text-sm text-primary hover:underline">See all {productData.reviewsCount || 0} reviews</button>
                                 </DialogTrigger>
                                 <DialogContent className="max-h-[80vh] min-w-[90vh] overflow-y-auto">
                                     <DialogHeader>
@@ -121,10 +121,10 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                     <h2 className="sr-only">Images</h2>
 
                     <div className="grid grid-cols-1 lg:flex-1 lg:grid-cols-2 lg:gap-8">
-                        {productData?.featured_image_url ? (
+                        {productData?.featuredImageUrl ? (
                             <img
                                 alt={productData.name}
-                                src={productData.featured_image_url}
+                                src={productData.featuredImageUrl}
                                 className="col-span-2 row-span-2 h-full w-full rounded-lg object-cover"
                             />
                         ) : (
@@ -137,10 +137,10 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                     <div className="mt-4">
                         <div className="flex gap-2 overflow-x-auto">
                             <div className="h-16 w-16 flex-shrink-0 rounded border border-border">
-                                {productData?.featured_image_url ? (
+                                {productData?.featuredImageUrl ? (
                                     <img
                                         alt={`${productData.name} thumbnail`}
-                                        src={productData.featured_image_url}
+                                        src={productData.featuredImageUrl}
                                         className="h-full w-full rounded object-cover"
                                     />
                                 ) : (
@@ -183,7 +183,7 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                                             </SelectContent>
                                         </Select>
                                     </div>
-                                    {errors.price_id && <div className="text-sm text-red-600">{errors.price_id}</div>}
+                                    {errors.price_id && <div className="text-sm text-destructive">{errors.price_id}</div>}
                                 </div>
                             )}
 
@@ -205,7 +205,7 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                {errors.quantity && <div className="text-sm text-red-600">{errors.quantity}</div>}
+                                {errors.quantity && <div className="text-sm text-destructive">{errors.quantity}</div>}
                             </div>
                         </div>
                     )}

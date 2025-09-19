@@ -2,12 +2,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import type { Product } from '@/types';
+import { getPriceDisplay } from '@/utils/price-display';
 import { Link } from '@inertiajs/react';
-import { NewspaperIcon, SparklesIcon, StarIcon, TrendingUpIcon } from 'lucide-react';
+import { NewspaperIcon, SparklesIcon, TrendingUpIcon } from 'lucide-react';
 
 interface DashboardProductCardProps {
-    product: Product;
+    product: App.Data.ProductData;
     type: 'newest' | 'popular' | 'featured';
     className?: string;
 }
@@ -64,9 +64,9 @@ export default function DashboardProductCard({ product, type, className }: Dashb
 
             <CardContent className="relative space-y-4">
                 <div className="aspect-[4/3] overflow-hidden rounded-md bg-muted">
-                    {product.featured_image_url ? (
+                    {product.featuredImageUrl ? (
                         <img
-                            src={product.featured_image_url}
+                            src={product.featuredImageUrl}
                             alt={product.name}
                             className="h-full w-full object-cover transition-transform group-hover:scale-105"
                         />
@@ -83,21 +83,8 @@ export default function DashboardProductCard({ product, type, className }: Dashb
                     {product.description && <p className="line-clamp-2 text-sm text-muted-foreground">{product.description}</p>}
 
                     <div className="flex items-center justify-between">
-                        <span className="text-base font-bold">${product.price?.toFixed(2) || '0.00'}</span>
-
-                        {product.rating && (
-                            <div className="flex items-center gap-1">
-                                <StarIcon className="size-3 fill-yellow-400 text-yellow-400" />
-                                <span className="text-xs text-muted-foreground">{product.rating.toFixed(1)}</span>
-                            </div>
-                        )}
+                        <span className="text-base font-bold">{getPriceDisplay(product)}</span>
                     </div>
-
-                    {product.category && (
-                        <Badge variant="outline" className="h-5 text-xs">
-                            {product.category.name}
-                        </Badge>
-                    )}
                 </div>
             </CardContent>
 

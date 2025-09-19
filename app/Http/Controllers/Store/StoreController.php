@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Store;
 
+use App\Data\ProductCategoryData;
+use App\Data\ProductData;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductCategory;
@@ -15,18 +17,18 @@ class StoreController extends Controller
     public function __invoke(): Response
     {
         return Inertia::render('store/index', [
-            'categories' => ProductCategory::query()
+            'categories' => ProductCategoryData::collect(ProductCategory::query()
                 ->with('image')
                 ->latest()
                 ->take(5)
-                ->get(),
-            'featuredProducts' => Product::query()
+                ->get()),
+            'featuredProducts' => ProductData::collect(Product::query()
                 ->products()
                 ->featured()
                 ->with('categories')
                 ->latest()
                 ->take(6)
-                ->get(),
+                ->get()),
             'userProvidedProducts' => [],
         ]);
     }

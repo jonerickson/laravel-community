@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Comment, SupportTicket } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { formatPriority, formatStatus, getPriorityVariant, getStatusVariant } from '@/utils/support-ticket';
 import { Head, router, useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
@@ -16,7 +16,7 @@ import { Calendar, CheckCircle, Clock, FileText, Flag, Lock, LockOpen, MessageCi
 import { useState } from 'react';
 
 interface SupportTicketShowProps {
-    ticket: SupportTicket;
+    ticket: App.Data.SupportTicketData;
 }
 
 export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
@@ -40,8 +40,8 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
         },
     ];
 
-    const createdAt = new Date(ticket.created_at);
-    const updatedAt = new Date(ticket.updated_at);
+    const createdAt = ticket.createdAt ? new Date(ticket.createdAt) : new Date();
+    const updatedAt = ticket.updatedAt ? new Date(ticket.updatedAt) : new Date();
 
     const handleCommentSuccess = () => {
         setShowCommentForm(false);
@@ -125,7 +125,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                         <CardDescription>Comment history and updates</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
-                                        {ticket.comments.map((comment: Comment, index: number) => (
+                                        {ticket.comments.map((comment: App.Data.CommentData, index: number) => (
                                             <div key={comment.id}>
                                                 <div className="flex items-start gap-3">
                                                     {comment.author && (
@@ -140,7 +140,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                                         <div className="flex items-center gap-2 text-sm">
                                                             <span className="font-medium">{comment.author?.name}</span>
                                                             <span className="text-muted-foreground">
-                                                                {format(new Date(comment.created_at), 'PPp')}
+                                                                {comment.createdAt ? format(new Date(comment.createdAt), 'PPp') : 'N/A'}
                                                             </span>
                                                         </div>
                                                         <RichEditorContent content={comment.content} />
@@ -190,11 +190,11 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                         <span className="font-medium">{ticket.author?.name}</span>
                                     </div>
 
-                                    {ticket.assignedTo && (
+                                    {ticket.assignedToUser && (
                                         <div className="flex items-center gap-2 text-sm">
                                             <User className="size-4 text-muted-foreground" />
                                             <span className="text-muted-foreground">Assigned to:</span>
-                                            <span className="font-medium">{ticket.assignedTo.name}</span>
+                                            <span className="font-medium">{ticket.assignedToUser.name}</span>
                                         </div>
                                     )}
 
@@ -210,19 +210,19 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                         <span className="font-medium">{format(updatedAt, 'PPP')}</span>
                                     </div>
 
-                                    {ticket.resolved_at && (
+                                    {ticket.resolvedAt && (
                                         <div className="flex items-center gap-2 text-sm">
                                             <Calendar className="size-4 text-muted-foreground" />
                                             <span className="text-muted-foreground">Resolved:</span>
-                                            <span className="font-medium">{format(new Date(ticket.resolved_at), 'PPP')}</span>
+                                            <span className="font-medium">{format(new Date(ticket.resolvedAt), 'PPP')}</span>
                                         </div>
                                     )}
 
-                                    {ticket.closed_at && (
+                                    {ticket.closedAt && (
                                         <div className="flex items-center gap-2 text-sm">
                                             <Calendar className="size-4 text-muted-foreground" />
                                             <span className="text-muted-foreground">Closed:</span>
-                                            <span className="font-medium">{format(new Date(ticket.closed_at), 'PPP')}</span>
+                                            <span className="font-medium">{format(new Date(ticket.closedAt), 'PPP')}</span>
                                         </div>
                                     )}
                                 </div>
@@ -250,7 +250,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                                         {file.name}
                                                     </a>
                                                 </div>
-                                                {ticket.is_active && (
+                                                {ticket.isActive && (
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
@@ -272,7 +272,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                 <CardTitle className="text-base">Actions</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-2">
-                                {ticket.is_active ? (
+                                {ticket.isActive ? (
                                     <>
                                         <Button
                                             variant="outline"

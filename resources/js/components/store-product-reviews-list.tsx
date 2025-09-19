@@ -1,11 +1,11 @@
 import { StarRating } from '@/components/star-rating';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Pagination } from '@/components/ui/pagination';
-import type { Comment, PaginatedData } from '@/types';
+import type { PaginatedData } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 
 interface ProductReviewsListProps {
-    reviews: Comment[];
+    reviews: App.Data.CommentData[];
     reviewsPagination: PaginatedData;
 }
 
@@ -36,9 +36,9 @@ export function StoreProductReviewsList({ reviews, reviewsPagination }: ProductR
                                     {review.rating && <StarRating rating={review.rating} size="sm" />}
                                 </div>
                                 <p className="mb-2 text-xs text-muted-foreground">
-                                    {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
+                                    {review.createdAt ? formatDistanceToNow(new Date(review.createdAt), { addSuffix: true }) : 'N/A'}
                                 </p>
-                                {review.content && <p className="text-sm leading-relaxed text-foreground">{review.content}</p>}
+                                {review.content && <span className="text-sm leading-relaxed text-foreground">{review.content}</span>}
                             </div>
                         </div>
                     </div>

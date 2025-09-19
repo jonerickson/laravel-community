@@ -2,14 +2,13 @@ import DashboardProductCard from '@/components/dashboard-product-card';
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import type { Product } from '@/types';
 import { Link } from '@inertiajs/react';
 import { ShoppingCart, Store } from 'lucide-react';
 
 interface DashboardProductGridProps {
-    newestProduct?: Product;
-    popularProduct?: Product;
-    featuredProduct?: Product;
+    newestProduct?: App.Data.ProductData;
+    popularProduct?: App.Data.ProductData;
+    featuredProduct?: App.Data.ProductData;
 }
 
 export default function DashboardProductGrid({ newestProduct, popularProduct, featuredProduct }: DashboardProductGridProps) {

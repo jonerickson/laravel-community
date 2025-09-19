@@ -2,7 +2,7 @@ import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
 import StoreIndexCategoriesItem from '@/components/store-index-categories-item';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, ProductCategory } from '@/types';
+import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { FolderIcon } from 'lucide-react';
 
@@ -18,7 +18,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface StoreCategoriesIndexProps {
-    categories: ProductCategory[];
+    categories: App.Data.ProductCategoryData[];
 }
 
 export default function StoreCategoriesIndex({ categories }: StoreCategoriesIndexProps) {

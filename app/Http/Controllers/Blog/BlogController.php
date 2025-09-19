@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Blog;
 
+use App\Data\CommentData;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -65,7 +66,7 @@ class BlogController extends Controller
 
         return Inertia::render('blog/show', [
             'post' => $post->loadMissing(['author']),
-            'comments' => Inertia::defer(fn () => $comments->items()),
+            'comments' => Inertia::defer(fn () => CommentData::collect($comments->items())),
             'commentsPagination' => Arr::except($comments->toArray(), ['data']),
             'recentViewers' => Inertia::defer(fn (): array => $post->getRecentViewers()),
         ]);

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\SupportTickets;
 
+use App\Data\SupportTicketCategoryData;
+use App\Data\SupportTicketData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SupportTickets\StoreSupportTicketRequest;
 use App\Http\Requests\SupportTickets\UpdateSupportTicketRequest;
@@ -34,7 +36,7 @@ class SupportTicketController extends Controller
             ->paginate(15);
 
         return Inertia::render('support/index', [
-            'tickets' => Inertia::merge(fn () => $tickets->items()),
+            'tickets' => Inertia::merge(fn () => SupportTicketData::collect($tickets->items())),
             'ticketsPagination' => Arr::except($tickets->toArray(), ['data']),
         ]);
     }
@@ -44,7 +46,7 @@ class SupportTicketController extends Controller
         $categories = SupportTicketCategory::active()->ordered()->get();
 
         return Inertia::render('support/create', [
-            'categories' => $categories,
+            'categories' => SupportTicketCategoryData::collect($categories),
         ]);
     }
 
@@ -65,7 +67,7 @@ class SupportTicketController extends Controller
         $ticket->loadMissing(['category', 'author', 'assignedTo', 'comments.author', 'files']);
 
         return Inertia::render('support/show', [
-            'ticket' => $ticket,
+            'ticket' => SupportTicketData::from($ticket),
         ]);
     }
 

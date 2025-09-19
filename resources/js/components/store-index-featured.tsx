@@ -1,10 +1,9 @@
 import Heading from '@/components/heading';
-import { type Product } from '@/types';
 import { Link } from '@inertiajs/react';
 import { ImageIcon } from 'lucide-react';
 
 interface StoreFeaturedProps {
-    products: Product[];
+    products: App.Data.ProductData[];
 }
 
 export default function StoreIndexFeatured({ products }: StoreFeaturedProps) {
@@ -26,10 +25,10 @@ export default function StoreIndexFeatured({ products }: StoreFeaturedProps) {
                             index === 0 ? 'sm:row-span-2 sm:aspect-square' : 'sm:aspect-auto'
                         }`}
                     >
-                        {product.featured_image_url ? (
+                        {product.featuredImageUrl ? (
                             <img
                                 alt={product.name}
-                                src={product.featured_image_url}
+                                src={product.featuredImageUrl}
                                 className="absolute size-full object-cover group-hover:opacity-75"
                             />
                         ) : (

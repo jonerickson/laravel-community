@@ -1,10 +1,9 @@
 import Heading from '@/components/heading';
 import StoreIndexCategoriesItem from '@/components/store-index-categories-item';
-import { ProductCategory } from '@/types';
 import { Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 
-export default function StoreIndexCategories({ categories }: { categories: ProductCategory[] }) {
+export default function StoreIndexCategories({ categories }: { categories: App.Data.ProductCategoryData[] }) {
     return (
         <div>
             <div className="sm:flex sm:items-baseline sm:justify-between">

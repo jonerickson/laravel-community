@@ -15,4 +15,8 @@ class ProductCategoryData extends Data
     public string $name;
 
     public string $slug;
+
+    public ?string $description;
+
+    public ?ImageData $image;
 }

@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, SupportTicketCategory } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { toast } from 'sonner';
 
@@ -23,7 +23,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface CreateSupportTicketProps {
-    categories: SupportTicketCategory[];
+    categories: App.Data.SupportTicketCategoryData[];
 }
 
 export default function CreateSupportTicket({ categories }: CreateSupportTicketProps) {

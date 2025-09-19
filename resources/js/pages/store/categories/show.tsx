@@ -2,13 +2,13 @@ import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
 import StoreCategoriesProductItem from '@/components/store-categories-product-item';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Product, ProductCategory } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { ShoppingBag } from 'lucide-react';
 
 interface StoreCategoryShowProps {
-    category: ProductCategory;
-    products: Product[];
+    category: App.Data.ProductCategoryData;
+    products: App.Data.ProductData[];
 }
 
 export default function StoreCategoryShow({ category, products }: StoreCategoryShowProps) {
@@ -47,11 +47,11 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
             name: product.name,
             description: product.description,
             url: route('store.products.show', { product: product.slug }),
-            image: product.featured_image_url,
+            image: product.featuredImageUrl,
             category: category.name,
             offers: {
                 '@type': 'Offer',
-                price: product.price,
+                price: product.defaultPrice?.amount ? product.defaultPrice.amount / 100 : 0,
                 priceCurrency: 'USD',
             },
         })),
@@ -68,12 +68,12 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
             <div className="flex h-full flex-1 flex-col overflow-x-auto">
-                <Heading title={category.name} description={category.description} />
+                <Heading title={category.name} description={category.description || undefined} />
 
                 {products.length > 0 ? (
                     <div className="-mt-6 grid grid-cols-2 sm:-mx-6 md:grid-cols-3 lg:grid-cols-4">
                         {products.map((product) => (
-                            <StoreCategoriesProductItem product={product} />
+                            <StoreCategoriesProductItem key={product.id} product={product} />
                         ))}
                     </div>
                 ) : (

@@ -1,13 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import type { SupportTicket } from '@/types';
+// No import needed, using App.Data.SupportTicketData directly
 import { useForm } from '@inertiajs/react';
 import { X } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface SupportTicketAttachmentFormProps {
-    ticket: SupportTicket;
+    ticket: App.Data.SupportTicketData;
     onCancel?: () => void;
     onSuccess?: () => void;
 }

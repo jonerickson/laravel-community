@@ -2,14 +2,14 @@ import HeadingSmall from '@/components/heading-small';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import type { SupportTicket } from '@/types';
+// No import needed, using App.Data.SupportTicketData directly
 import { formatPriority, formatStatus, getPriorityVariant, getStatusVariant } from '@/utils/support-ticket';
 import { Link } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Clock, Flag, Plus, Ticket } from 'lucide-react';
 
 interface SupportTicketsWidgetProps {
-    tickets?: SupportTicket[];
+    tickets?: App.Data.SupportTicketData[];
     className?: string;
 }
 
@@ -66,7 +66,7 @@ export default function SupportTicketWidget({ tickets = [], className }: Support
                             <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                 <div className="flex items-center gap-1">
                                     <Clock className="size-3" />
-                                    <span>{format(new Date(ticket.created_at), 'MMM d')}</span>
+                                    <span>{ticket.createdAt ? format(new Date(ticket.createdAt), 'MMM d') : 'N/A'}</span>
                                 </div>
                                 <Badge variant={getStatusVariant(ticket.status)} className="px-1.5 py-0.5 text-xs">
                                     {formatStatus(ticket.status)}

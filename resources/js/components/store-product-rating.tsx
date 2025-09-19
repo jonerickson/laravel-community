@@ -2,13 +2,12 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useApiRequest } from '@/hooks/use-api-request';
 import { cn } from '@/lib/utils';
-import { Product } from '@/types';
 import { Star } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 interface ProductRatingProps {
-    product: Product;
+    product: App.Data.ProductData;
     onRatingAdded?: () => void;
 }
 

@@ -2,7 +2,7 @@ import StoreIndexCategories from '@/components/store-index-categories';
 import StoreIndexFeatured from '@/components/store-index-featured';
 import StoreIndexUserProvided from '@/components/store-index-user-provided';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Product, ProductCategory } from '@/types';
+import { type BreadcrumbItem } from '@/types';
 import { Head, WhenVisible } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -13,9 +13,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface StoreIndexProps {
-    categories: ProductCategory[];
-    featuredProducts: Product[];
-    userProvidedProducts: Product[];
+    categories: App.Data.ProductCategoryData[];
+    featuredProducts: App.Data.ProductData[];
+    userProvidedProducts: App.Data.ProductData[];
 }
 
 export default function StoreIndex({ categories, featuredProducts, userProvidedProducts }: StoreIndexProps) {

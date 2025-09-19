@@ -6,7 +6,7 @@ import TrendingTopicsWidget from '@/components/trending-topics-widget';
 import WidgetLoading from '@/components/widget-loading';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type Post, type Product, type SupportTicket, type Topic } from '@/types';
+import { type BreadcrumbItem, type Post, type Topic } from '@/types';
 import { Deferred, Head } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -18,11 +18,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface DashboardProps {
-    newestProduct?: Product;
-    popularProduct?: Product;
-    featuredProduct?: Product;
+    newestProduct?: App.Data.ProductData;
+    popularProduct?: App.Data.ProductData;
+    featuredProduct?: App.Data.ProductData;
     announcements?: App.Data.AnnouncementData[];
-    supportTickets?: SupportTicket[];
+    supportTickets?: App.Data.SupportTicketData[];
     trendingTopics?: Topic[];
     latestBlogPosts?: Post[];
 }

@@ -1,12 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
-import type { SupportTicket } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { toast } from 'sonner';
 
 interface SupportTicketCommentFormProps {
-    ticket: SupportTicket;
+    ticket: App.Data.SupportTicketData;
     onCancel?: () => void;
     onSuccess?: () => void;
 }

@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { UserInfo } from '@/components/user-info';
 import { pluralize } from '@/lib/utils';
-import { Comment, Post, type PaginatedData } from '@/types';
+import { Post, type PaginatedData } from '@/types';
 import { Deferred } from '@inertiajs/react';
 import { Calendar, Clock, Eye, MessageSquare } from 'lucide-react';
 import usePermissions from '../hooks/use-permissions';
@@ -22,7 +22,7 @@ interface RecentViewer {
 
 interface BlogPostProps {
     post: Post;
-    comments: Comment[];
+    comments: App.Data.CommentData[];
     commentsPagination: PaginatedData;
     recentViewers: RecentViewer[];
 }

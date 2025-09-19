@@ -1,30 +1,8 @@
 import { LucideIcon } from 'lucide-react';
-import type { Config } from 'ziggy-js';
 
 export interface BreadcrumbItem {
     title: string;
     href: string;
-}
-
-export interface Comment {
-    id: number;
-    commentable_type: string;
-    commentable_id: number;
-    content: string;
-    is_approved: boolean;
-    created_by: number;
-    parent_id?: number | null;
-    rating?: number | null;
-    likes_count: number;
-    likes_summary: App.Data.LikeData[];
-    user_reaction?: string | null;
-    user_reactions: string[];
-    user?: App.Data.UserData;
-    author?: App.Data.UserData;
-    parent?: Comment;
-    replies?: Comment[];
-    created_at: string;
-    updated_at: string;
 }
 
 export interface Forum {
@@ -59,45 +37,6 @@ export interface ForumCategory {
     image?: Image | null;
     created_at: string;
     updated_at: string;
-}
-
-export interface Image {
-    id: number;
-    imageable_type: string;
-    imageable_id: number;
-    path: string;
-    url: string;
-    created_at: string;
-    updated_at: string;
-}
-
-export interface Order {
-    id: number;
-    user_id: number;
-    status: OrderStatus;
-    amount?: number | null;
-    invoice_url?: string | null;
-    reference_id?: string | null;
-    invoice_number?: string | null;
-    external_checkout_id?: string | null;
-    external_order_id?: string | null;
-    external_payment_id?: string | null;
-    external_invoice_id?: string | null;
-    created_at: string;
-    updated_at: string;
-    items?: OrderItem[];
-}
-
-export interface OrderItem {
-    id: number;
-    order_id: number;
-    product_id?: number | null;
-    price_id?: number | null;
-    quantity?: number;
-    created_at: string;
-    updated_at: string;
-    product?: Product | null;
-    price?: ProductPrice | null;
 }
 
 export interface NavGroup {
@@ -158,110 +97,9 @@ export interface Post {
     metadata?: Record<string, never> | null;
     created_at: string;
     updated_at: string;
-    comments?: Comment[];
+    comments?: App.Data.CommentData[];
     is_reported?: boolean;
     report_count?: number;
-}
-
-export interface Product {
-    id: number;
-    name: string;
-    slug: string;
-    description: string;
-    type: ProductType;
-    tax_code: ProductTaxCode;
-    is_featured: boolean;
-    featured_image?: string | null;
-    featured_image_url?: string | null;
-    external_product_id?: string | null;
-    metadata?: Record<string, never> | null;
-    prices?: ProductPrice[];
-    default_price?: ProductPrice | null;
-    created_at: string;
-    updated_at: string;
-    image?: string | null;
-    price?: number;
-    rating?: number;
-    average_rating?: number;
-    reviews_count?: number;
-    category?: ProductCategory | null;
-    reviews?: Comment[];
-    policies?: Policy[];
-}
-
-export interface ProductCategory {
-    id: number;
-    name: string;
-    slug: string;
-    description?: string;
-    image?: Image | null;
-}
-
-export interface ProductPrice {
-    id: number;
-    product_id: number;
-    name: string;
-    description?: string | null;
-    amount: number;
-    currency: string;
-    interval?: string | null;
-    interval_count: number;
-    is_active: boolean;
-    is_default: boolean;
-    external_price_id?: string | null;
-    metadata?: Record<string, never> | null;
-    created_at: string;
-    updated_at: string;
-}
-
-export interface SharedData {
-    auth: App.Data.AuthData;
-    name: string;
-    cartCount?: number;
-    flash?: App.Data.FlashData;
-    sidebarOpen: boolean;
-    ziggy: Config & { location: string };
-    quote?: {
-        message: string;
-        author: string;
-    };
-    [key: string]: unknown;
-}
-
-export interface SupportTicket {
-    id: number;
-    subject: string;
-    description: string;
-    status: App.Enums.SupportTicketStatus;
-    priority: App.Enums.SupportTicketPriority;
-    support_ticket_category_id: number;
-    category?: App.Enums.SupportTicketCategory;
-    assigned_to?: number | null;
-    assignedTo?: App.Data.UserData | null;
-    created_by: number;
-    author?: App.Data.UserData;
-    external_id?: string | null;
-    external_url?: string | null;
-    last_synced_at?: string | null;
-    resolved_at?: string | null;
-    closed_at?: string | null;
-    created_at: string;
-    updated_at: string;
-    comments?: Comment[];
-    files?: { id: string; name: string; url: string }[];
-    is_active: boolean;
-}
-
-export interface SupportTicketCategory {
-    id: number;
-    name: string;
-    slug: string;
-    description?: string | null;
-    color?: string | null;
-    order: number;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string;
 }
 
 export interface Topic {

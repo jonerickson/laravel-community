@@ -9,7 +9,8 @@
       "Read(//Users/jonerickson/Downloads/**)",
       "Bash(mv:*)",
       "mcp__laravel-boost__browser-logs",
-      "mcp__laravel-boost__tinker"
+      "mcp__laravel-boost__tinker",
+      "Bash(npm run types:*)"
     ],
     "deny": []
   },

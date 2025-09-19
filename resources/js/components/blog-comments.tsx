@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
 import { Textarea } from '@/components/ui/textarea';
 import { UserInfo } from '@/components/user-info';
-import { Comment, type PaginatedData, Post } from '@/types';
+import { type PaginatedData, Post } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { Edit, MessageCircle, Reply, Trash } from 'lucide-react';
 import { useState } from 'react';
@@ -14,13 +14,13 @@ import usePermissions from '../hooks/use-permissions';
 
 interface BlogCommentsProps {
     post: Post;
-    comments: Comment[];
+    comments: App.Data.CommentData[];
     commentsPagination: PaginatedData;
 }
 
 interface CommentItemProps {
     post: Post;
-    comment: Comment;
+    comment: App.Data.CommentData;
     onReply: (parentId: number) => void;
     replyingTo: number | null;
 }
@@ -28,7 +28,7 @@ interface CommentItemProps {
 function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
     const { can, cannot, hasAnyPermission } = usePermissions();
     const [isEditing, setIsEditing] = useState(false);
-    const commentDate = new Date(comment.created_at);
+    const commentDate = new Date(comment.createdAt || 'today');
     const formattedDate = commentDate.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -131,7 +131,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                             </span>
                         )}
                     </div>
-                    <time className="text-xs text-muted-foreground" dateTime={comment.created_at} itemProp="datePublished">
+                    <time className="text-xs text-muted-foreground" dateTime={comment.createdAt || undefined} itemProp="datePublished">
                         {formattedDate}
                     </time>
                 </div>
@@ -188,8 +188,8 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                                 {can('like_comments') && (
                                     <EmojiReactions
                                         comment={comment}
-                                        initialReactions={comment.likes_summary}
-                                        userReactions={comment.user_reactions}
+                                        initialReactions={comment.likesSummary}
+                                        userReactions={comment.userReactions}
                                         className="ml-auto"
                                     />
                                 )}
@@ -262,7 +262,7 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
         });
     };
 
-    const approvedComments = comments.filter((comment) => comment.is_approved && !comment.parent_id) || [];
+    const approvedComments = comments.filter((comment) => comment.isApproved && !comment.parentId) || [];
 
     if (!post.comments_enabled) {
         return (

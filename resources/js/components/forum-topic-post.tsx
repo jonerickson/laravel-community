@@ -136,7 +136,9 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                                                 <div className="mb-1 flex items-center gap-2">
                                                     <span className="text-sm font-medium">{comment.user?.name}</span>
                                                     <span className="text-xs text-muted-foreground">
-                                                        {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                                                        {comment.createdAt
+                                                            ? formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })
+                                                            : 'N/A'}
                                                     </span>
                                                 </div>
                                                 <p className="text-sm">{comment.content}</p>

@@ -1,7 +1,7 @@
 import BlogPost from '@/components/blog-post';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Comment, PaginatedData, Post } from '@/types';
+import type { BreadcrumbItem, PaginatedData, Post } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 
@@ -16,7 +16,7 @@ interface RecentViewer {
 
 interface BlogShowProps {
     post: Post;
-    comments: Comment[];
+    comments: App.Data.CommentData[];
     commentsPagination: PaginatedData;
     recentViewers: RecentViewer[];
 }
