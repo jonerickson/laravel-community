@@ -1,24 +1,15 @@
 import BlogPost from '@/components/blog-post';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, PaginatedData, Post } from '@/types';
+import type { BreadcrumbItem, Post } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-
-interface RecentViewer {
-    user: {
-        id: number;
-        name: string;
-        avatar?: string;
-    };
-    viewed_at: string;
-}
 
 interface BlogShowProps {
     post: Post;
     comments: App.Data.CommentData[];
-    commentsPagination: PaginatedData;
-    recentViewers: RecentViewer[];
+    commentsPagination: App.Data.PaginatedData;
+    recentViewers: App.Data.RecentViewerData[];
 }
 
 export default function BlogShow({ post, comments, commentsPagination, recentViewers }: BlogShowProps) {

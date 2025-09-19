@@ -146,7 +146,7 @@ trait Readable
             'user' => [
                 'id' => $read->author->id,
                 'name' => $read->author->name,
-                'avatar' => $read->author->avatar,
+                'avatarUrl' => $read->author->avatar_url,
             ],
             'viewed_at' => $read->updated_at->toISOString(),
         ])->toArray();

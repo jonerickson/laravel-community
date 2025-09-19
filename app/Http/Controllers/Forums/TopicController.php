@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Forums;
 
 use App\Actions\Forums\DeleteTopicAction;
+use App\Data\PaginatedData;
+use App\Data\RecentViewerData;
 use App\Enums\PostType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Forums\StoreTopicRequest;
@@ -53,8 +55,8 @@ class TopicController extends Controller
             'forum' => $forum,
             'topic' => $topic->load(['author', 'forum']),
             'posts' => Inertia::merge(fn () => $posts->items()),
-            'postsPagination' => Arr::except($posts->toArray(), ['data']),
-            'recentViewers' => Inertia::defer(fn (): array => $topic->getRecentViewers()),
+            'postsPagination' => PaginatedData::from(Arr::except($posts->toArray(), ['data'])),
+            'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($topic->getRecentViewers())),
         ]);
     }
 

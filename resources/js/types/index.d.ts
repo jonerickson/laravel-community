@@ -53,21 +53,6 @@ export interface NavItem {
     shouldShow?: boolean | ((auth: App.Data.AuthData) => boolean);
 }
 
-export interface PaginatedData {
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    from: number;
-    to: number;
-    links: {
-        first: string | null;
-        last: string | null;
-        prev: string | null;
-        next: string | null;
-    };
-}
-
 export interface Post {
     id: number;
     type: PostType;

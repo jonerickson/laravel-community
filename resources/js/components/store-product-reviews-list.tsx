@@ -1,12 +1,11 @@
 import { StarRating } from '@/components/star-rating';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Pagination } from '@/components/ui/pagination';
-import type { PaginatedData } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 
 interface ProductReviewsListProps {
     reviews: App.Data.CommentData[];
-    reviewsPagination: PaginatedData;
+    reviewsPagination: App.Data.PaginatedData;
 }
 
 export function StoreProductReviewsList({ reviews, reviewsPagination }: ProductReviewsListProps) {

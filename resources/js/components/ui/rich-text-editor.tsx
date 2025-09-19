@@ -1,10 +1,8 @@
 import { useEditor, EditorContent, type Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
-import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import TextAlign from '@tiptap/extension-text-align';
-import { Code as CodeExtension }from '@tiptap/extension-code';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -407,9 +405,6 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
             Placeholder.configure({
                 placeholder,
             }),
-            Link.configure({
-                openOnClick: false,
-            }),
             TextAlign.configure({
                 types: ['heading', 'paragraph'],
             }),
@@ -418,7 +413,6 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                 emojis: gitHubEmojis,
                 enableEmoticons: true,
             }),
-            CodeExtension
         ],
         content,
         onUpdate: ({ editor }) => {

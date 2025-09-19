@@ -4,7 +4,7 @@ import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
 import { Spinner } from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, PaginatedData, Post } from '@/types';
+import type { BreadcrumbItem, Post } from '@/types';
 import { Head, usePage, WhenVisible } from '@inertiajs/react';
 import { Newspaper } from 'lucide-react';
 import usePermissions from '../../hooks/use-permissions';
@@ -18,7 +18,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface BlogIndexProps {
     posts: Post[];
-    postsPagination: PaginatedData;
+    postsPagination: App.Data.PaginatedData;
 }
 
 export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
@@ -102,15 +102,15 @@ export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
 
                             <WhenVisible
                                 fallback={<></>}
-                                always={postsPagination.current_page < postsPagination.last_page}
+                                always={postsPagination.currentPage < postsPagination.lastPage}
                                 params={{
                                     data: {
-                                        page: postsPagination.current_page + 1,
+                                        page: postsPagination.currentPage + 1,
                                     },
                                     only: ['posts', 'postsPagination'],
                                 }}
                             >
-                                {postsPagination.current_page >= postsPagination.last_page ? (
+                                {postsPagination.currentPage >= postsPagination.lastPage ? (
                                     <div className="flex items-center justify-center py-8 text-center">
                                         <HeadingSmall title="There are no more blog posts." description="Check back later." />
                                     </div>

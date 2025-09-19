@@ -8,7 +8,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
-import type { BreadcrumbItem, Forum, PaginatedData, Post, Topic } from '@/types';
+import type { BreadcrumbItem, Forum, Post, Topic } from '@/types';
 import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowDown, ArrowLeft, Clock, Eye, Lock, MessageSquare, Pin, Reply, User } from 'lucide-react';
@@ -16,21 +16,12 @@ import { useEffect, useState } from 'react';
 import { route } from 'ziggy-js';
 import usePermissions from '../../../hooks/use-permissions';
 
-interface RecentViewer {
-    user: {
-        id: number;
-        name: string;
-        avatar?: string;
-    };
-    viewed_at: string;
-}
-
 interface TopicShowProps {
     forum: Forum;
     topic: Topic;
     posts: Post[];
-    postsPagination: PaginatedData;
-    recentViewers: RecentViewer[];
+    postsPagination: App.Data.PaginatedData;
+    recentViewers: App.Data.RecentViewerData[];
 }
 
 export default function ForumTopicShow({ forum, topic, posts, postsPagination, recentViewers }: TopicShowProps) {
@@ -76,7 +67,7 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
 
     const goToLatestPost = () => {
         router.reload({
-            data: { page: postsPagination.last_page },
+            data: { page: postsPagination.lastPage },
             only: ['posts', 'postsPagination'],
             onSuccess: () => {
                 setTimeout(() => {

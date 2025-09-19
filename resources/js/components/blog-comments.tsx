@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
 import { Textarea } from '@/components/ui/textarea';
 import { UserInfo } from '@/components/user-info';
-import { type PaginatedData, Post } from '@/types';
+import { Post } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { Edit, MessageCircle, Reply, Trash } from 'lucide-react';
 import { useState } from 'react';
@@ -15,7 +15,7 @@ import usePermissions from '../hooks/use-permissions';
 interface BlogCommentsProps {
     post: Post;
     comments: App.Data.CommentData[];
-    commentsPagination: PaginatedData;
+    commentsPagination: App.Data.PaginatedData;
 }
 
 interface CommentItemProps {

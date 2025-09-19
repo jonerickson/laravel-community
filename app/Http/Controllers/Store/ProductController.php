@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Store;
 
+use App\Data\PaginatedData;
 use App\Data\ProductData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Store\StoreProductRequest;
@@ -65,7 +66,7 @@ class ProductController extends Controller
         return Inertia::render('store/products/show', [
             'product' => ProductData::from($product->loadMissing(['prices', 'defaultPrice'])),
             'reviews' => Inertia::defer(fn () => $reviews->items()),
-            'reviewsPagination' => Arr::except($reviews->toArray(), ['data']),
+            'reviewsPagination' => PaginatedData::from(Arr::except($reviews->toArray(), ['data'])),
         ]);
     }
 }

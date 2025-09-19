@@ -9,7 +9,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useApiRequest } from '@/hooks/use-api-request';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Forum, PaginatedData, Topic } from '@/types';
+import type { BreadcrumbItem, Forum, Topic } from '@/types';
 import { stripCharacters } from '@/utils/truncate';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
@@ -22,7 +22,7 @@ import usePermissions from '../../hooks/use-permissions';
 interface ForumShowProps {
     forum: Forum;
     topics: Topic[];
-    topicsPagination: PaginatedData;
+    topicsPagination: App.Data.PaginatedData;
 }
 
 export default function ForumShow({ forum, topics: initialTopics, topicsPagination }: ForumShowProps) {

@@ -7,7 +7,6 @@ import { StoreProductReviewsList } from '@/components/store-product-reviews-list
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { PaginatedData } from '@/types';
 import { Deferred, useForm, usePage } from '@inertiajs/react';
 import { ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -15,7 +14,7 @@ import { useEffect, useState } from 'react';
 interface ProductProps {
     product: App.Data.ProductData;
     reviews: App.Data.CommentData[];
-    reviewsPagination: PaginatedData;
+    reviewsPagination: App.Data.PaginatedData;
 }
 
 export default function Product({ product: productData, reviews, reviewsPagination }: ProductProps) {

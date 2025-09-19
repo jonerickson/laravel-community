@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pagination } from '@/components/ui/pagination';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, PaginatedData } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { formatPriority, formatStatus, getPriorityVariant, getStatusVariant } from '@/utils/support-ticket';
 import { Head, Link, router } from '@inertiajs/react';
 import { format } from 'date-fns';
@@ -21,7 +21,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface SupportTicketsIndexProps {
     tickets: App.Data.SupportTicketData[];
-    ticketsPagination: PaginatedData;
+    ticketsPagination: App.Data.PaginatedData;
 }
 
 export default function SupportTicketsIndex({ tickets, ticketsPagination }: SupportTicketsIndexProps) {

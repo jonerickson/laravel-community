@@ -1,12 +1,12 @@
 import Product from '@/components/store-product';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, PaginatedData } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
 interface ProductPageProps {
     product: App.Data.ProductData;
     reviews: App.Data.CommentData[];
-    reviewsPagination: PaginatedData;
+    reviewsPagination: App.Data.PaginatedData;
 }
 
 export default function StoreProductShow({ product, reviews, reviewsPagination }: ProductPageProps) {

@@ -350,7 +350,7 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
 
         cancelSubscription(route('store.subscriptions.destroy'), {
             onError: (err) => {
-                console.log('Failed to cancel subscription:', err);
+                console.error('Failed to cancel subscription:', err);
                 toast.error('Failed to cancel subscription. Please try again.');
             },
             onFinish: () => {

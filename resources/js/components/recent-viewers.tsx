@@ -1,18 +1,9 @@
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { formatDistanceToNow } from 'date-fns';
 
-interface RecentViewer {
-    user: {
-        id: number;
-        name: string;
-        avatar?: string;
-    };
-    viewed_at: string;
-}
-
 interface RecentViewersProps {
-    viewers: RecentViewer[];
+    viewers: App.Data.RecentViewerData[];
 }
 
 export default function RecentViewers({ viewers }: RecentViewersProps) {
@@ -28,12 +19,13 @@ export default function RecentViewers({ viewers }: RecentViewersProps) {
                     {viewers.map((viewer) => (
                         <div key={viewer.user.id} className="flex items-center gap-2 rounded-md bg-muted/50 p-2 text-sm">
                             <Avatar className="h-6 w-6">
+                                {viewer.user.avatarUrl && <AvatarImage src={viewer.user.avatarUrl} alt={viewer.user.name} />}
                                 <AvatarFallback className="text-xs">{viewer.user.name.charAt(0).toUpperCase()}</AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col">
                                 <span className="leading-none font-medium">{viewer.user.name}</span>
                                 <span className="text-xs text-muted-foreground">
-                                    {formatDistanceToNow(new Date(viewer.viewed_at), { addSuffix: true })}
+                                    {formatDistanceToNow(new Date(viewer.viewedAt), { addSuffix: true })}
                                 </span>
                             </div>
                         </div>

@@ -1,20 +1,19 @@
 import { Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import type { PaginatedData } from '@/types';
 import { pluralize } from '@/lib/utils';
 
 interface PaginationProps {
-    pagination: PaginatedData;
+    pagination: App.Data.PaginatedData;
     baseUrl: string;
     entityLabel: string;
     className?: string;
 }
 
 export function Pagination({ pagination, baseUrl, entityLabel, className }: PaginationProps) {
-    const { current_page, last_page, per_page, total } = pagination;
+    const { currentPage, lastPage, perPage, total } = pagination;
 
-    if (last_page <= 1) {
+    if (lastPage <= 1) {
         return null;
     }
 
@@ -23,14 +22,14 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
         const showPages = 5;
         const halfShow = Math.floor(showPages / 2);
 
-        let start = Math.max(1, current_page - halfShow);
-        let end = Math.min(last_page, current_page + halfShow);
+        let start = Math.max(1, currentPage - halfShow);
+        let end = Math.min(lastPage, currentPage + halfShow);
 
-        if (current_page <= halfShow) {
-            end = Math.min(last_page, showPages);
+        if (currentPage <= halfShow) {
+            end = Math.min(lastPage, showPages);
         }
-        if (current_page > last_page - halfShow) {
-            start = Math.max(1, last_page - showPages + 1);
+        if (currentPage > lastPage - halfShow) {
+            start = Math.max(1, lastPage - showPages + 1);
         }
 
         if (start > 1) {
@@ -44,11 +43,11 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
             pages.push(i);
         }
 
-        if (end < last_page) {
-            if (end < last_page - 1) {
+        if (end < lastPage) {
+            if (end < lastPage - 1) {
                 pages.push('...');
             }
-            pages.push(last_page);
+            pages.push(lastPage);
         }
 
         return pages;
@@ -59,14 +58,14 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
     return (
         <div className={`flex flex-col md:flex-row items-center justify-between gap-4 ${className || ''}`}>
             <div className="hidden md:block text-sm text-muted-foreground">
-                Showing {((current_page - 1) * per_page) + 1} to {Math.min(current_page * per_page, total)} of {total} {pluralize(entityLabel, total)}
+                Showing {((currentPage - 1) * perPage) + 1} to {Math.min(currentPage * perPage, total)} of {total} {pluralize(entityLabel, total)}
             </div>
 
             <div className="flex items-center gap-1 w-full md:w-auto justify-center overflow-x-auto">
                 {/* Previous Button */}
-                {current_page > 1 ? (
+                {currentPage > 1 ? (
                     <Link
-                        href={`${baseUrl}?page=${current_page - 1}`}
+                        href={`${baseUrl}?page=${currentPage - 1}`}
                         className="inline-flex"
                     >
                         <Button variant="outline" size="sm">
@@ -94,7 +93,7 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
                             className="inline-flex"
                         >
                             <Button
-                                variant={current_page === page ? "default" : "outline"}
+                                variant={currentPage === page ? "default" : "outline"}
                                 size="sm"
                                 className="min-w-[40px]"
                             >
@@ -105,9 +104,9 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
                 ))}
 
                 {/* Next Button */}
-                {current_page < last_page ? (
+                {currentPage < lastPage ? (
                     <Link
-                        href={`${baseUrl}?page=${current_page + 1}`}
+                        href={`${baseUrl}?page=${currentPage + 1}`}
                         className="inline-flex"
                     >
                         <Button variant="outline" size="sm">

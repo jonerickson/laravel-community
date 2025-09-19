@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\SupportTickets;
 
+use App\Data\PaginatedData;
 use App\Data\SupportTicketCategoryData;
 use App\Data\SupportTicketData;
 use App\Http\Controllers\Controller;
@@ -37,7 +38,7 @@ class SupportTicketController extends Controller
 
         return Inertia::render('support/index', [
             'tickets' => Inertia::merge(fn () => SupportTicketData::collect($tickets->items())),
-            'ticketsPagination' => Arr::except($tickets->toArray(), ['data']),
+            'ticketsPagination' => PaginatedData::from(Arr::except($tickets->toArray(), ['data'])),
         ]);
     }
 

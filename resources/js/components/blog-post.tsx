@@ -6,25 +6,16 @@ import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { UserInfo } from '@/components/user-info';
 import { pluralize } from '@/lib/utils';
-import { Post, type PaginatedData } from '@/types';
+import { Post } from '@/types';
 import { Deferred } from '@inertiajs/react';
 import { Calendar, Clock, Eye, MessageSquare } from 'lucide-react';
 import usePermissions from '../hooks/use-permissions';
 
-interface RecentViewer {
-    user: {
-        id: number;
-        name: string;
-        avatar?: string;
-    };
-    viewed_at: string;
-}
-
 interface BlogPostProps {
     post: Post;
     comments: App.Data.CommentData[];
-    commentsPagination: PaginatedData;
-    recentViewers: RecentViewer[];
+    commentsPagination: App.Data.PaginatedData;
+    recentViewers: App.Data.RecentViewerData[];
 }
 
 export default function BlogPost({ post, comments, commentsPagination, recentViewers }: BlogPostProps) {

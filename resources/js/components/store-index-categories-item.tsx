@@ -2,7 +2,6 @@ import { Link } from '@inertiajs/react';
 import { ImageIcon } from 'lucide-react';
 
 export default function StoreIndexCategoriesItem({ item }: { item: App.Data.ProductCategoryData }) {
-    console.log(item.image);
     return (
         <Link
             key={item.name}

@@ -54,6 +54,8 @@ export default function Profile() {
         const file = e.target.files?.[0] || null;
         setData('avatar', file);
 
+        console.log(file);
+
         if (file) {
             const url = URL.createObjectURL(file);
             setPreviewUrl(url);

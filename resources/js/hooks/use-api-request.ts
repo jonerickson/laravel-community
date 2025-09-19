@@ -50,7 +50,6 @@ export function useApiRequest<T>() {
             const responseData = await apiRequest<T>(requestPromise);
             onSuccess?.(responseData);
 
-            console.log(responseData);
             if (responseData && typeof responseData === 'object' && 'message' in responseData && typeof responseData.message === 'string') {
                 toast.success(responseData.message);
             }

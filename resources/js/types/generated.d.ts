@@ -150,6 +150,21 @@ declare namespace App.Data {
         createdAt: string | null;
         updatedAt: string | null;
     };
+    export type PaginatedData = {
+        currentPage: number;
+        lastPage: number;
+        perPage: number;
+        total: number;
+        from: number;
+        to: number;
+        links: App.Data.PaginatedLinkData;
+    };
+    export type PaginatedLinkData = {
+        first: string | null;
+        last: string | null;
+        next: string | null;
+        prev: string | null;
+    };
     export type PaymentMethodData = {
         id: string;
         type: string;
@@ -237,6 +252,15 @@ declare namespace App.Data {
         isReadByUser: boolean;
         type: string;
         id: number;
+    };
+    export type RecentViewerData = {
+        user: App.Data.RecentViewerUserData;
+        viewedAt: string;
+    };
+    export type RecentViewerUserData = {
+        id: number;
+        name: string;
+        avatarUrl: string | null;
     };
     export type SharedData = {
         auth: App.Data.AuthData;
