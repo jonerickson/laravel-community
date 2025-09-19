@@ -213,7 +213,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     protected $dispatchesEvents = [
         'created' => UserCreated::class,
         'updated' => UserUpdated::class,
-        'deleted' => UserDeleted::class,
+        'deleting' => UserDeleted::class,
     ];
 
     /**

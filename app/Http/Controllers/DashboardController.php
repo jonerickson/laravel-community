@@ -12,6 +12,7 @@ use App\Models\Product;
 use App\Models\SupportTicket;
 use App\Models\Topic;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -80,8 +81,10 @@ class DashboardController
     {
         return ProductData::from(Product::query()
             ->with('defaultPrice')
-            ->with('prices')
             ->with('categories')
+            ->with(['prices' => function (HasMany $query) {
+                $query->active();
+            }])
             ->latest()
             ->first());
     }
@@ -90,8 +93,10 @@ class DashboardController
     {
         return ProductData::from(Product::query()
             ->with('defaultPrice')
-            ->with('prices')
             ->with('categories')
+            ->with(['prices' => function (HasMany $query) {
+                $query->active();
+            }])
             ->trending()
             ->first());
     }
@@ -101,8 +106,10 @@ class DashboardController
         return ProductData::from(Product::query()
             ->featured()
             ->with('defaultPrice')
-            ->with('prices')
             ->with('categories')
+            ->with(['prices' => function (HasMany $query) {
+                $query->active();
+            }])
             ->inRandomOrder()
             ->first());
     }

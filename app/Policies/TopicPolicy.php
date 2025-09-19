@@ -17,7 +17,9 @@ class TopicPolicy
 
     public function view(?User $user, Topic $topic): bool
     {
-        return PermissionService::hasPermissionTo('view_topics', $user);
+        return PermissionService::hasPermissionTo('view_topics', $user)
+            && $topic->forum->is_active
+            && $topic->forum->category->is_active;
     }
 
     public function create(?User $user): bool

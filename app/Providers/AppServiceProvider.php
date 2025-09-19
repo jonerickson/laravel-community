@@ -4,13 +4,21 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Events\PriceCreated;
+use App\Events\PriceDeleted;
+use App\Events\PriceUpdated;
 use App\Events\ProductCreated;
-use App\Events\ProductDeleting;
-use App\Events\ProductPriceCreated;
-use App\Events\ProductPriceDeleting;
-use App\Events\ProductPriceUpdated;
+use App\Events\ProductDeleted;
 use App\Events\ProductUpdated;
-use App\Listeners\SyncProductPriceWithPaymentProvider;
+use App\Events\Stripe\CustomerDeleted;
+use App\Events\Stripe\CustomerUpdated;
+use App\Events\Stripe\PaymentActionRequired;
+use App\Events\Stripe\PaymentSucceeded;
+use App\Events\Stripe\SubscriptionCreated;
+use App\Events\Stripe\SubscriptionDeleted;
+use App\Events\Stripe\SubscriptionUpdated;
+use App\Listeners\Stripe\ProcessWebhook;
+use App\Listeners\SyncPriceWithPaymentProvider;
 use App\Listeners\SyncProductWithPaymentProvider;
 use App\Models\User;
 use App\Providers\Social\DiscordProvider;
@@ -29,15 +37,9 @@ use Inertia\Inertia;
 use Laravel\Cashier\Cashier;
 use Laravel\Passport\Passport;
 use Laravel\Socialite\Facades\Socialite;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
     public function boot(): void
     {
         Cashier::calculateTaxes();
@@ -53,7 +55,7 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::before(function (?User $user = null) {
             if ($user?->hasRole('super-admin') === true) {
-                return true;
+                // return true;
             }
         });
 
@@ -72,11 +74,19 @@ class AppServiceProvider extends ServiceProvider
 
         Event::listen(ProductCreated::class, SyncProductWithPaymentProvider::class);
         Event::listen(ProductUpdated::class, SyncProductWithPaymentProvider::class);
-        Event::listen(ProductDeleting::class, SyncProductWithPaymentProvider::class);
+        Event::listen(ProductDeleted::class, SyncProductWithPaymentProvider::class);
 
-        Event::listen(ProductPriceCreated::class, SyncProductPriceWithPaymentProvider::class);
-        Event::listen(ProductPriceUpdated::class, SyncProductPriceWithPaymentProvider::class);
-        Event::listen(ProductPriceDeleting::class, SyncProductPriceWithPaymentProvider::class);
+        Event::listen(PriceCreated::class, SyncPriceWithPaymentProvider::class);
+        Event::listen(PriceUpdated::class, SyncPriceWithPaymentProvider::class);
+        Event::listen(PriceDeleted::class, SyncPriceWithPaymentProvider::class);
+
+        Event::listen(CustomerDeleted::class, ProcessWebhook::class);
+        Event::listen(CustomerUpdated::class, ProcessWebhook::class);
+        Event::listen(PaymentActionRequired::class, ProcessWebhook::class);
+        Event::listen(PaymentSucceeded::class, ProcessWebhook::class);
+        Event::listen(SubscriptionCreated::class, ProcessWebhook::class);
+        Event::listen(SubscriptionUpdated::class, ProcessWebhook::class);
+        Event::listen(SubscriptionDeleted::class, ProcessWebhook::class);
 
         Passport::authorizationView(
             fn ($parameters) => Inertia::render('oauth/authorize', [

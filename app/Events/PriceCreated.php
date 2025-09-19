@@ -8,9 +8,9 @@ use App\Models\Price;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ProductPriceUpdated
+class PriceCreated
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public Price $productPrice) {}
+    public function __construct(public Price $price) {}
 }

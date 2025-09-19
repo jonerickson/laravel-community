@@ -49,7 +49,7 @@ class ApiTokenResource extends Resource
                             ->required()
                             ->maxLength(255),
                         Select::make('tokenable_id')
-                            ->disabled(fn ($operation) => $operation !== 'create')
+                            ->disabledOn('edit')
                             ->options(User::query()->orderBy('name')->pluck('name', 'id'))
                             ->preload()
                             ->label('User')

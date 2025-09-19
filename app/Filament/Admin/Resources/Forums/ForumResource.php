@@ -54,10 +54,12 @@ class ForumResource extends Resource
                             ->live(onBlur: true)
                             ->afterStateUpdated(fn (string $context, $state, Set $set): mixed => $context === 'create' ? $set('slug', Str::slug($state)) : null),
                         TextInput::make('slug')
+                            ->disabledOn('edit')
                             ->required()
-                            ->unique(Forum::class, 'slug', ignoreRecord: true)
                             ->maxLength(255)
-                            ->helperText('URL-friendly version of the name.'),
+                            ->helperText('A SEO friendly title.')
+                            ->unique(ignoreRecord: true)
+                            ->rules(['alpha_dash']),
                         Select::make('category_id')
                             ->required()
                             ->searchable()

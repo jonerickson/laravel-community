@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Contracts;
 
+use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\SubscriptionData;
 use App\Models\Order;
@@ -32,6 +33,8 @@ interface PaymentProcessor
     public function deletePrice(Product $product, Price $price): bool;
 
     public function listPrices(Product $product, array $filters = []): Collection;
+
+    public function findInvoice(Order $order): ?InvoiceData;
 
     public function createPaymentMethod(User $user, string $paymentMethodId): PaymentMethodData;
 

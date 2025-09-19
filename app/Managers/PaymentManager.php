@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Managers;
 
 use App\Contracts\PaymentProcessor;
+use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\SubscriptionData;
 use App\Drivers\Payments\StripeDriver;
@@ -47,6 +48,11 @@ class PaymentManager extends Manager implements PaymentProcessor
     public function listProducts(array $filters = []): Collection
     {
         return $this->driver()->listProducts($filters);
+    }
+
+    public function findInvoice(Order $order): ?InvoiceData
+    {
+        return $this->driver()->findInvoice($order);
     }
 
     public function createPrice(Product $product, Price $price): Price

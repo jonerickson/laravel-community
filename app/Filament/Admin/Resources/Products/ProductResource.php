@@ -67,14 +67,14 @@ class ProductResource extends Resource
                                     ->helperText('The product name.')
                                     ->required()
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(function ($operation, $state, Set $set): void {
-                                        if ($operation === 'create') {
-                                            $set('slug', Str::slug($state));
-                                        }
-                                    }),
+                                    ->afterStateUpdated(fn (string $context, $state, Set $set): mixed => $context === 'create' ? $set('slug', Str::slug($state)) : null),
                                 TextInput::make('slug')
+                                    ->disabledOn('edit')
+                                    ->required()
+                                    ->maxLength(255)
                                     ->helperText('A SEO friendly title.')
-                                    ->required(),
+                                    ->unique(ignoreRecord: true)
+                                    ->rules(['alpha_dash']),
                                 Select::make('tax_code')
                                     ->required()
                                     ->label('Tax Code')

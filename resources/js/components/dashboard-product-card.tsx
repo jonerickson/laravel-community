@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { getPriceDisplay } from '@/utils/price-display';
+import { stripCharacters } from '@/utils/truncate';
 import { Link } from '@inertiajs/react';
 import { NewspaperIcon, SparklesIcon, TrendingUpIcon } from 'lucide-react';
 
@@ -80,7 +81,7 @@ export default function DashboardProductCard({ product, type, className }: Dashb
                 <div className="space-y-1.5">
                     <h3 className="line-clamp-1 text-sm leading-tight font-semibold">{product.name}</h3>
 
-                    {product.description && <p className="line-clamp-2 text-sm text-muted-foreground">{product.description}</p>}
+                    {product.description && <p className="line-clamp-2 text-sm text-muted-foreground">{stripCharacters(product.description)}</p>}
 
                     <div className="flex items-center justify-between">
                         <span className="text-base font-bold">{getPriceDisplay(product)}</span>

@@ -58,10 +58,12 @@ class AnnouncementResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (string $context, $state, Set $set): mixed => $context === 'create' ? $set('slug', Str::slug($state)) : null),
+                                    ->afterStateUpdated(fn (string $operation, $state, Set $set): mixed => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
                                 TextInput::make('slug')
+                                    ->disabledOn('edit')
                                     ->required()
                                     ->maxLength(255)
+                                    ->helperText('A SEO friendly title.')
                                     ->unique(ignoreRecord: true)
                                     ->rules(['alpha_dash']),
                                 Select::make('type')

@@ -9,9 +9,9 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\ColorColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 
 class ForumCategoriesTable
@@ -41,8 +41,9 @@ class ForumCategoriesTable
                     ->badge(),
                 ColorColumn::make('color')
                     ->sortable(),
-                ToggleColumn::make('is_active')
+                IconColumn::make('is_active')
                     ->label('Active')
+                    ->boolean()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

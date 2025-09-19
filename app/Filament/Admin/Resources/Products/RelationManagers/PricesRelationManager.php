@@ -42,23 +42,27 @@ class PricesRelationManager extends RelationManager
                     ->maxLength(255)
                     ->helperText('Display name for this price option.'),
                 TextInput::make('amount')
+                    ->disabledOn('edit')
                     ->required()
                     ->numeric()
                     ->prefix('$')
                     ->suffix('USD')
                     ->helperText('The amount in cents.'),
                 Select::make('currency')
+                    ->disabledOn('edit')
                     ->options([
                         'USD' => 'US Dollar',
                     ])
                     ->default('USD')
                     ->required(),
                 Select::make('interval')
+                    ->disabledOn('edit')
                     ->options(SubscriptionInterval::class)
                     ->nullable()
                     ->visible(fn () => $this->getOwnerRecord()->isSubscription())
                     ->helperText('Subscription billing interval.'),
                 TextInput::make('interval_count')
+                    ->disabledOn('edit')
                     ->label('Interval Count')
                     ->numeric()
                     ->default(1)

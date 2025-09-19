@@ -21,6 +21,7 @@ class ProductFactory extends Factory
         $typeName = $type === ProductType::Product ? 'Product' : 'Subscription';
 
         return [
+            'reference_id' => $this->faker->uuid(),
             'name' => $name = "$typeName {$this->faker->numberBetween(1, 10)}",
             'slug' => Str::slug($name),
             'description' => $this->faker->paragraph(),

@@ -9,6 +9,7 @@ use App\Data\ProductData;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -26,6 +27,9 @@ class StoreController extends Controller
                 ->products()
                 ->featured()
                 ->with('categories')
+                ->with(['prices' => function (HasMany $query) {
+                    $query->active();
+                }])
                 ->latest()
                 ->take(6)
                 ->get()),

@@ -14,6 +14,7 @@ use App\Managers\SupportTicketManager;
 use App\Models\SupportTicket;
 use App\Models\SupportTicketCategory;
 use App\Models\User;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -22,12 +23,16 @@ use Inertia\Response;
 
 class SupportTicketController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly SupportTicketManager $supportTicketManager
     ) {}
 
     public function index(): Response
     {
+        $this->authorize('viewAny', SupportTicket::class);
+
         $tickets = SupportTicket::query()
             ->with('category')
             ->with('author')
@@ -44,6 +49,8 @@ class SupportTicketController extends Controller
 
     public function create(): Response
     {
+        $this->authorize('create', SupportTicket::class);
+
         $categories = SupportTicketCategory::active()->ordered()->get();
 
         return Inertia::render('support/create', [
@@ -53,6 +60,8 @@ class SupportTicketController extends Controller
 
     public function store(StoreSupportTicketRequest $request): RedirectResponse
     {
+        $this->authorize('create', SupportTicket::class);
+
         $validated = $request->validated();
 
         $ticket = $this->supportTicketManager->createTicket($validated);
@@ -63,7 +72,7 @@ class SupportTicketController extends Controller
 
     public function show(SupportTicket $ticket): Response
     {
-        abort_unless($ticket->isAuthoredBy(Auth::user()), 403);
+        $this->authorize('view', $ticket);
 
         $ticket->loadMissing(['category', 'author', 'assignedTo', 'comments.author', 'files']);
 
@@ -74,6 +83,8 @@ class SupportTicketController extends Controller
 
     public function update(UpdateSupportTicketRequest $request, SupportTicket $ticket): RedirectResponse
     {
+        $this->authorize('update', $ticket);
+
         $validated = $request->validated();
 
         /** @var User $user */

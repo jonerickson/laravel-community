@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\SubscriptionInterval;
-use App\Events\ProductPriceCreated;
-use App\Events\ProductPriceDeleted;
-use App\Events\ProductPriceDeleting;
-use App\Events\ProductPriceUpdated;
+use App\Events\PriceCreated;
+use App\Events\PriceDeleted;
+use App\Events\PriceUpdated;
 use App\Traits\Activateable;
 use App\Traits\HasMetadata;
+use App\Traits\HasReferenceId;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
+ * @property string $reference_id
  * @property int $product_id
  * @property string $name
  * @property string|null $description
@@ -55,6 +55,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|Price whereMetadata($value)
  * @method static Builder<static>|Price whereName($value)
  * @method static Builder<static>|Price whereProductId($value)
+ * @method static Builder<static>|Price whereReferenceId($value)
  * @method static Builder<static>|Price whereUpdatedAt($value)
  * @method static Builder<static>|Price withExternalPrice()
  * @method static Builder<static>|Price withoutExternalPrice()
@@ -64,8 +65,8 @@ use Illuminate\Support\Carbon;
 class Price extends Model
 {
     use Activateable;
-    use HasFactory;
     use HasMetadata;
+    use HasReferenceId;
 
     protected $fillable = [
         'product_id',
@@ -88,10 +89,9 @@ class Price extends Model
     ];
 
     protected $dispatchesEvents = [
-        'created' => ProductPriceCreated::class,
-        'updated' => ProductPriceUpdated::class,
-        'deleting' => ProductPriceDeleting::class,
-        'deleted' => ProductPriceDeleted::class,
+        'created' => PriceCreated::class,
+        'updated' => PriceUpdated::class,
+        'deleting' => PriceDeleted::class,
     ];
 
     public function product(): BelongsTo

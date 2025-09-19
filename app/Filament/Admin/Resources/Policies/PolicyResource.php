@@ -52,9 +52,12 @@ class PolicyResource extends Resource
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(fn (string $context, $state, Set $set): mixed => $context === 'create' ? $set('slug', Str::slug($state)) : null),
                                 TextInput::make('slug')
+                                    ->disabledOn('edit')
                                     ->required()
                                     ->maxLength(255)
-                                    ->unique(ignoreRecord: true),
+                                    ->helperText('A SEO friendly title.')
+                                    ->unique(ignoreRecord: true)
+                                    ->rules(['alpha_dash']),
                                 Select::make('policy_category_id')
                                     ->relationship('category', 'name')
                                     ->required()

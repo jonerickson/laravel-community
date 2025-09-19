@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Listeners;
 
 use App\Events\ProductCreated;
-use App\Events\ProductDeleting;
+use App\Events\ProductDeleted;
 use App\Events\ProductUpdated;
 use App\Managers\PaymentManager;
 use Exception;
@@ -22,13 +22,13 @@ class SyncProductWithPaymentProvider implements ShouldQueue
         //
     }
 
-    public function handle(ProductCreated|ProductUpdated|ProductDeleting $event): void
+    public function handle(ProductCreated|ProductUpdated|ProductDeleted $event): void
     {
         try {
             match (true) {
                 $event instanceof ProductCreated => $this->handleProductCreated($event),
                 $event instanceof ProductUpdated => $this->handleProductUpdated($event),
-                $event instanceof ProductDeleting => $this->handleProductDeleted($event),
+                $event instanceof ProductDeleted => $this->handleProductDeleted($event),
             };
         } catch (Exception $e) {
             Log::error('Failed to sync product with payment provider', [
@@ -63,7 +63,7 @@ class SyncProductWithPaymentProvider implements ShouldQueue
         Log::info('Product updated in payment provider', ['product_id' => $event->product->id]);
     }
 
-    protected function handleProductDeleted(ProductDeleting $event): void
+    protected function handleProductDeleted(ProductDeleted $event): void
     {
         if (! $event->product->external_product_id) {
             return;

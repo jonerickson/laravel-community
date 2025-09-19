@@ -50,16 +50,16 @@ class OrderForm
                     ->columns()
                     ->schema([
                         TextInput::make('external_invoice_id')
-                            ->disabled(fn ($operation) => $operation === 'edit')
+                            ->disabledOn('edit')
                             ->label('External Invoice ID'),
                         TextInput::make('external_checkout_id')
-                            ->disabled(fn ($operation) => $operation === 'edit')
+                            ->disabledOn('edit')
                             ->label('External Checkout ID'),
                         TextInput::make('external_order_id')
-                            ->disabled(fn ($operation) => $operation === 'edit')
+                            ->disabledOn('edit')
                             ->label('External Order ID'),
                         TextInput::make('external_payment_id')
-                            ->disabled(fn ($operation) => $operation === 'edit')
+                            ->disabledOn('edit')
                             ->label('External Payment ID'),
                         TextInput::make('invoice_url')
                             ->label('Invoice URL')

@@ -9,7 +9,6 @@ use App\Enums\ProductTaxCode;
 use App\Enums\ProductType;
 use App\Events\ProductCreated;
 use App\Events\ProductDeleted;
-use App\Events\ProductDeleting;
 use App\Events\ProductUpdated;
 use App\Traits\Featureable;
 use App\Traits\HasFeaturedImage;
@@ -17,6 +16,7 @@ use App\Traits\HasFiles;
 use App\Traits\HasGroups;
 use App\Traits\HasLogging;
 use App\Traits\HasMetadata;
+use App\Traits\HasReferenceId;
 use App\Traits\HasSlug;
 use App\Traits\LogsMarketplaceActivity;
 use App\Traits\Reviewable;
@@ -34,6 +34,7 @@ use Laravel\Scout\Searchable;
 
 /**
  * @property int $id
+ * @property string $reference_id
  * @property string $name
  * @property string $slug
  * @property string $description
@@ -95,6 +96,7 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Product whereIsSubscriptionOnly($value)
  * @method static Builder<static>|Product whereMetadata($value)
  * @method static Builder<static>|Product whereName($value)
+ * @method static Builder<static>|Product whereReferenceId($value)
  * @method static Builder<static>|Product whereSlug($value)
  * @method static Builder<static>|Product whereTaxCode($value)
  * @method static Builder<static>|Product whereTrialDays($value)
@@ -114,6 +116,7 @@ class Product extends Model implements Sluggable
     use HasGroups;
     use HasLogging;
     use HasMetadata;
+    use HasReferenceId;
     use HasSlug;
     use LogsMarketplaceActivity;
     use Reviewable;
@@ -139,8 +142,7 @@ class Product extends Model implements Sluggable
     protected $dispatchesEvents = [
         'created' => ProductCreated::class,
         'updated' => ProductUpdated::class,
-        'deleting' => ProductDeleting::class,
-        'deleted' => ProductDeleted::class,
+        'deleting' => ProductDeleted::class,
     ];
 
     public function categories(): BelongsToMany

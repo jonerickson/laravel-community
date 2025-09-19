@@ -9,11 +9,14 @@ use App\Http\Requests\SupportTickets\StoreSupportTicketCommentRequest;
 use App\Managers\SupportTicketManager;
 use App\Models\Comment;
 use App\Models\SupportTicket;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         protected readonly SupportTicketManager $supportTicketManager
     ) {
@@ -22,6 +25,9 @@ class CommentController extends Controller
 
     public function store(StoreSupportTicketCommentRequest $request, SupportTicket $ticket): RedirectResponse
     {
+        $this->authorize('update', $ticket);
+        $this->authorize('create', Comment::class);
+
         $validated = $request->validated();
 
         $this->supportTicketManager->addComment(
@@ -36,8 +42,8 @@ class CommentController extends Controller
 
     public function destroy(SupportTicket $ticket, Comment $comment): RedirectResponse
     {
-        abort_unless($ticket->isAuthoredBy(Auth::user()), 403);
-        abort_unless($comment->created_by === Auth::id(), 403);
+        $this->authorize('update', $ticket);
+        $this->authorize('delete', $comment);
 
         $this->supportTicketManager->deleteComment($ticket, $comment);
 

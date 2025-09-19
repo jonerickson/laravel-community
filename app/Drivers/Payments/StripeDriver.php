@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Drivers\Payments;
 
 use App\Contracts\PaymentProcessor;
+use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\SubscriptionData;
 use App\Enums\OrderStatus;
@@ -65,8 +66,7 @@ class StripeDriver implements PaymentProcessor
             'description' => Str::limit(strip_tags($product->description)),
             'tax_code' => $product->tax_code->getStripeCode(),
             'metadata' => Arr::dot([
-                'laravel_product_id' => $product->id,
-                'categories' => $product->categories->implode('name', ', '),
+                'product_id' => $product->reference_id,
                 ...$product->metadata ?? [],
             ]),
             'active' => true,
@@ -74,8 +74,9 @@ class StripeDriver implements PaymentProcessor
             'idempotency_key' => $this->getIdempotencyKey(),
         ]);
 
-        $product->external_product_id = $stripeProduct->id;
-        $product->save();
+        $product->update([
+            'external_product_id' => $stripeProduct->id,
+        ]);
 
         return $product;
     }
@@ -99,8 +100,7 @@ class StripeDriver implements PaymentProcessor
             'name' => $product->name,
             'description' => Str::limit(strip_tags($product->description)),
             'metadata' => Arr::dot([
-                'laravel_product_id' => $product->id,
-                'categories' => $product->categories->implode('name', ', '),
+                'product_id' => $product->reference_id,
                 ...$product->metadata ?? [],
             ]),
         ], [
@@ -123,8 +123,9 @@ class StripeDriver implements PaymentProcessor
             'idempotency_key' => $this->getIdempotencyKey(),
         ]);
 
-        $product->external_product_id = null;
-        $product->save();
+        $product->update([
+            'external_product_id' => null,
+        ]);
 
         return true;
     }
@@ -155,8 +156,8 @@ class StripeDriver implements PaymentProcessor
             'unit_amount' => $price->amount,
             'currency' => strtolower($price->currency),
             'metadata' => Arr::dot([
-                'laravel_product_id' => $product->id,
-                'laravel_price_id' => $price->id,
+                'product_id' => $product->reference_id,
+                'price_id' => $price->reference_id,
                 ...$price->metadata ?? [],
             ]),
         ];
@@ -172,10 +173,9 @@ class StripeDriver implements PaymentProcessor
             'idempotency_key' => $this->getIdempotencyKey(),
         ]);
 
-        $price->external_price_id = $stripePrice->id;
-        $price->save();
-
-        $this->clearPriceCaches($product->id);
+        $price->update([
+            'external_price_id' => $stripePrice->id,
+        ]);
 
         return $price;
     }
@@ -192,15 +192,13 @@ class StripeDriver implements PaymentProcessor
 
         $this->stripe->prices->update($price->external_price_id, [
             'metadata' => Arr::dot([
-                'laravel_product_id' => $product->id,
-                'laravel_price_id' => $price->id,
+                'product_id' => $product->reference_id,
+                'price_id' => $price->reference_id,
                 ...$price->metadata ?? [],
             ]),
         ], [
             'idempotency_key' => $this->getIdempotencyKey(),
         ]);
-
-        $this->clearPriceCaches($product->id);
 
         return $price;
     }
@@ -220,10 +218,9 @@ class StripeDriver implements PaymentProcessor
             'idempotency_key' => $this->getIdempotencyKey(),
         ]);
 
-        $price->external_price_id = null;
-        $price->save();
-
-        $this->clearPriceCaches($product->id);
+        $price->update([
+            'external_price_id' => null,
+        ]);
 
         return true;
     }
@@ -286,6 +283,24 @@ class StripeDriver implements PaymentProcessor
         });
 
         return new Collection($prices->all());
+    }
+
+    /**
+     * @throws ApiErrorException
+     */
+    public function findInvoice(Order $order): ?InvoiceData
+    {
+        if (blank($invoiceId = $order->external_invoice_id)) {
+            return null;
+        }
+
+        $invoice = $this->stripe->invoices->retrieve($invoiceId);
+
+        return InvoiceData::from([
+            'id' => $invoice->id,
+            'amount' => $invoice->total,
+            'invoice_url' => $invoice->hosted_invoice_url,
+        ]);
     }
 
     public function createPaymentMethod(User $user, string $paymentMethodId): PaymentMethodData

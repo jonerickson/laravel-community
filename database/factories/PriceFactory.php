@@ -12,13 +12,14 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends Factory<Price>
  */
-class ProductPriceFactory extends Factory
+class PriceFactory extends Factory
 {
     public function definition(): array
     {
         $isRecurring = $this->faker->boolean(40);
 
         return [
+            'reference_id' => $this->faker->uuid(),
             'product_id' => Product::factory(),
             'name' => $this->faker->randomElement([
                 'Standard Price',

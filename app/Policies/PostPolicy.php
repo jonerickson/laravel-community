@@ -17,7 +17,8 @@ class PostPolicy
 
     public function view(?User $user, Post $post): bool
     {
-        return PermissionService::hasPermissionTo('view_posts', $user);
+        return PermissionService::hasPermissionTo('view_posts', $user) &&
+            $post->is_published;
     }
 
     public function create(?User $user): bool

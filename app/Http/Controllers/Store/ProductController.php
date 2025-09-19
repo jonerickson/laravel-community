@@ -9,6 +9,8 @@ use App\Data\ProductData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Store\StoreProductRequest;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -18,8 +20,12 @@ use Inertia\Response;
 
 class ProductController extends Controller
 {
+    use AuthorizesRequests;
+
     public function store(StoreProductRequest $request, Product $product): RedirectResponse
     {
+        $this->authorize('view', $product);
+
         $validated = $request->validated();
 
         $priceId = $validated['price_id'];
@@ -57,14 +63,20 @@ class ProductController extends Controller
 
     public function show(Request $request, Product $product): Response
     {
+        $this->authorize('view', $product);
+
         $perPage = $request->input('per_page', 5);
 
         $reviews = $product->reviews()->latest()->paginate(
             perPage: $perPage
         );
 
+        $product->load(['prices' => function (HasMany $query) {
+            $query->active();
+        }]);
+
         return Inertia::render('store/products/show', [
-            'product' => ProductData::from($product->loadMissing(['prices', 'defaultPrice'])),
+            'product' => ProductData::from($product->loadMissing(['defaultPrice'])),
             'reviews' => Inertia::defer(fn () => $reviews->items()),
             'reviewsPagination' => PaginatedData::from(Arr::except($reviews->toArray(), ['data'])),
         ]);

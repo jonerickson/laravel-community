@@ -17,6 +17,7 @@ class ForumCategoryPolicy
 
     public function view(?User $user, ForumCategory $category): bool
     {
-        return PermissionService::hasPermissionTo('view_forums_category', $user);
+        return PermissionService::hasPermissionTo('view_forums_category', $user)
+            && $category->is_active;
     }
 }
