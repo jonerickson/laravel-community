@@ -6,7 +6,7 @@ use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', fn () => Inertia::render('welcome'))->name('home');
+Route::get('/', fn () => Inertia::render('home'))->name('home');
 
 Route::group(['middleware' => 'auth', 'verified'], function (): void {
     Route::get('dashboard', DashboardController::class)->name('dashboard');

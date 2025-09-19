@@ -79,7 +79,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 
     return (
         <>
-            <div className="border-b border-sidebar-border/80">
+            <nav className="border-b border-sidebar-border/80">
                 <div className="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
                     <div className="lg:hidden">
                         <Sheet>
@@ -134,7 +134,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                         </Sheet>
                     </div>
 
-                    <Link href={route('dashboard')} prefetch className="flex items-center space-x-2">
+                    <Link href={route('home')} prefetch className="flex items-center space-x-2">
                         <AppLogo />
                     </Link>
 
@@ -228,7 +228,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                         )}
                     </div>
                 </div>
-            </div>
+            </nav>
             {breadcrumbs.length > 1 && (
                 <div className="flex w-full border-b border-sidebar-border/70">
                     <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 md:max-w-7xl">
