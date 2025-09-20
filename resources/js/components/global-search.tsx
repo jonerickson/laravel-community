@@ -186,7 +186,7 @@ export function GlobalSearch() {
     return (
         <>
             <Button variant="ghost" size="icon" className="group h-9 w-9" onClick={() => setOpen(true)}>
-                <Search className="!size-5 opacity-80 group-hover:opacity-100" />
+                <Search className="size-5 opacity-80 group-hover:opacity-100" />
                 <span className="sr-only">Search</span>
             </Button>
 

@@ -23,33 +23,38 @@ const mainNavItems: NavItem[] = [
         href: '/',
         icon: Home,
         shouldShow: (auth: App.Data.AuthData): boolean => auth?.user === null,
+        isActive: () => route().current('home'),
     },
     {
         title: 'Dashboard',
         href: () => route('dashboard'),
         icon: Grid,
         shouldShow: (auth: App.Data.AuthData): boolean => auth?.user !== null,
+        isActive: () => route().current('dashboard'),
     },
     {
         title: 'Blog',
         href: () => route('blog.index'),
         icon: Newspaper,
-        isActive: true,
+        isActive: () => route().current('blog.*'),
     },
     {
         title: 'Forums',
         href: () => route('forums.index'),
         icon: LibraryBig,
+        isActive: () => route().current('forums.*'),
     },
     {
         title: 'Store',
         href: () => route('store.index'),
         icon: ShoppingCart,
+        isActive: () => route().current('store.*') && !route().current('store.subscriptions'),
     },
     {
         title: 'Subscriptions',
         href: () => route('store.subscriptions'),
         icon: CalendarSync,
+        isActive: () => route().current('store.subscriptions'),
     },
 ];
 
@@ -58,11 +63,13 @@ const rightNavItems: NavItem[] = [
         title: 'Policies',
         href: () => route('policies.index'),
         icon: Folder,
+        isActive: () => route().current('policies.*'),
     },
     {
         title: 'Support',
         href: () => route('support.index'),
         icon: BookOpen,
+        isActive: () => route().current('support.*'),
     },
 ];
 
@@ -148,16 +155,12 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                         <NavigationMenuItem key={index} className="relative flex h-full items-center">
                                             <Link
                                                 href={typeof item.href === 'function' ? item.href() : item.href}
-                                                className={cn(
-                                                    navigationMenuTriggerStyle(),
-                                                    page.url === (typeof item.href === 'function' ? item.href() : item.href) && activeItemStyles,
-                                                    'h-9 px-3',
-                                                )}
+                                                className={cn(navigationMenuTriggerStyle(), item.isActive() && activeItemStyles, 'h-9 px-3')}
                                             >
                                                 {item.icon && <Icon iconNode={item.icon} className="mr-2 size-4" />}
                                                 {item.title}
                                             </Link>
-                                            {page.url === (typeof item.href === 'function' ? item.href() : item.href) && (
+                                            {item.isActive() && (
                                                 <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
                                             )}
                                         </NavigationMenuItem>

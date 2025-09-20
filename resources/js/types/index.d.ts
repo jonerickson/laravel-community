@@ -14,7 +14,7 @@ export interface NavItem {
     title: string;
     href: string | (() => string);
     icon?: LucideIcon | null;
-    isActive?: boolean;
+    isActive: () => boolean;
     target?: string;
     shouldShow?: boolean | ((auth: App.Data.AuthData) => boolean);
 }

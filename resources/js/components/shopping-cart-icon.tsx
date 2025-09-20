@@ -33,7 +33,7 @@ export function ShoppingCartIcon({ className }: ShoppingCartIconProps) {
     return (
         <Link href={route('store.cart.index')} className={cn('relative', className)}>
             <Button variant="ghost" size="icon" className="relative h-9 w-9">
-                <ShoppingCart className="size-5" />
+                <ShoppingCart className="size-5 opacity-80 group-hover:opacity-100" />
                 {cartCount > 0 && (
                     <Badge
                         variant="destructive"

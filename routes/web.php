@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::get('/', fn () => Inertia::render('home'))->name('home');
+Route::get('/', HomeController::class)->name('home');
 
 Route::group(['middleware' => 'auth', 'verified'], function (): void {
     Route::get('dashboard', DashboardController::class)->name('dashboard');

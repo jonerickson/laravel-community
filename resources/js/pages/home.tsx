@@ -4,12 +4,12 @@ import HeadingLarge from '@/components/heading-large';
 import { AbstractBackgroundPattern } from '@/components/ui/abstract-background-pattern';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Link, usePage } from '@inertiajs/react';
+import WidgetLoading from '@/components/widget-loading';
+import { Deferred, Link, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
     BarChart3,
     CalendarSync,
-    CheckCircle,
     Gamepad2,
     Globe,
     MessageSquare,
@@ -21,8 +21,13 @@ import {
     Users,
 } from 'lucide-react';
 
-export default function Home() {
-    const { name } = usePage<App.Data.SharedData>().props;
+interface HomeProps {
+    subscriptions: App.Data.SubscriptionData[];
+}
+
+export default function Home({ subscriptions = [] }: HomeProps) {
+    const page = usePage<App.Data.SharedData>();
+    const { name, auth } = page.props;
 
     return (
         <div className="min-h-screen bg-background text-foreground">
@@ -52,13 +57,20 @@ export default function Home() {
 
                             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                                 <Button size="lg" className="glow-blue">
-                                    <Link href={route('forums.index')} className="flex items-center gap-2">
-                                        <UserPlus className="size-4" />
-                                        Join The Community
-                                    </Link>
+                                    {auth.user ? (
+                                        <Link href={route('dashboard')} className="flex items-center gap-2">
+                                            <Rocket className="size-4" />
+                                            My Dashboard
+                                        </Link>
+                                    ) : (
+                                        <Link href={route('login')} className="flex items-center gap-2">
+                                            <UserPlus className="size-4" />
+                                            Join The Community
+                                        </Link>
+                                    )}
                                 </Button>
                                 <Button variant="outline" size="lg">
-                                    <Link href={route('forums.index')} className="flex items-center gap-2">
+                                    <Link href={route('store.index')} className="flex items-center gap-2">
                                         <ShoppingCart className="size-4" />
                                         Browse Store
                                     </Link>
@@ -174,7 +186,7 @@ export default function Home() {
                         <div className="mb-16 text-center">
                             <HeadingLarge
                                 title="Trusted by developers and players worldwide"
-                                description="Developers choose us for our commitment to open gaming environments and exceptional development capabilities"
+                                description="Players choose us for our commitment to open gaming environments and exceptional development capabilities"
                             ></HeadingLarge>
                         </div>
 
@@ -255,118 +267,40 @@ export default function Home() {
                     <div className="container mx-auto px-6 sm:px-4">
                         <div className="mb-16 text-center">
                             <h2 className="mb-4 text-3xl font-bold md:text-4xl">Simple, transparent pricing</h2>
-                            <p className="text-lg text-muted-foreground">Choose the plan that fits your community size</p>
+                            <p className="text-lg text-muted-foreground">Choose the plan that fits you best</p>
                         </div>
 
-                        <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Starter</CardTitle>
-                                    <CardDescription>Perfect for small communities</CardDescription>
-                                    <div className="mt-4 text-3xl font-bold">
-                                        $29<span className="text-lg font-normal text-muted-foreground">/month</span>
-                                    </div>
-                                </CardHeader>
-                                <CardContent>
-                                    <ul className="space-y-3">
-                                        <li className="flex items-center">
-                                            <CheckCircle className="text-gaming-green mr-2 h-4 w-4" />
-                                            Up to 1,000 players
-                                        </li>
-                                        <li className="flex items-center">
-                                            <CheckCircle className="text-gaming-green mr-2 h-4 w-4" />
-                                            Basic analytics
-                                        </li>
-                                        <li className="flex items-center">
-                                            <CheckCircle className="text-gaming-green mr-2 h-4 w-4" />
-                                            Community forums
-                                        </li>
-                                        <li className="flex items-center">
-                                            <CheckCircle className="text-gaming-green mr-2 h-4 w-4" />
-                                            Email support
-                                        </li>
-                                    </ul>
-                                    <Button className="mt-6 w-full bg-transparent" variant="outline">
-                                        Get Started
-                                    </Button>
-                                </CardContent>
-                            </Card>
+                        <Deferred data="subscriptions" fallback={<WidgetLoading />}>
+                            <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
+                                {subscriptions.map((subscription) => {
+                                    const defaultPrice = subscription.activePrices.find((price) => price.isDefault) ||
+                                        subscription.activePrices[0] || {
+                                            amount: 0,
+                                            interval: 'month',
+                                        };
 
-                            <Card className="border-gaming-blue glow-blue">
-                                <CardHeader>
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <CardTitle>Professional</CardTitle>
-                                            <CardDescription>Most popular choice</CardDescription>
-                                        </div>
-                                        <div className="bg-gaming-blue rounded px-2 py-1 text-xs font-semibold text-white">Popular</div>
-                                    </div>
-                                    <div className="mt-4 text-3xl font-bold">
-                                        $99<span className="text-lg font-normal text-muted-foreground">/month</span>
-                                    </div>
-                                </CardHeader>
-                                <CardContent>
-                                    <ul className="space-y-3">
-                                        <li className="flex items-center">
-                                            <CheckCircle className="text-gaming-green mr-2 h-4 w-4" />
-                                            Up to 10,000 players
-                                        </li>
-                                        <li className="flex items-center">
-                                            <CheckCircle className="text-gaming-green mr-2 h-4 w-4" />
-                                            Advanced analytics
-                                        </li>
-                                        <li className="flex items-center">
-                                            <CheckCircle className="text-gaming-green mr-2 h-4 w-4" />
-                                            Custom integrations
-                                        </li>
-                                        <li className="flex items-center">
-                                            <CheckCircle className="text-gaming-green mr-2 h-4 w-4" />
-                                            Priority support
-                                        </li>
-                                        <li className="flex items-center">
-                                            <CheckCircle className="text-gaming-green mr-2 h-4 w-4" />
-                                            API access
-                                        </li>
-                                    </ul>
-                                    <Button className="mt-6 w-full">Get Started</Button>
-                                </CardContent>
-                            </Card>
-
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Enterprise</CardTitle>
-                                    <CardDescription>For large gaming studios</CardDescription>
-                                    <div className="mt-4 text-3xl font-bold">Custom</div>
-                                </CardHeader>
-                                <CardContent>
-                                    <ul className="space-y-3">
-                                        <li className="flex items-center">
-                                            <CheckCircle className="text-gaming-green mr-2 h-4 w-4" />
-                                            Unlimited players
-                                        </li>
-                                        <li className="flex items-center">
-                                            <CheckCircle className="text-gaming-green mr-2 h-4 w-4" />
-                                            Custom features
-                                        </li>
-                                        <li className="flex items-center">
-                                            <CheckCircle className="text-gaming-green mr-2 h-4 w-4" />
-                                            Dedicated support
-                                        </li>
-                                        <li className="flex items-center">
-                                            <CheckCircle className="text-gaming-green mr-2 h-4 w-4" />
-                                            SLA guarantee
-                                        </li>
-                                        <li className="flex items-center">
-                                            <CheckCircle className="text-gaming-green mr-2 h-4 w-4" />
-                                            White-label options
-                                        </li>
-                                    </ul>
-                                    <Button className="mt-6 w-full bg-transparent" variant="outline">
-                                        Contact Sales
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        </div>
+                                    return (
+                                        <Card key={subscription.id} className="flex flex-col justify-between">
+                                            <CardHeader>
+                                                <CardTitle>{subscription.name}</CardTitle>
+                                                <CardDescription>{subscription.description}</CardDescription>
+                                                {defaultPrice && (
+                                                    <div className="mt-4 text-3xl font-bold">
+                                                        ${(defaultPrice.amount / 100).toFixed(0)}
+                                                        <span className="text-lg font-normal text-muted-foreground">/{defaultPrice.interval}</span>
+                                                    </div>
+                                                )}
+                                            </CardHeader>
+                                            <CardContent>
+                                                <Button className="mt-6 w-full bg-transparent" variant="outline" asChild>
+                                                    <Link href={route('store.subscriptions')}>Get started</Link>
+                                                </Button>
+                                            </CardContent>
+                                        </Card>
+                                    );
+                                })}
+                            </div>
+                        </Deferred>
                     </div>
                 </section>
 

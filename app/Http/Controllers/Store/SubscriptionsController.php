@@ -28,7 +28,7 @@ class SubscriptionsController extends Controller
     {
         $user = Auth::user();
 
-        $subscriptionProducts = Product::query()
+        $subscriptions = Product::query()
             ->subscriptions()
             ->with('activePrices')
             ->with('categories')
@@ -37,7 +37,7 @@ class SubscriptionsController extends Controller
             ->get();
 
         return Inertia::render('store/subscriptions', [
-            'subscriptionProducts' => SubscriptionData::collect($subscriptionProducts),
+            'subscriptionProducts' => SubscriptionData::collect($subscriptions),
             'currentSubscription' => $user ? $this->paymentManager->currentSubscription($user) : null,
         ]);
     }
