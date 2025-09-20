@@ -68,7 +68,7 @@ class BlogController extends Controller
         );
 
         return Inertia::render('blog/show', [
-            'post' => PostData::from($post->loadMissing(['author'])),
+            'post' => PostData::from($post),
             'comments' => Inertia::defer(fn () => CommentData::collect($comments->items())),
             'commentsPagination' => PaginatedData::from(Arr::except($comments->toArray(), ['data'])),
             'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($post->getRecentViewers())),

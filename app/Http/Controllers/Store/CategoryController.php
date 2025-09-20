@@ -33,8 +33,6 @@ class CategoryController extends Controller
     {
         $this->authorize('view', $category);
 
-        $category->loadMissing('image');
-
         $products = $category
             ->products()
             ->with('defaultPrice')

@@ -6,18 +6,18 @@ namespace App\Policies;
 
 use App\Models\ForumCategory;
 use App\Models\User;
-use App\Services\PermissionService;
+use Illuminate\Support\Facades\Gate;
 
 class ForumCategoryPolicy
 {
     public function viewAny(?User $user): bool
     {
-        return PermissionService::hasPermissionTo('view_any_forums_categories', $user);
+        return Gate::forUser($user)->check('view_any_forums_categories');
     }
 
     public function view(?User $user, ForumCategory $category): bool
     {
-        return PermissionService::hasPermissionTo('view_forums_category', $user)
+        return Gate::forUser($user)->check('view_forums_category')
             && $category->is_active;
     }
 }

@@ -19,7 +19,7 @@ class AuthData extends Data
 
     public bool $mustVerifyEmail;
 
-    /** @var string[] */
+    /** @var array<string, bool> */
     public array $can;
 
     /** @var string[] */

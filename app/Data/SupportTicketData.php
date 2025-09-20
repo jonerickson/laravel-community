@@ -8,6 +8,7 @@ use App\Enums\SupportTicketPriority;
 use App\Enums\SupportTicketStatus;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
+use Spatie\LaravelData\Attributes\LoadRelation;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
@@ -29,14 +30,17 @@ class SupportTicketData extends Data
 
     public int $supportTicketCategoryId;
 
+    #[LoadRelation]
     public ?SupportTicketCategoryData $category;
 
     public ?int $assignedTo;
 
+    #[LoadRelation]
     public ?UserData $assignedToUser;
 
     public int $createdBy;
 
+    #[LoadRelation]
     public ?UserData $author;
 
     public ?string $externalId;
@@ -53,9 +57,11 @@ class SupportTicketData extends Data
 
     public ?CarbonImmutable $updatedAt;
 
+    #[LoadRelation]
     /** @var CommentData[] */
     public Collection $comments;
 
+    #[LoadRelation]
     /** @var FileData[] */
     public Collection $files;
 

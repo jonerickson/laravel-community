@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Data;
 
 use Carbon\CarbonImmutable;
+use Spatie\LaravelData\Attributes\LoadRelation;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
@@ -30,9 +31,11 @@ class ForumCategoryData extends Data
 
     public bool $isActive;
 
+    #[LoadRelation]
     /** @var ForumData[] */
     public ?array $forums;
 
+    #[LoadRelation]
     public ?ImageData $image;
 
     public ?CarbonImmutable $createdAt;

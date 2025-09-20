@@ -29,8 +29,6 @@ class ForumController extends Controller
     {
         $this->authorize('view', $forum);
 
-        $forum->loadMissing('category');
-
         /** @var LengthAwarePaginator $topics */
         $topics = $forum
             ->topics()

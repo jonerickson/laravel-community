@@ -8,9 +8,10 @@ use App\Data\AuthData;
 use App\Data\FlashData;
 use App\Data\SharedData;
 use App\Data\UserData;
-use App\Services\PermissionService;
+use App\Models\Permission;
 use App\Services\ShoppingCartService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
 
@@ -30,7 +31,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => ($user = $request->user()) ? UserData::from($user) : null,
                 'isAdmin' => $user?->hasRole('super-admin') ?? false,
                 'roles' => $user?->roles?->pluck('name')->toArray() ?? [],
-                'can' => PermissionService::mapFrontendPermissions($user),
+                'can' => Permission::all()->mapWithKeys(fn (Permission $permission) => [$permission->name => Gate::forUser($user)->check($permission->name)])->toArray(),
                 'mustVerifyEmail' => $user && ! $user->hasVerifiedEmail(),
             ]),
             'cartCount' => $this->shoppingCartService->getCartCount(),

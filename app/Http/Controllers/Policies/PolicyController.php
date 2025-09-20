@@ -22,8 +22,6 @@ class PolicyController extends Controller
         $this->authorize('view', $category);
         $this->authorize('view', $policy);
 
-        $policy->loadMissing(['author', 'category']);
-
         return Inertia::render('policies/show', [
             'category' => PolicyCategoryData::from($category),
             'policy' => PolicyData::from($policy),

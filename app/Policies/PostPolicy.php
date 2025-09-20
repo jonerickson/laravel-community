@@ -6,31 +6,29 @@ namespace App\Policies;
 
 use App\Models\Post;
 use App\Models\User;
-use App\Services\PermissionService;
+use Illuminate\Support\Facades\Gate;
 
 class PostPolicy
 {
     public function viewAny(?User $user): bool
     {
-        return PermissionService::hasPermissionTo('view_any_posts', $user);
+        return Gate::forUser($user)->check('view_any_posts');
     }
 
     public function view(?User $user, Post $post): bool
     {
-        return false;
-
-        return PermissionService::hasPermissionTo('view_posts', $user)
+        return Gate::forUser($user)->check('view_posts')
             && $post->is_published;
     }
 
     public function create(?User $user): bool
     {
-        return PermissionService::hasPermissionTo('create_posts', $user);
+        return Gate::forUser($user)->check('create_posts');
     }
 
     public function update(?User $user, Post $post): bool
     {
-        if (PermissionService::hasPermissionTo('update_posts', $user)) {
+        if (Gate::forUser($user)->check('update_posts')) {
             return true;
         }
 
@@ -44,7 +42,7 @@ class PostPolicy
 
     public function delete(?User $user, Post $post): bool
     {
-        if (PermissionService::hasPermissionTo('delete_posts', $user)) {
+        if (Gate::forUser($user)->check('delete_posts')) {
             return true;
         }
 
@@ -57,21 +55,21 @@ class PostPolicy
 
     public function report(?User $user, Post $post): bool
     {
-        return PermissionService::hasPermissionTo('report_posts', $user);
+        return Gate::forUser($user)->check('report_posts');
     }
 
     public function like(?User $user, Post $post): bool
     {
-        return PermissionService::hasPermissionTo('like_posts', $user);
+        return Gate::forUser($user)->check('like_posts');
     }
 
     public function pin(?User $user, Post $post): bool
     {
-        return PermissionService::hasPermissionTo('pin_posts', $user);
+        return Gate::forUser($user)->check('pin_posts');
     }
 
     public function publish(?User $user, Post $post): bool
     {
-        return PermissionService::hasPermissionTo('publish_posts', $user);
+        return Gate::forUser($user)->check('publish_posts');
     }
 }

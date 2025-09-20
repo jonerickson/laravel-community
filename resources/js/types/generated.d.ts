@@ -30,7 +30,7 @@ declare namespace App.Data {
         user: App.Data.UserData | null;
         isAdmin: boolean;
         mustVerifyEmail: boolean;
-        can: Array<string>;
+        can: { [key: string]: boolean };
         roles: Array<string>;
     };
     export type CartData = {
@@ -70,6 +70,7 @@ declare namespace App.Data {
         replies: Array<App.Data.CommentData> | null;
         createdAt: string | null;
         updatedAt: string | null;
+        permissions: App.Data.PermissionData;
     };
     export type DownloadData = {
         id: string;
@@ -220,6 +221,10 @@ declare namespace App.Data {
         customer: string;
         paymentMethodTypes: Array<string>;
         usage: string;
+    };
+    export type PermissionData = {
+        canUpdate: boolean;
+        canDelete: boolean;
     };
     export type PolicyCategoryData = {
         id: number;

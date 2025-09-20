@@ -76,7 +76,7 @@ class ProductController extends Controller
         }]);
 
         return Inertia::render('store/products/show', [
-            'product' => ProductData::from($product->loadMissing(['defaultPrice'])),
+            'product' => ProductData::from($product),
             'reviews' => Inertia::defer(fn () => $reviews->items()),
             'reviewsPagination' => PaginatedData::from(Arr::except($reviews->toArray(), ['data'])),
         ]);

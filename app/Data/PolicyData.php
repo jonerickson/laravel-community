@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Data;
 
 use Carbon\CarbonImmutable;
+use Spatie\LaravelData\Attributes\LoadRelation;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
@@ -28,8 +29,10 @@ class PolicyData extends Data
 
     public bool $isActive;
 
+    #[LoadRelation]
     public ?UserData $author;
 
+    #[LoadRelation]
     public ?PolicyCategoryData $category;
 
     public ?CarbonImmutable $effectiveAt;

@@ -6,30 +6,30 @@ namespace App\Policies;
 
 use App\Models\Topic;
 use App\Models\User;
-use App\Services\PermissionService;
+use Illuminate\Support\Facades\Gate;
 
 class TopicPolicy
 {
     public function viewAny(?User $user): bool
     {
-        return PermissionService::hasPermissionTo('view_any_topics', $user);
+        return Gate::forUser($user)->check('view_any_topics');
     }
 
     public function view(?User $user, Topic $topic): bool
     {
-        return PermissionService::hasPermissionTo('view_topics', $user)
+        return Gate::forUser($user)->check('view_topics')
             && $topic->forum->is_active
             && $topic->forum->category->is_active;
     }
 
     public function create(?User $user): bool
     {
-        return PermissionService::hasPermissionTo('create_topics', $user);
+        return Gate::forUser($user)->check('create_topics');
     }
 
     public function update(?User $user, Topic $topic): bool
     {
-        if (PermissionService::hasPermissionTo('update_topics')) {
+        if (Gate::forUser($user)->check('update_topics')) {
             return true;
         }
 
@@ -42,7 +42,7 @@ class TopicPolicy
 
     public function delete(?User $user, Topic $topic): bool
     {
-        if (PermissionService::hasPermissionTo('delete_topics')) {
+        if (Gate::forUser($user)->check('delete_topics')) {
             return true;
         }
 
@@ -55,21 +55,21 @@ class TopicPolicy
 
     public function reply(?User $user, Topic $topic): bool
     {
-        return PermissionService::hasPermissionTo('reply_topics', $user);
+        return Gate::forUser($user)->check('reply_topics');
     }
 
     public function report(?User $user, Topic $topic): bool
     {
-        return PermissionService::hasPermissionTo('report_topics', $user);
+        return Gate::forUser($user)->check('report_topics');
     }
 
     public function pin(?User $user, Topic $topic): bool
     {
-        return PermissionService::hasPermissionTo('pin_topics', $user);
+        return Gate::forUser($user)->check('pin_topics');
     }
 
     public function lock(?User $user, Topic $topic): bool
     {
-        return PermissionService::hasPermissionTo('lock_topics', $user);
+        return Gate::forUser($user)->check('lock_topics');
     }
 }

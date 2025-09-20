@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Group;
-use App\Models\Permission;
 use App\Models\User;
 
 class PermissionService
@@ -31,37 +30,5 @@ class PermissionService
         }
 
         return false;
-    }
-
-    public static function mapFrontendPermissions(?User $user = null): array
-    {
-        if (blank($user) && ($guestGroup = Group::query()->defaultGuestGroups()->first())) {
-            return $guestGroup
-                ->getAllPermissions()
-                ->map(fn (Permission $permission) => $permission->name)
-                ->filter()
-                ->unique()
-                ->values()
-                ->toArray();
-        }
-
-        if (blank($user)) {
-            return [];
-        }
-
-        $permissions = $user->getAllPermissions();
-
-        $user->loadMissing('groups');
-
-        foreach ($user->groups as $group) {
-            $permissions->push(...$group->getAllPermissions());
-        }
-
-        return $permissions
-            ->map(fn (Permission $permission) => $permission->name)
-            ->filter()
-            ->unique()
-            ->values()
-            ->toArray();
     }
 }

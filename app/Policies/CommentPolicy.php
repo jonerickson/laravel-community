@@ -6,28 +6,28 @@ namespace App\Policies;
 
 use App\Models\Comment;
 use App\Models\User;
-use App\Services\PermissionService;
+use Illuminate\Support\Facades\Gate;
 
 class CommentPolicy
 {
     public function viewAny(?User $user): bool
     {
-        return PermissionService::hasPermissionTo('view_any_comments', $user);
+        return Gate::forUser($user)->check('view_any_comments');
     }
 
     public function view(?User $user, Comment $comment): bool
     {
-        return PermissionService::hasPermissionTo('view_comments', $user);
+        return Gate::forUser($user)->check('view_comments');
     }
 
     public function create(?User $user): bool
     {
-        return PermissionService::hasPermissionTo('create_comments', $user);
+        return Gate::forUser($user)->check('create_comments');
     }
 
     public function update(?User $user, Comment $comment): bool
     {
-        if (PermissionService::hasPermissionTo('update_comments')) {
+        if (Gate::forUser($user)->check('update_comments')) {
             return true;
         }
 
@@ -40,7 +40,7 @@ class CommentPolicy
 
     public function delete(?User $user, Comment $comment): bool
     {
-        if (PermissionService::hasPermissionTo('delete_comments')) {
+        if (Gate::forUser($user)->check('delete_comments')) {
             return true;
         }
 
@@ -53,6 +53,6 @@ class CommentPolicy
 
     public function like(?User $user, Comment $comment): bool
     {
-        return PermissionService::hasPermissionTo('like_comments', $user);
+        return Gate::forUser($user)->check('like_comments');
     }
 }

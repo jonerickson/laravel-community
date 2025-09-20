@@ -41,8 +41,6 @@ class TopicController extends Controller
 
         $topic->incrementViews();
 
-        $forum->loadMissing('category');
-
         /** @var LengthAwarePaginator $posts */
         $posts = $topic
             ->posts()
@@ -56,7 +54,7 @@ class TopicController extends Controller
 
         return Inertia::render('forums/topics/show', [
             'forum' => ForumData::from($forum),
-            'topic' => TopicData::from($topic->load(['author', 'forum'])),
+            'topic' => TopicData::from($topic),
             'posts' => Inertia::merge(fn () => PostData::collect($posts->items())),
             'postsPagination' => PaginatedData::from(Arr::except($posts->toArray(), ['data'])),
             'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($topic->getRecentViewers())),
@@ -70,8 +68,6 @@ class TopicController extends Controller
     {
         $this->authorize('view', $forum);
         $this->authorize('create', Topic::class);
-
-        $forum->loadMissing('category');
 
         return Inertia::render('forums/topics/create', [
             'forum' => ForumData::from($forum),

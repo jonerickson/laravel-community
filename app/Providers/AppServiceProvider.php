@@ -20,9 +20,11 @@ use App\Events\Stripe\SubscriptionUpdated;
 use App\Listeners\Stripe\ProcessWebhook;
 use App\Listeners\SyncPriceWithPaymentProvider;
 use App\Listeners\SyncProductWithPaymentProvider;
+use App\Models\Permission;
 use App\Models\User;
 use App\Providers\Social\DiscordProvider;
 use App\Providers\Social\RobloxProvider;
+use App\Services\PermissionService;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Database\Eloquent\Model;
@@ -55,8 +57,12 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::before(function (?User $user = null) {
             if ($user?->hasRole('super-admin') === true) {
-                // return true;
+                return true;
             }
+        });
+
+        Permission::all()->each(function (Permission $permission) {
+            Gate::define($permission->name, fn (?User $user = null) => PermissionService::hasPermissionTo($permission->name, $user));
         });
 
         Model::automaticallyEagerLoadRelationships();

@@ -6,6 +6,7 @@ namespace App\Data;
 
 use App\Enums\PostType;
 use Carbon\CarbonImmutable;
+use Spatie\LaravelData\Attributes\LoadRelation;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
@@ -66,6 +67,7 @@ class PostData extends Data
 
     public int $readsCount;
 
+    #[LoadRelation]
     public UserData $author;
 
     #[LiteralTypeScriptType('Array<string, unknown> | null')]
@@ -75,6 +77,7 @@ class PostData extends Data
 
     public ?CarbonImmutable $updatedAt;
 
+    #[LoadRelation]
     /** @var CommentData[] */
     public ?array $comments;
 

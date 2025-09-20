@@ -71,7 +71,7 @@ class PermissionSeeder extends Seeder
         $lines = array_slice(explode("\n", $source), $startLine, $endLine - $startLine + 1);
         $methodContent = implode("\n", $lines);
 
-        if (preg_match('/PermissionService::hasPermissionTo\([\'"]([^\'"]+)[\'"]/', $methodContent, $matches)) {
+        if (preg_match('/Gate::forUser\(\$user\)->check\([\'"]([^\'"]+)[\'"]/', $methodContent, $matches)) {
             return $matches[1];
         }
 

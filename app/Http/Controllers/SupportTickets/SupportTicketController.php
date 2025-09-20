@@ -73,8 +73,6 @@ class SupportTicketController extends Controller
     {
         $this->authorize('view', $ticket);
 
-        $ticket->loadMissing(['category', 'author', 'assignedTo', 'comments.author', 'files']);
-
         return Inertia::render('support/show', [
             'ticket' => SupportTicketData::from($ticket),
         ]);

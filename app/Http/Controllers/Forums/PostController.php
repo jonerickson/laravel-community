@@ -63,9 +63,6 @@ class PostController extends Controller
         $this->authorize('view', $topic);
         $this->authorize('update', $post);
 
-        $forum->loadMissing('category');
-        $post->loadMissing('author');
-
         return Inertia::render('forums/posts/edit', [
             'forum' => ForumData::from($forum),
             'topic' => TopicData::from($topic),
