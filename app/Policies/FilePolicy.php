@@ -49,7 +49,7 @@ class FilePolicy
             return false;
         }
 
-        return ! $resource instanceof Model || Gate::forUser($user)->check('view', $resource);
+        return $this->view($user, $file, $resource);
     }
 
     public function delete(?User $user, File $file, ?Model $resource = null): bool
@@ -58,6 +58,6 @@ class FilePolicy
             return false;
         }
 
-        return ! $resource instanceof Model || Gate::forUser($user)->check('view', $resource);
+        return $this->view($user, $file, $resource);
     }
 }

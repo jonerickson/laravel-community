@@ -1,10 +1,9 @@
-import { ReportDialog } from '@/components/report-dialog';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApiRequest } from '@/hooks/use-api-request';
 import usePermissions from '@/hooks/use-permissions';
 import { Link, useForm } from '@inertiajs/react';
-import { Edit, Eye, EyeOff, Flag, MoreHorizontal, Pin, PinOff, Trash } from 'lucide-react';
+import { Edit, Eye, EyeOff, MoreHorizontal, Pin, PinOff, Trash } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ForumTopicPostModerationMenuProps {
@@ -21,7 +20,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
     const { execute: pinPost, loading: pinLoading } = useApiRequest();
     const { execute: publishPost } = useApiRequest();
 
-    if (!hasAnyPermission(['report_posts', 'publish_posts', 'pin_posts']) && !post.permissions.canDelete && !post.permissions.canUpdate) {
+    if (!hasAnyPermission(['publish_posts', 'pin_posts']) && !post.permissions.canDelete && !post.permissions.canUpdate) {
         return null;
     }
 
@@ -122,15 +121,6 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                             Edit Post
                         </Link>
                     </DropdownMenuItem>
-                )}
-
-                {can('report_posts') && (
-                    <ReportDialog reportableType="App\Models\Post" reportableId={post.id}>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <Flag className="mr-2 size-4" />
-                            Report Post
-                        </DropdownMenuItem>
-                    </ReportDialog>
                 )}
 
                 {can('pin_posts') && (

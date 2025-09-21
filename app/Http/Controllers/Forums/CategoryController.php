@@ -39,7 +39,7 @@ class CategoryController extends Controller
                     ->withCount(['topics', 'posts'])
                     ->with(['latestTopics' => function (HasMany|Topic $subQuery): void {
                         $subQuery
-                            ->with(['author', 'lastPost.author'])
+                            ->with(['forum.category', 'author', 'lastPost.author'])
                             ->limit(3);
                     }]);
             }])

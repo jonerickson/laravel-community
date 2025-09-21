@@ -29,6 +29,7 @@ class ForumPolicy
         return Gate::forUser($user)->check('view_forums')
             && $forum->is_active
             && ($forum->category === null || Gate::forUser($user)->check('view', $forum->category))
-            && ($forum->category === null || $forum->category->is_active);
+            && ($forum->category === null || $forum->category->is_active)
+            && ($user?->groups->intersect($forum->groups)->isNotEmpty() ?? false);
     }
 }

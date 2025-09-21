@@ -57,9 +57,7 @@ class PostPolicy
         }
 
         return $post->isAuthoredBy($user)
-            && $post->is_published
-            && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum))
-            && (! $topic instanceof Topic || Gate::forUser($user)->check('view', $topic));
+            && $this->view($user, $post, $forum, $topic);
     }
 
     public function delete(?User $user, Post $post, ?Forum $forum = null, ?Topic $topic = null): bool
@@ -73,8 +71,7 @@ class PostPolicy
         }
 
         return $post->isAuthoredBy($user)
-            && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum))
-            && (! $topic instanceof Topic || Gate::forUser($user)->check('view', $topic));
+            && $this->view($user, $post, $forum, $topic);
     }
 
     public function report(?User $user, Post $post): bool
@@ -84,12 +81,14 @@ class PostPolicy
 
     public function like(?User $user, Post $post): bool
     {
-        return Gate::forUser($user)->check('like_posts');
+        return Gate::forUser($user)->check('like_posts')
+            && $this->view($user, $post);
     }
 
     public function pin(?User $user, Post $post): bool
     {
-        return Gate::forUser($user)->check('pin_posts');
+        return Gate::forUser($user)->check('pin_posts')
+            && $this->view($user, $post);
     }
 
     public function publish(?User $user, Post $post): bool

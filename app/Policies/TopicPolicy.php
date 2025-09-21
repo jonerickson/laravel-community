@@ -52,9 +52,8 @@ class TopicPolicy
         }
 
         return $topic->isAuthoredBy($user)
-            && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum))
-            && (! $forum instanceof Forum || $forum->is_active)
-            && ($forum?->category === null || $forum->category->is_active);
+            && ! $topic->is_locked
+            && $this->view($user, $topic, $forum);
     }
 
     public function delete(?User $user, Topic $topic, ?Forum $forum = null): bool
@@ -68,31 +67,31 @@ class TopicPolicy
         }
 
         return $topic->isAuthoredBy($user)
-            && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum))
-            && (! $forum instanceof Forum || $forum->is_active)
-            && ($forum?->category === null || $forum->category->is_active);
+            && $this->view($user, $topic, $forum);
     }
 
     public function reply(?User $user, Topic $topic, ?Forum $forum = null): bool
     {
         return Gate::forUser($user)->check('reply_topics')
-            && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum))
-            && (! $forum instanceof Forum || $forum->is_active)
-            && ($forum?->category === null || $forum->category->is_active);
+            && ! $topic->is_locked
+            && $this->view($user, $topic, $forum);
     }
 
     public function report(?User $user, Topic $topic): bool
     {
-        return Gate::forUser($user)->check('report_topics');
+        return Gate::forUser($user)->check('report_topics')
+            && $this->view($user, $topic);
     }
 
     public function pin(?User $user, Topic $topic): bool
     {
-        return Gate::forUser($user)->check('pin_topics');
+        return Gate::forUser($user)->check('pin_topics')
+            && $this->view($user, $topic);
     }
 
     public function lock(?User $user, Topic $topic): bool
     {
-        return Gate::forUser($user)->check('lock_topics');
+        return Gate::forUser($user)->check('lock_topics')
+            && $this->view($user, $topic);
     }
 }

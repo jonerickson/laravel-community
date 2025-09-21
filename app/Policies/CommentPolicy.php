@@ -52,7 +52,7 @@ class CommentPolicy
         }
 
         return $comment->isAuthoredBy($user)
-            && (! $commentable instanceof Model || Gate::forUser($user)->check('view', $commentable));
+            && $this->view($user, $comment, $commentable);
     }
 
     public function delete(?User $user, Comment $comment, ?Model $commentable = null): bool
@@ -66,11 +66,12 @@ class CommentPolicy
         }
 
         return $comment->isAuthoredBy($user)
-            && (! $commentable instanceof Model || Gate::forUser($user)->check('view', $commentable));
+            && $this->view($user, $comment, $commentable);
     }
 
     public function like(?User $user, Comment $comment): bool
     {
-        return Gate::forUser($user)->check('like_comments');
+        return Gate::forUser($user)->check('like_comments')
+            && $this->view($user, $comment);
     }
 }

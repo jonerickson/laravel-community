@@ -6,6 +6,8 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { stripCharacters } from '@/utils/truncate';
 import { formatDistanceToNow } from 'date-fns';
 import { EyeOff, Flag, Pin, Quote } from 'lucide-react';
 import usePermissions from '../hooks/use-permissions';
@@ -93,14 +95,18 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                         <RichEditorContent itemProp="text" content={post.content} />
 
                         {(hasAnyPermission(['like_posts', 'reply_topics']) || post.author?.signature) && (
-                            <div className="mt-4 border-t border-muted pt-2">
-                                {post.author?.signature && (
+                            <div
+                                className={cn('mt-4 border-t border-muted pt-2', {
+                                    'border-none': topic.isLocked && !stripCharacters(post.author?.signature || ''),
+                                })}
+                            >
+                                {stripCharacters(post.author?.signature || '').length > 0 && (
                                     <div className="mt-2 text-xs text-muted-foreground">
-                                        <RichEditorContent content={post.author.signature} />
+                                        <RichEditorContent content={post.author.signature || ''} />
                                     </div>
                                 )}
 
-                                {hasAnyPermission(['like_posts', 'reply_topics']) && (
+                                {hasAnyPermission(['like_posts', 'reply_topics']) && !topic.isLocked && (
                                     <div className="mt-2 flex items-start justify-between">
                                         <div className="flex gap-2">
                                             {can('reply_topics') && (

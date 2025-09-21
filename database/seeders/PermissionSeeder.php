@@ -105,8 +105,10 @@ class PermissionSeeder extends Seeder
             'update_topics',
             'pin_posts',
             'publish_posts',
+            'report_posts',
             'pin_topics',
             'lock_topics',
+            'report_topics',
         ]);
     }
 
@@ -127,9 +129,7 @@ class PermissionSeeder extends Seeder
             'view_posts',
             'view_topics',
             'like_comments',
-            'report_posts',
             'like_posts',
-            'report_topics',
             'reply_topics',
         ]);
     }
