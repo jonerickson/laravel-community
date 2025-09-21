@@ -20,15 +20,15 @@ class SupportTicketCategoryData extends Data
 
     public string $slug;
 
-    public ?string $description;
+    public ?string $description = null;
 
-    public ?string $color;
+    public ?string $color = null;
 
     public int $order;
 
     public bool $isActive;
 
-    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $createdAt = null;
 
-    public ?CarbonImmutable $updatedAt;
+    public ?CarbonImmutable $updatedAt = null;
 }

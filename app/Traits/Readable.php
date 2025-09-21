@@ -26,7 +26,7 @@ trait Readable
     {
         $user ??= Auth::user();
 
-        $query->whereDoesntHaveRelation('reads', function (Builder $query) use ($user) {
+        $query->whereDoesntHaveRelation('reads', function (Builder $query) use ($user): void {
             $query->whereBelongsTo($user, 'author');
         });
     }
@@ -35,7 +35,7 @@ trait Readable
     {
         $user ??= Auth::user();
 
-        $query->whereRelation('reads', function (Builder $query) use ($user) {
+        $query->whereRelation('reads', function (Builder $query) use ($user): void {
             $query->whereBelongsTo($user, 'author');
         });
     }

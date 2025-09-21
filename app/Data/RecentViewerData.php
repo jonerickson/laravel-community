@@ -26,5 +26,5 @@ class RecentViewerUserData extends Data
 
     public string $name;
 
-    public ?string $avatarUrl;
+    public ?string $avatarUrl = null;
 }

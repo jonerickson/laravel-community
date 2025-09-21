@@ -17,8 +17,8 @@ class ProductCategoryData extends Data
 
     public string $slug;
 
-    public ?string $description;
+    public ?string $description = null;
 
     #[LoadRelation]
-    public ?ImageData $image;
+    public ?ImageData $image = null;
 }

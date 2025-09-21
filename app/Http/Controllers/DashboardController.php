@@ -29,7 +29,7 @@ class DashboardController
             'newestProduct' => $this->getNewestProduct(),
             'popularProduct' => $this->getPopularProduct(),
             'featuredProduct' => $this->getFeaturedProduct(),
-            'announcements' => Inertia::defer(fn () => $this->getAnnouncements()),
+            'announcements' => Inertia::defer(fn (): Collection => $this->getAnnouncements()),
             'supportTickets' => Inertia::defer(fn (): Collection => $this->getSupportTickets()),
             'trendingTopics' => Inertia::defer(fn (): Collection => $this->getTrendingTopics()),
             'latestBlogPosts' => Inertia::defer(fn (): Collection => $this->getLatestBlogPosts()),
@@ -82,12 +82,12 @@ class DashboardController
             ->filter(fn (Post $post) => Gate::check('view', $post)));
     }
 
-    private function getNewestProduct(): ?ProductData
+    private function getNewestProduct(): ProductData
     {
         return ProductData::from(Product::query()
             ->with('defaultPrice')
             ->with('categories')
-            ->with(['prices' => function (HasMany $query) {
+            ->with(['prices' => function (HasMany $query): void {
                 $query->active();
             }])
             ->latest()
@@ -96,12 +96,12 @@ class DashboardController
             ->first());
     }
 
-    private function getPopularProduct(): ?ProductData
+    private function getPopularProduct(): ProductData
     {
         return ProductData::from(Product::query()
             ->with('defaultPrice')
             ->with('categories')
-            ->with(['prices' => function (HasMany $query) {
+            ->with(['prices' => function (HasMany $query): void {
                 $query->active();
             }])
             ->trending()
@@ -110,13 +110,13 @@ class DashboardController
             ->first());
     }
 
-    private function getFeaturedProduct(): ?ProductData
+    private function getFeaturedProduct(): ProductData
     {
         return ProductData::from(Product::query()
             ->featured()
             ->with('defaultPrice')
             ->with('categories')
-            ->with(['prices' => function (HasMany $query) {
+            ->with(['prices' => function (HasMany $query): void {
                 $query->active();
             }])
             ->inRandomOrder()

@@ -28,7 +28,7 @@ class ProductData extends Data
 
     public ProductType $type;
 
-    public ?ProductTaxCode $taxCode;
+    public ?ProductTaxCode $taxCode = null;
 
     public bool $isFeatured;
 
@@ -38,22 +38,22 @@ class ProductData extends Data
 
     public bool $allowPromotionCodes;
 
-    public ?string $featuredImage;
+    public ?string $featuredImage = null;
 
-    public ?string $featuredImageUrl;
+    public ?string $featuredImageUrl = null;
 
-    public ?string $externalProductId;
+    public ?string $externalProductId = null;
 
     #[LiteralTypeScriptType('Array<string, unknown> | null')]
-    public ?array $metadata;
+    public ?array $metadata = null;
 
     /** @var PriceData[] */
     public array $prices;
 
     #[LoadRelation]
-    public ?PriceData $defaultPrice;
+    public ?PriceData $defaultPrice = null;
 
-    public ?float $averageRating;
+    public ?float $averageRating = null;
 
     public int $reviewsCount;
 
@@ -63,7 +63,7 @@ class ProductData extends Data
     /** @var PolicyData[] */
     public array $policies;
 
-    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $createdAt = null;
 
-    public ?CarbonImmutable $updatedAt;
+    public ?CarbonImmutable $updatedAt = null;
 }

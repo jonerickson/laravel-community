@@ -24,7 +24,7 @@ class ImageData extends Data
 
     public string $url;
 
-    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $createdAt = null;
 
-    public ?CarbonImmutable $updatedAt;
+    public ?CarbonImmutable $updatedAt = null;
 }

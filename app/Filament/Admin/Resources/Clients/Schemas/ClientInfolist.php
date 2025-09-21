@@ -40,13 +40,13 @@ class ClientInfolist
                     ->schema([
                         TextEntry::make('authorize')
                             ->copyable()
-                            ->getStateUsing(fn () => route('passport.authorizations.authorize')),
+                            ->getStateUsing(fn (): string => route('passport.authorizations.authorize')),
                         TextEntry::make('token')
                             ->copyable()
-                            ->getStateUsing(fn () => route('passport.token')),
+                            ->getStateUsing(fn (): string => route('passport.token')),
                         TextEntry::make('refresh')
                             ->copyable()
-                            ->getStateUsing(fn () => route('passport.token.refresh')),
+                            ->getStateUsing(fn (): string => route('passport.token.refresh')),
                     ]),
             ]);
     }

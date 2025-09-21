@@ -29,7 +29,7 @@ class StoreController extends Controller
                 ->products()
                 ->featured()
                 ->with('categories')
-                ->with(['prices' => function (HasMany $query) {
+                ->with(['prices' => function (HasMany $query): void {
                     $query->active();
                 }])
                 ->latest()

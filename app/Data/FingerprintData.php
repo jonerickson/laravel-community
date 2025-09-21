@@ -16,7 +16,7 @@ class FingerprintData extends Data
 {
     public string $fingerprintId;
 
-    public ?CarbonImmutable $firstSeen;
+    public ?CarbonImmutable $firstSeen = null;
 
-    public ?CarbonImmutable $lastSeen;
+    public ?CarbonImmutable $lastSeen = null;
 }

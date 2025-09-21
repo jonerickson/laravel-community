@@ -23,14 +23,12 @@ class EnsureFrontendRequestsAreStateful
 
         return (new Pipeline(app()))->send($request)->through(
             static::fromFrontend($request) ? $this->frontendMiddleware() : []
-        )->then(function ($request) use ($next) {
-            return $next($request);
-        });
+        )->then(fn ($request) => $next($request));
     }
 
     protected static function fromFrontend(Request $request): bool
     {
-        $domain = $request->headers->get('referer') ?: $request->headers->get('origin');
+        $domain = in_array($request->headers->get('referer'), [null, '', '0'], true) ? $request->headers->get('origin') : $request->headers->get('referer');
 
         if (is_null($domain)) {
             return false;
@@ -45,12 +43,10 @@ class EnsureFrontendRequestsAreStateful
         $stateful = array_filter([
             '%s%s',
             'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
-            $appUrl ? parse_url($appUrl, PHP_URL_HOST).(parse_url($appUrl, PHP_URL_PORT) ? ':'.parse_url($appUrl, PHP_URL_PORT) : '') : '',
+            $appUrl ? parse_url((string) $appUrl, PHP_URL_HOST).(parse_url((string) $appUrl, PHP_URL_PORT) ? ':'.parse_url((string) $appUrl, PHP_URL_PORT) : '') : '',
         ]);
 
-        return Str::is(Collection::make($stateful)->map(function ($uri) {
-            return trim($uri).'/*';
-        })->all(), $domain);
+        return Str::is(Collection::make($stateful)->map(fn ($uri): string => trim((string) $uri).'/*')->all(), $domain);
     }
 
     protected function configureSecureCookieSessions(): void
@@ -70,9 +66,7 @@ class EnsureFrontendRequestsAreStateful
             VerifyCsrfToken::class,
         ];
 
-        array_unshift($middleware, function (Request $request, Closure $next) {
-            return $next($request);
-        });
+        array_unshift($middleware, fn (Request $request, Closure $next) => $next($request));
 
         return $middleware;
     }

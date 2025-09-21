@@ -45,7 +45,7 @@ class CategoryController extends Controller
             }])
             ->get()
             ->filter(fn (ForumCategory $category) => Gate::check('view', $category))
-            ->map(function (ForumCategory $category) {
+            ->map(function (ForumCategory $category): ForumCategory {
                 $category->setAttribute('forums', $category->forums->filter(fn (Forum $forum) => Gate::check('view', $forum)));
 
                 return $category;

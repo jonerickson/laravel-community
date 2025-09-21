@@ -21,26 +21,26 @@ class OrderData extends Data
 
     public OrderStatus $status;
 
-    public ?int $amount;
+    public ?int $amount = null;
 
-    public ?string $invoiceUrl;
+    public ?string $invoiceUrl = null;
 
-    public ?string $referenceId;
+    public ?string $referenceId = null;
 
-    public ?string $invoiceNumber;
+    public ?string $invoiceNumber = null;
 
-    public ?string $externalCheckoutId;
+    public ?string $externalCheckoutId = null;
 
-    public ?string $externalOrderId;
+    public ?string $externalOrderId = null;
 
-    public ?string $externalPaymentId;
+    public ?string $externalPaymentId = null;
 
-    public ?string $externalInvoiceId;
+    public ?string $externalInvoiceId = null;
 
     /** @var OrderItemData[] */
     public array $items;
 
-    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $createdAt = null;
 
-    public ?CarbonImmutable $updatedAt;
+    public ?CarbonImmutable $updatedAt = null;
 }

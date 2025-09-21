@@ -18,9 +18,9 @@ class SharedData extends Data
 
     public string $name;
 
-    public ?int $cartCount;
+    public ?int $cartCount = null;
 
-    public ?FlashData $flash;
+    public ?FlashData $flash = null;
 
     public bool $sidebarOpen;
 

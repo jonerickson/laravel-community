@@ -31,7 +31,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => ($user = $request->user()) ? UserData::from($user) : null,
                 'isAdmin' => $user?->hasRole('super-admin') ?? false,
                 'roles' => $user?->roles?->pluck('name')->toArray() ?? [],
-                'can' => Permission::all()->mapWithKeys(fn (Permission $permission) => [$permission->name => Gate::forUser($user)->check($permission->name)])->toArray(),
+                'can' => Permission::all()->mapWithKeys(fn (Permission $permission): array => [$permission->name => Gate::forUser($user)->check($permission->name)])->toArray(),
                 'mustVerifyEmail' => $user && ! $user->hasVerifiedEmail(),
             ]),
             'cartCount' => $this->shoppingCartService->getCartCount(),
@@ -44,7 +44,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             ...$sharedData->toArray(),
-            'flash' => fn () => FlashData::from([
+            'flash' => fn (): FlashData => FlashData::from([
                 'scrollToBottom' => $request->session()->pull('scrollToBottom'),
                 'message' => $request->session()->pull('message'),
                 'messageVariant' => $request->session()->pull('messageVariant'),

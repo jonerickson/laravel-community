@@ -30,33 +30,33 @@ class CommentData extends Data
 
     public int $createdBy;
 
-    public ?int $parentId;
+    public ?int $parentId = null;
 
-    public ?int $rating;
+    public ?int $rating = null;
 
     public int $likesCount;
 
     /** @var LikeData[] */
     public array $likesSummary;
 
-    public ?string $userReaction;
+    public ?string $userReaction = null;
 
     /** @var string[] */
     public array $userReactions;
 
     #[LoadRelation]
-    public ?UserData $user;
+    public ?UserData $user = null;
 
     #[LoadRelation]
-    public ?UserData $author;
+    public ?UserData $author = null;
 
     #[LoadRelation]
-    public ?CommentData $parent;
+    public ?CommentData $parent = null;
 
     /** @var CommentData[] */
-    public ?array $replies;
+    public ?array $replies = null;
 
-    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $createdAt = null;
 
-    public ?CarbonImmutable $updatedAt;
+    public ?CarbonImmutable $updatedAt = null;
 }

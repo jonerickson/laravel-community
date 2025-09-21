@@ -35,7 +35,7 @@ class ClientForm
                                 ->required()
                                 ->activeUrl()),
                         Radio::make('grant_types')
-                            ->visible(fn ($operation) => $operation === 'create')
+                            ->visible(fn ($operation): bool => $operation === 'create')
                             ->helperText('The grant type authorized by the client.')
                             ->label('Grant Type')
                             ->required()

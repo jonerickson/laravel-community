@@ -38,7 +38,7 @@ class CategoryController extends Controller
         $products = $category
             ->products()
             ->with('defaultPrice')
-            ->with(['prices' => function (HasMany $query) {
+            ->with(['prices' => function (HasMany $query): void {
                 $query->active();
             }])
             ->where('is_subscription_only', false)

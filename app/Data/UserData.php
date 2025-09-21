@@ -20,16 +20,16 @@ class UserData extends Data
 
     public string $email;
 
-    public ?string $avatarUrl;
+    public ?string $avatarUrl = null;
 
-    public ?string $signature;
+    public ?string $signature = null;
 
-    public ?CarbonImmutable $emailVerifiedAt;
+    public ?CarbonImmutable $emailVerifiedAt = null;
 
     /** @var GroupData[] */
     public array $groups;
 
-    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $createdAt = null;
 
-    public ?CarbonImmutable $updatedAt;
+    public ?CarbonImmutable $updatedAt = null;
 }

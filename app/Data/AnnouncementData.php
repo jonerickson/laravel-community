@@ -31,13 +31,13 @@ class AnnouncementData extends Data
 
     public int $createdBy;
 
-    public ?UserData $author;
+    public ?UserData $author = null;
 
-    public ?CarbonImmutable $startsAt;
+    public ?CarbonImmutable $startsAt = null;
 
-    public ?CarbonImmutable $endsAt;
+    public ?CarbonImmutable $endsAt = null;
 
-    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $createdAt = null;
 
-    public ?CarbonImmutable $updatedAt;
+    public ?CarbonImmutable $updatedAt = null;
 }

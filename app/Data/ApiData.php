@@ -24,5 +24,5 @@ class ApiData extends Data
     public ApiMetaData $meta;
 
     /** @var array<string, string[]>|null */
-    public ?array $errors;
+    public ?array $errors = null;
 }

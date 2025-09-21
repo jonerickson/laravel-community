@@ -31,31 +31,31 @@ class SupportTicketData extends Data
     public int $supportTicketCategoryId;
 
     #[LoadRelation]
-    public ?SupportTicketCategoryData $category;
+    public ?SupportTicketCategoryData $category = null;
 
-    public ?int $assignedTo;
+    public ?int $assignedTo = null;
 
     #[LoadRelation]
-    public ?UserData $assignedToUser;
+    public ?UserData $assignedToUser = null;
 
     public int $createdBy;
 
     #[LoadRelation]
-    public ?UserData $author;
+    public ?UserData $author = null;
 
-    public ?string $externalId;
+    public ?string $externalId = null;
 
-    public ?string $externalUrl;
+    public ?string $externalUrl = null;
 
-    public ?CarbonImmutable $lastSyncedAt;
+    public ?CarbonImmutable $lastSyncedAt = null;
 
-    public ?CarbonImmutable $resolvedAt;
+    public ?CarbonImmutable $resolvedAt = null;
 
-    public ?CarbonImmutable $closedAt;
+    public ?CarbonImmutable $closedAt = null;
 
-    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $createdAt = null;
 
-    public ?CarbonImmutable $updatedAt;
+    public ?CarbonImmutable $updatedAt = null;
 
     #[LoadRelation]
     /** @var CommentData[] */

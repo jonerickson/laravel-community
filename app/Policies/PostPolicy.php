@@ -38,7 +38,7 @@ class PostPolicy
 
     public function update(?User $user, Post $post): bool
     {
-        if (! $user) {
+        if (! $user instanceof User) {
             return false;
         }
 
@@ -52,7 +52,7 @@ class PostPolicy
 
     public function delete(?User $user, Post $post): bool
     {
-        if (! $user) {
+        if (! $user instanceof User) {
             return false;
         }
 

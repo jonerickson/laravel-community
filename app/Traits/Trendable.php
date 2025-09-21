@@ -174,8 +174,8 @@ trait Trendable
 
     public function clearTrendingCache(): bool
     {
-        $pattern = Config::get('trending.cache.prefix', 'trending').':'.static::class.':'.$this->getKey().':*';
-
+        $this->getKey();
+        Config::get('trending.cache.prefix', 'trending');
         // In production, you might want to use a more sophisticated cache clearing mechanism
         // For now, we'll just clear the current cache keys
         $cacheKeys = [
@@ -225,9 +225,8 @@ trait Trendable
 
         // Likes from related posts
         $likesScore = $this->calculateLikesScore();
-        $score += $likesScore * ($weights['likes'] ?? 2.5);
 
-        return $score;
+        return $score + $likesScore * ($weights['likes'] ?? 2.5);
     }
 
     protected function calculateLikesScore(): float
@@ -262,7 +261,7 @@ trait Trendable
         // Exponential decay for content in between
         $halfLifeHours = $decayConfig['half_life'] ?? 168; // 7 days default
 
-        return pow(0.5, $ageInHours / $halfLifeHours);
+        return 0.5 ** ($ageInHours / $halfLifeHours);
     }
 
     protected function getTrendingCacheKey(?Carbon $referenceTime = null): string

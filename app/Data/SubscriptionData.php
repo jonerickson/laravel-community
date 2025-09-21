@@ -24,7 +24,7 @@ class SubscriptionData extends Data
 
     public string $slug;
 
-    public ?string $featuredImageUrl;
+    public ?string $featuredImageUrl = null;
 
     public bool $current = false;
 
@@ -40,7 +40,7 @@ class SubscriptionData extends Data
     /** @var PolicyData[] */
     public Collection $policies;
 
-    public ?CarbonImmutable $trialEndsAt;
+    public ?CarbonImmutable $trialEndsAt = null;
 
-    public ?CarbonImmutable $endsAt;
+    public ?CarbonImmutable $endsAt = null;
 }

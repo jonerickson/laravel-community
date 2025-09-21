@@ -33,7 +33,7 @@ enum OrderStatus: string implements HasColor, HasLabel
         return match ($this) {
             OrderStatus::Succeeded => 'success',
             OrderStatus::Cancelled, OrderStatus::RequiresAction => 'danger',
-            ORderStatus::Processing, OrderStatus::RequiresCapture => 'warning',
+            OrderStatus::Processing, OrderStatus::RequiresCapture => 'warning',
             default => 'info',
         };
     }

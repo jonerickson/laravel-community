@@ -13,7 +13,7 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 #[MapInputName(SnakeCaseMapper::class)]
 class AuthData extends Data
 {
-    public ?UserData $user;
+    public ?UserData $user = null;
 
     public bool $isAdmin;
 

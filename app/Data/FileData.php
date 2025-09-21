@@ -20,11 +20,11 @@ class FileData extends Data
 
     public string $url;
 
-    public ?int $size;
+    public ?int $size = null;
 
-    public ?string $mimeType;
+    public ?string $mimeType = null;
 
-    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $createdAt = null;
 
-    public ?CarbonImmutable $updatedAt;
+    public ?CarbonImmutable $updatedAt = null;
 }

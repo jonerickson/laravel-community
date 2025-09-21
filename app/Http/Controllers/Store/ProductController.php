@@ -71,7 +71,7 @@ class ProductController extends Controller
             perPage: $perPage
         );
 
-        $product->load(['prices' => function (HasMany $query) {
+        $product->load(['prices' => function (HasMany $query): void {
             $query->active();
         }]);
 

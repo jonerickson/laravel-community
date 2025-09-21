@@ -141,7 +141,7 @@ class UserResource extends Resource
                                                     ->successNotificationTitle('The integration has been removed.')
                                                     ->modalSubmitActionLabel('Delete')
                                                     ->modalHeading('Remove Integration')
-                                                    ->action(function (Action $action, User $record) {
+                                                    ->action(function (Action $action, User $record): void {
                                                         // $record->delete();
                                                         $action->success();
                                                     })

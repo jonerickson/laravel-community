@@ -21,13 +21,13 @@ class ForumData extends Data
 
     public string $slug;
 
-    public ?string $description;
+    public ?string $description = null;
 
-    public ?int $categoryId;
+    public ?int $categoryId = null;
 
-    public ?string $rules;
+    public ?string $rules = null;
 
-    public ?string $icon;
+    public ?string $icon = null;
 
     public string $color;
 
@@ -35,17 +35,17 @@ class ForumData extends Data
 
     public bool $isActive;
 
-    public ?int $topicsCount;
+    public ?int $topicsCount = null;
 
-    public ?int $postsCount;
+    public ?int $postsCount = null;
 
     /** @var TopicData[] */
-    public ?array $latestTopics;
+    public ?array $latestTopics = null;
 
     #[LoadRelation]
     public ForumCategoryData $category;
 
-    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $createdAt = null;
 
-    public ?CarbonImmutable $updatedAt;
+    public ?CarbonImmutable $updatedAt = null;
 }

@@ -16,7 +16,7 @@ class CartItemData extends Data
 {
     public int $productId;
 
-    public ?int $priceId;
+    public ?int $priceId = null;
 
     public string $name;
 
@@ -24,12 +24,12 @@ class CartItemData extends Data
 
     public int $quantity;
 
-    public ?ProductData $product;
+    public ?ProductData $product = null;
 
-    public ?PriceData $selectedPrice;
+    public ?PriceData $selectedPrice = null;
 
     /** @var PriceData[] */
     public array $availablePrices;
 
-    public ?CarbonImmutable $addedAt;
+    public ?CarbonImmutable $addedAt = null;
 }

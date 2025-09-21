@@ -21,23 +21,23 @@ class PolicyData extends Data
 
     public string $slug;
 
-    public ?string $version;
+    public ?string $version = null;
 
-    public ?string $description;
+    public ?string $description = null;
 
     public string $content;
 
     public bool $isActive;
 
     #[LoadRelation]
-    public ?UserData $author;
+    public ?UserData $author = null;
 
     #[LoadRelation]
-    public ?PolicyCategoryData $category;
+    public ?PolicyCategoryData $category = null;
 
-    public ?CarbonImmutable $effectiveAt;
+    public ?CarbonImmutable $effectiveAt = null;
 
-    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $createdAt = null;
 
-    public ?CarbonImmutable $updatedAt;
+    public ?CarbonImmutable $updatedAt = null;
 }

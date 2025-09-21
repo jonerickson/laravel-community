@@ -22,13 +22,13 @@ class UserSocialData extends Data
 
     public string $providerId;
 
-    public ?string $providerName;
+    public ?string $providerName = null;
 
-    public ?string $providerEmail;
+    public ?string $providerEmail = null;
 
-    public ?string $providerAvatar;
+    public ?string $providerAvatar = null;
 
-    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $createdAt = null;
 
-    public ?CarbonImmutable $updatedAt;
+    public ?CarbonImmutable $updatedAt = null;
 }

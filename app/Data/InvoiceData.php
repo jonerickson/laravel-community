@@ -17,5 +17,5 @@ class InvoiceData extends Data
 
     public int $amount;
 
-    public ?string $invoiceUrl;
+    public ?string $invoiceUrl = null;
 }

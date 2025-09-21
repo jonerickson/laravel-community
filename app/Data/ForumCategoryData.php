@@ -21,9 +21,9 @@ class ForumCategoryData extends Data
 
     public string $slug;
 
-    public ?string $description;
+    public ?string $description = null;
 
-    public ?string $icon;
+    public ?string $icon = null;
 
     public string $color;
 
@@ -32,12 +32,12 @@ class ForumCategoryData extends Data
     public bool $isActive;
 
     /** @var ForumData[] */
-    public ?array $forums;
+    public ?array $forums = null;
 
     #[LoadRelation]
-    public ?ImageData $image;
+    public ?ImageData $image = null;
 
-    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $createdAt = null;
 
-    public ?CarbonImmutable $updatedAt;
+    public ?CarbonImmutable $updatedAt = null;
 }

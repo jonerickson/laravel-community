@@ -63,7 +63,7 @@ class SubscriptionsController extends Controller
             order: $order,
         );
 
-        if (! $result) {
+        if ($result === false || ($result === '' || $result === '0')) {
             return back()
                 ->with('message', 'We were unable to start your subscription. Please try again later.');
         }

@@ -43,7 +43,7 @@ class SyncPriceWithPaymentProvider implements ShouldQueue
             Log::error('Failed to sync product price with payment provider', [
                 'product_price_id' => $event->price->id,
                 'product_id' => $event->price->product_id,
-                'event_type' => get_class($event),
+                'event_type' => $event::class,
                 'error' => $e->getMessage(),
             ]);
 

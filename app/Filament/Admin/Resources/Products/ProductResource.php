@@ -149,7 +149,7 @@ class ProductResource extends Resource
                                     ->helperText('Mark this product as featured to display it prominently on the store page.')
                                     ->columnSpanFull(),
                                 Toggle::make('is_subscription_only')
-                                    ->visible(fn (Get $get) => $get('type') === ProductType::Subscription)
+                                    ->visible(fn (Get $get): bool => $get('type') === ProductType::Subscription)
                                     ->label('Subscription only')
                                     ->helperText('Only show this product on the subscriptions page - not in the store.')
                                     ->columnSpanFull(),
@@ -161,7 +161,7 @@ class ProductResource extends Resource
                                     ->columnSpanFull(),
                                 TextInput::make('trial_days')
                                     ->default(0)
-                                    ->visible(fn (Get $get) => $get('type') === ProductType::Subscription)
+                                    ->visible(fn (Get $get): bool => $get('type') === ProductType::Subscription)
                                     ->label('Trial mode')
                                     ->suffix('days')
                                     ->helperText('Enable trial mode for this product by providing the number of days the trial is active.')
@@ -183,7 +183,7 @@ class ProductResource extends Resource
                                     ->helperText('Metadata will be merged with any external payment processor that is used.')
                                     ->hiddenLabel(),
                                 Repeater::make('metadata.features')
-                                    ->visible(fn (Get $get) => $get('type') === ProductType::Subscription)
+                                    ->visible(fn (Get $get): bool => $get('type') === ProductType::Subscription)
                                     ->addActionLabel('Add a new feature')
                                     ->simple(TextInput::make('feature')),
                             ]),

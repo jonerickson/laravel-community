@@ -27,7 +27,7 @@ class DownloadsController extends Controller
         $downloads = collect();
 
         $products = Product::query()
-            ->whereHas('orderItems', function ($query) use ($completedOrderIds) {
+            ->whereHas('orderItems', function ($query) use ($completedOrderIds): void {
                 $query->whereIn('order_id', $completedOrderIds);
             })
             ->whereHas('files')
@@ -36,7 +36,7 @@ class DownloadsController extends Controller
         foreach ($products as $product) {
             $orderDate = Order::query()
                 ->whereIn('id', $completedOrderIds)
-                ->whereHas('items', function ($query) use ($product) {
+                ->whereHas('items', function ($query) use ($product): void {
                     $query->where('product_id', $product->id);
                 })
                 ->latest()

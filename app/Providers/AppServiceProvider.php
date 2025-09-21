@@ -61,8 +61,8 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
-        Permission::all()->each(function (Permission $permission) {
-            Gate::define($permission->name, fn (?User $user = null) => PermissionService::hasPermissionTo($permission->name, $user));
+        Permission::all()->each(function (Permission $permission): void {
+            Gate::define($permission->name, fn (?User $user = null): bool => PermissionService::hasPermissionTo($permission->name, $user));
         });
 
         Model::automaticallyEagerLoadRelationships();

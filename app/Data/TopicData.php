@@ -24,7 +24,7 @@ class TopicData extends Data
 
     public string $slug;
 
-    public ?string $description;
+    public ?string $description = null;
 
     public int $forumId;
 
@@ -42,7 +42,7 @@ class TopicData extends Data
 
     public int $postsCount;
 
-    public ?CarbonImmutable $lastReplyAt;
+    public ?CarbonImmutable $lastReplyAt = null;
 
     public bool $isReadByUser;
 
@@ -53,18 +53,18 @@ class TopicData extends Data
     public float $trendingScore;
 
     #[LoadRelation]
-    public ?ForumData $forum;
+    public ?ForumData $forum = null;
 
     #[LoadRelation]
     public UserData $author;
 
     #[LoadRelation]
-    public ?PostData $lastPost;
+    public ?PostData $lastPost = null;
 
     /** @var PostData[] */
-    public ?array $posts;
+    public ?array $posts = null;
 
-    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $createdAt = null;
 
-    public ?CarbonImmutable $updatedAt;
+    public ?CarbonImmutable $updatedAt = null;
 }

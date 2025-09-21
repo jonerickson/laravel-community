@@ -38,7 +38,7 @@ class TopicPolicy
 
     public function update(?User $user, Topic $topic): bool
     {
-        if (! $user) {
+        if (! $user instanceof User) {
             return false;
         }
 
@@ -51,7 +51,7 @@ class TopicPolicy
 
     public function delete(?User $user, Topic $topic): bool
     {
-        if (! $user) {
+        if (! $user instanceof User) {
             return false;
         }
 

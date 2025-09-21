@@ -21,7 +21,7 @@ class EditProduct extends EditRecord
             Action::make('link')
                 ->color('gray')
                 ->label('Link external ID')
-                ->visible(fn (Product $record) => blank($record->external_product_id))
+                ->visible(fn (Product $record): bool => blank($record->external_product_id))
                 ->modalDescription('Provide an external product ID links this product with a product you have already created in your payment processor.')
                 ->schema([
                     TextInput::make('external_product_id')
@@ -31,20 +31,20 @@ class EditProduct extends EditRecord
                         ->maxLength(255),
                 ])
                 ->successNotificationTitle('The product has been successfully linked.')
-                ->action(function (array $data, Product $record, Action $action) {
+                ->action(function (array $data, Product $record, Action $action): void {
                     $record->forceFill($data)->save();
                     $action->success();
                 }),
             Action::make('unlink')
                 ->label('Unlink external ID')
                 ->color('gray')
-                ->visible(fn (Product $record) => filled($record->external_product_id))
+                ->visible(fn (Product $record): bool => filled($record->external_product_id))
                 ->requiresConfirmation()
                 ->modalSubmitActionLabel('Unlink')
                 ->modalHeading('Unlink External Product ID')
                 ->modalDescription('Are you sure you want to unlink this product?')
                 ->successNotificationTitle('The product has been successfully unlinked.')
-                ->action(function (array $data, Product $record, Action $action) {
+                ->action(function (array $data, Product $record, Action $action): void {
                     $record->forceFill(['external_product_id' => null])->save();
                     $action->success();
                 }),

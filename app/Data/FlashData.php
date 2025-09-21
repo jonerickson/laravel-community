@@ -13,9 +13,9 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 #[MapInputName(SnakeCaseMapper::class)]
 class FlashData extends Data
 {
-    public ?bool $scrollToBottom;
+    public ?bool $scrollToBottom = null;
 
-    public ?string $message;
+    public ?string $message = null;
 
-    public ?string $messageVariant;
+    public ?string $messageVariant = null;
 }

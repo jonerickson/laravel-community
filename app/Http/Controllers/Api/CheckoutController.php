@@ -75,7 +75,7 @@ class CheckoutController
             $productPrices[] = $selectedPrice;
         }
 
-        if (empty($productPrices)) {
+        if ($productPrices === []) {
             return ApiResource::error(
                 message: 'Cart is empty.',
                 errors: ['cart' => ['Cart cannot be empty.']],
@@ -99,7 +99,7 @@ class CheckoutController
             order: $order,
         );
 
-        if (! $result) {
+        if ($result === false || ($result === '' || $result === '0')) {
             return ApiResource::error(
                 message: 'Failed to create checkout session.'
             );

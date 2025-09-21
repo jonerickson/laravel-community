@@ -33,7 +33,7 @@ class ShoppingCartController extends Controller
         $priceId = $request->input('price_id');
         $quantity = $request->input('quantity');
 
-        $existingKeys = array_filter(array_keys($cart), fn (int|string $key): bool => str_starts_with($key, $productId.'_'));
+        $existingKeys = array_filter(array_keys($cart), fn (int|string $key): bool => str_starts_with((string) $key, $productId.'_'));
 
         foreach ($existingKeys as $key) {
             unset($cart[$key]);

@@ -36,7 +36,7 @@ class CommentPolicy
 
     public function update(?User $user, Comment $comment): bool
     {
-        if (! $user) {
+        if (! $user instanceof User) {
             return false;
         }
 
@@ -49,7 +49,7 @@ class CommentPolicy
 
     public function delete(?User $user, Comment $comment): bool
     {
-        if (! $user) {
+        if (! $user instanceof User) {
             return false;
         }
 

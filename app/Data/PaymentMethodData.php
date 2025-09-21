@@ -17,17 +17,17 @@ class PaymentMethodData extends Data
 
     public string $type;
 
-    public ?string $brand;
+    public ?string $brand = null;
 
-    public ?string $last4;
+    public ?string $last4 = null;
 
-    public ?string $expMonth;
+    public ?string $expMonth = null;
 
-    public ?string $expYear;
+    public ?string $expYear = null;
 
-    public ?string $holderName;
+    public ?string $holderName = null;
 
-    public ?string $holderEmail;
+    public ?string $holderEmail = null;
 
     public bool $isDefault = false;
 

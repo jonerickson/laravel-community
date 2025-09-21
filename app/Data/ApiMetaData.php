@@ -15,7 +15,7 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 #[MapInputName(SnakeCaseMapper::class)]
 class ApiMetaData extends Data
 {
-    public ?CarbonImmutable $timestamp;
+    public ?CarbonImmutable $timestamp = null;
 
     public string $version;
 

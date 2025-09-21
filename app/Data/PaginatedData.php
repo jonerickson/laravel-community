@@ -21,9 +21,9 @@ class PaginatedData extends Data
 
     public int $total;
 
-    public ?int $from;
+    public ?int $from = null;
 
-    public ?int $to;
+    public ?int $to = null;
 
     public PaginatedLinkData $links;
 }
@@ -32,11 +32,11 @@ class PaginatedData extends Data
 #[MapInputName(SnakeCaseMapper::class)]
 class PaginatedLinkData extends Data
 {
-    public ?string $first;
+    public ?string $first = null;
 
-    public ?string $last;
+    public ?string $last = null;
 
-    public ?string $next;
+    public ?string $next = null;
 
-    public ?string $prev;
+    public ?string $prev = null;
 }

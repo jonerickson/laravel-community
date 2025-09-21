@@ -18,17 +18,17 @@ class OrderItemData extends Data
 
     public int $orderId;
 
-    public ?int $productId;
+    public ?int $productId = null;
 
-    public ?int $priceId;
+    public ?int $priceId = null;
 
     public int $quantity;
 
-    public ?ProductData $product;
+    public ?ProductData $product = null;
 
-    public ?PriceData $price;
+    public ?PriceData $price = null;
 
-    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $createdAt = null;
 
-    public ?CarbonImmutable $updatedAt;
+    public ?CarbonImmutable $updatedAt = null;
 }

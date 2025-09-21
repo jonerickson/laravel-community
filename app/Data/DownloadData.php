@@ -17,15 +17,15 @@ class DownloadData extends Data
 
     public string $name;
 
-    public ?string $description;
+    public ?string $description = null;
 
-    public ?string $fileSize;
+    public ?string $fileSize = null;
 
-    public ?string $fileType;
+    public ?string $fileType = null;
 
     public string $downloadUrl;
 
-    public ?string $productName;
+    public ?string $productName = null;
 
     public string $createdAt;
 }

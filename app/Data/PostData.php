@@ -28,7 +28,7 @@ class PostData extends Data
 
     public string $slug;
 
-    public ?string $excerpt;
+    public ?string $excerpt = null;
 
     public string $content;
 
@@ -47,20 +47,20 @@ class PostData extends Data
     /** @var LikeData[] */
     public array $likesSummary;
 
-    public ?string $userReaction;
+    public ?string $userReaction = null;
 
     /** @var string[] */
     public array $userReactions;
 
-    public ?int $topicId;
+    public ?int $topicId = null;
 
-    public ?string $featuredImage;
+    public ?string $featuredImage = null;
 
-    public ?string $featuredImageUrl;
+    public ?string $featuredImageUrl = null;
 
-    public ?int $readingTime;
+    public ?int $readingTime = null;
 
-    public ?CarbonImmutable $publishedAt;
+    public ?CarbonImmutable $publishedAt = null;
 
     public int $createdBy;
 
@@ -74,17 +74,17 @@ class PostData extends Data
     public UserData $author;
 
     #[LiteralTypeScriptType('Array<string, unknown> | null')]
-    public ?array $metadata;
+    public ?array $metadata = null;
 
-    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $createdAt = null;
 
-    public ?CarbonImmutable $updatedAt;
+    public ?CarbonImmutable $updatedAt = null;
 
     #[LoadRelation]
     /** @var CommentData[] */
-    public ?array $comments;
+    public ?array $comments = null;
 
-    public ?bool $isReported;
+    public ?bool $isReported = null;
 
-    public ?int $reportCount;
+    public ?int $reportCount = null;
 }

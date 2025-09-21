@@ -18,12 +18,12 @@ class PolicyCategoryData extends Data
 
     public string $slug;
 
-    public ?string $description;
+    public ?string $description = null;
 
     /** @var PolicyData[] */
     public Collection $activePolicies;
 
-    public ?CarbonImmutable $createdAt;
+    public ?CarbonImmutable $createdAt = null;
 
-    public ?CarbonImmutable $updatedAt;
+    public ?CarbonImmutable $updatedAt = null;
 }

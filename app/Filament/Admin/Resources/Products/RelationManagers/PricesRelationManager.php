@@ -86,10 +86,10 @@ class PricesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->description(fn () => $this->getOwnerRecord()->isSubscription()
+            ->description(fn (): string => $this->getOwnerRecord()->isSubscription()
                 ? 'Subscription pricing for this product.'
                 : 'One-time pricing for this product.')
-            ->emptyStateDescription(fn () => $this->getOwnerRecord()->isSubscription()
+            ->emptyStateDescription(fn (): string => $this->getOwnerRecord()->isSubscription()
                 ? 'No subscription prices set for this product.'
                 : 'No prices set for this product.')
             ->recordTitleAttribute('name')
@@ -130,18 +130,18 @@ class PricesRelationManager extends RelationManager
                     ->color('gray')
                     ->label('Sync prices')
                     ->requiresConfirmation()
-                    ->visible(fn () => filled($this->getOwnerRecord()->external_product_id))
+                    ->visible(fn (): bool => filled($this->getOwnerRecord()->external_product_id))
                     ->modalHeading('Sync Product Prices')
                     ->modalIcon(Heroicon::OutlinedArrowPath)
                     ->modalDescription('This will remove any existing prices for this product locally and pull in the latest product prices from your payment processor.')
                     ->modalSubmitActionLabel('Sync')
                     ->successNotificationTitle('The prices have been successfully synced.')
                     ->failureNotificationTitle('There was an error syncing the prices. Please try again.')
-                    ->action(function (Action $action) {
+                    ->action(function (Action $action): void {
                         /** @var Product $product */
                         $product = $this->getOwnerRecord();
 
-                        $result = DB::transaction(function () use ($product) {
+                        $result = DB::transaction(function () use ($product): true {
                             $paymentManager = app(PaymentManager::class);
 
                             if ($prices = $paymentManager->listPrices($product)) {
