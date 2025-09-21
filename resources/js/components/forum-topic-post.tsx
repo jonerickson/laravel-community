@@ -19,7 +19,7 @@ interface ForumTopicPostProps {
 }
 
 export default function ForumTopicPost({ post, index, forum, topic, onQuote }: ForumTopicPostProps) {
-    const { can, cannot, hasAnyPermission, hasAllPermissions } = usePermissions();
+    const { can, hasAnyPermission, hasAllPermissions } = usePermissions();
 
     const isHiddenForUser = (post.isReported || !post.isPublished) && !hasAllPermissions(['report_posts', 'publish_posts']);
 
@@ -29,8 +29,8 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
 
     const getCardClassName = () => {
         if (post.isPinned) return 'border-info-foreground/10 bg-info/10';
-        if (!post.isPublished && can('publish_posts')) return 'border-warning/10 bg-warning/10';
-        if (post.isReported && can('report_posts')) return 'border-destructive/10 bg-destructive/10';
+        if (!post.isPublished) return 'border-warning/10 bg-warning/10';
+        if (post.isReported) return 'border-destructive/10 bg-destructive/10';
         return '';
     };
 
@@ -80,7 +80,7 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                                         Unpublished
                                     </Badge>
                                 )}
-                                {post.isReported && can('report_posts') && (
+                                {post.isReported && (
                                     <Badge variant="destructive">
                                         <Flag className="mr-1 size-3" />
                                         Reported {post.reportCount && post.reportCount > 1 ? `(${post.reportCount})` : ''}

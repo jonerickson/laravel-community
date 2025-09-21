@@ -7,7 +7,6 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Head, usePage, WhenVisible } from '@inertiajs/react';
 import { Newspaper } from 'lucide-react';
-import usePermissions from '../../hooks/use-permissions';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,7 +21,6 @@ interface BlogIndexProps {
 }
 
 export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
-    const { can } = usePermissions();
     const { name: siteName } = usePage<App.Data.SharedData>().props;
 
     const structuredData = {

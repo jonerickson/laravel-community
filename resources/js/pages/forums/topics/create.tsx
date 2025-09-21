@@ -9,14 +9,12 @@ import type { BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { toast } from 'sonner';
 import { route } from 'ziggy-js';
-import usePermissions from '../../../hooks/use-permissions';
 
 interface CreateTopicProps {
     forum: App.Data.ForumData;
 }
 
 export default function ForumTopicCreate({ forum }: CreateTopicProps) {
-    const { can, cannot } = usePermissions();
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
         description: '',

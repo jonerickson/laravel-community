@@ -25,7 +25,7 @@ interface TopicShowProps {
 }
 
 export default function ForumTopicShow({ forum, topic, posts, postsPagination, recentViewers }: TopicShowProps) {
-    const { can, cannot } = usePermissions();
+    const { can } = usePermissions();
     const { name: siteName } = usePage<App.Data.SharedData>().props;
     const [showReplyForm, setShowReplyForm] = useState(false);
     const [quotedContent, setQuotedContent] = useState<string>('');

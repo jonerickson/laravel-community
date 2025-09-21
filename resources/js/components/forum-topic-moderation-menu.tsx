@@ -12,7 +12,7 @@ interface ForumTopicModerationMenuProps {
 }
 
 export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicModerationMenuProps) {
-    const { can, cannot, hasAnyPermission } = usePermissions();
+    const { can, hasAnyPermission } = usePermissions();
     const { delete: deleteTopic } = useForm();
     const { execute: pinTopic, loading: pinLoading } = useApiRequest();
     const { execute: lockTopic, loading: lockLoading } = useApiRequest();

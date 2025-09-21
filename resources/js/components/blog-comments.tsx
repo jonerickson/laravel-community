@@ -25,7 +25,7 @@ interface CommentItemProps {
 }
 
 function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
-    const { can, cannot, hasAnyPermission } = usePermissions();
+    const { can, hasAnyPermission } = usePermissions();
     const [isEditing, setIsEditing] = useState(false);
     const commentDate = new Date(comment.createdAt || 'today');
     const formattedDate = commentDate.toLocaleDateString('en-US', {
@@ -226,7 +226,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
 }
 
 export default function BlogComments({ post, comments, commentsPagination }: BlogCommentsProps) {
-    const { can, cannot } = usePermissions();
+    const { can } = usePermissions();
     const [replyingTo, setReplyingTo] = useState<number | null>(null);
     const {
         data,

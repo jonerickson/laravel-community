@@ -12,32 +12,38 @@ const mainNavItems: NavItem[] = [
         href: '/',
         icon: Home,
         shouldShow: (auth: App.Data.AuthData): boolean => auth?.user === null,
+        isActive: () => true,
     },
     {
         title: 'Dashboard',
         href: () => route('dashboard'),
         icon: Grid,
         shouldShow: (auth: App.Data.AuthData): boolean => auth?.user !== null,
+        isActive: () => true,
     },
     {
         title: 'Blog',
         href: () => route('blog.index'),
         icon: Newspaper,
+        isActive: () => true,
     },
     {
         title: 'Forums',
         href: () => route('forums.index'),
         icon: LibraryBig,
+        isActive: () => true,
     },
     {
         title: 'Store',
         href: () => route('store.index'),
         icon: ShoppingCart,
+        isActive: () => true,
     },
     {
         title: 'Subscriptions',
         href: () => route('store.subscriptions'),
         icon: CalendarSync,
+        isActive: () => true,
     },
 ];
 
@@ -46,11 +52,13 @@ const supportNavItems: NavItem[] = [
         title: 'Policies',
         href: () => route('policies.index'),
         icon: Folder,
+        isActive: () => true,
     },
     {
         title: 'Support',
         href: () => route('support.index'),
         icon: BookOpen,
+        isActive: () => true,
     },
 ];
 

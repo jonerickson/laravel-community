@@ -26,7 +26,7 @@ interface ForumShowProps {
 }
 
 export default function ForumShow({ forum, topics: initialTopics, topicsPagination }: ForumShowProps) {
-    const { can, cannot, hasAnyPermission } = usePermissions();
+    const { can, hasAnyPermission } = usePermissions();
     const { name: siteName } = usePage<App.Data.SharedData>().props;
     const [topics, setTopics] = useState<App.Data.TopicData[]>(initialTopics);
     const [selectedTopics, setSelectedTopics] = useState<number[]>([]);

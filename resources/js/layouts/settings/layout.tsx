@@ -11,36 +11,43 @@ const sidebarNavItems: NavItem[] = [
         title: 'Account',
         href: '/settings/account',
         icon: null,
+        isActive: () => true,
     },
     {
         title: 'Appearance',
         href: '/settings/appearance',
         icon: null,
+        isActive: () => true,
     },
     {
         title: 'Billing',
         href: '/settings/billing',
         icon: null,
+        isActive: () => true,
     },
     {
         title: 'Downloads',
         href: '/settings/downloads',
         icon: null,
+        isActive: () => true,
     },
     {
         title: 'Integrations',
         href: '/settings/integrations',
         icon: null,
+        isActive: () => true,
     },
     {
         title: 'Orders',
         href: '/settings/orders',
         icon: null,
+        isActive: () => true,
     },
     {
         title: 'Payment Methods',
         href: '/settings/payment-methods',
         icon: null,
+        isActive: () => true,
     },
 ];
 

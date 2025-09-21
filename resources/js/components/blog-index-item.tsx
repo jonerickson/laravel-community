@@ -5,14 +5,12 @@ import { pluralize } from '@/lib/utils';
 import { stripCharacters, truncate } from '@/utils/truncate';
 import { Link } from '@inertiajs/react';
 import { Clock, Eye, ImageIcon, MessageCircle } from 'lucide-react';
-import usePermissions from '../hooks/use-permissions';
 
 interface BlogIndexItemProps {
     post: App.Data.PostData;
 }
 
 export default function BlogIndexItem({ post }: BlogIndexItemProps) {
-    const { can } = usePermissions();
     const publishedDate = new Date(post.publishedAt || post.createdAt || new Date());
     const formattedDate = publishedDate.toLocaleDateString('en-US', {
         year: 'numeric',

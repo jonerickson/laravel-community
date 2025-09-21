@@ -8,7 +8,6 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { LibraryBig, MessageSquare, Users } from 'lucide-react';
 import { route } from 'ziggy-js';
-import usePermissions from '../../../hooks/use-permissions';
 
 interface CategoryShowProps {
     category: App.Data.ForumCategoryData;
@@ -16,7 +15,6 @@ interface CategoryShowProps {
 }
 
 export default function ForumCategoryShow({ category, forums }: CategoryShowProps) {
-    const { can } = usePermissions();
     const { name: siteName } = usePage<App.Data.SharedData>().props;
 
     const breadcrumbs: BreadcrumbItem[] = [

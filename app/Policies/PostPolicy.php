@@ -27,7 +27,8 @@ class PostPolicy
     public function view(?User $user, Post $post): bool
     {
         return Gate::forUser($user)->check('view_posts')
-            && $post->is_published;
+            && (! $post->is_reported || ($post->is_reported && $this->report($user, $post)))
+            && ($post->is_published || (! $post->is_published && $this->publish($user, $post)));
     }
 
     public function create(?User $user): bool
