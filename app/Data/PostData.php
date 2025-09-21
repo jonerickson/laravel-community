@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use App\Data\Traits\HasDataPermissions;
 use App\Enums\PostType;
 use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\LoadRelation;
@@ -17,6 +18,8 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 #[MapInputName(SnakeCaseMapper::class)]
 class PostData extends Data
 {
+    use HasDataPermissions;
+
     public int $id;
 
     public PostType $type;

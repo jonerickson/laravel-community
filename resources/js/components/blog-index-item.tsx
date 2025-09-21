@@ -54,7 +54,7 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                             </span>
                         </div>
 
-                        {can('view_any_comments') && post.commentsEnabled && (
+                        {post.commentsEnabled && (
                             <div className="flex items-center gap-1 text-muted-foreground">
                                 <MessageCircle className="size-3" />
                                 <span>

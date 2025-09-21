@@ -10,6 +10,15 @@ use Illuminate\Support\Facades\Gate;
 
 class PostPolicy
 {
+    public function before(User $user): ?bool
+    {
+        if (! $this->viewAny($user)) {
+            return false;
+        }
+
+        return null;
+    }
+
     public function viewAny(?User $user): bool
     {
         return Gate::forUser($user)->check('view_any_posts');
@@ -28,12 +37,12 @@ class PostPolicy
 
     public function update(?User $user, Post $post): bool
     {
-        if (Gate::forUser($user)->check('update_posts')) {
-            return true;
-        }
-
         if (! $user) {
             return false;
+        }
+
+        if (Gate::forUser($user)->check('update_posts')) {
+            return true;
         }
 
         return $post->isAuthoredBy($user)
@@ -42,12 +51,12 @@ class PostPolicy
 
     public function delete(?User $user, Post $post): bool
     {
-        if (Gate::forUser($user)->check('delete_posts')) {
-            return true;
-        }
-
         if (! $user) {
             return false;
+        }
+
+        if (Gate::forUser($user)->check('delete_posts')) {
+            return true;
         }
 
         return $post->isAuthoredBy($user);

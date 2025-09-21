@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,7 +23,8 @@ class StoreController extends Controller
                 ->with('image')
                 ->latest()
                 ->take(5)
-                ->get()),
+                ->get()
+                ->filter(fn (ProductCategory $category) => Gate::check('view', $category))),
             'featuredProducts' => ProductData::collect(Product::query()
                 ->products()
                 ->featured()
@@ -32,7 +34,8 @@ class StoreController extends Controller
                 }])
                 ->latest()
                 ->take(6)
-                ->get()),
+                ->get()
+                ->filter(fn (Product $product) => Gate::check('view', $product))),
             'userProvidedProducts' => [],
         ]);
     }

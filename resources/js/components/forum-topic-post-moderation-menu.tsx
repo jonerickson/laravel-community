@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApiRequest } from '@/hooks/use-api-request';
 import usePermissions from '@/hooks/use-permissions';
-import { Link, useForm, usePage } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import { Edit, Eye, EyeOff, Flag, MoreHorizontal, Pin, PinOff, Trash } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -14,20 +14,19 @@ interface ForumTopicPostModerationMenuProps {
 }
 
 export default function ForumTopicPostModerationMenu({ post, forum, topic }: ForumTopicPostModerationMenuProps) {
-    const { can, cannot, hasAnyPermission } = usePermissions();
-    const { auth } = usePage<App.Data.SharedData>().props;
+    const { can, hasAnyPermission } = usePermissions();
     const { delete: deletePost } = useForm({
         is_published: post.isPublished,
     });
     const { execute: pinPost, loading: pinLoading } = useApiRequest();
     const { execute: publishPost } = useApiRequest();
 
-    if (!hasAnyPermission(['report_posts', 'delete_posts', 'publish_posts', 'pin_posts', 'update_posts']) && post.createdBy !== auth?.user?.id) {
+    if (!hasAnyPermission(['report_posts', 'publish_posts', 'pin_posts']) && !post.permissions.canDelete && !post.permissions.canUpdate) {
         return null;
     }
 
     const handleDeletePost = () => {
-        if (cannot('delete_posts')) {
+        if (!post.permissions.canDelete) {
             return;
         }
 
@@ -51,10 +50,6 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
     };
 
     const handleTogglePublish = async () => {
-        if (cannot('publish_posts')) {
-            return;
-        }
-
         const isCurrentlyPublished = post.isPublished;
         const action = isCurrentlyPublished ? 'unpublish' : 'publish';
         const url = isCurrentlyPublished ? route('api.publish.destroy') : route('api.publish.store');
@@ -83,10 +78,6 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
     };
 
     const handleTogglePin = async () => {
-        if (cannot('pin_posts')) {
-            return;
-        }
-
         const isCurrentlyPinned = post.isPinned;
         const url = isCurrentlyPinned ? route('api.pin.destroy') : route('api.pin.store');
         const method = isCurrentlyPinned ? 'DELETE' : 'POST';
@@ -118,7 +109,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                {can('update_posts') && (
+                {post.permissions.canUpdate && (
                     <DropdownMenuItem asChild>
                         <Link
                             href={route('forums.posts.edit', {
@@ -174,7 +165,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                     </DropdownMenuItem>
                 )}
 
-                {can('delete_posts') && (
+                {post.permissions.canDelete && (
                     <DropdownMenuItem onClick={handleDeletePost} className="text-destructive focus:text-destructive">
                         <Trash className="mr-2 size-4 text-destructive" />
                         Delete Post

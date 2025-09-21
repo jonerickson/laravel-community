@@ -7,7 +7,6 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-import usePermissions from '../../../hooks/use-permissions';
 
 interface EditPostProps {
     forum: App.Data.ForumData;
@@ -16,7 +15,6 @@ interface EditPostProps {
 }
 
 export default function ForumPostEdit({ forum, topic, post }: EditPostProps) {
-    const { can, cannot } = usePermissions();
     const { data, setData, patch, processing, errors } = useForm({
         content: post.content,
     });
@@ -47,10 +45,6 @@ export default function ForumPostEdit({ forum, topic, post }: EditPostProps) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (cannot('update_posts')) {
-            return;
-        }
-
         patch(
             route('forums.posts.update', {
                 forum: forum.slug,
@@ -71,42 +65,40 @@ export default function ForumPostEdit({ forum, topic, post }: EditPostProps) {
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <Heading title="Edit post" description={`Editing your post in "${topic.title}"`} />
 
-                {can('update_posts') && (
-                    <Card className="-mt-8">
-                        <CardHeader>
-                            <CardTitle>Post content</CardTitle>
-                            <CardDescription>Make your changes to the post content below.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div className="space-y-2">
-                                    <RichTextEditor
-                                        content={data.content}
-                                        onChange={(content) => setData('content', content)}
-                                        placeholder="Edit your post content..."
-                                    />
-                                    <InputError message={errors.content} />
-                                </div>
+                <Card className="-mt-8">
+                    <CardHeader>
+                        <CardTitle>Post content</CardTitle>
+                        <CardDescription>Make your changes to the post content below.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="space-y-2">
+                                <RichTextEditor
+                                    content={data.content}
+                                    onChange={(content) => setData('content', content)}
+                                    placeholder="Edit your post content..."
+                                />
+                                <InputError message={errors.content} />
+                            </div>
 
-                                <div className="flex items-center gap-4">
-                                    <Button type="submit" disabled={processing}>
-                                        {processing ? 'Saving...' : 'Save changes'}
-                                    </Button>
-                                    <Button variant="outline" type="button" disabled={processing}>
-                                        <Link
-                                            href={route('forums.topics.show', {
-                                                forum: forum.slug,
-                                                topic: topic.slug,
-                                            })}
-                                        >
-                                            Cancel
-                                        </Link>
-                                    </Button>
-                                </div>
-                            </form>
-                        </CardContent>
-                    </Card>
-                )}
+                            <div className="flex items-center gap-4">
+                                <Button type="submit" disabled={processing}>
+                                    {processing ? 'Saving...' : 'Save changes'}
+                                </Button>
+                                <Button variant="outline" type="button" disabled={processing}>
+                                    <Link
+                                        href={route('forums.topics.show', {
+                                            forum: forum.slug,
+                                            topic: topic.slug,
+                                        })}
+                                    >
+                                        Cancel
+                                    </Link>
+                                </Button>
+                            </div>
+                        </form>
+                    </CardContent>
+                </Card>
 
                 <Card>
                     <CardHeader>

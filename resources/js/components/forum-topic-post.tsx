@@ -35,10 +35,6 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
     };
 
     const handleQuote = () => {
-        if (cannot('reply_topics')) {
-            return;
-        }
-
         if (onQuote && post.author?.name) {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = post.content;

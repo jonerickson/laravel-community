@@ -45,10 +45,6 @@ export default function ForumTopicCreate({ forum }: CreateTopicProps) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (cannot('create_topics')) {
-            return;
-        }
-
         post(route('forums.topics.store', { forum: forum.slug }), {
             onSuccess: () => {
                 reset();
@@ -71,50 +67,61 @@ export default function ForumTopicCreate({ forum }: CreateTopicProps) {
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <Heading title="Create new topic" description={`Start a new discussion in ${forum.name}`} />
 
-                {can('create_topics') && (
-                    <Card className="-mt-8">
-                        <CardHeader>
-                            <CardTitle>Topic details</CardTitle>
-                            <CardDescription>
-                                Provide a clear title and description for your topic to help others understand what you're discussing.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div className="space-y-2">
-                                    <Input
-                                        id="title"
-                                        type="text"
-                                        value={data.title}
-                                        onChange={(e) => setData('title', e.target.value)}
-                                        placeholder="Title"
-                                        required
-                                    />
-                                    <InputError message={errors.title} />
-                                </div>
+                <Card className="-mt-8">
+                    <CardHeader>
+                        <CardTitle>Topic details</CardTitle>
+                        <CardDescription>
+                            Provide a clear title and description for your topic to help others understand what you're discussing.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="space-y-2">
+                                <Input
+                                    id="title"
+                                    type="text"
+                                    value={data.title}
+                                    onChange={(e) => setData('title', e.target.value)}
+                                    placeholder="Title"
+                                    required
+                                />
+                                <InputError message={errors.title} />
+                            </div>
 
-                                <div className="space-y-2">
-                                    <RichTextEditor
-                                        content={data.content}
-                                        onChange={(content) => setData('content', content)}
-                                        placeholder="Write the first post for your topic. Be detailed and clear to encourage discussion."
-                                    />
-                                    <InputError message={errors.content} />
-                                    <div className="text-xs text-muted-foreground">This will be the first post in your topic thread.</div>
-                                </div>
+                            <div className="space-y-2">
+                                <Input
+                                    id="description"
+                                    type="text"
+                                    value={data.description}
+                                    onChange={(e) => setData('description', e.target.value)}
+                                    placeholder="Description"
+                                    required
+                                />
+                                <InputError message={errors.description} />
+                                <div className="text-xs text-muted-foreground">An optional brief description of the topic.</div>
+                            </div>
 
-                                <div className="flex items-start gap-4">
-                                    <Button type="submit" disabled={processing}>
-                                        {processing ? 'Creating topic...' : 'Create topic'}
-                                    </Button>
-                                    <Button variant="outline" type="button" disabled={processing}>
-                                        <Link href={route('forums.show', { forum: forum.slug })}>Cancel</Link>
-                                    </Button>
-                                </div>
-                            </form>
-                        </CardContent>
-                    </Card>
-                )}
+                            <div className="space-y-2">
+                                <RichTextEditor
+                                    content={data.content}
+                                    onChange={(content) => setData('content', content)}
+                                    placeholder="Write the first post for your topic. Be detailed and clear to encourage discussion."
+                                />
+                                <InputError message={errors.content} />
+                                <div className="text-xs text-muted-foreground">This will be the first post in your topic thread.</div>
+                            </div>
+
+                            <div className="flex items-start gap-4">
+                                <Button type="submit" disabled={processing}>
+                                    {processing ? 'Creating topic...' : 'Create topic'}
+                                </Button>
+                                <Button variant="outline" type="button" disabled={processing}>
+                                    <Link href={route('forums.show', { forum: forum.slug })}>Cancel</Link>
+                                </Button>
+                            </div>
+                        </form>
+                    </CardContent>
+                </Card>
 
                 <Card>
                     <CardHeader>

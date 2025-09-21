@@ -31,7 +31,6 @@ class ForumCategoryData extends Data
 
     public bool $isActive;
 
-    #[LoadRelation]
     /** @var ForumData[] */
     public ?array $forums;
 

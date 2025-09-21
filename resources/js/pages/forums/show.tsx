@@ -111,10 +111,6 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
     };
 
     const handleBulkDelete = async () => {
-        if (cannot('delete_topics')) {
-            return;
-        }
-
         if (!selectedTopics.length || !confirm(`Are you sure you want to delete ${selectedTopics.length} topic(s)? This action cannot be undone.`)) {
             return;
         }
@@ -201,7 +197,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                     </Alert>
                 )}
 
-                {can('view_any_topics') && topics.length > 0 ? (
+                {topics.length > 0 ? (
                     <>
                         <div className="rounded-md border">
                             <Table>

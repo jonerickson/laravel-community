@@ -17,8 +17,10 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\LaravelData\PaginatedDataCollection;
 
 class SupportTicketController extends Controller
 {
@@ -32,17 +34,18 @@ class SupportTicketController extends Controller
     {
         $this->authorize('viewAny', SupportTicket::class);
 
-        $tickets = SupportTicket::query()
+        $tickets = SupportTicketData::collect(SupportTicket::query()
             ->with('category')
             ->with('author')
-            ->with('assignedTo')
             ->whereBelongsTo(Auth::user(), 'author')
             ->latest()
-            ->paginate(15);
+            ->get()
+            ->filter(fn (SupportTicket $ticket) => Gate::check('view', $ticket))
+            ->all(), PaginatedDataCollection::class);
 
         return Inertia::render('support/index', [
-            'tickets' => Inertia::merge(fn () => SupportTicketData::collect($tickets->items())),
-            'ticketsPagination' => PaginatedData::from(Arr::except($tickets->toArray(), ['data'])),
+            'tickets' => Inertia::merge(fn () => $tickets->items()->items()),
+            'ticketsPagination' => PaginatedData::from(Arr::except($tickets->items()->toArray(), ['data'])),
         ]);
     }
 

@@ -97,7 +97,7 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                     </div>
                 </div>
 
-                {can('view_any_forums') && forums.length > 0 ? (
+                {forums.length > 0 ? (
                     <div className="rounded-md border">
                         <Table>
                             <TableHeader>

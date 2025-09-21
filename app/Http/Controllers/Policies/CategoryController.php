@@ -7,9 +7,11 @@ namespace App\Http\Controllers\Policies;
 use App\Data\PolicyCategoryData;
 use App\Data\PolicyData;
 use App\Http\Controllers\Controller;
+use App\Models\Policy;
 use App\Models\PolicyCategory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -26,7 +28,8 @@ class CategoryController extends Controller
             ->with(['activePolicies' => function (HasMany $query): void {
                 $query->effective()->ordered();
             }])
-            ->get();
+            ->get()
+            ->filter(fn (PolicyCategory $category) => Gate::check('view', $category));
 
         return Inertia::render('policies/index', [
             'categories' => PolicyCategoryData::collect($categories),
@@ -41,7 +44,8 @@ class CategoryController extends Controller
             ->activePolicies()
             ->effective()
             ->ordered()
-            ->get();
+            ->get()
+            ->filter(fn (Policy $policy) => Gate::check('view', $policy));
 
         return Inertia::render('policies/category', [
             'category' => PolicyCategoryData::from($category),

@@ -22,10 +22,6 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
     }
 
     const handleDeleteTopic = () => {
-        if (cannot('delete_topics')) {
-            return;
-        }
-
         if (!window.confirm('Are you sure you want to delete this topic? This action cannot be undone and will delete all posts in this topic.')) {
             return;
         }
@@ -45,10 +41,6 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
     };
 
     const handleTogglePin = async () => {
-        if (cannot('pin_topics')) {
-            return;
-        }
-
         const isCurrentlyPinned = topic.isPinned;
         const url = isCurrentlyPinned ? route('api.pin.destroy') : route('api.pin.store');
         const method = isCurrentlyPinned ? 'DELETE' : 'POST';
@@ -72,10 +64,6 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
     };
 
     const handleToggleLock = async () => {
-        if (cannot('lock_topics')) {
-            return;
-        }
-
         const isCurrentlyLocked = topic.isLocked;
         const url = isCurrentlyLocked ? route('api.lock.destroy') : route('api.lock.store');
         const method = isCurrentlyLocked ? 'DELETE' : 'POST';
@@ -139,7 +127,7 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
                     </DropdownMenuItem>
                 )}
 
-                {can('delete_topics') && (
+                {topic.permissions.canDelete && (
                     <DropdownMenuItem onClick={handleDeleteTopic} className="text-destructive focus:text-destructive">
                         <Trash className="mr-2 size-4 text-destructive" />
                         Delete Topic

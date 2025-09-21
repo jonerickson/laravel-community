@@ -10,6 +10,15 @@ use Illuminate\Support\Facades\Gate;
 
 class ForumPolicy
 {
+    public function before(User $user): ?bool
+    {
+        if (! $this->viewAny($user)) {
+            return false;
+        }
+
+        return null;
+    }
+
     public function viewAny(?User $user): bool
     {
         return Gate::forUser($user)->check('view_any_forums');

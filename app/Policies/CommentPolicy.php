@@ -10,6 +10,15 @@ use Illuminate\Support\Facades\Gate;
 
 class CommentPolicy
 {
+    public function before(User $user): ?bool
+    {
+        if (! $this->viewAny($user)) {
+            return false;
+        }
+
+        return null;
+    }
+
     public function viewAny(?User $user): bool
     {
         return Gate::forUser($user)->check('view_any_comments');
@@ -27,12 +36,12 @@ class CommentPolicy
 
     public function update(?User $user, Comment $comment): bool
     {
-        if (Gate::forUser($user)->check('update_comments')) {
-            return true;
-        }
-
         if (! $user) {
             return false;
+        }
+
+        if (Gate::forUser($user)->check('update_comments')) {
+            return true;
         }
 
         return $comment->isAuthoredBy($user);
@@ -40,12 +49,12 @@ class CommentPolicy
 
     public function delete(?User $user, Comment $comment): bool
     {
-        if (Gate::forUser($user)->check('delete_comments')) {
-            return true;
-        }
-
         if (! $user) {
             return false;
+        }
+
+        if (Gate::forUser($user)->check('delete_comments')) {
+            return true;
         }
 
         return $comment->isAuthoredBy($user);

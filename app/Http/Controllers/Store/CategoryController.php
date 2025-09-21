@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ProductCategory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class CategoryController extends Controller
@@ -22,7 +23,8 @@ class CategoryController extends Controller
 
         $categories = ProductCategory::query()
             ->with('image')
-            ->get();
+            ->get()
+            ->filter(fn (ProductCategory $category) => Gate::check('view', $category));
 
         return Inertia::render('store/categories/index', [
             'categories' => ProductCategoryData::collect($categories),

@@ -281,6 +281,7 @@ declare namespace App.Data {
         comments: Array<App.Data.CommentData> | null;
         isReported: boolean | null;
         reportCount: number | null;
+        permissions: App.Data.PermissionData;
     };
     export type PriceData = {
         id: number;
@@ -417,6 +418,7 @@ declare namespace App.Data {
         posts: Array<App.Data.PostData> | null;
         createdAt: string | null;
         updatedAt: string | null;
+        permissions: App.Data.PermissionData;
     };
     export type UserData = {
         id: number;

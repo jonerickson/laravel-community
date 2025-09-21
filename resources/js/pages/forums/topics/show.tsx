@@ -78,10 +78,6 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
     };
 
     const handleQuotePost = (postContent: string, authorName: string) => {
-        if (cannot('reply_topics')) {
-            return;
-        }
-
         setQuotedContent(postContent);
         setQuotedAuthor(authorName);
         setShowReplyForm(true);
@@ -236,7 +232,7 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                     </div>
                 </div>
 
-                {showReplyForm && can('reply_topics') && (
+                {showReplyForm && (
                     <ForumTopicReply
                         forumSlug={forum.slug}
                         topicSlug={topic.slug}
@@ -268,7 +264,7 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                     <RecentViewers viewers={recentViewers} />
                 </Deferred>
 
-                {!topic.isLocked && posts.length > 0 && can('reply_topics') && <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} />}
+                {!topic.isLocked && posts.length > 0 && <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} />}
 
                 <Pagination
                     pagination={postsPagination}

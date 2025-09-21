@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use App\Data\Traits\HasDataPermissions;
 use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\LoadRelation;
 use Spatie\LaravelData\Attributes\MapInputName;
@@ -15,7 +16,7 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 #[MapInputName(SnakeCaseMapper::class)]
 class CommentData extends Data
 {
-    use HasPermissions;
+    use HasDataPermissions;
 
     public int $id;
 

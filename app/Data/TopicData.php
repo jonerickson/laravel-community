@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use App\Data\Traits\HasDataPermissions;
 use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\LoadRelation;
 use Spatie\LaravelData\Attributes\MapInputName;
@@ -15,6 +16,8 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 #[MapInputName(SnakeCaseMapper::class)]
 class TopicData extends Data
 {
+    use HasDataPermissions;
+
     public int $id;
 
     public string $title;

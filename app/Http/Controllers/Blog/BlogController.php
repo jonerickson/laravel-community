@@ -9,15 +9,16 @@ use App\Data\PaginatedData;
 use App\Data\PostData;
 use App\Data\RecentViewerData;
 use App\Http\Controllers\Controller;
+use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\LaravelData\PaginatedDataCollection;
 
 class BlogController extends Controller
 {
@@ -30,25 +31,20 @@ class BlogController extends Controller
     {
         $this->authorize('viewAny', Post::class);
 
-        /** @var LengthAwarePaginator $posts */
-        $posts = Post::query()
+        $posts = PostData::collect(Post::query()
             ->blog()
             ->with('comments')
             ->with('author')
             ->with('reads')
             ->published()
             ->latest()
-            ->paginate(
-                perPage: $request->input('per_page', 9)
-            );
-
-        $posts->setCollection(
-            collection: $posts->getCollection()->filter(fn (Post $post) => Gate::check('view', $post))
-        );
+            ->get()
+            ->filter(fn (Post $post) => Gate::check('view', $post))
+            ->all(), PaginatedDataCollection::class);
 
         return Inertia::render('blog/index', [
-            'posts' => Inertia::merge(fn () => PostData::collect($posts->items())),
-            'postsPagination' => PaginatedData::from(Arr::except($posts->toArray(), ['data'])),
+            'posts' => Inertia::merge(fn () => $posts->items()->items()),
+            'postsPagination' => PaginatedData::from(Arr::except($posts->items()->toArray(), ['data'])),
         ]);
     }
 
@@ -61,16 +57,17 @@ class BlogController extends Controller
 
         $post->incrementViews();
 
-        $perPage = $request->input('per_page', 10);
-
-        $comments = $post->approvedComments()->with(['author', 'replies', 'replies.author', 'parent'])->latest()->paginate(
-            perPage: $perPage
-        );
+        $comments = CommentData::collect($post->approvedComments()
+            ->with(['author', 'replies', 'replies.author', 'parent'])
+            ->latest()
+            ->get()
+            ->filter(fn (Comment $comment) => Gate::check('view', $comment))
+            ->all(), PaginatedDataCollection::class);
 
         return Inertia::render('blog/show', [
             'post' => PostData::from($post),
-            'comments' => Inertia::defer(fn () => CommentData::collect($comments->items())),
-            'commentsPagination' => PaginatedData::from(Arr::except($comments->toArray(), ['data'])),
+            'comments' => Inertia::defer(fn () => $comments->items()->items()),
+            'commentsPagination' => PaginatedData::from(Arr::except($comments->items()->toArray(), ['data'])),
             'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($post->getRecentViewers())),
         ]);
     }

@@ -19,12 +19,12 @@ use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\LaravelData\PaginatedDataCollection;
 use Throwable;
 
 class TopicController extends Controller
@@ -41,22 +41,19 @@ class TopicController extends Controller
 
         $topic->incrementViews();
 
-        /** @var LengthAwarePaginator $posts */
-        $posts = $topic
+        $posts = PostData::collect($topic
             ->posts()
             ->with(['author', 'comments.author', 'comments.replies.author', 'reports'])
             ->latestActivity()
-            ->paginate(10);
-
-        $posts->setCollection(
-            collection: $posts->getCollection()->filter(fn (Post $post) => Gate::check('view', $post))
-        );
+            ->paginate(10)
+            ->filter(fn (Post $post) => Gate::check('view', $post))
+            ->all(), PaginatedDataCollection::class);
 
         return Inertia::render('forums/topics/show', [
             'forum' => ForumData::from($forum),
             'topic' => TopicData::from($topic),
-            'posts' => Inertia::merge(fn () => PostData::collect($posts->items())),
-            'postsPagination' => PaginatedData::from(Arr::except($posts->toArray(), ['data'])),
+            'posts' => Inertia::merge(fn () => $posts->items()->items()),
+            'postsPagination' => PaginatedData::from(Arr::except($posts->items()->toArray(), ['data'])),
             'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($topic->getRecentViewers())),
         ]);
     }

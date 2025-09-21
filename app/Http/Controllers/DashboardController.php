@@ -17,6 +17,7 @@ use App\Models\Topic;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -55,7 +56,8 @@ class DashboardController
             ->active()
             ->latest()
             ->limit(5)
-            ->get());
+            ->get()
+            ->filter(fn (SupportTicket $ticket) => Gate::check('view', $ticket)));
     }
 
     private function getTrendingTopics(): Collection
@@ -64,7 +66,8 @@ class DashboardController
             ->with('forum')
             ->with('author')
             ->with('lastPost.author')
-            ->get());
+            ->get()
+            ->filter(fn (Topic $topic) => Gate::check('view', $topic)));
     }
 
     private function getLatestBlogPosts(): Collection
@@ -75,7 +78,8 @@ class DashboardController
             ->with('author')
             ->latest('published_at')
             ->limit(3)
-            ->get());
+            ->get()
+            ->filter(fn (Post $post) => Gate::check('view', $post)));
     }
 
     private function getNewestProduct(): ?ProductData
@@ -87,6 +91,8 @@ class DashboardController
                 $query->active();
             }])
             ->latest()
+            ->get()
+            ->filter(fn (Product $product) => Gate::check('view', $product))
             ->first());
     }
 
@@ -99,6 +105,8 @@ class DashboardController
                 $query->active();
             }])
             ->trending()
+            ->get()
+            ->filter(fn (Product $product) => Gate::check('view', $product))
             ->first());
     }
 
@@ -112,6 +120,8 @@ class DashboardController
                 $query->active();
             }])
             ->inRandomOrder()
+            ->get()
+            ->filter(fn (Product $product) => Gate::check('view', $product))
             ->first());
     }
 }

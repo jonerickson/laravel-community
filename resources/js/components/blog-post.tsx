@@ -73,7 +73,7 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
                         </span>
                     </div>
 
-                    {post.commentsEnabled && can('view_any_comments') && (
+                    {post.commentsEnabled && (
                         <div className="flex items-center gap-1">
                             <MessageSquare className="size-4" aria-hidden="true" />
                             <span aria-label={`Total comments: ${post.commentsCount} comments`}>
@@ -125,7 +125,7 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
                     </div>
                 </Deferred>
 
-                {post.commentsEnabled && can('view_any_comments') && (
+                {post.commentsEnabled && (
                     <section className="mt-8 border-t pt-6" aria-label="Comments section">
                         <Deferred
                             fallback={

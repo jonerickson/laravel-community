@@ -14,6 +14,7 @@ use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -34,7 +35,8 @@ class SubscriptionsController extends Controller
             ->with('categories')
             ->with('policies.category')
             ->orderBy('name')
-            ->get();
+            ->get()
+            ->filter(fn (Product $product) => Gate::check('view', $product));
 
         return Inertia::render('store/subscriptions', [
             'subscriptionProducts' => SubscriptionData::collect($subscriptions),

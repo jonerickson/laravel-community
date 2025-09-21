@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Data\SubscriptionData;
 use App\Models\Product;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -17,7 +18,8 @@ class HomeController
             ->subscriptions()
             ->with('activePrices')
             ->orderBy('name')
-            ->get();
+            ->get()
+            ->filter(fn (Product $product) => Gate::check('view', $product));
 
         return Inertia::render('home', [
             'subscriptions' => Inertia::defer(fn () => SubscriptionData::collect($subscriptions)),

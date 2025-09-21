@@ -10,6 +10,15 @@ use Illuminate\Support\Facades\Gate;
 
 class TopicPolicy
 {
+    public function before(User $user): ?bool
+    {
+        if (! $this->viewAny($user)) {
+            return false;
+        }
+
+        return null;
+    }
+
     public function viewAny(?User $user): bool
     {
         return Gate::forUser($user)->check('view_any_topics');
@@ -29,12 +38,12 @@ class TopicPolicy
 
     public function update(?User $user, Topic $topic): bool
     {
-        if (Gate::forUser($user)->check('update_topics')) {
-            return true;
-        }
-
         if (! $user) {
             return false;
+        }
+
+        if (Gate::forUser($user)->check('update_topics')) {
+            return true;
         }
 
         return $topic->isAuthoredBy($user);
@@ -42,12 +51,12 @@ class TopicPolicy
 
     public function delete(?User $user, Topic $topic): bool
     {
-        if (Gate::forUser($user)->check('delete_topics')) {
-            return true;
-        }
-
         if (! $user) {
             return false;
+        }
+
+        if (Gate::forUser($user)->check('delete_topics')) {
+            return true;
         }
 
         return $topic->isAuthoredBy($user);

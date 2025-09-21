@@ -62,10 +62,6 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
     const handleReplySubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (cannot('create_comments')) {
-            return;
-        }
-
         submitComment(route('blog.comments.store', { post }), {
             onSuccess: () => {
                 reset();
@@ -79,7 +75,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
     };
 
     const handleDelete = () => {
-        if (cannot('delete_comments')) {
+        if (!comment.permissions.canDelete) {
             return;
         }
 
@@ -98,7 +94,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
     const handleEditSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (cannot('update_comments')) {
+        if (!comment.permissions.canUpdate) {
             return;
         }
 
@@ -165,13 +161,13 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                                         <Reply className="mr-1 size-3" />
                                         Reply
                                     </Button>
-                                    {can('update_comments') && (
+                                    {comment.permissions.canUpdate && (
                                         <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="h-auto p-1 text-xs">
                                             <Edit className="mr-1 size-3" />
                                             Edit
                                         </Button>
                                     )}
-                                    {can('delete_comments') && (
+                                    {comment.permissions.canDelete && (
                                         <Button
                                             variant="ghost"
                                             size="sm"
@@ -245,10 +241,6 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
-        if (cannot('create_comments')) {
-            return;
-        }
 
         submitComment(route('blog.comments.store', { post }), {
             onSuccess: () => {
