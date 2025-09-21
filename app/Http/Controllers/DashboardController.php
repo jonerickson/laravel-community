@@ -67,7 +67,7 @@ class DashboardController
             ->with('author')
             ->with('lastPost.author')
             ->get()
-            ->filter(fn (Topic $topic) => Gate::check('view', $topic)));
+            ->filter(fn (Topic $topic) => Gate::check('view', [$topic, $topic->forum])));
     }
 
     private function getLatestBlogPosts(): Collection

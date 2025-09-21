@@ -21,8 +21,7 @@ class CommentController extends Controller
      */
     public function store(Request $request, Post $post): RedirectResponse
     {
-        $this->authorize('update', $post);
-        $this->authorize('create', Comment::class);
+        $this->authorize('create', [Comment::class, $post]);
 
         $validated = $request->validate([
             'content' => 'required|string',
@@ -44,8 +43,7 @@ class CommentController extends Controller
      */
     public function update(Request $request, Post $post, Comment $comment): RedirectResponse
     {
-        $this->authorize('update', $post);
-        $this->authorize('update', $comment);
+        $this->authorize('update', [$comment, $post]);
 
         $validated = $request->validate([
             'content' => 'required|string',
@@ -62,8 +60,7 @@ class CommentController extends Controller
      */
     public function destroy(Post $post, Comment $comment): RedirectResponse
     {
-        $this->authorize('update', $post);
-        $this->authorize('delete', $comment);
+        $this->authorize('delete', [$comment, $post]);
 
         $comment->delete();
 

@@ -34,37 +34,9 @@ class TopicController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function show(Forum $forum, Topic $topic): Response
-    {
-        $this->authorize('view', $forum);
-        $this->authorize('view', $topic);
-
-        $topic->incrementViews();
-
-        $posts = PostData::collect($topic
-            ->posts()
-            ->with(['author', 'comments.author', 'comments.replies.author', 'reports'])
-            ->latestActivity()
-            ->paginate(10)
-            ->filter(fn (Post $post) => Gate::check('view', $post))
-            ->all(), PaginatedDataCollection::class);
-
-        return Inertia::render('forums/topics/show', [
-            'forum' => ForumData::from($forum),
-            'topic' => TopicData::from($topic),
-            'posts' => Inertia::merge(fn () => $posts->items()->items()),
-            'postsPagination' => PaginatedData::from(Arr::except($posts->items()->toArray(), ['data'])),
-            'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($topic->getRecentViewers())),
-        ]);
-    }
-
-    /**
-     * @throws AuthorizationException
-     */
     public function create(Forum $forum): Response
     {
-        $this->authorize('view', $forum);
-        $this->authorize('create', Topic::class);
+        $this->authorize('create', [Topic::class, $forum]);
 
         return Inertia::render('forums/topics/create', [
             'forum' => ForumData::from($forum),
@@ -76,8 +48,7 @@ class TopicController extends Controller
      */
     public function store(StoreTopicRequest $request, Forum $forum): RedirectResponse
     {
-        $this->authorize('view', $forum);
-        $this->authorize('create', Topic::class);
+        $this->authorize('create', [Topic::class, $forum]);
 
         $validated = $request->validated();
 
@@ -109,12 +80,37 @@ class TopicController extends Controller
     }
 
     /**
+     * @throws AuthorizationException
+     */
+    public function show(Forum $forum, Topic $topic): Response
+    {
+        $this->authorize('view', [$topic, $forum]);
+
+        $topic->incrementViews();
+
+        $posts = PostData::collect($topic
+            ->posts()
+            ->with(['author', 'comments.author', 'comments.replies.author', 'reports'])
+            ->latestActivity()
+            ->paginate(10)
+            ->filter(fn (Post $post) => Gate::check('view', [$post, $forum, $topic]))
+            ->all(), PaginatedDataCollection::class);
+
+        return Inertia::render('forums/topics/show', [
+            'forum' => ForumData::from($forum),
+            'topic' => TopicData::from($topic),
+            'posts' => Inertia::merge(fn () => $posts->items()->items()),
+            'postsPagination' => PaginatedData::from(Arr::except($posts->items()->toArray(), ['data'])),
+            'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($topic->getRecentViewers())),
+        ]);
+    }
+
+    /**
      * @throws Throwable
      */
     public function destroy(Forum $forum, Topic $topic): RedirectResponse
     {
-        $this->authorize('view', $forum);
-        $this->authorize('delete', $topic);
+        $this->authorize('delete', [$topic, $forum]);
 
         DeleteTopicAction::execute($topic, $forum);
 

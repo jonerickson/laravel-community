@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Gate;
 
 class ForumPolicy
 {
-    public function before(User $user): ?bool
+    public function before(?User $user): ?bool
     {
         if (! $this->viewAny($user)) {
             return false;
@@ -28,6 +28,7 @@ class ForumPolicy
     {
         return Gate::forUser($user)->check('view_forums')
             && $forum->is_active
-            && $forum->category->is_active;
+            && ($forum->category === null || Gate::forUser($user)->check('view', $forum->category))
+            && ($forum->category === null || $forum->category->is_active);
     }
 }

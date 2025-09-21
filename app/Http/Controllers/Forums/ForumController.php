@@ -34,7 +34,7 @@ class ForumController extends Controller
             ->with(['author', 'lastPost.author'])
             ->latestActivity()
             ->get()
-            ->filter(fn (Topic $topic) => Gate::check('view', $topic))
+            ->filter(fn (Topic $topic) => Gate::check('view', [$topic, $forum]))
             ->all(), PaginatedDataCollection::class);
 
         return Inertia::render('forums/show', [

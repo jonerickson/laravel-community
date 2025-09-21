@@ -61,7 +61,7 @@ class BlogController extends Controller
             ->with(['author', 'replies', 'replies.author', 'parent'])
             ->latest()
             ->get()
-            ->filter(fn (Comment $comment) => Gate::check('view', $comment))
+            ->filter(fn (Comment $comment) => Gate::check('view', [$comment, $post]))
             ->all(), PaginatedDataCollection::class);
 
         return Inertia::render('blog/show', [

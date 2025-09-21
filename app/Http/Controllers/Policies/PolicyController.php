@@ -19,7 +19,6 @@ class PolicyController extends Controller
 
     public function show(PolicyCategory $category, Policy $policy): Response
     {
-        $this->authorize('view', $category);
         $this->authorize('view', $policy);
 
         return Inertia::render('policies/show', [

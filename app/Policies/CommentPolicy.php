@@ -6,11 +6,12 @@ namespace App\Policies;
 
 use App\Models\Comment;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
 
 class CommentPolicy
 {
-    public function before(User $user): ?bool
+    public function before(?User $user): ?bool
     {
         if (! $this->viewAny($user)) {
             return false;
@@ -24,17 +25,23 @@ class CommentPolicy
         return Gate::forUser($user)->check('view_any_comments');
     }
 
-    public function view(?User $user, Comment $comment): bool
+    public function view(?User $user, Comment $comment, ?Model $commentable = null): bool
     {
-        return Gate::forUser($user)->check('view_comments');
+        return Gate::forUser($user)->check('view_comments')
+            && (! $commentable instanceof Model || Gate::forUser($user)->check('view', $commentable));
     }
 
-    public function create(?User $user): bool
+    public function create(?User $user, ?Model $commentable = null): bool
     {
-        return Gate::forUser($user)->check('create_comments');
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        return Gate::forUser($user)->check('create_comments')
+            && (! $commentable instanceof Model || Gate::forUser($user)->check('view', $commentable));
     }
 
-    public function update(?User $user, Comment $comment): bool
+    public function update(?User $user, Comment $comment, ?Model $commentable = null): bool
     {
         if (! $user instanceof User) {
             return false;
@@ -44,10 +51,11 @@ class CommentPolicy
             return true;
         }
 
-        return $comment->isAuthoredBy($user);
+        return $comment->isAuthoredBy($user)
+            && (! $commentable instanceof Model || Gate::forUser($user)->check('view', $commentable));
     }
 
-    public function delete(?User $user, Comment $comment): bool
+    public function delete(?User $user, Comment $comment, ?Model $commentable = null): bool
     {
         if (! $user instanceof User) {
             return false;
@@ -57,7 +65,8 @@ class CommentPolicy
             return true;
         }
 
-        return $comment->isAuthoredBy($user);
+        return $comment->isAuthoredBy($user)
+            && (! $commentable instanceof Model || Gate::forUser($user)->check('view', $commentable));
     }
 
     public function like(?User $user, Comment $comment): bool

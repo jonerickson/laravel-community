@@ -29,9 +29,7 @@ class PostController extends Controller
      */
     public function store(StorePostRequest $request, Forum $forum, Topic $topic): RedirectResponse
     {
-        $this->authorize('view', $forum);
-        $this->authorize('view', $topic);
-        $this->authorize('create', Post::class);
+        $this->authorize('create', [Post::class, $forum, $topic]);
 
         $validated = $request->validated();
 
@@ -59,9 +57,7 @@ class PostController extends Controller
      */
     public function edit(Forum $forum, Topic $topic, Post $post): Response
     {
-        $this->authorize('view', $forum);
-        $this->authorize('view', $topic);
-        $this->authorize('update', $post);
+        $this->authorize('update', [$post, $forum, $topic]);
 
         return Inertia::render('forums/posts/edit', [
             'forum' => ForumData::from($forum),
@@ -75,9 +71,7 @@ class PostController extends Controller
      */
     public function update(UpdatePostRequest $request, Forum $forum, Topic $topic, Post $post): RedirectResponse
     {
-        $this->authorize('view', $forum);
-        $this->authorize('view', $topic);
-        $this->authorize('update', $post);
+        $this->authorize('update', [$post, $forum, $topic]);
 
         $validated = $request->validated();
 
@@ -92,9 +86,7 @@ class PostController extends Controller
      */
     public function destroy(Forum $forum, Topic $topic, Post $post): RedirectResponse
     {
-        $this->authorize('view', $forum);
-        $this->authorize('view', $topic);
-        $this->authorize('delete', $post);
+        $this->authorize('delete', [$post, $forum, $topic]);
 
         $post->delete();
 

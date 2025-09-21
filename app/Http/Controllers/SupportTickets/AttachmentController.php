@@ -18,8 +18,7 @@ class AttachmentController extends Controller
 
     public function store(Request $request, SupportTicket $ticket): Response
     {
-        $this->authorize('update', $ticket);
-        $this->authorize('create', File::class);
+        $this->authorize('create', [File::class, $ticket]);
 
         $validated = $request->validate([
             'attachment' => ['required', 'file', 'max:10240', 'mimes:pdf,doc,docx,txt,png,jpg,jpeg,gif,heif'],
@@ -41,8 +40,7 @@ class AttachmentController extends Controller
 
     public function destroy(SupportTicket $ticket, File $file): Response
     {
-        $this->authorize('update', $ticket);
-        $this->authorize('delete', $file);
+        $this->authorize('delete', [$file, $ticket]);
 
         $file->delete();
 

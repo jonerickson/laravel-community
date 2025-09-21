@@ -46,7 +46,7 @@ class EnsureFrontendRequestsAreStateful
             $appUrl ? parse_url((string) $appUrl, PHP_URL_HOST).(parse_url((string) $appUrl, PHP_URL_PORT) ? ':'.parse_url((string) $appUrl, PHP_URL_PORT) : '') : '',
         ]);
 
-        return Str::is(Collection::make($stateful)->map(fn ($uri): string => trim((string) $uri).'/*')->all(), $domain);
+        return Str::is(Collection::make($stateful)->map(fn ($uri): string => trim($uri).'/*')->all(), $domain);
     }
 
     protected function configureSecureCookieSessions(): void

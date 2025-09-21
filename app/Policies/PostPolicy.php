@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Models\Forum;
 use App\Models\Post;
+use App\Models\Topic;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 
 class PostPolicy
 {
-    public function before(User $user): ?bool
+    public function before(?User $user): ?bool
     {
         if (! $this->viewAny($user)) {
             return false;
@@ -24,19 +26,27 @@ class PostPolicy
         return Gate::forUser($user)->check('view_any_posts');
     }
 
-    public function view(?User $user, Post $post): bool
+    public function view(?User $user, Post $post, ?Forum $forum = null, ?Topic $topic = null): bool
     {
         return Gate::forUser($user)->check('view_posts')
-            && (! $post->is_reported || ($post->is_reported && $this->report($user, $post)))
-            && ($post->is_published || (! $post->is_published && $this->publish($user, $post)));
+            && (! $post->is_reported || ($post->is_reported && Gate::forUser($user)->check('report', $post)))
+            && ($post->is_published || (! $post->is_published && Gate::forUser($user)->check('publish', $post)))
+            && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum))
+            && (! $topic instanceof Topic || Gate::forUser($user)->check('view', $topic));
     }
 
-    public function create(?User $user): bool
+    public function create(?User $user, ?Forum $forum = null, ?Topic $topic = null): bool
     {
-        return Gate::forUser($user)->check('create_posts');
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        return Gate::forUser($user)->check('create_posts')
+            && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum))
+            && (! $topic instanceof Topic || Gate::forUser($user)->check('view', $topic));
     }
 
-    public function update(?User $user, Post $post): bool
+    public function update(?User $user, Post $post, ?Forum $forum = null, ?Topic $topic = null): bool
     {
         if (! $user instanceof User) {
             return false;
@@ -47,10 +57,12 @@ class PostPolicy
         }
 
         return $post->isAuthoredBy($user)
-            && $post->is_published;
+            && $post->is_published
+            && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum))
+            && (! $topic instanceof Topic || Gate::forUser($user)->check('view', $topic));
     }
 
-    public function delete(?User $user, Post $post): bool
+    public function delete(?User $user, Post $post, ?Forum $forum = null, ?Topic $topic = null): bool
     {
         if (! $user instanceof User) {
             return false;
@@ -60,7 +72,9 @@ class PostPolicy
             return true;
         }
 
-        return $post->isAuthoredBy($user);
+        return $post->isAuthoredBy($user)
+            && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum))
+            && (! $topic instanceof Topic || Gate::forUser($user)->check('view', $topic));
     }
 
     public function report(?User $user, Post $post): bool

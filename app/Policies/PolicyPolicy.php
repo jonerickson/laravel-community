@@ -6,10 +6,11 @@ namespace App\Policies;
 
 use App\Models\Policy;
 use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 
 class PolicyPolicy
 {
-    public function before(User $user): ?bool
+    public function before(?User $user): ?bool
     {
         if (! $this->viewAny($user)) {
             return false;
@@ -26,7 +27,8 @@ class PolicyPolicy
     public function view(?User $user, Policy $policy): bool
     {
         return $policy->is_active
-            && $policy->category->is_active
+            && ($policy->category === null || Gate::forUser($user)->check('view', $policy->category))
+            && ($policy->category === null || $policy->category->is_active)
             && (! $policy->effective_at || ! $policy->effective_at->isFuture());
     }
 }

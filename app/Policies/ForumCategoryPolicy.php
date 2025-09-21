@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Gate;
 
 class ForumCategoryPolicy
 {
-    public function before(User $user): ?bool
+    public function before(?User $user): ?bool
     {
         if (! $this->viewAny($user)) {
             return false;
