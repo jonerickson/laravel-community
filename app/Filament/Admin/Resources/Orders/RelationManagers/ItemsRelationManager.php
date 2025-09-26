@@ -54,17 +54,15 @@ class ItemsRelationManager extends RelationManager
                 TextColumn::make('product.name')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('price.name')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('price.amount')
-                    ->money('USD', divideBy: 100)
+                TextColumn::make('price')
+                    ->formatStateUsing(fn (Price $state) => $state->getLabel())
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('quantity')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('amount')
+                    ->label('Total')
                     ->money('USD', divideBy: 100)
                     ->sortable(),
             ])

@@ -45,7 +45,7 @@ interface PaymentProcessor
 
     public function deletePaymentMethod(User $user, string $paymentMethodId): bool;
 
-    public function startSubscription(User $user, Order $order, bool $chargeNow = true): bool|string;
+    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true): bool|string|SubscriptionData;
 
     public function cancelSubscription(User $user, bool $cancelNow = false): bool;
 
@@ -55,7 +55,7 @@ interface PaymentProcessor
 
     public function listSubscriptions(User $user, array $filters = []): Collection;
 
-    public function getCheckoutUrl(User $user, Order $order): bool|string;
+    public function getCheckoutUrl(Order $order): bool|string;
 
     public function processCheckoutSuccess(Request $request, Order $order): bool;
 

@@ -96,9 +96,9 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deletePaymentMethod($user, $paymentMethodId);
     }
 
-    public function startSubscription(User $user, Order $order, bool $chargeNow = true): bool|string
+    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true): bool|string|SubscriptionData
     {
-        return $this->driver()->startSubscription($user, $order, $chargeNow);
+        return $this->driver()->startSubscription($order, $chargeNow, $firstParty);
     }
 
     public function cancelSubscription(User $user, bool $cancelNow = false): bool
@@ -121,9 +121,9 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->listSubscriptions($user, $filters);
     }
 
-    public function getCheckoutUrl(User $user, Order $order): bool|string
+    public function getCheckoutUrl(Order $order): bool|string
     {
-        return $this->driver()->getCheckoutUrl($user, $order);
+        return $this->driver()->getCheckoutUrl($order);
     }
 
     public function processCheckoutSuccess(Request $request, Order $order): bool

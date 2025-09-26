@@ -8,7 +8,6 @@ use App\Filament\Admin\Resources\Orders\Actions\CancelAction;
 use App\Filament\Admin\Resources\Orders\Actions\CheckoutAction;
 use App\Filament\Admin\Resources\Orders\Actions\RefundAction;
 use App\Filament\Admin\Resources\Users\RelationManagers\OrdersRelationManager;
-use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -40,6 +39,7 @@ class OrdersTable
                     ->badge()
                     ->searchable(),
                 TextColumn::make('amount')
+                    ->label('Total')
                     ->money('USD', divideBy: 100)
                     ->sortable(),
                 TextColumn::make('items.product.name')
@@ -58,15 +58,11 @@ class OrdersTable
             ])
             ->recordActions([
                 CheckoutAction::make(),
-                RefundAction::make(),
                 ViewAction::make(),
                 EditAction::make(),
+                RefundAction::make(),
                 CancelAction::make(),
                 DeleteAction::make(),
-                ActionGroup::make([
-                    CancelAction::make(),
-                    RefundAction::make(),
-                ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

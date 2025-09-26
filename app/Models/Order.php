@@ -124,15 +124,11 @@ class Order extends Model
                 return null;
             }
 
-            if ($this->is_one_time) {
-                return app(PaymentManager::class)->getCheckoutUrl(
-                    user: $this->user,
-                    order: $this
-                );
+            if ($this->is_recurring) {
+                return null;
             }
 
-            return app(PaymentManager::class)->startSubscription(
-                user: $this->user,
+            return app(PaymentManager::class)->getCheckoutUrl(
                 order: $this
             );
         })->shouldCache();
@@ -150,7 +146,8 @@ class Order extends Model
 
     public function scopeReadyToView(Builder $query): void
     {
-        $query->whereIn('status', [OrderStatus::Cancelled, OrderStatus::Pending, OrderStatus::Succeeded, OrderStatus::Refunded]);
+        $query->whereIn('status', [OrderStatus::Cancelled, OrderStatus::Pending, OrderStatus::Succeeded, OrderStatus::Refunded])
+            ->whereHas('items');
     }
 
     public function scopeCompleted(Builder $query): void

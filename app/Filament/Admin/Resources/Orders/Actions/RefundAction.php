@@ -19,7 +19,7 @@ class RefundAction extends Action
         parent::setUp();
 
         $this->label('Refund');
-        $this->color('danger');
+        $this->color('info');
         $this->icon(Heroicon::OutlinedReceiptRefund);
         $this->requiresConfirmation();
         $this->modalHeading('Refund');

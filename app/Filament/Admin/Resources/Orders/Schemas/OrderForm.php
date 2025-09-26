@@ -20,9 +20,6 @@ class OrderForm
                     ->columnSpanFull()
                     ->columns(1)
                     ->schema([
-                        TextInput::make('name')
-                            ->maxLength(255)
-                            ->required(),
                         Select::make('user_id')
                             ->preload()
                             ->searchable()

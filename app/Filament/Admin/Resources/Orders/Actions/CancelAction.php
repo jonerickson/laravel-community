@@ -23,11 +23,12 @@ class CancelAction extends Action
         $this->requiresConfirmation();
         $this->modalHeading('Cancel Order');
         $this->modalDescription('Are you sure you want to cancel this order?');
-        $this->action(function (Order $record) {
+        $this->action(function (Order $record, Action $action): void {
             $paymentManager = app(PaymentManager::class);
             $paymentManager->cancelOrder(
                 order: $record
             );
+            $action->success();
         });
     }
 

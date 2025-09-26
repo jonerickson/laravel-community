@@ -12,8 +12,14 @@ enum SubscriptionStatus: string implements HasColor, HasLabel
 {
     case Active = 'active';
     case Pending = 'pending';
-    case Cancelled = 'cancelled';
+    case Cancelled = 'canceled';
     case Refunded = 'refunded';
+    case GradePeriod = 'grade_period';
+    case Trialing = 'trialing';
+    case PastDue = 'past_due';
+    case Unpaid = 'unpaid';
+    case Incomplete = 'incomplete';
+    case IncompleteExpired = 'incomplete_expired';
 
     public function getLabel(): string
     {
@@ -24,9 +30,25 @@ enum SubscriptionStatus: string implements HasColor, HasLabel
     {
         return match ($this) {
             SubscriptionStatus::Active => 'success',
-            SubscriptionStatus::Pending => 'warning',
-            SubscriptionStatus::Cancelled => 'danger',
-            SubscriptionStatus::Refunded => 'info',
+            SubscriptionStatus::Pending, SubscriptionStatus::Unpaid => 'warning',
+            SubscriptionStatus::Cancelled, SubscriptionStatus::PastDue, SubscriptionStatus::Incomplete, SubscriptionStatus::IncompleteExpired => 'danger',
+            SubscriptionStatus::Refunded, SubscriptionStatus::GradePeriod, SubscriptionStatus::Trialing => 'info',
+        };
+    }
+
+    public function canCancel(): bool
+    {
+        return match ($this) {
+            SubscriptionStatus::Cancelled, SubscriptionStatus::Refunded => false,
+            default => true,
+        };
+    }
+
+    public function canContinue(): bool
+    {
+        return match ($this) {
+            SubscriptionStatus::Trialing, SubscriptionStatus::Active => true,
+            default => false,
         };
     }
 }

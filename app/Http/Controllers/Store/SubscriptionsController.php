@@ -60,7 +60,6 @@ class SubscriptionsController extends Controller
         ]);
 
         $result = $this->paymentManager->startSubscription(
-            user: $user,
             order: $order,
         );
 

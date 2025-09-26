@@ -7,8 +7,10 @@ namespace App\Drivers\Payments;
 use App\Contracts\PaymentProcessor;
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
+use App\Data\PriceData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
+use App\Data\UserData;
 use App\Enums\OrderRefundReason;
 use App\Enums\OrderStatus;
 use App\Enums\SubscriptionInterval;
@@ -30,6 +32,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\SubscriptionBuilder;
+use Stripe\Checkout\Session;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Stripe;
 use Stripe\StripeClient;
@@ -369,7 +372,7 @@ class StripeDriver implements PaymentProcessor
     /**
      * @throws Exception
      */
-    public function startSubscription(User $user, Order $order, bool $chargeNow = true): bool|string
+    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true): bool|string|SubscriptionData
     {
         $lineItems = [];
 
@@ -385,7 +388,7 @@ class StripeDriver implements PaymentProcessor
             return false;
         }
 
-        if (($subscription = $user->subscription()) && $subscription->valid()) {
+        if (($subscription = $order->user->subscription()) && $subscription->valid()) {
             if ($chargeNow) {
                 $subscription->swapAndInvoice(
                     prices: $lineItems,
@@ -409,13 +412,15 @@ class StripeDriver implements PaymentProcessor
             'order_id' => $order->reference_id,
         ], ...$order->items->map(fn (OrderItem $orderItem) => data_get($orderItem->product->metadata, 'metadata', []))->toArray());
 
-        $checkoutSession = $user
+        /** @var Subscription|Session $result */
+        $result = $order->user
             ->newSubscription('default', $lineItems)
             ->when(! $chargeNow, fn (SubscriptionBuilder $builder) => $builder->createAndSendInvoice())
             ->when(filled($trialDays), fn (SubscriptionBuilder $builder) => $builder->trialDays($trialDays->product->trial_days))
             ->when(filled($allowPromotionCodes), fn (SubscriptionBuilder $builder) => $builder->allowPromotionCodes())
             ->withMetadata($metadata)
-            ->checkout([
+            ->when(! $firstParty, fn (SubscriptionBuilder $builder) => $builder->create())
+            ->when($firstParty, fn (SubscriptionBuilder $builder) => $builder->checkout([
                 'client_reference_id' => $order->reference_id,
                 'origin_context' => 'web',
                 'consent_collection' => [
@@ -437,13 +442,31 @@ class StripeDriver implements PaymentProcessor
                     'order' => $order,
                     'redirect' => route('store.subscriptions', absolute: false),
                 ]),
-            ])->asStripeCheckoutSession();
+            ])->asStripeCheckoutSession());
 
-        $order->update([
-            'external_checkout_id' => $checkoutSession->id,
+        if ($result instanceof Session) {
+            $order->update([
+                'external_checkout_id' => $result->id,
+            ]);
+
+            return $result->url;
+        }
+
+        return SubscriptionData::from([
+            'name' => $result->type,
+            'user' => UserData::from($result->user),
+            'status' => SubscriptionStatus::tryFrom($result->stripe_status),
+            'trialEndsAt' => $result->trial_ends_at?->toImmutable(),
+            'endsAt' => $result->ends_at?->toImmutable(),
+            'createdAt' => $result->created_at?->toImmutable(),
+            'updatedAt' => $result->updated_at?->toImmutable(),
+            'price' => PriceData::from($price = Price::query()->where('external_price_id', $result->stripe_price)->first()),
+            'product' => ProductData::from($product = $price?->product),
+            'externalSubscriptionId' => $result->stripe_id,
+            'externalProductId' => $product?->external_product_id,
+            'externalPriceId' => $result->stripe_price,
+            'quantity' => $result->quantity,
         ]);
-
-        return $checkoutSession->url;
     }
 
     public function cancelSubscription(User $user, bool $cancelNow = false): bool
@@ -494,19 +517,18 @@ class StripeDriver implements PaymentProcessor
             return null;
         }
 
-        $externalProductId = data_get($subscription->items->firstWhere('stripe_price', $subscription->stripe_price), 'stripe_product');
-
         return SubscriptionData::from([
             'name' => $subscription->type,
-            'status' => $subscription->canceled() ? SubscriptionStatus::Cancelled :
-                       ($subscription->active() ? SubscriptionStatus::Active : SubscriptionStatus::Pending),
+            'user' => UserData::from($subscription->user),
+            'status' => SubscriptionStatus::tryFrom($subscription->stripe_status),
             'trialEndsAt' => $subscription->trial_ends_at?->toImmutable(),
             'endsAt' => $subscription->ends_at?->toImmutable(),
             'createdAt' => $subscription->created_at?->toImmutable(),
             'updatedAt' => $subscription->updated_at?->toImmutable(),
-            'product' => ProductData::from(Product::query()->where('external_product_id', $externalProductId)->first()),
+            'price' => PriceData::from($price = Price::query()->where('external_price_id', $subscription->stripe_price)->first()),
+            'product' => ProductData::from($product = $price?->product),
             'externalSubscriptionId' => $subscription->stripe_id,
-            'externalProductId' => $externalProductId,
+            'externalProductId' => $product?->external_product_id,
             'externalPriceId' => $subscription->stripe_price,
             'quantity' => $subscription->quantity,
         ]);
@@ -531,15 +553,16 @@ class StripeDriver implements PaymentProcessor
 
             return SubscriptionData::from([
                 'name' => $subscription->type,
-                'status' => $subscription->canceled() ? SubscriptionStatus::Cancelled :
-                           ($subscription->active() ? SubscriptionStatus::Active : SubscriptionStatus::Pending),
+                'user' => UserData::from($subscription->user),
+                'status' => SubscriptionStatus::tryFrom($subscription->stripe_status),
                 'trialEndsAt' => $subscription->trial_ends_at?->toImmutable(),
                 'endsAt' => $subscription->ends_at?->toImmutable(),
                 'createdAt' => $subscription->created_at?->toImmutable(),
                 'updatedAt' => $subscription->updated_at?->toImmutable(),
-                'product' => ProductData::from(Product::query()->where('external_product_id', $externalProductId)->first()),
+                'price' => PriceData::from($price = Price::query()->where('external_price_id', $subscription->stripe_price)->first()),
+                'product' => ProductData::from($product = $price?->product),
                 'externalSubscriptionId' => $subscription->stripe_id,
-                'externalProductId' => $externalProductId,
+                'externalProductId' => $product?->external_product_id,
                 'externalPriceId' => $subscription->stripe_price,
                 'quantity' => $subscription->quantity,
             ]);
@@ -548,7 +571,7 @@ class StripeDriver implements PaymentProcessor
         return new Collection($subscriptionData->all());
     }
 
-    public function getCheckoutUrl(User $user, Order $order): bool|string
+    public function getCheckoutUrl(Order $order): bool|string
     {
         $lineItems = [];
 
@@ -574,7 +597,7 @@ class StripeDriver implements PaymentProcessor
             'order_id' => $order->reference_id,
         ], ...$order->items->map(fn (OrderItem $orderItem) => data_get($orderItem->product->metadata, 'metadata', []))->toArray());
 
-        $checkoutSession = $user->checkout($lineItems, [
+        $checkoutSession = $order->user->checkout($lineItems, [
             'client_reference_id' => $order->reference_id,
             'success_url' => URL::signedRoute('store.checkout.success', [
                 'order' => $order,

@@ -17,6 +17,8 @@ class SubscriptionData extends Data
 {
     public string $name;
 
+    public ?UserData $user = null;
+
     public ?SubscriptionStatus $status = null;
 
     public ?CarbonImmutable $trialEndsAt = null;
@@ -28,6 +30,8 @@ class SubscriptionData extends Data
     public ?CarbonImmutable $updatedAt = null;
 
     public ?ProductData $product = null;
+
+    public ?PriceData $price = null;
 
     public ?string $externalSubscriptionId = null;
 

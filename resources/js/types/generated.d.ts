@@ -356,12 +356,14 @@ declare namespace App.Data {
     };
     export type SubscriptionData = {
         name: string;
+        user: App.Data.UserData | null;
         status: App.Enums.SubscriptionStatus | null;
         trialEndsAt: string | null;
         endsAt: string | null;
         createdAt: string | null;
         updatedAt: string | null;
         product: App.Data.ProductData | null;
+        price: App.Data.PriceData | null;
         externalSubscriptionId: string | null;
         externalProductId: string | null;
         externalPriceId: string | null;
@@ -492,7 +494,17 @@ declare namespace App.Enums {
     export type ReportReason = 'spam' | 'harassment' | 'inappropriate_content' | 'abuse' | 'impersonation' | 'false_information' | 'other';
     export type ReportStatus = 'pending' | 'reviewed' | 'approved' | 'rejected';
     export type SubscriptionInterval = 'day' | 'week' | 'month' | 'year';
-    export type SubscriptionStatus = 'active' | 'pending' | 'cancelled' | 'refunded';
+    export type SubscriptionStatus =
+        | 'active'
+        | 'pending'
+        | 'canceled'
+        | 'refunded'
+        | 'grade_period'
+        | 'trialing'
+        | 'past_due'
+        | 'unpaid'
+        | 'incomplete'
+        | 'incomplete_expired';
     export type SupportTicketPriority = 'low' | 'medium' | 'high' | 'critical';
     export type SupportTicketStatus = 'new' | 'open' | 'in_progress' | 'resolved' | 'closed';
 }

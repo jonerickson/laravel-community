@@ -17,7 +17,7 @@ class CheckoutAction extends Action
         $this->label('Checkout');
         $this->color('gray');
         $this->icon(Heroicon::OutlinedShoppingCart);
-        $this->visible(fn (Order $record) => $record->status->canCheckout());
+        $this->visible(fn (Order $record) => $record->is_one_time && $record->status->canCheckout());
         $this->url(fn (Order $record) => $record->checkout_url, shouldOpenInNewTab: true);
     }
 

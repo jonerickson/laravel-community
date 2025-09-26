@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace App\Livewire\Subscriptions;
 
 use App\Enums\SubscriptionStatus;
+use App\Filament\Admin\Resources\Subscriptions\Actions\CancelAction;
+use App\Filament\Admin\Resources\Subscriptions\Actions\ContinueAction;
+use App\Filament\Admin\Resources\Subscriptions\Actions\NewAction;
+use App\Filament\Admin\Resources\Subscriptions\Actions\SwapAction;
 use App\Managers\PaymentManager;
 use App\Models\User;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -24,11 +28,14 @@ class ListSubscriptions extends Component implements HasActions, HasSchemas, Has
     use InteractsWithSchemas;
     use InteractsWithTable;
 
-    private ?User $user = null;
+    public ?User $user = null;
+
+    public array $records = [];
 
     public function mount(User $record): void
     {
         $this->user = $record;
+        $this->records = app(PaymentManager::class)->listSubscriptions($this->user)->toArray();
     }
 
     public function table(Table $table): Table
@@ -36,7 +43,7 @@ class ListSubscriptions extends Component implements HasActions, HasSchemas, Has
         return $table
             ->heading('Subscriptions')
             ->description('The user\'s subscription history.')
-            ->records(fn () => app(PaymentManager::class)->listSubscriptions($this->user)->toArray())
+            ->records(fn () => collect($this->records))
             ->columns([
                 TextColumn::make('name')
                     ->searchable(),
@@ -63,6 +70,16 @@ class ListSubscriptions extends Component implements HasActions, HasSchemas, Has
                     ->dateTimeTooltip()
                     ->label('Purchased On')
                     ->sortable(),
+            ])
+            ->headerActions([
+                SwapAction::make()
+                    ->user($this->user),
+                NewAction::make()
+                    ->user($this->user),
+            ])
+            ->recordActions([
+                CancelAction::make(),
+                ContinueAction::make(),
             ]);
     }
 

@@ -95,7 +95,6 @@ class CheckoutController
         }
 
         $result = $this->paymentManager->getCheckoutUrl(
-            user: $user,
             order: $order,
         );
 

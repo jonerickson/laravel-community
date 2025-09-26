@@ -127,7 +127,7 @@ export default function Orders() {
                 return (
                     <div className="text-right">
                         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                            Amount
+                            Total
                             <ArrowUpDown className="ml-2 size-3" />
                         </Button>
                     </div>

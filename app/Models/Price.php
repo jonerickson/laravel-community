@@ -11,11 +11,14 @@ use App\Events\PriceUpdated;
 use App\Traits\Activateable;
 use App\Traits\HasMetadata;
 use App\Traits\HasReferenceId;
+use Filament\Support\Contracts\HasLabel;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Number;
 
 /**
  * @property int $id
@@ -65,7 +68,7 @@ use Illuminate\Support\Carbon;
  *
  * @mixin \Eloquent
  */
-class Price extends Model
+class Price extends Model implements HasLabel
 {
     use Activateable;
     use HasMetadata;
@@ -140,6 +143,14 @@ class Price extends Model
     public function isOneTime(): Attribute
     {
         return Attribute::get(fn () => ! $this->is_recurring);
+    }
+
+    public function getLabel(): string|Htmlable|null
+    {
+        $amount = Number::currency($this->amount / 100);
+        $interval = $this->interval->getLabel();
+
+        return "$this->name - $amount / $interval";
     }
 
     protected function casts(): array
