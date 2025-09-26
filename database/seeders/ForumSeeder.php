@@ -82,12 +82,15 @@ class ForumSeeder extends Seeder
         ];
 
         $author = User::first() ?? User::factory()->create();
-        $group = Group::defaultMemberGroups()->first() ?? Group::factory()->asDefaultMemberGroup()->create();
+        $memberGroup = Group::defaultMemberGroups()->first() ?? Group::factory()->asDefaultMemberGroup()->create();
+        $guestGroup = Group::defaultGuestGroups()->first() ?? Group::factory()->asDefaultGuest()->create();
+        $adminGroup = Group::query()->where('name', 'Administrators')->first() ?? Group::factory()->state(['name' => 'Administrators'])->create();
 
         foreach (array_reverse($categories) as $category) {
             $forumCategory = ForumCategory::factory()
                 ->state(Arr::except($category, ['forums']))
-                ->hasAttached($group)
+                ->hasAttached($memberGroup)
+                ->hasAttached($guestGroup)
                 ->has(Image::factory()->state([
                     'path' => 'boilerplate/forum-category-1.jpeg',
                 ]))
@@ -97,7 +100,8 @@ class ForumSeeder extends Seeder
                 Forum::factory()
                     ->state($forum)
                     ->for($forumCategory, 'category')
-                    ->hasAttached($group)
+                    ->hasAttached($memberGroup)
+                    ->hasAttached($guestGroup)
                     ->create()
                     ->each(function (Forum $forum) use ($author) {
                         Topic::factory(5)
@@ -117,5 +121,16 @@ class ForumSeeder extends Seeder
             }
         }
 
+        Forum::factory()
+            ->for(ForumCategory::factory()
+                ->state([
+                    'name' => 'Administrators Only',
+                ])
+                ->hasAttached($adminGroup), 'category')
+            ->state([
+                'name' => 'General Discussion',
+            ])
+            ->hasAttached($adminGroup)
+            ->create();
     }
 }

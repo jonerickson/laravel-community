@@ -36,7 +36,8 @@ class SubscriptionsController extends Controller
             ->with('policies.category')
             ->orderBy('name')
             ->get()
-            ->filter(fn (Product $product) => Gate::check('view', $product));
+            ->filter(fn (Product $product) => Gate::check('view', $product))
+            ->values();
 
         return Inertia::render('store/subscriptions', [
             'subscriptionProducts' => SubscriptionData::collect($subscriptions),

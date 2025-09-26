@@ -18,7 +18,8 @@ class IntegrationsController extends Controller
     {
         $user = Auth::user();
 
-        $connectedAccounts = $user->socials()
+        $connectedAccounts = $user
+            ->socials()
             ->select(['id', 'user_id', 'provider', 'provider_id', 'provider_name', 'provider_email', 'provider_avatar', 'created_at', 'updated_at'])
             ->get();
 

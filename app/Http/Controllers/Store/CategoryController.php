@@ -24,7 +24,8 @@ class CategoryController extends Controller
         $categories = ProductCategory::query()
             ->with('image')
             ->get()
-            ->filter(fn (ProductCategory $category) => Gate::check('view', $category));
+            ->filter(fn (ProductCategory $category) => Gate::check('view', $category))
+            ->values();
 
         return Inertia::render('store/categories/index', [
             'categories' => ProductCategoryData::collect($categories),
@@ -42,7 +43,8 @@ class CategoryController extends Controller
                 $query->active();
             }])
             ->where('is_subscription_only', false)
-            ->get();
+            ->get()
+            ->values();
 
         return Inertia::render('store/categories/show', [
             'category' => ProductCategoryData::from($category),

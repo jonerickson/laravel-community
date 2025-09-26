@@ -49,7 +49,8 @@ class CategoryController extends Controller
                 $category->setAttribute('forums', $category->forums->filter(fn (Forum $forum) => Gate::check('view', $forum)));
 
                 return $category;
-            });
+            })
+            ->values();
 
         return Inertia::render('forums/categories/index', [
             'categories' => ForumCategoryData::collect($categories),
@@ -73,7 +74,8 @@ class CategoryController extends Controller
                     ->limit(3);
             }])
             ->get()
-            ->filter(fn (Forum $forum) => Gate::check('view', $forum));
+            ->filter(fn (Forum $forum) => Gate::check('view', $forum))
+            ->values();
 
         return Inertia::render('forums/categories/show', [
             'category' => ForumCategoryData::from($category),

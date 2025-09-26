@@ -13,43 +13,99 @@ use App\Events\Stripe\SubscriptionCreated;
 use App\Events\Stripe\SubscriptionDeleted;
 use App\Events\Stripe\SubscriptionUpdated;
 use App\Models\Order;
+use App\Models\User;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
 
-class ProcessWebhook
+class ProcessWebhook implements ShouldQueue
 {
+    use Dispatchable;
+    use InteractsWithQueue;
+
+    private ?array $payload = null;
+
     public function handle(CustomerDeleted|CustomerUpdated|PaymentActionRequired|PaymentSucceeded|SubscriptionCreated|SubscriptionUpdated|SubscriptionDeleted $event): void
     {
+        $this->payload = $event->payload;
+
         match (true) {
-            $event instanceof PaymentSucceeded => $this->handlePaymentSucceeded($event),
-            $event instanceof PaymentActionRequired => $this->handlePaymentActionRequired($event),
-            $event instanceof SubscriptionDeleted => $this->handleSubscriptionDeleted($event),
-            $event instanceof SubscriptionUpdated => $this->handleSubscriptionUpdated($event),
-            $event instanceof SubscriptionCreated => $this->handleSubscriptionCreated($event),
-            $event instanceof CustomerUpdated => $this->handleCustomerUpdated($event),
-            $event instanceof CustomerDeleted => $this->handleCustomerDeleted($event),
+            $event instanceof PaymentSucceeded => $this->handlePaymentSucceeded(),
+            $event instanceof PaymentActionRequired => $this->handlePaymentActionRequired(),
+            $event instanceof SubscriptionDeleted => $this->handleSubscriptionDeleted(),
+            $event instanceof SubscriptionUpdated => $this->handleSubscriptionUpdated(),
+            $event instanceof SubscriptionCreated => $this->handleSubscriptionCreated(),
+            $event instanceof CustomerUpdated => $this->handleCustomerUpdated(),
+            $event instanceof CustomerDeleted => $this->handleCustomerDeleted(),
         };
     }
 
-    protected function handleCustomerDeleted(CustomerDeleted $event): void {}
-
-    protected function handleCustomerUpdated(CustomerUpdated $event): void {}
-
-    protected function handleSubscriptionCreated(SubscriptionCreated $event): void {}
-
-    protected function handleSubscriptionUpdated(SubscriptionUpdated $event): void {}
-
-    protected function handleSubscriptionDeleted(SubscriptionDeleted $event): void {}
-
-    protected function handlePaymentSucceeded(PaymentSucceeded $event): void
+    public function tags(CustomerDeleted|CustomerUpdated|PaymentActionRequired|PaymentSucceeded|SubscriptionCreated|SubscriptionUpdated|SubscriptionDeleted $event): array
     {
-        Order::firstOrCreate([
-            'reference_id' => data_get($event->payload, 'data.object.metadata.order_id'),
+        return array_filter(['stripe', data_get($event->payload, 'type')]);
+    }
+
+    protected function handleCustomerDeleted(): void {}
+
+    protected function handleCustomerUpdated(): void {}
+
+    protected function handleSubscriptionCreated(): void {}
+
+    protected function handleSubscriptionUpdated(): void {}
+
+    protected function handleSubscriptionDeleted(): void {}
+
+    protected function handlePaymentSucceeded(): void
+    {
+        if (! $customer = $this->resolveCustomer()) {
+            return;
+        }
+
+        if (! $orderId = $this->resolveOrderId()) {
+            return;
+        }
+
+        Order::updateOrCreate([
+            'reference_id' => $orderId,
         ], [
+            'user_id' => $customer->getKey(),
             'status' => OrderStatus::Succeeded,
-            'amount' => data_get($event->payload, 'data.object.amount_paid'),
-            'invoice_url' => data_get($event->payload, 'data.object.hosted_invoice_url'),
-            'external_invoice_id' => data_get($event->payload, 'data.object.id'),
+            'amount' => data_get($this->payload, 'data.object.amount_paid'),
+            'invoice_url' => data_get($this->payload, 'data.object.hosted_invoice_url'),
+            'external_invoice_id' => data_get($this->payload, 'data.object.id'),
         ]);
     }
 
-    protected function handlePaymentActionRequired(PaymentActionRequired $event): void {}
+    protected function handlePaymentActionRequired(): void
+    {
+        if (! $customer = $this->resolveCustomer()) {
+            return;
+        }
+
+        if (! $orderId = $this->resolveOrderId()) {
+            return;
+        }
+
+        Order::updateOrCreate([
+            'reference_id' => $orderId,
+        ], [
+            'user_id' => $customer->getKey(),
+            'status' => OrderStatus::RequiresAction,
+            'amount' => data_get($this->payload, 'data.object.amount_paid'),
+            'invoice_url' => data_get($this->payload, 'data.object.hosted_invoice_url'),
+            'external_invoice_id' => data_get($this->payload, 'data.object.id'),
+        ]);
+    }
+
+    private function resolveCustomer(): ?User
+    {
+        return User::query()
+            ->where('stripe_id', data_get($this->payload, 'data.object.customer'))
+            ->first();
+    }
+
+    private function resolveOrderId(): ?string
+    {
+        return data_get($this->payload, 'data.object.metadata.order_id');
+    }
 }

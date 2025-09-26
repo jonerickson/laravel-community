@@ -29,7 +29,8 @@ class CategoryController extends Controller
                 $query->effective()->ordered();
             }])
             ->get()
-            ->filter(fn (PolicyCategory $category) => Gate::check('view', $category));
+            ->filter(fn (PolicyCategory $category) => Gate::check('view', $category))
+            ->values();
 
         return Inertia::render('policies/index', [
             'categories' => PolicyCategoryData::collect($categories),
@@ -45,7 +46,8 @@ class CategoryController extends Controller
             ->effective()
             ->ordered()
             ->get()
-            ->filter(fn (Policy $policy) => Gate::check('view', $policy));
+            ->filter(fn (Policy $policy) => Gate::check('view', $policy))
+            ->values();
 
         return Inertia::render('policies/category', [
             'category' => PolicyCategoryData::from($category),

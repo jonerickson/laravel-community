@@ -227,7 +227,7 @@ CREATE TABLE `forums_groups` (
   KEY `forums_groups_forum_id_foreign` (`forum_id`),
   KEY `forums_groups_group_id_foreign` (`group_id`),
   CONSTRAINT `forums_groups_forum_id_foreign` FOREIGN KEY (`forum_id`) REFERENCES `forums` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `forums_groups_group_id_foreign` FOREIGN KEY (`group_id`) REFERENCES `forums_categories` (`id`) ON DELETE CASCADE
+  CONSTRAINT `forums_groups_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `groups`;

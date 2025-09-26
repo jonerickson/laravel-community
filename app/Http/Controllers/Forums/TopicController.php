@@ -94,6 +94,7 @@ class TopicController extends Controller
             ->latestActivity()
             ->paginate(10)
             ->filter(fn (Post $post) => Gate::check('view', [$post, $forum, $topic]))
+            ->values()
             ->all(), PaginatedDataCollection::class);
 
         return Inertia::render('forums/topics/show', [

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Models\Forum;
+use App\Models\Group;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 
@@ -26,10 +27,12 @@ class ForumPolicy
 
     public function view(?User $user, Forum $forum): bool
     {
+        $groups = $user instanceof User ? $user->groups : Group::defaultGuestGroups()->get();
+
         return Gate::forUser($user)->check('view_forums')
             && $forum->is_active
             && ($forum->category === null || Gate::forUser($user)->check('view', $forum->category))
             && ($forum->category === null || $forum->category->is_active)
-            && ($user?->groups->intersect($forum->groups)->isNotEmpty() ?? false);
+            && ($groups->intersect($forum->groups)->isNotEmpty() ?? false);
     }
 }

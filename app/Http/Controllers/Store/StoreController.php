@@ -24,7 +24,8 @@ class StoreController extends Controller
                 ->latest()
                 ->take(5)
                 ->get()
-                ->filter(fn (ProductCategory $category) => Gate::check('view', $category))),
+                ->filter(fn (ProductCategory $category) => Gate::check('view', $category))
+                ->values()),
             'featuredProducts' => ProductData::collect(Product::query()
                 ->products()
                 ->featured()
@@ -35,7 +36,8 @@ class StoreController extends Controller
                 ->latest()
                 ->take(6)
                 ->get()
-                ->filter(fn (Product $product) => Gate::check('view', $product))),
+                ->filter(fn (Product $product) => Gate::check('view', $product))
+                ->values()),
             'userProvidedProducts' => [],
         ]);
     }

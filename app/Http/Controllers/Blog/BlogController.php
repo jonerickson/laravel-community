@@ -40,6 +40,7 @@ class BlogController extends Controller
             ->latest()
             ->get()
             ->filter(fn (Post $post) => Gate::check('view', $post))
+            ->values()
             ->all(), PaginatedDataCollection::class);
 
         return Inertia::render('blog/index', [
@@ -62,6 +63,7 @@ class BlogController extends Controller
             ->latest()
             ->get()
             ->filter(fn (Comment $comment) => Gate::check('view', [$comment, $post]))
+            ->values()
             ->all(), PaginatedDataCollection::class);
 
         return Inertia::render('blog/show', [
