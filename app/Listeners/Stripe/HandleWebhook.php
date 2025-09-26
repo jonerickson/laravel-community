@@ -8,6 +8,7 @@ use App\Events\Stripe\CustomerDeleted;
 use App\Events\Stripe\CustomerUpdated;
 use App\Events\Stripe\PaymentActionRequired;
 use App\Events\Stripe\PaymentSucceeded;
+use App\Events\Stripe\RefundCreated;
 use App\Events\Stripe\SubscriptionCreated;
 use App\Events\Stripe\SubscriptionDeleted;
 use App\Events\Stripe\SubscriptionUpdated;
@@ -34,6 +35,7 @@ class HandleWebhook implements ShouldQueue
             'customer.subscription.deleted' => SubscriptionDeleted::dispatch($event->payload),
             'customer.updated' => CustomerUpdated::dispatch($event->payload),
             'customer.deleted' => CustomerDeleted::dispatch($event->payload),
+            'refund.created' => RefundCreated::dispatch($event->payload),
             default => null,
         };
     }

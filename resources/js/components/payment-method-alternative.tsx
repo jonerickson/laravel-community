@@ -18,28 +18,28 @@ export default function PaymentMethodAlternative({ paymentMethod, onSetDefault, 
                     name: 'Cash App Pay',
                     icon: DollarSign,
                     color: 'text-success',
-                    bgColor: 'bg-success-foreground border-success/10',
+                    bgColor: 'bg-success/10 border-success/10',
                 };
             case 'link':
                 return {
                     name: 'Link',
                     icon: LinkIcon,
                     color: 'text-info',
-                    bgColor: 'bg-info-foreground border-info/10',
+                    bgColor: 'bg-info/10 border-info/10',
                 };
             case 'apple_pay':
                 return {
                     name: 'Apple Pay',
                     icon: Smartphone,
                     color: 'text-primary',
-                    bgColor: 'bg-primary bg-primary/10',
+                    bgColor: 'bg-primary/10 bg-primary/10',
                 };
             case 'google_pay':
                 return {
                     name: 'Google Pay',
                     icon: Smartphone,
                     color: 'text-primary',
-                    bgColor: 'bg-primary bg-primary/10',
+                    bgColor: 'bg-primary/10 bg-primary/10',
                 };
             default:
                 return {
@@ -64,7 +64,7 @@ export default function PaymentMethodAlternative({ paymentMethod, onSetDefault, 
                         </div>
                         <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-2">
-                                <h3 className="truncate font-semibold">{methodInfo.name}</h3>
+                                <h3 className={`truncate font-semibold ${methodInfo.color}`}>{methodInfo.name}</h3>
                                 {paymentMethod.isDefault && (
                                     <Badge variant="secondary" className="flex-shrink-0">
                                         <Star className="mr-1 size-3" />

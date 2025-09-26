@@ -74,7 +74,7 @@ class OrderItem extends Model
 
     public function amount(): Attribute
     {
-        return Attribute::get(fn () => $this->price->amount * $this->quantity)
+        return Attribute::get(fn () => ($this->price->amount ?? 0) * $this->quantity)
             ->shouldCache();
     }
 

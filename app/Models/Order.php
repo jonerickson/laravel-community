@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
  * @property int $id
@@ -37,6 +38,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read mixed $is_recurring
  * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $items
  * @property-read int|null $items_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
+ * @property-read int|null $products_count
  * @property-read User $user
  *
  * @method static Builder<static>|Order completed()
@@ -93,19 +96,6 @@ class Order extends Model
         'is_one_time',
     ];
 
-    public static function boot(): void
-    {
-        parent::boot();
-
-        static::saving(function (Order $model) {
-            if (blank($model->name)) {
-                $model->forceFill([
-                    'name' => $model->items?->first?->product?->name,
-                ]);
-            }
-        });
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -114,6 +104,11 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function products(): HasManyThrough
+    {
+        return $this->hasManyThrough(Product::class, OrderItem::class, 'order_id', 'id', 'id', 'product_id');
     }
 
     public function amount(): Attribute
@@ -166,7 +161,6 @@ class Order extends Model
     protected function casts(): array
     {
         return [
-            'amount' => 'integer',
             'status' => OrderStatus::class,
         ];
     }

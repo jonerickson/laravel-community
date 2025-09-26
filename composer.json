@@ -23,6 +23,7 @@
         "spatie/laravel-data": "^4.17",
         "spatie/laravel-permission": "^6.21",
         "spatie/laravel-typescript-transformer": "^2.5",
+        "staudenmeir/eloquent-has-many-deep": "^1.7",
         "tightenco/ziggy": "^2.6"
     },
     "require-dev": {

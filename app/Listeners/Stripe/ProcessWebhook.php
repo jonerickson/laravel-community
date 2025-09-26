@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Listeners\Stripe;
 
+use App\Enums\OrderRefundReason;
 use App\Enums\OrderStatus;
 use App\Events\Stripe\CustomerDeleted;
 use App\Events\Stripe\CustomerUpdated;
 use App\Events\Stripe\PaymentActionRequired;
 use App\Events\Stripe\PaymentSucceeded;
+use App\Events\Stripe\RefundCreated;
 use App\Events\Stripe\SubscriptionCreated;
 use App\Events\Stripe\SubscriptionDeleted;
 use App\Events\Stripe\SubscriptionUpdated;
@@ -38,17 +40,9 @@ class ProcessWebhook implements ShouldQueue
         //
     }
 
-    public function handle(CustomerDeleted|CustomerUpdated|PaymentActionRequired|PaymentSucceeded|SubscriptionCreated|SubscriptionUpdated|SubscriptionDeleted $event): void
+    public function handle(CustomerDeleted|CustomerUpdated|PaymentActionRequired|PaymentSucceeded|SubscriptionCreated|SubscriptionUpdated|SubscriptionDeleted|RefundCreated $event): void
     {
         $this->payload = $event->payload;
-
-        if (! $this->customer = $this->resolveCustomer()) {
-            return;
-        }
-
-        if (! $this->orderId = $this->resolveOrderId()) {
-            return;
-        }
 
         match (true) {
             $event instanceof PaymentSucceeded => $this->handlePaymentSucceeded(),
@@ -58,10 +52,11 @@ class ProcessWebhook implements ShouldQueue
             $event instanceof SubscriptionCreated => $this->handleSubscriptionCreated(),
             $event instanceof CustomerUpdated => $this->handleCustomerUpdated(),
             $event instanceof CustomerDeleted => $this->handleCustomerDeleted(),
+            $event instanceof RefundCreated => $this->handleRefundCreated(),
         };
     }
 
-    public function tags(CustomerDeleted|CustomerUpdated|PaymentActionRequired|PaymentSucceeded|SubscriptionCreated|SubscriptionUpdated|SubscriptionDeleted $event): array
+    public function tags(CustomerDeleted|CustomerUpdated|PaymentActionRequired|PaymentSucceeded|SubscriptionCreated|SubscriptionUpdated|SubscriptionDeleted|RefundCreated $event): array
     {
         return array_filter(['stripe', data_get($event->payload, 'type')]);
     }
@@ -78,6 +73,14 @@ class ProcessWebhook implements ShouldQueue
 
     protected function handlePaymentSucceeded(): void
     {
+        if (! $this->customer = $this->resolveCustomer()) {
+            return;
+        }
+
+        if (! $this->orderId = $this->resolveOrderId()) {
+            return;
+        }
+
         $order = Order::firstOrCreate([
             'reference_id' => $this->orderId,
         ], [
@@ -106,14 +109,40 @@ class ProcessWebhook implements ShouldQueue
 
     protected function handlePaymentActionRequired(): void
     {
+        if (! $this->customer = $this->resolveCustomer()) {
+            return;
+        }
+
+        if (! $this->orderId = $this->resolveOrderId()) {
+            return;
+        }
+
         Order::updateOrCreate([
             'reference_id' => $this->orderId,
         ], [
             'user_id' => $this->customer->getKey(),
             'status' => OrderStatus::RequiresAction,
-            'amount' => data_get($this->payload, 'data.object.amount_paid'),
             'invoice_url' => data_get($this->payload, 'data.object.hosted_invoice_url'),
             'external_invoice_id' => data_get($this->payload, 'data.object.id'),
+        ]);
+    }
+
+    protected function handleRefundCreated(): void
+    {
+        if (! $paymentIntendId = $this->resolvePaymentIntendId()) {
+            return;
+        }
+
+        $order = Order::query()->where('external_order_id', $paymentIntendId)->first();
+
+        if (blank($order) || $order->status === OrderStatus::Refunded) {
+            return;
+        }
+
+        $order->update([
+            'status' => OrderStatus::Refunded,
+            'refund_reason' => OrderRefundReason::tryFrom(data_get($this->payload, 'data.object.reason')) ?? OrderRefundReason::Other,
+            'refund_notes' => data_get($this->payload, 'data.object.reason'),
         ]);
     }
 
@@ -122,6 +151,14 @@ class ProcessWebhook implements ShouldQueue
         return User::query()
             ->where('stripe_id', data_get($this->payload, 'data.object.customer'))
             ->first();
+    }
+
+    private function resolvePaymentIntendId()
+    {
+        return match (data_get($this->payload, 'type')) {
+            'refund.created' => data_get($this->payload, 'data.object.payment_intent'),
+            default => null,
+        };
     }
 
     private function resolveOrderId()

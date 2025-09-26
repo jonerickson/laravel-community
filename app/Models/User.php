@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\OrderStatus;
 use App\Events\UserCreated;
 use App\Events\UserDeleted;
 use App\Events\UserUpdated;
@@ -30,7 +31,6 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
@@ -40,6 +40,8 @@ use Laravel\Cashier\Billable;
 use Laravel\Cashier\Subscription;
 use Laravel\Passport\Contracts\OAuthenticatable;
 use Laravel\Passport\HasApiTokens;
+use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
+use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 /**
  * @property int $id
@@ -93,8 +95,6 @@ use Laravel\Passport\HasApiTokens;
  * @property-read int|null $pending_reports_count
  * @property-read Collection<int, Permission> $permissions
  * @property-read int|null $permissions_count
- * @property-read Collection<int, Product> $products
- * @property-read int|null $products_count
  * @property-read Collection<int, Report> $rejectedReports
  * @property-read int|null $rejected_reports_count
  * @property-read int $report_count
@@ -108,6 +108,8 @@ use Laravel\Passport\HasApiTokens;
  * @property-read int|null $subscriptions_count
  * @property-read Collection<int, \Laravel\Passport\Token> $tokens
  * @property-read int|null $tokens_count
+ * @property-read Collection|Product[] $products
+ * @property-read int|null $products_count
  *
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static Builder<static>|User hasExpiredGenericTrial()
@@ -162,6 +164,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     use HasMultiFactorAuthentication;
     use HasPermissions;
     use HasReferenceId;
+    use HasRelationships;
     use LogsAuthActivity;
     use Notifiable;
     use Reportable;
@@ -243,9 +246,16 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         return $this->hasMany(Order::class);
     }
 
-    public function products(): HasManyThrough
+    public function products(): HasManyDeep
     {
-        return $this->hasManyThrough(Product::class, Order::class);
+        return $this->hasManyDeep(
+            related: Product::class,
+            through: [Order::class, OrderItem::class],
+            foreignKeys: ['user_id', 'order_id', 'id'],
+            localKeys: ['id', 'id', 'product_id']
+        )
+            ->where('orders.status', OrderStatus::Succeeded)
+            ->distinct();
     }
 
     public function socials(): HasMany
