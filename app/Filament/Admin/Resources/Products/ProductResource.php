@@ -37,6 +37,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
 class ProductResource extends Resource
@@ -218,10 +219,7 @@ class ProductResource extends Resource
                     ->label('External Product ID')
                     ->searchable()
                     ->copyable()
-                    ->copyMessage('Stripe Product ID copied')
-                    ->placeholder('Not linked')
-                    ->icon(fn ($state): string => $state ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
-                    ->iconColor(fn ($state): string => $state ? 'success' : 'danger')
+                    ->default(new HtmlString('&mdash;'))
                     ->toggleable(),
                 TextColumn::make('created_at')
                     ->dateTime()

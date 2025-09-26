@@ -12,11 +12,15 @@ use App\Events\Stripe\PaymentSucceeded;
 use App\Events\Stripe\SubscriptionCreated;
 use App\Events\Stripe\SubscriptionDeleted;
 use App\Events\Stripe\SubscriptionUpdated;
+use App\Managers\PaymentManager;
 use App\Models\Order;
+use App\Models\Price;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 class ProcessWebhook implements ShouldQueue
 {
@@ -25,9 +29,26 @@ class ProcessWebhook implements ShouldQueue
 
     private ?array $payload = null;
 
+    private ?User $customer = null;
+
+    private ?string $orderId = null;
+
+    public function __construct(protected PaymentManager $paymentManager)
+    {
+        //
+    }
+
     public function handle(CustomerDeleted|CustomerUpdated|PaymentActionRequired|PaymentSucceeded|SubscriptionCreated|SubscriptionUpdated|SubscriptionDeleted $event): void
     {
         $this->payload = $event->payload;
+
+        if (! $this->customer = $this->resolveCustomer()) {
+            return;
+        }
+
+        if (! $this->orderId = $this->resolveOrderId()) {
+            return;
+        }
 
         match (true) {
             $event instanceof PaymentSucceeded => $this->handlePaymentSucceeded(),
@@ -57,39 +78,38 @@ class ProcessWebhook implements ShouldQueue
 
     protected function handlePaymentSucceeded(): void
     {
-        if (! $customer = $this->resolveCustomer()) {
-            return;
-        }
-
-        if (! $orderId = $this->resolveOrderId()) {
-            return;
-        }
-
-        Order::updateOrCreate([
-            'reference_id' => $orderId,
+        $order = Order::firstOrCreate([
+            'reference_id' => $this->orderId,
         ], [
-            'user_id' => $customer->getKey(),
+            'user_id' => $this->customer->getKey(),
             'status' => OrderStatus::Succeeded,
-            'amount' => data_get($this->payload, 'data.object.amount_paid'),
             'invoice_url' => data_get($this->payload, 'data.object.hosted_invoice_url'),
             'external_invoice_id' => data_get($this->payload, 'data.object.id'),
         ]);
+
+        if ($order->wasRecentlyCreated) {
+            foreach (Arr::wrap(data_get($this->payload, 'data.object.lines.data')) as $lineItem) {
+                $price = Price::firstOrCreate([
+                    'external_price_id' => data_get($lineItem, 'pricing.price_details.price'),
+                ], [
+                    'name' => data_get($lineItem, 'description'),
+                ]);
+
+                $order->items()->create([
+                    'quantity' => data_get($lineItem, 'quantity') ?? 1,
+                    'product_id' => $price->product?->getKey(),
+                    'price_id' => $price->getKey(),
+                ]);
+            }
+        }
     }
 
     protected function handlePaymentActionRequired(): void
     {
-        if (! $customer = $this->resolveCustomer()) {
-            return;
-        }
-
-        if (! $orderId = $this->resolveOrderId()) {
-            return;
-        }
-
         Order::updateOrCreate([
-            'reference_id' => $orderId,
+            'reference_id' => $this->orderId,
         ], [
-            'user_id' => $customer->getKey(),
+            'user_id' => $this->customer->getKey(),
             'status' => OrderStatus::RequiresAction,
             'amount' => data_get($this->payload, 'data.object.amount_paid'),
             'invoice_url' => data_get($this->payload, 'data.object.hosted_invoice_url'),
@@ -104,8 +124,11 @@ class ProcessWebhook implements ShouldQueue
             ->first();
     }
 
-    private function resolveOrderId(): ?string
+    private function resolveOrderId()
     {
-        return data_get($this->payload, 'data.object.metadata.order_id');
+        return match (data_get($this->payload, 'type')) {
+            'invoice.payment_succeeded' => data_get(Collection::make(data_get($this->payload, 'data.object.lines.data'))->firstWhere(fn (array $item) => filled(data_get($item, 'metadata.order_id'))), 'metadata.order_id'),
+            default => null,
+        };
     }
 }

@@ -8,6 +8,7 @@ use App\Contracts\PaymentProcessor;
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\SubscriptionData;
+use App\Enums\OrderRefundReason;
 use App\Enums\OrderStatus;
 use App\Enums\SubscriptionInterval;
 use App\Models\Order;
@@ -162,7 +163,7 @@ class StripeDriver implements PaymentProcessor
             ]),
         ];
 
-        if ($price->isRecurring()) {
+        if ($price->is_recurring) {
             $stripeParams['recurring'] = [
                 'interval' => $price->interval?->value,
                 'interval_count' => $price->interval_count,
@@ -501,7 +502,7 @@ class StripeDriver implements PaymentProcessor
         return $subscriptionData;
     }
 
-    public function redirectToCheckout(User $user, Order $order): bool|string
+    public function getCheckoutUrl(User $user, Order $order): bool|string
     {
         $lineItems = [];
 
@@ -601,7 +602,6 @@ class StripeDriver implements PaymentProcessor
             'external_payment_id' => $paymentIntent?->payment_method ?? null,
             'external_invoice_id' => $invoiceId ?? null,
             'status' => $paymentIntent ? (OrderStatus::tryFrom($paymentIntent->status) ?? OrderStatus::Processing) : OrderStatus::Processing,
-            'amount' => $paymentIntent?->amount ?? null,
             'invoice_url' => $invoice?->hosted_invoice_url ?? null,
             'invoice_number' => $invoice?->number ?? null,
         ]);
@@ -613,6 +613,73 @@ class StripeDriver implements PaymentProcessor
     {
         if (blank($order->external_checkout_id)) {
             return false;
+        }
+
+        $order->update([
+            'status' => OrderStatus::Cancelled,
+        ]);
+
+        return true;
+    }
+
+    /**
+     * @throws ApiErrorException
+     * @throws Exception
+     */
+    public function refundOrder(Order $order, OrderRefundReason $reason, ?string $notes = null): bool
+    {
+        if (blank($order->external_order_id)) {
+            return false;
+        }
+
+        if (! $order->status->canRefund()) {
+            return false;
+        }
+
+        $metadata = [
+            'order_id' => $order->reference_id,
+            'refund_reason' => $reason->value,
+        ];
+
+        if (filled($notes)) {
+            $metadata['refund_notes'] = $notes;
+        }
+
+        $refund = $this->stripe->refunds->create([
+            'payment_intent' => $order->external_order_id,
+            'reason' => match ($reason) {
+                OrderRefundReason::Duplicate => 'duplicate',
+                OrderRefundReason::Fraudulent => 'fraudulent',
+                OrderRefundReason::RequestedByCustomer => 'requested_by_customer',
+                default => null,
+            },
+            'metadata' => $metadata,
+        ], [
+            'idempotency_key' => $this->getIdempotencyKey(),
+        ]);
+
+        $order->update([
+            'status' => OrderStatus::Refunded,
+            'refund_reason' => $reason,
+            'refund_notes' => $notes,
+        ]);
+
+        return $refund->status === 'succeeded';
+    }
+
+    /**
+     * @throws ApiErrorException
+     */
+    public function cancelOrder(Order $order): bool
+    {
+        if (! $order->status->canCancel()) {
+            return false;
+        }
+
+        if (filled($order->external_checkout_id)) {
+            $this->stripe->checkout->sessions->expire($order->external_checkout_id, null, [
+                'idempotency_key' => $this->getIdempotencyKey(),
+            ]);
         }
 
         $order->update([

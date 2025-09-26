@@ -12,6 +12,7 @@ use App\Traits\Activateable;
 use App\Traits\HasMetadata;
 use App\Traits\HasReferenceId;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
@@ -32,6 +33,8 @@ use Illuminate\Support\Carbon;
  * @property array<array-key, mixed>|null $metadata
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read mixed $is_one_time
+ * @property-read mixed $is_recurring
  * @property-read Product $product
  *
  * @method static Builder<static>|Price active()
@@ -80,6 +83,11 @@ class Price extends Model
         'description',
     ];
 
+    protected $appends = [
+        'is_recurring',
+        'is_one_time',
+    ];
+
     protected $hidden = [
         'external_price_id',
     ];
@@ -124,37 +132,14 @@ class Price extends Model
         $query->whereNull('external_price_id');
     }
 
-    public function isRecurring(): bool
+    public function isRecurring(): Attribute
     {
-        return ! is_null($this->interval);
+        return Attribute::get(fn () => ! is_null($this->interval));
     }
 
-    public function isOneTime(): bool
+    public function isOneTime(): Attribute
     {
-        return is_null($this->interval);
-    }
-
-    public function hasStripePrice(): bool
-    {
-        return ! is_null($this->external_price_id);
-    }
-
-    public function getFormattedAmount(): string
-    {
-        return number_format($this->amount, 2);
-    }
-
-    public function getDisplayName(): string
-    {
-        if ($this->isRecurring()) {
-            $interval = $this->interval_count > 1
-                ? "$this->interval_count {$this->interval}s"
-                : $this->interval;
-
-            return "$this->name (per $interval)";
-        }
-
-        return $this->name;
+        return Attribute::get(fn () => ! $this->is_recurring);
     }
 
     protected function casts(): array

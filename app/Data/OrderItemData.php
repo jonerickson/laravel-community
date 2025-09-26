@@ -24,6 +24,12 @@ class OrderItemData extends Data
 
     public int $quantity;
 
+    public ?int $amount = null;
+
+    public bool $isOneTime;
+
+    public bool $isRecurring;
+
     public ?ProductData $product = null;
 
     public ?PriceData $price = null;

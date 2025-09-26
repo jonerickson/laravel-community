@@ -9,6 +9,7 @@ use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\SubscriptionData;
 use App\Drivers\Payments\StripeDriver;
+use App\Enums\OrderRefundReason;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
@@ -115,9 +116,9 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->currentSubscription($user);
     }
 
-    public function redirectToCheckout(User $user, Order $order): bool|string
+    public function getCheckoutUrl(User $user, Order $order): bool|string
     {
-        return $this->driver()->redirectToCheckout($user, $order);
+        return $this->driver()->getCheckoutUrl($user, $order);
     }
 
     public function processCheckoutSuccess(Request $request, Order $order): bool
@@ -128,6 +129,16 @@ class PaymentManager extends Manager implements PaymentProcessor
     public function processCheckoutCancel(Request $request, Order $order): bool
     {
         return $this->driver()->processCheckoutCancel($request, $order);
+    }
+
+    public function refundOrder(Order $order, OrderRefundReason $reason, ?string $notes = null): bool
+    {
+        return $this->driver()->refundOrder($order, $reason, $notes);
+    }
+
+    public function cancelOrder(Order $order): bool
+    {
+        return $this->driver()->cancelOrder($order);
     }
 
     protected function createStripeDriver(): PaymentProcessor

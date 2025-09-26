@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Orders\RelationManagers;
 
-use Filament\Actions\DetachAction;
+use App\Models\Price;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -19,9 +23,23 @@ class ItemsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(1)
             ->components([
+                Select::make('product_id')
+                    ->required()
+                    ->relationship('product', 'name')
+                    ->preload()
+                    ->live(onBlur: true)
+                    ->searchable(),
+                Select::make('price_id')
+                    ->label('Price')
+                    ->disableOptionWhen(fn (Get $get) => blank($get('product_id')))
+                    ->required()
+                    ->options(fn (Get $get) => Price::query()->where('product_id', $get('product_id'))->pluck('name', 'id'))
+                    ->preload()
+                    ->searchable(),
                 TextInput::make('quantity')
-                    ->columnSpanFull()
+                    ->default(1)
                     ->required()
                     ->numeric(),
             ]);
@@ -46,20 +64,25 @@ class ItemsRelationManager extends RelationManager
                 TextColumn::make('quantity')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('price.interval')
-                    ->label('Interval')
-                    ->searchable()
+                TextColumn::make('amount')
+                    ->money('USD', divideBy: 100)
                     ->sortable(),
-                TextColumn::make('price.interval_count')
-                    ->numeric()
-                    ->searchable()
-                    ->sortable(),
+            ])
+            ->headerActions([
+                CreateAction::make()
+                    ->label('Add order item')
+                    ->modalHeading('Add Order Item')
+                    ->modalDescription('Add a new item to the order.')
+                    ->modalSubmitActionLabel('Add')
+                    ->createAnother(false),
             ])
             ->recordActions([
                 EditAction::make(),
-                DetachAction::make()
+                DeleteAction::make()
                     ->label('Remove')
                     ->modalHeading('Remove Item')
+                    ->modalDescription('Remove an item from the order.')
+                    ->modalSubmitActionLabel('Remove')
                     ->requiresConfirmation(),
             ]);
     }

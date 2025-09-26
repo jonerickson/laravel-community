@@ -94,7 +94,7 @@ class CheckoutController
             ]);
         }
 
-        $result = $this->paymentManager->redirectToCheckout(
+        $result = $this->paymentManager->getCheckoutUrl(
             user: $user,
             order: $order,
         );

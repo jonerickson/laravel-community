@@ -165,7 +165,7 @@ function PricingCard({
                             </Button>
 
                             {currentSubscription?.trialEndsAt && new Date(currentSubscription.trialEndsAt) > new Date() && (
-                                <div className="rounded-md bg-info/10 p-3 text-center">
+                                <div className="rounded-md bg-info-foreground p-3 text-center">
                                     <p className="text-sm font-medium text-info">Trial Active</p>
                                     <p className="text-xs text-muted-foreground">
                                         Trial ends {new Date(currentSubscription.trialEndsAt).toLocaleDateString()}

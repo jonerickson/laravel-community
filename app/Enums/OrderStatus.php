@@ -19,6 +19,7 @@ enum OrderStatus: string implements HasColor, HasLabel
     case RequiresConfirmation = 'requires_confirmation';
     case RequiresPaymentMethod = 'requires_payment_method';
     case Succeeded = 'succeeded';
+    case Refunded = 'refunded';
 
     public function getLabel(): string|Htmlable|null
     {
@@ -35,6 +36,30 @@ enum OrderStatus: string implements HasColor, HasLabel
             OrderStatus::Cancelled, OrderStatus::RequiresAction => 'danger',
             OrderStatus::Processing, OrderStatus::RequiresCapture => 'warning',
             default => 'info',
+        };
+    }
+
+    public function canCheckout(): bool
+    {
+        return match ($this) {
+            OrderStatus::Pending => true,
+            default => false,
+        };
+    }
+
+    public function canRefund(): bool
+    {
+        return match ($this) {
+            OrderStatus::Succeeded => true,
+            default => false,
+        };
+    }
+
+    public function canCancel(): bool
+    {
+        return match ($this) {
+            OrderStatus::Cancelled, OrderStatus::Refunded => false,
+            default => true,
         };
     }
 }

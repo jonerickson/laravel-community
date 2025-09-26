@@ -7,6 +7,7 @@ namespace App\Contracts;
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\SubscriptionData;
+use App\Enums\OrderRefundReason;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
@@ -52,9 +53,13 @@ interface PaymentProcessor
 
     public function currentSubscription(User $user): ?SubscriptionData;
 
-    public function redirectToCheckout(User $user, Order $order): bool|string;
+    public function getCheckoutUrl(User $user, Order $order): bool|string;
 
     public function processCheckoutSuccess(Request $request, Order $order): bool;
 
     public function processCheckoutCancel(Request $request, Order $order): bool;
+
+    public function refundOrder(Order $order, OrderRefundReason $reason, ?string $notes = null): bool;
+
+    public function cancelOrder(Order $order): bool;
 }

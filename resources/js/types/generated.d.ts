@@ -165,7 +165,12 @@ declare namespace App.Data {
         id: number;
         userId: number;
         status: App.Enums.OrderStatus;
+        refundReason: string | null;
+        refundNotes: string | null;
         amount: number | null;
+        isOneTime: boolean;
+        isRecurring: boolean;
+        checkoutUrl: string | null;
         invoiceUrl: string | null;
         referenceId: string | null;
         invoiceNumber: string | null;
@@ -183,6 +188,9 @@ declare namespace App.Data {
         productId: number | null;
         priceId: number | null;
         quantity: number;
+        amount: number | null;
+        isOneTime: boolean;
+        isRecurring: boolean;
         product: App.Data.ProductData | null;
         price: App.Data.PriceData | null;
         createdAt: string | null;
@@ -445,6 +453,7 @@ declare namespace App.Data {
 }
 declare namespace App.Enums {
     export type AnnouncementType = 'info' | 'success' | 'warning' | 'error';
+    export type OrderRefundReason = 'duplicate' | 'fraudulent' | 'requested_by_customer' | 'other';
     export type OrderStatus =
         | 'pending'
         | 'canceled'
@@ -453,7 +462,8 @@ declare namespace App.Enums {
         | 'requires_capture'
         | 'requires_confirmation'
         | 'requires_payment_method'
-        | 'succeeded';
+        | 'succeeded'
+        | 'refunded';
     export type PostType = 'blog' | 'forum';
     export type ProductTaxCode =
         | 'general_tangible_goods'

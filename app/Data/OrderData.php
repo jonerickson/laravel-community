@@ -21,7 +21,17 @@ class OrderData extends Data
 
     public OrderStatus $status;
 
+    public ?string $refundReason = null;
+
+    public ?string $refundNotes = null;
+
     public ?int $amount = null;
+
+    public bool $isOneTime;
+
+    public bool $isRecurring;
+
+    public ?string $checkoutUrl = null;
 
     public ?string $invoiceUrl = null;
 

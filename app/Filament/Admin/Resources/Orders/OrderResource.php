@@ -7,6 +7,7 @@ namespace App\Filament\Admin\Resources\Orders;
 use App\Filament\Admin\Resources\Orders\Pages\CreateOrder;
 use App\Filament\Admin\Resources\Orders\Pages\EditOrder;
 use App\Filament\Admin\Resources\Orders\Pages\ListOrders;
+use App\Filament\Admin\Resources\Orders\Pages\ViewOrder;
 use App\Filament\Admin\Resources\Orders\RelationManagers\ItemsRelationManager;
 use App\Filament\Admin\Resources\Orders\Schemas\OrderForm;
 use App\Filament\Admin\Resources\Orders\Schemas\OrderInfolist;
@@ -54,6 +55,7 @@ class OrderResource extends Resource
             'index' => ListOrders::route('/'),
             'create' => CreateOrder::route('/create'),
             'edit' => EditOrder::route('/{record}/edit'),
+            'view' => ViewOrder::route('/{record}'),
         ];
     }
 }

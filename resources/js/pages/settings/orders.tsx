@@ -10,7 +10,7 @@ import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { currency, date } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Copy, ExternalLink, FileText } from 'lucide-react';
+import { ArrowUpDown, Copy, CreditCard, ExternalLink, FileText, Repeat } from 'lucide-react';
 import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -101,8 +101,15 @@ export default function Orders() {
                         .join(', ') || 'N/A';
 
                 return (
-                    <div className="max-w-[200px] truncate" title={productNames}>
-                        {productNames}
+                    <div className="flex max-w-[200px] items-center gap-2">
+                        <div className="truncate" title={productNames}>
+                            {productNames}
+                        </div>
+                        {order.isRecurring && (
+                            <div title="Recurring order" className="flex-shrink-0">
+                                <Repeat className="size-3 text-info" />
+                            </div>
+                        )}
                     </div>
                 );
             },
@@ -142,8 +149,16 @@ export default function Orders() {
 
                 return (
                     <div className="flex justify-end gap-2">
+                        {order.status === 'pending' && order.checkoutUrl && (
+                            <Button variant="ghost" size="sm" asChild>
+                                <a href={order.checkoutUrl} target="_blank" rel="noopener noreferrer">
+                                    <CreditCard className="mr-1 size-4" />
+                                    Checkout
+                                </a>
+                            </Button>
+                        )}
                         {order.invoiceUrl && (
-                            <Button variant="outline" size="sm" asChild>
+                            <Button variant="ghost" size="sm" asChild>
                                 <a href={order.invoiceUrl} target="_blank" rel="noopener noreferrer">
                                     <ExternalLink className="mr-1 size-4" />
                                     View
