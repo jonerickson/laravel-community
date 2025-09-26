@@ -21,7 +21,7 @@ class OrdersRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->description('The user\'s orders')
+            ->description('The user\'s order history.')
             ->toolbarActions([]);
     }
 }

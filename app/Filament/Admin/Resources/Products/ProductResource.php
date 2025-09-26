@@ -37,7 +37,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
 class ProductResource extends Resource
@@ -215,12 +214,6 @@ class ProductResource extends Resource
                     ->default(0)
                     ->money()
                     ->sortable(),
-                TextColumn::make('external_product_id')
-                    ->label('External Product ID')
-                    ->searchable()
-                    ->copyable()
-                    ->default(new HtmlString('&mdash;'))
-                    ->toggleable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

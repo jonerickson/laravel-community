@@ -20,11 +20,16 @@ class ClientsTable
         return $table
             ->emptyStateDescription('There are no clients currently configured.')
             ->columns([
+                TextColumn::make('name')
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('id')
                     ->label('Client ID')
+                    ->copyable()
                     ->searchable(),
-                TextColumn::make('name')
-                    ->searchable(),
+                TextColumn::make('grant_types')
+                    ->label('Grant Types')
+                    ->badge(),
                 IconColumn::make('revoked')
                     ->boolean(),
                 TextColumn::make('created_at')

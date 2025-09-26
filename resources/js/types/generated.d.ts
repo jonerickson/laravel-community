@@ -355,18 +355,17 @@ declare namespace App.Data {
         ziggy: Config & { location: string };
     };
     export type SubscriptionData = {
-        id: number;
         name: string;
-        description: string;
-        slug: string;
-        featuredImageUrl: string | null;
-        current: boolean;
-        metadata: Array<string, unknown> | null;
-        activePrices: Array<App.Data.PriceData>;
-        categories: Array<App.Data.ProductCategoryData>;
-        policies: Array<App.Data.PolicyData>;
+        status: App.Enums.SubscriptionStatus | null;
         trialEndsAt: string | null;
         endsAt: string | null;
+        createdAt: string | null;
+        updatedAt: string | null;
+        product: App.Data.ProductData | null;
+        externalSubscriptionId: string | null;
+        externalProductId: string | null;
+        externalPriceId: string | null;
+        quantity: number | null;
     };
     export type SupportTicketCategoryData = {
         id: number;
@@ -493,6 +492,7 @@ declare namespace App.Enums {
     export type ReportReason = 'spam' | 'harassment' | 'inappropriate_content' | 'abuse' | 'impersonation' | 'false_information' | 'other';
     export type ReportStatus = 'pending' | 'reviewed' | 'approved' | 'rejected';
     export type SubscriptionInterval = 'day' | 'week' | 'month' | 'year';
+    export type SubscriptionStatus = 'active' | 'pending' | 'cancelled' | 'refunded';
     export type SupportTicketPriority = 'low' | 'medium' | 'high' | 'critical';
     export type SupportTicketStatus = 'new' | 'open' | 'in_progress' | 'resolved' | 'closed';
 }

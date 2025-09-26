@@ -7,6 +7,7 @@ namespace App\Filament\Admin\Resources\Orders\Tables;
 use App\Filament\Admin\Resources\Orders\Actions\CancelAction;
 use App\Filament\Admin\Resources\Orders\Actions\CheckoutAction;
 use App\Filament\Admin\Resources\Orders\Actions\RefundAction;
+use App\Filament\Admin\Resources\Users\RelationManagers\OrdersRelationManager;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -33,6 +34,7 @@ class OrdersTable
                     ->copyable()
                     ->searchable(),
                 TextColumn::make('user.name')
+                    ->hiddenOn(OrdersRelationManager::class)
                     ->searchable(),
                 TextColumn::make('status')
                     ->badge()
@@ -40,10 +42,8 @@ class OrdersTable
                 TextColumn::make('amount')
                     ->money('USD', divideBy: 100)
                     ->sortable(),
-                TextColumn::make('external_order_id')
-                    ->default(new HtmlString('&mdash;'))
-                    ->copyable()
-                    ->label('External Order ID'),
+                TextColumn::make('items.product.name')
+                    ->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -73,6 +73,7 @@ class OrdersTable
                     DeleteBulkAction::make(),
                 ]),
             ])
+            ->deferLoading()
             ->defaultSort('created_at', 'desc');
     }
 }

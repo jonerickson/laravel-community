@@ -10,6 +10,7 @@ const statusMap: Record<App.Enums.OrderStatus, string> = {
     requires_payment_method: 'bg-pink-500 text-white dark:bg-pink-600',
     succeeded: 'bg-green-500 text-white dark:bg-green-600',
     pending: 'bg-yellow-500 text-white dark:bg-yellow-600',
+    refunded: 'bg-blue-500 text-white dark:bg-blue-600',
 };
 
 export default function OrderStatus({ status }: { status: App.Enums.OrderStatus }) {

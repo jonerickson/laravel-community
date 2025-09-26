@@ -39,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
             'primary' => Color::Zinc,
         ]);
 
-        Gate::before(function (?User $user = null): ?bool {
+        Gate::before(function (?User $user = null) {
             if ($user?->hasRole('super-admin') === true) {
                 return true;
             }

@@ -30,6 +30,8 @@ class ClientInfolist
                         IconEntry::make('revoked')
                             ->columnSpanFull()
                             ->boolean(),
+                        TextEntry::make('grant_types')
+                            ->badge(),
                         TextEntry::make('created_at')
                             ->dateTime(),
                         TextEntry::make('updated_at')
@@ -39,14 +41,17 @@ class ClientInfolist
                     ->columnSpanFull()
                     ->schema([
                         TextEntry::make('authorize')
+                            ->badge()
                             ->copyable()
-                            ->getStateUsing(fn (): string => route('passport.authorizations.authorize')),
+                            ->state(fn (): string => route('passport.authorizations.authorize')),
                         TextEntry::make('token')
+                            ->badge()
                             ->copyable()
-                            ->getStateUsing(fn (): string => route('passport.token')),
+                            ->state(fn (): string => route('passport.token')),
                         TextEntry::make('refresh')
+                            ->badge()
                             ->copyable()
-                            ->getStateUsing(fn (): string => route('passport.token.refresh')),
+                            ->state(fn (): string => route('passport.token.refresh')),
                     ]),
             ]);
     }

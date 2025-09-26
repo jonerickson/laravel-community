@@ -5,6 +5,7 @@ import { AbstractBackgroundPattern } from '@/components/ui/abstract-background-p
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import WidgetLoading from '@/components/widget-loading';
+import { stripCharacters } from '@/utils/truncate';
 import { Deferred, Link, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
@@ -22,7 +23,7 @@ import {
 } from 'lucide-react';
 
 interface HomeProps {
-    subscriptions: App.Data.SubscriptionData[];
+    subscriptions: App.Data.ProductData[];
 }
 
 export default function Home({ subscriptions = [] }: HomeProps) {
@@ -273,8 +274,8 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                         <Deferred data="subscriptions" fallback={<WidgetLoading />}>
                             <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
                                 {subscriptions.map((subscription) => {
-                                    const defaultPrice = subscription.activePrices.find((price) => price.isDefault) ||
-                                        subscription.activePrices[0] || {
+                                    const defaultPrice = subscription.prices.find((price: App.Data.PriceData) => price.isDefault) ||
+                                        subscription.prices[0] || {
                                             amount: 0,
                                             interval: 'month',
                                         };
@@ -283,11 +284,11 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                                         <Card key={subscription.id} className="flex flex-col justify-between">
                                             <CardHeader>
                                                 <CardTitle>{subscription.name}</CardTitle>
-                                                <CardDescription>{subscription.description}</CardDescription>
+                                                <CardDescription>{stripCharacters(subscription.description)}</CardDescription>
                                                 {defaultPrice && (
                                                     <div className="mt-4 text-3xl font-bold">
                                                         ${(defaultPrice.amount / 100).toFixed(0)}
-                                                        <span className="text-lg font-normal text-muted-foreground">/{defaultPrice.interval}</span>
+                                                        <span className="text-lg font-normal text-muted-foreground"> / {defaultPrice.interval}</span>
                                                     </div>
                                                 )}
                                             </CardHeader>

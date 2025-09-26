@@ -7,10 +7,12 @@ namespace App\Drivers\Payments;
 use App\Contracts\PaymentProcessor;
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
+use App\Data\ProductData;
 use App\Data\SubscriptionData;
 use App\Enums\OrderRefundReason;
 use App\Enums\OrderStatus;
 use App\Enums\SubscriptionInterval;
+use App\Enums\SubscriptionStatus;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Price;
@@ -25,6 +27,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use Laravel\Cashier\Subscription;
 use Laravel\Cashier\SubscriptionBuilder;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Stripe;
@@ -490,16 +493,58 @@ class StripeDriver implements PaymentProcessor
             return null;
         }
 
-        if (! $price = Price::query()->where('external_price_id', $subscription->stripe_price)->first()) {
-            return null;
+        $externalProductId = data_get($subscription->items->firstWhere('stripe_price', $subscription->stripe_price), 'stripe_product');
+
+        return SubscriptionData::from([
+            'name' => $subscription->type,
+            'status' => $subscription->canceled() ? SubscriptionStatus::Cancelled :
+                       ($subscription->active() ? SubscriptionStatus::Active : SubscriptionStatus::Pending),
+            'trialEndsAt' => $subscription->trial_ends_at?->toImmutable(),
+            'endsAt' => $subscription->ends_at?->toImmutable(),
+            'createdAt' => $subscription->created_at?->toImmutable(),
+            'updatedAt' => $subscription->updated_at?->toImmutable(),
+            'product' => ProductData::from(Product::query()->where('external_product_id', $externalProductId)->first()),
+            'externalSubscriptionId' => $subscription->stripe_id,
+            'externalProductId' => $externalProductId,
+            'externalPriceId' => $subscription->stripe_price,
+            'quantity' => $subscription->quantity,
+        ]);
+    }
+
+    public function listSubscriptions(User $user, array $filters = []): Collection
+    {
+        $subscriptions = $user->subscriptions();
+
+        if (isset($filters['limit'])) {
+            $subscriptions = $subscriptions->limit($filters['limit']);
         }
 
-        $subscriptionData = SubscriptionData::from($price->product);
-        $subscriptionData->current = true;
-        $subscriptionData->trialEndsAt = $subscription->trial_ends_at?->toImmutable();
-        $subscriptionData->endsAt = $subscription->ends_at?->toImmutable();
+        if (isset($filters['active']) && $filters['active']) {
+            $subscriptions = $subscriptions->active();
+        }
 
-        return $subscriptionData;
+        $subscriptionModels = $subscriptions->get();
+
+        $subscriptionData = $subscriptionModels->map(function (Subscription $subscription) {
+            $externalProductId = data_get($subscription->items->firstWhere('stripe_price', $subscription->stripe_price), 'stripe_product');
+
+            return SubscriptionData::from([
+                'name' => $subscription->type,
+                'status' => $subscription->canceled() ? SubscriptionStatus::Cancelled :
+                           ($subscription->active() ? SubscriptionStatus::Active : SubscriptionStatus::Pending),
+                'trialEndsAt' => $subscription->trial_ends_at?->toImmutable(),
+                'endsAt' => $subscription->ends_at?->toImmutable(),
+                'createdAt' => $subscription->created_at?->toImmutable(),
+                'updatedAt' => $subscription->updated_at?->toImmutable(),
+                'product' => ProductData::from(Product::query()->where('external_product_id', $externalProductId)->first()),
+                'externalSubscriptionId' => $subscription->stripe_id,
+                'externalProductId' => $externalProductId,
+                'externalPriceId' => $subscription->stripe_price,
+                'quantity' => $subscription->quantity,
+            ]);
+        })->filter()->values();
+
+        return new Collection($subscriptionData->all());
     }
 
     public function getCheckoutUrl(User $user, Order $order): bool|string

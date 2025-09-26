@@ -26,11 +26,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface SubscriptionsProps {
-    subscriptionProducts: App.Data.SubscriptionData[];
+    subscriptionProducts: App.Data.ProductData[];
     currentSubscription: App.Data.SubscriptionData | null;
 }
 
-const getIconForPlan = (plan: App.Data.SubscriptionData): React.ElementType => {
+const getIconForPlan = (plan: App.Data.ProductData): React.ElementType => {
     const planName = plan.name.toLowerCase();
     if (planName.includes('starter') || planName.includes('basic')) return Star;
     if (planName.includes('professional') || planName.includes('pro')) return Zap;
@@ -38,7 +38,7 @@ const getIconForPlan = (plan: App.Data.SubscriptionData): React.ElementType => {
     return Rocket;
 };
 
-const getColorForPlan = (plan: App.Data.SubscriptionData): string => {
+const getColorForPlan = (plan: App.Data.ProductData): string => {
     const planName = plan.name.toLowerCase();
     if (planName.includes('starter') || planName.includes('basic')) return 'from-blue-500 to-blue-600';
     if (planName.includes('professional') || planName.includes('pro')) return 'from-purple-500 to-purple-600';
@@ -47,7 +47,7 @@ const getColorForPlan = (plan: App.Data.SubscriptionData): string => {
 };
 
 interface PricingCardProps {
-    plan: App.Data.SubscriptionData;
+    plan: App.Data.ProductData;
     billingCycle: App.Enums.SubscriptionInterval;
     onSubscribe: (planId: number | null, priceId: number | null) => void;
     onCancel: (priceId: number) => void;
@@ -77,12 +77,12 @@ function PricingCard({
 }: PricingCardProps) {
     const Icon = getIconForPlan(plan);
     const color = getColorForPlan(plan);
-    const priceData = plan.activePrices.find((price) => price.interval === billingCycle);
+    const priceData = plan.prices.find((price: App.Data.PriceData) => price.interval === billingCycle);
     const price = priceData ? priceData.amount : 0;
     const priceId = priceData?.id || null;
 
-    const monthlyPrice = plan.activePrices.find((price) => price.interval === 'month');
-    const yearlyPrice = plan.activePrices.find((price) => price.interval === 'year');
+    const monthlyPrice = plan.prices.find((price: App.Data.PriceData) => price.interval === 'month');
+    const yearlyPrice = plan.prices.find((price: App.Data.PriceData) => price.interval === 'year');
     const yearlyDiscount =
         billingCycle === 'year' && monthlyPrice && yearlyPrice ? Math.round((1 - yearlyPrice.amount / 12 / monthlyPrice.amount) * 100) : 0;
 
@@ -277,7 +277,7 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
     });
 
     const availableIntervals = Object.values(['day', 'week', 'month', 'year']).filter((cycle) => {
-        return subscriptionProducts.some((plan) => plan.activePrices.some((price) => price.interval === cycle));
+        return subscriptionProducts.some((plan) => plan.prices.some((price: App.Data.PriceData) => price.interval === cycle));
     });
 
     const handlePolicyAgreementChange = (planId: number, agreed: boolean) => {
@@ -293,9 +293,9 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
             return;
         }
 
-        if (currentSubscription && currentSubscription.id !== planId) {
+        if (currentSubscription) {
             const plan = subscriptionProducts.find((p) => p.id === planId);
-            if (plan) {
+            if (plan && currentSubscription.externalProductId !== plan.externalProductId) {
                 setPendingChangePlan({ planId, priceId, planName: plan.name });
                 setShowChangeDialog(true);
                 return;
@@ -406,10 +406,10 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
                             </div>
                         )}
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                            {subscriptionProducts.map((plan: App.Data.SubscriptionData) => {
-                                const priceData = plan.activePrices.find((price) => price.interval === billingCycle);
+                            {subscriptionProducts.map((plan: App.Data.ProductData) => {
+                                const priceData = plan.prices.find((price: App.Data.PriceData) => price.interval === billingCycle);
                                 const priceId = priceData?.id || null;
-                                const isCurrentPlan = currentSubscription?.id === plan.id;
+                                const isCurrentPlan = currentSubscription?.externalProductId === plan.externalProductId;
                                 const isSubscribing = processingPriceId === priceId && priceId !== null;
                                 const isCancelling = cancellingPriceId === priceId && priceId !== null;
                                 const isContinuing = continuingPriceId === priceId && priceId !== null;

@@ -43,6 +43,8 @@ use Laravel\Passport\HasApiTokens;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
+use function Illuminate\Events\queueable;
+
 /**
  * @property int $id
  * @property string $reference_id
@@ -270,6 +272,32 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         )->shouldCache();
     }
 
+    public function stripeName(): string
+    {
+        return $this->name;
+    }
+
+    public function stripeEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function stripeAddress(): array
+    {
+        if (blank($this->billing_address)) {
+            return [];
+        }
+
+        return [
+            'city' => $this->billing_city,
+            'country' => $this->billing_country,
+            'line1' => $this->billing_address,
+            'line2' => $this->billing_address_line_2,
+            'postal_code' => $this->billing_postal_code,
+            'state' => $this->billing_state,
+        ];
+    }
+
     public function getLoggedAttributes(): array
     {
         return [
@@ -289,6 +317,15 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     public function getActivityLogName(): string
     {
         return 'user';
+    }
+
+    protected static function booted(): void
+    {
+        static::updated(queueable(function (User $customer) {
+            if ($customer->hasStripeId()) {
+                $customer->syncStripeCustomerDetails();
+            }
+        }));
     }
 
     protected function getDefaultGuardName(): string

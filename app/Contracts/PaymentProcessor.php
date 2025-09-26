@@ -53,6 +53,8 @@ interface PaymentProcessor
 
     public function currentSubscription(User $user): ?SubscriptionData;
 
+    public function listSubscriptions(User $user, array $filters = []): Collection;
+
     public function getCheckoutUrl(User $user, Order $order): bool|string;
 
     public function processCheckoutSuccess(Request $request, Order $order): bool;

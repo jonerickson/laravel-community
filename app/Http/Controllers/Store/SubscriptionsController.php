@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Store;
 
-use App\Data\SubscriptionData;
+use App\Data\ProductData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Store\SubscriptionCancelRequest;
 use App\Http\Requests\Store\SubscriptionCheckoutRequest;
@@ -31,7 +31,7 @@ class SubscriptionsController extends Controller
 
         $subscriptions = Product::query()
             ->subscriptions()
-            ->with('activePrices')
+            ->with('prices')
             ->with('categories')
             ->with('policies.category')
             ->orderBy('name')
@@ -40,7 +40,7 @@ class SubscriptionsController extends Controller
             ->values();
 
         return Inertia::render('store/subscriptions', [
-            'subscriptionProducts' => SubscriptionData::collect($subscriptions),
+            'subscriptionProducts' => ProductData::collect($subscriptions),
             'currentSubscription' => $user ? $this->paymentManager->currentSubscription($user) : null,
         ]);
     }
