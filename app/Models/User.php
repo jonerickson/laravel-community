@@ -8,6 +8,7 @@ use App\Enums\OrderStatus;
 use App\Events\UserCreated;
 use App\Events\UserDeleted;
 use App\Events\UserUpdated;
+use App\Managers\PaymentManager;
 use App\Traits\HasAvatar;
 use App\Traits\HasEmailAuthentication;
 use App\Traits\HasGroups;
@@ -42,8 +43,6 @@ use Laravel\Passport\Contracts\OAuthenticatable;
 use Laravel\Passport\HasApiTokens;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
-
-use function Illuminate\Events\queueable;
 
 /**
  * @property int $id
@@ -197,14 +196,6 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         'pm_type',
         'pm_last_four',
         'pm_expiration',
-        'extra_billing_information',
-        'billing_address',
-        'billing_address_line_2',
-        'billing_city',
-        'billing_state',
-        'billing_postal_code',
-        'billing_country',
-        'vat_id',
     ];
 
     protected $appends = [
@@ -321,11 +312,21 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
 
     protected static function booted(): void
     {
-        static::updated(queueable(function (User $customer) {
-            if ($customer->hasStripeId()) {
-                $customer->syncStripeCustomerDetails();
+        static::updated(function (User $user) {
+            if (! $user->hasStripeId() || ! $user->isDirty([
+                'name',
+                'email',
+                'billing_address',
+                'billing_address_line_2',
+                'billing_city',
+                'billing_state',
+                'billing_postal_code',
+            ])) {
+                return;
             }
-        }));
+
+            app(PaymentManager::class)->syncCustomerInformation($user);
+        });
     }
 
     protected function getDefaultGuardName(): string

@@ -146,6 +146,11 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->cancelOrder($order);
     }
 
+    public function syncCustomerInformation(User $user): bool
+    {
+        return $this->driver()->syncCustomerInformation($user);
+    }
+
     protected function createStripeDriver(): PaymentProcessor
     {
         $stripeSecret = $this->config->get('services.stripe.secret');

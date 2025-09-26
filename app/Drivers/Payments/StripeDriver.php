@@ -13,6 +13,7 @@ use App\Enums\OrderRefundReason;
 use App\Enums\OrderStatus;
 use App\Enums\SubscriptionInterval;
 use App\Enums\SubscriptionStatus;
+use App\Jobs\Stripe\UpdateCustomerInformation;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Price;
@@ -730,6 +731,13 @@ class StripeDriver implements PaymentProcessor
         $order->update([
             'status' => OrderStatus::Cancelled,
         ]);
+
+        return true;
+    }
+
+    public function syncCustomerInformation(User $user): bool
+    {
+        UpdateCustomerInformation::dispatchIf($user->hasStripeId(), $user);
 
         return true;
     }

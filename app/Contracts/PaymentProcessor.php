@@ -64,4 +64,6 @@ interface PaymentProcessor
     public function refundOrder(Order $order, OrderRefundReason $reason, ?string $notes = null): bool;
 
     public function cancelOrder(Order $order): bool;
+
+    public function syncCustomerInformation(User $user): bool;
 }
