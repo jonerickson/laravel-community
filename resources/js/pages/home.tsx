@@ -2,9 +2,11 @@ import { AppFooter } from '@/components/app-footer';
 import { AppHeader } from '@/components/app-header';
 import HeadingLarge from '@/components/heading-large';
 import { AbstractBackgroundPattern } from '@/components/ui/abstract-background-pattern';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import WidgetLoading from '@/components/widget-loading';
+import { cn } from '@/lib/utils';
 import { stripCharacters } from '@/utils/truncate';
 import { Deferred, Link, usePage } from '@inertiajs/react';
 import {
@@ -281,7 +283,17 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                                         };
 
                                     return (
-                                        <Card key={subscription.id} className="flex flex-col justify-between">
+                                        <Card
+                                            key={subscription.id}
+                                            className={cn('relative flex flex-col justify-between', subscription.isFeatured && 'ring-2 ring-info')}
+                                        >
+                                            {subscription.isFeatured && (
+                                                <div className="absolute -top-4 left-1/2 z-10 -translate-x-1/2">
+                                                    <Badge variant="default" className="bg-info text-info-foreground">
+                                                        Featured
+                                                    </Badge>
+                                                </div>
+                                            )}
                                             <CardHeader>
                                                 <CardTitle>{subscription.name}</CardTitle>
                                                 <CardDescription>{stripCharacters(subscription.description)}</CardDescription>

@@ -7,6 +7,7 @@ import { StoreProductReviewsList } from '@/components/store-product-reviews-list
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { pluralize } from '@/lib/utils';
 import { Deferred, useForm, usePage } from '@inertiajs/react';
 import { ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -87,7 +88,9 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                         <Deferred fallback={<div className="text-sm text-primary">Loading reviews...</div>} data="reviews">
                             <Dialog open={isRatingModalOpen} onOpenChange={setIsRatingModalOpen}>
                                 <DialogTrigger asChild>
-                                    <button className="text-sm text-primary hover:underline">See all {productData.reviewsCount || 0} reviews</button>
+                                    <button className="text-sm text-primary hover:underline">
+                                        See all {productData.reviewsCount || 0} {pluralize('review', productData.reviewsCount || 0)}
+                                    </button>
                                 </DialogTrigger>
                                 <DialogContent className="max-h-[80vh] min-w-[90vh] overflow-y-auto">
                                     <DialogHeader>

@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
+import { cn } from '@/lib/utils';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { Check, Crown, Package, RefreshCw, Rocket, Shield, Star, Users, X, Zap } from 'lucide-react';
@@ -84,10 +85,26 @@ function PricingCard({
     const monthlyPrice = plan.prices.find((price: App.Data.PriceData) => price.interval === 'month');
     const yearlyPrice = plan.prices.find((price: App.Data.PriceData) => price.interval === 'year');
     const yearlyDiscount =
-        billingCycle === 'year' && monthlyPrice && yearlyPrice ? Math.round((1 - yearlyPrice.amount / 12 / monthlyPrice.amount) * 100) : 0;
+        billingCycle === 'year' && monthlyPrice && yearlyPrice
+            ? Math.round((1 - yearlyPrice.amount / 100 / 12 / (monthlyPrice.amount / 100)) * 100)
+            : 0;
 
     return (
-        <Card className={`relative flex w-full max-w-sm flex-col ${isCurrentPlan ? 'ring-2 ring-success' : ''}`}>
+        <Card className={cn('relative flex w-full flex-col', isCurrentPlan && 'ring-2 ring-success', plan.isFeatured && 'ring-2 ring-info')}>
+            {plan.isFeatured && (
+                <div className="absolute -top-4 left-1/2 z-10 -translate-x-1/2">
+                    <Badge variant="default" className="bg-info text-info-foreground">
+                        Featured
+                    </Badge>
+                </div>
+            )}
+            {isCurrentPlan && (
+                <div className="absolute -top-4 left-1/2 z-10 -translate-x-1/2">
+                    <Badge variant="default" className="bg-success text-success-foreground">
+                        Current
+                    </Badge>
+                </div>
+            )}
             <CardHeader className="pb-4 text-center">
                 <div className={`mx-auto mb-4 rounded-full bg-gradient-to-r p-3 ${color} w-fit text-white`}>
                     <Icon className="h-8 w-8" />
@@ -99,7 +116,7 @@ function PricingCard({
 
                 <div className="mt-6">
                     <div className="flex items-baseline justify-center">
-                        <span className="text-4xl font-bold">${price}</span>
+                        <span className="text-4xl font-bold">${(price / 100).toFixed(2)}</span>
                         <span className="ml-1 text-muted-foreground">/ {billingCycle}</span>
                     </div>
                     {billingCycle === 'year' && yearlyDiscount > 0 && (
@@ -383,7 +400,7 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
             <Head title="Subscriptions" />
 
             <div className="mx-auto max-w-7xl py-4">
-                <div className="mb-12 text-center">
+                <div className="mb-8 text-center">
                     <Heading
                         title="Choose your plan"
                         description="Select the perfect subscription plan for your needs. Upgrade or downgrade anytime."
@@ -391,9 +408,9 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
                 </div>
 
                 {subscriptionProducts.length > 0 ? (
-                    <div className="flex flex-col gap-8">
+                    <div className="flex flex-col gap-6">
                         {availableIntervals.length > 1 && (
-                            <div className="flex justify-center">
+                            <div className="flex justify-center pb-4">
                                 <Tabs value={billingCycle} onValueChange={(value) => setBillingCycle(value as App.Enums.SubscriptionInterval)}>
                                     <TabsList className={`grid w-full max-w-2xl grid-cols-${availableIntervals.length}`}>
                                         {availableIntervals.map((interval) => (
@@ -405,7 +422,7 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
                                 </Tabs>
                             </div>
                         )}
-                        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {subscriptionProducts.map((plan: App.Data.ProductData) => {
                                 const priceData = plan.prices.find((price: App.Data.PriceData) => price.interval === billingCycle);
                                 const priceId = priceData?.id || null;
