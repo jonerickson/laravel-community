@@ -6,6 +6,8 @@ namespace App\Contracts;
 
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
+use App\Data\PriceData;
+use App\Data\ProductData;
 use App\Data\SubscriptionData;
 use App\Enums\OrderRefundReason;
 use App\Models\Order;
@@ -17,31 +19,40 @@ use Illuminate\Http\Request;
 
 interface PaymentProcessor
 {
-    public function createProduct(Product $product): Product;
+    public function createProduct(Product $product): ProductData;
 
-    public function getProduct(Product $product): Product;
+    public function getProduct(Product $product): ProductData;
 
-    public function updateProduct(Product $product): Product;
+    public function updateProduct(Product $product): ?ProductData;
 
     public function deleteProduct(Product $product): bool;
 
-    public function listProducts(array $filters = []): Collection;
+    /**
+     * @return Collection<int, ProductData>
+     */
+    public function listProducts(array $filters = []): mixed;
 
-    public function createPrice(Product $product, Price $price): Price;
+    public function createPrice(Product $product, Price $price): PriceData;
 
-    public function updatePrice(Product $product, Price $price): Price;
+    public function updatePrice(Product $product, Price $price): ?PriceData;
 
     public function deletePrice(Product $product, Price $price): bool;
 
-    public function listPrices(Product $product, array $filters = []): Collection;
+    /**
+     * @return Collection<int, PriceData>
+     */
+    public function listPrices(Product $product, array $filters = []): mixed;
 
     public function findInvoice(Order $order): ?InvoiceData;
 
     public function createPaymentMethod(User $user, string $paymentMethodId): PaymentMethodData;
 
-    public function getPaymentMethods(User $user): Collection;
+    /**
+     * @return Collection<int, PaymentMethodData>
+     */
+    public function listPaymentMethods(User $user): mixed;
 
-    public function updatePaymentMethod(User $user, string $paymentMethodId, bool $isDefault): bool;
+    public function updatePaymentMethod(User $user, string $paymentMethodId, bool $isDefault): ?PaymentMethodData;
 
     public function deletePaymentMethod(User $user, string $paymentMethodId): bool;
 
@@ -53,7 +64,10 @@ interface PaymentProcessor
 
     public function currentSubscription(User $user): ?SubscriptionData;
 
-    public function listSubscriptions(User $user, array $filters = []): Collection;
+    /**
+     * @return Collection<int, SubscriptionData>
+     */
+    public function listSubscriptions(User $user, array $filters = []): mixed;
 
     public function getCheckoutUrl(Order $order): bool|string;
 

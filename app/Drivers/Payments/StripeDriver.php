@@ -10,11 +10,9 @@ use App\Data\PaymentMethodData;
 use App\Data\PriceData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
-use App\Data\UserData;
 use App\Enums\OrderRefundReason;
 use App\Enums\OrderStatus;
 use App\Enums\SubscriptionInterval;
-use App\Enums\SubscriptionStatus;
 use App\Jobs\Stripe\UpdateCustomerInformation;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -67,7 +65,7 @@ class StripeDriver implements PaymentProcessor
     /**
      * @throws ApiErrorException
      */
-    public function createProduct(Product $product): Product
+    public function createProduct(Product $product): ProductData
     {
         $stripeProduct = $this->stripe->products->create([
             'name' => $product->name,
@@ -86,23 +84,23 @@ class StripeDriver implements PaymentProcessor
             'external_product_id' => $stripeProduct->id,
         ]);
 
-        return $product;
+        return ProductData::from($product);
     }
 
     /**
      * @throws ApiErrorException
      */
-    public function getProduct(Product $product): Product
+    public function getProduct(Product $product): ProductData
     {
         $this->stripe->products->retrieve($product->external_product_id);
 
-        return $product;
+        return ProductData::from($product);
     }
 
     /**
      * @throws ApiErrorException
      */
-    public function updateProduct(Product $product): Product
+    public function updateProduct(Product $product): ?ProductData
     {
         $this->stripe->products->update($product->external_product_id, [
             'name' => $product->name,
@@ -115,7 +113,7 @@ class StripeDriver implements PaymentProcessor
             'idempotency_key' => $this->getIdempotencyKey(),
         ]);
 
-        return $product;
+        return ProductData::from($product);
     }
 
     /**
@@ -138,7 +136,10 @@ class StripeDriver implements PaymentProcessor
         return true;
     }
 
-    public function listProducts(array $filters = []): Collection
+    /**
+     * @return Collection<int, ProductData>
+     */
+    public function listProducts(array $filters = []): mixed
     {
         $query = Product::query()->whereNotNull('external_product_id');
 
@@ -146,14 +147,14 @@ class StripeDriver implements PaymentProcessor
             $query->limit($filters['limit']);
         }
 
-        return $query->get();
+        return ProductData::collect($query->get());
     }
 
     /**
      * @throws ApiErrorException
      * @throws Exception
      */
-    public function createPrice(Product $product, Price $price): Price
+    public function createPrice(Product $product, Price $price): PriceData
     {
         if (! $product->external_product_id) {
             throw new Exception('Product must have an external price ID to update.');
@@ -185,17 +186,17 @@ class StripeDriver implements PaymentProcessor
             'external_price_id' => $stripePrice->id,
         ]);
 
-        return $price;
+        return PriceData::from($price);
     }
 
     /**
      * @throws ApiErrorException
      * @throws Exception
      */
-    public function updatePrice(Product $product, Price $price): Price
+    public function updatePrice(Product $product, Price $price): ?PriceData
     {
         if (! $price->external_price_id) {
-            throw new Exception('Product must have an external price ID to update.');
+            return null;
         }
 
         $this->stripe->prices->update($price->external_price_id, [
@@ -208,7 +209,7 @@ class StripeDriver implements PaymentProcessor
             'idempotency_key' => $this->getIdempotencyKey(),
         ]);
 
-        return $price;
+        return PriceData::from($price);
     }
 
     /**
@@ -234,10 +235,12 @@ class StripeDriver implements PaymentProcessor
     }
 
     /**
+     * @return Collection<int, PriceData>
+     *
      * @throws ApiErrorException
      * @throws Exception
      */
-    public function listPrices(Product $product, array $filters = []): Collection
+    public function listPrices(Product $product, array $filters = []): mixed
     {
         if (! $product->external_product_id) {
             throw new Exception('Product must have an external product ID to list prices.');
@@ -313,49 +316,28 @@ class StripeDriver implements PaymentProcessor
 
     public function createPaymentMethod(User $user, string $paymentMethodId): PaymentMethodData
     {
-        $paymentMethod = $user->addPaymentMethod($paymentMethodId);
-
-        return PaymentMethodData::from([
-            'id' => $paymentMethod->id,
-            'type' => $paymentMethod->type,
-            'brand' => $paymentMethod->card->brand ?? null,
-            'last4' => $paymentMethod->card->last4 ?? null,
-            'exp_month' => $paymentMethod->card->exp_month ?? null,
-            'exp_year' => $paymentMethod->card->exp_year ?? null,
-            'holder_name' => $paymentMethod->billing_details->name ?? null,
-            'email' => $paymentMethod->billing_details->email ?? null,
-            'is_default' => $user->defaultPaymentMethod()?->id === $paymentMethod->id,
-        ]);
+        return PaymentMethodData::from($user->addPaymentMethod($paymentMethodId));
     }
 
-    public function getPaymentMethods(User $user): Collection
+    /**
+     * @return Collection<int, PaymentMethodData>
+     */
+    public function listPaymentMethods(User $user): mixed
     {
-        $paymentMethods = $user->paymentMethods()->map(fn ($paymentMethod): PaymentMethodData => PaymentMethodData::from([
-            'id' => $paymentMethod->id,
-            'type' => $paymentMethod->type,
-            'brand' => $paymentMethod->card->brand ?? null,
-            'last4' => $paymentMethod->card->last4 ?? null,
-            'exp_month' => $paymentMethod->card->exp_month ?? null,
-            'exp_year' => $paymentMethod->card->exp_year ?? null,
-            'holder_name' => $paymentMethod->billing_details->name ?? null,
-            'holder_email' => $paymentMethod->billing_details->email ?? null,
-            'is_default' => $user->defaultPaymentMethod()?->id === $paymentMethod->id,
-        ]));
-
-        return new Collection($paymentMethods->all());
+        return PaymentMethodData::collect($user->paymentMethods());
     }
 
-    public function updatePaymentMethod(User $user, string $paymentMethodId, bool $isDefault): bool
+    public function updatePaymentMethod(User $user, string $paymentMethodId, bool $isDefault): ?PaymentMethodData
     {
-        if (! $user->findPaymentMethod($paymentMethodId)) {
-            return false;
+        if (! $paymentMethod = $user->findPaymentMethod($paymentMethodId)) {
+            return null;
         }
 
         if ($isDefault) {
             $user->updateDefaultPaymentMethod($paymentMethodId);
         }
 
-        return true;
+        return PaymentMethodData::from($paymentMethod);
     }
 
     public function deletePaymentMethod(User $user, string $paymentMethodId): bool
@@ -452,21 +434,7 @@ class StripeDriver implements PaymentProcessor
             return $result->url;
         }
 
-        return SubscriptionData::from([
-            'name' => $result->type,
-            'user' => UserData::from($result->user),
-            'status' => SubscriptionStatus::tryFrom($result->stripe_status),
-            'trialEndsAt' => $result->trial_ends_at?->toImmutable(),
-            'endsAt' => $result->ends_at?->toImmutable(),
-            'createdAt' => $result->created_at?->toImmutable(),
-            'updatedAt' => $result->updated_at?->toImmutable(),
-            'price' => PriceData::from($price = Price::query()->where('external_price_id', $result->stripe_price)->first()),
-            'product' => ProductData::from($product = $price?->product),
-            'externalSubscriptionId' => $result->stripe_id,
-            'externalProductId' => $product?->external_product_id,
-            'externalPriceId' => $result->stripe_price,
-            'quantity' => $result->quantity,
-        ]);
+        return SubscriptionData::from($result);
     }
 
     public function cancelSubscription(User $user, bool $cancelNow = false): bool
@@ -517,24 +485,13 @@ class StripeDriver implements PaymentProcessor
             return null;
         }
 
-        return SubscriptionData::from([
-            'name' => $subscription->type,
-            'user' => UserData::from($subscription->user),
-            'status' => SubscriptionStatus::tryFrom($subscription->stripe_status),
-            'trialEndsAt' => $subscription->trial_ends_at?->toImmutable(),
-            'endsAt' => $subscription->ends_at?->toImmutable(),
-            'createdAt' => $subscription->created_at?->toImmutable(),
-            'updatedAt' => $subscription->updated_at?->toImmutable(),
-            'price' => PriceData::from($price = Price::query()->where('external_price_id', $subscription->stripe_price)->first()),
-            'product' => ProductData::from($product = $price?->product),
-            'externalSubscriptionId' => $subscription->stripe_id,
-            'externalProductId' => $product?->external_product_id,
-            'externalPriceId' => $subscription->stripe_price,
-            'quantity' => $subscription->quantity,
-        ]);
+        return SubscriptionData::from($subscription);
     }
 
-    public function listSubscriptions(User $user, array $filters = []): Collection
+    /**
+     * @return Collection<int, SubscriptionData>
+     */
+    public function listSubscriptions(User $user, array $filters = []): mixed
     {
         $subscriptions = $user->subscriptions();
 
@@ -546,29 +503,7 @@ class StripeDriver implements PaymentProcessor
             $subscriptions = $subscriptions->active();
         }
 
-        $subscriptionModels = $subscriptions->get();
-
-        $subscriptionData = $subscriptionModels->map(function (Subscription $subscription) {
-            $externalProductId = data_get($subscription->items->firstWhere('stripe_price', $subscription->stripe_price), 'stripe_product');
-
-            return SubscriptionData::from([
-                'name' => $subscription->type,
-                'user' => UserData::from($subscription->user),
-                'status' => SubscriptionStatus::tryFrom($subscription->stripe_status),
-                'trialEndsAt' => $subscription->trial_ends_at?->toImmutable(),
-                'endsAt' => $subscription->ends_at?->toImmutable(),
-                'createdAt' => $subscription->created_at?->toImmutable(),
-                'updatedAt' => $subscription->updated_at?->toImmutable(),
-                'price' => PriceData::from($price = Price::query()->where('external_price_id', $subscription->stripe_price)->first()),
-                'product' => ProductData::from($product = $price?->product),
-                'externalSubscriptionId' => $subscription->stripe_id,
-                'externalProductId' => $product?->external_product_id,
-                'externalPriceId' => $subscription->stripe_price,
-                'quantity' => $subscription->quantity,
-            ]);
-        })->filter()->values();
-
-        return new Collection($subscriptionData->all());
+        return SubscriptionData::collect($subscriptions->get());
     }
 
     public function getCheckoutUrl(Order $order): bool|string
@@ -633,7 +568,7 @@ class StripeDriver implements PaymentProcessor
                 ],
             ],
             'payment_intent_data' => [
-                'receipt_email' => $user->email,
+                'receipt_email' => $order->user->email,
                 'metadata' => $metadata,
             ],
         ])->asStripeCheckoutSession();

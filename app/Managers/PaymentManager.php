@@ -7,6 +7,8 @@ namespace App\Managers;
 use App\Contracts\PaymentProcessor;
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
+use App\Data\PriceData;
+use App\Data\ProductData;
 use App\Data\SubscriptionData;
 use App\Drivers\Payments\StripeDriver;
 use App\Enums\OrderRefundReason;
@@ -26,17 +28,17 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->config->get('payment.default', 'stripe');
     }
 
-    public function createProduct(Product $product): Product
+    public function createProduct(Product $product): ProductData
     {
         return $this->driver()->createProduct($product);
     }
 
-    public function getProduct(Product $product): Product
+    public function getProduct(Product $product): ProductData
     {
         return $this->driver()->getProduct($product);
     }
 
-    public function updateProduct(Product $product): Product
+    public function updateProduct(Product $product): ?ProductData
     {
         return $this->driver()->updateProduct($product);
     }
@@ -46,7 +48,7 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deleteProduct($product);
     }
 
-    public function listProducts(array $filters = []): Collection
+    public function listProducts(array $filters = []): mixed
     {
         return $this->driver()->listProducts($filters);
     }
@@ -56,12 +58,12 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->findInvoice($order);
     }
 
-    public function createPrice(Product $product, Price $price): Price
+    public function createPrice(Product $product, Price $price): PriceData
     {
         return $this->driver()->createPrice($product, $price);
     }
 
-    public function updatePrice(Product $product, Price $price): Price
+    public function updatePrice(Product $product, Price $price): ?PriceData
     {
         return $this->driver()->updatePrice($product, $price);
     }
@@ -71,7 +73,7 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deletePrice($product, $price);
     }
 
-    public function listPrices(Product $product, array $filters = []): Collection
+    public function listPrices(Product $product, array $filters = []): mixed
     {
         return $this->driver()->listPrices($product, $filters);
     }
@@ -81,12 +83,12 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->createPaymentMethod($user, $paymentMethodId);
     }
 
-    public function getPaymentMethods(User $user): Collection
+    public function listPaymentMethods(User $user): mixed
     {
-        return $this->driver()->getPaymentMethods($user);
+        return $this->driver()->listPaymentMethods($user);
     }
 
-    public function updatePaymentMethod(User $user, string $paymentMethodId, bool $isDefault): bool
+    public function updatePaymentMethod(User $user, string $paymentMethodId, bool $isDefault): ?PaymentMethodData
     {
         return $this->driver()->updatePaymentMethod($user, $paymentMethodId, $isDefault);
     }

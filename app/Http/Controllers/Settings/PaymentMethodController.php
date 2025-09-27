@@ -26,7 +26,7 @@ class PaymentMethodController extends Controller
         $user = Auth::user();
 
         return Inertia::render('settings/payment-methods', [
-            'paymentMethods' => $this->paymentManager->getPaymentMethods($user),
+            'paymentMethods' => $this->paymentManager->listPaymentMethods($user),
         ]);
     }
 
@@ -66,7 +66,7 @@ class PaymentMethodController extends Controller
             isDefault: $validated['is_default']
         );
 
-        if (! $updated) {
+        if (blank($updated)) {
             return back()->with([
                 'message' => 'The payment method was not found. Please try again later.',
                 'messageVariant' => 'error',
@@ -90,7 +90,7 @@ class PaymentMethodController extends Controller
             paymentMethodId: $validated['method']
         );
 
-        if (! $deleted) {
+        if (blank($deleted)) {
             return back()->with([
                 'message' => 'The payment method was not found. Please try again later.',
                 'messageVariant' => 'error',

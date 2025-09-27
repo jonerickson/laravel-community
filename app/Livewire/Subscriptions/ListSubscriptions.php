@@ -45,31 +45,25 @@ class ListSubscriptions extends Component implements HasActions, HasSchemas, Has
             ->description('The user\'s subscription history.')
             ->records(fn () => collect($this->records))
             ->columns([
-                TextColumn::make('name')
-                    ->searchable(),
-                TextColumn::make('product.name')
-                    ->searchable(),
+                TextColumn::make('name'),
+                TextColumn::make('product.name'),
                 TextColumn::make('status')
                     ->formatStateUsing(fn ($state) => SubscriptionStatus::tryFrom($state))
-                    ->badge()
-                    ->searchable(),
+                    ->badge(),
                 TextColumn::make('trialEndsAt')
                     ->label('Trial Ends At')
                     ->since()
                     ->dateTimeTooltip()
-                    ->placeholder('None')
-                    ->searchable(),
+                    ->placeholder('None'),
                 TextColumn::make('endsAt')
                     ->label('Ends At')
                     ->since()
                     ->dateTimeTooltip()
-                    ->placeholder('None')
-                    ->searchable(),
+                    ->placeholder('None'),
                 TextColumn::make('createdAt')
                     ->since()
                     ->dateTimeTooltip()
-                    ->label('Purchased On')
-                    ->sortable(),
+                    ->label('Purchased On'),
             ])
             ->headerActions([
                 SwapAction::make()

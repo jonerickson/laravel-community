@@ -45,13 +45,15 @@ class OrdersTable
                 TextColumn::make('items.product.name')
                     ->searchable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Order Placed At')
+                    ->since()
+                    ->dateTimeTooltip()
+                    ->sortable(),
                 TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Order Updated At')
+                    ->since()
+                    ->dateTimeTooltip()
+                    ->sortable(),
             ])
             ->filters([
                 //

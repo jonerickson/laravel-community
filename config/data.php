@@ -72,6 +72,8 @@ return [
      * every data object, unless overridden in a specific data object class.
      */
     'normalizers' => [
+        App\Data\Normalizers\Stripe\SubscriptionNormalizer::class,
+        App\Data\Normalizers\Stripe\PaymentMethodNormalizer::class,
         Spatie\LaravelData\Normalizers\ModelNormalizer::class,
         // Spatie\LaravelData\Normalizers\FormRequestNormalizer::class,
         Spatie\LaravelData\Normalizers\ArrayableNormalizer::class,

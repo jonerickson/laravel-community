@@ -10,6 +10,7 @@ use App\Filament\Admin\Resources\Users\Pages\ListUsers;
 use App\Filament\Admin\Resources\Users\RelationManagers\FingerprintsRelationManager;
 use App\Filament\Admin\Resources\Users\RelationManagers\OrdersRelationManager;
 use App\Filament\Admin\Resources\Users\RelationManagers\SocialsRelationManager;
+use App\Livewire\PaymentMethods\ListPaymentMethods;
 use App\Livewire\Subscriptions\ListSubscriptions;
 use App\Models\Fingerprint;
 use App\Models\Permission;
@@ -218,8 +219,15 @@ class UserResource extends Resource
                                     'pageClass' => EditUser::class,
                                 ]),
                             ]),
-                        Tabs\Tab::make('Subscriptions')
+                        Tabs\Tab::make('Payment Methods')
                             ->icon(Heroicon::OutlinedCreditCard)
+                            ->schema([
+                                Livewire::make(ListPaymentMethods::class, fn (User $record) => [
+                                    'record' => $record,
+                                ]),
+                            ]),
+                        Tabs\Tab::make('Subscriptions')
+                            ->icon(Heroicon::OutlinedArrowPath)
                             ->visibleOn('edit')
                             ->schema([
                                 Livewire::make(ListSubscriptions::class, fn (User $record) => [

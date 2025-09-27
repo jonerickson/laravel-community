@@ -1,5 +1,5 @@
 import { type BreadcrumbItem } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 
 import { DataTable } from '@/components/data-table';
 import { EmptyState } from '@/components/empty-state';
@@ -24,9 +24,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Orders() {
-    const { orders } = usePage<App.Data.SharedData>().props as unknown as { orders: App.Data.OrderData[] };
+interface OrdersProps {
+    orders: App.Data.OrderData[];
+}
 
+export default function Orders({ orders }: OrdersProps) {
     const copyToClipboard = async (text: string, label: string) => {
         try {
             await navigator.clipboard.writeText(text);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Settings;
 
 use App\Data\OrderData;
+use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +24,9 @@ class OrderController extends Controller
                 ->readyToView()
                 ->with(['items.product'])
                 ->latest()
-                ->get()),
+                ->get()
+                ->filter(fn (Order $order) => ! ($order->status === OrderStatus::Pending) || filled($order->checkout_url))
+                ->values()),
         ]);
     }
 }
