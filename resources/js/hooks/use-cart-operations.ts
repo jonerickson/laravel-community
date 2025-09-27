@@ -11,8 +11,9 @@ interface CartTotals {
 
 export function useCartOperations(initialItems: App.Data.CartItemData[] = []) {
     const [items, setItems] = useState<App.Data.CartItemData[]>(initialItems);
-    const [loading, setLoading] = useState<number | null>(null);
+    const [loading, setLoading] = useState<number | null | boolean>(null);
     const { execute: executeApiRequest } = useApiRequest<App.Data.CartData>();
+    const { execute: executeCheckout } = useApiRequest<App.Data.CheckoutData>();
 
     const updateQuantity = async (productId: number, quantity: number, priceId?: number | null) => {
         setLoading(productId);
@@ -42,9 +43,7 @@ export function useCartOperations(initialItems: App.Data.CartItemData[] = []) {
 
                     toast.success('Your cart has been successfully updated.');
                 },
-                onSettled: () => {
-                    setLoading(null);
-                },
+                onSettled: () => setLoading(null),
             },
         );
     };
@@ -77,9 +76,7 @@ export function useCartOperations(initialItems: App.Data.CartItemData[] = []) {
 
                     toast.success('The item has been successfully added to your cart.');
                 },
-                onSettled: () => {
-                    setLoading(null);
-                },
+                onSettled: () => setLoading(null),
             },
         );
     };
@@ -113,43 +110,24 @@ export function useCartOperations(initialItems: App.Data.CartItemData[] = []) {
                         }),
                     );
                 },
-                onSettled: () => {
-                    setLoading(null);
-                },
+                onSettled: () => setLoading(null),
             },
         );
     };
 
-    const clearCart = async () => {
-        if (!window.confirm('Are you sure you want to empty your entire cart?')) {
-            return;
-        }
+    const proceedToCheckout = async () => {
+        setLoading(true);
 
-        setLoading(-1);
-
-        await executeApiRequest(
+        await executeCheckout(
             {
-                url: route('api.cart.clear'),
-                method: 'DELETE',
+                url: route('api.checkout'),
+                method: 'POST',
             },
             {
                 onSuccess: (data) => {
-                    setItems(data.cartItems);
-
-                    window.dispatchEvent(
-                        new CustomEvent('cart-updated', {
-                            detail: {
-                                cartCount: data.cartCount,
-                                cartItems: data.cartItems,
-                            },
-                        }),
-                    );
-
-                    toast.success('Your cart has been cleared.');
+                    window.location.href = data.checkoutUrl;
                 },
-                onSettled: () => {
-                    setLoading(null);
-                },
+                onSettled: () => setLoading(null),
             },
         );
     };
@@ -173,10 +151,11 @@ export function useCartOperations(initialItems: App.Data.CartItemData[] = []) {
 
     return {
         items,
+        setItems,
         addItem,
         updateQuantity,
         removeItem,
-        clearCart,
+        proceedToCheckout,
         calculateTotals,
         loading,
     };

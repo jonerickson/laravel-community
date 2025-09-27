@@ -4,11 +4,10 @@ import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useApiRequest } from '@/hooks/use-api-request';
 import { useCartOperations } from '@/hooks/use-cart-operations';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { ImageIcon, ShoppingCart as ShoppingCartIcon, Trash2, XIcon } from 'lucide-react';
 import { useState } from 'react';
 
@@ -28,11 +27,31 @@ interface ShoppingCartProps {
 }
 
 export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
-    const { items, updateQuantity, removeItem, clearCart, calculateTotals, loading } = useCartOperations(cartItems);
-    const { loading: checkoutLoading, execute: executeCheckout } = useApiRequest<App.Data.CheckoutData>();
+    const { items, setItems, updateQuantity, removeItem, proceedToCheckout, calculateTotals, loading } = useCartOperations(cartItems);
     const [policiesAgreed, setPoliciesAgreed] = useState(false);
-
+    const { delete: clearCartForm, processing: clearCartProcessing } = useForm();
     const { subtotal, total } = calculateTotals();
+
+    const clearCart = () => {
+        if (!window.confirm('Are you sure you want to empty your cart? This action cannot be undone.')) {
+            return;
+        }
+
+        clearCartForm(route('store.cart.destroy'), {
+            onSuccess: () => {
+                setItems([]);
+
+                window.dispatchEvent(
+                    new CustomEvent('cart-updated', {
+                        detail: {
+                            cartCount: 0,
+                            cartItems: [],
+                        },
+                    }),
+                );
+            },
+        });
+    };
 
     const getAllPolicies = (): App.Data.PolicyData[] => {
         const allPolicies: App.Data.PolicyData[] = [];
@@ -65,20 +84,6 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
         removeItem(productId, item.name, priceId);
     };
 
-    const handleCheckout = async () => {
-        await executeCheckout(
-            {
-                url: route('api.checkout'),
-                method: 'POST',
-            },
-            {
-                onSuccess: (data) => {
-                    window.location.href = data.checkoutUrl;
-                },
-            },
-        );
-    };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Shopping cart" />
@@ -86,9 +91,9 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                 <div className="flex items-start justify-between">
                     <Heading title="Shopping cart" description={`${items.length} ${items.length === 1 ? 'item' : 'items'} in your cart`} />
                     {items.length > 0 && (
-                        <Button variant="outline" onClick={clearCart} disabled={loading === -1}>
+                        <Button variant="outline" onClick={clearCart} disabled={clearCartProcessing}>
                             <Trash2 className="mr-2 size-4" />
-                            {loading === -1 ? 'Clearing...' : 'Empty cart'}
+                            {clearCartProcessing ? 'Clearing...' : 'Empty cart'}
                         </Button>
                     )}
                 </div>
@@ -287,10 +292,10 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                             <div className="mt-2">
                                 <Button
                                     className="w-full"
-                                    onClick={handleCheckout}
-                                    disabled={checkoutLoading || (policies.length > 0 && !policiesAgreed)}
+                                    onClick={proceedToCheckout}
+                                    disabled={loading !== null || (policies.length > 0 && !policiesAgreed)}
                                 >
-                                    {checkoutLoading
+                                    {loading
                                         ? 'Processing...'
                                         : policies.length > 0 && !policiesAgreed
                                           ? 'Agree to Policies to Checkout'
