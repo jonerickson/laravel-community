@@ -20,15 +20,13 @@ class CheckBannedUser
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $fingerprintId = $request->header('X-Fingerprint-ID') ?? $request->cookie('fingerprint_id');
-
         $fingerprints = Fingerprint::query()
             ->when($request->user(), fn (Builder $query, User $user) => $query->whereBelongsTo($user))
-            ->when($fingerprintId, fn (Builder $query, string $fingerprintId) => $query->where('fingerprint_id', $fingerprintId))
+            ->when($request->fingerprintId(), fn (Builder $query, string $fingerprintId) => $query->where('fingerprint_id', $fingerprintId))
             ->get();
 
         foreach ($fingerprints as $fingerprint) {
-            throw_if($fingerprint->isBanned(), new BannedException(
+            throw_if($fingerprint->isBanned() && ! $request->routeIs('policies.*') && ! $request->routeIs('api.fingerprint'), new BannedException(
                 fingerprint: $fingerprint,
             ));
         }

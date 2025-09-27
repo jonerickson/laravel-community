@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -75,5 +76,13 @@ class AppServiceProvider extends ServiceProvider
                 'scopes' => $parameters['scopes'],
             ])
         );
+
+        Request::macro('fingerprintId', function (): string {
+            /** @var \Illuminate\Http\Request $request */
+            $request = app('request');
+
+            return $request->header('X-Fingerprint-ID')
+                ?? $request->cookie('fingerprint_id');
+        });
     }
 }

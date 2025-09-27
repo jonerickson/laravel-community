@@ -29,13 +29,6 @@ class FingerprintController extends Controller
             userAgent: $request->userAgent()
         )->refresh();
 
-        if ($fingerprint->isBanned()) {
-            return ApiResource::error(
-                message: 'Access denied. This device has been banned.',
-                status: 403
-            );
-        }
-
         Cookie::queue(
             key: 'fingerprint_id',
             value: $fingerprint->fingerprint_id,

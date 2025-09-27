@@ -16361,6 +16361,16 @@ namespace Illuminate\Support\Facades {
             return \Illuminate\Http\Request::inertia();
         }
 
+        /**
+         * @see \App\Providers\AppServiceProvider::boot()
+         * @return string
+         * @static
+         */
+        public static function fingerprintId()
+        {
+            return \Illuminate\Http\Request::fingerprintId();
+        }
+
             }
     /**
      * @see \Illuminate\Routing\ResponseFactory
@@ -23599,6 +23609,16 @@ namespace Illuminate\Http {
         public static function inertia()
         {
             return \Illuminate\Http\Request::inertia();
+        }
+
+        /**
+         * @see \App\Providers\AppServiceProvider::boot()
+         * @return string
+         * @static
+         */
+        public static function fingerprintId()
+        {
+            return \Illuminate\Http\Request::fingerprintId();
         }
 
             }

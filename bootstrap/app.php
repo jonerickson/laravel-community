@@ -28,7 +28,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'stripe/*',
         ]);
 
-        $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+        $middleware->encryptCookies(except: [
+            'appearance',
+            'sidebar_state',
+            'fingerprint_id',
+            '__stripe_mid',
+        ]);
 
         $middleware->api([
             AddQueuedCookiesToResponse::class,

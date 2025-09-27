@@ -8,6 +8,7 @@ use App\Models\View;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Facades\Request;
 
 trait Viewable
 {
@@ -18,7 +19,7 @@ trait Viewable
 
     public function fingerprintView(?string $fingerprintId = null): ?View
     {
-        $fingerprintId ??= $this->getCurrentFingerprintId();
+        $fingerprintId ??= request()->fingerprintId();
 
         if (! $fingerprintId) {
             return null;
@@ -34,7 +35,7 @@ trait Viewable
 
     public function recordView(?string $fingerprintId = null): Model|bool
     {
-        $fingerprintId ??= $this->getCurrentFingerprintId();
+        $fingerprintId ??= Request::fingerprintId();
 
         if (! $fingerprintId) {
             return false;
@@ -71,12 +72,6 @@ trait Viewable
     public function incrementViews(): void
     {
         $this->recordView();
-    }
-
-    protected function getCurrentFingerprintId(): ?string
-    {
-        return request()->header('X-Fingerprint-ID')
-            ?? request()->cookie('fingerprint_id');
     }
 
     protected function initializeViewable(): void

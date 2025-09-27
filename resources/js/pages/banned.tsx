@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
-import { AlertTriangleIcon, MailIcon, ShieldXIcon } from 'lucide-react';
+import { Head, Link } from '@inertiajs/react';
+import { AlertTriangleIcon, ShieldXIcon } from 'lucide-react';
 
 interface UserFingerprint {
     id: number;
@@ -53,7 +53,6 @@ export default function Banned({ user, fingerprint, banReason, bannedAt, bannedB
                             <div className="flex items-start gap-3">
                                 <AlertTriangleIcon className="mt-0.5 size-5 flex-shrink-0 text-destructive" />
                                 <div className="space-y-2">
-                                    <h3 className="font-semibold text-destructive">Ban Details</h3>
                                     <div className="space-y-1 text-sm text-destructive">
                                         {user && (
                                             <p>
@@ -80,7 +79,7 @@ export default function Banned({ user, fingerprint, banReason, bannedAt, bannedB
 
                         {banReason && (
                             <div className="space-y-2">
-                                <h3 className="font-semibold">Reason for Ban</h3>
+                                <h3 className="font-semibold">Reason for ban:</h3>
                                 <div className="rounded-lg border border-muted-foreground/10 bg-muted p-4">
                                     <p className="text-sm whitespace-pre-wrap text-muted-foreground">{banReason}</p>
                                 </div>
@@ -111,18 +110,17 @@ export default function Banned({ user, fingerprint, banReason, bannedAt, bannedB
                                 className="flex-1"
                                 onClick={() => window.open('mailto:support@mountaininteractive.com', '_blank')}
                             >
-                                <MailIcon className="mr-2 size-4" />
-                                Contact Support
+                                Contact support
                             </Button>
-                            <Button variant="outline" className="flex-1" onClick={() => window.open('/policies', '_blank')}>
-                                View Guidelines
+                            <Button variant="outline" className="flex-1" asChild>
+                                <Link href={route('policies.index')}>View policies</Link>
                             </Button>
                         </div>
 
                         <div className="rounded-lg border border-info/10 bg-info-foreground p-4">
                             <div className="text-sm text-info">
                                 <p>
-                                    <strong>Need Help?</strong>
+                                    <strong>Need help?</strong>
                                 </p>
                                 <p className="mt-1">
                                     If you believe this suspension was made in error or would like to appeal, please contact our support team with
