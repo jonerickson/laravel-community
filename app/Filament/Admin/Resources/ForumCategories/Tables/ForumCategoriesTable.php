@@ -12,6 +12,8 @@ use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
 class ForumCategoriesTable
@@ -55,7 +57,13 @@ class ForumCategoriesTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                TernaryFilter::make('is_active')
+                    ->label('Active'),
+                SelectFilter::make('groups')
+                    ->relationship('groups', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
             ])
             ->recordActions([
                 EditAction::make(),

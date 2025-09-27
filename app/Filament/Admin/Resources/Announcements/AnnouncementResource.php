@@ -159,12 +159,14 @@ class AnnouncementResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('type')
-                    ->options(AnnouncementType::class),
                 TernaryFilter::make('is_active')
                     ->label('Active'),
                 TernaryFilter::make('is_dismissible')
                     ->label('Dismissible'),
+                SelectFilter::make('type')
+                    ->multiple()
+                    ->searchable()
+                    ->options(AnnouncementType::class),
                 Filter::make('current')
                     ->label('Currently Active')
                     ->query(fn (Builder $query): Builder => $query->current()),

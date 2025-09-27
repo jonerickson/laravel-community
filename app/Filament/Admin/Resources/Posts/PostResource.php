@@ -33,7 +33,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
-use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -198,16 +198,17 @@ class PostResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TernaryFilter::make('is_published')
-                    ->label('Publication Status'),
-                TernaryFilter::make('is_featured')
-                    ->label('Featured Status'),
+                SelectFilter::make('author')
+                    ->relationship('author', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
                 TernaryFilter::make('comments_enabled')
-                    ->label('Comments Status'),
-                Filter::make('published')
-                    ->query(fn (Builder $query): Builder => $query->published()),
-                Filter::make('drafts')
-                    ->query(fn (Builder $query): Builder => $query->where('is_published', false)),
+                    ->label('Comments Enabled'),
+                TernaryFilter::make('is_featured')
+                    ->label('Featured'),
+                TernaryFilter::make('is_published')
+                    ->label('Published'),
             ])
             ->recordActions([
                 ViewAction::make()

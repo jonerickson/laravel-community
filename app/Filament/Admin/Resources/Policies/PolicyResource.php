@@ -26,6 +26,8 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 
@@ -130,6 +132,15 @@ class PolicyResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                TernaryFilter::make('is_active')
+                    ->label('Active'),
+                SelectFilter::make('category')
+                    ->relationship('category', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
             ])
             ->recordActions([
                 EditAction::make(),

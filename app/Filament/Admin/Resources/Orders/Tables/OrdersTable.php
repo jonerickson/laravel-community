@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Orders\Tables;
 
+use App\Enums\OrderStatus;
 use App\Filament\Admin\Resources\Orders\Actions\CancelAction;
 use App\Filament\Admin\Resources\Orders\Actions\CheckoutAction;
 use App\Filament\Admin\Resources\Orders\Actions\RefundAction;
@@ -14,6 +15,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\HtmlString;
 
@@ -56,7 +58,18 @@ class OrdersTable
                     ->sortable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('user')
+                    ->relationship('user', 'name')
+                    ->preload()
+                    ->searchable()
+                    ->multiple(),
+                SelectFilter::make('product')
+                    ->relationship('items.product', 'name')
+                    ->preload()
+                    ->searchable()
+                    ->multiple(),
+                SelectFilter::make('status')
+                    ->options(OrderStatus::class),
             ])
             ->recordActions([
                 CheckoutAction::make(),

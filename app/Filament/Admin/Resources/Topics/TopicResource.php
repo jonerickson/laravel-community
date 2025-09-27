@@ -21,6 +21,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -85,6 +86,18 @@ class TopicResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('title')
+                    ->icons(function (Topic $record) {
+                        $icons = [];
+
+                        if ($record->is_pinned) {
+                            $icons[] = Heroicon::OutlinedPaperClip;
+                        }
+                        if ($record->is_locked) {
+                            $icons[] = Heroicon::OutlinedLockClosed;
+                        }
+
+                        return $icons;
+                    })
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('author.name')
@@ -93,10 +106,6 @@ class TopicResource extends Resource
                     ->sortable(),
                 TextColumn::make('posts_count')
                     ->label('Posts')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('views_count')
-                    ->label('Views')
                     ->numeric()
                     ->sortable(),
                 ToggleColumn::make('is_pinned')
@@ -109,12 +118,20 @@ class TopicResource extends Resource
                     ->sortable(),
             ])
             ->filters([
+                SelectFilter::make('author')
+                    ->multiple()
+                    ->preload()
+                    ->searchable()
+                    ->relationship('author', 'name'),
                 SelectFilter::make('forum')
+                    ->multiple()
+                    ->preload()
+                    ->searchable()
                     ->relationship('forum', 'name'),
-                TernaryFilter::make('is_pinned')
-                    ->label('Pinned'),
                 TernaryFilter::make('is_locked')
                     ->label('Locked'),
+                TernaryFilter::make('is_pinned')
+                    ->label('Pinned'),
             ])
             ->recordActions([
                 EditAction::make(),

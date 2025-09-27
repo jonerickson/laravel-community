@@ -224,15 +224,14 @@ class ProductResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('categories')
+                    ->relationship('categories', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
                 SelectFilter::make('type')
                     ->options(ProductType::class)
                     ->native(false),
-                Filter::make('products')
-                    ->label('Products Only')
-                    ->query(fn (Builder|Product $query): Builder => $query->products()),
-                Filter::make('subscriptions')
-                    ->label('Subscriptions Only')
-                    ->query(fn (Builder|Product $query): Builder => $query->subscriptions()),
                 Filter::make('with_external_product_id')
                     ->label('Linked to External Product')
                     ->query(fn (Builder|Product $query): Builder => $query->withExternalProduct()),
