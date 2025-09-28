@@ -20,7 +20,7 @@ A new support ticket has been created and requires your attention.
 {!! $supportTicket->description !!}
 
 <x-mail::button :url="route('support.show', $supportTicket)">
-View Ticket
+View ticket
 </x-mail::button>
 
 Thanks,<br>

@@ -41,7 +41,7 @@ class ListPaymentMethods extends Component implements HasActions, HasSchemas, Ha
         return $table
             ->heading('Payment Methods')
             ->description('The user\'s saved payment methods.')
-            ->records(fn () => collect($this->records))
+            ->records(fn (): \Illuminate\Support\Collection => collect($this->records))
             ->columns([
                 TextColumn::make('type')
                     ->default(new HtmlString('&ndash;'))

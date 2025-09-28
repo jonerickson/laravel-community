@@ -27,6 +27,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use Override;
 
 class PolicyCategoryResource extends Resource
 {
@@ -36,6 +37,7 @@ class PolicyCategoryResource extends Resource
 
     protected static ?string $label = 'policy category';
 
+    #[Override]
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -78,6 +80,7 @@ class PolicyCategoryResource extends Resource
             ]);
     }
 
+    #[Override]
     public static function table(Table $table): Table
     {
         return $table

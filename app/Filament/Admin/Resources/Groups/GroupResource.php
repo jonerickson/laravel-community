@@ -34,6 +34,7 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use Override;
 
 class GroupResource extends Resource
 {
@@ -41,6 +42,7 @@ class GroupResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
 
+    #[Override]
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -108,6 +110,7 @@ class GroupResource extends Resource
             ]);
     }
 
+    #[Override]
     public static function table(Table $table): Table
     {
         return $table

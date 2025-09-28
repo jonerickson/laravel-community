@@ -32,6 +32,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use Override;
 
 class ForumResource extends Resource
 {
@@ -39,6 +40,7 @@ class ForumResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
+    #[Override]
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -95,6 +97,7 @@ class ForumResource extends Resource
             ]);
     }
 
+    #[Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -178,6 +181,7 @@ class ForumResource extends Resource
             ->defaultGroup('category.name');
     }
 
+    #[Override]
     public static function getRelations(): array
     {
         return [

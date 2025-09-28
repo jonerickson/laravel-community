@@ -8,9 +8,11 @@ use App\Contracts\SupportTicketProvider;
 use App\Managers\SupportTicketManager;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use Override;
 
 class SupportTicketServiceProvider extends ServiceProvider
 {
+    #[Override]
     public function register(): void
     {
         $this->app->singleton('support-ticket', fn (Application $app): SupportTicketManager => new SupportTicketManager($app));

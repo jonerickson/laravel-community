@@ -35,6 +35,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Override;
 
 class AnnouncementResource extends Resource
 {
@@ -42,6 +43,7 @@ class AnnouncementResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-megaphone';
 
+    #[Override]
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -120,6 +122,7 @@ class AnnouncementResource extends Resource
             ]);
     }
 
+    #[Override]
     public static function table(Table $table): Table
     {
         return $table

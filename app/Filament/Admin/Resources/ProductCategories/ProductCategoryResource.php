@@ -25,6 +25,7 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use Override;
 
 class ProductCategoryResource extends Resource
 {
@@ -34,6 +35,7 @@ class ProductCategoryResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFolder;
 
+    #[Override]
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -83,6 +85,7 @@ class ProductCategoryResource extends Resource
             ]);
     }
 
+    #[Override]
     public static function table(Table $table): Table
     {
         return $table

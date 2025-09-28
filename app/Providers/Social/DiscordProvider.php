@@ -10,6 +10,7 @@ use JsonException;
 use Laravel\Socialite\Two\AbstractProvider;
 use Laravel\Socialite\Two\Token;
 use Laravel\Socialite\Two\User;
+use Override;
 
 class DiscordProvider extends AbstractProvider
 {
@@ -17,6 +18,7 @@ class DiscordProvider extends AbstractProvider
 
     protected $scopeSeparator = ' ';
 
+    #[Override]
     public function refreshToken($refreshToken): Token
     {
         $response = $this->getRefreshTokenResponse($refreshToken);

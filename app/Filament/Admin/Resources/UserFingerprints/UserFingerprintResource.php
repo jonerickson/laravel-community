@@ -29,6 +29,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Override;
 
 class UserFingerprintResource extends Resource
 {
@@ -38,6 +39,7 @@ class UserFingerprintResource extends Resource
 
     protected static ?string $label = 'Fingerprints';
 
+    #[Override]
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -83,6 +85,7 @@ class UserFingerprintResource extends Resource
             ]);
     }
 
+    #[Override]
     public static function table(Table $table): Table
     {
         return $table

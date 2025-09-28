@@ -15,11 +15,13 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Database\Eloquent\Builder;
+use Override;
 
 class NewAction extends Action
 {
     protected User|Closure|null $user = null;
 
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -55,7 +57,7 @@ class NewAction extends Action
                 ->options(fn (Get $get) => Price::query()->active()->whereRelation('product', fn (Builder $query) => $query->whereKey($get('product_id')))->pluck('name', 'id')),
         ]);
 
-        $this->action(function (NewAction $action, array $data) {
+        $this->action(function (NewAction $action, array $data): void {
             $order = Order::create([
                 'status' => OrderStatus::Pending,
                 'user_id' => $this->getUser()->getKey(),
@@ -82,7 +84,7 @@ class NewAction extends Action
         return 'new';
     }
 
-    public function getUser()
+    public function getUser(): mixed
     {
         return $this->evaluate($this->user);
     }

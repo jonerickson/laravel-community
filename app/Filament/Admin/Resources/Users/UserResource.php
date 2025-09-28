@@ -48,6 +48,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Override;
 
 class UserResource extends Resource
 {
@@ -55,6 +56,7 @@ class UserResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
+    #[Override]
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -205,7 +207,7 @@ class UserResource extends Resource
                             ->icon(Heroicon::OutlinedLink)
                             ->visibleOn('edit')
                             ->schema([
-                                Livewire::make(SocialsRelationManager::class, fn (User $record) => [
+                                Livewire::make(SocialsRelationManager::class, fn (User $record): array => [
                                     'ownerRecord' => $record,
                                     'pageClass' => EditUser::class,
                                 ]),
@@ -214,7 +216,7 @@ class UserResource extends Resource
                             ->icon(Heroicon::OutlinedShoppingCart)
                             ->visibleOn('edit')
                             ->schema([
-                                Livewire::make(OrdersRelationManager::class, fn (User $record) => [
+                                Livewire::make(OrdersRelationManager::class, fn (User $record): array => [
                                     'ownerRecord' => $record,
                                     'pageClass' => EditUser::class,
                                 ]),
@@ -222,7 +224,7 @@ class UserResource extends Resource
                         Tabs\Tab::make('Payment Methods')
                             ->icon(Heroicon::OutlinedCreditCard)
                             ->schema([
-                                Livewire::make(ListPaymentMethods::class, fn (User $record) => [
+                                Livewire::make(ListPaymentMethods::class, fn (User $record): array => [
                                     'record' => $record,
                                 ]),
                             ]),
@@ -230,7 +232,7 @@ class UserResource extends Resource
                             ->icon(Heroicon::OutlinedArrowPath)
                             ->visibleOn('edit')
                             ->schema([
-                                Livewire::make(ListSubscriptions::class, fn (User $record) => [
+                                Livewire::make(ListSubscriptions::class, fn (User $record): array => [
                                     'record' => $record,
                                 ]),
                             ]),
@@ -238,6 +240,7 @@ class UserResource extends Resource
             ]);
     }
 
+    #[Override]
     public static function table(Table $table): Table
     {
         return $table
@@ -362,6 +365,7 @@ class UserResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
+    #[Override]
     public static function getRelations(): array
     {
         return [

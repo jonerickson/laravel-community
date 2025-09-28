@@ -6,6 +6,7 @@ namespace App\Http\Requests\Settings;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Override;
 
 class DestroyPaymentMethodRequest extends FormRequest
 {
@@ -21,6 +22,7 @@ class DestroyPaymentMethodRequest extends FormRequest
         ];
     }
 
+    #[Override]
     public function messages(): array
     {
         return [

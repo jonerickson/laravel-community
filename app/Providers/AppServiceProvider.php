@@ -63,7 +63,7 @@ class AppServiceProvider extends ServiceProvider
             config: config('services.roblox')
         ));
 
-        Table::configureUsing(function (Table $table) {
+        Table::configureUsing(function (Table $table): void {
             $table->emptyStateDescription('There are no items to view.');
         });
 

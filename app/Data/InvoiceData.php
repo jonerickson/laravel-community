@@ -18,4 +18,6 @@ class InvoiceData extends Data
     public int $amount;
 
     public ?string $invoiceUrl = null;
+
+    public ?string $invoicePdfUrl = null;
 }

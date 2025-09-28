@@ -25,7 +25,7 @@ class OrderController extends Controller
                 ->with(['items.product'])
                 ->latest()
                 ->get()
-                ->filter(fn (Order $order) => ! ($order->status === OrderStatus::Pending) || filled($order->checkout_url))
+                ->filter(fn (Order $order): bool => $order->status !== OrderStatus::Pending || filled($order->checkout_url))
                 ->values()),
         ]);
     }

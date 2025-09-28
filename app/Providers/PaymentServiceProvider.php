@@ -8,9 +8,11 @@ use App\Contracts\PaymentProcessor;
 use App\Managers\PaymentManager;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use Override;
 
 class PaymentServiceProvider extends ServiceProvider
 {
+    #[Override]
     public function register(): void
     {
         $this->app->singleton('payment-processor', fn (Application $app): PaymentManager => new PaymentManager($app));

@@ -10,9 +10,11 @@ use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Support\Icons\Heroicon;
+use Override;
 
 class CancelAction extends Action
 {
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -22,7 +24,7 @@ class CancelAction extends Action
         $this->icon(Heroicon::OutlinedXCircle);
         $this->successNotificationTitle('The subscription has been successfully cancelled.');
         $this->requiresConfirmation();
-        $this->visible(fn (array $record) => SubscriptionData::from($record)->status->canCancel() && blank(data_get($record, 'endsAt')));
+        $this->visible(fn (array $record): bool => SubscriptionData::from($record)->status->canCancel() && blank(data_get($record, 'endsAt')));
         $this->modalHeading('Cancel Subscription');
         $this->modalDescription('Are you sure you want to cancel this subscription?');
 
@@ -33,7 +35,7 @@ class CancelAction extends Action
                 ->helperText('Cancel the subscription immediately. If left unchecked, the subscription will cancel at the end of the billing cycle.'),
         ]);
 
-        $this->action(function (array $record, array $data, Action $action) {
+        $this->action(function (array $record, array $data, Action $action): void {
             $subscription = SubscriptionData::from($record);
 
             $paymentManager = app(PaymentManager::class);

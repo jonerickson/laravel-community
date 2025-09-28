@@ -26,6 +26,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Laravel\Passport\Token;
+use Override;
 use UnitEnum;
 
 class ApiTokenResource extends Resource
@@ -38,6 +39,7 @@ class ApiTokenResource extends Resource
 
     protected static ?string $label = 'API Key';
 
+    #[Override]
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -62,6 +64,7 @@ class ApiTokenResource extends Resource
             ]);
     }
 
+    #[Override]
     public static function table(Table $table): Table
     {
         return $table

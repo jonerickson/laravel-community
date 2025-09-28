@@ -7,6 +7,7 @@ namespace App\Http\Requests\Store;
 use App\Models\Price;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Override;
 
 class SubscriptionCheckoutRequest extends FormRequest
 {
@@ -22,6 +23,7 @@ class SubscriptionCheckoutRequest extends FormRequest
         ];
     }
 
+    #[Override]
     public function messages(): array
     {
         return [

@@ -6,6 +6,7 @@ namespace App\Http\Requests\Settings;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Override;
 
 class UpdateProfileRequest extends FormRequest
 {
@@ -23,6 +24,7 @@ class UpdateProfileRequest extends FormRequest
         ];
     }
 
+    #[Override]
     public function messages(): array
     {
         return [

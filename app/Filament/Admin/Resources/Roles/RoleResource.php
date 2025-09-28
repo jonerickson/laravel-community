@@ -17,6 +17,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Override;
 use UnitEnum;
 
 class RoleResource extends Resource
@@ -29,16 +30,19 @@ class RoleResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    #[Override]
     public static function form(Schema $schema): Schema
     {
         return RoleForm::configure($schema);
     }
 
+    #[Override]
     public static function table(Table $table): Table
     {
         return RolesTable::configure($table);
     }
 
+    #[Override]
     public static function getRelations(): array
     {
         return [

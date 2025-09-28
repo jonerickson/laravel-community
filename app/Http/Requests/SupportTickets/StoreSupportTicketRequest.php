@@ -6,6 +6,7 @@ namespace App\Http\Requests\SupportTickets;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Override;
 
 class StoreSupportTicketRequest extends FormRequest
 {
@@ -23,6 +24,7 @@ class StoreSupportTicketRequest extends FormRequest
         ];
     }
 
+    #[Override]
     public function messages(): array
     {
         return [

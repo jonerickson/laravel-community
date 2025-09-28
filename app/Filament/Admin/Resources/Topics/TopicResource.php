@@ -27,6 +27,7 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Override;
 
 class TopicResource extends Resource
 {
@@ -34,6 +35,7 @@ class TopicResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-pencil-square';
 
+    #[Override]
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -81,12 +83,13 @@ class TopicResource extends Resource
             ]);
     }
 
+    #[Override]
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 TextColumn::make('title')
-                    ->icons(function (Topic $record) {
+                    ->icons(function (Topic $record): array {
                         $icons = [];
 
                         if ($record->is_pinned) {

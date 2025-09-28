@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\OrderStatus;
+use App\Events\OrderSaving;
 use App\Managers\PaymentManager;
-use App\Observers\OrderObserver;
 use App\Traits\HasReferenceId;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -65,7 +64,6 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  *
  * @mixin \Eloquent
  */
-#[ObservedBy(OrderObserver::class)]
 class Order extends Model
 {
     use HasFactory;
@@ -94,6 +92,10 @@ class Order extends Model
         'checkout_url',
         'is_recurring',
         'is_one_time',
+    ];
+
+    protected $dispatchesEvents = [
+        'saving' => OrderSaving::class,
     ];
 
     public function user(): BelongsTo
@@ -128,20 +130,22 @@ class Order extends Model
                 return null;
             }
 
-            return app(PaymentManager::class)->getCheckoutUrl(
+            return rescue(fn () => app(PaymentManager::class)->getCheckoutUrl(
                 order: $this
-            );
+            ));
         })->shouldCache();
     }
 
     public function isRecurring(): Attribute
     {
-        return Attribute::get(fn () => filled($this->items->firstWhere(fn (OrderItem $orderItem) => $orderItem->price->is_recurring)));
+        return Attribute::get(fn (): bool => filled($this->items->firstWhere(fn (OrderItem $orderItem) => $orderItem->price->is_recurring)))
+            ->shouldCache();
     }
 
     public function isOneTime(): Attribute
     {
-        return Attribute::get(fn () => ! $this->is_recurring);
+        return Attribute::get(fn (): bool => ! $this->is_recurring)
+            ->shouldCache();
     }
 
     public function scopeReadyToView(Builder $query): void

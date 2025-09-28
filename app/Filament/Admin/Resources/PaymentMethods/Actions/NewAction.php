@@ -8,11 +8,13 @@ use App\Managers\PaymentManager;
 use App\Models\User;
 use Closure;
 use Filament\Actions\Action;
+use Override;
 
 class NewAction extends Action
 {
     protected User|Closure|null $user = null;
 
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -21,7 +23,7 @@ class NewAction extends Action
         $this->color('primary');
         $this->successNotificationTitle('The payment method has been successfully added.');
 
-        $this->action(function (NewAction $action, array $data) {
+        $this->action(function (NewAction $action, array $data): void {
             $paymentManager = app(PaymentManager::class);
             $paymentManager->createPaymentMethod(
                 user: $this->getUser(),
@@ -37,7 +39,7 @@ class NewAction extends Action
         return 'new';
     }
 
-    public function getUser()
+    public function getUser(): mixed
     {
         return $this->evaluate($this->user);
     }

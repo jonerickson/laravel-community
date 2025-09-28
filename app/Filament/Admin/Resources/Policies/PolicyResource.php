@@ -30,6 +30,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use Override;
 
 class PolicyResource extends Resource
 {
@@ -37,6 +38,7 @@ class PolicyResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
+    #[Override]
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -95,6 +97,7 @@ class PolicyResource extends Resource
             ]);
     }
 
+    #[Override]
     public static function table(Table $table): Table
     {
         return $table

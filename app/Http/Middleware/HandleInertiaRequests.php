@@ -13,6 +13,7 @@ use App\Services\ShoppingCartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Middleware;
+use Override;
 use Tighten\Ziggy\Ziggy;
 
 class HandleInertiaRequests extends Middleware
@@ -24,6 +25,7 @@ class HandleInertiaRequests extends Middleware
         //
     }
 
+    #[Override]
     public function share(Request $request): array
     {
         $sharedData = SharedData::from([

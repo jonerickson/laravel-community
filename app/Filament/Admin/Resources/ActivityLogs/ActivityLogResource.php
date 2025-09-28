@@ -18,6 +18,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Override;
 use Phiki\Grammar\Grammar;
 use Spatie\Activitylog\Models\Activity;
 use UnitEnum;
@@ -34,6 +35,7 @@ class ActivityLogResource extends Resource
 
     protected static ?string $label = 'log';
 
+    #[Override]
     public static function table(Table $table): Table
     {
         return $table

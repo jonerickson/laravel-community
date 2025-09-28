@@ -33,7 +33,7 @@ class ItemsRelationManager extends RelationManager
                     ->searchable(),
                 Select::make('price_id')
                     ->label('Price')
-                    ->disableOptionWhen(fn (Get $get) => blank($get('product_id')))
+                    ->disableOptionWhen(fn (Get $get): bool => blank($get('product_id')))
                     ->required()
                     ->options(fn (Get $get) => Price::query()->where('product_id', $get('product_id'))->pluck('name', 'id'))
                     ->preload()
@@ -55,7 +55,7 @@ class ItemsRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('price')
-                    ->formatStateUsing(fn (Price $state) => $state->getLabel())
+                    ->formatStateUsing(fn (Price $state): string|\Illuminate\Contracts\Support\Htmlable|null => $state->getLabel())
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('quantity')

@@ -12,6 +12,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
+use Override;
 use UnitEnum;
 
 class ManageEmailSettings extends SettingsPage
@@ -35,6 +36,7 @@ class ManageEmailSettings extends SettingsPage
         return Auth::user()->hasRole('super-admin');
     }
 
+    #[Override]
     public function form(Schema $schema): Schema
     {
         return $schema

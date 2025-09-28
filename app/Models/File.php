@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Override;
 
 /**
  * @property int $id
@@ -64,6 +65,7 @@ class File extends Model
         )->shouldCache();
     }
 
+    #[Override]
     protected static function booted(): void
     {
         static::creating(function (File $model): void {

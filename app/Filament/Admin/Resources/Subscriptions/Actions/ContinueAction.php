@@ -9,9 +9,11 @@ use App\Managers\PaymentManager;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Support\Icons\Heroicon;
+use Override;
 
 class ContinueAction extends Action
 {
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -21,11 +23,11 @@ class ContinueAction extends Action
         $this->icon(Heroicon::OutlinedCheckCircle);
         $this->successNotificationTitle('The subscription has been successfully continued.');
         $this->requiresConfirmation();
-        $this->visible(fn (array $record) => SubscriptionData::from($record)->status->canContinue() && filled(data_get($record, 'endsAt')));
+        $this->visible(fn (array $record): bool => SubscriptionData::from($record)->status->canContinue() && filled(data_get($record, 'endsAt')));
         $this->modalHeading('Continue Subscription');
         $this->modalDescription('Are you sure you want to continue this subscription?');
 
-        $this->action(function (array $record, Action $action) {
+        $this->action(function (array $record, Action $action): void {
             $subscription = SubscriptionData::from($record);
 
             $paymentManager = app(PaymentManager::class);

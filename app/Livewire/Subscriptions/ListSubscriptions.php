@@ -43,7 +43,7 @@ class ListSubscriptions extends Component implements HasActions, HasSchemas, Has
         return $table
             ->heading('Subscriptions')
             ->description('The user\'s subscription history.')
-            ->records(fn () => collect($this->records))
+            ->records(fn (): \Illuminate\Support\Collection => collect($this->records))
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('product.name'),

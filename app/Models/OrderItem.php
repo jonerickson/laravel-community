@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Filament\Support\Contracts\HasLabel;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,7 +38,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
-class OrderItem extends Model
+class OrderItem extends Model implements HasLabel
 {
     use HasFactory;
 
@@ -74,8 +76,16 @@ class OrderItem extends Model
 
     public function amount(): Attribute
     {
-        return Attribute::get(fn () => ($this->price->amount ?? 0) * $this->quantity)
+        return Attribute::get(fn (): int|float => ($this->price->amount ?? 0) * $this->quantity)
             ->shouldCache();
+    }
+
+    public function getLabel(): string|Htmlable|null
+    {
+        $product = $this->product?->name ?? 'Unknown Product';
+        $price = $this->price?->getLabel() ?? 'Unknown Price';
+
+        return "$product - $price";
     }
 
     protected function casts(): array

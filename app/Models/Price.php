@@ -19,6 +19,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Number;
+use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 
 /**
  * @property int $id
@@ -137,20 +139,23 @@ class Price extends Model implements HasLabel
 
     public function isRecurring(): Attribute
     {
-        return Attribute::get(fn () => ! is_null($this->interval));
+        return Attribute::get(fn (): bool => ! is_null($this->interval));
     }
 
     public function isOneTime(): Attribute
     {
-        return Attribute::get(fn () => ! $this->is_recurring);
+        return Attribute::get(fn (): bool => ! $this->is_recurring);
     }
 
     public function getLabel(): string|Htmlable|null
     {
         $amount = Number::currency($this->amount / 100);
-        $interval = $this->interval->getLabel();
+        $interval = $this->interval?->getLabel();
 
-        return "$this->name - $amount / $interval";
+        return Str::of($this->name)
+            ->append(" - $amount")
+            ->when(filled($interval), fn (Stringable $str): string => " / $interval")
+            ->toString();
     }
 
     protected function casts(): array

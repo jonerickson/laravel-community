@@ -28,12 +28,12 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->config->get('payment.default', 'stripe');
     }
 
-    public function createProduct(Product $product): ProductData
+    public function createProduct(Product $product): ?ProductData
     {
         return $this->driver()->createProduct($product);
     }
 
-    public function getProduct(Product $product): ProductData
+    public function getProduct(Product $product): ?ProductData
     {
         return $this->driver()->getProduct($product);
     }
@@ -58,7 +58,7 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->findInvoice($order);
     }
 
-    public function createPrice(Product $product, Price $price): PriceData
+    public function createPrice(Product $product, Price $price): ?PriceData
     {
         return $this->driver()->createPrice($product, $price);
     }
@@ -78,7 +78,7 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->listPrices($product, $filters);
     }
 
-    public function createPaymentMethod(User $user, string $paymentMethodId): PaymentMethodData
+    public function createPaymentMethod(User $user, string $paymentMethodId): ?PaymentMethodData
     {
         return $this->driver()->createPaymentMethod($user, $paymentMethodId);
     }

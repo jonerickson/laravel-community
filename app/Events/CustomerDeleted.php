@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Events\Stripe;
+namespace App\Events;
 
+use App\Models\User;
 use Illuminate\Foundation\Queue\Queueable;
 
-class PaymentSucceeded
+class CustomerDeleted
 {
     use Queueable;
 
-    public function __construct(public array $payload)
+    public function __construct(public User $user)
     {
         //
     }

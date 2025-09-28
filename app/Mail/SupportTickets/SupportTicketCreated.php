@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Mail;
+namespace App\Mail\SupportTickets;
 
-use App\Enums\SupportTicketStatus;
 use App\Models\SupportTicket;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -12,33 +11,28 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
-class SupportTicketStatusChanged extends Mailable implements ShouldQueue
+class SupportTicketCreated extends Mailable implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(
-        public SupportTicket $supportTicket,
-        public SupportTicketStatus $oldStatus,
-        public SupportTicketStatus $newStatus
-    ) {
+    public function __construct(public SupportTicket $supportTicket)
+    {
         //
     }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Support Ticket Status Updated: '.$this->supportTicket->ticket_number,
+            subject: 'New Support Ticket Created: '.$this->supportTicket->ticket_number,
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.support-tickets.support-ticket-status-changed',
+            markdown: 'emails.support-tickets.support-ticket-created',
             with: [
                 'supportTicket' => $this->supportTicket,
-                'oldStatus' => $this->oldStatus,
-                'newStatus' => $this->newStatus,
             ],
         );
     }

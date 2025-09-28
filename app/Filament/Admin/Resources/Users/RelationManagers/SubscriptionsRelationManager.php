@@ -62,11 +62,9 @@ class SubscriptionsRelationManager extends RelationManager
                 $user = $this->getOwnerRecord();
                 $subscription = $paymentManager->currentSubscription($user);
 
-                return Collection::wrap($subscription)->map(function (SubscriptionData $subscriptionData) {
-                    return [
-                        'type' => $subscriptionData->name,
-                    ];
-                });
+                return Collection::wrap($subscription)->map(fn (SubscriptionData $subscriptionData): array => [
+                    'type' => $subscriptionData->name,
+                ]);
             })
             ->columns([
                 TextColumn::make('type')

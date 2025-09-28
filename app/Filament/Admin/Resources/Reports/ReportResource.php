@@ -21,6 +21,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use Override;
 
 class ReportResource extends Resource
 {
@@ -42,6 +43,7 @@ class ReportResource extends Resource
         return 'warning';
     }
 
+    #[Override]
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -83,6 +85,7 @@ class ReportResource extends Resource
             ]);
     }
 
+    #[Override]
     public static function table(Table $table): Table
     {
         return $table

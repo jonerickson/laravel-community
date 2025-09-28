@@ -27,7 +27,7 @@ Your ticket is now being actively worked on. We'll keep you updated on the progr
 @endif
 
 <x-mail::button :url="route('support.show', $supportTicket)">
-View Ticket
+View ticket
 </x-mail::button>
 
 Thanks,<br>

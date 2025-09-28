@@ -41,6 +41,7 @@ use Laravel\Cashier\Billable;
 use Laravel\Cashier\Subscription;
 use Laravel\Passport\Contracts\OAuthenticatable;
 use Laravel\Passport\HasApiTokens;
+use Override;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
@@ -310,9 +311,10 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         return 'user';
     }
 
+    #[Override]
     protected static function booted(): void
     {
-        static::updated(function (User $user) {
+        static::updated(function (User $user): void {
             if (! $user->hasStripeId() || ! $user->isDirty([
                 'name',
                 'email',

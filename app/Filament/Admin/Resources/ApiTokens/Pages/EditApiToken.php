@@ -7,6 +7,7 @@ namespace App\Filament\Admin\Resources\ApiTokens\Pages;
 use App\Filament\Admin\Resources\ApiTokens\ApiTokenResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Override;
 
 class EditApiToken extends EditRecord
 {
@@ -23,6 +24,7 @@ class EditApiToken extends EditRecord
         ];
     }
 
+    #[Override]
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

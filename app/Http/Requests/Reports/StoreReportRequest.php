@@ -8,6 +8,7 @@ use App\Enums\ReportReason;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Override;
 
 class StoreReportRequest extends FormRequest
 {
@@ -26,6 +27,7 @@ class StoreReportRequest extends FormRequest
         ];
     }
 
+    #[Override]
     public function messages(): array
     {
         return [

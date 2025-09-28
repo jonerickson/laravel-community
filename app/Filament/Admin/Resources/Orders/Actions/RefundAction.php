@@ -11,9 +11,11 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Support\Icons\Heroicon;
+use Override;
 
 class RefundAction extends Action
 {
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -35,7 +37,7 @@ class RefundAction extends Action
                 ->helperText('Optional refund notes.'),
         ]);
         $this->visible(fn (Order $record) => $record->status->canRefund());
-        $this->action(function (Order $record, array $data) {
+        $this->action(function (Order $record, array $data): void {
             $paymentManager = app(PaymentManager::class);
             $paymentManager->refundOrder(
                 order: $record,

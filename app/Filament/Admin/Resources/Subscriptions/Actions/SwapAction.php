@@ -16,11 +16,13 @@ use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Database\Eloquent\Builder;
+use Override;
 
 class SwapAction extends Action
 {
     protected User|Closure|null $user = null;
 
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -53,14 +55,14 @@ class SwapAction extends Action
                 ->required()
                 ->preload()
                 ->searchable()
-                ->options(fn (Get $get) => Price::query()->active()->whereRelation('product', fn (Builder $query) => $query->whereKey($get('product_id')))->get()->mapWithKeys(fn (Price $price) => [$price->id => $price->getLabel()])),
+                ->options(fn (Get $get) => Price::query()->active()->whereRelation('product', fn (Builder $query) => $query->whereKey($get('product_id')))->get()->mapWithKeys(fn (Price $price): array => [$price->id => $price->getLabel()])),
             Checkbox::make('charge_now')
                 ->default(true)
                 ->inline()
                 ->helperText('Charge the customer immediately. If left unchecked, the user will be sent an invoice to pay at a later time.'),
         ]);
 
-        $this->action(function (SwapAction $action, array $data) {
+        $this->action(function (SwapAction $action, array $data): void {
             $order = Order::create([
                 'status' => OrderStatus::Pending,
                 'user_id' => $this->getUser()->getKey(),
@@ -88,7 +90,7 @@ class SwapAction extends Action
         return 'swap';
     }
 
-    public function getUser()
+    public function getUser(): mixed
     {
         return $this->evaluate($this->user);
     }

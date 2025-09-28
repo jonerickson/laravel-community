@@ -21,7 +21,7 @@ class EnsureFrontendRequestsAreStateful
     {
         $this->configureSecureCookieSessions();
 
-        return (new Pipeline(app()))->send($request)->through(
+        return new Pipeline(app())->send($request)->through(
             static::fromFrontend($request) ? $this->frontendMiddleware() : []
         )->then(fn ($request) => $next($request));
     }

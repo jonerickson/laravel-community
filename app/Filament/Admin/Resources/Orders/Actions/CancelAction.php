@@ -8,9 +8,11 @@ use App\Managers\PaymentManager;
 use App\Models\Order;
 use Filament\Actions\Action;
 use Filament\Support\Icons\Heroicon;
+use Override;
 
 class CancelAction extends Action
 {
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -9,6 +9,7 @@ use App\Models\User;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Resources\Pages\CreateRecord;
 use Laravel\Passport\Token;
+use Override;
 
 class CreateApiToken extends CreateRecord
 {
@@ -16,6 +17,7 @@ class CreateApiToken extends CreateRecord
 
     protected static string $resource = ApiTokenResource::class;
 
+    #[Override]
     protected function handleRecordCreation(array $data): Token
     {
         $user = User::find($data['tokenable_id']);
@@ -27,6 +29,7 @@ class CreateApiToken extends CreateRecord
         return $result->getToken();
     }
 
+    #[Override]
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

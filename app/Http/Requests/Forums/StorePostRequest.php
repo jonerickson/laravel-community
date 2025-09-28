@@ -6,6 +6,7 @@ namespace App\Http\Requests\Forums;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Override;
 
 class StorePostRequest extends FormRequest
 {
@@ -21,6 +22,7 @@ class StorePostRequest extends FormRequest
         ];
     }
 
+    #[Override]
     public function messages(): array
     {
         return [

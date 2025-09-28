@@ -8,16 +8,16 @@ use App\Events\SupportTicketCommentAdded;
 use App\Events\SupportTicketCreated;
 use App\Events\SupportTicketStatusChanged;
 use App\Events\SupportTicketUpdated;
-use App\Mail\SupportTicketCommentAdded as SupportTicketCommentAddedMail;
-use App\Mail\SupportTicketCreated as SupportTicketCreatedMail;
-use App\Mail\SupportTicketStatusChanged as SupportTicketStatusChangedMail;
+use App\Mail\SupportTickets\SupportTicketCommentAdded as SupportTicketCommentAddedMail;
+use App\Mail\SupportTickets\SupportTicketCreated as SupportTicketCreatedMail;
+use App\Mail\SupportTickets\SupportTicketStatusChanged as SupportTicketStatusChangedMail;
 use Illuminate\Support\Facades\Mail;
 
 class HandleSupportTicketEvent
 {
     public function handle(SupportTicketCreated|SupportTicketCommentAdded|SupportTicketStatusChanged|SupportTicketUpdated $event): void
     {
-        match (get_class($event)) {
+        match ($event::class) {
             SupportTicketCreated::class => $this->sendMail(
                 new SupportTicketCreatedMail($event->supportTicket),
                 $event->supportTicket
@@ -34,7 +34,7 @@ class HandleSupportTicketEvent
         };
     }
 
-    protected function sendMail($mailable, $supportTicket): void
+    protected function sendMail(\Illuminate\Contracts\Mail\Mailable $mailable, $supportTicket): void
     {
         if ($supportTicket->author) {
             Mail::to($supportTicket->author->email)->send($mailable);

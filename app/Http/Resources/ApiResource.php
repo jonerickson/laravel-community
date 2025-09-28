@@ -8,6 +8,7 @@ use App\Data\ApiData;
 use App\Data\ApiMetaData;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Override;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ApiResource extends JsonResource
@@ -42,6 +43,7 @@ class ApiResource extends JsonResource
         return new self(null, $message, 200, $meta);
     }
 
+    #[Override]
     public function toArray(Request $request): array
     {
         $metaData = ApiMetaData::from([
@@ -61,6 +63,7 @@ class ApiResource extends JsonResource
         return $apiData->toArray();
     }
 
+    #[Override]
     public function withResponse(Request $request, JsonResponse $response): void
     {
         $response->setStatusCode($this->status);

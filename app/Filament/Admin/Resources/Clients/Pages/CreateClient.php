@@ -9,6 +9,7 @@ use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Laravel\Passport\ClientRepository;
+use Override;
 
 class CreateClient extends CreateRecord
 {
@@ -21,6 +22,7 @@ class CreateClient extends CreateRecord
         $this->clientRepository = app(ClientRepository::class);
     }
 
+    #[Override]
     protected function handleRecordCreation(array $data): Model
     {
         return match (Arr::pull($data, 'grant_types')) {

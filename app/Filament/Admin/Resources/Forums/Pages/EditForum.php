@@ -9,6 +9,7 @@ use App\Models\Forum;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Override;
 
 class EditForum extends EditRecord
 {
@@ -34,6 +35,7 @@ class EditForum extends EditRecord
         ];
     }
 
+    #[Override]
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

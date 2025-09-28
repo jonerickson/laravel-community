@@ -6,6 +6,7 @@ namespace App\Http\Requests\Settings;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Override;
 
 class UpdatePaymentMethodRequest extends FormRequest
 {
@@ -22,6 +23,7 @@ class UpdatePaymentMethodRequest extends FormRequest
         ];
     }
 
+    #[Override]
     public function messages(): array
     {
         return [

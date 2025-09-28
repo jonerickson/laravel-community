@@ -7,6 +7,7 @@ namespace App\Http\Requests\Store;
 use App\Models\Price;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Override;
 
 class SubscriptionCancelRequest extends FormRequest
 {
@@ -23,6 +24,7 @@ class SubscriptionCancelRequest extends FormRequest
         ];
     }
 
+    #[Override]
     public function messages(): array
     {
         return [

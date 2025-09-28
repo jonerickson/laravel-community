@@ -19,9 +19,9 @@ use Illuminate\Http\Request;
 
 interface PaymentProcessor
 {
-    public function createProduct(Product $product): ProductData;
+    public function createProduct(Product $product): ?ProductData;
 
-    public function getProduct(Product $product): ProductData;
+    public function getProduct(Product $product): ?ProductData;
 
     public function updateProduct(Product $product): ?ProductData;
 
@@ -32,7 +32,7 @@ interface PaymentProcessor
      */
     public function listProducts(array $filters = []): mixed;
 
-    public function createPrice(Product $product, Price $price): PriceData;
+    public function createPrice(Product $product, Price $price): ?PriceData;
 
     public function updatePrice(Product $product, Price $price): ?PriceData;
 
@@ -45,7 +45,7 @@ interface PaymentProcessor
 
     public function findInvoice(Order $order): ?InvoiceData;
 
-    public function createPaymentMethod(User $user, string $paymentMethodId): PaymentMethodData;
+    public function createPaymentMethod(User $user, string $paymentMethodId): ?PaymentMethodData;
 
     /**
      * @return Collection<int, PaymentMethodData>
