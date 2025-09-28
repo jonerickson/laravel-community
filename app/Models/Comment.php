@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Events\CommentCreated;
 use App\Traits\HasAuthor;
 use App\Traits\Likeable;
 use Eloquent;
@@ -67,6 +68,10 @@ class Comment extends Model
     use HasAuthor;
     use HasFactory;
     use Likeable;
+
+    protected $dispatchesEvents = [
+        'created' => CommentCreated::class,
+    ];
 
     protected $fillable = [
         'commentable_type',

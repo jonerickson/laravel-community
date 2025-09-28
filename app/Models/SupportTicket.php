@@ -6,6 +6,8 @@ namespace App\Models;
 
 use App\Enums\SupportTicketPriority;
 use App\Enums\SupportTicketStatus;
+use App\Events\SupportTicketCreated;
+use App\Events\SupportTicketUpdated;
 use App\Traits\Commentable;
 use App\Traits\HasAuthor;
 use App\Traits\HasFiles;
@@ -88,6 +90,11 @@ class SupportTicket extends Model
     use HasAuthor;
     use HasFactory;
     use HasFiles;
+
+    protected $dispatchesEvents = [
+        'created' => SupportTicketCreated::class,
+        'updated' => SupportTicketUpdated::class,
+    ];
 
     protected $attributes = [
         'status' => SupportTicketStatus::New,

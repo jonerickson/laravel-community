@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace App\Events\Stripe;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Foundation\Queue\Queueable;
 
-class PaymentActionRequired implements ShouldQueue
+class PaymentActionRequired
 {
-    use Dispatchable;
-    use InteractsWithQueue;
+    use Queueable;
 
     public function __construct(public array $payload)
     {

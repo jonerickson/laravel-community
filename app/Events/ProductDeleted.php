@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace App\Events;
 
 use App\Models\Product;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
+use Illuminate\Foundation\Queue\Queueable;
 
 class ProductDeleted
 {
-    use Dispatchable, SerializesModels;
+    use Queueable;
 
     public function __construct(public Product $product) {}
 }

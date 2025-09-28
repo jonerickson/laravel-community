@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Events;
 
-use App\Models\Order;
+use App\Models\SupportTicket;
 use Illuminate\Foundation\Queue\Queueable;
 
-class OrderProcessing
+class SupportTicketCreated
 {
     use Queueable;
 
-    public function __construct(public Order $order)
+    public function __construct(public SupportTicket $supportTicket)
     {
         //
     }

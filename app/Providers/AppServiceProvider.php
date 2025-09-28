@@ -77,7 +77,7 @@ class AppServiceProvider extends ServiceProvider
             ])
         );
 
-        Request::macro('fingerprintId', function (): string {
+        Request::macro('fingerprintId', function (): ?string {
             /** @var \Illuminate\Http\Request $request */
             $request = app('request');
 
