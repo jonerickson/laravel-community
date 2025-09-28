@@ -9,6 +9,7 @@
         "php": "^8.4",
         "ext-fileinfo": "*",
         "filament/filament": "^4.0.15",
+        "filament/spatie-laravel-settings-plugin": "^4.0",
         "inertiajs/inertia-laravel": "^2.0.6",
         "laravel/cashier": "^15.7.1",
         "laravel/framework": "^12.28.1",
@@ -23,6 +24,7 @@
         "spatie/laravel-activitylog": "^4.10.2",
         "spatie/laravel-data": "^4.17",
         "spatie/laravel-permission": "^6.21",
+        "spatie/laravel-settings": "^3.4",
         "spatie/laravel-typescript-transformer": "^2.5",
         "staudenmeir/eloquent-has-many-deep": "^1.7",
         "tightenco/ziggy": "^2.6"

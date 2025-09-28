@@ -71,7 +71,7 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
                 <Heading title={category.name} description={category.description || undefined} />
 
                 {products.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
                         {products.map((product) => (
                             <StoreCategoriesProductItem key={product.id} product={product} />
                         ))}

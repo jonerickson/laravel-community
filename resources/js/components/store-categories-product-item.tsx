@@ -31,7 +31,7 @@ export default function StoreCategoriesProductItem({ product }: { product: App.D
             )}
             <div className="flex flex-1 flex-col pt-4">
                 <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="mb-2 flex items-center gap-2">
                         <HeadingSmall title={product.name} description={truncate(stripCharacters(product.description))} />
                     </div>
                     <div className="mt-3">
@@ -39,9 +39,9 @@ export default function StoreCategoriesProductItem({ product }: { product: App.D
                     </div>
                 </div>
                 <div className="mt-3 space-y-2">
-                    <div className='flex items-center gap-2'>
+                    <div className="flex items-center gap-2">
                         {product.isFeatured && (
-                            <Badge variant="default" className="bg-info text-info-foreground text-xs">
+                            <Badge variant="default" className="bg-info text-xs text-info-foreground">
                                 Featured
                             </Badge>
                         )}
