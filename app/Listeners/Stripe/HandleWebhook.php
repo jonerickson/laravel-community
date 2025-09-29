@@ -57,14 +57,15 @@ class HandleWebhook implements ShouldQueue
             'customer.subscription.created' => event(new SubscriptionCreated($order)),
             'customer.subscription.updated' => event(new SubscriptionUpdated(
                 order: $order,
-                status: SubscriptionStatus::tryFrom(data_get($event->payload, 'data.object.status')),
+                currentStatus: SubscriptionStatus::tryFrom(data_get($event->payload, 'data.object.status') ?? ''),
+                previousStatus: SubscriptionStatus::tryFrom(data_get($event->payload, 'data.previous_attributes.status') ?? ''),
             )),
             'customer.subscription.deleted' => event(new SubscriptionDeleted($order)),
             'customer.updated' => event(new CustomerUpdated($this->user)),
             'customer.deleted' => event(new CustomerDeleted($this->user)),
             'refund.created' => event(new RefundCreated(
                 order: $order,
-                reason: OrderRefundReason::tryFrom(data_get($event->payload, 'data.object.reason')) ?? OrderRefundReason::Other,
+                reason: OrderRefundReason::tryFrom(data_get($event->payload, 'data.object.reason') ?? '') ?? OrderRefundReason::Other,
                 notes: data_get($event->payload, 'data.object.reason')
             )),
             default => null,

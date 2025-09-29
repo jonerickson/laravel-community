@@ -591,7 +591,7 @@ class StripeDriver implements PaymentProcessor
                 'external_order_id' => $paymentIntentId ?? null,
                 'external_payment_id' => $paymentIntent?->payment_method ?? null,
                 'external_invoice_id' => $invoiceId ?? null,
-                'status' => $paymentIntent ? (OrderStatus::tryFrom($paymentIntent->status) ?? OrderStatus::Processing) : OrderStatus::Processing,
+                'status' => $paymentIntent ? (OrderStatus::tryFrom($paymentIntent->status ?? '') ?? OrderStatus::Processing) : OrderStatus::Processing,
                 'invoice_url' => $invoice?->hosted_invoice_url ?? null,
                 'invoice_number' => $invoice?->number ?? null,
             ]);

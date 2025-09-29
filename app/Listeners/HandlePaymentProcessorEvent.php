@@ -11,6 +11,8 @@ use App\Events\RefundCreated;
 use App\Events\SubscriptionCreated;
 use App\Events\SubscriptionDeleted;
 use App\Events\SubscriptionUpdated;
+use App\Mail\Payments\PaymentSucceeded as PaymentSucceededMail;
+use Illuminate\Support\Facades\Mail;
 
 class HandlePaymentProcessorEvent
 {
@@ -28,6 +30,10 @@ class HandlePaymentProcessorEvent
 
     private function handlePaymentSucceeded(PaymentSucceeded $event): void
     {
+        if ($event->order->user) {
+            Mail::to($event->order->user->email)->send(new PaymentSucceededMail($event->order));
+        }
+
         if ($event->order->status === OrderStatus::Succeeded) {
             return;
         }

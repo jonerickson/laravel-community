@@ -12,23 +12,29 @@ use App\Mail\Subscriptions\SubscriptionDeleted as SubscriptionDeletedMail;
 use App\Mail\Subscriptions\SubscriptionUpdated as SubscriptionUpdatedMail;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Traits\Conditionable;
 
 class HandleSubscriptionEvent
 {
+    use Conditionable;
+
     public function handle(SubscriptionCreated|SubscriptionUpdated|SubscriptionDeleted $event): void
     {
         match ($event::class) {
             SubscriptionCreated::class => $this->sendMail(
-                new SubscriptionCreatedMail($event->order),
-                $event->order
+                mailable: new SubscriptionCreatedMail($event->order),
+                order: $event->order
             ),
-            SubscriptionUpdated::class => $this->sendMail(
-                new SubscriptionUpdatedMail($event->order, $event->status),
-                $event->order
+            SubscriptionUpdated::class => $this->when(
+                value: filled($event->previousStatus) && $event->currentStatus !== $event->previousStatus,
+                callback: fn (HandleSubscriptionEvent $eventHandler) => $eventHandler->sendMail(
+                    mailable: new SubscriptionUpdatedMail($event->order, $event->currentStatus),
+                    order: $event->order
+                )
             ),
             SubscriptionDeleted::class => $this->sendMail(
-                new SubscriptionDeletedMail($event->order),
-                $event->order
+                mailable: new SubscriptionDeletedMail($event->order),
+                order: $event->order
             ),
             default => null,
         };

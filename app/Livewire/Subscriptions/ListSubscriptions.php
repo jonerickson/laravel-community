@@ -20,6 +20,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
 use Livewire\Component;
 
 class ListSubscriptions extends Component implements HasActions, HasSchemas, HasTable
@@ -43,12 +44,12 @@ class ListSubscriptions extends Component implements HasActions, HasSchemas, Has
         return $table
             ->heading('Subscriptions')
             ->description('The user\'s subscription history.')
-            ->records(fn (): \Illuminate\Support\Collection => collect($this->records))
+            ->records(fn (): Collection => collect($this->records))
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('product.name'),
                 TextColumn::make('status')
-                    ->formatStateUsing(fn ($state) => SubscriptionStatus::tryFrom($state))
+                    ->formatStateUsing(fn ($state) => SubscriptionStatus::tryFrom($state ?? ''))
                     ->badge(),
                 TextColumn::make('trialEndsAt')
                     ->label('Trial Ends At')

@@ -12,6 +12,7 @@ use App\Mail\Orders\OrderCancelled as OrderCancelledMail;
 use App\Mail\Orders\OrderPending as OrderPendingMail;
 use App\Mail\Orders\OrderProcessing as OrderProcessingMail;
 use App\Mail\Orders\OrderSucceeded as OrderSucceededMail;
+use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Support\Facades\Mail;
 
 class HandleOrderEvent
@@ -39,7 +40,7 @@ class HandleOrderEvent
         };
     }
 
-    protected function sendMail(\Illuminate\Contracts\Mail\Mailable $mailable, $order): void
+    protected function sendMail(Mailable $mailable, $order): void
     {
         if ($order->user) {
             Mail::to($order->user->email)->send($mailable);

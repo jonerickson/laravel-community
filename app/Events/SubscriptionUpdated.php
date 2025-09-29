@@ -15,7 +15,8 @@ class SubscriptionUpdated implements ShouldQueue
 
     public function __construct(
         public Order $order,
-        public ?SubscriptionStatus $status = null,
+        public ?SubscriptionStatus $currentStatus = null,
+        public ?SubscriptionStatus $previousStatus = null,
     ) {
         //
     }

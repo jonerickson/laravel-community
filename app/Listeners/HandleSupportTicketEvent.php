@@ -11,6 +11,7 @@ use App\Events\SupportTicketUpdated;
 use App\Mail\SupportTickets\SupportTicketCommentAdded as SupportTicketCommentAddedMail;
 use App\Mail\SupportTickets\SupportTicketCreated as SupportTicketCreatedMail;
 use App\Mail\SupportTickets\SupportTicketStatusChanged as SupportTicketStatusChangedMail;
+use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Support\Facades\Mail;
 
 class HandleSupportTicketEvent
@@ -19,22 +20,22 @@ class HandleSupportTicketEvent
     {
         match ($event::class) {
             SupportTicketCreated::class => $this->sendMail(
-                new SupportTicketCreatedMail($event->supportTicket),
-                $event->supportTicket
+                mailable: new SupportTicketCreatedMail($event->supportTicket),
+                supportTicket: $event->supportTicket
             ),
             SupportTicketCommentAdded::class => $this->sendMail(
-                new SupportTicketCommentAddedMail($event->supportTicket, $event->comment),
-                $event->supportTicket
+                mailable: new SupportTicketCommentAddedMail($event->supportTicket, $event->comment),
+                supportTicket: $event->supportTicket
             ),
             SupportTicketStatusChanged::class => $this->sendMail(
-                new SupportTicketStatusChangedMail($event->supportTicket, $event->oldStatus, $event->newStatus),
-                $event->supportTicket
+                mailable: new SupportTicketStatusChangedMail($event->supportTicket, $event->oldStatus, $event->newStatus),
+                supportTicket: $event->supportTicket
             ),
             default => null,
         };
     }
 
-    protected function sendMail(\Illuminate\Contracts\Mail\Mailable $mailable, $supportTicket): void
+    protected function sendMail(Mailable $mailable, $supportTicket): void
     {
         if ($supportTicket->author) {
             Mail::to($supportTicket->author->email)->send($mailable);

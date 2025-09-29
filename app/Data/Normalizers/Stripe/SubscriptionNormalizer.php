@@ -21,7 +21,7 @@ class SubscriptionNormalizer implements Normalizer
             return [
                 'name' => $value->type,
                 'user' => UserData::from($value->user),
-                'status' => SubscriptionStatus::tryFrom($value->stripe_status),
+                'status' => SubscriptionStatus::tryFrom($value->stripe_status ?? ''),
                 'trialEndsAt' => $value->trial_ends_at?->toImmutable(),
                 'endsAt' => $value->ends_at?->toImmutable(),
                 'createdAt' => $value->created_at?->toImmutable(),
