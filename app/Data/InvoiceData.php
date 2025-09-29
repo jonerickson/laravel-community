@@ -20,4 +20,6 @@ class InvoiceData extends Data
     public ?string $invoiceUrl = null;
 
     public ?string $invoicePdfUrl = null;
+
+    public ?string $externalPaymentId = null;
 }

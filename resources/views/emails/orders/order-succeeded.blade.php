@@ -12,13 +12,15 @@ Excellent! Your order **#{{ $order->reference_id }}** has been completed success
 **Status:** {{ $order->status->getLabel() }}<br>
 **Total:** ${{ number_format($order->amount / 100, 2) }}<br>
 
+@if(count($order->items))
 <x-mail::table>
-| Item | Quantity | Price |
-|:-----|---------:|------:|
+| Item | Quantity |
+|:-----|---------:|
 @foreach($order->items as $item)
-| {{ $item->product?->name ?? 'Unknown Product' }} | {{ $item->quantity }} | {{ $item->price?->getLabel() ?? 'N/A' }} |
+| {{ $item->getLabel() }} | {{ $item->quantity }} |
 @endforeach
 </x-mail::table>
+@endif
 
 <x-mail::button :url="route('settings.orders')">
 View order

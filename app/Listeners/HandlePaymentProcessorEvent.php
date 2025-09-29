@@ -11,7 +11,9 @@ use App\Events\RefundCreated;
 use App\Events\SubscriptionCreated;
 use App\Events\SubscriptionDeleted;
 use App\Events\SubscriptionUpdated;
+use App\Mail\Payments\PaymentActionRequired as PaymentActionRequiredMail;
 use App\Mail\Payments\PaymentSucceeded as PaymentSucceededMail;
+use App\Mail\Payments\RefundCreated as RefundCreatedMail;
 use Illuminate\Support\Facades\Mail;
 
 class HandlePaymentProcessorEvent
@@ -45,6 +47,10 @@ class HandlePaymentProcessorEvent
 
     private function handlePaymentActionRequired(PaymentActionRequired $event): void
     {
+        if ($event->order->user && $event->confirmationUrl !== null) {
+            Mail::to($event->order->user->email)->send(new PaymentActionRequiredMail($event->order, $event->confirmationUrl));
+        }
+
         if ($event->order->status === OrderStatus::RequiresAction) {
             return;
         }
@@ -71,6 +77,10 @@ class HandlePaymentProcessorEvent
 
     private function handleRefundCreated(RefundCreated $event): void
     {
+        if ($event->order->user) {
+            Mail::to($event->order->user->email)->send(new RefundCreatedMail($event->order, $event->reason));
+        }
+
         if ($event->order->status === OrderStatus::Refunded) {
             return;
         }

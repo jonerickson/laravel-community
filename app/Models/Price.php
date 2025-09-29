@@ -38,8 +38,8 @@ use Illuminate\Support\Stringable;
  * @property array<array-key, mixed>|null $metadata
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read mixed $is_one_time
- * @property-read mixed $is_recurring
+ * @property-read bool $is_one_time
+ * @property-read bool $is_recurring
  * @property-read Product $product
  *
  * @method static Builder<static>|Price active()

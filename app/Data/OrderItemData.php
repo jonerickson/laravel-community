@@ -18,6 +18,8 @@ class OrderItemData extends Data
 
     public int $orderId;
 
+    public ?string $name;
+
     public ?int $productId = null;
 
     public ?int $priceId = null;

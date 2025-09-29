@@ -28,7 +28,7 @@ class OrderSucceeded extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Order Succeeded - #'.$this->order->reference_id,
+            subject: 'Order Successful - #'.$this->order->reference_id,
         );
     }
 

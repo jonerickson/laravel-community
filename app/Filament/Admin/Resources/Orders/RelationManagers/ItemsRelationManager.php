@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Orders\RelationManagers;
 
+use App\Models\OrderItem;
 use App\Models\Price;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -15,6 +16,8 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\HtmlString;
 
 class ItemsRelationManager extends RelationManager
 {
@@ -51,11 +54,14 @@ class ItemsRelationManager extends RelationManager
             ->heading('Order Items')
             ->description('The products belonging to the order.')
             ->columns([
-                TextColumn::make('product.name')
+                TextColumn::make('name')
+                    ->default(new HtmlString('&ndash;'))
+                    ->formatStateUsing(fn(OrderItem $item): string => $item->getLabel())
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('price')
-                    ->formatStateUsing(fn (Price $state): string|\Illuminate\Contracts\Support\Htmlable|null => $state->getLabel())
+                    ->default(new HtmlString('&ndash;'))
+                    ->formatStateUsing(fn ($state): string|Htmlable|null => $state instanceof Price ? $state->getLabel() : $state)
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('quantity')

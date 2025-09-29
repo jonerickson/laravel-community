@@ -151,6 +151,8 @@ declare namespace App.Data {
         externalInvoiceId: string;
         amount: number;
         invoiceUrl: string | null;
+        invoicePdfUrl: string | null;
+        externalPaymentId: string | null;
     };
     export type LikeData = {
         emoji: string;
@@ -185,6 +187,7 @@ declare namespace App.Data {
     export type OrderItemData = {
         id: number;
         orderId: number;
+        name: string | null;
         productId: number | null;
         priceId: number | null;
         quantity: number;

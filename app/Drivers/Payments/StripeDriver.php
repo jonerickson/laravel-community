@@ -285,6 +285,7 @@ class StripeDriver implements PaymentProcessor
                 'amount' => $invoice->total,
                 'invoice_url' => $invoice->hosted_invoice_url,
                 'invoice_pdf_url' => $invoice->invoice_pdf,
+                'external_payment_id' => $invoice->payment_intent,
             ]);
         });
     }

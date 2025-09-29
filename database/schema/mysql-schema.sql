@@ -468,8 +468,10 @@ DROP TABLE IF EXISTS `orders_items`;
 CREATE TABLE `orders_items` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `order_id` bigint unsigned NOT NULL,
+  `name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `product_id` bigint unsigned DEFAULT NULL,
   `price_id` bigint unsigned DEFAULT NULL,
+  `amount` int DEFAULT NULL,
   `quantity` int NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -792,6 +794,21 @@ CREATE TABLE `sessions` (
   KEY `sessions_last_activity_index` (`last_activity`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `settings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `settings` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `group` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `locked` tinyint(1) NOT NULL DEFAULT '0',
+  `payload` json NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `settings_group_name_unique` (`group`,`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `subscription_items`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -1077,3 +1094,6 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (65,'2025_09_12_034
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (66,'2025_09_15_161847_create_users_socials_table',19);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (67,'2025_09_15_212422_create_orders_table',20);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (68,'2025_09_15_214103_create_order_items_table',21);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (69,'2022_12_14_083707_create_settings_table',22);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (70,'2025_09_28_202015_create_email_settings',23);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (71,'2025_09_28_202053_create_general_settings',23);

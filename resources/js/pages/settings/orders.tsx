@@ -98,7 +98,7 @@ export default function Orders({ orders }: OrdersProps) {
                 const order = row.original;
                 const productNames =
                     order.items
-                        ?.map((item) => item.product?.name)
+                        ?.map((item) => item.product?.name || item.name)
                         .filter(Boolean)
                         .join(', ') || 'N/A';
 

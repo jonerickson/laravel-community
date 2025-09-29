@@ -33,12 +33,8 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read mixed $amount
  * @property-read mixed $checkout_url
- * @property-read mixed $is_one_time
- * @property-read mixed $is_recurring
- * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $items
- * @property-read int|null $items_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
- * @property-read int|null $products_count
+ * @property-read bool $is_one_time
+ * @property-read bool $is_recurring
  * @property-read User $user
  *
  * @method static Builder<static>|Order completed()
@@ -138,7 +134,7 @@ class Order extends Model
 
     public function isRecurring(): Attribute
     {
-        return Attribute::get(fn (): bool => filled($this->items->firstWhere(fn (OrderItem $orderItem) => $orderItem->price->is_recurring)))
+        return Attribute::get(fn (): bool => filled($this->items->filter->price->firstWhere(fn (OrderItem $orderItem) => $orderItem->price->is_recurring)))
             ->shouldCache();
     }
 

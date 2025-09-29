@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Number;
 
 /**
  * @property int $id
@@ -17,9 +18,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $product_id
  * @property int|null $price_id
  * @property int $quantity
+ * @property string|null $name
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read mixed $amount
+ * @property-read int|float $amount
  * @property-read Order $order
  * @property-read Price|null $price
  * @property-read Product|null $product
@@ -30,6 +32,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem wherePriceId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereProductId($value)
@@ -53,9 +56,7 @@ class OrderItem extends Model implements HasLabel
         'product_id',
         'price_id',
         'quantity',
-    ];
-
-    protected $appends = [
+        'name',
         'amount',
     ];
 
@@ -76,16 +77,34 @@ class OrderItem extends Model implements HasLabel
 
     public function amount(): Attribute
     {
-        return Attribute::get(fn (): int|float => ($this->price->amount ?? 0) * $this->quantity)
-            ->shouldCache();
+        return Attribute::get(function ($value, $attributes): int|float {
+            if ($amount = data_get($attributes, 'amount')) {
+                return $amount * $this->quantity;
+            }
+
+            return ($this->price->amount ?? 0) * $this->quantity;
+        })->shouldCache();
     }
 
     public function getLabel(): string|Htmlable|null
     {
-        $product = $this->product?->name ?? 'Unknown Product';
-        $price = $this->price?->getLabel() ?? 'Unknown Price';
+        $product = $this->name ?? $this->product?->name ?? 'Unknown Product';
+        $price = ($this->getOriginal('amount')
+            ? Number::currency($this->amount / 100)
+            : $this->price?->getLabel()) ?? 'Unknown Price';
 
         return "$product - $price";
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (OrderItem $model) {
+            if (blank($model->name)) {
+                $model->fill([
+                    'name' => $model->getLabel(),
+                ]);
+            }
+        });
     }
 
     protected function casts(): array

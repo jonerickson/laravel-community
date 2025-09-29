@@ -36,6 +36,6 @@ class CancelAction extends Action
 
     public static function getDefaultName(): ?string
     {
-        return 'refund';
+        return 'cancel';
     }
 }

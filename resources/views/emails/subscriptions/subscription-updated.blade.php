@@ -38,13 +38,15 @@ Your subscription **#{{ $order->reference_id }}** has been updated.
 **Current Status:** {{ $newStatus?->getLabel() ?? $order->status->getLabel() }}<br />
 **Total:** ${{ number_format($order->amount / 100, 2) }}<br />
 
+@if(count($order->items))
 <x-mail::table>
-| Item | Price |
-|:-----|------:|
+| Item | Quantity |
+|:-----|---------:|
 @foreach($order->items as $item)
-| {{ $item->product?->name ?? 'Unknown Product' }} | {{ $item->price?->getLabel() ?? 'N/A' }} |
+| {{ $item->getLabel() }} | {{ $item->quantity }} |
 @endforeach
 </x-mail::table>
+@endif
 
 <x-mail::button :url="route('settings.orders')">Manage subscription</x-mail::button>
 
