@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Number;
+use Override;
 
 /**
  * @property int $id
@@ -96,9 +97,10 @@ class OrderItem extends Model implements HasLabel
         return "$product - $price";
     }
 
+    #[Override]
     protected static function booted(): void
     {
-        static::creating(function (OrderItem $model) {
+        static::creating(function (OrderItem $model): void {
             if (blank($model->name)) {
                 $model->fill([
                     'name' => $model->getLabel(),

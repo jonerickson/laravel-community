@@ -56,7 +56,7 @@ class ItemsRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('name')
                     ->default(new HtmlString('&ndash;'))
-                    ->formatStateUsing(fn(OrderItem $item): string => $item->getLabel())
+                    ->formatStateUsing(fn (OrderItem $item): string => $item->getLabel())
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('price')

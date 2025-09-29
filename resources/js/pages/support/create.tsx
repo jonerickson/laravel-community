@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -24,25 +23,27 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface CreateSupportTicketProps {
     categories: App.Data.SupportTicketCategoryData[];
+    orders: App.Data.OrderData[];
 }
 
-export default function CreateSupportTicket({ categories }: CreateSupportTicketProps) {
+export default function CreateSupportTicket({ categories, orders }: CreateSupportTicketProps) {
     const { data, setData, post, processing, errors, reset } = useForm({
         subject: '',
         description: '',
         support_ticket_category_id: '',
+        order_id: '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
+        if (data.order_id === 'none') {
+            setData('order_id', '');
+        }
+
         post(route('support.store'), {
             onSuccess: () => {
                 reset();
-            },
-            onError: (err) => {
-                console.error('Error creating ticket:', err);
-                toast.error(err.message || 'Unable to create support ticket. Please try again.');
             },
         });
     };
@@ -84,7 +85,36 @@ export default function CreateSupportTicket({ categories }: CreateSupportTicketP
                                     </SelectContent>
                                 </Select>
                                 <InputError message={errors.support_ticket_category_id} />
+                                <div className="text-xs text-muted-foreground">Choose the category that best outlines the nature of your ticket.</div>
                             </div>
+
+                            {orders && orders.length > 0 && (
+                                <div className="grid gap-2">
+                                    <Label htmlFor="order_id">Related Order (optional)</Label>
+                                    <Select value={data.order_id} onValueChange={(value) => setData('order_id', value)}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select an order if this is related to a purchase" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="none">No related order</SelectItem>
+                                            {orders.map((order) => (
+                                                <SelectItem key={order.id} value={order.id.toString()}>
+                                                    #{order.referenceId} -{' '}
+                                                    {order.items
+                                                        ?.map((item) => item.product?.name || item.name)
+                                                        .filter(Boolean)
+                                                        .join(', ') || 'N/A'}{' '}
+                                                    - ${((order.amount || 0) / 100).toFixed(2)}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError message={errors.order_id} />
+                                    <div className="text-xs text-muted-foreground">
+                                        Attaching a related order helps our support team provide better assistance.
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="grid gap-2">
                                 <Label htmlFor="subject">Subject</Label>
@@ -97,6 +127,7 @@ export default function CreateSupportTicket({ categories }: CreateSupportTicketP
                                     required
                                 />
                                 <InputError message={errors.subject} />
+                                <div className="text-xs text-muted-foreground">The main subject of your support ticket.</div>
                             </div>
 
                             <div className="grid gap-2">

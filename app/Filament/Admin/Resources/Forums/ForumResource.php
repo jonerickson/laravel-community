@@ -176,7 +176,7 @@ class ForumResource extends Resource
                         ->requiresConfirmation(),
                 ]),
             ])
-            ->reorderable()
+            ->reorderable('order')
             ->defaultSort('order')
             ->defaultGroup('category.name');
     }

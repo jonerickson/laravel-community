@@ -390,6 +390,7 @@ declare namespace App.Data {
         status: App.Enums.SupportTicketStatus;
         priority: App.Enums.SupportTicketPriority;
         supportTicketCategoryId: number;
+        order: App.Data.OrderData | null;
         category: App.Data.SupportTicketCategoryData | null;
         assignedTo: number | null;
         assignedToUser: App.Data.UserData | null;

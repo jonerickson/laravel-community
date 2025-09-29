@@ -21,6 +21,7 @@ class StoreSupportTicketRequest extends FormRequest
             'subject' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:10000'],
             'support_ticket_category_id' => ['required', 'exists:support_tickets_categories,id'],
+            'order_id' => ['nullable', 'exists:orders,id,user_id,'.Auth::id()],
         ];
     }
 
@@ -34,6 +35,7 @@ class StoreSupportTicketRequest extends FormRequest
             'description.max' => 'The description cannot be longer than 10,000 characters.',
             'support_ticket_category_id.required' => 'Please select a category for your support ticket.',
             'support_ticket_category_id.exists' => 'The selected category is invalid.',
+            'order_id.exists' => 'The selected order is invalid or does not belong to you.',
         ];
     }
 }

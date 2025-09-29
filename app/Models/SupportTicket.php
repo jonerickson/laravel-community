@@ -110,6 +110,7 @@ class SupportTicket extends Model
         'priority',
         'support_ticket_category_id',
         'assigned_to',
+        'order_id',
         'external_id',
         'external_driver',
         'external_data',
@@ -143,6 +144,11 @@ class SupportTicket extends Model
     public function assignedTo(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
     }
 
     public function scopeActive(Builder $query): void

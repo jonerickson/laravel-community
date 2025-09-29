@@ -31,6 +31,9 @@ class SupportTicketData extends Data
     public int $supportTicketCategoryId;
 
     #[LoadRelation]
+    public ?OrderData $order = null;
+
+    #[LoadRelation]
     public ?SupportTicketCategoryData $category = null;
 
     public ?int $assignedTo = null;

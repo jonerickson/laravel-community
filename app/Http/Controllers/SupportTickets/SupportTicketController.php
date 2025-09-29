@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\SupportTickets;
 
+use App\Data\OrderData;
 use App\Data\PaginatedData;
 use App\Data\SupportTicketCategoryData;
 use App\Data\SupportTicketData;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SupportTickets\StoreSupportTicketRequest;
 use App\Http\Requests\SupportTickets\UpdateSupportTicketRequest;
 use App\Managers\SupportTicketManager;
+use App\Models\Order;
 use App\Models\SupportTicket;
 use App\Models\SupportTicketCategory;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -37,6 +39,7 @@ class SupportTicketController extends Controller
         $tickets = SupportTicketData::collect(SupportTicket::query()
             ->with('category')
             ->with('author')
+            ->with('order')
             ->whereBelongsTo(Auth::user(), 'author')
             ->latest()
             ->get()
@@ -55,8 +58,14 @@ class SupportTicketController extends Controller
 
         $categories = SupportTicketCategory::active()->ordered()->get();
 
+        $orders = Order::query()
+            ->whereBelongsTo(Auth::user())
+            ->latest()
+            ->get();
+
         return Inertia::render('support/create', [
             'categories' => SupportTicketCategoryData::collect($categories),
+            'orders' => OrderData::collect($orders),
         ]);
     }
 
