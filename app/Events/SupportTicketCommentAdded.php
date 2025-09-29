@@ -6,9 +6,10 @@ namespace App\Events;
 
 use App\Models\Comment;
 use App\Models\SupportTicket;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class SupportTicketCommentAdded
+class SupportTicketCommentAdded implements ShouldQueue
 {
     use Queueable;
 

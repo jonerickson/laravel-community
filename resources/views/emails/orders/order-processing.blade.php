@@ -12,8 +12,6 @@ Great news! Your order **#{{ $order->reference_id }}** is now being processed. W
 **Status:** {{ $order->status->getLabel() }}<br>
 **Total:** ${{ number_format($order->amount / 100, 2) }}<br>
 
-## Items Ordered
-
 <x-mail::table>
 | Item | Quantity | Price |
 |:-----|---------:|------:|

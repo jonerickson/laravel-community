@@ -6,9 +6,10 @@ namespace App\Events;
 
 use App\Enums\SupportTicketStatus;
 use App\Models\SupportTicket;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class SupportTicketStatusChanged
+class SupportTicketStatusChanged implements ShouldQueue
 {
     use Queueable;
 

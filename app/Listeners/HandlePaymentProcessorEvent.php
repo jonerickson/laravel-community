@@ -8,16 +8,21 @@ use App\Enums\OrderStatus;
 use App\Events\PaymentActionRequired;
 use App\Events\PaymentSucceeded;
 use App\Events\RefundCreated;
+use App\Events\SubscriptionCreated;
+use App\Events\SubscriptionDeleted;
+use App\Events\SubscriptionUpdated;
 
 class HandlePaymentProcessorEvent
 {
-    public function handle(PaymentSucceeded|PaymentActionRequired|RefundCreated $event): void
+    public function handle(PaymentSucceeded|PaymentActionRequired|SubscriptionCreated|SubscriptionUpdated|SubscriptionDeleted|RefundCreated $event): void
     {
         match ($event::class) {
             PaymentSucceeded::class => $this->handlePaymentSucceeded($event),
             PaymentActionRequired::class => $this->handlePaymentActionRequired($event),
+            SubscriptionCreated::class => $this->handleSubscriptionCreated(),
+            SubscriptionUpdated::class => $this->handleSubscriptionUpdated(),
+            SubscriptionDeleted::class => $this->handleSubscriptionDeleted(),
             RefundCreated::class => $this->handleRefundCreated($event),
-
         };
     }
 
@@ -41,6 +46,21 @@ class HandlePaymentProcessorEvent
         $event->order->update([
             'status' => OrderStatus::RequiresAction,
         ]);
+    }
+
+    private function handleSubscriptionCreated(): void
+    {
+        //
+    }
+
+    private function handleSubscriptionUpdated(): void
+    {
+        //
+    }
+
+    private function handleSubscriptionDeleted(): void
+    {
+        //
     }
 
     private function handleRefundCreated(RefundCreated $event): void

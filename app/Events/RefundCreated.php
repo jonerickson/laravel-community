@@ -6,9 +6,10 @@ namespace App\Events;
 
 use App\Enums\OrderRefundReason;
 use App\Models\Order;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class RefundCreated
+class RefundCreated implements ShouldQueue
 {
     use Queueable;
 

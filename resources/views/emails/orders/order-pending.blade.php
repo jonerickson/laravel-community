@@ -12,8 +12,6 @@ Your order **#{{ $order->reference_id }}** is now pending review. We'll process 
 **Status:** {{ $order->status->getLabel() }}<br>
 **Total:** ${{ number_format($order->amount / 100, 2) }}<br>
 
-## Items Ordered
-
 <x-mail::table>
 | Item | Quantity | Price |
 |:-----|---------:|------:|

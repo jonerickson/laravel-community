@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Events;
 
 use App\Models\Order;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class SubscriptionCreated
+class SubscriptionCreated implements ShouldQueue
 {
     use Queueable;
 

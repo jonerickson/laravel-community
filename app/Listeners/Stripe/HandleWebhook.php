@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Listeners\Stripe;
 
 use App\Enums\OrderRefundReason;
+use App\Enums\SubscriptionStatus;
 use App\Events\CustomerDeleted;
 use App\Events\CustomerUpdated;
 use App\Events\PaymentActionRequired;
@@ -54,7 +55,10 @@ class HandleWebhook implements ShouldQueue
             'invoice.payment_succeeded' => event(new PaymentSucceeded($order)),
             'invoice.payment_action_required' => event(new PaymentActionRequired($order)),
             'customer.subscription.created' => event(new SubscriptionCreated($order)),
-            'customer.subscription.updated' => event(new SubscriptionUpdated($order)),
+            'customer.subscription.updated' => event(new SubscriptionUpdated(
+                order: $order,
+                status: SubscriptionStatus::tryFrom(data_get($event->payload, 'data.object.status')),
+            )),
             'customer.subscription.deleted' => event(new SubscriptionDeleted($order)),
             'customer.updated' => event(new CustomerUpdated($this->user)),
             'customer.deleted' => event(new CustomerDeleted($this->user)),
@@ -76,19 +80,61 @@ class HandleWebhook implements ShouldQueue
 
     protected function handleCustomerUpdated(): void {}
 
-    protected function handleSubscriptionCreated(): void {}
-
-    protected function handleSubscriptionUpdated(): void {}
-
-    protected function handleSubscriptionDeleted(): void {}
-
-    protected function handlePaymentSucceeded(): ?Order
+    protected function handleSubscriptionCreated(): ?Order
     {
-        if ((($orderId = $this->resolveOrderId())) === null || (($orderId = $this->resolveOrderId())) === '' || (($orderId = $this->resolveOrderId())) === '0') {
+        if (blank($orderId = $this->resolveOrderId())) {
             return null;
         }
 
-        $order = Order::firstOrCreate([
+        return Order::updateOrCreate([
+            'reference_id' => $orderId,
+        ], [
+            'user_id' => $this->user->getKey(),
+            'external_order_id' => data_get($this->payload, 'data.object.id'),
+            'external_payment_id' => data_get($this->payload, 'data.object.default_payment_method'),
+            'external_invoice_id' => data_get($this->payload, 'data.object.latest_invoice'),
+        ]);
+    }
+
+    protected function handleSubscriptionUpdated(): ?Order
+    {
+        if (blank($orderId = $this->resolveOrderId())) {
+            return null;
+        }
+
+        return Order::updateOrCreate([
+            'reference_id' => $orderId,
+        ], [
+            'user_id' => $this->user->getKey(),
+            'external_order_id' => data_get($this->payload, 'data.object.id'),
+            'external_payment_id' => data_get($this->payload, 'data.object.default_payment_method'),
+            'external_invoice_id' => data_get($this->payload, 'data.object.latest_invoice'),
+        ]);
+    }
+
+    protected function handleSubscriptionDeleted(): ?Order
+    {
+        if (blank($orderId = $this->resolveOrderId())) {
+            return null;
+        }
+
+        return Order::updateOrCreate([
+            'reference_id' => $orderId,
+        ], [
+            'user_id' => $this->user->getKey(),
+            'external_order_id' => data_get($this->payload, 'data.object.id'),
+            'external_payment_id' => data_get($this->payload, 'data.object.default_payment_method'),
+            'external_invoice_id' => data_get($this->payload, 'data.object.latest_invoice'),
+        ]);
+    }
+
+    protected function handlePaymentSucceeded(): ?Order
+    {
+        if (blank($orderId = $this->resolveOrderId())) {
+            return null;
+        }
+
+        $order = Order::updateOrCreate([
             'reference_id' => $orderId,
         ], [
             'user_id' => $this->user->getKey(),
@@ -117,11 +163,11 @@ class HandleWebhook implements ShouldQueue
 
     protected function handlePaymentActionRequired(): ?Order
     {
-        if ((($orderId = $this->resolveOrderId())) === null || (($orderId = $this->resolveOrderId())) === '' || (($orderId = $this->resolveOrderId())) === '0') {
+        if (blank($orderId = $this->resolveOrderId())) {
             return null;
         }
 
-        return Order::firstOrCreate([
+        return Order::updateOrCreate([
             'reference_id' => $orderId,
         ], [
             'user_id' => $this->user->getKey(),
@@ -132,11 +178,11 @@ class HandleWebhook implements ShouldQueue
 
     protected function handleRefundCreated(): ?Order
     {
-        if ((($paymentIntendId = $this->resolvePaymentIntendId())) === null || (($paymentIntendId = $this->resolvePaymentIntendId())) === '' || (($paymentIntendId = $this->resolvePaymentIntendId())) === '0') {
+        if (blank($paymentIntendId = $this->resolvePaymentIntendId())) {
             return null;
         }
 
-        return Order::firstOrCreate([
+        return Order::updateOrCreate([
             'external_order_id' => $paymentIntendId,
         ], [
             'user_id' => $this->user->getKey(),
@@ -148,6 +194,9 @@ class HandleWebhook implements ShouldQueue
         return match (data_get($this->payload, 'type')) {
             'invoice.payment_succeeded' => $this->handlePaymentSucceeded(),
             'invoice.payment_action_required' => $this->handlePaymentActionRequired(),
+            'customer.subscription.created' => $this->handleSubscriptionCreated(),
+            'customer.subscription.updated' => $this->handleSubscriptionUpdated(),
+            'customer.subscription.deleted' => $this->handleSubscriptionDeleted(),
             'refund.created' => $this->handleRefundCreated(),
             default => null,
         };
@@ -155,9 +204,11 @@ class HandleWebhook implements ShouldQueue
 
     private function resolveCustomer(): ?User
     {
-        return User::query()
-            ->where('stripe_id', data_get($this->payload, 'data.object.customer'))
-            ->first();
+        return match (data_get($this->payload, 'type')) {
+            default => User::query()
+                ->where('stripe_id', data_get($this->payload, 'data.object.customer'))
+                ->first(),
+        };
     }
 
     private function resolvePaymentIntendId(): ?string
@@ -172,6 +223,7 @@ class HandleWebhook implements ShouldQueue
     {
         return match (data_get($this->payload, 'type')) {
             'invoice.payment_succeeded' => data_get(Collection::make(data_get($this->payload, 'data.object.lines.data'))->firstWhere(fn (array $item): bool => filled(data_get($item, 'metadata.order_id'))), 'metadata.order_id'),
+            'customer.subscription.created', 'customer.subscription.updated', 'customer.subscription.deleted' => data_get($this->payload, 'data.object.metadata.order_id'),
             default => null,
         };
     }

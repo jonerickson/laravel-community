@@ -2,40 +2,35 @@
 
 declare(strict_types=1);
 
-namespace App\Mail\Orders;
+namespace App\Mail\Subscriptions;
 
-use App\Data\InvoiceData;
-use App\Managers\PaymentManager;
 use App\Models\Order;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
-class OrderSucceeded extends Mailable implements ShouldQueue
+class SubscriptionDeleted extends Mailable implements ShouldQueue
 {
     use Queueable;
 
-    protected ?InvoiceData $invoice = null;
-
     public function __construct(public Order $order)
     {
-        $this->invoice = app(PaymentManager::class)->findInvoice($order);
+        //
     }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Order Succeeded - #'.$this->order->reference_id,
+            subject: 'Subscription Cancelled - #'.$this->order->reference_id,
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.orders.order-succeeded',
+            markdown: 'emails.subscriptions.subscription-deleted',
             with: [
                 'order' => $this->order,
             ],
@@ -44,13 +39,6 @@ class OrderSucceeded extends Mailable implements ShouldQueue
 
     public function attachments(): array
     {
-        if (blank($url = $this->invoice->invoicePdfUrl)) {
-            return [];
-        }
-
-        return [
-            Attachment::fromUrl($url)
-                ->as($this->order->reference_id),
-        ];
+        return [];
     }
 }

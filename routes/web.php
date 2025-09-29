@@ -6,6 +6,12 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('test', function (): App\Mail\Subscriptions\SubscriptionUpdated {
+    $order = App\Models\Order::latest()->first();
+
+    return new App\Mail\Subscriptions\SubscriptionUpdated(order: $order);
+});
+
 Route::get('/', HomeController::class)->name('home');
 
 Route::group(['middleware' => 'auth', 'verified'], function (): void {

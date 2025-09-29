@@ -154,7 +154,7 @@ class Price extends Model implements HasLabel
 
         return Str::of($this->name)
             ->append(" - $amount")
-            ->when(filled($interval), fn (Stringable $str): string => " / $interval")
+            ->when(filled($interval), fn (Stringable $str): Stringable => $str->append(" / $interval"))
             ->toString();
     }
 

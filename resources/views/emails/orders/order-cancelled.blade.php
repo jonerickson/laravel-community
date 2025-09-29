@@ -12,8 +12,6 @@ Your order **#{{ $order->reference_id }}** has been cancelled. If you have any q
 **Status:** {{ $order->status->getLabel() }}<br>
 **Total:** ${{ number_format($order->amount / 100, 2) }}<br>
 
-## Items Ordered
-
 <x-mail::table>
 | Item | Quantity | Price |
 |:-----|---------:|------:|
