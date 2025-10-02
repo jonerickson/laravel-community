@@ -23,9 +23,12 @@ return [
     'show_webby' => true,
 
     'routes' => [
-        'domain' => env('API_DOMAIN'),
+        'domain' => env('APP_URL'),
         // Global middleware applied to every API Platform routes
-        // 'middleware' => [],
+        'middleware' => [
+            'web',
+            'auth',
+        ],
     ],
 
     'resources' => [
@@ -61,7 +64,7 @@ return [
         'pagination_client_partial' => false,
         'pagination_items_per_page' => 30,
         'pagination_maximum_items_per_page' => 30,
-        'route_prefix' => '/v1',
+        'route_prefix' => '/api/v1',
         'middleware' => [],
         'collect_denormalization_errors' => true,
         'normalization_context' => [
