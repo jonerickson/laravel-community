@@ -1,9 +1,11 @@
 import { AbstractBackgroundPattern } from '@/components/ui/abstract-background-pattern';
+import { useFingerprint } from '@/hooks';
 import { useFlashMessages } from '@/hooks/use-flash-messages';
 import AuthLayoutTemplate from '@/layouts/auth/auth-simple-layout';
 
 export default function AuthLayout({ children, title, description, ...props }: { children: React.ReactNode; title: string; description: string }) {
     useFlashMessages();
+    useFingerprint();
 
     return (
         <div className="relative overflow-hidden">

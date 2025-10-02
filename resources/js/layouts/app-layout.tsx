@@ -1,3 +1,4 @@
+import { useFingerprint } from '@/hooks';
 import { useFlashMessages } from '@/hooks/use-flash-messages';
 import { useLayout } from '@/hooks/use-layout';
 import AppHeaderLayout from '@/layouts/app/app-header-layout';
@@ -17,6 +18,7 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
     const { layout } = useLayout();
 
     useFlashMessages();
+    useFingerprint();
 
     const LayoutComponent = layout === 'header' || !auth?.user ? AppHeaderLayout : AppSidebarLayout;
 

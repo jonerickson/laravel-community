@@ -13,15 +13,18 @@ use App\Services\PermissionService;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
 use Filament\Tables\Table;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Laravel\Cashier\Cashier;
 use Laravel\Passport\Passport;
@@ -65,6 +68,32 @@ class AppServiceProvider extends ServiceProvider
 
         Model::automaticallyEagerLoadRelationships();
         Model::shouldBeStrict();
+
+        Password::defaults(function () {
+            return Password::min(8)
+                ->when($this->app->environment(['staging', 'production']), function (Password $password) {
+                    $password
+                        ->letters()
+                        ->symbols()
+                        ->numbers()
+                        ->mixedCase()
+                        ->uncompromised();
+                });
+        });
+
+        RateLimiter::for('login', function (\Illuminate\Http\Request $request) {
+            return [
+                Limit::perMinute(5)->by($request->fingerprintId() ?: $request->ip()),
+                Limit::perHour(30)->by($request->fingerprintId() ?: $request->ip()),
+            ];
+        });
+
+        RateLimiter::for('register', function (\Illuminate\Http\Request $request) {
+            return [
+                Limit::perMinute(2)->by($request->fingerprintId() ?: $request->ip()),
+                Limit::perHour(5)->by($request->fingerprintId() ?: $request->ip()),
+            ];
+        });
 
         Socialite::extend('discord', fn () => Socialite::buildProvider(
             provider: DiscordProvider::class,
