@@ -35,7 +35,7 @@ class PermissionSeeder extends Seeder
 
     private function createPermissionsFromPolicies(): void
     {
-        $policyFiles = glob(base_path('vendor/jonerickson/laravel-community/src/Policies/*.php'));
+        $policyFiles = glob(app_path('Policies/*.php'));
 
         foreach ($policyFiles as $policyFile) {
             $className = 'App\\Policies\\'.basename($policyFile, '.php');

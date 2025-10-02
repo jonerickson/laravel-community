@@ -1,9 +1,12 @@
+import { EmptyState } from '@/components/empty-state';
+import Heading from '@/components/heading';
 import StoreIndexCategories from '@/components/store-index-categories';
 import StoreIndexFeatured from '@/components/store-index-featured';
 import StoreIndexUserProvided from '@/components/store-index-user-provided';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, WhenVisible } from '@inertiajs/react';
+import { ShoppingCart } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -39,6 +42,18 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
                     <WhenVisible fallback={<div className="h-64 animate-pulse rounded-lg bg-muted" />} data={['userProvidedProducts']}>
                         <StoreIndexUserProvided products={userProvidedProducts} />
                     </WhenVisible>
+                )}
+
+                {categories.length === 0 && featuredProducts.length === 0 && userProvidedProducts.length === 0 && (
+                    <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto">
+                        <div className="sm:flex sm:items-baseline sm:justify-between">
+                            <Heading title="Store" description="No products available" />
+                        </div>
+
+                        <div className="-mt-8">
+                            <EmptyState icon={<ShoppingCart />} title="No products available" description="Check back later for new categories." />
+                        </div>
+                    </div>
                 )}
             </div>
         </AppLayout>

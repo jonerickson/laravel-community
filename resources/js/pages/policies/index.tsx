@@ -1,10 +1,11 @@
+import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { FileText, Folder } from 'lucide-react';
+import { File, FileText, Folder } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -72,13 +73,7 @@ export default function PolicyCategoryIndex({ categories }: PoliciesIndexProps) 
                 </div>
 
                 {categories.length === 0 && (
-                    <Card>
-                        <CardContent className="flex flex-col items-center justify-center py-12">
-                            <FileText className="mb-4 size-12 text-muted-foreground" />
-                            <CardTitle className="mb-2">No Policies Available</CardTitle>
-                            <CardDescription>Policy documents will be available here when published.</CardDescription>
-                        </CardContent>
-                    </Card>
+                    <EmptyState icon={<File />} title="No policies available" description="Policy documents will be available here when published." />
                 )}
             </div>
         </AppLayout>
