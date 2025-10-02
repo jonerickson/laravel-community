@@ -16,13 +16,13 @@ use Override;
 /**
  * @property int $id
  * @property int $order_id
+ * @property string|null $name
  * @property int|null $product_id
  * @property int|null $price_id
+ * @property int|float $amount
  * @property int $quantity
- * @property string|null $name
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read int|float $amount
  * @property-read Order $order
  * @property-read Price|null $price
  * @property-read Product|null $product
@@ -31,6 +31,7 @@ use Override;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereName($value)

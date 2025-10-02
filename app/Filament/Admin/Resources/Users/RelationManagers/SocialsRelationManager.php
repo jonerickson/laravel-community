@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 
 class SocialsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'socials';
+    protected static string $relationship = 'integrations';
 
     public function table(Table $table): Table
     {

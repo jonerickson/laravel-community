@@ -30,7 +30,7 @@ class CallbackController extends Controller
             'email_verified_at' => now(),
         ]);
 
-        $user->socials()->updateOrCreate([
+        $user->integrations()->updateOrCreate([
             'provider' => $provider,
             'provider_id' => $socialUser->getId(),
         ], [

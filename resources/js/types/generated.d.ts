@@ -444,7 +444,7 @@ declare namespace App.Data {
         createdAt: string | null;
         updatedAt: string | null;
     };
-    export type UserSocialData = {
+    export type UserIntegrationData = {
         id: number;
         userId: number;
         provider: string;

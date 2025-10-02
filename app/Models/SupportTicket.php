@@ -27,6 +27,7 @@ use Override;
  * @property SupportTicketStatus $status
  * @property SupportTicketPriority $priority
  * @property int $support_ticket_category_id
+ * @property int|null $order_id
  * @property int|null $assigned_to
  * @property string|null $external_id
  * @property string|null $external_driver
@@ -51,6 +52,7 @@ use Override;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, File> $files
  * @property-read int|null $files_count
  * @property-read bool $is_active
+ * @property-read Order|null $order
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $topLevelComments
  * @property-read int|null $top_level_comments_count
  *
@@ -75,6 +77,7 @@ use Override;
  * @method static Builder<static>|SupportTicket whereExternalId($value)
  * @method static Builder<static>|SupportTicket whereId($value)
  * @method static Builder<static>|SupportTicket whereLastSyncedAt($value)
+ * @method static Builder<static>|SupportTicket whereOrderId($value)
  * @method static Builder<static>|SupportTicket wherePriority($value)
  * @method static Builder<static>|SupportTicket whereResolvedAt($value)
  * @method static Builder<static>|SupportTicket whereStatus($value)

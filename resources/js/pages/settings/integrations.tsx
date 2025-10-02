@@ -45,7 +45,7 @@ const availableIntegrations: Integration[] = [
 ];
 
 interface ConnectedAccountsProps {
-    connectedAccounts: App.Data.UserSocialData[];
+    connectedAccounts: App.Data.UserIntegrationData[];
 }
 
 export default function Integrations({ connectedAccounts }: ConnectedAccountsProps) {

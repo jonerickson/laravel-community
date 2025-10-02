@@ -18,7 +18,7 @@ use App\Http\Controllers\Api\TopicController;
 use App\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['middleware' => [EnsureFrontendRequestsAreStateful::class], 'as' => 'api.'], function (): void {
+Route::group(['domain' => config('app.url'), 'middleware' => [EnsureFrontendRequestsAreStateful::class], 'as' => 'api.'], function (): void {
     Route::put('/cart', [ShoppingCartController::class, 'update'])->name('cart.update');
     Route::delete('/cart', [ShoppingCartController::class, 'destroy'])->name('cart.destroy');
     Route::post('/fingerprint', FingerprintController::class)->name('fingerprint');

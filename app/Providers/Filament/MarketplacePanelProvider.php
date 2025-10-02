@@ -16,6 +16,7 @@ use Filament\Support\Enums\Width;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -31,7 +32,8 @@ class MarketplacePanelProvider extends PanelProvider
         return $panel
             ->id('marketplace')
             ->path('marketplace')
-            ->brandLogo(fn (): View|\Illuminate\Contracts\View\Factory => view('filament.components.logo'))
+            ->domain(config('app.url'))
+            ->brandLogo(fn (): View|Factory => view('filament.components.logo'))
             ->colors([
                 'primary' => Color::Zinc,
             ])

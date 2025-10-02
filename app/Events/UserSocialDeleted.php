@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Events;
 
-use App\Models\UserSocial;
+use App\Models\UserIntegration;
 use Illuminate\Foundation\Queue\Queueable;
 
 class UserSocialDeleted
 {
     use Queueable;
 
-    public function __construct(public UserSocial $social)
+    public function __construct(public UserIntegration $social)
     {
         //
     }

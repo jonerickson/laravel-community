@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Models\Permission;
+use App\Models\Subscription;
 use App\Models\User;
 use App\Providers\Social\DiscordProvider;
 use App\Providers\Social\RobloxProvider;
@@ -27,10 +28,17 @@ use Laravel\Socialite\Facades\Socialite;
 
 class AppServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        Cashier::ignoreRoutes();
+        Passport::ignoreRoutes();
+    }
+
     public function boot(): void
     {
         Cashier::calculateTaxes();
         Cashier::useCustomerModel(User::class);
+        Cashier::useSubscriptionModel(Subscription::class);
 
         Context::add('request_id', Str::uuid()->toString());
 

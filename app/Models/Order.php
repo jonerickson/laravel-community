@@ -35,6 +35,10 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property-read mixed $checkout_url
  * @property-read bool $is_one_time
  * @property-read bool $is_recurring
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $items
+ * @property-read int|null $items_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
+ * @property-read int|null $products_count
  * @property-read User $user
  *
  * @method static Builder<static>|Order completed()

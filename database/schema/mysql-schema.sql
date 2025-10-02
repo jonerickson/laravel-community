@@ -857,6 +857,7 @@ CREATE TABLE `support_tickets` (
   `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `priority` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `support_ticket_category_id` bigint unsigned NOT NULL,
+  `order_id` bigint unsigned DEFAULT NULL,
   `assigned_to` bigint unsigned DEFAULT NULL,
   `external_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `external_driver` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -875,8 +876,10 @@ CREATE TABLE `support_tickets` (
   KEY `support_tickets_support_ticket_category_id_status_index` (`support_ticket_category_id`,`status`),
   KEY `support_tickets_external_driver_external_id_index` (`external_driver`,`external_id`),
   KEY `support_tickets_ticket_number_index` (`ticket_number`),
+  KEY `support_tickets_order_id_foreign` (`order_id`),
   CONSTRAINT `support_tickets_assigned_to_foreign` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `support_tickets_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `support_tickets_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE SET NULL,
   CONSTRAINT `support_tickets_support_ticket_category_id_foreign` FOREIGN KEY (`support_ticket_category_id`) REFERENCES `support_tickets_categories` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -983,10 +986,10 @@ CREATE TABLE `users_groups` (
   CONSTRAINT `users_groups_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `users_socials`;
+DROP TABLE IF EXISTS `users_integrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `users_socials` (
+CREATE TABLE `users_integrations` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
   `provider` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -1097,3 +1100,4 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (68,'2025_09_15_214
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (69,'2022_12_14_083707_create_settings_table',22);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (70,'2025_09_28_202015_create_email_settings',23);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (71,'2025_09_28_202053_create_general_settings',23);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (72,'2025_09_29_180212_add_order_id_to_support_tickets_table',24);

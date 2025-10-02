@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.4",
         "ext-fileinfo": "*",
+        "api-platform/laravel": "^4.1",
         "filament/filament": "^4.0.15",
         "filament/spatie-laravel-settings-plugin": "^4.0",
         "inertiajs/inertia-laravel": "^2.0.6",

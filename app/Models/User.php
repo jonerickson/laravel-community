@@ -4,10 +4,17 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Serializer\AbstractItemNormalizer;
+use App\Data\SubscriptionData;
 use App\Enums\OrderStatus;
 use App\Events\UserCreated;
 use App\Events\UserDeleted;
 use App\Events\UserUpdated;
+use App\Facades\PaymentProcessor;
 use App\Managers\PaymentManager;
 use App\Traits\HasAvatar;
 use App\Traits\HasEmailAuthentication;
@@ -38,12 +45,12 @@ use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Laravel\Cashier\Billable;
-use Laravel\Cashier\Subscription;
 use Laravel\Passport\Contracts\OAuthenticatable;
 use Laravel\Passport\HasApiTokens;
 use Override;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * @property int $id
@@ -81,10 +88,13 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read string|null $avatar_url
  * @property-read Collection<int, \Laravel\Passport\Client> $clients
  * @property-read int|null $clients_count
+ * @property-read SubscriptionData|null $current_subscription
  * @property-read Collection<int, Fingerprint> $fingerprints
  * @property-read int|null $fingerprints_count
  * @property-read Collection<int, Group> $groups
  * @property-read int|null $groups_count
+ * @property-read Collection<int, UserIntegration> $integrations
+ * @property-read int|null $integrations_count
  * @property-read bool $is_banned
  * @property-read bool $is_reported
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
@@ -104,8 +114,6 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read int|null $reports_count
  * @property-read Collection<int, Role> $roles
  * @property-read int|null $roles_count
- * @property-read Collection<int, UserSocial> $socials
- * @property-read int|null $socials_count
  * @property-read Collection<int, Subscription> $subscriptions
  * @property-read int|null $subscriptions_count
  * @property-read Collection<int, \Laravel\Passport\Token> $tokens
@@ -154,6 +162,23 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  *
  * @mixin \Eloquent
  */
+#[ApiResource(
+    operations: [
+        new Get,
+        new GetCollection,
+    ],
+    normalizationContext: [
+        AbstractItemNormalizer::GROUPS => ['user'],
+        AbstractItemNormalizer::SKIP_NULL_VALUES => false,
+    ]
+)]
+#[ApiProperty(identifier: true, property: 'id', serialize: new Groups(['user']))]
+#[ApiProperty(property: 'referenceId', serialize: new Groups(['user']))]
+#[ApiProperty(property: 'name', serialize: new Groups(['user']))]
+#[ApiProperty(property: 'email', serialize: new Groups(['user']))]
+#[ApiProperty(property: 'integrations', serialize: new Groups(['user']))]
+#[ApiProperty(property: 'products', serialize: new Groups(['user']))]
+#[ApiProperty(property: 'currentSubscription', serialize: new Groups(['user']))]
 class User extends Authenticatable implements EmailAuthenticationContract, FilamentAvatar, FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery, HasName, MustVerifyEmail, OAuthenticatable
 {
     use Billable;
@@ -192,11 +217,15 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     ];
 
     protected $hidden = [
+        'password',
         'remember_token',
         'stripe_id',
         'pm_type',
         'pm_last_four',
         'pm_expiration',
+        'has_email_authentication',
+        'app_authentication_recovery_codes',
+        'app_authentication_secret',
     ];
 
     protected $appends = [
@@ -252,9 +281,9 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
             ->distinct();
     }
 
-    public function socials(): HasMany
+    public function integrations(): HasMany
     {
-        return $this->hasMany(UserSocial::class);
+        return $this->hasMany(UserIntegration::class);
     }
 
     public function isBanned(): Attribute
@@ -262,6 +291,13 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         return Attribute::make(
             get: fn (): bool => $this->fingerprints()->banned()->exists(),
         )->shouldCache();
+    }
+
+    public function currentSubscription(): Attribute
+    {
+        return Attribute::get(function (): ?SubscriptionData {
+            return PaymentProcessor::currentSubscription($this);
+        });
     }
 
     public function stripeName(): string
