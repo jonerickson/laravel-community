@@ -82,9 +82,9 @@ class DashboardController
             ->filter(fn (Post $post) => Gate::check('view', $post)));
     }
 
-    private function getNewestProduct(): ProductData
+    private function getNewestProduct(): ?ProductData
     {
-        return ProductData::from(Product::query()
+        $product = Product::query()
             ->with('defaultPrice')
             ->with('categories')
             ->with(['prices' => function (HasMany $query): void {
@@ -93,12 +93,18 @@ class DashboardController
             ->latest()
             ->get()
             ->filter(fn (Product $product) => Gate::check('view', $product))
-            ->first());
+            ->first();
+
+        if (! $product) {
+            return null;
+        }
+
+        return ProductData::from($product);
     }
 
-    private function getPopularProduct(): ProductData
+    private function getPopularProduct(): ?ProductData
     {
-        return ProductData::from(Product::query()
+        $product = Product::query()
             ->with('defaultPrice')
             ->with('categories')
             ->with(['prices' => function (HasMany $query): void {
@@ -107,12 +113,18 @@ class DashboardController
             ->trending()
             ->get()
             ->filter(fn (Product $product) => Gate::check('view', $product))
-            ->first());
+            ->first();
+
+        if (! $product) {
+            return null;
+        }
+
+        return ProductData::from($product);
     }
 
-    private function getFeaturedProduct(): ProductData
+    private function getFeaturedProduct(): ?ProductData
     {
-        return ProductData::from(Product::query()
+        $product = Product::query()
             ->featured()
             ->with('defaultPrice')
             ->with('categories')
@@ -122,6 +134,12 @@ class DashboardController
             ->inRandomOrder()
             ->get()
             ->filter(fn (Product $product) => Gate::check('view', $product))
-            ->first());
+            ->first();
+
+        if (! $product) {
+            return null;
+        }
+
+        return ProductData::from($product);
     }
 }

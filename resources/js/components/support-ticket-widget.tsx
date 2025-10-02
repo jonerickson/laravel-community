@@ -21,7 +21,7 @@ export default function SupportTicketWidget({ tickets = [], className }: Support
                     <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                     <div className="relative flex items-center justify-center">
                         <div className="space-y-3 text-center">
-                            <HeadingSmall title="Support Tickets" description="No active support tickets" />
+                            <HeadingSmall title="Support tickets" description="No active support tickets" />
                             <Button asChild variant="outline" size="sm">
                                 <Link href={route('support.create')}>
                                     <Plus className="size-4" />
