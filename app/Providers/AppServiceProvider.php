@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -56,9 +57,11 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
-        Permission::all()->each(function (Permission $permission): void {
-            Gate::define($permission->name, fn (?User $user = null): bool => PermissionService::hasPermissionTo($permission->name, $user));
-        });
+        if (Schema::hasTable('permissions')) {
+            Permission::all()->each(function (Permission $permission): void {
+                Gate::define($permission->name, fn (?User $user = null): bool => PermissionService::hasPermissionTo($permission->name, $user));
+            });
+        }
 
         Model::automaticallyEagerLoadRelationships();
         Model::shouldBeStrict();
