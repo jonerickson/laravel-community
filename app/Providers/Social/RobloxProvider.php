@@ -14,7 +14,7 @@ use Override;
 
 class RobloxProvider extends AbstractProvider
 {
-    protected $scopes = ['email', 'identify'];
+    protected $scopes = ['openid', 'profile', 'email'];
 
     protected $scopeSeparator = ' ';
 
@@ -33,12 +33,12 @@ class RobloxProvider extends AbstractProvider
 
     protected function getAuthUrl($state): string
     {
-        return $this->buildAuthUrlFromBase('https://discord.com/api/oauth2/authorize', $state);
+        return $this->buildAuthUrlFromBase('https://apis.roblox.com/oauth/v1/authorize', $state);
     }
 
     protected function getTokenUrl(): string
     {
-        return 'https://discord.com/api/oauth2/token';
+        return 'https://apis.roblox.com/oauth/v1/token';
     }
 
     /**
@@ -46,7 +46,7 @@ class RobloxProvider extends AbstractProvider
      */
     protected function getUserByToken($token): mixed
     {
-        $response = $this->getHttpClient()->get('https://discord.com/api/users/@me', [
+        $response = $this->getHttpClient()->get('https://apis.roblox.com/oauth/v1/userinfo', [
             'headers' => [
                 'cache-control' => 'no-cache',
                 'Authorization' => 'Bearer '.$token,
@@ -60,8 +60,8 @@ class RobloxProvider extends AbstractProvider
     protected function mapUserToObject(array $user): User
     {
         return (new User)->setRaw($user)->map([
-            'id' => $user['id'],
-            'name' => $user['username'],
+            'id' => $user['sub'],
+            'name' => $user['name'],
             'email' => $user['email'] ?? null,
         ]);
     }
