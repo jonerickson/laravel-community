@@ -29,7 +29,7 @@ return [
     ],
 
     'resources' => [
-        app_path('Models'),
+        app_path('Data/Api'),
     ],
 
     'formats' => [
@@ -63,6 +63,11 @@ return [
         'pagination_maximum_items_per_page' => 30,
         'route_prefix' => '/v1',
         'middleware' => [],
+        'collect_denormalization_errors' => true,
+        'normalization_context' => [
+            'force_iri_generation' => false,
+            'skip_null_values' => false,
+        ],
     ],
 
     'pagination' => [
@@ -97,22 +102,22 @@ return [
 
     'swagger_ui' => [
         'enabled' => true,
-        // 'apiKeys' => [
-        //     'api' => [
-        //         'name' => 'Authorization',
-        //         'type' => 'header',
-        //     ],
-        // ],
-        // 'oauth' => [
-        //     'enabled' => true,
-        //     'type' => 'oauth2',
-        //     'flow' => 'authorizationCode',
-        //     'tokenUrl' => '',
-        //     'authorizationUrl' =>'',
-        //     'refreshUrl' => '',
-        //     'scopes' => ['scope1' => 'Description scope 1'],
-        //     'pkce' => true,
-        // ],
+        'apiKeys' => [
+            'api' => [
+                'name' => 'Authorization',
+                'type' => 'header',
+            ],
+        ],
+        'oauth' => [
+            'enabled' => true,
+            'type' => 'oauth2',
+            'flow' => 'authorizationCode',
+            'tokenUrl' => env('APP_URL').'/oauth/token',
+            'authorizationUrl' => env('APP_URL').'/oauth/authorize',
+            'refreshUrl' => env('APP_URL').'/oauth/refresh',
+            'scopes' => [],
+            'pkce' => true,
+        ],
         // 'license' => [
         //     'name' => 'Apache 2.0',
         //     'url' => 'https://www.apache.org/licenses/LICENSE-2.0.html',

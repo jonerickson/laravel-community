@@ -9,6 +9,6 @@ Route::group([
     'domain' => config('app.url'),
     'prefix' => config('cashier.path'),
     'namespace' => 'Laravel\Cashier\Http\Controllers',
-], function () {
+], function (): void {
     require __DIR__.'/../vendor/laravel/cashier/routes/web.php';
 });

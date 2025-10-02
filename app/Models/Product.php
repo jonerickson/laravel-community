@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Serializer\AbstractItemNormalizer;
 use App\Contracts\Sluggable;
 use App\Enums\ProductTaxCode;
 use App\Enums\ProductType;
@@ -35,7 +31,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Laravel\Scout\Searchable;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * @property int $id
@@ -112,18 +107,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
  *
  * @mixin \Eloquent
  */
-#[ApiResource(
-    operations: [
-        new Get,
-    ],
-    normalizationContext: [
-        AbstractItemNormalizer::GROUPS => ['product'],
-        AbstractItemNormalizer::SKIP_NULL_VALUES => false,
-    ]
-)]
-#[ApiProperty(identifier: true, property: 'id', serialize: new Groups(['user', 'product']))]
-#[ApiProperty(property: 'referenceId', serialize: new Groups(['user', 'product']))]
-#[ApiProperty(property: 'name', serialize: new Groups(['user', 'product']))]
 class Product extends Model implements Sluggable
 {
     use Featureable;

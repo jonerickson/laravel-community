@@ -25,9 +25,11 @@ use Inertia\Inertia;
 use Laravel\Cashier\Cashier;
 use Laravel\Passport\Passport;
 use Laravel\Socialite\Facades\Socialite;
+use Override;
 
 class AppServiceProvider extends ServiceProvider
 {
+    #[Override]
     public function register(): void
     {
         Cashier::ignoreRoutes();

@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ApiResource;
-use App\Models\Post;
+use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class PublishController extends Controller
+class LockController extends Controller
 {
     use AuthorizesRequests;
 
@@ -22,18 +22,18 @@ class PublishController extends Controller
     public function store(Request $request): JsonResource
     {
         $request->validate([
-            'post_id' => 'required|exists:posts,id',
+            'topic_id' => 'required|exists:topics,id',
         ]);
 
-        $post = Post::findOrFail($request->input('post_id'));
+        $topic = Topic::findOrFail($request->input('topic_id'));
 
-        $this->authorize('publish', $post);
+        $this->authorize('lock', $topic);
 
-        $post->update(['is_published' => true]);
+        $topic->lock();
 
         return ApiResource::success(
-            resource: $post->fresh(),
-            message: 'Post has been published successfully.'
+            resource: $topic,
+            message: 'Topic has been locked successfully.'
         );
     }
 
@@ -43,18 +43,18 @@ class PublishController extends Controller
     public function destroy(Request $request): JsonResource
     {
         $request->validate([
-            'post_id' => 'required|exists:posts,id',
+            'topic_id' => 'required|exists:topics,id',
         ]);
 
-        $post = Post::findOrFail($request->input('post_id'));
+        $topic = Topic::findOrFail($request->input('topic_id'));
 
-        $this->authorize('publish', $post);
+        $this->authorize('lock', $topic);
 
-        $post->update(['is_published' => false]);
+        $topic->unlock();
 
         return ApiResource::success(
-            resource: $post->fresh(),
-            message: 'Post has been unpublished successfully.'
+            resource: $topic,
+            message: 'Topic has been unlocked successfully.'
         );
     }
 }

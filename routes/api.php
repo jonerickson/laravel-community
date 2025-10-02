@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Api\CheckoutController;
-use App\Http\Controllers\Api\CommentController;
-use App\Http\Controllers\Api\FingerprintController;
-use App\Http\Controllers\Api\LikeController;
-use App\Http\Controllers\Api\LockController;
-use App\Http\Controllers\Api\PaymentMethodController;
-use App\Http\Controllers\Api\PinController;
-use App\Http\Controllers\Api\PublishController;
-use App\Http\Controllers\Api\ReadController;
-use App\Http\Controllers\Api\ReportController;
-use App\Http\Controllers\Api\SearchController;
-use App\Http\Controllers\Api\ShoppingCartController;
-use App\Http\Controllers\Api\TopicController;
+use App\Http\Controllers\Api\Frontend\CheckoutController;
+use App\Http\Controllers\Api\Frontend\CommentController;
+use App\Http\Controllers\Api\Frontend\FingerprintController;
+use App\Http\Controllers\Api\Frontend\LikeController;
+use App\Http\Controllers\Api\Frontend\LockController;
+use App\Http\Controllers\Api\Frontend\PaymentMethodController;
+use App\Http\Controllers\Api\Frontend\PinController;
+use App\Http\Controllers\Api\Frontend\PublishController;
+use App\Http\Controllers\Api\Frontend\ReadController;
+use App\Http\Controllers\Api\Frontend\ReportController;
+use App\Http\Controllers\Api\Frontend\SearchController;
+use App\Http\Controllers\Api\Frontend\ShoppingCartController;
+use App\Http\Controllers\Api\Frontend\TopicController;
 use App\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Illuminate\Support\Facades\Route;
 

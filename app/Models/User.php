@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Serializer\AbstractItemNormalizer;
 use App\Data\SubscriptionData;
 use App\Enums\OrderStatus;
 use App\Events\UserCreated;
@@ -50,7 +45,6 @@ use Laravel\Passport\HasApiTokens;
 use Override;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * @property int $id
@@ -162,23 +156,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
  *
  * @mixin \Eloquent
  */
-#[ApiResource(
-    operations: [
-        new Get,
-        new GetCollection,
-    ],
-    normalizationContext: [
-        AbstractItemNormalizer::GROUPS => ['user'],
-        AbstractItemNormalizer::SKIP_NULL_VALUES => false,
-    ]
-)]
-#[ApiProperty(identifier: true, property: 'id', serialize: new Groups(['user']))]
-#[ApiProperty(property: 'referenceId', serialize: new Groups(['user']))]
-#[ApiProperty(property: 'name', serialize: new Groups(['user']))]
-#[ApiProperty(property: 'email', serialize: new Groups(['user']))]
-#[ApiProperty(property: 'integrations', serialize: new Groups(['user']))]
-#[ApiProperty(property: 'products', serialize: new Groups(['user']))]
-#[ApiProperty(property: 'currentSubscription', serialize: new Groups(['user']))]
 class User extends Authenticatable implements EmailAuthenticationContract, FilamentAvatar, FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery, HasName, MustVerifyEmail, OAuthenticatable
 {
     use Billable;
@@ -295,9 +272,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
 
     public function currentSubscription(): Attribute
     {
-        return Attribute::get(function (): ?SubscriptionData {
-            return PaymentProcessor::currentSubscription($this);
-        });
+        return Attribute::get(fn (): ?SubscriptionData => PaymentProcessor::currentSubscription($this));
     }
 
     public function stripeName(): string

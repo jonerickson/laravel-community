@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Frontend;
 
 use App\Data\CheckoutData;
 use App\Http\Resources\ApiResource;

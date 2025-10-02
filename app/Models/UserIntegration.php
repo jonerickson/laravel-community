@@ -7,8 +7,6 @@ namespace App\Models;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Link;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use App\Events\UserSocialCreated;
 use App\Events\UserSocialDeleted;
@@ -48,20 +46,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
  */
 #[ApiResource(
     operations: [
-        new Get(uriTemplate: 'integrations/{id}'),
-        new GetCollection(
-            uriTemplate: 'users/{userId}/integrations',
-            uriVariables: [
-                'userId' => new Link(
-                    fromProperty: 'integrations',
-                    fromClass: User::class
-                ),
-            ]
-        ),
+        new Get(uriTemplate: 'integrations/{id}', openapi: false),
     ],
     normalizationContext: [
         AbstractItemNormalizer::GROUPS => ['integration'],
-        AbstractItemNormalizer::SKIP_NULL_VALUES => false,
     ]
 )]
 #[ApiProperty(property: 'provider', serialize: new Groups(['user', 'integration']))]
