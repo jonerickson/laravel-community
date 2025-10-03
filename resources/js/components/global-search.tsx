@@ -190,7 +190,7 @@ export function GlobalSearch() {
                 <span className="sr-only">Search</span>
             </Button>
 
-            <CommandDialog open={open} onOpenChange={setOpen} className="w-full lg:!max-w-5xl">
+            <CommandDialog open={open} onOpenChange={setOpen} className="top-[30%] w-full sm:top-[50%] lg:!max-w-5xl">
                 <CommandInput placeholder="Search topics, posts, policies, and products..." value={query} onValueChange={setQuery} />
 
                 <Collapsible open={dateFiltersOpen} onOpenChange={setDateFiltersOpen}>
