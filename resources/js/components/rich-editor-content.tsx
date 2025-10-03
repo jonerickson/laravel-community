@@ -11,6 +11,7 @@ export default function RichEditorContent({ content, className, ...props }: Rich
             // prettier-ignore
             className={cn(
                 "prose prose-sm max-w-none",
+                "[&_p]:text-sm [&_p]:mt-2",
                 "[&_a]:font-medium [&_a]:text-primary [&_a]:underline [&_a]:decoration-primary [&_a]:underline-offset-2",
                 "dark:[&_a]:text-blue-400 dark:[&_a]:decoration-blue-400",
 
@@ -21,10 +22,10 @@ export default function RichEditorContent({ content, className, ...props }: Rich
 
                 "[&_h1]:text-2xl [&_h2]:text-xl [&_h3]:text-lg [&_h4]:text-base [&_h5]:text-sm [&_h6]:text-xs",
                 "[&_h1]:font-semibold [&_h2]:font-semibold [&_h3]:font-semibold [&_h4]:font-medium [&_h5]:font-medium [&_h6]:font-medium",
+                "[&_h1]:mt-4 [&_h2]:mt-4 [&_h3]:mt-4 [&_h4]:mt-4 [&_h5]:mt-4 [&_h6]:mt-4",
 
-                "[&_ul]:list-disc [&_ul]:ml-6 [&_ul]:my-4",
+                "[&_ul]:list-disc [&_ul]:ml-6 [&_ul]:my-2",
                 "[&_ol]:list-decimal [&_ol]:ml-6 [&_ol]:my-4",
-                "[&_li]:my-1",
                 className
             )}
             dangerouslySetInnerHTML={{ __html: content }}
