@@ -137,6 +137,7 @@ class ProductResource extends Resource
                                             ->maxLength(65535)
                                             ->nullable(),
                                         FileUpload::make('path')
+                                            ->disk('private')
                                             ->visibility('private')
                                             ->hiddenLabel(),
                                     ]),
