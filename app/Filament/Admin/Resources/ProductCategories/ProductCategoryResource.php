@@ -16,7 +16,9 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
@@ -39,47 +41,63 @@ class ProductCategoryResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(3)
             ->components([
-                Section::make('Category Information')
-                    ->columnSpanFull()
-                    ->columns()
+                Group::make()
+                    ->columnSpan(['lg' => 2])
                     ->schema([
-                        TextInput::make('name')
-                            ->required()
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $context, $state, Set $set): mixed => $context === 'create' ? $set('slug', Str::slug($state)) : null),
-                        TextInput::make('slug')
-                            ->disabledOn('edit')
-                            ->required()
-                            ->maxLength(255)
-                            ->helperText('A SEO friendly title.')
-                            ->unique(ignoreRecord: true)
-                            ->rules(['alpha_dash']),
-                        Textarea::make('description')
-                            ->helperText('A helpful description on what the product category features.')
+                        Section::make('Category Information')
                             ->columnSpanFull()
-                            ->maxLength(500)
-                            ->rows(3),
+                            ->columns()
+                            ->schema([
+                                TextInput::make('name')
+                                    ->required()
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(fn (string $context, $state, Set $set): mixed => $context === 'create' ? $set('slug', Str::slug($state)) : null),
+                                TextInput::make('slug')
+                                    ->disabledOn('edit')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->helperText('A SEO friendly title.')
+                                    ->unique(ignoreRecord: true)
+                                    ->rules(['alpha_dash']),
+                                Textarea::make('description')
+                                    ->helperText('A helpful description on what the product category features.')
+                                    ->columnSpanFull()
+                                    ->maxLength(500)
+                                    ->rows(3),
+                            ]),
+                        Section::make('Image')
+                            ->columnSpanFull()
+                            ->relationship('image')
+                            ->schema([
+                                FileUpload::make('path')
+                                    ->helperText('Add a category image to be displayed on the store index.')
+                                    ->hiddenLabel()
+                                    ->disk('public')
+                                    ->directory('product-category-images')
+                                    ->visibility('public')
+                                    ->downloadable()
+                                    ->previewable()
+                                    ->openable()
+                                    ->image()
+                                    ->imageEditor()
+                                    ->imageEditorAspectRatios([
+                                        '16:9',
+                                        '4:3',
+                                        '1:1',
+                                    ]),
+                            ]),
                     ]),
-                Section::make('Image')
-                    ->columnSpanFull()
-                    ->relationship('image')
+                Group::make()
                     ->schema([
-                        FileUpload::make('path')
-                            ->helperText('Add a category image to be displayed on the store index.')
-                            ->hiddenLabel()
-                            ->disk('public')
-                            ->directory('product-category-images')
-                            ->visibility('public')
-                            ->downloadable()
-                            ->previewable()
-                            ->openable()
-                            ->image()
-                            ->imageEditor()
-                            ->imageEditorAspectRatios([
-                                '16:9',
-                                '4:3',
-                                '1:1',
+                        Section::make('Publishing')
+                            ->schema([
+                                Toggle::make('is_active')
+                                    ->label('Active')
+                                    ->helperText('Enable the category for viewing.')
+                                    ->required()
+                                    ->default(true),
                             ]),
                     ]),
             ]);
@@ -118,7 +136,9 @@ class ProductCategoryResource extends Resource
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->reorderable('order')
+            ->defaultSort('order');
     }
 
     public static function getPages(): array

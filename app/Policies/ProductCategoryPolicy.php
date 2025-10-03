@@ -25,6 +25,6 @@ class ProductCategoryPolicy
 
     public function view(?User $user, ProductCategory $category): bool
     {
-        return true;
+        return $category->is_active;
     }
 }

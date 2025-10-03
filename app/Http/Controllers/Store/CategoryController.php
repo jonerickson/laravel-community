@@ -22,6 +22,8 @@ class CategoryController extends Controller
         $this->authorize('viewAny', ProductCategory::class);
 
         $categories = ProductCategory::query()
+            ->active()
+            ->ordered()
             ->with('image')
             ->get()
             ->filter(fn (ProductCategory $category) => Gate::check('view', $category))

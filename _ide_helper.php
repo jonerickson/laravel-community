@@ -13221,58 +13221,47 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
-         * Get the number of queue jobs that are ready to process.
+         * Release a reserved job back onto the queue after (n) seconds.
          *
-         * @param string|null $queue
-         * @return int
+         * @param string $queue
+         * @param \Illuminate\Queue\Jobs\DatabaseJobRecord $job
+         * @param int $delay
+         * @return mixed
          * @static
          */
-        public static function readyNow($queue = null)
+        public static function release($queue, $job, $delay)
         {
-            /** @var \Laravel\Horizon\RedisQueue $instance */
-            return $instance->readyNow($queue);
-        }
-
-        /**
-         * Migrate the delayed jobs that are ready to the regular queue.
-         *
-         * @param string $from
-         * @param string $to
-         * @return void
-         * @static
-         */
-        public static function migrateExpiredJobs($from, $to)
-        {
-            /** @var \Laravel\Horizon\RedisQueue $instance */
-            $instance->migrateExpiredJobs($from, $to);
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            return $instance->release($queue, $job, $delay);
         }
 
         /**
          * Delete a reserved job from the queue.
          *
          * @param string $queue
-         * @param \Illuminate\Queue\Jobs\RedisJob $job
+         * @param string $id
          * @return void
+         * @throws \Throwable
          * @static
          */
-        public static function deleteReserved($queue, $job)
+        public static function deleteReserved($queue, $id)
         {
-            /** @var \Laravel\Horizon\RedisQueue $instance */
-            $instance->deleteReserved($queue, $job);
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            $instance->deleteReserved($queue, $id);
         }
 
         /**
          * Delete a reserved job from the reserved queue and release it.
          *
          * @param string $queue
-         * @param \Illuminate\Queue\Jobs\RedisJob $job
+         * @param \Illuminate\Queue\Jobs\DatabaseJob $job
          * @param int $delay
          * @return void
          * @static
          */
         public static function deleteAndRelease($queue, $job, $delay)
         {
-            /** @var \Laravel\Horizon\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             $instance->deleteAndRelease($queue, $job, $delay);
         }
 
@@ -13285,8 +13274,7 @@ namespace Illuminate\Support\Facades {
          */
         public static function clear($queue)
         {
-            //Method inherited from \Illuminate\Queue\RedisQueue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->clear($queue);
         }
 
@@ -13299,35 +13287,20 @@ namespace Illuminate\Support\Facades {
          */
         public static function getQueue($queue)
         {
-            //Method inherited from \Illuminate\Queue\RedisQueue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getQueue($queue);
         }
 
         /**
-         * Get the connection for the queue.
+         * Get the underlying database instance.
          *
-         * @return \Illuminate\Redis\Connections\Connection
+         * @return \Illuminate\Database\Connection
          * @static
          */
-        public static function getConnection()
+        public static function getDatabase()
         {
-            //Method inherited from \Illuminate\Queue\RedisQueue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
-            return $instance->getConnection();
-        }
-
-        /**
-         * Get the underlying Redis instance.
-         *
-         * @return \Illuminate\Contracts\Redis\Factory
-         * @static
-         */
-        public static function getRedis()
-        {
-            //Method inherited from \Illuminate\Queue\RedisQueue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
-            return $instance->getRedis();
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
+            return $instance->getDatabase();
         }
 
         /**
@@ -13340,7 +13313,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobTries($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getJobTries($job);
         }
 
@@ -13354,7 +13327,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobBackoff($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getJobBackoff($job);
         }
 
@@ -13368,7 +13341,7 @@ namespace Illuminate\Support\Facades {
         public static function getJobExpiration($job)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getJobExpiration($job);
         }
 
@@ -13382,7 +13355,7 @@ namespace Illuminate\Support\Facades {
         public static function createPayloadUsing($callback)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            \Laravel\Horizon\RedisQueue::createPayloadUsing($callback);
+            \Illuminate\Queue\DatabaseQueue::createPayloadUsing($callback);
         }
 
         /**
@@ -13394,7 +13367,7 @@ namespace Illuminate\Support\Facades {
         public static function getContainer()
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             return $instance->getContainer();
         }
 
@@ -13408,7 +13381,7 @@ namespace Illuminate\Support\Facades {
         public static function setContainer($container)
         {
             //Method inherited from \Illuminate\Queue\Queue 
-            /** @var \Laravel\Horizon\RedisQueue $instance */
+            /** @var \Illuminate\Queue\DatabaseQueue $instance */
             $instance->setContainer($container);
         }
 
@@ -23594,50 +23567,6 @@ namespace Livewire {
 
 namespace Illuminate\Support {
     /**
-     * @template TKey of array-key
-     * @template-covariant TValue
-     * @implements \ArrayAccess<TKey, TValue>
-     * @implements \Illuminate\Support\Enumerable<TKey, TValue>
-     */
-    class Collection {
-        /**
-         * @see \App\Models\Product::touch()
-         * @static
-         */
-        public static function searchable()
-        {
-            return \Illuminate\Support\Collection::searchable();
-        }
-
-        /**
-         * @see \App\Models\Product::withoutRecursion()
-         * @static
-         */
-        public static function unsearchable()
-        {
-            return \Illuminate\Support\Collection::unsearchable();
-        }
-
-        /**
-         * @see \App\Models\Product::resolveObserveAttributes()
-         * @static
-         */
-        public static function searchableSync()
-        {
-            return \Illuminate\Support\Collection::searchableSync();
-        }
-
-        /**
-         * @see \App\Models\Product::resolveObserveAttributes()
-         * @static
-         */
-        public static function unsearchableSync()
-        {
-            return \Illuminate\Support\Collection::unsearchableSync();
-        }
-
-            }
-    /**
      */
     class Str {
         /**
@@ -23891,10 +23820,6 @@ namespace Illuminate\Database\Query {
         }
 
             }
-    /**
-     */
-    class JoinClause extends \Illuminate\Database\Query\Builder {
-            }
     }
 
 namespace Illuminate\Database\Eloquent\Relations {
@@ -24135,113 +24060,6 @@ namespace Illuminate\Database\Eloquent\Relations {
             return \Illuminate\Database\Eloquent\Relations\Relation::getPowerJoinExistenceCompareKey();
         }
 
-        /**
-         * @see \Laravel\Scout\SearchableScope::extend()
-         * @param mixed $chunk
-         * @static
-         */
-        public static function searchable($chunk = null)
-        {
-            return \Illuminate\Database\Eloquent\Relations\Relation::searchable($chunk);
-        }
-
-        /**
-         * @see \Laravel\Scout\SearchableScope::extend()
-         * @param mixed $chunk
-         * @static
-         */
-        public static function unsearchable($chunk = null)
-        {
-            return \Illuminate\Database\Eloquent\Relations\Relation::unsearchable($chunk);
-        }
-
-            }
-    /**
-     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
-     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
-     * @template TPivotModel of \Illuminate\Database\Eloquent\Relations\Pivot = \Illuminate\Database\Eloquent\Relations\Pivot
-     * @template TAccessor of string = 'pivot'
-     * @extends \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, TDeclaringModel, \Illuminate\Database\Eloquent\Collection<int, TRelatedModel&object{pivot: TPivotModel}>>
-     * @todo use TAccessor when PHPStan bug is fixed: https://github.com/phpstan/phpstan/issues/12756
-     */
-    class BelongsToMany extends \Illuminate\Database\Eloquent\Relations\Relation {
-            }
-    /**
-     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
-     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
-     * @extends \Illuminate\Database\Eloquent\Relations\HasOneOrMany<TRelatedModel, TDeclaringModel, \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>>
-     */
-    class HasMany extends \Illuminate\Database\Eloquent\Relations\HasOneOrMany {
-            }
-    /**
-     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
-     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
-     * @template TResult
-     * @extends \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, TDeclaringModel, TResult>
-     */
-    class HasOneOrMany extends \Illuminate\Database\Eloquent\Relations\Relation {
-            }
-    /**
-     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
-     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
-     * @extends \Illuminate\Database\Eloquent\Relations\HasOneOrMany<TRelatedModel, TDeclaringModel, ?TRelatedModel>
-     */
-    class HasOne extends \Illuminate\Database\Eloquent\Relations\HasOneOrMany {
-            }
-    /**
-     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
-     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
-     * @extends \Illuminate\Database\Eloquent\Relations\MorphOneOrMany<TRelatedModel, TDeclaringModel, ?TRelatedModel>
-     */
-    class MorphOne extends \Illuminate\Database\Eloquent\Relations\MorphOneOrMany {
-            }
-    /**
-     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
-     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
-     * @template TResult
-     * @extends \Illuminate\Database\Eloquent\Relations\HasOneOrMany<TRelatedModel, TDeclaringModel, TResult>
-     */
-    class MorphOneOrMany extends \Illuminate\Database\Eloquent\Relations\HasOneOrMany {
-            }
-    /**
-     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
-     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
-     * @extends \Illuminate\Database\Eloquent\Relations\MorphOneOrMany<TRelatedModel, TDeclaringModel, \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>>
-     */
-    class MorphMany extends \Illuminate\Database\Eloquent\Relations\MorphOneOrMany {
-            }
-    /**
-     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
-     * @template TIntermediateModel of \Illuminate\Database\Eloquent\Model
-     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
-     * @extends \Illuminate\Database\Eloquent\Relations\HasOneOrManyThrough<TRelatedModel, TIntermediateModel, TDeclaringModel, \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>>
-     */
-    class HasManyThrough extends \Illuminate\Database\Eloquent\Relations\HasOneOrManyThrough {
-            }
-    /**
-     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
-     * @template TIntermediateModel of \Illuminate\Database\Eloquent\Model
-     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
-     * @template TResult
-     * @extends \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, TIntermediateModel, TResult>
-     */
-    class HasOneOrManyThrough extends \Illuminate\Database\Eloquent\Relations\Relation {
-            }
-    /**
-     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
-     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
-     * @extends \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, TDeclaringModel, ?TRelatedModel>
-     */
-    class BelongsTo extends \Illuminate\Database\Eloquent\Relations\Relation {
-            }
-    /**
-     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
-     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
-     * @template TPivotModel of \Illuminate\Database\Eloquent\Relations\Pivot = \Illuminate\Database\Eloquent\Relations\MorphPivot
-     * @template TAccessor of string = 'pivot'
-     * @extends \Illuminate\Database\Eloquent\Relations\BelongsToMany<TRelatedModel, TDeclaringModel, TPivotModel, TAccessor>
-     */
-    class MorphToMany extends \Illuminate\Database\Eloquent\Relations\BelongsToMany {
             }
     }
 
@@ -24335,17 +24153,6 @@ namespace App\Http\Requests\Store {
     /**
      */
     class StoreProductRequest extends \Illuminate\Foundation\Http\FormRequest {
-            }
-    }
-
-namespace Staudenmeir\EloquentHasManyDeep {
-    /**
-     * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
-     * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
-     * @extends \Illuminate\Database\Eloquent\Relations\HasManyThrough<TRelatedModel, \Illuminate\Database\Eloquent\Model, TDeclaringModel>
-     * @implements \Staudenmeir\EloquentHasManyDeep\Eloquent\Relations\Interfaces\DeepRelation<TRelatedModel, TDeclaringModel>
-     */
-    class HasManyDeep extends \Illuminate\Database\Eloquent\Relations\HasManyThrough {
             }
     }
 
@@ -27042,16 +26849,6 @@ namespace Illuminate\View {
             return \Illuminate\View\View::response($callback);
         }
 
-            }
-    }
-
-namespace Illuminate\Database\Eloquent {
-    /**
-     * @template TKey of array-key
-     * @template TModel of \Illuminate\Database\Eloquent\Model
-     * @extends \Illuminate\Support\Collection<TKey, TModel>
-     */
-    class Collection extends \Illuminate\Support\Collection {
             }
     }
 
@@ -32340,18 +32137,12 @@ namespace  {
     class View extends \Illuminate\Support\Facades\View {}
     class Vite extends \Illuminate\Support\Facades\Vite {}
     class EloquentSerialize extends \AnourValar\EloquentSerialize\Facades\EloquentSerializeFacade {}
-    class Horizon extends \Laravel\Horizon\Horizon {}
     class Mcp extends \Laravel\Mcp\Server\Facades\Mcp {}
     class Socialite extends \Laravel\Socialite\Facades\Socialite {}
     class Livewire extends \Livewire\Livewire {}
 }
 
 
-namespace Facades\Livewire\Features\SupportFileUploads {
-    /**
-     * @mixin \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl     */
-    class GenerateSignedUploadUrl extends \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl {}
-}
 
 
 

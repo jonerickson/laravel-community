@@ -77,6 +77,7 @@ class ProductSeeder extends Seeder
 
         $subscriptionCategory = ProductCategory::factory()->state([
             'name' => $name = 'Subscription Category 1',
+            'is_active' => false,
             'slug' => Str::slug($name),
         ])->create();
 

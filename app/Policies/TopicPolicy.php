@@ -28,17 +28,13 @@ class TopicPolicy
     public function view(?User $user, Topic $topic, ?Forum $forum = null): bool
     {
         return Gate::forUser($user)->check('view_topics')
-            && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum))
-            && ($topic->forum === null || $topic->forum->is_active)
-            && ($topic->forum?->category === null || $topic->forum->category->is_active);
+            && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum));
     }
 
     public function create(?User $user, ?Forum $forum = null): bool
     {
         return Gate::forUser($user)->check('create_topics')
-            && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum))
-            && (! $forum instanceof Forum || $forum->is_active)
-            && ($forum?->category === null || $forum->category->is_active);
+            && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum));
     }
 
     public function update(?User $user, Topic $topic, ?Forum $forum = null): bool

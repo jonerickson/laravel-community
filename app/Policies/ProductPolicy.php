@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 
 class ProductPolicy
 {
@@ -25,6 +27,6 @@ class ProductPolicy
 
     public function view(?User $user, Product $product): bool
     {
-        return true;
+        return $product->categories === null || $product->categories->filter(fn (ProductCategory $category) => Gate::forUser($user)->check('view', $category))->isNotEmpty();
     }
 }

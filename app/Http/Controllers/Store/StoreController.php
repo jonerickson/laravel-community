@@ -20,6 +20,8 @@ class StoreController extends Controller
     {
         return Inertia::render('store/index', [
             'categories' => ProductCategoryData::collect(ProductCategory::query()
+                ->active()
+                ->ordered()
                 ->with('image')
                 ->latest()
                 ->take(5)
