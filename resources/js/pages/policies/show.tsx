@@ -1,4 +1,5 @@
 import Heading from '@/components/heading';
+import RichEditorContent from '@/components/rich-editor-content';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
@@ -58,7 +59,7 @@ export default function PolicyShow({ category, policy }: PoliciesShowProps) {
                     </div>
                 </div>
 
-                <div className="prose prose-slate dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: policy.content }} />
+                <RichEditorContent content={policy.content} />
 
                 {policy.updatedAt && policy.updatedAt !== policy.createdAt && (
                     <div className="mt-6 text-sm text-muted-foreground">Last updated on {new Date(policy.updatedAt).toLocaleDateString()}</div>
