@@ -158,7 +158,7 @@ export function AppFooter() {
                 </div>
 
                 <div className="mt-8 border-t border-sidebar-border/50 pt-8">
-                    <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+                    <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row">
                         <div className="flex flex-col items-center gap-4 md:flex-row">
                             <p className="text-sm text-muted-foreground">
                                 &copy; {new Date().getFullYear()} {name}. All rights reserved.

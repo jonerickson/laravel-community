@@ -35,7 +35,7 @@ export default function PolicyShow({ category, policy }: PoliciesShowProps) {
                         <Heading title={policy.title} />
                     </div>
 
-                    <div className="mt-4 flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
+                    <div className="flex flex-col gap-2 pt-4 text-sm text-muted-foreground sm:flex-row sm:items-center sm:gap-6">
                         <div className="flex items-center gap-1">
                             <FileText className="size-4" />
                             <span>{category.name}</span>

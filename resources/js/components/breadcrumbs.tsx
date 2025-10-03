@@ -1,11 +1,20 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { useLayout } from '@/hooks';
+import { cn } from '@/lib/utils';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Fragment } from 'react';
 
 export function Breadcrumbs({ breadcrumbs }: { breadcrumbs: BreadcrumbItemType[] }) {
+    const { layout } = useLayout();
+
     return (
-        <div className="hidden md:flex">
+        <div
+            className={cn('px-2 lg:px-0', {
+                'hidden sm:flex': layout === 'sidebar',
+                flex: layout === 'header',
+            })}
+        >
             {breadcrumbs.length > 0 && (
                 <Breadcrumb>
                     <BreadcrumbList>
