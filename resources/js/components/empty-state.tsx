@@ -1,8 +1,6 @@
-import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { Plus } from 'lucide-react';
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
+import { PlusIcon } from 'lucide-react';
 import { cloneElement, ReactElement, SVGProps } from 'react';
 
 interface EmptyStateProps {
@@ -17,21 +15,24 @@ export function EmptyState({ icon, title, description, buttonText, onButtonClick
     const iconProps = icon.props as { className?: string };
 
     return (
-        <Card>
-            <CardContent className="p-12 text-center">
-                {cloneElement(icon as ReactElement<SVGProps<SVGSVGElement>>, {
-                    className: cn('mx-auto mb-4 size-10 text-muted-foreground/50', iconProps.className),
-                })}
-                <HeadingSmall title={title} description={description} />
-                {onButtonClick && buttonText && (
-                    <div className="mt-6">
-                        <Button onClick={onButtonClick}>
-                            <Plus className="mr-2 size-4" />
-                            {buttonText}
-                        </Button>
-                    </div>
-                )}
-            </CardContent>
-        </Card>
+        <Empty className="border border-dashed">
+            <EmptyHeader>
+                <EmptyMedia variant="icon">
+                    {cloneElement(icon as ReactElement<SVGProps<SVGSVGElement>>, {
+                        className: iconProps.className,
+                    })}
+                </EmptyMedia>
+                <EmptyTitle>{title}</EmptyTitle>
+                <EmptyDescription>{description}</EmptyDescription>
+            </EmptyHeader>
+            {onButtonClick && buttonText && (
+                <EmptyContent>
+                    <Button onClick={onButtonClick} variant="outline" size="sm">
+                        <PlusIcon />
+                        {buttonText}
+                    </Button>
+                </EmptyContent>
+            )}
+        </Empty>
     );
 }

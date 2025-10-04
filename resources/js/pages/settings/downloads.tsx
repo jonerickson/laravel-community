@@ -74,7 +74,7 @@ export default function Downloads() {
                         </div>
                     ) : (
                         <EmptyState
-                            icon={<DownloadIcon className="h-12 w-12" />}
+                            icon={<DownloadIcon />}
                             title="No downloads available"
                             description="You don't have any downloadable files yet. Downloads will appear here when you purchase products that include digital files."
                         />

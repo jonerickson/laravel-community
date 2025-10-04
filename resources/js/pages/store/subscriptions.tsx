@@ -486,7 +486,7 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
                     </div>
                 ) : (
                     <EmptyState
-                        icon={<Package className="size-12" />}
+                        icon={<Package />}
                         title="No subscription plans available"
                         description="We're currently working on our subscription offerings. Check back soon for exciting plans and features!"
                     />
