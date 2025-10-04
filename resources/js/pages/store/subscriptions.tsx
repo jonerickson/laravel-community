@@ -422,7 +422,16 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
                                 </Tabs>
                             </div>
                         )}
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        <div
+                            className={cn(
+                                'grid grid-cols-1 gap-6',
+                                subscriptionProducts.length === 1
+                                    ? 'md:grid-cols-1'
+                                    : subscriptionProducts.length === 2
+                                      ? 'md:grid-cols-2'
+                                      : 'md:grid-cols-2 lg:grid-cols-3',
+                            )}
+                        >
                             {subscriptionProducts.map((plan: App.Data.ProductData) => {
                                 const priceData = plan.prices.find((price: App.Data.PriceData) => price.interval === billingCycle);
                                 const priceId = priceData?.id || null;
