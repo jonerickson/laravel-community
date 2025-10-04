@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Input } from '@/components/ui/input';
+import { Kbd } from '@/components/ui/kbd';
 import { Label } from '@/components/ui/label';
 import { Toggle } from '@/components/ui/toggle';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -339,10 +340,7 @@ export function GlobalSearch() {
                         <div className="py-6 text-center text-sm text-muted-foreground">
                             <div className="mb-2">Start typing to search...</div>
                             <div className="text-xs">
-                                <kbd className="pointer-events-none inline-flex h-5 items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 select-none">
-                                    <span className="text-xs">⌘</span>K
-                                </kbd>{' '}
-                                to focus
+                                <Kbd>⌘ K</Kbd> to focus
                             </div>
                         </div>
                     )}
