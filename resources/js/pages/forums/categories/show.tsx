@@ -97,13 +97,13 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
 
                 {forums.length > 0 ? (
                     <div className="rounded-md border">
-                        <Table>
+                        <Table className="table table-fixed">
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="w-[60%]"></TableHead>
-                                    <TableHead className="w-[10%] text-center">Topics</TableHead>
-                                    <TableHead className="w-[10%] text-center">Posts</TableHead>
-                                    <TableHead className="w-[20%] text-right">Latest Activity</TableHead>
+                                    <TableHead className="hidden w-[10%] text-center md:table-cell">Topics</TableHead>
+                                    <TableHead className="hidden w-[10%] text-center md:table-cell">Posts</TableHead>
+                                    <TableHead className="hidden w-[20%] text-right md:table-cell">Latest Activity</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -126,23 +126,25 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                                                             {forum.name}
                                                         </Link>
                                                     </div>
-                                                    {forum.description && <p className="text-sm text-muted-foreground">{forum.description}</p>}
+                                                    {forum.description && (
+                                                        <p className="text-sm text-wrap break-words text-muted-foreground">{forum.description}</p>
+                                                    )}
                                                 </div>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="p-4 text-center">
+                                        <TableCell className="hidden p-4 text-center md:table-cell">
                                             <div className="flex items-center justify-center gap-1">
                                                 <MessageSquare className="size-4" />
                                                 <span>{forum.topicsCount || 0}</span>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="p-4 text-center">
+                                        <TableCell className="hidden p-4 text-center md:table-cell">
                                             <div className="flex items-center justify-center gap-1">
                                                 <Users className="size-4" />
                                                 <span>{forum.postsCount || 0}</span>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="p-4 text-right">
+                                        <TableCell className="hidden p-4 text-right md:table-cell">
                                             {forum.latestTopics && forum.latestTopics.length > 0 ? (
                                                 <div className="text-sm">
                                                     <div className="mb-1">
@@ -151,7 +153,7 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                                                                 forum: forum.slug,
                                                                 topic: forum.latestTopics[0].slug,
                                                             })}
-                                                            className="font-medium hover:underline"
+                                                            className="font-medium text-wrap break-words hover:underline"
                                                         >
                                                             {forum.latestTopics[0].title}
                                                         </Link>
