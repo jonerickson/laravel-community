@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\ForumCategories\Schemas;
 
+use App\Models\Group as GroupModel;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -89,6 +90,10 @@ class ForumCategoryForm
                             ->columnSpanFull()
                             ->schema([
                                 Select::make('groups')
+                                    ->default(fn () => collect([
+                                        ...GroupModel::query()->defaultGuestGroups()->pluck('name', 'id'),
+                                        ...GroupModel::query()->defaultMemberGroups()->pluck('name', 'id'),
+                                    ]))
                                     ->relationship('groups', 'name')
                                     ->preload()
                                     ->searchable()

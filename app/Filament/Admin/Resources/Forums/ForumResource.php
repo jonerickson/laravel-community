@@ -9,6 +9,7 @@ use App\Filament\Admin\Resources\Forums\Pages\EditForum;
 use App\Filament\Admin\Resources\Forums\Pages\ListForums;
 use App\Filament\Admin\Resources\Forums\RelationManagers\TopicsRelationManager;
 use App\Models\Forum;
+use App\Models\Group as GroupModel;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -88,6 +89,10 @@ class ForumResource extends Resource
                     ->columnSpanFull()
                     ->schema([
                         Select::make('groups')
+                            ->default(fn () => collect([
+                                ...GroupModel::query()->defaultGuestGroups()->pluck('name', 'id'),
+                                ...GroupModel::query()->defaultMemberGroups()->pluck('name', 'id'),
+                            ]))
                             ->relationship('groups', 'name')
                             ->preload()
                             ->searchable()

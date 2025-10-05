@@ -91,7 +91,7 @@ function PricingCard({
 
     return (
         <Card className={cn('relative flex w-full flex-col', isCurrentPlan && 'ring-2 ring-success', plan.isFeatured && 'ring-2 ring-info')}>
-            {plan.isFeatured && ! isCurrentPlan && (
+            {plan.isFeatured && !isCurrentPlan && (
                 <div className="absolute -top-4 left-1/2 z-10 -translate-x-1/2">
                     <Badge variant="default" className="bg-info text-info-foreground">
                         Featured
