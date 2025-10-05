@@ -1,6 +1,7 @@
 import EmojiReactions from '@/components/emoji-reactions';
 import ForumTopicPostModerationMenu from '@/components/forum-topic-post-moderation-menu';
 import ForumUserInfo from '@/components/forum-user-info';
+import { ReportDialog } from '@/components/report-dialog';
 import RichEditorContent from '@/components/rich-editor-content';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -109,6 +110,7 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                                 {hasAnyPermission(['like_posts', 'reply_topics']) && !topic.isLocked && (
                                     <div className="mt-2 flex items-start justify-between">
                                         <div className="flex gap-2">
+                                            {can('report_posts') && <ReportDialog reportableType="App\Models\Post" reportableId={post.id} />}
                                             {can('reply_topics') && (
                                                 <Button variant="ghost" size="sm" className="h-8 px-3 text-muted-foreground" onClick={handleQuote}>
                                                     <Quote className="mr-1 size-3" />

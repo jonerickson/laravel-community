@@ -6,14 +6,17 @@ namespace App\Filament\Admin\Resources\Reports;
 
 use App\Enums\ReportReason;
 use App\Enums\ReportStatus;
+use App\Filament\Admin\Resources\Reports\Actions\ApproveAction;
+use App\Filament\Admin\Resources\Reports\Actions\DetailsAction;
+use App\Filament\Admin\Resources\Reports\Actions\RejectAction;
+use App\Filament\Admin\Resources\Reports\Actions\ViewContentAction;
 use App\Filament\Admin\Resources\Reports\Pages\ListReports;
 use App\Models\Report;
 use BackedEnum;
 use Carbon\CarbonInterface;
-use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteAction;
 use Filament\Forms;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -128,42 +131,11 @@ class ReportResource extends Resource
                     ->options(ReportReason::class),
             ])
             ->recordActions([
-                Action::make('details')
-                    ->label('Details')
-                    ->icon('heroicon-o-document-text')
-                    ->color('gray')
-                    ->modalHeading('Report Details')
-                    ->modalDescription(fn (Report $record): string => "Report #{$record->id} - {$record->reason->getLabel()}")
-                    ->modalSubmitAction(false)
-                    ->modalCancelActionLabel('Close')
-                    ->schema([
-                        TextEntry::make('additional_info')
-                            ->hiddenLabel()
-                            ->default('There is no additional information.'),
-                    ]),
-                Action::make('view_content')
-                    ->label('View Content')
-                    ->icon('heroicon-o-eye')
-                    ->color('info')
-                    ->url(fn (Report $record): ?string => $record->getUrl())
-                    ->openUrlInNewTab()
-                    ->visible(fn (Report $record): bool => $record->getUrl() !== null),
-                Action::make('approve')
-                    ->icon('heroicon-o-check')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->action(function (Report $record): void {
-                        $record->approve(Auth::user());
-                    })
-                    ->visible(fn (Report $record): bool => $record->isPending()),
-                Action::make('reject')
-                    ->icon('heroicon-o-x-mark')
-                    ->color('danger')
-                    ->requiresConfirmation()
-                    ->action(function (Report $record): void {
-                        $record->reject(Auth::user());
-                    })
-                    ->visible(fn (Report $record): bool => $record->isPending()),
+                DetailsAction::make(),
+                ViewContentAction::make(),
+                ApproveAction::make(),
+                RejectAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkAction::make('approve')

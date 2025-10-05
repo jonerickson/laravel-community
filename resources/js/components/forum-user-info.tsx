@@ -1,9 +1,6 @@
-import { ReportDialog } from '@/components/report-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { usePage } from '@inertiajs/react';
 
 export default function ForumUserInfo({ user, isAuthor = false }: { user: App.Data.UserData; isAuthor?: boolean }) {
-    const { auth } = usePage<App.Data.SharedData>().props;
     return (
         <div className="flex flex-row items-center gap-4 md:flex-col md:gap-2 md:px-8">
             <Avatar className="size-12">
@@ -32,12 +29,6 @@ export default function ForumUserInfo({ user, isAuthor = false }: { user: App.Da
                     </ul>
                 )}
             </div>
-
-            {auth.user && auth.user.id !== user.id && (
-                <div className="mt-2 hidden md:block">
-                    <ReportDialog reportableType="App\Models\User" reportableId={user.id} />
-                </div>
-            )}
         </div>
     );
 }
