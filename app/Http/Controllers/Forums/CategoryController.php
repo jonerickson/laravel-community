@@ -45,8 +45,21 @@ class CategoryController extends Controller
             }])
             ->get()
             ->filter(fn (ForumCategory $category) => Gate::check('view', $category))
-            ->map(function (ForumCategory $category): ForumCategory {
-                $category->setAttribute('forums', $category->forums->filter(fn (Forum $forum) => Gate::check('view', $forum)));
+            ->map(function (ForumCategory $category) {
+                $category->setRelation(
+                    'forums',
+                    $category->forums
+                        ->filter(fn (Forum $forum) => Gate::check('view', $forum))
+                        ->map(function (Forum $forum) {
+                            $forum->setRelation(
+                                'latestTopics',
+                                $forum->latestTopics->filter(fn (Topic $topic) => Gate::check('view', $topic))->values()
+                            );
+
+                            return $forum;
+                        })
+                        ->values()
+                );
 
                 return $category;
             })
@@ -75,6 +88,14 @@ class CategoryController extends Controller
             }])
             ->get()
             ->filter(fn (Forum $forum) => Gate::check('view', $forum))
+            ->map(function (Forum $forum) {
+                $forum->setRelation(
+                    'latestTopics',
+                    $forum->latestTopics->filter(fn (Topic $topic) => Gate::check('view', $topic))->values()
+                );
+
+                return $forum;
+            })
             ->values();
 
         return Inertia::render('forums/categories/show', [
