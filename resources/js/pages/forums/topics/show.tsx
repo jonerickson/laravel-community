@@ -264,7 +264,7 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                     <RecentViewers viewers={recentViewers} />
                 </Deferred>
 
-                {!topic.isLocked && posts.length > 0 && <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} />}
+                {can('reply_topics') && !topic.isLocked && posts.length > 0 && <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} />}
 
                 <Pagination
                     pagination={postsPagination}
