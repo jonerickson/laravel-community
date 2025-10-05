@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use App\Enums\WarningConsequenceType;
 use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
@@ -28,6 +29,10 @@ class UserData extends Data
 
     /** @var GroupData[] */
     public array $groups;
+
+    public int $warningPoints = 0;
+
+    public ?WarningConsequenceType $activeConsequenceType = null;
 
     public ?CarbonImmutable $createdAt = null;
 

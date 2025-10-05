@@ -8,6 +8,7 @@ use App\Data\ForumData;
 use App\Data\PostData;
 use App\Data\TopicData;
 use App\Enums\PostType;
+use App\Enums\WarningConsequenceType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Forums\StorePostRequest;
 use App\Http\Requests\Forums\UpdatePostRequest;
@@ -17,6 +18,7 @@ use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -33,12 +35,15 @@ class PostController extends Controller
 
         $validated = $request->validated();
 
+        $user = Auth::user();
+        $requiresModeration = $user->active_consequence?->type === WarningConsequenceType::ModerateContent;
+
         $topic->posts()->create([
             'type' => PostType::Forum,
             'title' => 'Re: '.$topic->title,
             'content' => $validated['content'],
-            'is_published' => true,
-            'published_at' => now(),
+            'is_published' => ! $requiresModeration,
+            'published_at' => $requiresModeration ? null : now(),
         ]);
 
         $totalPosts = $topic->posts()->count();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Enums\WarningConsequenceType;
 use App\Models\Forum;
 use App\Models\Post;
 use App\Models\Topic;
@@ -38,6 +39,10 @@ class PostPolicy
     public function create(?User $user, ?Forum $forum = null, ?Topic $topic = null): bool
     {
         if (! $user instanceof User) {
+            return false;
+        }
+
+        if ($user->active_consequence?->type === WarningConsequenceType::PostRestriction || $user->active_consequence?->type === WarningConsequenceType::Ban) {
             return false;
         }
 

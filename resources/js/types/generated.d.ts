@@ -441,6 +441,8 @@ declare namespace App.Data {
         signature: string | null;
         emailVerifiedAt: string | null;
         groups: Array<App.Data.GroupData>;
+        warningPoints: number;
+        activeConsequenceType: App.Enums.WarningConsequenceType | null;
         createdAt: string | null;
         updatedAt: string | null;
     };
@@ -511,4 +513,5 @@ declare namespace App.Enums {
         | 'incomplete_expired';
     export type SupportTicketPriority = 'low' | 'medium' | 'high' | 'critical';
     export type SupportTicketStatus = 'new' | 'open' | 'in_progress' | 'resolved' | 'closed';
+    export type WarningConsequenceType = 'none' | 'moderate_content' | 'post_restriction' | 'ban';
 }

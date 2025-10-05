@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Enums\WarningConsequenceType;
 use App\Models\Comment;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -34,6 +35,10 @@ class CommentPolicy
     public function create(?User $user, ?Model $commentable = null): bool
     {
         if (! $user instanceof User) {
+            return false;
+        }
+
+        if ($user->active_consequence?->type === WarningConsequenceType::PostRestriction || $user->active_consequence?->type === WarningConsequenceType::Ban) {
             return false;
         }
 

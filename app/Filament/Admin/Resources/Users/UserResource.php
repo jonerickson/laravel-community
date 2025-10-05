@@ -236,6 +236,35 @@ class UserResource extends Resource
                                     'record' => $record,
                                 ]),
                             ]),
+                        Tabs\Tab::make('Warnings')
+                            ->icon('heroicon-o-exclamation-triangle')
+                            ->visibleOn('edit')
+                            ->schema([
+                                Section::make('Warning Information')
+                                    ->description('View and manage user warning points and consequences.')
+                                    ->columns()
+                                    ->schema([
+                                        TextEntry::make('warning_points')
+                                            ->label('Current Warning Points')
+                                            ->badge()
+                                            ->color(fn (int $state): string => match (true) {
+                                                $state >= 50 => 'danger',
+                                                $state >= 25 => 'warning',
+                                                $state >= 10 => 'info',
+                                                default => 'success',
+                                            }),
+                                        TextEntry::make('active_consequence.type')
+                                            ->label('Current Consequence')
+                                            ->badge()
+                                            ->formatStateUsing(fn ($state) => $state?->getLabel() ?? 'None')
+                                            ->color(fn ($state) => $state?->getColor() ?? 'success')
+                                            ->icon(fn ($state) => $state?->getIcon() ?? 'heroicon-o-check-circle'),
+                                    ]),
+                                Livewire::make(RelationManagers\UserWarningsRelationManager::class, fn (User $record): array => [
+                                    'ownerRecord' => $record,
+                                    'pageClass' => EditUser::class,
+                                ]),
+                            ]),
                     ]),
             ]);
     }

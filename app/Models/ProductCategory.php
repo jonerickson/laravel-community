@@ -21,10 +21,10 @@ use Illuminate\Support\Str;
 /**
  * @property int $id
  * @property string $name
- * @property string $slug
  * @property string|null $description
  * @property int $order
  * @property bool $is_active
+ * @property string $slug
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities

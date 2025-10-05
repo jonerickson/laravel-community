@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Enums\WarningConsequenceType;
 use App\Models\Forum;
 use App\Models\Topic;
 use App\Models\User;
@@ -33,6 +34,14 @@ class TopicPolicy
 
     public function create(?User $user, ?Forum $forum = null): bool
     {
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        if ($user->active_consequence?->type === WarningConsequenceType::PostRestriction || $user->active_consequence?->type === WarningConsequenceType::Ban) {
+            return false;
+        }
+
         return Gate::forUser($user)->check('create_topics')
             && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum));
     }
@@ -68,6 +77,14 @@ class TopicPolicy
 
     public function reply(?User $user, Topic $topic, ?Forum $forum = null): bool
     {
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        if ($user->active_consequence?->type === WarningConsequenceType::PostRestriction || $user->active_consequence?->type === WarningConsequenceType::Ban) {
+            return false;
+        }
+
         return Gate::forUser($user)->check('reply_topics')
             && ! $topic->is_locked
             && $this->view($user, $topic, $forum);

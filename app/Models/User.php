@@ -75,6 +75,9 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property string|null $billing_country
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read WarningConsequence|null $active_consequence
+ * @property-read Collection<int, UserWarning> $activeWarnings
+ * @property-read int|null $active_warnings_count
  * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Collection<int, Report> $approvedReports
@@ -112,6 +115,9 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read int|null $subscriptions_count
  * @property-read Collection<int, \Laravel\Passport\Token> $tokens
  * @property-read int|null $tokens_count
+ * @property-read Collection<int, UserWarning> $userWarnings
+ * @property-read int|null $user_warnings_count
+ * @property-read int $warning_points
  * @property-read Collection|Product[] $products
  * @property-read int|null $products_count
  *
@@ -261,6 +267,38 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     public function integrations(): HasMany
     {
         return $this->hasMany(UserIntegration::class);
+    }
+
+    public function userWarnings(): HasMany
+    {
+        return $this->hasMany(UserWarning::class);
+    }
+
+    public function activeWarnings(): HasMany
+    {
+        return $this->hasMany(UserWarning::class)->active();
+    }
+
+    public function warningPoints(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): int => $this->activeWarnings()->get()->sum(fn (UserWarning $warning) => $warning->warning->points)
+        )->shouldCache();
+    }
+
+    public function activeConsequence(): Attribute
+    {
+        return Attribute::make(
+            get: function (): ?WarningConsequence {
+                $points = $this->warning_points;
+
+                return WarningConsequence::query()
+                    ->active()
+                    ->where('threshold', '<=', $points)
+                    ->orderByDesc('threshold')
+                    ->first();
+            }
+        )->shouldCache();
     }
 
     public function isBanned(): Attribute
