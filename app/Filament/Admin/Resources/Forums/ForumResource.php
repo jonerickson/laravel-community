@@ -90,8 +90,8 @@ class ForumResource extends Resource
                     ->schema([
                         Select::make('groups')
                             ->default(fn () => collect([
-                                ...GroupModel::query()->defaultGuestGroups()->pluck('name', 'id'),
-                                ...GroupModel::query()->defaultMemberGroups()->pluck('name', 'id'),
+                                ...GroupModel::query()->defaultGuestGroups()->pluck('id'),
+                                ...GroupModel::query()->defaultMemberGroups()->pluck('id'),
                             ]))
                             ->relationship('groups', 'name')
                             ->preload()
