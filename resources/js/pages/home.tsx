@@ -13,6 +13,8 @@ import {
     ArrowRight,
     BarChart3,
     CalendarSync,
+    Check,
+    ChevronDown,
     Gamepad2,
     Globe,
     MessageSquare,
@@ -23,6 +25,7 @@ import {
     UserPlus,
     Users,
 } from 'lucide-react';
+import { useState } from 'react';
 
 interface HomeProps {
     subscriptions: App.Data.ProductData[];
@@ -274,45 +277,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                         </div>
 
                         <Deferred data="subscriptions" fallback={<WidgetLoading />}>
-                            <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
-                                {subscriptions.map((subscription) => {
-                                    const defaultPrice = subscription.prices.find((price: App.Data.PriceData) => price.isDefault) ||
-                                        subscription.prices[0] || {
-                                            amount: 0,
-                                            interval: 'month',
-                                        };
-
-                                    return (
-                                        <Card
-                                            key={subscription.id}
-                                            className={cn('relative flex flex-col justify-between', subscription.isFeatured && 'ring-2 ring-info')}
-                                        >
-                                            {subscription.isFeatured && (
-                                                <div className="absolute -top-4 left-1/2 z-10 -translate-x-1/2">
-                                                    <Badge variant="default" className="bg-info text-info-foreground">
-                                                        Featured
-                                                    </Badge>
-                                                </div>
-                                            )}
-                                            <CardHeader>
-                                                <CardTitle>{subscription.name}</CardTitle>
-                                                <CardDescription>{stripCharacters(subscription.description)}</CardDescription>
-                                                {defaultPrice && (
-                                                    <div className="mt-4 text-3xl font-bold">
-                                                        ${(defaultPrice.amount / 100).toFixed(0)}
-                                                        <span className="text-lg font-normal text-muted-foreground"> / {defaultPrice.interval}</span>
-                                                    </div>
-                                                )}
-                                            </CardHeader>
-                                            <CardContent>
-                                                <Button className="mt-6 w-full bg-transparent" variant="outline" asChild>
-                                                    <Link href={route('store.subscriptions')}>Get started</Link>
-                                                </Button>
-                                            </CardContent>
-                                        </Card>
-                                    );
-                                })}
-                            </div>
+                            <SubscriptionCards subscriptions={subscriptions} />
                         </Deferred>
                     </div>
                 </section>
@@ -345,6 +310,103 @@ export default function Home({ subscriptions = [] }: HomeProps) {
             </main>
 
             <AppFooter />
+        </div>
+    );
+}
+
+interface SubscriptionCardsProps {
+    subscriptions: App.Data.ProductData[];
+}
+
+function SubscriptionCards({ subscriptions }: SubscriptionCardsProps) {
+    const [expandedCards, setExpandedCards] = useState<Record<number, boolean>>({});
+
+    const toggleExpanded = (subscriptionId: number) => {
+        setExpandedCards((prev) => ({
+            ...prev,
+            [subscriptionId]: !prev[subscriptionId],
+        }));
+    };
+
+    return (
+        <div
+            className={cn(
+                'mx-auto grid max-w-5xl grid-cols-1 gap-6',
+                subscriptions.length === 1 ? 'md:grid-cols-1' : subscriptions.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3',
+            )}
+        >
+            {subscriptions.map((subscription) => {
+                const defaultPrice = subscription.prices.find((price: App.Data.PriceData) => price.isDefault) ||
+                    subscription.prices[0] || {
+                        amount: 0,
+                        interval: 'month',
+                    };
+
+                const features = subscription.metadata?.features || [];
+                const isExpanded = expandedCards[subscription.id] || false;
+                const displayedFeatures = isExpanded ? features : features.slice(0, 5);
+                const hasMoreFeatures = features.length > 5;
+
+                return (
+                    <Card
+                        key={subscription.id}
+                        className={cn('relative flex flex-col justify-between', subscription.isFeatured && 'ring-2 ring-info')}
+                    >
+                        {subscription.isFeatured && (
+                            <div className="absolute -top-4 left-1/2 z-10 -translate-x-1/2">
+                                <Badge variant="default" className="bg-info text-info-foreground">
+                                    Featured
+                                </Badge>
+                            </div>
+                        )}
+                        <CardHeader>
+                            <CardTitle>{subscription.name}</CardTitle>
+                            <CardDescription>{stripCharacters(subscription.description)}</CardDescription>
+                            {defaultPrice && (
+                                <div className="mt-4 text-3xl font-bold">
+                                    ${(defaultPrice.amount / 100).toFixed(0)}
+                                    <span className="text-lg font-normal text-muted-foreground"> / {defaultPrice.interval}</span>
+                                </div>
+                            )}
+                        </CardHeader>
+                        <CardContent className="flex flex-1 flex-col">
+                            {features.length > 0 && (
+                                <div className="mb-4 space-y-3">
+                                    <h4 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Features included</h4>
+                                    <ul className="space-y-2">
+                                        {displayedFeatures.map((feature: string, index: number) => (
+                                            <li key={index} className="flex items-start">
+                                                <Check className="mt-0.5 mr-3 size-4 flex-shrink-0 text-success" />
+                                                <span className="text-sm">{feature}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                            <div className="mt-auto space-y-2 pt-4">
+                                {hasMoreFeatures && (
+                                    <Button variant="ghost" size="sm" onClick={() => toggleExpanded(subscription.id)} className="w-full">
+                                        {isExpanded ? (
+                                            <>
+                                                View less
+                                                <ChevronDown className="size-4 rotate-180 transition-transform" />
+                                            </>
+                                        ) : (
+                                            <>
+                                                View {features.length - 5} more
+                                                <ChevronDown className="size-4 transition-transform" />
+                                            </>
+                                        )}
+                                    </Button>
+                                )}
+                                <Button className="mt-auto w-full bg-transparent" variant="outline" asChild>
+                                    <Link href={route('store.subscriptions')}>Get started</Link>
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                );
+            })}
         </div>
     );
 }
