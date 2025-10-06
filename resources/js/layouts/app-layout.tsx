@@ -33,12 +33,12 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
                     'px-6 pt-6 pb-12 lg:px-4': LayoutComponent === AppHeaderLayout,
                 })}
             >
-                <div className="mb-4 flex flex-col gap-4">
+                <div className="flex flex-col space-y-4">
                     <EmailVerificationBanner />
                     <UserWarningBanner />
                     <AnnouncementsList announcements={announcements} />
+                    {children}
                 </div>
-                {children}
             </div>
         </LayoutComponent>
     );

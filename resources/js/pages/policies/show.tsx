@@ -30,7 +30,7 @@ export default function PolicyShow({ category, policy }: PoliciesShowProps) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Policies - ${category.name} - ${policy.title}`} />
             <div className="flex h-full flex-1 flex-col overflow-x-auto">
-                <div className="mb-8">
+                <div className="mb-4">
                     <div className="-mb-7">
                         <Heading title={policy.title} />
                     </div>
@@ -48,20 +48,20 @@ export default function PolicyShow({ category, policy }: PoliciesShowProps) {
                             </div>
                         )}
 
-                        {policy.version && <span>Version {policy.version}</span>}
-
                         {policy.author && (
                             <div className="flex items-center gap-1">
                                 <User className="size-4" />
                                 <span>Published by {typeof policy.author === 'object' ? policy.author.name : 'Administrator'}</span>
                             </div>
                         )}
+
+                        {policy.version && <span>Version {policy.version}</span>}
                     </div>
                 </div>
 
                 <RichEditorContent content={policy.content} />
 
-                {policy.updatedAt && policy.updatedAt !== policy.createdAt && (
+                {policy.updatedAt && (
                     <div className="mt-6 text-sm text-muted-foreground">Last updated on {new Date(policy.updatedAt).toLocaleDateString()}</div>
                 )}
             </div>
