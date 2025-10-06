@@ -76,6 +76,10 @@ class CommentPolicy
 
     public function like(?User $user, Comment $comment): bool
     {
+        if (! $user instanceof User) {
+            return false;
+        }
+
         return Gate::forUser($user)->check('like_comments')
             && $this->view($user, $comment);
     }
