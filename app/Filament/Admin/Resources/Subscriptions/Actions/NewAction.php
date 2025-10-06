@@ -29,7 +29,7 @@ class NewAction extends Action
         $this->label('New subscription');
         $this->color('primary');
         $this->successNotificationTitle('The subscription has been successfully started.');
-        $this->modalHeading('New Subscription');
+        $this->modalHeading('New subscription');
         $this->modalDescription('Enter the required information to start the user on a new subscription.');
         $this->modalSubmitActionLabel('Start');
 

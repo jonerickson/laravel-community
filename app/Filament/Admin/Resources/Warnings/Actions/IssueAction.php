@@ -13,8 +13,6 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
-use Filament\Support\Enums\Alignment;
-use Filament\Support\Enums\Width;
 
 class IssueAction extends Action
 {
@@ -26,6 +24,7 @@ class IssueAction extends Action
 
         $this->label('Issue warning');
         $this->color('warning');
+        $this->modalDescription('Issue a warning to this user.');
         $this->schema([
             Select::make('warning_id')
                 ->label('Warning Type')
@@ -65,8 +64,6 @@ class IssueAction extends Action
                 ->body("Warning '$warning->name' has been issued to the user.")
                 ->send();
         });
-        $this->modalWidth(Width::Medium);
-        $this->modalAlignment(Alignment::Center);
     }
 
     public static function getDefaultName(): ?string

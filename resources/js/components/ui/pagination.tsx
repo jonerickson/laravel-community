@@ -1,7 +1,7 @@
-import { Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { pluralize } from '@/lib/utils';
+import { Link } from '@inertiajs/react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PaginationProps {
     pagination: App.Data.PaginatedData;
@@ -56,66 +56,52 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
     const pageNumbers = getPageNumbers();
 
     return (
-        <div className={`flex flex-col md:flex-row items-center justify-between gap-4 ${className || ''}`}>
-            <div className="hidden md:block text-sm text-muted-foreground">
-                Showing {((currentPage - 1) * perPage) + 1} to {Math.min(currentPage * perPage, total)} of {total} {pluralize(entityLabel, total)}
+        <div className={`flex flex-col items-center justify-between gap-4 md:flex-row ${className || ''}`}>
+            <div className="hidden text-sm text-muted-foreground md:block">
+                Showing {(currentPage - 1) * perPage + 1} to {Math.min(currentPage * perPage, total)} of {total} {pluralize(entityLabel, total)}
             </div>
 
-            <div className="flex items-center gap-1 w-full md:w-auto justify-center overflow-x-auto">
+            <div className="flex w-full items-center justify-center gap-1 overflow-x-auto md:w-auto">
                 {/* Previous Button */}
                 {currentPage > 1 ? (
-                    <Link
-                        href={`${baseUrl}?page=${currentPage - 1}`}
-                        className="inline-flex"
-                    >
+                    <Link href={`${baseUrl}?page=${currentPage - 1}`} className="inline-flex">
                         <Button variant="outline" size="sm">
-                            <ChevronLeft className="size-4 mr-1" />
+                            <ChevronLeft className="mr-1 size-4" />
                             Previous
                         </Button>
                     </Link>
                 ) : (
                     <Button variant="outline" size="sm" disabled>
-                        <ChevronLeft className="size-4 mr-1" />
+                        <ChevronLeft className="mr-1 size-4" />
                         Previous
                     </Button>
                 )}
 
-                {pageNumbers.map((page, index) => (
+                {pageNumbers.map((page, index) =>
                     page === '...' ? (
                         <span key={`ellipsis-${index}`} className="px-3 py-2 text-sm text-muted-foreground">
                             ...
                         </span>
                     ) : (
-                        <Link
-                            key={page}
-                            href={`${baseUrl}?page=${page}`}
-                            className="inline-flex"
-                        >
-                            <Button
-                                variant={currentPage === page ? "default" : "outline"}
-                                size="sm"
-                                className="min-w-[40px]"
-                            >
+                        <Link key={page} href={`${baseUrl}?page=${page}`} className="inline-flex">
+                            <Button variant={currentPage === page ? 'default' : 'outline'} size="sm" className="min-w-[40px]">
                                 {page}
                             </Button>
                         </Link>
-                    )
-                ))}
+                    ),
+                )}
 
                 {currentPage < lastPage ? (
-                    <Link
-                        href={`${baseUrl}?page=${currentPage + 1}`}
-                        className="inline-flex"
-                    >
+                    <Link href={`${baseUrl}?page=${currentPage + 1}`} className="inline-flex">
                         <Button variant="outline" size="sm">
                             Next
-                            <ChevronRight className="size-4 ml-1" />
+                            <ChevronRight className="ml-1 size-4" />
                         </Button>
                     </Link>
                 ) : (
                     <Button variant="outline" size="sm" disabled>
                         Next
-                        <ChevronRight className="size-4 ml-1" />
+                        <ChevronRight className="ml-1 size-4" />
                     </Button>
                 )}
             </div>

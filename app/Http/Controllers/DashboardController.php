@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Data\AnnouncementData;
 use App\Data\PostData;
 use App\Data\ProductData;
 use App\Data\SupportTicketData;
 use App\Data\TopicData;
-use App\Models\Announcement;
 use App\Models\Post;
 use App\Models\Product;
 use App\Models\SupportTicket;
@@ -29,22 +27,10 @@ class DashboardController
             'newestProduct' => $this->getNewestProduct(),
             'popularProduct' => $this->getPopularProduct(),
             'featuredProduct' => $this->getFeaturedProduct(),
-            'announcements' => Inertia::defer(fn (): Collection => $this->getAnnouncements()),
             'supportTickets' => Inertia::defer(fn (): Collection => $this->getSupportTickets()),
             'trendingTopics' => Inertia::defer(fn (): Collection => $this->getTrendingTopics()),
             'latestBlogPosts' => Inertia::defer(fn (): Collection => $this->getLatestBlogPosts()),
         ]);
-    }
-
-    private function getAnnouncements(): Collection
-    {
-        return AnnouncementData::collect(Announcement::query()
-            ->with('author')
-            ->with('reads')
-            ->current()
-            ->unread()
-            ->latest()
-            ->get());
     }
 
     private function getSupportTickets(): Collection

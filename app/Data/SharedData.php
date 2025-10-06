@@ -16,6 +16,9 @@ class SharedData extends Data
 {
     public AuthData $auth;
 
+    /** @var AnnouncementData[] */
+    public array $announcements;
+
     public string $name;
 
     public ?int $cartCount = null;

@@ -6,8 +6,14 @@ namespace App\Filament\Admin\Resources\Users\RelationManagers;
 
 use App\Filament\Admin\Resources\Warnings\Actions\IssueAction;
 use App\Models\UserWarning;
+use App\Models\Warning;
 use BackedEnum;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -19,10 +25,40 @@ class UserWarningsRelationManager extends RelationManager
 
     protected static string|null|BackedEnum $icon = 'heroicon-o-exclamation-triangle';
 
+    public function form(Schema $schema): Schema
+    {
+        return $schema
+            ->columns(1)
+            ->components([
+                Select::make('warning_id')
+                    ->label('Warning Type')
+                    ->options(Warning::active()->pluck('name', 'id'))
+                    ->required()
+                    ->searchable()
+                    ->live()
+                    ->afterStateUpdated(function ($state, $set) {
+                        $warning = Warning::find($state);
+                        if ($warning) {
+                            $set('points_preview', $warning->points);
+                            $set('days_preview', $warning->days_applied);
+                        }
+                    }),
+                Textarea::make('reason')
+                    ->label('Specific Reason')
+                    ->rows(3)
+                    ->maxLength(1000)
+                    ->placeholder('Optional: provide specific details about this warning instance'),
+            ]);
+    }
+
     public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('warning.name')
+            ->description('The user\'s warning history.')
+            ->emptyStateHeading('No warnings issued')
+            ->emptyStateDescription('This user has no warning history.')
+            ->emptyStateIcon('heroicon-o-check-circle')
             ->columns([
                 TextColumn::make('warning.name')
                     ->label('Warning Type')
@@ -58,8 +94,9 @@ class UserWarningsRelationManager extends RelationManager
                 IssueAction::make()
                     ->user(fn () => $this->getOwnerRecord()),
             ])
-            ->emptyStateHeading('No warnings issued')
-            ->emptyStateDescription('This user has no warning history.')
-            ->emptyStateIcon('heroicon-o-check-circle');
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ]);
     }
 }

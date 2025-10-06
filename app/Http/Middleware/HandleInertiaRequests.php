@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Data\AnnouncementData;
 use App\Data\AuthData;
 use App\Data\FlashData;
 use App\Data\SharedData;
 use App\Data\UserData;
+use App\Models\Announcement;
 use App\Models\Permission;
 use App\Services\ShoppingCartService;
 use Illuminate\Http\Request;
@@ -36,6 +38,13 @@ class HandleInertiaRequests extends Middleware
                 'can' => Permission::all()->mapWithKeys(fn (Permission $permission): array => [$permission->name => Gate::forUser($user)->check($permission->name)])->toArray(),
                 'mustVerifyEmail' => $user && ! $user->hasVerifiedEmail(),
             ]),
+            'announcements' => AnnouncementData::collect(Announcement::query()
+                ->with('author')
+                ->with('reads')
+                ->current()
+                ->unread()
+                ->latest()
+                ->get()),
             'cartCount' => $this->shoppingCartService->getCartCount(),
             'flash' => null,
             'name' => config('app.name'),

@@ -1,6 +1,6 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Info, TriangleAlert, X, XCircle } from 'lucide-react';
+import { CheckCircle, Info, TriangleAlert, XCircle, XIcon } from 'lucide-react';
 import { useState } from 'react';
 
 interface AnnouncementBannerProps {
@@ -44,24 +44,20 @@ export default function AnnouncementsBanner({ announcement, onDismiss }: Announc
     return (
         <Alert variant={config.variant}>
             <IconComponent className="size-4" />
-            <div className="flex-1">
-                <AlertTitle>{announcement.title}</AlertTitle>
-                <AlertDescription>
-                    <p dangerouslySetInnerHTML={{ __html: announcement.content }} />
-                </AlertDescription>
-            </div>
+            <div className="flex items-center justify-between">
+                <div>
+                    <AlertTitle>{announcement.title}</AlertTitle>
+                    <AlertDescription>
+                        <p className="mb-0" dangerouslySetInnerHTML={{ __html: announcement.content }} />
+                    </AlertDescription>
+                </div>
 
-            {announcement.isDismissible && (
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleDismiss}
-                    className="absolute top-2 right-2 h-6 w-6 p-0 hover:bg-black/10 dark:hover:bg-white/10"
-                    aria-label="Dismiss announcement"
-                >
-                    <X className="size-4" />
-                </Button>
-            )}
+                {announcement.isDismissible && (
+                    <Button variant="ghost" size="sm" onClick={handleDismiss} aria-label="Dismiss announcement">
+                        <XIcon className="size-4" />
+                    </Button>
+                )}
+            </div>
         </Alert>
     );
 }

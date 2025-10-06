@@ -351,6 +351,7 @@ declare namespace App.Data {
     };
     export type SharedData = {
         auth: App.Data.AuthData;
+        announcements: Array<App.Data.AnnouncementData>;
         name: string;
         cartCount: number | null;
         flash: App.Data.FlashData | null;

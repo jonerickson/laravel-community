@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Data\SubscriptionData;
 use App\Enums\OrderStatus;
+use App\Enums\WarningConsequenceType;
 use App\Events\UserCreated;
 use App\Events\UserDeleted;
 use App\Events\UserUpdated;
@@ -76,6 +77,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read WarningConsequence|null $active_consequence
+ * @property-read WarningConsequenceType|null $active_consequence_type
  * @property-read Collection<int, UserWarning> $activeWarnings
  * @property-read int|null $active_warnings_count
  * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
@@ -213,6 +215,8 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
 
     protected $appends = [
         'is_banned',
+        'active_consequence',
+        'active_consequence_type',
     ];
 
     protected $with = [
@@ -276,7 +280,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
 
     public function activeWarnings(): HasMany
     {
-        return $this->hasMany(UserWarning::class)->active();
+        return $this->userWarnings()->active();
     }
 
     public function warningPoints(): Attribute
@@ -299,6 +303,12 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
                     ->first();
             }
         )->shouldCache();
+    }
+
+    public function activeConsequenceType(): Attribute
+    {
+        return Attribute::get(fn (): ?WarningConsequenceType => $this->active_consequence->type ?? null)
+            ->shouldCache();
     }
 
     public function isBanned(): Attribute

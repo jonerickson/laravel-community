@@ -1,5 +1,4 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import type { App } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { AlertTriangle, ShieldAlert, XCircle } from 'lucide-react';
 
@@ -16,7 +15,7 @@ export function UserWarningBanner() {
     const getVariant = () => {
         if (points >= 50) return 'destructive';
         if (points >= 25) return 'destructive';
-        if (points >= 10) return 'default';
+        if (points >= 10) return 'info';
         return 'default';
     };
 
@@ -27,10 +26,10 @@ export function UserWarningBanner() {
     };
 
     const getTitle = () => {
-        if (consequenceType === 'ban') return 'Account Banned';
-        if (consequenceType === 'post_restriction') return 'Posting Restricted';
-        if (consequenceType === 'moderate_content') return 'Content Under Moderation';
-        return 'Warning Points Active';
+        if (consequenceType === 'ban') return 'Account banned';
+        if (consequenceType === 'post_restriction') return 'Posting restricted';
+        if (consequenceType === 'moderate_content') return 'Content under moderation';
+        return 'Warning points active';
     };
 
     const getDescription = () => {
@@ -43,8 +42,8 @@ export function UserWarningBanner() {
     const Icon = getIcon();
 
     return (
-        <Alert variant={getVariant()} className="mb-4">
-            <Icon className="h-4 w-4" />
+        <Alert variant={getVariant()}>
+            <Icon className="size-4" />
             <AlertTitle>{getTitle()}</AlertTitle>
             <AlertDescription>{getDescription()}</AlertDescription>
         </Alert>

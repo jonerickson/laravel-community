@@ -1,3 +1,6 @@
+import AnnouncementsList from '@/components/announcements-list';
+import { EmailVerificationBanner } from '@/components/email-verification-banner';
+import { UserWarningBanner } from '@/components/user-warning-banner';
 import { useFingerprint } from '@/hooks';
 import { useFlashMessages } from '@/hooks/use-flash-messages';
 import { useLayout } from '@/hooks/use-layout';
@@ -14,7 +17,7 @@ interface AppLayoutProps {
 }
 
 export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
-    const { auth } = usePage<App.Data.SharedData>().props;
+    const { auth, announcements } = usePage<App.Data.SharedData>().props;
     const { layout } = useLayout();
 
     useFlashMessages();
@@ -30,6 +33,11 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
                     'px-6 pt-6 pb-12 lg:px-4': LayoutComponent === AppHeaderLayout,
                 })}
             >
+                <div className="mb-4 flex flex-col gap-4">
+                    <EmailVerificationBanner />
+                    <UserWarningBanner />
+                    <AnnouncementsList announcements={announcements} />
+                </div>
                 {children}
             </div>
         </LayoutComponent>

@@ -16,6 +16,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -41,7 +42,10 @@ class ListPaymentMethods extends Component implements HasActions, HasSchemas, Ha
         return $table
             ->heading('Payment Methods')
             ->description('The user\'s saved payment methods.')
-            ->records(fn (): \Illuminate\Support\Collection => collect($this->records))
+            ->emptyStateHeading('No payment methods')
+            ->emptyStateDescription('This user has no payment methods on file.')
+            ->emptyStateIcon('heroicon-o-credit-card')
+            ->records(fn (): Collection => collect($this->records))
             ->columns([
                 TextColumn::make('type')
                     ->default(new HtmlString('&ndash;'))

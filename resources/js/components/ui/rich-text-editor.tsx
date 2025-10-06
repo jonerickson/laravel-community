@@ -1,30 +1,41 @@
-import { useEditor, EditorContent, type Editor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Placeholder from '@tiptap/extension-placeholder';
-import Image from '@tiptap/extension-image';
-import TextAlign from '@tiptap/extension-text-align';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
+import Image from '@tiptap/extension-image';
+import Placeholder from '@tiptap/extension-placeholder';
+import TextAlign from '@tiptap/extension-text-align';
+import { EditorContent, useEditor, type Editor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Bold, Italic, List, ListOrdered, Quote, Undo, Redo, Link as LinkIcon, Smile, ImageIcon, AlignLeft, AlignCenter, AlignRight, AlignJustify, MoreHorizontal, Code,
-    Strikethrough,
-    Underline,
+    AlignCenter,
+    AlignJustify,
+    AlignLeft,
+    AlignRight,
+    Bold,
+    Code,
     Heading,
     Heading1,
     Heading2,
     Heading3,
     Heading4,
     Heading5,
-    Heading6
+    Heading6,
+    ImageIcon,
+    Italic,
+    Link as LinkIcon,
+    List,
+    ListOrdered,
+    MoreHorizontal,
+    Quote,
+    Redo,
+    Smile,
+    Strikethrough,
+    Underline,
+    Undo,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
 
 const ResizableImage = Image.extend({
     addAttributes() {
@@ -32,25 +43,25 @@ const ResizableImage = Image.extend({
             ...this.parent?.(),
             width: {
                 default: null,
-                parseHTML: element => element.getAttribute('width'),
-                renderHTML: attributes => {
+                parseHTML: (element) => element.getAttribute('width'),
+                renderHTML: (attributes) => {
                     if (!attributes.width) {
-                        return {}
+                        return {};
                     }
-                    return { width: attributes.width }
+                    return { width: attributes.width };
                 },
             },
             height: {
                 default: null,
-                parseHTML: element => element.getAttribute('height'),
-                renderHTML: attributes => {
+                parseHTML: (element) => element.getAttribute('height'),
+                renderHTML: (attributes) => {
                     if (!attributes.height) {
-                        return {}
+                        return {};
                     }
-                    return { height: attributes.height }
+                    return { height: attributes.height };
                 },
             },
-        }
+        };
     },
     addNodeView() {
         return ({ node, HTMLAttributes, getPos, editor }) => {
@@ -66,7 +77,8 @@ const ResizableImage = Image.extend({
             img.style.height = node.attrs.height ? `${node.attrs.height}px` : 'auto';
 
             const resizeHandle = document.createElement('div');
-            resizeHandle.className = 'absolute bottom-0 right-0 w-3 h-3 bg-background border border-border rounded-sm cursor-se-resize opacity-0 group-hover:opacity-100 transition-opacity shadow-sm';
+            resizeHandle.className =
+                'absolute bottom-0 right-0 w-3 h-3 bg-background border border-border rounded-sm cursor-se-resize opacity-0 group-hover:opacity-100 transition-opacity shadow-sm';
             resizeHandle.style.transform = 'translate(50%, 50%)';
 
             const gripDots = document.createElement('div');
@@ -122,7 +134,7 @@ const ResizableImage = Image.extend({
                             ...node.attrs,
                             width,
                             height,
-                        })
+                        }),
                     );
                 }
 
@@ -269,17 +281,25 @@ function ImageDialog({ editor, isOpen, onOpenChange }: ImageDialogProps) {
             const reader = new FileReader();
             reader.onload = (event) => {
                 const dataUrl = event.target?.result as string;
-                editor.chain().focus().setImage({
-                    src: dataUrl,
-                    alt: altText || file.name
-                }).run();
+                editor
+                    .chain()
+                    .focus()
+                    .setImage({
+                        src: dataUrl,
+                        alt: altText || file.name,
+                    })
+                    .run();
             };
             reader.readAsDataURL(file);
         } else if (imageUrl) {
-            editor.chain().focus().setImage({
-                src: imageUrl,
-                alt: altText || 'Image'
-            }).run();
+            editor
+                .chain()
+                .focus()
+                .setImage({
+                    src: imageUrl,
+                    alt: altText || 'Image',
+                })
+                .run();
         }
 
         onOpenChange(false);
@@ -294,11 +314,7 @@ function ImageDialog({ editor, isOpen, onOpenChange }: ImageDialogProps) {
                 <div className="grid gap-4 pb-4">
                     <div className="grid gap-2">
                         <label className="text-sm font-medium">Upload Image</label>
-                        <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                        />
+                        <Input type="file" accept="image/*" onChange={handleFileChange} />
                     </div>
                     <div className="text-center text-sm text-muted-foreground">or</div>
                     <div className="grid gap-2">
@@ -312,22 +328,14 @@ function ImageDialog({ editor, isOpen, onOpenChange }: ImageDialogProps) {
                     </div>
                     <div className="grid gap-2">
                         <label className="text-sm font-medium">Alt Text (Optional)</label>
-                        <Input
-                            value={altText}
-                            onChange={(e) => setAltText(e.target.value)}
-                            placeholder="Describe the image"
-                        />
+                        <Input value={altText} onChange={(e) => setAltText(e.target.value)} placeholder="Describe the image" />
                     </div>
                 </div>
                 <DialogFooter>
                     <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                         Cancel
                     </Button>
-                    <Button
-                        type="button"
-                        onClick={handleSubmit}
-                        disabled={!file && !imageUrl}
-                    >
+                    <Button type="button" onClick={handleSubmit} disabled={!file && !imageUrl}>
                         Insert Image
                     </Button>
                 </DialogFooter>
@@ -370,31 +378,29 @@ function EmojiDialog({ editor, isOpen, onOpenChange }: EmojiDialogProps) {
     );
 }
 
-function ToolbarButton({ action, icon: Icon, isActive, disabled }: {
+function ToolbarButton({
+    action,
+    icon: Icon,
+    isActive,
+    disabled,
+}: {
     action: () => void;
     icon: React.ComponentType<{ className?: string }>;
     isActive?: boolean;
     disabled?: boolean;
 }) {
     return (
-        <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={action}
-            className={isActive ? 'bg-muted' : ''}
-            disabled={disabled}
-        >
+        <Button type="button" variant="ghost" size="sm" onClick={action} className={isActive ? 'bg-muted' : ''} disabled={disabled}>
             <Icon className="size-4" />
         </Button>
     );
 }
 
 function ToolbarSeparator() {
-    return <div className="w-px h-6 bg-border mx-1" />;
+    return <div className="mx-1 h-6 w-px bg-border" />;
 }
 
-export function RichTextEditor({ content, onChange, placeholder = "Start typing...", className }: RichTextEditorProps) {
+export function RichTextEditor({ content, onChange, placeholder = 'Start typing...', className }: RichTextEditorProps) {
     const [linkDialogOpen, setLinkDialogOpen] = useState(false);
     const [emojiDialogOpen, setEmojiDialogOpen] = useState(false);
     const [imageDialogOpen, setImageDialogOpen] = useState(false);
@@ -432,19 +438,11 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
 
     return (
         <>
-            <div className={`border border-input rounded-md ${className}`}>
-                <div className="flex items-center gap-1 p-2 border-b">
+            <div className={`rounded-md border border-input ${className}`}>
+                <div className="flex items-center gap-1 border-b p-2">
                     {/* Essential formatting tools - always visible */}
-                    <ToolbarButton
-                        action={() => editor.chain().focus().toggleBold().run()}
-                        icon={Bold}
-                        isActive={editor.isActive('bold')}
-                    />
-                    <ToolbarButton
-                        action={() => editor.chain().focus().toggleItalic().run()}
-                        icon={Italic}
-                        isActive={editor.isActive('italic')}
-                    />
+                    <ToolbarButton action={() => editor.chain().focus().toggleBold().run()} icon={Bold} isActive={editor.isActive('bold')} />
+                    <ToolbarButton action={() => editor.chain().focus().toggleItalic().run()} icon={Italic} isActive={editor.isActive('italic')} />
                     <ToolbarButton
                         action={() => editor.chain().focus().toggleStrike().run()}
                         icon={Strikethrough}
@@ -463,42 +461,42 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem
-                                onClick={() => editor.chain().focus().toggleHeading({level: 1}).run()}
+                                onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
                                 className="flex items-center gap-2"
                             >
                                 <Heading1 className="size-4" />
                                 Heading 1
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                                onClick={() => editor.chain().focus().toggleHeading({level: 2}).run()}
+                                onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
                                 className="flex items-center gap-2"
                             >
                                 <Heading2 className="size-4" />
                                 Heading 2
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                                onClick={() => editor.chain().focus().toggleHeading({level: 3}).run()}
+                                onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
                                 className="flex items-center gap-2"
                             >
                                 <Heading3 className="size-4" />
                                 Heading 3
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                                onClick={() => editor.chain().focus().toggleHeading({level: 4}).run()}
+                                onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
                                 className="flex items-center gap-2"
                             >
                                 <Heading4 className="size-4" />
                                 Heading 4
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                                onClick={() => editor.chain().focus().toggleHeading({level: 5}).run()}
+                                onClick={() => editor.chain().focus().toggleHeading({ level: 5 }).run()}
                                 className="flex items-center gap-2"
                             >
                                 <Heading5 className="size-4" />
                                 Heading 5
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                                onClick={() => editor.chain().focus().toggleHeading({level: 6}).run()}
+                                onClick={() => editor.chain().focus().toggleHeading({ level: 6 }).run()}
                                 className="flex items-center gap-2"
                             >
                                 <Heading6 className="size-4" />
@@ -508,7 +506,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                     </DropdownMenu>
 
                     {/* Desktop-only tools - hidden on mobile */}
-                    <div className="hidden md:flex items-center gap-1">
+                    <div className="hidden items-center gap-1 md:flex">
                         <ToolbarSeparator />
                         <ToolbarButton
                             action={() => editor.chain().focus().toggleBulletList().run()}
@@ -547,19 +545,9 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                             isActive={editor.isActive({ textAlign: 'justify' })}
                         />
                         <ToolbarSeparator />
-                        <ToolbarButton
-                            action={() => setLinkDialogOpen(true)}
-                            icon={LinkIcon}
-                            isActive={editor.isActive('link')}
-                        />
-                        <ToolbarButton
-                            action={() => setImageDialogOpen(true)}
-                            icon={ImageIcon}
-                        />
-                        <ToolbarButton
-                            action={() => setEmojiDialogOpen(true)}
-                            icon={Smile}
-                        />
+                        <ToolbarButton action={() => setLinkDialogOpen(true)} icon={LinkIcon} isActive={editor.isActive('link')} />
+                        <ToolbarButton action={() => setImageDialogOpen(true)} icon={ImageIcon} />
+                        <ToolbarButton action={() => setEmojiDialogOpen(true)} icon={Smile} />
                         <ToolbarSeparator />
                         <ToolbarButton
                             action={() => editor.chain().focus().undo().run()}
@@ -579,10 +567,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                    onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-                                    className="flex items-center gap-2"
-                                >
+                                <DropdownMenuItem onClick={() => editor.chain().focus().toggleCodeBlock().run()} className="flex items-center gap-2">
                                     <Code className="size-4" />
                                     Code Block
                                 </DropdownMenuItem>
@@ -591,7 +576,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                     </div>
 
                     {/* Mobile-only "More" dropdown with all additional tools */}
-                    <div className="md:hidden ml-auto">
+                    <div className="ml-auto md:hidden">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button type="button" variant="ghost" size="sm">
@@ -599,10 +584,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48">
-                                <DropdownMenuItem
-                                    onClick={() => editor.chain().focus().toggleBulletList().run()}
-                                    className="flex items-center gap-2"
-                                >
+                                <DropdownMenuItem onClick={() => editor.chain().focus().toggleBulletList().run()} className="flex items-center gap-2">
                                     <List className="size-4" />
                                     Bullet List
                                 </DropdownMenuItem>
@@ -613,10 +595,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                                     <ListOrdered className="size-4" />
                                     Numbered List
                                 </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    onClick={() => editor.chain().focus().toggleBlockquote().run()}
-                                    className="flex items-center gap-2"
-                                >
+                                <DropdownMenuItem onClick={() => editor.chain().focus().toggleBlockquote().run()} className="flex items-center gap-2">
                                     <Quote className="size-4" />
                                     Quote
                                 </DropdownMenuItem>
@@ -648,24 +627,15 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                                     <AlignJustify className="size-4" />
                                     Justify
                                 </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    onClick={() => setLinkDialogOpen(true)}
-                                    className="flex items-center gap-2"
-                                >
+                                <DropdownMenuItem onClick={() => setLinkDialogOpen(true)} className="flex items-center gap-2">
                                     <LinkIcon className="size-4" />
                                     Insert Link
                                 </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    onClick={() => setImageDialogOpen(true)}
-                                    className="flex items-center gap-2"
-                                >
+                                <DropdownMenuItem onClick={() => setImageDialogOpen(true)} className="flex items-center gap-2">
                                     <ImageIcon className="size-4" />
                                     Insert Image
                                 </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    onClick={() => setEmojiDialogOpen(true)}
-                                    className="flex items-center gap-2"
-                                >
+                                <DropdownMenuItem onClick={() => setEmojiDialogOpen(true)} className="flex items-center gap-2">
                                     <Smile className="size-4" />
                                     Insert Emoji
                                 </DropdownMenuItem>
@@ -685,10 +655,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                                     <Redo className="size-4" />
                                     Redo
                                 </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-                                    className="flex items-center gap-2"
-                                >
+                                <DropdownMenuItem onClick={() => editor.chain().focus().toggleCodeBlock().run()} className="flex items-center gap-2">
                                     <Code className="size-4" />
                                     Code Block
                                 </DropdownMenuItem>
@@ -696,31 +663,19 @@ export function RichTextEditor({ content, onChange, placeholder = "Start typing.
                         </DropdownMenu>
                     </div>
                 </div>
-                <div className="p-3 min-h-[150px] cursor-text" onClick={() => editor?.chain().focus().run()}>
+                <div className="min-h-[150px] cursor-text p-3" onClick={() => editor?.chain().focus().run()}>
                     <EditorContent
                         editor={editor}
-                        className="prose prose-sm max-w-none focus-within:outline-none [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:min-h-[120px] [&_.ProseMirror]:cursor-text [&_.ProseMirror_a]:text-blue-600 [&_.ProseMirror_a]:underline [&_.ProseMirror_a]:decoration-blue-600 [&_.ProseMirror_a]:underline-offset-2 [&_.ProseMirror_a]:cursor-pointer dark:[&_.ProseMirror_a]:text-blue-400 dark:[&_.ProseMirror_a]:decoration-blue-400 [&_.ProseMirror_pre]:bg-muted [&_.ProseMirror_pre]:border [&_.ProseMirror_pre]:border-border [&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:rounded-md [&_.ProseMirror_pre]:font-mono [&_.ProseMirror_pre]:text-sm [&_.ProseMirror_pre]:overflow-x-auto [&_.ProseMirror_pre]:my-4 [&_.ProseMirror_pre]:relative [&_.ProseMirror_pre_code]:bg-transparent [&_.ProseMirror_pre_code]:p-0 [&_.ProseMirror_pre_code]:text-foreground [&_.ProseMirror_pre_code]:font-mono [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:italic [&_.ProseMirror_blockquote]:bg-muted [&_.ProseMirror_blockquote]:py-4 [&_.ProseMirror_blockquote]:text-muted-foreground [&_.ProseMirror_blockquote]:border-border [&_.ProseMirror_blockquote]:my-4"
+                        className="prose prose-sm max-w-none focus-within:outline-none [&_.ProseMirror]:min-h-[120px] [&_.ProseMirror]:cursor-text [&_.ProseMirror]:border-none [&_.ProseMirror]:outline-none [&_.ProseMirror_a]:cursor-pointer [&_.ProseMirror_a]:text-blue-600 [&_.ProseMirror_a]:underline [&_.ProseMirror_a]:decoration-blue-600 [&_.ProseMirror_a]:underline-offset-2 dark:[&_.ProseMirror_a]:text-blue-400 dark:[&_.ProseMirror_a]:decoration-blue-400 [&_.ProseMirror_blockquote]:my-4 [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-border [&_.ProseMirror_blockquote]:bg-muted [&_.ProseMirror_blockquote]:py-4 [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:text-muted-foreground [&_.ProseMirror_blockquote]:italic [&_.ProseMirror_pre]:relative [&_.ProseMirror_pre]:my-4 [&_.ProseMirror_pre]:overflow-x-auto [&_.ProseMirror_pre]:rounded-md [&_.ProseMirror_pre]:border [&_.ProseMirror_pre]:border-border [&_.ProseMirror_pre]:bg-muted [&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:font-mono [&_.ProseMirror_pre]:text-sm [&_.ProseMirror_pre_code]:bg-transparent [&_.ProseMirror_pre_code]:p-0 [&_.ProseMirror_pre_code]:font-mono [&_.ProseMirror_pre_code]:text-foreground"
                     />
                 </div>
             </div>
 
-            <LinkDialog
-                editor={editor}
-                isOpen={linkDialogOpen}
-                onOpenChange={setLinkDialogOpen}
-            />
+            <LinkDialog editor={editor} isOpen={linkDialogOpen} onOpenChange={setLinkDialogOpen} />
 
-            <ImageDialog
-                editor={editor}
-                isOpen={imageDialogOpen}
-                onOpenChange={setImageDialogOpen}
-            />
+            <ImageDialog editor={editor} isOpen={imageDialogOpen} onOpenChange={setImageDialogOpen} />
 
-            <EmojiDialog
-                editor={editor}
-                isOpen={emojiDialogOpen}
-                onOpenChange={setEmojiDialogOpen}
-            />
+            <EmojiDialog editor={editor} isOpen={emojiDialogOpen} onOpenChange={setEmojiDialogOpen} />
         </>
     );
 }
