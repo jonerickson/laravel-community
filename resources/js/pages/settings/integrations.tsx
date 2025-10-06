@@ -102,7 +102,7 @@ export default function Integrations({ connectedAccounts }: ConnectedAccountsPro
             <Head title="Integrations" />
             <SettingsLayout>
                 <div className="space-y-8">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                         <HeadingSmall title="Integrations" description="Connect your accounts for enhanced features and authentication" />
                         {availableToConnect.length > 0 && (
                             <Button onClick={() => setShowAddDialog(true)}>
@@ -146,7 +146,7 @@ export default function Integrations({ connectedAccounts }: ConnectedAccountsPro
                                             </div>
                                         </div>
                                         <Button
-                                            variant="outline"
+                                            variant="ghost"
                                             size="sm"
                                             onClick={() => handleRemoveAccount(account.id, getProviderDisplayName(account.provider))}
                                             className="text-destructive hover:text-destructive"

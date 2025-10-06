@@ -75,7 +75,7 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
 
                 <SettingsLayout>
                     <div className="space-y-8">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                             <HeadingSmall title="Payment methods" description="Manage your payment methods for purchases and subscriptions" />
                             <Button onClick={() => setShowAddDialog(true)}>
                                 <Plus className="mr-2 size-4" />

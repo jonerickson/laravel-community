@@ -2,12 +2,12 @@ import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
 import InputError from '@/components/input-error';
+import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
 import { FormEventHandler } from 'react';
-import TextLink from '@/components/text-link';
 
 export default function SetEmail({ status }: { status?: string }) {
     const { data, setData, post, processing, reset, errors } = useForm<Required<{ email: string }>>({
