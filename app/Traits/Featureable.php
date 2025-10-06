@@ -17,7 +17,7 @@ trait Featureable
         $query->where('is_featured', true);
     }
 
-    protected function initializeFeatureable()
+    protected function initializeFeatureable(): void
     {
         $this->mergeFillable([
             'is_featured',

@@ -1,4 +1,5 @@
 import { EmptyState } from '@/components/empty-state';
+import { FollowButton } from '@/components/follow-button';
 import ForumTopicModerationMenu from '@/components/forum-topic-moderation-menu';
 import ForumTopicPost from '@/components/forum-topic-post';
 import ForumTopicReply from '@/components/forum-topic-reply';
@@ -196,6 +197,12 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                         <ForumTopicModerationMenu topic={topic} forum={forum} />
                     </div>
                     <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row sm:items-center">
+                        <FollowButton
+                            type="topic"
+                            id={topic.id}
+                            isFollowing={topic.isFollowedByUser ?? false}
+                            followersCount={topic.followersCount ?? 0}
+                        />
                         <Button onClick={goToLatestPost} variant="outline">
                             <ArrowDown className="mr-2 size-4" />
                             Latest

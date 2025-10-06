@@ -1,4 +1,5 @@
 import { EmptyState } from '@/components/empty-state';
+import { FollowButton } from '@/components/follow-button';
 import Heading from '@/components/heading';
 import RichEditorContent from '@/components/rich-editor-content';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -157,6 +158,12 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                         </div>
                     </div>
                     <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row sm:items-center">
+                        <FollowButton
+                            type="forum"
+                            id={forum.id}
+                            isFollowing={forum.isFollowedByUser ?? false}
+                            followersCount={forum.followersCount ?? 0}
+                        />
                         {hasAnyPermission(['delete_topics']) && (
                             <>
                                 {selectedTopics.length > 0 && (

@@ -24130,6 +24130,10 @@ namespace App\Http\Requests\SupportTickets {
 namespace App\Http\Requests\Auth {
     /**
      */
+    class SetEmailRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    /**
+     */
     class LoginRequest extends \Illuminate\Foundation\Http\FormRequest {
             }
     /**

@@ -7,7 +7,6 @@ namespace App\Models;
 use App\Traits\HasAuthor;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Carbon;
@@ -39,12 +38,10 @@ use Illuminate\Support\Carbon;
 class Read extends Model
 {
     use HasAuthor;
-    use HasFactory;
 
     protected $fillable = [
         'readable_type',
         'readable_id',
-        'created_by',
     ];
 
     public function readable(): MorphTo

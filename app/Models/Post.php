@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Contracts\Sluggable;
 use App\Enums\PostType;
+use App\Events\PostCreated;
 use App\Traits\Commentable;
 use App\Traits\Featureable;
 use App\Traits\HasAuthor;
@@ -153,6 +154,10 @@ class Post extends Model implements Sluggable
 
     protected $appends = [
         'reading_time',
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => PostCreated::class,
     ];
 
     public function generateSlug(): ?string

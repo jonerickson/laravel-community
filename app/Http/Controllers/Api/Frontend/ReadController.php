@@ -32,8 +32,7 @@ class ReadController extends Controller
             ]);
         }
 
-        $user = Auth::user();
-        $result = $readable->markAsRead($user->id);
+        $result = $readable->markAsRead(Auth::user());
 
         $readData = ReadData::from([
             'markedAsRead' => ! is_bool($result),

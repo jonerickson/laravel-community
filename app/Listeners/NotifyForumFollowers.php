@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Listeners;
+
+use App\Events\PostCreated;
+use App\Events\TopicCreated;
+use App\Notifications\Forums\NewContentNotification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Notification;
+
+class NotifyForumFollowers implements ShouldQueue
+{
+    public function handle(TopicCreated|PostCreated $event): void
+    {
+        if ($event instanceof TopicCreated) {
+            $content = $event->topic;
+            $forum = $event->topic->forum;
+        } else {
+            $content = $event->post;
+            $forum = $event->post->topic->forum;
+        }
+
+        $followers = $forum->follows()
+            ->with('author')
+            ->get()
+            ->pluck('author')
+            ->filter(fn ($follower): bool => $follower->id !== $content->created_by);
+
+        if ($followers->isNotEmpty()) {
+            Notification::send($followers, new NewContentNotification($content, $forum));
+        }
+    }
+}

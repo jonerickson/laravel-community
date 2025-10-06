@@ -128,6 +128,8 @@ declare namespace App.Data {
         isActive: boolean;
         topicsCount: number | null;
         postsCount: number | null;
+        isFollowedByUser: boolean | null;
+        followersCount: number | null;
         latestTopics: Array<App.Data.TopicData> | null;
         category: App.Data.ForumCategoryData;
         createdAt: string | null;
@@ -426,6 +428,8 @@ declare namespace App.Data {
         readsCount: number;
         isHot: boolean;
         trendingScore: number;
+        isFollowedByUser: boolean | null;
+        followersCount: number | null;
         forum: App.Data.ForumData | null;
         author: App.Data.UserData;
         lastPost: App.Data.PostData | null;

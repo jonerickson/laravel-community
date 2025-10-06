@@ -52,6 +52,10 @@ class TopicData extends Data
 
     public float $trendingScore;
 
+    public ?bool $isFollowedByUser = null;
+
+    public ?int $followersCount = null;
+
     #[LoadRelation]
     public ?ForumData $forum = null;
 

@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Contracts\Sluggable;
 use App\Traits\Activateable;
+use App\Traits\Followable;
 use App\Traits\HasGroups;
 use App\Traits\HasSlug;
 use App\Traits\Orderable;
@@ -34,8 +35,13 @@ use Illuminate\Support\Str;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read ForumCategory|null $category
+ * @property-read Collection<int, Follow> $followers
+ * @property-read int $followers_count
+ * @property-read Collection<int, Follow> $follows
+ * @property-read int|null $follows_count
  * @property-read Collection<int, Group> $groups
  * @property-read int|null $groups_count
+ * @property-read bool $is_followed_by_user
  * @property-read Collection<int, Topic> $latestTopics
  * @property-read int|null $latest_topics_count
  * @property-read Collection<int, Post> $posts
@@ -68,6 +74,7 @@ use Illuminate\Support\Str;
 class Forum extends Model implements Sluggable
 {
     use Activateable;
+    use Followable;
     use HasFactory;
     use HasGroups;
     use HasSlug;

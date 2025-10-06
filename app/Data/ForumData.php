@@ -39,6 +39,10 @@ class ForumData extends Data
 
     public ?int $postsCount = null;
 
+    public ?bool $isFollowedByUser = null;
+
+    public ?int $followersCount = null;
+
     /** @var TopicData[] */
     public ?array $latestTopics = null;
 

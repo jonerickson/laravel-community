@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\Sluggable;
+use App\Events\TopicCreated;
+use App\Traits\Followable;
 use App\Traits\HasAuthor;
 use App\Traits\HasLogging;
 use App\Traits\HasSlug;
@@ -41,7 +43,12 @@ use Laravel\Scout\Searchable;
  * @property-read User $author
  * @property-read mixed $author_name
  * @property-read User $creator
+ * @property-read Collection<int, Follow> $followers
+ * @property-read int $followers_count
+ * @property-read Collection<int, Follow> $follows
+ * @property-read int|null $follows_count
  * @property-read Forum $forum
+ * @property-read bool $is_followed_by_user
  * @property-read bool $is_hot
  * @property-read bool $is_read_by_user
  * @property-read Post|null $lastPost
@@ -85,6 +92,7 @@ use Laravel\Scout\Searchable;
  */
 class Topic extends Model implements Sluggable
 {
+    use Followable;
     use HasAuthor;
     use HasFactory;
     use HasLogging;
@@ -111,6 +119,10 @@ class Topic extends Model implements Sluggable
 
     protected $touches = [
         'forum',
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => TopicCreated::class,
     ];
 
     public function generateSlug(): ?string

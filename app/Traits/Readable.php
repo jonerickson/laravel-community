@@ -48,31 +48,31 @@ trait Readable
         });
     }
 
-    public function userRead(?int $userId = null): ?Read
+    public function userRead(?User $user = null): ?Read
     {
-        $userId ??= Auth::id();
+        $user ??= Auth::user();
 
-        if (! $userId) {
+        if (! $user) {
             return null;
         }
 
-        return $this->reads()->whereCreatedBy($userId)->first();
+        return $this->reads()->whereCreatedBy($user)->first();
     }
 
-    public function isReadBy(?int $userId = null): bool
+    public function isReadBy(?User $user = null): bool
     {
-        return $this->userRead($userId) !== null;
+        return $this->userRead($user) !== null;
     }
 
-    public function markAsRead(?int $userId = null): Read|bool
+    public function markAsRead(?User $user = null): Read|bool
     {
-        $userId ??= Auth::id();
+        $user ??= Auth::user();
 
-        if (! $userId) {
+        if (! $user) {
             return false;
         }
 
-        $existingRead = $this->userRead($userId);
+        $existingRead = $this->userRead($user);
         if ($existingRead) {
             $existingRead->touch();
 
@@ -82,15 +82,15 @@ trait Readable
         return $this->reads()->updateOrCreate([]);
     }
 
-    public function markAsUnread(?int $userId = null): bool
+    public function markAsUnread(?User $user = null): bool
     {
-        $userId ??= Auth::id();
+        $user ??= Auth::user();
 
-        if (! $userId) {
+        if (! $user) {
             return false;
         }
 
-        $existingRead = $this->userRead($userId);
+        $existingRead = $this->userRead($user);
         if ($existingRead) {
             $existingRead->delete();
 
@@ -100,15 +100,15 @@ trait Readable
         return false;
     }
 
-    public function hasUnreadUpdates(?int $userId = null): bool
+    public function hasUnreadUpdates(?User $user = null): bool
     {
-        $userId ??= Auth::id();
+        $user ??= Auth::user();
 
-        if (! $userId) {
+        if (! $user) {
             return false;
         }
 
-        $userRead = $this->userRead($userId);
+        $userRead = $this->userRead($user);
 
         if (! $userRead) {
             return true;
@@ -121,13 +121,13 @@ trait Readable
     {
         return Attribute::make(
             get: function (): bool {
-                $userId = Auth::id();
+                $user = Auth::user();
 
-                if (! $userId) {
+                if (! $user) {
                     return false;
                 }
 
-                return $this->isReadBy($userId);
+                return $this->isReadBy($user);
             }
         )->shouldCache();
     }
