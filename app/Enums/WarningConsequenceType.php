@@ -47,10 +47,10 @@ enum WarningConsequenceType: string implements HasColor, HasIcon, HasLabel
     public function getDescription(): string
     {
         return match ($this) {
-            self::None => 'User has no restrictions',
-            self::ModerateContent => 'User posts require approval before being published',
-            self::PostRestriction => 'User cannot create posts or topics',
-            self::Ban => 'User is banned from accessing the website',
+            self::None => 'There are no restrictions.',
+            self::ModerateContent => 'Your posts require approval before being published.',
+            self::PostRestriction => 'You cannot create posts or topics.',
+            self::Ban => 'You are banned from accessing the website.',
         };
     }
 }

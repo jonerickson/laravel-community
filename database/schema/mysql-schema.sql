@@ -668,6 +668,8 @@ CREATE TABLE `products_categories` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `order` int NOT NULL DEFAULT '0',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -799,8 +801,8 @@ DROP TABLE IF EXISTS `settings`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `settings` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `group` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `group` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `locked` tinyint(1) NOT NULL DEFAULT '0',
   `payload` json NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -1005,6 +1007,28 @@ CREATE TABLE `users_integrations` (
   CONSTRAINT `users_socials_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `users_warnings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users_warnings` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `warning_id` bigint unsigned NOT NULL,
+  `created_by` bigint unsigned DEFAULT NULL,
+  `reason` text COLLATE utf8mb4_unicode_ci,
+  `points_at_issue` int unsigned NOT NULL,
+  `expires_at` timestamp NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `users_warnings_warning_id_foreign` (`warning_id`),
+  KEY `users_warnings_created_by_foreign` (`created_by`),
+  KEY `users_warnings_user_id_expires_at_index` (`user_id`,`expires_at`),
+  CONSTRAINT `users_warnings_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `users_warnings_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `users_warnings_warning_id_foreign` FOREIGN KEY (`warning_id`) REFERENCES `warnings` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `views`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -1020,6 +1044,35 @@ CREATE TABLE `views` (
   UNIQUE KEY `views_viewable_type_viewable_id_fingerprint_id_unique` (`viewable_type`,`viewable_id`,`fingerprint_id`),
   KEY `views_viewable_type_viewable_id_index` (`viewable_type`,`viewable_id`),
   KEY `views_fingerprint_id_index` (`fingerprint_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `warnings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `warnings` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `points` int unsigned NOT NULL,
+  `days_applied` int unsigned NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `warnings_consequences`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `warnings_consequences` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `threshold` int unsigned NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `warnings_consequences_type_unique` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -1098,6 +1151,10 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (66,'2025_09_15_161
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (67,'2025_09_15_212422_create_orders_table',20);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (68,'2025_09_15_214103_create_order_items_table',21);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (69,'2022_12_14_083707_create_settings_table',22);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (70,'2025_09_28_202015_create_email_settings',23);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (71,'2025_09_28_202053_create_general_settings',23);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (72,'2025_09_29_180212_add_order_id_to_support_tickets_table',24);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (73,'2025_09_28_202015_create_email_settings',25);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (74,'2025_09_28_202053_create_general_settings',25);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (75,'2025_10_02_234848_add_is_active_to_products_categories',25);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (76,'2025_10_05_212730_create_warnings_table',26);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (77,'2025_10_05_212738_create_user_warnings_table',26);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (78,'2025_10_05_213137_create_warning_consequences_table',27);

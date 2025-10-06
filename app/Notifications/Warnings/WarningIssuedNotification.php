@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Notifications\Warnings;
 
 use App\Mail\WarningIssuedMail;
+use App\Models\User;
 use App\Models\UserWarning;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -23,9 +24,9 @@ class WarningIssuedNotification extends Notification implements ShouldQueue
         return ['mail', 'database'];
     }
 
-    public function toMail(object $notifiable): WarningIssuedMail
+    public function toMail(User $notifiable): WarningIssuedMail
     {
-        return new WarningIssuedMail($this->userWarning, $notifiable);
+        return new WarningIssuedMail($this->userWarning, $notifiable)->to($notifiable->email);
     }
 
     public function toArray(object $notifiable): array

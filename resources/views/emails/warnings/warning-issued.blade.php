@@ -1,29 +1,26 @@
 <x-mail::message>
-    # Warning Issued You have been issued a warning on {{ config('app.name') }}. ## Warning Details **Warning Type:**
-    {{ $userWarning->warning->name }}
-    <br />
-    **Points:** {{ $userWarning->warning->points }}
-    <br />
-    **Expires:** {{ $userWarning->expires_at->format('F j, Y') }}
-    <br />
-    @if ($userWarning->reason)
-        **Reason:** {{ $userWarning->reason }}
-        <br />
-    @endif
+# Warning Issued
 
-    **Your current warning points:** {{ $userWarning->points_at_issue }}
+You have been issued a warning on {{ config('app.name') }}.
 
-    @if ($user->active_consequence)
-        ## Current Restriction
+## Warning Details
+**Warning Type:** {{ $userWarning->warning->name }}<br />
+**Points:** {{ $userWarning->warning->points }}<br />
+**Expires:** {{ $userWarning->expires_at->format('F j, Y') }}<br />
+@if ($userWarning->reason)
+**Reason:** {{ $userWarning->reason }}<br />
+@endif
 
-        **{{ $user->active_consequence->type->getLabel() }}**
+**Your current warning points:** {{ $userWarning->points_at_issue }}
 
-        {{ $user->active_consequence->type->getDescription() }}
-    @endif
+@if ($user->active_consequence)
+## Current Restriction
+**{{ $user->active_consequence->type->getLabel() }}:** {{ $user->active_consequence->type->getDescription() }}<br>
+@endif
 
-    Please review our community guidelines to avoid further warnings.
+Please review our community guidelines to avoid further warnings.
 
-    Thanks,
-    <br />
-    {{ config('app.name') }}
+Thanks,
+<br />
+{{ config('app.name') }}
 </x-mail::message>
