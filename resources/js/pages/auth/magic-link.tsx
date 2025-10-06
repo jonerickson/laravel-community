@@ -9,11 +9,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
 
-interface ForgotPasswordProps {
+interface MagicLinkProps {
     status?: string;
 }
 
-export default function AuthForgotPassword({ status }: ForgotPasswordProps) {
+export default function AuthMagicLink({ status }: MagicLinkProps) {
     const { data, setData, post, processing, errors } = useForm<Required<{ email: string }>>({
         email: '',
     });
@@ -21,12 +21,12 @@ export default function AuthForgotPassword({ status }: ForgotPasswordProps) {
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        post(route('password.email'));
+        post(route('magic-link.send'));
     };
 
     return (
-        <AuthLayout title="Forgot password" description="Enter your email to receive a password reset link">
-            <Head title="Forgot password" />
+        <AuthLayout title="Email login link" description="Enter your email to receive a login link">
+            <Head title="Email login link" />
 
             {status && <div className="text-center text-sm font-medium text-success">{status}</div>}
 
@@ -51,7 +51,7 @@ export default function AuthForgotPassword({ status }: ForgotPasswordProps) {
                     <div className="my-6 flex items-center justify-start">
                         <Button className="w-full" disabled={processing}>
                             {processing && <LoaderCircle className="size-4 animate-spin" />}
-                            Email password reset link
+                            Email login link
                         </Button>
                     </div>
                 </form>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
+use App\Http\Controllers\Auth\MagicLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -38,6 +39,17 @@ Route::middleware('guest')->group(function (): void {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
+
+    Route::get('magic-link', [MagicLinkController::class, 'create'])
+        ->name('magic-link.request');
+
+    Route::post('magic-link', [MagicLinkController::class, 'store'])
+        ->middleware(['throttle:login'])
+        ->name('magic-link.send');
+
+    Route::get('magic-link/login/{user}', [MagicLinkController::class, 'index'])
+        ->middleware(['signed'])
+        ->name('magic-link.login');
 });
 
 Route::group(['prefix' => 'oauth'], function (): void {

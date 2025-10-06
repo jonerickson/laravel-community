@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Actions;
+namespace App\Actions\Warnings;
 
+use App\Actions\Action;
 use App\Models\User;
 use App\Models\UserWarning;
 use App\Models\Warning;

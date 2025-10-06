@@ -1,6 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
 import { IconBrandDiscord, IconRobot } from '@tabler/icons-react';
-import { LoaderCircle } from 'lucide-react';
+import { LoaderCircle, Mail } from 'lucide-react';
 import { FormEventHandler, useEffect } from 'react';
 
 import InputError from '@/components/input-error';
@@ -114,6 +114,13 @@ export default function AuthLogin({ status, canResetPassword }: LoginProps) {
                     </div>
 
                     <div className="flex flex-col gap-4">
+                        <Button className="w-full" tabIndex={4} size="icon" variant="outline" asChild>
+                            <a href={route('magic-link.request')}>
+                                <Mail />
+                                Email me a login link
+                            </a>
+                        </Button>
+
                         <Button className="w-full bg-[#424549] text-white" tabIndex={4} size="icon" asChild>
                             <a href={route('oauth.redirect', { provider: 'discord' })}>
                                 <IconBrandDiscord />

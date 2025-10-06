@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Warnings\Actions;
 
-use App\Actions\IssueWarningAction;
+use App\Actions\Warnings\IssueWarningAction;
 use App\Models\User;
 use App\Models\Warning;
 use Closure;

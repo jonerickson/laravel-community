@@ -24,7 +24,7 @@ export default function AuthVerifyPassword({ status }: VerifyPasswordProps) {
             <Head title="Email verification" />
 
             {status === 'verification-link-sent' && (
-                <div className="mb-4 text-center text-sm font-medium text-success">
+                <div className="text-center text-sm font-medium text-success">
                     A new verification link has been sent to the email address you provided during registration.
                 </div>
             )}
