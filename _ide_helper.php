@@ -24092,6 +24092,10 @@ namespace App\Http\Requests\Settings {
             }
     /**
      */
+    class UpdatePasswordRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    /**
+     */
     class StorePaymentMethodRequest extends \Illuminate\Foundation\Http\FormRequest {
             }
     /**
@@ -24127,6 +24131,10 @@ namespace App\Http\Requests\Auth {
     /**
      */
     class LoginRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    /**
+     */
+    class SendMagicLinkRequest extends \Illuminate\Foundation\Http\FormRequest {
             }
     }
 

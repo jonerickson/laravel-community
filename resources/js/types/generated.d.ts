@@ -444,6 +444,7 @@ declare namespace App.Data {
         groups: Array<App.Data.GroupData>;
         warningPoints: number;
         activeConsequenceType: App.Enums.WarningConsequenceType | null;
+        hasPassword: boolean;
         createdAt: string | null;
         updatedAt: string | null;
     };

@@ -7,9 +7,11 @@ namespace App\Filament\Admin\Resources\Reports\Actions;
 use App\Models\Report;
 use Filament\Actions\Action;
 use Illuminate\Support\Facades\Auth;
+use Override;
 
 class RejectAction extends Action
 {
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

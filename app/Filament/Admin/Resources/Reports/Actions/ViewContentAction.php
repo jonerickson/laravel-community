@@ -6,9 +6,11 @@ namespace App\Filament\Admin\Resources\Reports\Actions;
 
 use App\Models\Report;
 use Filament\Actions\Action;
+use Override;
 
 class ViewContentAction extends Action
 {
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();

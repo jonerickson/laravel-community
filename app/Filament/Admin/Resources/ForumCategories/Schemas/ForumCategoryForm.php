@@ -15,6 +15,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class ForumCategoryForm
@@ -90,7 +91,7 @@ class ForumCategoryForm
                             ->columnSpanFull()
                             ->schema([
                                 Select::make('groups')
-                                    ->default(fn () => collect([
+                                    ->default(fn (): Collection => collect([
                                         ...GroupModel::query()->defaultGuestGroups()->pluck('id'),
                                         ...GroupModel::query()->defaultMemberGroups()->pluck('id'),
                                     ]))

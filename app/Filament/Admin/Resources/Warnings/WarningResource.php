@@ -14,6 +14,7 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Override;
 
 class WarningResource extends Resource
 {
@@ -23,11 +24,13 @@ class WarningResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    #[Override]
     public static function form(Schema $schema): Schema
     {
         return WarningForm::configure($schema);
     }
 
+    #[Override]
     public static function table(Table $table): Table
     {
         return WarningsTable::configure($table);

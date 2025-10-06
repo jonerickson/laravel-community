@@ -15,6 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Override;
 
 class WarningConsequenceResource extends Resource
 {
@@ -24,11 +25,13 @@ class WarningConsequenceResource extends Resource
 
     protected static bool $shouldRegisterNavigation = false;
 
+    #[Override]
     public static function form(Schema $schema): Schema
     {
         return WarningConsequenceForm::configure($schema);
     }
 
+    #[Override]
     public static function table(Table $table): Table
     {
         return WarningConsequencesTable::configure($table);

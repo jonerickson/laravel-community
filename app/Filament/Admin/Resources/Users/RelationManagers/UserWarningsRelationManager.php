@@ -37,7 +37,7 @@ class UserWarningsRelationManager extends RelationManager
                     ->required()
                     ->searchable()
                     ->live()
-                    ->afterStateUpdated(function ($state, $set) {
+                    ->afterStateUpdated(function ($state, $set): void {
                         $warning = Warning::find($state);
                         if ($warning) {
                             $set('points_preview', $warning->points);
@@ -97,7 +97,7 @@ class UserWarningsRelationManager extends RelationManager
                     ->dateTimeTooltip()
                     ->sortable()
                     ->badge()
-                    ->color(fn (UserWarning $record) => $record->hasActiveConsequence() ? 'danger' : 'success'),
+                    ->color(fn (UserWarning $record): string => $record->hasActiveConsequence() ? 'danger' : 'success'),
                 TextColumn::make('author.name')
                     ->label('Issued By'),
                 TextColumn::make('created_at')
@@ -113,12 +113,12 @@ class UserWarningsRelationManager extends RelationManager
                     ->dateTimeTooltip()
                     ->sortable()
                     ->badge()
-                    ->color(fn (UserWarning $record) => $record->isActive() ? 'danger' : 'success'),
+                    ->color(fn (UserWarning $record): string => $record->isActive() ? 'danger' : 'success'),
             ])
             ->defaultSort('created_at', 'desc')
             ->headerActions([
                 IssueAction::make()
-                    ->user(fn () => $this->getOwnerRecord()),
+                    ->user(fn (): \Illuminate\Database\Eloquent\Model => $this->getOwnerRecord()),
             ])
             ->recordActions([
                 EditAction::make(),

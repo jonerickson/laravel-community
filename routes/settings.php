@@ -7,6 +7,7 @@ use App\Http\Controllers\Settings\BillingController;
 use App\Http\Controllers\Settings\DownloadsController;
 use App\Http\Controllers\Settings\IntegrationsController;
 use App\Http\Controllers\Settings\OrderController;
+use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\PaymentMethodController;
 use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +18,8 @@ Route::group(['middleware' => ['auth', 'verified']], function (): void {
     Route::get('settings/account', [ProfileController::class, 'edit'])->name('settings.profile.edit');
     Route::post('settings/account', [ProfileController::class, 'update'])->name('settings.profile.update');
     Route::delete('settings/account', [ProfileController::class, 'destroy'])->name('settings.profile.destroy');
+
+    Route::put('settings/password', [PasswordController::class, 'update'])->name('settings.password.update');
 
     Route::get('settings/integrations', [IntegrationsController::class, 'index'])->name('settings.integrations.index');
     Route::delete('settings/integrations/{social}', [IntegrationsController::class, 'destroy'])->name('settings.integrations.destroy');

@@ -69,31 +69,25 @@ class AppServiceProvider extends ServiceProvider
         Model::automaticallyEagerLoadRelationships();
         Model::shouldBeStrict();
 
-        Password::defaults(function () {
-            return Password::min(8)
-                ->when($this->app->environment(['staging', 'production']), function (Password $password) {
-                    $password
-                        ->letters()
-                        ->symbols()
-                        ->numbers()
-                        ->mixedCase()
-                        ->uncompromised();
-                });
-        });
+        Password::defaults(fn () => Password::min(8)
+            ->when($this->app->environment(['staging', 'production']), function (Password $password): void {
+                $password
+                    ->letters()
+                    ->symbols()
+                    ->numbers()
+                    ->mixedCase()
+                    ->uncompromised();
+            }));
 
-        RateLimiter::for('login', function (\Illuminate\Http\Request $request) {
-            return [
-                Limit::perMinute(5)->by($request->fingerprintId() ?: $request->ip()),
-                Limit::perHour(30)->by($request->fingerprintId() ?: $request->ip()),
-            ];
-        });
+        RateLimiter::for('login', fn (\Illuminate\Http\Request $request): array => [
+            Limit::perMinute(5)->by($request->fingerprintId() ?: $request->ip()),
+            Limit::perHour(30)->by($request->fingerprintId() ?: $request->ip()),
+        ]);
 
-        RateLimiter::for('register', function (\Illuminate\Http\Request $request) {
-            return [
-                Limit::perMinute(2)->by($request->fingerprintId() ?: $request->ip()),
-                Limit::perHour(5)->by($request->fingerprintId() ?: $request->ip()),
-            ];
-        });
+        RateLimiter::for('register', fn (\Illuminate\Http\Request $request): array => [
+            Limit::perMinute(2)->by($request->fingerprintId() ?: $request->ip()),
+            Limit::perHour(5)->by($request->fingerprintId() ?: $request->ip()),
+        ]);
 
         Socialite::extend('discord', fn () => Socialite::buildProvider(
             provider: DiscordProvider::class,

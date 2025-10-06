@@ -34,6 +34,8 @@ class UserData extends Data
 
     public ?WarningConsequenceType $activeConsequenceType = null;
 
+    public bool $hasPassword = false;
+
     public ?CarbonImmutable $createdAt = null;
 
     public ?CarbonImmutable $updatedAt = null;

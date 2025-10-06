@@ -21,7 +21,7 @@ class ListWarnings extends ListRecords
         return [
             Action::make('consequences')
                 ->color('gray')
-                ->url(fn () => ListWarningConsequences::getUrl()),
+                ->url(fn (): string => ListWarningConsequences::getUrl()),
             CreateAction::make(),
         ];
     }

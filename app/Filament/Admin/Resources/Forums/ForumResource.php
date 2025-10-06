@@ -32,6 +32,7 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Override;
 
@@ -89,7 +90,7 @@ class ForumResource extends Resource
                     ->columnSpanFull()
                     ->schema([
                         Select::make('groups')
-                            ->default(fn () => collect([
+                            ->default(fn (): Collection => collect([
                                 ...GroupModel::query()->defaultGuestGroups()->pluck('id'),
                                 ...GroupModel::query()->defaultMemberGroups()->pluck('id'),
                             ]))

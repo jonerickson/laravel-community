@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import UpdatePassword from '@/components/update-password';
 import { useInitials } from '@/hooks/use-initials';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
@@ -143,7 +144,7 @@ export default function Profile() {
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <Button disabled={processing}>{processing ? 'Saving...' : 'Save'}</Button>
+                            <Button disabled={processing}>{processing ? 'Saving...' : 'Save profile'}</Button>
                             <Transition
                                 show={recentlySuccessful}
                                 enter="transition ease-in-out"
@@ -156,6 +157,8 @@ export default function Profile() {
                         </div>
                     </form>
                 </div>
+
+                <UpdatePassword />
 
                 <DeleteUser />
             </SettingsLayout>

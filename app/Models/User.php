@@ -92,6 +92,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read int|null $fingerprints_count
  * @property-read Collection<int, Group> $groups
  * @property-read int|null $groups_count
+ * @property-read bool $has_password
  * @property-read Collection<int, UserIntegration> $integrations
  * @property-read int|null $integrations_count
  * @property-read bool $is_banned
@@ -293,14 +294,12 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     public function activeConsequence(): Attribute
     {
         return Attribute::make(
-            get: function (): ?WarningConsequence {
-                return $this->userWarnings()
-                    ->activeConsequence()
-                    ->with('warningConsequence')
-                    ->orderByDesc('consequence_expires_at')
-                    ->first()
-                    ?->warningConsequence;
-            }
+            get: fn (): ?WarningConsequence => $this->userWarnings()
+                ->activeConsequence()
+                ->with('warningConsequence')
+                ->orderByDesc('consequence_expires_at')
+                ->first()
+                ?->warningConsequence
         )->shouldCache();
     }
 
@@ -315,6 +314,11 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         return Attribute::make(
             get: fn (): bool => $this->fingerprints()->banned()->exists() || $this->active_consequence_type === WarningConsequenceType::Ban,
         )->shouldCache();
+    }
+
+    public function hasPassword(): Attribute
+    {
+        return Attribute::get(fn (): bool => $this->password !== null);
     }
 
     public function currentSubscription(): Attribute

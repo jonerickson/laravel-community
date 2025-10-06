@@ -12,11 +12,13 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
+use Override;
 
 class IssueAction extends Action
 {
     protected Closure|User|null $user = null;
 
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -31,7 +33,7 @@ class IssueAction extends Action
                 ->required()
                 ->searchable()
                 ->live()
-                ->afterStateUpdated(function ($state, $set) {
+                ->afterStateUpdated(function ($state, $set): void {
                     $warning = Warning::find($state);
                     if ($warning) {
                         $set('points_preview', $warning->points);
@@ -44,7 +46,7 @@ class IssueAction extends Action
                 ->maxLength(1000)
                 ->placeholder('Optional: provide specific details about this warning instance'),
         ]);
-        $this->action(function (array $data) {
+        $this->action(function (array $data): void {
             $warning = Warning::findOrFail($data['warning_id']);
 
             IssueWarningAction::execute(
