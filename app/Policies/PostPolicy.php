@@ -30,8 +30,8 @@ class PostPolicy
     public function view(?User $user, Post $post, ?Forum $forum = null, ?Topic $topic = null): bool
     {
         return Gate::forUser($user)->check('view_posts')
-            && (! $post->is_reported || ($post->is_reported && Gate::forUser($user)->check('report', $post)))
-            && ($post->is_published || (! $post->is_published && Gate::forUser($user)->check('publish', $post)))
+            && (! $post->is_reported || ($post->is_reported && (($user && $post->isAuthoredBy($user)) || Gate::forUser($user)->check('report', $post))))
+            && ($post->is_published || (! $post->is_published && (($user && $post->isAuthoredBy($user)) || Gate::forUser($user)->check('publish', $post))))
             && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum))
             && (! $topic instanceof Topic || Gate::forUser($user)->check('view', $topic));
     }
@@ -81,23 +81,39 @@ class PostPolicy
 
     public function report(?User $user, Post $post): bool
     {
+        if (! $user instanceof User) {
+            return false;
+        }
+
         return Gate::forUser($user)->check('report_posts');
     }
 
     public function like(?User $user, Post $post): bool
     {
+        if (! $user instanceof User) {
+            return false;
+        }
+
         return Gate::forUser($user)->check('like_posts')
             && $this->view($user, $post);
     }
 
     public function pin(?User $user, Post $post): bool
     {
+        if (! $user instanceof User) {
+            return false;
+        }
+
         return Gate::forUser($user)->check('pin_posts')
             && $this->view($user, $post);
     }
 
     public function publish(?User $user, Post $post): bool
     {
+        if (! $user instanceof User) {
+            return false;
+        }
+
         return Gate::forUser($user)->check('publish_posts');
     }
 }

@@ -6,6 +6,7 @@ namespace App\Policies;
 
 use App\Enums\WarningConsequenceType;
 use App\Models\Forum;
+use App\Models\Post;
 use App\Models\Topic;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
@@ -29,6 +30,7 @@ class TopicPolicy
     public function view(?User $user, Topic $topic, ?Forum $forum = null): bool
     {
         return Gate::forUser($user)->check('view_topics')
+            && ($topic->posts->some(fn (Post $post) => Gate::forUser($user)->check('view', $post)))
             && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum));
     }
 
@@ -92,18 +94,30 @@ class TopicPolicy
 
     public function report(?User $user, Topic $topic): bool
     {
+        if (! $user instanceof User) {
+            return false;
+        }
+
         return Gate::forUser($user)->check('report_topics')
             && $this->view($user, $topic);
     }
 
     public function pin(?User $user, Topic $topic): bool
     {
+        if (! $user instanceof User) {
+            return false;
+        }
+
         return Gate::forUser($user)->check('pin_topics')
             && $this->view($user, $topic);
     }
 
     public function lock(?User $user, Topic $topic): bool
     {
+        if (! $user instanceof User) {
+            return false;
+        }
+
         return Gate::forUser($user)->check('lock_topics')
             && $this->view($user, $topic);
     }
