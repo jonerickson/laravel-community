@@ -6,6 +6,7 @@ namespace App\Http\Controllers\OAuth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\UserIntegration;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
@@ -23,14 +24,7 @@ class CallbackController extends Controller
             ]);
         }
 
-        $user = User::updateOrCreate([
-            'email' => $email = $socialUser->getEmail(),
-        ], [
-            'name' => $socialUser->getName(),
-            'email_verified_at' => $email ? now() : null,
-        ]);
-
-        $user->integrations()->updateOrCreate([
+        $integration = UserIntegration::firstOrNew([
             'provider' => $provider,
             'provider_id' => $socialUser->getId(),
         ], [
@@ -38,6 +32,19 @@ class CallbackController extends Controller
             'provider_email' => $socialUser->getEmail(),
             'provider_avatar' => $socialUser->getAvatar(),
         ]);
+
+        if (blank($integration->getKey())) {
+            $user = User::create([
+                'name' => $socialUser->getName(),
+                'email' => $email = $socialUser->getEmail(),
+                'email_verified_at' => $email ? now() : null,
+            ]);
+
+            $integration->user()->associate($user);
+            $integration->save();
+        } else {
+            $user = $integration->user;
+        }
 
         $user->logSocialLogin($provider);
 
