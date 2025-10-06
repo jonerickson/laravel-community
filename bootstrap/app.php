@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 use App\Exceptions\BannedException;
 use App\Http\Middleware\CheckBannedUser;
+use App\Http\Middleware\EnsureAccountHasEmail;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -39,6 +41,10 @@ return Application::configure(basePath: dirname(__DIR__))
             AddQueuedCookiesToResponse::class,
         ]);
 
+        $middleware->alias([
+            'email' => EnsureAccountHasEmail::class,
+        ]);
+
         $middleware->web(append: [
             CreateFreshApiToken::class,
             CheckBannedUser::class,
@@ -46,6 +52,8 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
+
+        $middleware->appendToPriorityList(EnsureEmailIsVerified::class, EnsureAccountHasEmail::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {

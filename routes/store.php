@@ -21,7 +21,7 @@ Route::group(['as' => 'store.', 'prefix' => 'store'], function (): void {
     Route::get('cart', [ShoppingCartController::class, 'index'])->name('cart.index');
     Route::delete('cart', [ShoppingCartController::class, 'destroy'])->name('cart.destroy');
 
-    Route::group(['middleware' => 'auth'], function (): void {
+    Route::group(['middleware' => ['auth']], function (): void {
         Route::post('subscriptions', [SubscriptionsController::class, 'store'])->name('subscriptions.store');
         Route::put('subscriptions', [SubscriptionsController::class, 'update'])->name('subscriptions.update');
         Route::delete('subscriptions', [SubscriptionsController::class, 'destroy'])->name('subscriptions.destroy');

@@ -62,7 +62,6 @@ class RobloxProvider extends AbstractProvider
         return (new User)->setRaw($user)->map([
             'id' => $user['sub'],
             'name' => $user['name'],
-            'email' => $user['email'] ?? null,
         ]);
     }
 }

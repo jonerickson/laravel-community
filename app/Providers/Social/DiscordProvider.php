@@ -62,7 +62,7 @@ class DiscordProvider extends AbstractProvider
         return (new User)->setRaw($user)->map([
             'id' => $user['id'],
             'name' => $user['username'],
-            'email' => $user['email'] ?? null,
+            // 'email' => $user['email'] ?? null,
         ]);
     }
 }

@@ -24,10 +24,10 @@ class CallbackController extends Controller
         }
 
         $user = User::updateOrCreate([
-            'email' => $socialUser->getEmail(),
+            'email' => $email = $socialUser->getEmail(),
         ], [
             'name' => $socialUser->getName(),
-            'email_verified_at' => now(),
+            'email_verified_at' => $email ? now() : null,
         ]);
 
         $user->integrations()->updateOrCreate([

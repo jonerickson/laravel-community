@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\MagicLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\SetEmailPromptController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\OAuth\CallbackController;
 use App\Http\Controllers\OAuth\RedirectController;
@@ -70,6 +71,12 @@ Route::middleware('auth')->group(function (): void {
     Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
         ->middleware('throttle:6,1')
         ->name('verification.send');
+
+    Route::get('set-email', [SetEmailPromptController::class, 'create'])
+        ->name('set-email.notice');
+
+    Route::post('set-email', [SetEmailPromptController::class, 'store'])
+        ->name('set-email.verify');
 
     Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
         ->name('password.confirm');

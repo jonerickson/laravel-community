@@ -9,7 +9,7 @@ use Exception;
 
 class BannedException extends Exception
 {
-    public function __construct(public Fingerprint $fingerprint)
+    public function __construct(public ?Fingerprint $fingerprint = null)
     {
         parent::__construct(
             message: 'Your account has been banned.',
