@@ -34,9 +34,10 @@ class CallbackController extends Controller
         ]);
 
         if (blank($integration->getKey())) {
-            $user = User::create([
-                'name' => $socialUser->getName(),
+            $user = User::firstOrCreate([
                 'email' => $email = $socialUser->getEmail(),
+            ], [
+                'name' => $socialUser->getName(),
                 'email_verified_at' => $email ? now() : null,
             ]);
 
