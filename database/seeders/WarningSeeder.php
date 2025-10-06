@@ -17,16 +17,19 @@ class WarningSeeder extends Seeder
             [
                 'type' => WarningConsequenceType::ModerateContent,
                 'threshold' => 10,
+                'duration_days' => 30,
                 'is_active' => true,
             ],
             [
                 'type' => WarningConsequenceType::PostRestriction,
                 'threshold' => 25,
+                'duration_days' => 60,
                 'is_active' => true,
             ],
             [
                 'type' => WarningConsequenceType::Ban,
                 'threshold' => 50,
+                'duration_days' => 365,
                 'is_active' => true,
             ],
         ];

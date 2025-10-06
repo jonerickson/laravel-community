@@ -36,8 +36,11 @@ class WarningIssuedNotification extends Notification implements ShouldQueue
             'warning_name' => $this->userWarning->warning->name,
             'points' => $this->userWarning->warning->points,
             'reason' => $this->userWarning->reason,
-            'expires_at' => $this->userWarning->expires_at,
+            'points_expire_at' => $this->userWarning->points_expire_at,
+            'consequence_expires_at' => $this->userWarning->consequence_expires_at,
             'points_at_issue' => $this->userWarning->points_at_issue,
+            'warning_consequence_id' => $this->userWarning->warning_consequence_id,
+            'consequence_type' => $this->userWarning->warningConsequence?->type,
         ];
     }
 }

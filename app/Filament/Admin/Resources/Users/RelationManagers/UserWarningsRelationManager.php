@@ -10,6 +10,7 @@ use App\Models\Warning;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -48,6 +49,14 @@ class UserWarningsRelationManager extends RelationManager
                     ->rows(3)
                     ->maxLength(1000)
                     ->placeholder('Optional: provide specific details about this warning instance'),
+                DateTimePicker::make('consequence_expires_at')
+                    ->label('Consequence Expires At')
+                    ->helperText('The date at which the issue consequence expires.')
+                    ->nullable(),
+                DateTimePicker::make('points_expire_at')
+                    ->label('Points Expire At')
+                    ->helperText('The date at which the issued points expire.')
+                    ->required(),
             ]);
     }
 
@@ -64,14 +73,31 @@ class UserWarningsRelationManager extends RelationManager
                     ->label('Warning Type')
                     ->sortable(),
                 TextColumn::make('warning.points')
-                    ->label('Points')
+                    ->label('Points Issued')
                     ->badge()
                     ->color('warning'),
+                TextColumn::make('points_at_issue')
+                    ->label('Points Total At Issue')
+                    ->badge()
+                    ->color('info'),
                 TextColumn::make('reason')
                     ->label('Reason')
                     ->limit(50)
                     ->placeholder('No specific reason provided')
                     ->wrap(),
+                TextColumn::make('warningConsequence.type')
+                    ->placeholder('No consequence issued')
+                    ->label('Consequence Issued')
+                    ->badge(),
+                TextColumn::make('consequence_expires_at')
+                    ->placeholder('No consequence expiration')
+                    ->label('Consequence Expire At')
+                    ->dateTime()
+                    ->since()
+                    ->dateTimeTooltip()
+                    ->sortable()
+                    ->badge()
+                    ->color(fn (UserWarning $record) => $record->hasActiveConsequence() ? 'danger' : 'success'),
                 TextColumn::make('author.name')
                     ->label('Issued By'),
                 TextColumn::make('created_at')
@@ -80,8 +106,8 @@ class UserWarningsRelationManager extends RelationManager
                     ->since()
                     ->dateTimeTooltip()
                     ->sortable(),
-                TextColumn::make('expires_at')
-                    ->label('Expires')
+                TextColumn::make('points_expire_at')
+                    ->label('Points Expire At')
                     ->dateTime()
                     ->since()
                     ->dateTimeTooltip()

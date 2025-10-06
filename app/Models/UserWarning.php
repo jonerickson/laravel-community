@@ -13,10 +13,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $user_id
  * @property int $warning_id
+ * @property int|null $warning_consequence_id
  * @property int|null $created_by
  * @property string|null $reason
  * @property int $points_at_issue
- * @property \Illuminate\Support\Carbon $expires_at
+ * @property \Illuminate\Support\Carbon $points_expire_at
+ * @property \Illuminate\Support\Carbon|null $consequence_expires_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read User|null $author
@@ -24,20 +26,24 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read User|null $creator
  * @property-read User $user
  * @property-read Warning $warning
+ * @property-read WarningConsequence|null $warningConsequence
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning active()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning activeConsequence()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning expired()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning whereConsequenceExpiresAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning whereCreatedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning whereExpiresAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning wherePointsAtIssue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning wherePointsExpireAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning whereReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning whereWarningConsequenceId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserWarning whereWarningId($value)
  *
  * @mixin \Eloquent
@@ -51,9 +57,11 @@ class UserWarning extends Model
     protected $fillable = [
         'user_id',
         'warning_id',
+        'warning_consequence_id',
         'reason',
         'points_at_issue',
-        'expires_at',
+        'points_expire_at',
+        'consequence_expires_at',
     ];
 
     public function user(): BelongsTo
@@ -66,26 +74,42 @@ class UserWarning extends Model
         return $this->belongsTo(Warning::class);
     }
 
+    public function warningConsequence(): BelongsTo
+    {
+        return $this->belongsTo(WarningConsequence::class);
+    }
+
     public function isActive(): bool
     {
-        return $this->expires_at->isFuture();
+        return $this->points_expire_at->isFuture();
+    }
+
+    public function hasActiveConsequence(): bool
+    {
+        return $this->consequence_expires_at?->isFuture() ?? false;
     }
 
     public function scopeActive($query)
     {
-        return $query->where('expires_at', '>', Carbon::now());
+        return $query->where('points_expire_at', '>', Carbon::now());
     }
 
     public function scopeExpired($query)
     {
-        return $query->where('expires_at', '<=', Carbon::now());
+        return $query->where('points_expire_at', '<=', Carbon::now());
+    }
+
+    public function scopeActiveConsequence($query)
+    {
+        return $query->where('consequence_expires_at', '>', Carbon::now());
     }
 
     protected function casts(): array
     {
         return [
             'points_at_issue' => 'integer',
-            'expires_at' => 'datetime',
+            'points_expire_at' => 'datetime',
+            'consequence_expires_at' => 'datetime',
         ];
     }
 }

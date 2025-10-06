@@ -13,9 +13,9 @@ export function UserWarningBanner() {
     const points = auth.user.warningPoints;
 
     const getVariant = () => {
-        if (points >= 50) return 'destructive';
-        if (points >= 25) return 'destructive';
-        if (points >= 10) return 'info';
+        if (consequenceType === 'ban') return 'destructive';
+        if (consequenceType === 'post_restriction') return 'warning';
+        if (consequenceType === 'moderate_content') return 'info';
         return 'default';
     };
 

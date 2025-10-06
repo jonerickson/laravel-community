@@ -247,12 +247,7 @@ class UserResource extends Resource
                                         TextEntry::make('warning_points')
                                             ->label('Current Warning Points')
                                             ->badge()
-                                            ->color(fn (int $state): string => match (true) {
-                                                $state >= 50 => 'danger',
-                                                $state >= 25 => 'warning',
-                                                $state >= 10 => 'info',
-                                                default => 'success',
-                                            }),
+                                            ->color(fn (int $state, User $record): string => $record->active_consequence_type?->getColor() ?? 'success'),
                                         TextEntry::make('active_consequence.type')
                                             ->label('Current Consequence')
                                             ->badge()

@@ -29,8 +29,9 @@ enum WarningConsequenceType: string implements HasColor, HasIcon, HasLabel
     {
         return match ($this) {
             self::None => 'success',
-            self::ModerateContent => 'warning',
-            self::PostRestriction, self::Ban => 'danger',
+            self::ModerateContent => 'info',
+            self::PostRestriction => 'warning',
+            self::Ban => 'danger',
         };
     }
 

@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Warnings\Actions;
 
+use App\Actions\IssueWarningAction;
 use App\Models\User;
-use App\Models\UserWarning;
 use App\Models\Warning;
-use App\Notifications\Warnings\WarningIssuedNotification;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -48,15 +47,11 @@ class IssueAction extends Action
         $this->action(function (array $data) {
             $warning = Warning::findOrFail($data['warning_id']);
 
-            $userWarning = UserWarning::create([
-                'user_id' => $this->getUser()->id,
-                'warning_id' => $warning->id,
-                'reason' => $data['reason'] ?? null,
-                'points_at_issue' => $this->getUser()->warning_points + $warning->points,
-                'expires_at' => now()->addDays($warning->days_applied),
-            ]);
-
-            $this->getUser()->notify(new WarningIssuedNotification($userWarning));
+            IssueWarningAction::execute(
+                $this->getUser(),
+                $warning,
+                $data['reason'] ?? null
+            );
 
             Notification::make()
                 ->title('Warning Issued')

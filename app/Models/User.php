@@ -294,13 +294,12 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     {
         return Attribute::make(
             get: function (): ?WarningConsequence {
-                $points = $this->warning_points;
-
-                return WarningConsequence::query()
-                    ->active()
-                    ->where('threshold', '<=', $points)
-                    ->orderByDesc('threshold')
-                    ->first();
+                return $this->userWarnings()
+                    ->activeConsequence()
+                    ->with('warningConsequence')
+                    ->orderByDesc('consequence_expires_at')
+                    ->first()
+                    ?->warningConsequence;
             }
         )->shouldCache();
     }
@@ -314,7 +313,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     public function isBanned(): Attribute
     {
         return Attribute::make(
-            get: fn (): bool => $this->fingerprints()->banned()->exists(),
+            get: fn (): bool => $this->fingerprints()->banned()->exists() || $this->active_consequence_type === WarningConsequenceType::Ban,
         )->shouldCache();
     }
 

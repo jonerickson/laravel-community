@@ -26,6 +26,10 @@ trait Readable
     {
         $user ??= Auth::user();
 
+        if (blank($user)) {
+            return;
+        }
+
         $query->whereDoesntHaveRelation('reads', function (Builder $query) use ($user): void {
             $query->whereBelongsTo($user, 'author');
         });
@@ -34,6 +38,10 @@ trait Readable
     public function scopeRead(Builder $query, ?User $user = null): void
     {
         $user ??= Auth::user();
+
+        if (blank($user)) {
+            return;
+        }
 
         $query->whereRelation('reads', function (Builder $query) use ($user): void {
             $query->whereBelongsTo($user, 'author');

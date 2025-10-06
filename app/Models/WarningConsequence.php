@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property WarningConsequenceType $type
  * @property int $threshold
+ * @property int $duration_days
  * @property bool $is_active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WarningConsequence newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WarningConsequence query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WarningConsequence whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WarningConsequence whereDurationDays($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WarningConsequence whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WarningConsequence whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WarningConsequence whereThreshold($value)
@@ -39,6 +41,7 @@ class WarningConsequence extends Model
     protected $fillable = [
         'type',
         'threshold',
+        'duration_days',
     ];
 
     protected function casts(): array
@@ -46,6 +49,7 @@ class WarningConsequence extends Model
         return [
             'type' => WarningConsequenceType::class,
             'threshold' => 'integer',
+            'duration_days' => 'integer',
         ];
     }
 }
