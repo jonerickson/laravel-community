@@ -6,6 +6,7 @@ namespace App\Traits;
 
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @mixin Eloquent
@@ -24,17 +25,28 @@ trait Pinnable
 
     public function pin(): bool
     {
-        return $this->update(['is_pinned' => true]);
+        return tap($this)->update(['is_pinned' => true]);
     }
 
     public function unpin(): bool
     {
-        return $this->update(['is_pinned' => false]);
+        return tap($this)->update(['is_pinned' => false]);
     }
 
     public function togglePin(): bool
     {
-        return $this->update(['is_pinned' => ! $this->is_pinned]);
+        return tap($this)->update(['is_pinned' => ! $this->is_pinned]);
+    }
+
+    protected static function bootPinnable(): void
+    {
+        static::creating(function (Model $model): void {
+            if (! isset($model->is_pinned)) {
+                $model->fill([
+                    'is_pinned' => false,
+                ]);
+            }
+        });
     }
 
     protected function initializePinnable(): void

@@ -87,7 +87,6 @@ class DatabaseDriver implements SupportTicketProvider
             'commentable_type' => SupportTicket::class,
             'commentable_id' => $ticket->id,
             'content' => $content,
-            'is_approved' => true,
         ]);
 
         return $comment->exists;

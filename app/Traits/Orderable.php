@@ -13,15 +13,6 @@ trait Orderable
         return (static::max('order') ?? 0) + 1;
     }
 
-    public static function bootOrderable(): void
-    {
-        static::creating(function ($model): void {
-            if (is_null($model->order)) {
-                $model->order = static::getNextOrder();
-            }
-        });
-    }
-
     public function scopeOrdered(Builder $query): void
     {
         $query->orderBy('order');
@@ -47,6 +38,17 @@ trait Orderable
         if ($next) {
             $this->swapOrder($next);
         }
+    }
+
+    protected static function bootOrderable(): void
+    {
+        static::creating(function ($model): void {
+            if (! isset($model->order)) {
+                $model->fill([
+                    'order' => static::getNextOrder(),
+                ]);
+            }
+        });
     }
 
     protected function initializeOrderable(): void

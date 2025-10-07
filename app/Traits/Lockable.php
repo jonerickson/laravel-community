@@ -6,6 +6,7 @@ namespace App\Traits;
 
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @mixin Eloquent
@@ -24,17 +25,28 @@ trait Lockable
 
     public function lock(): bool
     {
-        return $this->update(['is_locked' => true]);
+        return tap($this)->update(['is_locked' => true]);
     }
 
     public function unlock(): bool
     {
-        return $this->update(['is_locked' => false]);
+        return tap($this)->update(['is_locked' => false]);
     }
 
     public function toggleLock(): bool
     {
-        return $this->update(['is_locked' => ! $this->is_locked]);
+        return tap($this)->update(['is_locked' => ! $this->is_locked]);
+    }
+
+    protected static function bootLockable(): void
+    {
+        static::creating(function (Model $model): void {
+            if (! isset($model->is_locked)) {
+                $model->fill([
+                    'is_locked' => false,
+                ]);
+            }
+        });
     }
 
     protected function initializeLockable(): void

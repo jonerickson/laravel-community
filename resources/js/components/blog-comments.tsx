@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
 import { Textarea } from '@/components/ui/textarea';
 import { UserInfo } from '@/components/user-info';
+import { cn } from '@/lib/utils';
 import { useForm } from '@inertiajs/react';
 import { Edit, MessageCircle, Reply, Trash } from 'lucide-react';
 import { useState } from 'react';
@@ -116,8 +117,13 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
 
     return (
         <div className="space-y-6 border-l-2 border-muted pl-4" itemScope itemType="https://schema.org/Comment">
-            <div className="flex flex-col gap-3 rounded-lg bg-muted/50 p-4">
-                <div className="flex items-center justify-between">
+            <div
+                className={cn('flex flex-col gap-3 rounded-lg p-4', {
+                    'bg-muted/50': comment.isApproved,
+                    'border-2 border-warning bg-warning/10': !comment.isApproved,
+                })}
+            >
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-2">
                         {comment.author && (
                             <span itemProp="author" itemScope itemType="https://schema.org/Person">
@@ -126,9 +132,14 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                             </span>
                         )}
                     </div>
-                    <time className="text-xs text-muted-foreground" dateTime={comment.createdAt || undefined} itemProp="datePublished">
-                        {formattedDate}
-                    </time>
+                    <div className="flex items-center gap-2">
+                        {!comment.isApproved && (
+                            <span className="rounded-full bg-warning px-2 py-0.5 text-xs font-medium text-warning-foreground">Pending Approval</span>
+                        )}
+                        <time className="text-xs text-muted-foreground" dateTime={comment.createdAt || undefined} itemProp="datePublished">
+                            {formattedDate}
+                        </time>
+                    </div>
                 </div>
 
                 {isEditing ? (
@@ -253,7 +264,7 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
         });
     };
 
-    const approvedComments = comments.filter((comment) => comment.isApproved && !comment.parentId) || [];
+    const topLevelComments = comments.filter((comment) => !comment.parentId) || [];
 
     if (!post.commentsEnabled) {
         return (
@@ -295,9 +306,9 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
                 </form>
             )}
 
-            {approvedComments.length > 0 ? (
+            {topLevelComments.length > 0 ? (
                 <div className="space-y-6">
-                    {approvedComments.map((comment) => (
+                    {topLevelComments.map((comment) => (
                         <CommentItem key={comment.id} post={post} comment={comment} onReply={setReplyingTo} replyingTo={replyingTo} />
                     ))}
 

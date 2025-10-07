@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\WarningConsequenceType;
 use App\Events\CommentCreated;
+use App\Traits\Approvable;
 use App\Traits\HasAuthor;
 use App\Traits\Likeable;
 use Eloquent;
@@ -16,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Carbon;
+use Override;
 
 /**
  * @property int $id
@@ -50,6 +53,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|Comment query()
  * @method static Builder<static>|Comment ratings()
  * @method static Builder<static>|Comment topLevel()
+ * @method static Builder<static>|Comment unapproved()
  * @method static Builder<static>|Comment whereCommentableId($value)
  * @method static Builder<static>|Comment whereCommentableType($value)
  * @method static Builder<static>|Comment whereContent($value)
@@ -65,6 +69,7 @@ use Illuminate\Support\Carbon;
  */
 class Comment extends Model
 {
+    use Approvable;
     use HasAuthor;
     use HasFactory;
     use Likeable;
@@ -78,7 +83,6 @@ class Comment extends Model
         'commentable_id',
         'content',
         'rating',
-        'is_approved',
         'parent_id',
     ];
 
@@ -95,11 +99,6 @@ class Comment extends Model
     public function replies(): HasMany
     {
         return $this->hasMany(Comment::class, 'parent_id');
-    }
-
-    public function scopeApproved(Builder $query): void
-    {
-        $query->where('is_approved', true);
     }
 
     public function scopePending(Builder $query): void
@@ -132,10 +131,17 @@ class Comment extends Model
         $query->whereNull('rating');
     }
 
-    protected function casts(): array
+    #[Override]
+    protected static function booted(): void
     {
-        return [
-            'is_approved' => 'boolean',
-        ];
+        static::creating(function (Comment $comment): void {
+            if ($author = $comment->author) {
+                $requiresModeration = $author->active_consequence?->type === WarningConsequenceType::ModerateContent;
+
+                $comment->forceFill([
+                    'is_approved' => ! $requiresModeration,
+                ]);
+            }
+        });
     }
 }

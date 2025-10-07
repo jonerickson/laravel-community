@@ -166,6 +166,22 @@ CREATE TABLE `fingerprints` (
   CONSTRAINT `users_fingerprints_banned_by_foreign` FOREIGN KEY (`banned_by`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `follows`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `follows` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `created_by` bigint unsigned NOT NULL,
+  `followable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `followable_id` bigint unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `follows_created_by_followable_type_followable_id_unique` (`created_by`,`followable_type`,`followable_id`),
+  KEY `follows_followable_type_followable_id_index` (`followable_type`,`followable_id`),
+  CONSTRAINT `follows_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `forums`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -962,7 +978,7 @@ CREATE TABLE `users` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `reference_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `signature` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -985,6 +1001,7 @@ CREATE TABLE `users` (
   `vat_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `invoice_emails` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `billing_country` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `last_seen_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -1182,3 +1199,5 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (81,'2025_10_06_165
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (82,'2025_10_06_171446_add_duration_days_to_warnings_consequences_table',29);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (83,'2025_10_06_172442_add_warning_consequence_to_users_warnings_table',30);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (84,'2025_10_06_173141_add_points_and_consequence_expiration_to_users_warnings',31);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (85,'2025_10_06_212630_create_follows_table',32);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (86,'2025_10_07_151006_add_last_seen_at_to_users_table',33);

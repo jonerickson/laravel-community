@@ -8,6 +8,7 @@ use App\Enums\PublishableStatus;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @mixin Eloquent
@@ -35,6 +36,22 @@ trait Publishable
         $query->orderBy('published_at', 'desc');
     }
 
+    public function publish(): static
+    {
+        return tap($this)->update([
+            'is_published' => true,
+            'published_at' => $this->published_at ?? now(),
+        ]);
+    }
+
+    public function unpublish(): static
+    {
+        return tap($this)->update([
+            'is_published' => false,
+            'published_at' => null,
+        ]);
+    }
+
     public function isPublished(): bool
     {
         return $this->is_published
@@ -51,6 +68,18 @@ trait Publishable
 
             return PublishableStatus::Draft;
         })->shouldCache();
+    }
+
+    protected static function bootPublishable(): void
+    {
+        static::creating(function (Model $model): void {
+            if (! isset($model->is_published)) {
+                $model->fill([
+                    'is_published' => true,
+                    'published_at' => now(),
+                ]);
+            }
+        });
     }
 
     protected function initializePublishable(): void

@@ -18,11 +18,9 @@ class ModerationStatsOverview extends StatsOverviewWidget
     #[Override]
     protected function getStats(): array
     {
-        $unpublishedPosts = Post::where('is_published', false)->count();
+        $unpublishedPosts = Post::query()->published()->count();
         $pendingReports = Report::where('status', ReportStatus::Pending)->count();
-        $postsWithReports = Post::whereHas('reports', function ($query): void {
-            $query->where('status', ReportStatus::Pending);
-        })->count();
+        $postsWithReports = Post::whereHas('pendingReports')->count();
         $reportsToday = Report::whereDate('created_at', today())->count();
 
         return [

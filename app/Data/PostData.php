@@ -34,6 +34,8 @@ class PostData extends Data
 
     public bool $isPublished;
 
+    public bool $isApproved;
+
     public bool $isFeatured;
 
     public bool $isPinned;

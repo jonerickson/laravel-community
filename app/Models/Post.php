@@ -8,6 +8,7 @@ use App\Contracts\Sluggable;
 use App\Enums\PostType;
 use App\Enums\WarningConsequenceType;
 use App\Events\PostCreated;
+use App\Traits\Approvable;
 use App\Traits\Commentable;
 use App\Traits\Featureable;
 use App\Traits\HasAuthor;
@@ -41,6 +42,7 @@ use Override;
  * @property string|null $excerpt
  * @property string $content
  * @property bool $is_published
+ * @property bool $is_approved
  * @property bool $is_featured
  * @property bool $is_pinned
  * @property bool $comments_enabled
@@ -89,6 +91,7 @@ use Override;
  * @property-read Collection<int, View> $views
  * @property-read string|int $views_count
  *
+ * @method static Builder<static>|Post approved()
  * @method static Builder<static>|Post blog()
  * @method static \Database\Factories\PostFactory factory($count = null, $state = [])
  * @method static Builder<static>|Post featured()
@@ -96,12 +99,14 @@ use Override;
  * @method static Builder<static>|Post latestActivity()
  * @method static Builder<static>|Post newModelQuery()
  * @method static Builder<static>|Post newQuery()
+ * @method static Builder<static>|Post notFeatured()
  * @method static Builder<static>|Post notPinned()
  * @method static Builder<static>|Post pinned()
  * @method static Builder<static>|Post published()
  * @method static Builder<static>|Post query()
  * @method static Builder<static>|Post read(?\App\Models\User $user = null)
  * @method static Builder<static>|Post recent()
+ * @method static Builder<static>|Post unapproved()
  * @method static Builder<static>|Post unpublished()
  * @method static Builder<static>|Post unread(?\App\Models\User $user = null)
  * @method static Builder<static>|Post whereCommentsEnabled($value)
@@ -111,6 +116,7 @@ use Override;
  * @method static Builder<static>|Post whereExcerpt($value)
  * @method static Builder<static>|Post whereFeaturedImage($value)
  * @method static Builder<static>|Post whereId($value)
+ * @method static Builder<static>|Post whereIsApproved($value)
  * @method static Builder<static>|Post whereIsFeatured($value)
  * @method static Builder<static>|Post whereIsPinned($value)
  * @method static Builder<static>|Post whereIsPublished($value)
@@ -126,6 +132,7 @@ use Override;
  */
 class Post extends Model implements Sluggable
 {
+    use Approvable;
     use Commentable;
     use Featureable;
     use HasAuthor;
@@ -255,8 +262,7 @@ class Post extends Model implements Sluggable
                 $requiresModeration = $author->active_consequence?->type === WarningConsequenceType::ModerateContent;
 
                 $post->forceFill([
-                    'is_published' => ! $requiresModeration,
-                    'published_at' => $requiresModeration ? null : now(),
+                    'is_approved' => ! $requiresModeration,
                 ]);
             }
         });

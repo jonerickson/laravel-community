@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { stripCharacters } from '@/utils/truncate';
 import { formatDistanceToNow } from 'date-fns';
-import { EyeOff, Flag, Pin, Quote } from 'lucide-react';
+import { EyeOff, Flag, Pin, Quote, ThumbsDown, ThumbsUp } from 'lucide-react';
 import usePermissions from '../hooks/use-permissions';
 
 interface ForumTopicPostProps {
@@ -31,9 +31,9 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
     }
 
     const getCardClassName = () => {
-        if (post.isPinned) return 'border-info-foreground/10 bg-info/10';
-        if (!post.isPublished) return 'border-warning/10 bg-warning/10';
-        if (post.isReported) return 'border-destructive/10 bg-destructive/10';
+        if (post.isPinned) return 'border-2 border-info bg-info/10';
+        if (!post.isPublished || !post.isApproved) return 'border-2 border-warning bg-warning/10';
+        if (post.isReported) return 'border-2 border-destructive bg-destructive/10';
         return '';
     };
 
@@ -81,6 +81,12 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                                     <Badge variant="warning">
                                         <EyeOff className="mr-1 size-3" />
                                         Unpublished
+                                    </Badge>
+                                )}
+                                {!post.isApproved && (
+                                    <Badge variant="warning">
+                                        <ThumbsUp className="mr-1 size-3" />
+                                        Pending Approval
                                     </Badge>
                                 )}
                                 {post.isReported && (

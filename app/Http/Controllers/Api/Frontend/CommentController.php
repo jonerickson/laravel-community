@@ -48,7 +48,6 @@ class CommentController extends Controller
             'content' => $validated['content'],
             'rating' => $validated['rating'] ?? null,
             'parent_id' => $validated['parent_id'] ?? null,
-            'is_approved' => true,
         ]);
 
         $comment->load('author');

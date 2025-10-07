@@ -80,6 +80,7 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Product hotTopics(?int $limit = null)
  * @method static Builder<static>|Product newModelQuery()
  * @method static Builder<static>|Product newQuery()
+ * @method static Builder<static>|Product notFeatured()
  * @method static Builder<static>|Product products()
  * @method static Builder<static>|Product query()
  * @method static Builder<static>|Product risingTopics(?int $limit = null)

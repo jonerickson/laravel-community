@@ -58,7 +58,7 @@ class BlogController extends Controller
 
         $post->incrementViews();
 
-        $comments = CommentData::collect($post->approvedComments()
+        $comments = CommentData::collect($post->comments()
             ->with(['author', 'replies', 'replies.author', 'parent'])
             ->latest()
             ->get()

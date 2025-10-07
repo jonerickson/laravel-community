@@ -122,7 +122,7 @@ class CommentsRelationManager extends RelationManager
                 Action::make('approve')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->action(fn (Comment $record) => $record->update(['is_approved' => true]))
+                    ->action(fn (Comment $record): Comment => $record->approve())
                     ->visible(fn (Comment $record): bool => ! $record->is_approved)
                     ->requiresConfirmation()
                     ->modalHeading('Approve Comment')
@@ -131,7 +131,7 @@ class CommentsRelationManager extends RelationManager
                 Action::make('unapprove')
                     ->icon('heroicon-o-x-circle')
                     ->color('warning')
-                    ->action(fn (Comment $record) => $record->update(['is_approved' => false]))
+                    ->action(fn (Comment $record): Comment => $record->unapprove())
                     ->visible(fn (Comment $record): bool => $record->is_approved)
                     ->requiresConfirmation()
                     ->modalHeading('Unapprove Comment')
@@ -149,7 +149,7 @@ class CommentsRelationManager extends RelationManager
                         ->requiresConfirmation()
                         ->action(function ($records): void {
                             $records->each(function ($record): void {
-                                $record->update(['is_approved' => true]);
+                                $record->approve();
                             });
                         }),
                     BulkAction::make('unapprove')
@@ -159,7 +159,7 @@ class CommentsRelationManager extends RelationManager
                         ->requiresConfirmation()
                         ->action(function ($records): void {
                             $records->each(function ($record): void {
-                                $record->update(['is_approved' => false]);
+                                $record->unapprove();
                             });
                         }),
                     DeleteBulkAction::make(),

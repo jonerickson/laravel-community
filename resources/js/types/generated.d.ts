@@ -270,6 +270,7 @@ declare namespace App.Data {
         excerpt: string | null;
         content: string;
         isPublished: boolean;
+        isApproved: boolean;
         isFeatured: boolean;
         isPinned: boolean;
         commentsEnabled: boolean;

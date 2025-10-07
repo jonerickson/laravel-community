@@ -29,9 +29,7 @@ class PublishController extends Controller
 
         $this->authorize('publish', $post);
 
-        $post->forceFill([
-            'is_published' => true,
-        ])->save();
+        $post->publish();
 
         return ApiResource::success(
             resource: $post->fresh(),
@@ -52,7 +50,7 @@ class PublishController extends Controller
 
         $this->authorize('publish', $post);
 
-        $post->update(['is_published' => false]);
+        $post->unpublish();
 
         return ApiResource::success(
             resource: $post->fresh(),

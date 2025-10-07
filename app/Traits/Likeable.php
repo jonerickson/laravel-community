@@ -82,7 +82,6 @@ trait Likeable
 
         return $this->likes()->create([
             'emoji' => self::emojiToUnicode($emoji),
-            'created_by' => $userId,
         ]);
     }
 

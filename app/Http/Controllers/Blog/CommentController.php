@@ -31,7 +31,6 @@ class CommentController extends Controller
         $post->comments()->create([
             'content' => $validated['content'],
             'parent_id' => $validated['parent_id'] ?? null,
-            'is_approved' => true,
         ]);
 
         return to_route('blog.show', [$post])
