@@ -12,6 +12,10 @@ interface DashboardProductGridProps {
 }
 
 export default function DashboardProductGrid({ newestProduct, popularProduct, featuredProduct }: DashboardProductGridProps) {
+    if (!newestProduct && !popularProduct && !featuredProduct) {
+        return null;
+    }
+
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between">

@@ -71,6 +71,7 @@ class DashboardController
     private function getNewestProduct(): ?ProductData
     {
         $product = Product::query()
+            ->products()
             ->with('defaultPrice')
             ->with('categories')
             ->with(['prices' => function (HasMany $query): void {
@@ -91,6 +92,7 @@ class DashboardController
     private function getPopularProduct(): ?ProductData
     {
         $product = Product::query()
+            ->products()
             ->with('defaultPrice')
             ->with('categories')
             ->with(['prices' => function (HasMany $query): void {
@@ -111,6 +113,7 @@ class DashboardController
     private function getFeaturedProduct(): ?ProductData
     {
         $product = Product::query()
+            ->products()
             ->featured()
             ->with('defaultPrice')
             ->with('categories')
