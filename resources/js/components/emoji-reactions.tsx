@@ -16,7 +16,6 @@ interface EmojiReactionsProps {
 }
 
 const AVAILABLE_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '😡'];
-const MOBILE_DROPDOWN_EMOJIS = ['❤️', '😂', '😮', '😢', '😡'];
 
 export default function EmojiReactions({ post, comment, initialReactions = [], userReactions = [], className = '' }: EmojiReactionsProps) {
     const [reactions, setReactions] = useState<App.Data.LikeData[]>(initialReactions);
