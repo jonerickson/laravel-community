@@ -141,8 +141,8 @@ export function useCartOperations(initialItems: App.Data.CartItemData[] = []) {
             return total;
         }, 0);
 
-        const shipping = subtotal > 0 ? 5.0 : 0;
-        const taxRate = 0.08;
+        const shipping = 0.0;
+        const taxRate = 0.0;
         const tax = subtotal * taxRate;
         const total = subtotal + shipping + tax;
 

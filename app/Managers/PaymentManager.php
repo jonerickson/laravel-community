@@ -118,7 +118,7 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->currentSubscription($user);
     }
 
-    public function listSubscriptions(User $user, array $filters = []): Collection
+    public function listSubscriptions(?User $user = null, array $filters = []): Collection
     {
         return $this->driver()->listSubscriptions($user, $filters);
     }

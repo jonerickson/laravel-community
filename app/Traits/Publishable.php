@@ -24,7 +24,7 @@ trait Publishable
     public function scopeUnpublished(Builder $query): void
     {
         $query->where('is_published', false)
-            ->orWhere(function (Builder $query) {
+            ->orWhere(function (Builder $query): void {
                 $query->whereNotNull('published_at')
                     ->whereFuture('published_at');
             });

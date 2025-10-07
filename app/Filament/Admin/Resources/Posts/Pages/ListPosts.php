@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Posts\Pages;
 
 use App\Filament\Admin\Resources\Posts\PostResource;
+use App\Filament\Admin\Resources\Posts\Widgets\PostStatsOverview;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Override;
 
 class ListPosts extends ListRecords
 {
@@ -18,6 +20,14 @@ class ListPosts extends ListRecords
     {
         return [
             CreateAction::make(),
+        ];
+    }
+
+    #[Override]
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            PostStatsOverview::make(),
         ];
     }
 }

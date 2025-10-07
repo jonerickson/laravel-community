@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool cancelSubscription(\App\Models\User $user, bool $cancelNow = false)
  * @method static bool continueSubscription(\App\Models\User $user)
  * @method static \App\Data\SubscriptionData|null currentSubscription(\App\Models\User $user)
- * @method static \Illuminate\Database\Eloquent\Collection listSubscriptions(\App\Models\User $user, array $filters = [])
+ * @method static \Illuminate\Database\Eloquent\Collection listSubscriptions(\App\Models\User|null $user = null, array $filters = [])
  * @method static string|bool getCheckoutUrl(\App\Models\Order $order)
  * @method static bool processCheckoutSuccess(\Illuminate\Http\Request $request, \App\Models\Order $order)
  * @method static bool processCheckoutCancel(\Illuminate\Http\Request $request, \App\Models\Order $order)

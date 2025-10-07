@@ -559,7 +559,7 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
                             <div className="space-y-3 text-sm text-muted-foreground">
                                 <div className="flex justify-between">
                                     <span>Current plan:</span>
-                                    <span className="font-medium text-foreground">{currentSubscription?.name}</span>
+                                    <span className="font-medium text-foreground">{currentSubscription?.product?.name}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>New plan:</span>

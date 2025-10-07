@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Livewire\Subscriptions;
 
-use App\Enums\SubscriptionStatus;
 use App\Filament\Admin\Resources\Subscriptions\Actions\CancelAction;
 use App\Filament\Admin\Resources\Subscriptions\Actions\ContinueAction;
 use App\Filament\Admin\Resources\Subscriptions\Actions\NewAction;
 use App\Filament\Admin\Resources\Subscriptions\Actions\SwapAction;
+use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Managers\PaymentManager;
 use App\Models\User;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -33,10 +33,13 @@ class ListSubscriptions extends Component implements HasActions, HasSchemas, Has
 
     public array $records = [];
 
-    public function mount(User $record): void
+    public function mount(?User $record = null): void
     {
         $this->user = $record;
-        $this->records = app(PaymentManager::class)->listSubscriptions($this->user)->toArray();
+
+        if ($this->user instanceof User) {
+            $this->records = app(PaymentManager::class)->listSubscriptions($this->user)->toArray();
+        }
     }
 
     public function table(Table $table): Table
@@ -49,25 +52,37 @@ class ListSubscriptions extends Component implements HasActions, HasSchemas, Has
             ->emptyStateIcon('heroicon-o-arrow-path')
             ->records(fn (): Collection => collect($this->records))
             ->columns([
-                TextColumn::make('name'),
                 TextColumn::make('product.name'),
+                TextColumn::make('user.name')
+                    ->label('Customer')
+                    ->searchable()
+                    ->url(fn (array $record): ?string => data_get($record, 'user') ? EditUser::getUrl(['record' => data_get($record, 'user.id')]) : null),
                 TextColumn::make('status')
-                    ->formatStateUsing(fn ($state) => SubscriptionStatus::tryFrom($state ?? ''))
-                    ->badge(),
+                    ->label('Status')
+                    ->badge()
+                    ->formatStateUsing(fn (string $state): string => ucfirst(str_replace('_', ' ', $state)))
+                    ->color(fn (string $state): string => match ($state) {
+                        'active' => 'success',
+                        'trialing' => 'info',
+                        'canceled' => 'warning',
+                        'incomplete', 'incomplete_expired', 'past_due' => 'danger',
+                        default => 'gray',
+                    }),
                 TextColumn::make('trialEndsAt')
                     ->label('Trial Ends At')
                     ->since()
                     ->dateTimeTooltip()
-                    ->placeholder('None'),
+                    ->placeholder('No Trial'),
                 TextColumn::make('endsAt')
                     ->label('Ends At')
                     ->since()
                     ->dateTimeTooltip()
-                    ->placeholder('None'),
+                    ->placeholder('Active')
+                    ->color(fn ($state): string => $state ? 'warning' : 'success'),
                 TextColumn::make('createdAt')
                     ->since()
                     ->dateTimeTooltip()
-                    ->label('Purchased On'),
+                    ->label('Started'),
             ])
             ->headerActions([
                 SwapAction::make()

@@ -10,6 +10,8 @@ use App\Filament\Admin\Resources\Users\Pages\ListUsers;
 use App\Filament\Admin\Resources\Users\RelationManagers\FingerprintsRelationManager;
 use App\Filament\Admin\Resources\Users\RelationManagers\OrdersRelationManager;
 use App\Filament\Admin\Resources\Users\RelationManagers\SocialsRelationManager;
+use App\Filament\Admin\Resources\Users\Widgets\RegistrationsTable;
+use App\Filament\Admin\Resources\Users\Widgets\UserStatsOverview;
 use App\Livewire\PaymentMethods\ListPaymentMethods;
 use App\Livewire\Subscriptions\ListSubscriptions;
 use App\Models\Fingerprint;
@@ -55,6 +57,15 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
+
+    #[Override]
+    public static function getWidgets(): array
+    {
+        return [
+            UserStatsOverview::make(),
+            RegistrationsTable::make(),
+        ];
+    }
 
     #[Override]
     public static function form(Schema $schema): Schema

@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Laravel\Scout\Searchable;
+use Override;
 
 /**
  * @property int $id
@@ -246,6 +247,7 @@ class Post extends Model implements Sluggable
         };
     }
 
+    #[Override]
     protected static function booted(): void
     {
         static::creating(function (Post $post): void {

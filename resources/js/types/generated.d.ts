@@ -507,7 +507,7 @@ declare namespace App.Enums {
     export type PublishableStatus = 'published' | 'draft';
     export type ReportReason = 'spam' | 'harassment' | 'inappropriate_content' | 'abuse' | 'impersonation' | 'false_information' | 'other';
     export type ReportStatus = 'pending' | 'reviewed' | 'approved' | 'rejected';
-    export type SubscriptionInterval = 'day' | 'week' | 'month' | 'year';
+    export type SubscriptionInterval = 'month' | 'year';
     export type SubscriptionStatus =
         | 'active'
         | 'pending'

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Users\Pages;
 
 use App\Filament\Admin\Resources\Users\UserResource;
+use App\Filament\Admin\Resources\Users\Widgets\UserStatsOverview;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Override;
 
 class ListUsers extends ListRecords
 {
@@ -18,6 +20,14 @@ class ListUsers extends ListRecords
     {
         return [
             CreateAction::make(),
+        ];
+    }
+
+    #[Override]
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            UserStatsOverview::make(),
         ];
     }
 }

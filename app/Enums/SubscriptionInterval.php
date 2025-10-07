@@ -12,8 +12,6 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 #[TypeScript]
 enum SubscriptionInterval: string implements HasLabel
 {
-    case Daily = 'day';
-    case Weekly = 'week';
     case Monthly = 'month';
     case Yearly = 'year';
 

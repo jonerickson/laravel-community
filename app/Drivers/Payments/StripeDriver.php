@@ -18,6 +18,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Price;
 use App\Models\Product;
+use App\Models\Subscription as SubscriptionModel;
 use App\Models\User;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
@@ -476,10 +477,12 @@ class StripeDriver implements PaymentProcessor
     /**
      * @return Collection<int, SubscriptionData>
      */
-    public function listSubscriptions(User $user, array $filters = []): mixed
+    public function listSubscriptions(?User $user = null, array $filters = []): mixed
     {
         return $this->executeWithErrorHandling('listSubscriptions', function () use ($user, $filters): array|\Illuminate\Contracts\Pagination\CursorPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Support\Enumerable|\Spatie\LaravelData\CursorPaginatedDataCollection|\Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection {
-            $subscriptions = $user->subscriptions();
+            $subscriptions = $user instanceof User ? $user->subscriptions() : SubscriptionModel::query()
+                ->with('user')
+                ->latest();
 
             if (isset($filters['limit'])) {
                 $subscriptions = $subscriptions->limit($filters['limit']);

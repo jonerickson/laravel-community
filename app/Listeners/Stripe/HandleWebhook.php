@@ -226,10 +226,27 @@ class HandleWebhook implements ShouldQueue
     private function resolveOrderId(): ?string
     {
         return match (data_get($this->payload, 'type')) {
-            'invoice.payment_succeeded' => data_get(Collection::make(data_get($this->payload, 'data.object.lines.data'))->firstWhere(fn (array $item): bool => filled(data_get($item, 'metadata.order_id'))), 'metadata.order_id'),
+            'invoice.payment_succeeded' => $this->findOrderIdForInvoice(),
             'customer.subscription.created', 'customer.subscription.updated', 'customer.subscription.deleted' => data_get($this->payload, 'data.object.metadata.order_id'),
             default => null,
         };
+    }
+
+    private function findOrderIdForInvoice(): ?string
+    {
+        // First try: Check invoice metadata for one-off purchases
+        $orderId = data_get($this->payload, 'data.object.metadata.order_id');
+
+        if (filled($orderId)) {
+            return $orderId;
+        }
+
+        // Second try: Check line items metadata for subscription purchases
+        $lineItems = Collection::make(data_get($this->payload, 'data.object.lines.data'));
+
+        $lineItemWithOrderId = $lineItems->first(fn (array $item): bool => filled(data_get($item, 'metadata.order_id')));
+
+        return data_get($lineItemWithOrderId, 'metadata.order_id');
     }
 
     private function resolvePaymentConfirmationUrl(Order $order): ?string
