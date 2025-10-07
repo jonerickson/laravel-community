@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Posts\Widgets;
 
+use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Models\Post;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -29,7 +30,6 @@ class PostModerationTable extends TableWidget
                     ->with(['author', 'pendingReports'])
                     ->withCount('pendingReports')
                     ->latest()
-                    ->limit(20)
             )
             ->heading('Posts Needing Moderation')
             ->description('Unpublished posts and posts with pending reports.')
@@ -37,12 +37,11 @@ class PostModerationTable extends TableWidget
                 TextColumn::make('title')
                     ->sortable()
                     ->label('Post Title')
-                    ->searchable()
                     ->limit(50)
                     ->url(fn (Post $record): ?string => $record->getUrl(), shouldOpenInNewTab: true),
                 TextColumn::make('author.name')
                     ->label('Author')
-                    ->searchable(),
+                    ->url(fn (Post $record): ?string => $record->author ? EditUser::getUrl(['record' => $record->author]) : null),
                 TextColumn::make('is_published')
                     ->sortable()
                     ->label('Status')

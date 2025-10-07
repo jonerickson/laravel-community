@@ -24,9 +24,9 @@ class RegistrationsTable extends TableWidget
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('email')
-                    ->label('Email address'),
+                    ->label('Email Address'),
                 TextColumn::make('created_at')
-                    ->label('Registered At')
+                    ->label('Registered')
                     ->alignEnd()
                     ->dateTime()
                     ->sortable(),

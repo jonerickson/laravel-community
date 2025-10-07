@@ -33,13 +33,15 @@ class RecentOrdersTable extends TableWidget
             ->columns([
                 TextColumn::make('reference_id')
                     ->label('Order #')
-                    ->searchable()
                     ->url(fn (Order $record): string => ViewOrder::getUrl(['record' => $record])),
+                TextColumn::make('invoice_number')
+                    ->label('Invoice')
+                    ->url(fn (Order $record): ?string => $record->invoice_url, shouldOpenInNewTab: true)
+                    ->placeholder('N/A'),
                 TextColumn::make('items.product.name')
                     ->label('Product(s)'),
                 TextColumn::make('user.name')
                     ->label('Customer')
-                    ->searchable()
                     ->url(fn (Order $record): ?string => $record->user ? EditUser::getUrl(['record' => $record->user]) : null),
                 TextColumn::make('status')
                     ->badge(),
@@ -51,11 +53,6 @@ class RecentOrdersTable extends TableWidget
                     ->label('Items')
                     ->counts('items')
                     ->sortable(),
-                TextColumn::make('invoice_number')
-                    ->label('Invoice')
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->url(fn (Order $record): ?string => $record->invoice_url, shouldOpenInNewTab: true)
-                    ->placeholder('N/A'),
                 TextColumn::make('created_at')
                     ->label('Ordered')
                     ->dateTime()

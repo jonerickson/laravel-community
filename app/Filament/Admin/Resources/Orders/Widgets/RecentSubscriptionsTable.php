@@ -24,6 +24,7 @@ class RecentSubscriptionsTable extends TableWidget
         return $listSubscriptions->table($table)
             ->heading('Recent Subscriptions')
             ->description('Most recent subscription activity.')
+            ->searchable(false)
             ->headerActions([])
             ->recordActions([]);
     }
