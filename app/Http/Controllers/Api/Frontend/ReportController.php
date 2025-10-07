@@ -47,7 +47,7 @@ class ReportController extends Controller
 
         return ApiResource::created(
             resource: $report,
-            message: 'Report submitted successfully. Thank you for helping keep our community safe.'
+            message: 'Your report was submitted successfully. Thank you for helping keep our community safe.'
         );
     }
 }

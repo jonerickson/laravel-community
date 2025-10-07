@@ -12,6 +12,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class PinController extends Controller
 {
@@ -38,7 +39,7 @@ class PinController extends Controller
 
         if (blank($pinnable)) {
             return ApiResource::error(
-                message: 'Either a topic or post is required.'
+                message: 'Please select either a topic or post is required.'
             );
         }
 
@@ -46,11 +47,11 @@ class PinController extends Controller
 
         $pinnable->pin();
 
-        $class = class_basename($pinnable);
+        $class = Str::of($pinnable::class)->classBasename()->lower()->toString();
 
         return ApiResource::success(
             resource: $pinnable,
-            message: "$class has been pinned successfully."
+            message: "The $class has been successfully pinned."
         );
     }
 
@@ -75,7 +76,7 @@ class PinController extends Controller
 
         if (blank($pinnable)) {
             return ApiResource::error(
-                message: 'Either a topic or post is required.'
+                message: 'Please select either a topic or post is required.'
             );
         }
 
@@ -83,11 +84,11 @@ class PinController extends Controller
 
         $pinnable->unpin();
 
-        $class = class_basename($pinnable);
+        $class = Str::of($pinnable::class)->classBasename()->lower()->toString();
 
         return ApiResource::success(
             resource: $pinnable,
-            message: "$class has been pinned successfully."
+            message: "The $class has been successfully unpinned."
         );
     }
 }

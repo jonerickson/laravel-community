@@ -5,7 +5,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { useReport } from '@/hooks/use-report';
 import { AlertTriangleIcon, FlagIcon } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
 
 interface ReportDialogProps {
     reportableType: string;
@@ -32,11 +31,6 @@ export function ReportDialog({ reportableType, reportableId, trigger, children }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        if (!reason) {
-            toast.error('Please select a reason for the report.');
-            return;
-        }
 
         await submitReport({
             reportable_type: reportableType,

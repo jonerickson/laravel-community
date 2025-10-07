@@ -26,7 +26,7 @@ class CheckoutController
 
         if (! $user) {
             return ApiResource::error(
-                message: 'Authentication required to checkout.',
+                message: 'Authentication is required to checkout.',
                 errors: ['auth' => ['User must be authenticated.']],
                 status: 401
             );
@@ -36,7 +36,7 @@ class CheckoutController
 
         if (blank($cartItems)) {
             return ApiResource::error(
-                message: 'Cart is empty.',
+                message: 'Your cart is currently empty.',
                 errors: ['cart' => ['Cart cannot be empty.']],
                 status: 400
             );
@@ -77,7 +77,7 @@ class CheckoutController
 
         if ($productPrices === []) {
             return ApiResource::error(
-                message: 'Cart is empty.',
+                message: 'Your cart is currently empty.',
                 errors: ['cart' => ['Cart cannot be empty.']],
                 status: 400
             );
@@ -98,9 +98,9 @@ class CheckoutController
             order: $order,
         );
 
-        if ($result === false || ($result === '' || $result === '0')) {
+        if (blank($result)) {
             return ApiResource::error(
-                message: 'Failed to create checkout session.'
+                message: 'Failed to create checkout session. Please try again.',
             );
         }
 

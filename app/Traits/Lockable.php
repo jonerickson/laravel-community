@@ -23,17 +23,17 @@ trait Lockable
         $query->where('is_locked', false);
     }
 
-    public function lock(): bool
+    public function lock(): static
     {
         return tap($this)->update(['is_locked' => true]);
     }
 
-    public function unlock(): bool
+    public function unlock(): static
     {
         return tap($this)->update(['is_locked' => false]);
     }
 
-    public function toggleLock(): bool
+    public function toggleLock(): static
     {
         return tap($this)->update(['is_locked' => ! $this->is_locked]);
     }

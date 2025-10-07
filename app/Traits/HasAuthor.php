@@ -27,6 +27,13 @@ trait HasAuthor
         return $this->created_by === $user->id;
     }
 
+    public function authorName(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->author?->name ?? 'Unknown'
+        );
+    }
+
     protected static function bootHasAuthor(): void
     {
         static::creating(function (Model $model): void {
@@ -43,12 +50,5 @@ trait HasAuthor
         $this->mergeFillable([
             'created_by',
         ]);
-    }
-
-    protected function authorName(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->author?->name ?? 'Unknown'
-        );
     }
 }

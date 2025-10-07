@@ -23,17 +23,17 @@ trait Pinnable
         $query->where('is_pinned', false);
     }
 
-    public function pin(): bool
+    public function pin(): static
     {
         return tap($this)->update(['is_pinned' => true]);
     }
 
-    public function unpin(): bool
+    public function unpin(): static
     {
         return tap($this)->update(['is_pinned' => false]);
     }
 
-    public function togglePin(): bool
+    public function togglePin(): static
     {
         return tap($this)->update(['is_pinned' => ! $this->is_pinned]);
     }

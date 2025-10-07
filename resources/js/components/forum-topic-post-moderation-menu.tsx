@@ -2,9 +2,8 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApiRequest } from '@/hooks/use-api-request';
 import usePermissions from '@/hooks/use-permissions';
-import { Link, useForm } from '@inertiajs/react';
-import { Edit, Eye, EyeOff, MoreHorizontal, Pin, PinOff, Trash } from 'lucide-react';
-import { toast } from 'sonner';
+import { Link, router, useForm } from '@inertiajs/react';
+import { Edit, Eye, EyeOff, MoreHorizontal, Pin, PinOff, ThumbsDown, ThumbsUp, Trash } from 'lucide-react';
 
 interface ForumTopicPostModerationMenuProps {
     post: App.Data.PostData;
@@ -19,8 +18,9 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
     });
     const { execute: pinPost, loading: pinLoading } = useApiRequest();
     const { execute: publishPost } = useApiRequest();
+    const { execute: approvePost } = useApiRequest();
 
-    if (!hasAnyPermission(['publish_posts', 'pin_posts']) && !post.permissions.canDelete && !post.permissions.canUpdate) {
+    if (!hasAnyPermission(['publish_posts', 'pin_posts', 'approve_posts']) && !post.permissions.canDelete && !post.permissions.canUpdate) {
         return null;
     }
 
@@ -39,12 +39,6 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                 topic: topic.slug,
                 post: post.slug,
             }),
-            {
-                onError: (err) => {
-                    console.error('Error deleting post:', err);
-                    toast.error(err.message || 'Unable to delete post. Please try again.');
-                },
-            },
         );
     };
 
@@ -68,9 +62,34 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
             },
             {
                 onSuccess: () => {
-                    const message = isCurrentlyPublished ? 'The post has been unpublished.' : 'The post has been published.';
-                    toast.success(message);
-                    window.location.reload();
+                    router.reload();
+                },
+            },
+        );
+    };
+
+    const handleToggleApprove = async () => {
+        const isCurrentlyApproved = post.isApproved;
+        const action = isCurrentlyApproved ? 'unapprove' : 'approve';
+        const url = isCurrentlyApproved ? route('api.approve.destroy') : route('api.approve.store');
+        const method = isCurrentlyApproved ? 'DELETE' : 'POST';
+
+        if (!window.confirm(`Are you sure you want to ${action} this post?`)) {
+            return;
+        }
+
+        await approvePost(
+            {
+                url,
+                method,
+                data: {
+                    type: 'post',
+                    id: post.id,
+                },
+            },
+            {
+                onSuccess: () => {
+                    router.reload();
                 },
             },
         );
@@ -91,9 +110,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
             },
             {
                 onSuccess: () => {
-                    const message = isCurrentlyPinned ? 'The post has been unpinned.' : 'The post has been pinned.';
-                    toast.success(message);
-                    window.location.reload();
+                    router.reload();
                 },
             },
         );
@@ -120,6 +137,22 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                             <Edit className="mr-2 size-4" />
                             Edit Post
                         </Link>
+                    </DropdownMenuItem>
+                )}
+
+                {can('approve_posts') && (
+                    <DropdownMenuItem onClick={handleToggleApprove}>
+                        {post.isApproved ? (
+                            <>
+                                <ThumbsDown className="mr-2 size-4" />
+                                Unapprove Post
+                            </>
+                        ) : (
+                            <>
+                                <ThumbsUp className="mr-2 size-4" />
+                                Approve Post
+                            </>
+                        )}
                     </DropdownMenuItem>
                 )}
 

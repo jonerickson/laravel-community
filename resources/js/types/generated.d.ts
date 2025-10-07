@@ -16,7 +16,7 @@ declare namespace App.Data {
     };
     export type ApiData = {
         success: boolean;
-        message: string;
+        message: string | null;
         data: unknown;
         meta: App.Data.ApiMetaData;
         errors: { [key: string]: Array<string> } | null;

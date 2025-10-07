@@ -114,14 +114,14 @@ class Forum extends Model implements Sluggable
         return $this->hasManyThrough(Post::class, Topic::class);
     }
 
-    protected function topicsCount(): Attribute
+    public function topicsCount(): Attribute
     {
         return Attribute::make(
             get: fn (): int => $this->topics()->count()
         );
     }
 
-    protected function postsCount(): Attribute
+    public function postsCount(): Attribute
     {
         return Attribute::make(
             get: fn (): int => Post::whereHas('topic', fn ($query) => $query->where('forum_id', $this->id))->count()

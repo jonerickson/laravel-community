@@ -13,12 +13,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ApiResource extends JsonResource
 {
-    public function __construct($resource, protected string $message = 'Success.', protected int $status = 200, protected array $meta = [], protected ?array $errors = null)
+    public function __construct($resource, protected ?string $message = null, protected int $status = 200, protected array $meta = [], protected ?array $errors = null)
     {
         parent::__construct($resource);
     }
 
-    public static function success($resource = null, string $message = 'Success.', array $meta = []): self
+    public static function success($resource = null, ?string $message = null, array $meta = []): self
     {
         return new self($resource, $message, 200, $meta);
     }

@@ -116,4 +116,13 @@ class PostPolicy
 
         return Gate::forUser($user)->check('publish_posts');
     }
+
+    public function approve(?User $user, Post $post): bool
+    {
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        return Gate::forUser($user)->check('approve_posts');
+    }
 }

@@ -33,7 +33,7 @@ class LockController extends Controller
 
         return ApiResource::success(
             resource: $topic,
-            message: 'Topic has been locked successfully.'
+            message: 'The topic has been successfully locked.'
         );
     }
 
@@ -54,7 +54,7 @@ class LockController extends Controller
 
         return ApiResource::success(
             resource: $topic,
-            message: 'Topic has been unlocked successfully.'
+            message: 'The topic has been successfully unlocked.'
         );
     }
 }

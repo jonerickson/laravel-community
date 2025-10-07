@@ -52,7 +52,9 @@ trait Followable
             throw new RuntimeException('User must be authenticated to follow.');
         }
 
-        return $this->follows()->updateOrCreate([]);
+        return $this->follows()->updateOrCreate([
+            'created_by' => $user->getKey(),
+        ]);
     }
 
     public function unfollow(?User $user = null): bool

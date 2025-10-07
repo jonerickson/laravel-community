@@ -331,9 +331,6 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
         }));
 
         subscribeToPrice(route('store.subscriptions.store'), {
-            onError: () => {
-                toast.error('Failed to start subscription. Please try again.');
-            },
             onFinish: () => {
                 setProcessingPriceId(null);
             },
@@ -366,10 +363,6 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
         }));
 
         cancelSubscription(route('store.subscriptions.destroy'), {
-            onError: (err) => {
-                console.error('Failed to cancel subscription:', err);
-                toast.error('Failed to cancel subscription. Please try again.');
-            },
             onFinish: () => {
                 setCancellingPriceId(null);
                 setPendingCancelPriceId(null);
@@ -386,9 +379,6 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
         }));
 
         continueSubscription(route('store.subscriptions.update'), {
-            onError: () => {
-                toast.error('Failed to continue subscription. Please try again.');
-            },
             onFinish: () => {
                 setContinuingPriceId(null);
             },
@@ -399,7 +389,7 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Subscriptions" />
 
-            <div className="mx-auto max-w-7xl py-4">
+            <div className="py-4">
                 <div className="mb-8 text-center">
                     <Heading
                         title="Choose your plan"

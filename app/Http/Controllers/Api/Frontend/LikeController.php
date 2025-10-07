@@ -51,7 +51,6 @@ class LikeController extends Controller
 
         return new ApiResource(
             resource: $likeSummaryData,
-            message: 'Item liked successfully.'
         );
     }
 

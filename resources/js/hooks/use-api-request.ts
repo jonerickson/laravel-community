@@ -1,4 +1,4 @@
-import { ApiError, apiRequest } from '@/utils/api';
+import { ApiError } from '@/utils/api';
 import { router } from '@inertiajs/react';
 import axios, { type AxiosRequestConfig } from 'axios';
 import { useState } from 'react';
@@ -32,26 +32,29 @@ export function useApiRequest<T>() {
 
             switch (method) {
                 case 'POST':
-                    requestPromise = axios.post(url, data, config);
+                    requestPromise = axios.post<App.Data.ApiData>(url, data, config);
                     break;
                 case 'PUT':
-                    requestPromise = axios.put(url, data, config);
+                    requestPromise = axios.put<App.Data.ApiData>(url, data, config);
                     break;
                 case 'PATCH':
-                    requestPromise = axios.patch(url, data, config);
+                    requestPromise = axios.patch<App.Data.ApiData>(url, data, config);
                     break;
                 case 'DELETE':
-                    requestPromise = axios.delete(url, { ...config, data });
+                    requestPromise = axios.delete<App.Data.ApiData>(url, { ...config, data });
                     break;
                 default:
-                    requestPromise = axios.get(url, config);
+                    requestPromise = axios.get<App.Data.ApiData>(url, config);
             }
 
-            const responseData = await apiRequest<T>(requestPromise);
+            const response = await requestPromise;
+            const apiData = response.data as App.Data.ApiData;
+
+            const responseData = apiData.data as T;
             onSuccess?.(responseData);
 
-            if (responseData && typeof responseData === 'object' && 'message' in responseData && typeof responseData.message === 'string') {
-                toast.success(responseData.message);
+            if (apiData.message) {
+                toast.success(apiData.message);
             }
 
             return responseData;

@@ -254,6 +254,17 @@ class Post extends Model implements Sluggable
         };
     }
 
+    public function readingTime(): Attribute
+    {
+        return Attribute::make(
+            get: function (): int {
+                $wordCount = str_word_count(strip_tags($this->content));
+
+                return max(1, (int) ceil($wordCount / 200));
+            }
+        )->shouldCache();
+    }
+
     #[Override]
     protected static function booted(): void
     {
@@ -266,17 +277,6 @@ class Post extends Model implements Sluggable
                 ]);
             }
         });
-    }
-
-    protected function readingTime(): Attribute
-    {
-        return Attribute::make(
-            get: function (): int {
-                $wordCount = str_word_count(strip_tags($this->content));
-
-                return max(1, (int) ceil($wordCount / 200));
-            }
-        )->shouldCache();
     }
 
     protected function casts(): array

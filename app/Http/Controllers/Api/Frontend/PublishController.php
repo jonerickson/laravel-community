@@ -33,7 +33,7 @@ class PublishController extends Controller
 
         return ApiResource::success(
             resource: $post->fresh(),
-            message: 'Post has been published successfully.'
+            message: 'The post has been successfully published.'
         );
     }
 
@@ -54,7 +54,7 @@ class PublishController extends Controller
 
         return ApiResource::success(
             resource: $post->fresh(),
-            message: 'Post has been unpublished successfully.'
+            message: 'The post has been successfully unpublished.'
         );
     }
 }

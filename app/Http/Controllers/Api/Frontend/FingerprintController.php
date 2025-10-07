@@ -42,7 +42,6 @@ class FingerprintController extends Controller
 
         return ApiResource::success(
             resource: $fingerprintData,
-            message: 'Fingerprint tracked successfully.'
         );
     }
 }

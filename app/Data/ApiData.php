@@ -16,7 +16,7 @@ class ApiData extends Data
 {
     public bool $success;
 
-    public string $message;
+    public ?string $message = null;
 
     #[LiteralTypeScriptType('unknown')]
     public mixed $data;

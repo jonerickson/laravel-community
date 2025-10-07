@@ -17,7 +17,7 @@ export function handleApiResponse<T>(response: AxiosResponse<App.Data.ApiData>):
         return response.data.data as T;
     }
 
-    throw new ApiError(response.data.message, response.status, response.data.errors, response);
+    throw new ApiError(response.data.message || 'An unknown error occurred. Please try again.', response.status, response.data.errors, response);
 }
 
 export function handleApiError(error: unknown): ApiError {

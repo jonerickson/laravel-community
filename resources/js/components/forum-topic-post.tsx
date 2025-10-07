@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { stripCharacters } from '@/utils/truncate';
 import { formatDistanceToNow } from 'date-fns';
-import { EyeOff, Flag, Pin, Quote, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { EyeOff, Flag, Pin, Quote, ThumbsUp } from 'lucide-react';
 import usePermissions from '../hooks/use-permissions';
 
 interface ForumTopicPostProps {

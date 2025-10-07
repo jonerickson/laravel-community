@@ -4,7 +4,6 @@ import { useApiRequest } from '@/hooks/use-api-request';
 import { cn } from '@/lib/utils';
 import { Star } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
 
 interface ProductRatingProps {
     product: App.Data.ProductData;
@@ -19,11 +18,6 @@ export function StoreProductRating({ product, onRatingAdded }: ProductRatingProp
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        if (rating === 0) {
-            toast.error('Please select a rating.');
-            return;
-        }
 
         await executeSubmitRating(
             {

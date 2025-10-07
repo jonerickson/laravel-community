@@ -41,7 +41,7 @@ class TopicController extends Controller
             resource: [
                 'deleted_count' => count($validated['topic_ids']),
             ],
-            message: 'Topics deleted successfully.',
+            message: 'The topic(s) were successfully deleted.',
         );
     }
 }

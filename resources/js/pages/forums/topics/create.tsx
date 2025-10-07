@@ -7,7 +7,6 @@ import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { toast } from 'sonner';
 import { route } from 'ziggy-js';
 
 interface CreateTopicProps {
@@ -46,10 +45,6 @@ export default function ForumTopicCreate({ forum }: CreateTopicProps) {
         post(route('forums.topics.store', { forum: forum.slug }), {
             onSuccess: () => {
                 reset();
-            },
-            onError: (err) => {
-                console.error('Error creating topic:', err);
-                toast.error(err.message || 'Unable to create topic. Please try again.');
             },
         });
     };

@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils';
 import { useForm } from '@inertiajs/react';
 import { Edit, MessageCircle, Reply, Trash } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
 import usePermissions from '../hooks/use-permissions';
 
 interface BlogCommentsProps {
@@ -68,10 +67,6 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                 reset();
                 onReply(0);
             },
-            onError: (err) => {
-                console.error('Error adding reply:', err);
-                toast.error(err.message || 'Unable to add reply. Please try again.');
-            },
         });
     };
 
@@ -84,12 +79,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
             return;
         }
 
-        deleteComment(route('blog.comments.destroy', { post, comment }), {
-            onError: (err) => {
-                console.error('Error deleting comment:', err);
-                toast.error(err.message || 'Unable to delete comment. Please try again.');
-            },
-        });
+        deleteComment(route('blog.comments.destroy', { post, comment }));
     };
 
     const handleEditSubmit = (e: React.FormEvent) => {
@@ -102,10 +92,6 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
         updateComment(route('blog.comments.update', { post, comment }), {
             onSuccess: () => {
                 setIsEditing(false);
-            },
-            onError: (err) => {
-                console.error('Error updating comment:', err);
-                toast.error(err.message || 'Unable to update comment. Please try again.');
             },
         });
     };
@@ -256,10 +242,6 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
         submitComment(route('blog.comments.store', { post }), {
             onSuccess: () => {
                 reset();
-            },
-            onError: (err) => {
-                console.error('Error adding comment:', err);
-                toast.error(err.message || 'Unable to add comment. Please try again.');
             },
         });
     };

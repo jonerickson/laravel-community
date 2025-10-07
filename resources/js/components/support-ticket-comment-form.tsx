@@ -2,7 +2,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { useForm } from '@inertiajs/react';
-import { toast } from 'sonner';
 
 interface SupportTicketCommentFormProps {
     ticket: App.Data.SupportTicketData;
@@ -19,19 +18,10 @@ export default function SupportTicketCommentForm({ ticket, onCancel, onSuccess }
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!data.content.trim()) {
-            toast.error('Please enter a comment.');
-            return;
-        }
-
         post(route('support.comments.store', ticket.id), {
             onSuccess: () => {
                 reset();
                 onSuccess?.();
-            },
-            onError: (err) => {
-                console.error('Error adding comment:', err);
-                toast.error(err.message || 'Failed to add comment. Please try again.');
             },
         });
     };

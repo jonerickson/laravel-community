@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { pluralize } from '@/lib/utils';
-import { Deferred, useForm, usePage } from '@inertiajs/react';
+import { Deferred, router, useForm, usePage } from '@inertiajs/react';
 import { ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -107,7 +107,7 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                                                     product={productData}
                                                     onRatingAdded={() => {
                                                         setIsRatingModalOpen(false);
-                                                        window.location.reload();
+                                                        router.reload({ only: ['product'] });
                                                     }}
                                                 />
                                             </div>

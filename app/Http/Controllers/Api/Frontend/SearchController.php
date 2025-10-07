@@ -36,7 +36,7 @@ class SearchController extends Controller
         if (blank($query) || strlen((string) $query) < 2) {
             return ApiResource::success(
                 resource: [],
-                message: 'Search query too short.',
+                message: 'Your search query is too short.',
                 meta: [
                     'total' => 0,
                     'query' => $query,
@@ -128,7 +128,6 @@ class SearchController extends Controller
 
         return ApiResource::success(
             resource: $results->values(),
-            message: 'Search completed successfully.',
             meta: [
                 'total' => $results->count(),
                 'query' => $query,

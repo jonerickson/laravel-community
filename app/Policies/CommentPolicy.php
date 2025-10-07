@@ -84,4 +84,13 @@ class CommentPolicy
         return Gate::forUser($user)->check('like_comments')
             && $this->view($user, $comment);
     }
+
+    public function approve(?User $user, Comment $comment): bool
+    {
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        return Gate::forUser($user)->check('approve_comments');
+    }
 }

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\Frontend\ApproveController;
 use App\Http\Controllers\Api\Frontend\CheckoutController;
-use App\Http\Controllers\Api\Frontend\CommentController;
 use App\Http\Controllers\Api\Frontend\FingerprintController;
 use App\Http\Controllers\Api\Frontend\LikeController;
 use App\Http\Controllers\Api\Frontend\LockController;
@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\Frontend\PinController;
 use App\Http\Controllers\Api\Frontend\PublishController;
 use App\Http\Controllers\Api\Frontend\ReadController;
 use App\Http\Controllers\Api\Frontend\ReportController;
+use App\Http\Controllers\Api\Frontend\ReviewController;
 use App\Http\Controllers\Api\Frontend\SearchController;
 use App\Http\Controllers\Api\Frontend\ShoppingCartController;
 use App\Http\Controllers\Api\Frontend\TopicController;
@@ -25,8 +26,10 @@ Route::group(['domain' => config('app.url'), 'middleware' => [EnsureFrontendRequ
     Route::get('/search', SearchController::class)->name('search');
 
     Route::group(['middleware' => ['auth:api', 'verified']], function (): void {
+        Route::post('/approve', [ApproveController::class, 'store'])->name('approve.store');
+        Route::delete('/approve', [ApproveController::class, 'destroy'])->name('approve.destroy');
         Route::post('/checkout', CheckoutController::class)->name('checkout');
-        Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+        Route::post('/comments', [ReviewController::class, 'store'])->name('comments.store');
         Route::delete('/forums/topics', [TopicController::class, 'destroy'])->name('forums.topics.destroy');
         Route::post('/like', LikeController::class)->name('like');
         Route::get('/payment-methods', PaymentMethodController::class)->name('payment-methods');

@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 // No import needed, using App.Data.SupportTicketData directly
 import { useForm } from '@inertiajs/react';
 import { X } from 'lucide-react';
-import { toast } from 'sonner';
 
 interface SupportTicketAttachmentFormProps {
     ticket: App.Data.SupportTicketData;
@@ -22,11 +21,6 @@ export default function SupportTicketAttachmentForm({ ticket, onCancel, onSucces
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
         if (selectedFile) {
-            if (selectedFile.size > 10 * 1024 * 1024) {
-                // 10MB limit
-                toast.error('File size must be less than 10MB');
-                return;
-            }
             setData('attachment', selectedFile);
         }
     };
@@ -34,19 +28,10 @@ export default function SupportTicketAttachmentForm({ ticket, onCancel, onSucces
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!data.attachment) {
-            toast.error('Please select a file to upload.');
-            return;
-        }
-
         post(route('support.attachments.store', ticket.id), {
             onSuccess: () => {
                 reset();
                 onSuccess?.();
-            },
-            onError: (err) => {
-                console.error('Error uploading attachment:', err);
-                toast.error(err.attachment || 'Failed to upload attachment. Please try again.');
             },
         });
     };

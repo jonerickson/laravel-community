@@ -92,7 +92,7 @@ class ShoppingCartController extends Controller
 
         return ApiResource::success(
             resource: $cartResponse,
-            message: 'Item removed from cart successfully.'
+            message: 'The item was successfully removed from your cart.'
         );
     }
 }

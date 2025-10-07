@@ -12,11 +12,10 @@ import { useApiRequest } from '@/hooks/use-api-request';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { stripCharacters } from '@/utils/truncate';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, Circle, Eye, EyeOff, LibraryBig, Lock, MessageSquare, Pin, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
 import { route } from 'ziggy-js';
 import usePermissions from '../../hooks/use-permissions';
 
@@ -129,7 +128,7 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                 onSuccess: () => {
                     setTopics((prevTopics) => prevTopics.filter((topic) => !selectedTopics.includes(topic.id)));
                     setSelectedTopics([]);
-                    toast.success('The post(s) have been successfully deleted.');
+                    router.reload();
                 },
             },
         );

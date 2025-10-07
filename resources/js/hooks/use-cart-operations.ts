@@ -1,6 +1,5 @@
 import { useApiRequest } from '@/hooks/use-api-request';
 import { useState } from 'react';
-import { toast } from 'sonner';
 
 interface CartTotals {
     subtotal: number;
@@ -40,8 +39,6 @@ export function useCartOperations(initialItems: App.Data.CartItemData[] = []) {
                             },
                         }),
                     );
-
-                    toast.success('Your cart has been successfully updated.');
                 },
                 onSettled: () => setLoading(null),
             },
@@ -73,8 +70,6 @@ export function useCartOperations(initialItems: App.Data.CartItemData[] = []) {
                             },
                         }),
                     );
-
-                    toast.success('The item has been successfully added to your cart.');
                 },
                 onSettled: () => setLoading(null),
             },

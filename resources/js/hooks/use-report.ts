@@ -1,5 +1,4 @@
 import { useApiRequest } from '@/hooks/use-api-request';
-import { toast } from 'sonner';
 
 interface ReportData {
     reportable_type: string;
@@ -12,16 +11,11 @@ export function useReport() {
     const { loading, execute } = useApiRequest();
 
     const submitReport = async (data: ReportData) => {
-        await execute(
-            {
-                url: route('api.reports.store'),
-                method: 'POST',
-                data,
-            },
-            {
-                onSuccess: () => toast.success('Report submitted successfully. Thank you for helping keep our community safe.'),
-            },
-        );
+        await execute({
+            url: route('api.reports.store'),
+            method: 'POST',
+            data,
+        });
     };
 
     return {

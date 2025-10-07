@@ -43,7 +43,6 @@ class ReadController extends Controller
 
         return new ApiResource(
             resource: $readData,
-            message: 'Item read successfully.'
         );
     }
 

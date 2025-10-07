@@ -1,9 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApiRequest } from '@/hooks/use-api-request';
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { Lock, LockOpen, MoreHorizontal, Pin, PinOff, Trash } from 'lucide-react';
-import { toast } from 'sonner';
 import usePermissions from '../hooks/use-permissions';
 
 interface ForumTopicModerationMenuProps {
@@ -31,12 +30,6 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
                 forum: forum.slug,
                 topic: topic.slug,
             }),
-            {
-                onError: (err) => {
-                    console.error('Error deleting topic:', err);
-                    toast.error(err.message || 'Unable to delete topic. Please try again.');
-                },
-            },
         );
     };
 
@@ -55,9 +48,7 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
             },
             {
                 onSuccess: () => {
-                    const message = isCurrentlyPinned ? 'The topic has been unpinned.' : 'The topic has been pinned.';
-                    toast.success(message);
-                    window.location.reload();
+                    router.reload();
                 },
             },
         );
@@ -78,9 +69,7 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
             },
             {
                 onSuccess: () => {
-                    const message = isCurrentlyLocked ? 'The topic has been unlocked.' : 'The topic has been locked.';
-                    toast.success(message);
-                    window.location.reload();
+                    router.reload();
                 },
             },
         );
