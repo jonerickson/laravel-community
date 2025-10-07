@@ -22,6 +22,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -125,6 +126,7 @@ class PostResource extends Resource
                                     ->default(false)
                                     ->helperText('Feature this post on the homepage.'),
                                 Toggle::make('comments_enabled')
+                                    ->label('Comments')
                                     ->default(true)
                                     ->helperText('Allow users to comment on this post.'),
                                 Toggle::make('is_published')
@@ -139,6 +141,17 @@ class PostResource extends Resource
                                     ->default(now()),
                                 Hidden::make('created_by')
                                     ->default(Auth::id()),
+                            ]),
+                        Section::make('Author')
+                            ->columnSpanFull()
+                            ->collapsed()
+                            ->schema([
+                                Select::make('created_by')
+                                    ->relationship('author', 'name')
+                                    ->required()
+                                    ->default(Auth::id())
+                                    ->preload()
+                                    ->searchable(),
                             ]),
                         Section::make('SEO & Meta')
                             ->collapsible()
@@ -207,7 +220,7 @@ class PostResource extends Resource
                     ->preload()
                     ->searchable(),
                 TernaryFilter::make('comments_enabled')
-                    ->label('Comments Enabled'),
+                    ->label('Comments'),
                 TernaryFilter::make('is_featured')
                     ->label('Featured'),
                 TernaryFilter::make('is_published')

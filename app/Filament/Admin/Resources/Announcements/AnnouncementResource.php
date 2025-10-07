@@ -109,6 +109,7 @@ class AnnouncementResource extends Resource
                             ]),
                         Section::make('Author')
                             ->columnSpanFull()
+                            ->collapsed()
                             ->schema([
                                 Select::make('created_by')
                                     ->relationship('author', 'name')
@@ -116,8 +117,7 @@ class AnnouncementResource extends Resource
                                     ->default(Auth::id())
                                     ->preload()
                                     ->searchable(),
-                            ])
-                            ->collapsed(),
+                            ]),
                     ]),
             ]);
     }

@@ -27,6 +27,7 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 use Override;
 
 class TopicResource extends Resource
@@ -59,12 +60,6 @@ class TopicResource extends Resource
                                 Textarea::make('description')
                                     ->maxLength(500)
                                     ->rows(3),
-                                Select::make('created_by')
-                                    ->label('Author')
-                                    ->relationship('author', 'name')
-                                    ->preload()
-                                    ->required()
-                                    ->searchable(),
                             ]),
                     ]),
                 Group::make()
@@ -78,6 +73,17 @@ class TopicResource extends Resource
                                 Toggle::make('is_locked')
                                     ->helperText('Toggle to lock/unlock this topic.')
                                     ->label('Locked'),
+                            ]),
+                        Section::make('Author')
+                            ->columnSpanFull()
+                            ->collapsed()
+                            ->schema([
+                                Select::make('created_by')
+                                    ->relationship('author', 'name')
+                                    ->required()
+                                    ->default(Auth::id())
+                                    ->preload()
+                                    ->searchable(),
                             ]),
                     ]),
             ]);

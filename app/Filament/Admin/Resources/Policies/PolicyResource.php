@@ -29,6 +29,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Override;
 
@@ -92,6 +93,17 @@ class PolicyResource extends Resource
                                     ->default(today())
                                     ->label('Effective Date')
                                     ->helperText('Leave empty for immediate effect'),
+                            ]),
+                        Section::make('Author')
+                            ->columnSpanFull()
+                            ->collapsed()
+                            ->schema([
+                                Select::make('created_by')
+                                    ->relationship('author', 'name')
+                                    ->required()
+                                    ->default(Auth::id())
+                                    ->preload()
+                                    ->searchable(),
                             ]),
                     ]),
             ]);
