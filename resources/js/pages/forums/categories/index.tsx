@@ -1,9 +1,9 @@
 import { EmptyState } from '@/components/empty-state';
 import ForumSelectionDialog from '@/components/forum-selection-dialog';
 import Heading from '@/components/heading';
-import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
@@ -212,10 +212,12 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                                                     )),
                                                 )}
                                                 {!category.forums?.some((forum) => forum.latestTopics && forum.latestTopics.length > 0) && (
-                                                    <div className="flex flex-col items-center justify-center py-14 text-center">
-                                                        <MessageSquare className="mb-2 size-8 text-muted-foreground/50" />
-                                                        <HeadingSmall title={'No topics'} description={'There are no recent topics to show.'} />
-                                                    </div>
+                                                    <Empty>
+                                                        <EmptyHeader>
+                                                            <EmptyTitle>No topics</EmptyTitle>
+                                                            <EmptyDescription>There are no recent topics to show.</EmptyDescription>
+                                                        </EmptyHeader>
+                                                    </Empty>
                                                 )}
                                             </div>
                                         </div>
