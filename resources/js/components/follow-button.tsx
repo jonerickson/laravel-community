@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { Bell, BellOff } from 'lucide-react';
 import { useState } from 'react';
 import { route } from 'ziggy-js';
@@ -14,7 +14,12 @@ interface FollowButtonProps {
 }
 
 export function FollowButton({ type, id, isFollowing, followersCount, variant = 'outline', size = 'default' }: FollowButtonProps) {
+    const { auth } = usePage<App.Data.SharedData>().props;
     const [loading, setLoading] = useState(false);
+
+    if (!auth || !auth.user) {
+        return null;
+    }
 
     const handleToggleFollow = () => {
         setLoading(true);
