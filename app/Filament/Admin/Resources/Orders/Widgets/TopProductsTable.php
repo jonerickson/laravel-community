@@ -35,6 +35,7 @@ class TopProductsTable extends TableWidget
             )
             ->heading('Top 10 Products by Revenue')
             ->description('Best-selling products based on total revenue generated.')
+            ->deferLoading()
             ->columns([
                 TextColumn::make('name')
                     ->label('Product')

@@ -21,6 +21,7 @@ class RegistrationsTable extends TableWidget
             ->description('New user registrations today.')
             ->emptyStateHeading('No registrations')
             ->emptyStateDescription('There have been no new registrations today.')
+            ->deferLoading()
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('email')

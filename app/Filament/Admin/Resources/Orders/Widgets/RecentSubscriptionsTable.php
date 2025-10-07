@@ -25,6 +25,7 @@ class RecentSubscriptionsTable extends TableWidget
             ->heading('Recent Subscriptions')
             ->description('Most recent subscription activity.')
             ->searchable(false)
+            ->deferLoading()
             ->headerActions([])
             ->recordActions([]);
     }

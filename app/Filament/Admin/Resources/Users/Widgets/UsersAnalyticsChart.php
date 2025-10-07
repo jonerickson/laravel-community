@@ -14,6 +14,8 @@ class UsersAnalyticsChart extends ChartWidget
 {
     protected ?string $heading = 'User Analytics';
 
+    protected ?string $description = 'A comprehensive overview of user activity in your community.';
+
     protected int|string|array $columnSpan = 'full';
 
     protected static ?int $sort = 1;

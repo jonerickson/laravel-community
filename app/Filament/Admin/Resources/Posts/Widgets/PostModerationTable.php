@@ -33,6 +33,7 @@ class PostModerationTable extends TableWidget
             )
             ->heading('Posts Needing Moderation')
             ->description('Unpublished posts and posts with pending reports.')
+            ->deferLoading()
             ->columns([
                 TextColumn::make('title')
                     ->sortable()

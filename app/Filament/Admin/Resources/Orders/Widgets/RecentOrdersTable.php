@@ -30,6 +30,7 @@ class RecentOrdersTable extends TableWidget
             ->heading('Recent Orders')
             ->description('Most recent order activity.')
             ->defaultSort('created_at', 'desc')
+            ->deferLoading()
             ->columns([
                 TextColumn::make('reference_id')
                     ->label('Order #')
