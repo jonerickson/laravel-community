@@ -9,7 +9,7 @@ import { pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
-import { Circle, Lock, MessageSquare, Pin, Plus } from 'lucide-react';
+import { AlertTriangle, Circle, EyeOff, Lock, MessageSquare, Pin, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { route } from 'ziggy-js';
 import usePermissions from '../../../hooks/use-permissions';
@@ -176,6 +176,10 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                                                                     {topic.isHot && <span className="text-sm">🔥</span>}
                                                                     {topic.isPinned && <Pin className="size-4 text-info" />}
                                                                     {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
+                                                                    {topic.hasReportedContent && (
+                                                                        <AlertTriangle className="size-4 text-destructive" />
+                                                                    )}
+                                                                    {topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
                                                                     <span
                                                                         className={`truncate font-medium ${
                                                                             topic.isReadByUser ? 'text-muted-foreground' : 'text-foreground'

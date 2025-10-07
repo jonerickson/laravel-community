@@ -29,7 +29,9 @@ class PublishController extends Controller
 
         $this->authorize('publish', $post);
 
-        $post->update(['is_published' => true]);
+        $post->forceFill([
+            'is_published' => true,
+        ])->save();
 
         return ApiResource::success(
             resource: $post->fresh(),

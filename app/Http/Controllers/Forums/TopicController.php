@@ -11,7 +11,6 @@ use App\Data\PostData;
 use App\Data\RecentViewerData;
 use App\Data\TopicData;
 use App\Enums\PostType;
-use App\Enums\WarningConsequenceType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Forums\StoreTopicRequest;
 use App\Models\Forum;
@@ -21,7 +20,6 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -54,10 +52,7 @@ class TopicController extends Controller
 
         $validated = $request->validated();
 
-        $user = Auth::user();
-        $requiresModeration = $user->active_consequence?->type === WarningConsequenceType::ModerateContent;
-
-        $topic = DB::transaction(function () use ($validated, $forum, $requiresModeration) {
+        $topic = DB::transaction(function () use ($validated, $forum) {
             $topic = Topic::create([
                 'title' => $validated['title'],
                 'description' => $validated['description'],
@@ -68,8 +63,6 @@ class TopicController extends Controller
                 'type' => PostType::Forum,
                 'title' => $validated['title'],
                 'content' => $validated['content'],
-                'is_published' => ! $requiresModeration,
-                'published_at' => $requiresModeration ? null : now(),
             ]);
 
             return $topic;

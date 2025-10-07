@@ -430,6 +430,8 @@ declare namespace App.Data {
         trendingScore: number;
         isFollowedByUser: boolean | null;
         followersCount: number | null;
+        hasReportedContent: boolean;
+        hasUnpublishedContent: boolean;
         forum: App.Data.ForumData | null;
         author: App.Data.UserData;
         lastPost: App.Data.PostData | null;

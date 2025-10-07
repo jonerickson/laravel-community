@@ -228,10 +228,10 @@ class PostResource extends Resource
                         ->requiresConfirmation()
                         ->action(function ($records): void {
                             $records->each(function ($record): void {
-                                $record->update([
+                                $record->forceFill([
                                     'is_published' => true,
                                     'published_at' => $record->published_at ?? now(),
-                                ]);
+                                ])->save();
                             });
                         }),
                     BulkAction::make('unpublish')
@@ -240,7 +240,9 @@ class PostResource extends Resource
                         ->requiresConfirmation()
                         ->action(function ($records): void {
                             $records->each(function ($record): void {
-                                $record->update(['is_published' => false]);
+                                $record->forceFill([
+                                    'is_published' => false,
+                                ])->save();
                             });
                         }),
                 ]),

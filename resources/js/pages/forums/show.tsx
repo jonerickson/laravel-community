@@ -14,7 +14,7 @@ import type { BreadcrumbItem } from '@/types';
 import { stripCharacters } from '@/utils/truncate';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
-import { Circle, Eye, LibraryBig, Lock, MessageSquare, Pin, Plus, Trash2 } from 'lucide-react';
+import { AlertTriangle, Circle, Eye, EyeOff, LibraryBig, Lock, MessageSquare, Pin, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { route } from 'ziggy-js';
@@ -260,6 +260,8 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                                             {topic.isHot && <span className="text-sm">🔥</span>}
                                                             {topic.isPinned && <Pin className="size-4 text-info" />}
                                                             {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
+                                                            {topic.hasReportedContent && <AlertTriangle className="size-4 text-destructive" />}
+                                                            {topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
                                                             <Link
                                                                 href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
                                                                 className={`hover:underline ${

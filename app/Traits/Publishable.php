@@ -21,6 +21,15 @@ trait Publishable
             ->wherePast('published_at');
     }
 
+    public function scopeUnpublished(Builder $query): void
+    {
+        $query->where('is_published', false)
+            ->orWhere(function (Builder $query) {
+                $query->whereNotNull('published_at')
+                    ->whereFuture('published_at');
+            });
+    }
+
     public function scopeRecent(Builder $query): void
     {
         $query->orderBy('published_at', 'desc');

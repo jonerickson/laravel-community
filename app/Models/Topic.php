@@ -48,6 +48,8 @@ use Laravel\Scout\Searchable;
  * @property-read Collection<int, Follow> $follows
  * @property-read int|null $follows_count
  * @property-read Forum $forum
+ * @property-read bool $has_reported_content
+ * @property-read bool $has_unpublished_content
  * @property-read bool $is_followed_by_user
  * @property-read bool $is_hot
  * @property-read bool $is_read_by_user
@@ -115,6 +117,8 @@ class Topic extends Model implements Sluggable
         'posts_count',
         'last_reply_at',
         'is_hot',
+        'has_reported_content',
+        'has_unpublished_content',
     ];
 
     protected $touches = [
@@ -168,6 +172,24 @@ class Topic extends Model implements Sluggable
     {
         return Attribute::make(
             get: fn () => $this->posts()->count(),
+        )->shouldCache();
+    }
+
+    public function hasReportedContent(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): bool => $this->posts()
+                ->whereHas('pendingReports')
+                ->exists()
+        )->shouldCache();
+    }
+
+    public function hasUnpublishedContent(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): bool => $this->posts()
+                ->unpublished()
+                ->exists()
         )->shouldCache();
     }
 

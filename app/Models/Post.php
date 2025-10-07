@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Contracts\Sluggable;
 use App\Enums\PostType;
+use App\Enums\WarningConsequenceType;
 use App\Events\PostCreated;
 use App\Traits\Commentable;
 use App\Traits\Featureable;
@@ -100,6 +101,7 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Post query()
  * @method static Builder<static>|Post read(?\App\Models\User $user = null)
  * @method static Builder<static>|Post recent()
+ * @method static Builder<static>|Post unpublished()
  * @method static Builder<static>|Post unread(?\App\Models\User $user = null)
  * @method static Builder<static>|Post whereCommentsEnabled($value)
  * @method static Builder<static>|Post whereContent($value)
@@ -242,6 +244,20 @@ class Post extends Model implements Sluggable
             PostType::Blog => 'blog',
             PostType::Forum => 'forum',
         };
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (Post $post): void {
+            if ($author = $post->author) {
+                $requiresModeration = $author->active_consequence?->type === WarningConsequenceType::ModerateContent;
+
+                $post->forceFill([
+                    'is_published' => ! $requiresModeration,
+                    'published_at' => $requiresModeration ? null : now(),
+                ]);
+            }
+        });
     }
 
     protected function readingTime(): Attribute

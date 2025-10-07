@@ -56,6 +56,10 @@ class TopicData extends Data
 
     public ?int $followersCount = null;
 
+    public bool $hasReportedContent = false;
+
+    public bool $hasUnpublishedContent = false;
+
     #[LoadRelation]
     public ?ForumData $forum = null;
 
