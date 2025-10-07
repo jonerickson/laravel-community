@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\Frontend\ApproveController;
 use App\Http\Controllers\Api\Frontend\CheckoutController;
 use App\Http\Controllers\Api\Frontend\FingerprintController;
+use App\Http\Controllers\Api\Frontend\FollowController;
 use App\Http\Controllers\Api\Frontend\LikeController;
 use App\Http\Controllers\Api\Frontend\LockController;
 use App\Http\Controllers\Api\Frontend\PaymentMethodController;
@@ -30,6 +31,8 @@ Route::group(['domain' => config('app.url'), 'middleware' => [EnsureFrontendRequ
         Route::delete('/approve', [ApproveController::class, 'destroy'])->name('approve.destroy');
         Route::post('/checkout', CheckoutController::class)->name('checkout');
         Route::post('/comments', [ReviewController::class, 'store'])->name('comments.store');
+        Route::post('/follow', [FollowController::class, 'store'])->name('follow.store');
+        Route::delete('/follow/', [FollowController::class, 'destroy'])->name('follow.destroy');
         Route::delete('/forums/topics', [TopicController::class, 'destroy'])->name('forums.topics.destroy');
         Route::post('/like', LikeController::class)->name('like');
         Route::get('/payment-methods', PaymentMethodController::class)->name('payment-methods');

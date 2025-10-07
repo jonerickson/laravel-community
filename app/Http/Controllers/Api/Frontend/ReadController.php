@@ -46,7 +46,7 @@ class ReadController extends Controller
         );
     }
 
-    private function resolveReadable(string $type, int $id)
+    private function resolveReadable(string $type, int $id): Topic|Post|Forum|Announcement|null
     {
         return match ($type) {
             'topic' => Topic::find($id),

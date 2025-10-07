@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Forums\CategoryController;
-use App\Http\Controllers\Forums\FollowController;
 use App\Http\Controllers\Forums\ForumController;
 use App\Http\Controllers\Forums\PostController;
 use App\Http\Controllers\Forums\TopicController;
@@ -22,9 +21,6 @@ Route::group(['prefix' => 'forums', 'as' => 'forums.'], function (): void {
         Route::patch('/{forum:slug}/topics/{topic:slug}/posts/{post:slug}', [PostController::class, 'update'])->name('posts.update');
         Route::delete('/{forum:slug}/topics/{topic:slug}/posts/{post:slug}', [PostController::class, 'destroy'])->name('posts.destroy');
         Route::post('/{forum:slug}/topics/{topic:slug}/reply', [PostController::class, 'store'])->name('posts.store');
-
-        Route::post('/follow/{type}/{id}', [FollowController::class, 'store'])->name('follow');
-        Route::delete('/follow/{type}/{id}', [FollowController::class, 'destroy'])->name('unfollow');
     });
 
     Route::get('/{forum:slug}/topics/{topic:slug}', [TopicController::class, 'show'])->name('topics.show');

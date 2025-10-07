@@ -74,7 +74,7 @@ class ApproveController extends Controller
         );
     }
 
-    private function resolveApprovable(string $type, int $id)
+    private function resolveApprovable(string $type, int $id): Post|Comment|null
     {
         return match ($type) {
             'post' => Post::find($id),

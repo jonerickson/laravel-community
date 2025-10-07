@@ -54,7 +54,7 @@ class LikeController extends Controller
         );
     }
 
-    private function resolveLikeable(string $type, int $id)
+    private function resolveLikeable(string $type, int $id): Post|Comment|null
     {
         return match ($type) {
             'post' => Post::find($id),

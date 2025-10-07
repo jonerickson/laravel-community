@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
+import { useApiRequest } from '@/hooks';
 import { router, usePage } from '@inertiajs/react';
 import { Bell, BellOff } from 'lucide-react';
-import { useState } from 'react';
 import { route } from 'ziggy-js';
 
 interface FollowButtonProps {
@@ -15,25 +15,31 @@ interface FollowButtonProps {
 
 export function FollowButton({ type, id, isFollowing, followersCount, variant = 'outline', size = 'default' }: FollowButtonProps) {
     const { auth } = usePage<App.Data.SharedData>().props;
-    const [loading, setLoading] = useState(false);
+    const { execute, loading } = useApiRequest();
 
     if (!auth || !auth.user) {
         return null;
     }
 
-    const handleToggleFollow = () => {
-        setLoading(true);
+    const handleToggleFollow = async () => {
+        const url = isFollowing ? route('api.follow.destroy') : route('api.follow.store');
+        const method = isFollowing ? 'DELETE' : 'POST';
 
-        const routeName = isFollowing ? 'forums.unfollow' : 'forums.follow';
-
-        router.visit(route(routeName, { type, id }), {
-            method: isFollowing ? 'delete' : 'post',
-            preserveScroll: true,
-            preserveState: true,
-            onFinish: () => {
-                setLoading(false);
+        await execute(
+            {
+                url,
+                method,
+                data: {
+                    type: type,
+                    id: id,
+                },
             },
-        });
+            {
+                onSuccess: () => {
+                    router.reload();
+                },
+            },
+        );
     };
 
     return (
