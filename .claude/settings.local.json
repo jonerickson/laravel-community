@@ -6,11 +6,11 @@
       "mcp__laravel-boost__list-artisan-commands",
       "mcp__playwright__browser_take_screenshot",
       "mcp__playwright__browser_navigate",
-      "Read(//Users/jonerickson/Downloads/**)",
       "Bash(mv:*)",
       "mcp__laravel-boost__browser-logs",
       "mcp__laravel-boost__tinker",
-      "Bash(npm run types:*)"
+      "Bash(npm run types:*)",
+      "Bash(php artisan make:*)"
     ],
     "deny": []
   },

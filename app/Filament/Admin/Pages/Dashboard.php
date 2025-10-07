@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Pages;
 
+use App\Filament\Admin\Resources\Orders\Widgets\OrdersAnalyticsChart;
 use App\Filament\Admin\Resources\Orders\Widgets\OrderStatsOverview;
 use App\Filament\Admin\Resources\Orders\Widgets\RecentOrdersTable;
 use App\Filament\Admin\Resources\Orders\Widgets\RecentSubscriptionsTable;
@@ -53,6 +54,7 @@ class Dashboard extends BaseDashboard
     {
         return [
             OrderStatsOverview::make(),
+            OrdersAnalyticsChart::make(),
             RecentOrdersTable::make(),
             TopProductsTable::make(),
         ];
