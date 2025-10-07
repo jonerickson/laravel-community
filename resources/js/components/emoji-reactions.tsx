@@ -16,7 +16,6 @@ interface EmojiReactionsProps {
 }
 
 const AVAILABLE_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '😡'];
-const MOBILE_EMOJIS = ['👍'];
 const MOBILE_DROPDOWN_EMOJIS = ['❤️', '😂', '😮', '😢', '😡'];
 
 export default function EmojiReactions({ post, comment, initialReactions = [], userReactions = [], className = '' }: EmojiReactionsProps) {
@@ -180,9 +179,7 @@ export default function EmojiReactions({ post, comment, initialReactions = [], u
                     size="sm"
                     disabled={loading}
                     className="gap-0"
-                >
-                    {MOBILE_EMOJIS.map((emoji) => renderEmojiButton(emoji))}
-                </ToggleGroup>
+                ></ToggleGroup>
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -191,7 +188,7 @@ export default function EmojiReactions({ post, comment, initialReactions = [], u
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-32">
-                        {MOBILE_DROPDOWN_EMOJIS.map((emoji) => {
+                        {AVAILABLE_EMOJIS.map((emoji) => {
                             const reaction = reactionMap[emoji];
                             const count = reaction?.count || 0;
                             const hasReactions = count > 0;
