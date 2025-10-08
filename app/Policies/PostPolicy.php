@@ -30,8 +30,9 @@ class PostPolicy
     public function view(?User $user, Post $post, ?Forum $forum = null, ?Topic $topic = null): bool
     {
         return Gate::forUser($user)->check('view_posts')
-            && (! $post->is_reported || ($post->is_reported && (($user && $post->isAuthoredBy($user)) || Gate::forUser($user)->check('report', $post))))
+            && ($post->is_approved || (! $post->is_approved && (($user && $post->isAuthoredBy($user)) || Gate::forUser($user)->check('approve', $post))))
             && ($post->is_published || (! $post->is_published && (($user && $post->isAuthoredBy($user)) || Gate::forUser($user)->check('publish', $post))))
+            && (! $post->is_reported || ($post->is_reported && (($user && $post->isAuthoredBy($user)) || Gate::forUser($user)->check('report', $post))))
             && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum))
             && (! $topic instanceof Topic || Gate::forUser($user)->check('view', $topic));
     }

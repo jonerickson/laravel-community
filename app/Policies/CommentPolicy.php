@@ -29,7 +29,7 @@ class CommentPolicy
     public function view(?User $user, Comment $comment, ?Model $commentable = null): bool
     {
         return Gate::forUser($user)->check('view_comments')
-            && ($comment->is_approved || (! $comment->is_approved && (($user && $comment->isAuthoredBy($user)) || Gate::forUser($user)->check('update', $comment))))
+            && ($comment->is_approved || (! $comment->is_approved && (($user && $comment->isAuthoredBy($user)) || Gate::forUser($user)->check('approve', $comment))))
             && (! $commentable instanceof Model || Gate::forUser($user)->check('view', $commentable));
     }
 

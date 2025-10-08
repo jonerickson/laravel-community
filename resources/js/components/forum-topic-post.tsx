@@ -24,7 +24,8 @@ interface ForumTopicPostProps {
 export default function ForumTopicPost({ post, index, forum, topic, onQuote }: ForumTopicPostProps) {
     const { can, hasAnyPermission, hasAllPermissions } = usePermissions();
 
-    const isHiddenForUser = (post.isReported || !post.isPublished) && !hasAllPermissions(['report_posts', 'publish_posts']);
+    const isHiddenForUser =
+        (post.isReported || !post.isPublished || !post.isApproved) && !hasAllPermissions(['report_posts', 'publish_posts', 'approve_posts']);
 
     if (isHiddenForUser) {
         return null;
