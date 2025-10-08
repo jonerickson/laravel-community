@@ -1,6 +1,5 @@
-import { ApiError } from '@/utils/api';
 import { router } from '@inertiajs/react';
-import axios, { type AxiosRequestConfig } from 'axios';
+import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { route } from 'ziggy-js';
@@ -59,18 +58,32 @@ export function useApiRequest<T>() {
 
             return responseData;
         } catch (error) {
-            const apiError = error as ApiError;
+            const apiError = error as AxiosError<App.Data.ApiData>;
 
-            if (apiError.statusCode === 401) {
+            if (apiError.status === 401) {
                 const currentPath = window.location.pathname + window.location.search;
                 const redirectUrl = route('login', { redirect: encodeURIComponent(currentPath) });
                 router.visit(redirectUrl);
                 return;
             }
 
+            const errorResponse = apiError.response?.data;
+            const errorMessage = errorResponse?.message || apiError.message || 'Something went wrong. Please try again.';
+
+            if (errorResponse?.errors) {
+                const firstErrorKey = Object.keys(errorResponse.errors)[0];
+                const firstError = errorResponse.errors[firstErrorKey]?.[0];
+                if (firstError) {
+                    toast.error(firstError);
+                } else {
+                    toast.error(errorMessage);
+                }
+            } else {
+                toast.error(errorMessage);
+            }
+
             onError?.(apiError);
             console.error('Error performing API request:', apiError);
-            toast.error(apiError.message || 'Something went wrong. Please try again.');
         } finally {
             setLoading(false);
             onSettled?.();

@@ -72,6 +72,14 @@ declare namespace App.Data {
         updatedAt: string | null;
         permissions: App.Data.PermissionData;
     };
+    export type CustomerData = {
+        id: string;
+        email: string;
+        name: string | null;
+        phone: string | null;
+        currency: string | null;
+        metadata: Array<string, unknown> | null;
+    };
     export type DownloadData = {
         id: string;
         name: string;
@@ -231,7 +239,7 @@ declare namespace App.Data {
         id: string;
         clientSecret: string;
         status: string;
-        customer: string;
+        customer: string | null;
         paymentMethodTypes: Array<string>;
         usage: string;
     };
