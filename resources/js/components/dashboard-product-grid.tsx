@@ -17,8 +17,8 @@ export default function DashboardProductGrid({ newestProduct, popularProduct, fe
     }
 
     return (
-        <div className="space-y-4">
-            <div className="flex items-center justify-between">
+        <div className="space-y-6">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h2 className="flex items-center gap-2 text-lg font-semibold">
                         <ShoppingCart className="size-4 text-destructive" />
@@ -30,7 +30,7 @@ export default function DashboardProductGrid({ newestProduct, popularProduct, fe
                     View store
                 </Link>
             </div>
-            <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+            <div className="grid auto-rows-min gap-6 md:grid-cols-3">
                 <div className="relative">
                     {newestProduct ? (
                         <DashboardProductCard product={newestProduct} type="newest" />

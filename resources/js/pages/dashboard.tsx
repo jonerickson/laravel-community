@@ -35,7 +35,7 @@ export default function Dashboard({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="relative flex h-full flex-1 flex-col gap-4 overflow-x-auto">
-                <div className="relative z-10 flex flex-col gap-4">
+                <div className="relative z-10 flex flex-col gap-6">
                     <DashboardProductGrid newestProduct={newestProduct} popularProduct={popularProduct} featuredProduct={featuredProduct} />
 
                     <Deferred fallback={<WidgetLoading />} data={'latestBlogPosts'}>

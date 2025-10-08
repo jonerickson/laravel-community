@@ -63,7 +63,7 @@ export default function DashboardProductCard({ product, type, className }: Dashb
                 </div>
             </CardHeader>
 
-            <CardContent className="relative space-y-4">
+            <CardContent className="relative space-y-6">
                 <div className="aspect-[4/3] overflow-hidden rounded-md bg-muted">
                     {product.featuredImageUrl ? (
                         <img
@@ -90,7 +90,7 @@ export default function DashboardProductCard({ product, type, className }: Dashb
             </CardContent>
 
             <CardFooter className="relative pt-1">
-                <Button asChild className="h-7 w-full" size="sm">
+                <Button asChild className="w-full">
                     <Link href={route('store.products.show', { product: product.slug })}>View product</Link>
                 </Button>
             </CardFooter>
