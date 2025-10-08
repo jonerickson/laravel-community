@@ -7,12 +7,11 @@ import { route } from 'ziggy-js';
 
 interface BlogShowProps {
     post: App.Data.PostData;
-    comments: App.Data.CommentData[];
-    commentsPagination: App.Data.PaginatedData;
+    comments: App.Data.PaginatedData<App.Data.CommentData>;
     recentViewers: App.Data.RecentViewerData[];
 }
 
-export default function BlogShow({ post, comments, commentsPagination, recentViewers }: BlogShowProps) {
+export default function BlogShow({ post, comments, recentViewers }: BlogShowProps) {
     const { name: siteName } = usePage<App.Data.SharedData>().props;
     const pageDescription = post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, '') + '...';
 
@@ -95,7 +94,7 @@ export default function BlogShow({ post, comments, commentsPagination, recentVie
             </Head>
 
             <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto">
-                <BlogPost post={post} comments={comments} commentsPagination={commentsPagination} recentViewers={recentViewers} />
+                <BlogPost post={post} comments={comments} recentViewers={recentViewers} />
             </div>
         </AppLayout>
     );

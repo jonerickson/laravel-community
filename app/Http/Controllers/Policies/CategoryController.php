@@ -32,7 +32,7 @@ class CategoryController extends Controller
             ->filter(fn (PolicyCategory $category) => Gate::check('view', $category))
             ->values();
 
-        return Inertia::render('policies/index', [
+        return Inertia::render('policies/categories/index', [
             'categories' => PolicyCategoryData::collect($categories),
         ]);
     }
@@ -49,7 +49,7 @@ class CategoryController extends Controller
             ->filter(fn (Policy $policy) => Gate::check('view', $policy))
             ->values();
 
-        return Inertia::render('policies/category', [
+        return Inertia::render('policies/categories/show', [
             'category' => PolicyCategoryData::from($category),
             'policies' => PolicyData::collect($policies),
         ]);

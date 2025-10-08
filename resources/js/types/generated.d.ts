@@ -201,14 +201,15 @@ declare namespace App.Data {
         createdAt: string | null;
         updatedAt: string | null;
     };
-    export type PaginatedData = {
+    export type PaginatedData<T = unknown> = {
+        data: Array<T>;
         currentPage: number;
         lastPage: number;
         perPage: number;
         total: number;
         from: number | null;
         to: number | null;
-        links: App.Data.PaginatedLinkData;
+        links: App.Data.PaginatedLinkData | null;
     };
     export type PaginatedLinkData = {
         first: string | null;

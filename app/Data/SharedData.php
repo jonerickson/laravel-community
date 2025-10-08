@@ -21,13 +21,13 @@ class SharedData extends Data
 
     public string $name;
 
-    public ?string $email;
+    public ?string $email = null;
 
-    public ?string $phone;
+    public ?string $phone = null;
 
-    public ?string $address;
+    public ?string $address = null;
 
-    public ?string $slogan;
+    public ?string $slogan = null;
 
     public ?int $cartCount = null;
 

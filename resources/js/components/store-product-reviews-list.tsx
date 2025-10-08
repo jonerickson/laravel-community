@@ -1,15 +1,14 @@
 import { StarRating } from '@/components/star-rating';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Pagination } from '@/components/ui/pagination';
+import { InfiniteScroll } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface ProductReviewsListProps {
-    reviews: App.Data.CommentData[];
-    reviewsPagination: App.Data.PaginatedData;
+    reviews: App.Data.PaginatedData<App.Data.CommentData>;
 }
 
-export function StoreProductReviewsList({ reviews, reviewsPagination }: ProductReviewsListProps) {
-    if (!reviews || reviews.length === 0) {
+export function StoreProductReviewsList({ reviews }: ProductReviewsListProps) {
+    if (!reviews || reviews.data.length === 0) {
         return (
             <div className="py-8 text-center text-sm text-muted-foreground">
                 <p>No reviews yet. Be the first to review this product!</p>
@@ -18,10 +17,10 @@ export function StoreProductReviewsList({ reviews, reviewsPagination }: ProductR
     }
 
     return (
-        <div>
+        <InfiniteScroll data="reviews">
             <div className="space-y-6 divide-y divide-muted">
-                {reviews.map((review) => (
-                    <div key={review.id} className="pb-6 last:pb-0">
+                {reviews.data.map((review) => (
+                    <div key={review.id} className="pb-6">
                         <div className="flex items-start gap-3">
                             {review.author && (
                                 <Avatar className="h-10 w-10">
@@ -43,10 +42,6 @@ export function StoreProductReviewsList({ reviews, reviewsPagination }: ProductR
                     </div>
                 ))}
             </div>
-
-            <div className="pb-6">
-                <Pagination pagination={reviewsPagination} baseUrl={''} entityLabel={'review'} />
-            </div>
-        </div>
+        </InfiniteScroll>
     );
 }

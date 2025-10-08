@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Store;
 
-use App\Data\PaginatedData;
+use App\Data\CommentData;
 use App\Data\ProductData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Store\StoreProductRequest;
+use App\Models\Price;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\LaravelData\PaginatedDataCollection;
 
 class ProductController extends Controller
 {
@@ -65,20 +66,19 @@ class ProductController extends Controller
     {
         $this->authorize('view', $product);
 
-        $perPage = $request->input('per_page', 5);
+        $reviews = CommentData::collect($product
+            ->reviews()
+            ->latest()
+            ->get()
+            ->all(), PaginatedDataCollection::class);
 
-        $reviews = $product->reviews()->latest()->paginate(
-            perPage: $perPage
-        );
-
-        $product->load(['prices' => function (HasMany $query): void {
+        $product->load(['prices' => function (HasMany|Price $query): void {
             $query->active();
         }]);
 
         return Inertia::render('store/products/show', [
             'product' => ProductData::from($product),
-            'reviews' => Inertia::defer(fn () => $reviews->items()),
-            'reviewsPagination' => PaginatedData::from(Arr::except($reviews->toArray(), ['data'])),
+            'reviews' => Inertia::scroll(fn () => $reviews->items()),
         ]);
     }
 }

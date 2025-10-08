@@ -5,12 +5,11 @@ import ForumTopicPost from '@/components/forum-topic-post';
 import ForumTopicReply from '@/components/forum-topic-reply';
 import RecentViewers from '@/components/recent-viewers';
 import { Button } from '@/components/ui/button';
-import { Pagination } from '@/components/ui/pagination';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
-import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
+import { Deferred, Head, InfiniteScroll, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, ArrowDown, ArrowLeft, Clock, Eye, EyeOff, Lock, MessageSquare, Pin, Reply, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -20,12 +19,11 @@ import usePermissions from '../../../hooks/use-permissions';
 interface TopicShowProps {
     forum: App.Data.ForumData;
     topic: App.Data.TopicData;
-    posts: App.Data.PostData[];
-    postsPagination: App.Data.PaginatedData;
+    posts: App.Data.PaginatedData<App.Data.PostData>;
     recentViewers: App.Data.RecentViewerData[];
 }
 
-export default function ForumTopicShow({ forum, topic, posts, postsPagination, recentViewers }: TopicShowProps) {
+export default function ForumTopicShow({ forum, topic, posts, recentViewers }: TopicShowProps) {
     const { can } = usePermissions();
     const { name: siteName } = usePage<App.Data.SharedData>().props;
     const [showReplyForm, setShowReplyForm] = useState(false);
@@ -68,7 +66,7 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
 
     const goToLatestPost = () => {
         router.reload({
-            data: { page: postsPagination.lastPage },
+            data: { page: posts.lastPage },
             only: ['posts', 'postsPagination'],
             onSuccess: () => {
                 setTimeout(() => {
@@ -153,7 +151,7 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
             },
         ],
         commentCount: topic.postsCount || 0,
-        comment: posts
+        comment: posts.data
             .filter((post) => post.author)
             .map((post) => ({
                 '@type': 'Comment',
@@ -180,7 +178,7 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                 <meta property="article:modified_time" content={topic.updatedAt || undefined} />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex flex-col items-start justify-between gap-2 sm:flex-row">
                     <div className="mb-4 flex w-full items-start justify-between gap-2">
                         <div className="flex-1">
@@ -218,7 +216,7 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                     </div>
                 </div>
 
-                <div className="hidden items-center gap-4 text-sm text-muted-foreground sm:flex md:-mt-4">
+                <div className="hidden items-center gap-4 text-sm text-muted-foreground sm:flex md:-mt-6">
                     <div className="flex items-center gap-1">
                         <User className="size-4" />
                         <span>Started by {topic.author.name}</span>
@@ -252,35 +250,25 @@ export default function ForumTopicShow({ forum, topic, posts, postsPagination, r
                     />
                 )}
 
-                <Pagination
-                    pagination={postsPagination}
-                    baseUrl={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
-                    entityLabel="post"
-                    className="hidden md:flex"
-                />
-
-                {posts.length > 0 ? (
-                    <div className="grid gap-4">
-                        {posts.map((post, index) => (
-                            <ForumTopicPost key={post.id} post={post} index={index} forum={forum} topic={topic} onQuote={handleQuotePost} />
-                        ))}
-                    </div>
-                ) : (
-                    <EmptyState icon={<MessageSquare />} title="No posts yet" description="This topic doesn't have any posts yet." />
-                )}
+                <div className="mt-2">
+                    {posts.data.length > 0 ? (
+                        <InfiniteScroll data="posts">
+                            <div className="grid gap-6">
+                                {posts.data.map((post, index) => (
+                                    <ForumTopicPost key={post.id} post={post} index={index} forum={forum} topic={topic} onQuote={handleQuotePost} />
+                                ))}
+                            </div>
+                        </InfiniteScroll>
+                    ) : (
+                        <EmptyState icon={<MessageSquare />} title="No posts yet" description="This topic doesn't have any posts yet." />
+                    )}
+                </div>
 
                 <Deferred fallback={null} data="recentViewers">
                     <RecentViewers viewers={recentViewers} />
                 </Deferred>
 
-                {can('reply_topics') && !topic.isLocked && posts.length > 0 && <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} />}
-
-                <Pagination
-                    pagination={postsPagination}
-                    baseUrl={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
-                    entityLabel="post"
-                    className="pb-4"
-                />
+                {can('reply_topics') && !topic.isLocked && posts.data.length > 0 && <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} />}
 
                 <div className="flex justify-start py-4">
                     <Link

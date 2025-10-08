@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Forums;
 
 use App\Data\ForumData;
-use App\Data\PaginatedData;
 use App\Data\TopicData;
 use App\Http\Controllers\Controller;
 use App\Models\Forum;
 use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -40,8 +38,7 @@ class ForumController extends Controller
 
         return Inertia::render('forums/show', [
             'forum' => ForumData::from($forum),
-            'topics' => Inertia::merge(fn () => $topics->items()->items()),
-            'topicsPagination' => PaginatedData::from(Arr::except($topics->items()->toArray(), ['data'])),
+            'topics' => Inertia::scroll(fn () => $topics->items()),
         ]);
     }
 }

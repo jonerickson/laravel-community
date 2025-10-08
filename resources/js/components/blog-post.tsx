@@ -3,7 +3,6 @@ import EmojiReactions from '@/components/emoji-reactions';
 import RecentViewers from '@/components/recent-viewers';
 import RichEditorContent from '@/components/rich-editor-content';
 import { Badge } from '@/components/ui/badge';
-import { Spinner } from '@/components/ui/spinner';
 import { UserInfo } from '@/components/user-info';
 import { pluralize } from '@/lib/utils';
 import { Deferred } from '@inertiajs/react';
@@ -12,12 +11,11 @@ import usePermissions from '../hooks/use-permissions';
 
 interface BlogPostProps {
     post: App.Data.PostData;
-    comments: App.Data.CommentData[];
-    commentsPagination: App.Data.PaginatedData;
+    comments: App.Data.PaginatedData<App.Data.CommentData>;
     recentViewers: App.Data.RecentViewerData[];
 }
 
-export default function BlogPost({ post, comments, commentsPagination, recentViewers }: BlogPostProps) {
+export default function BlogPost({ post, comments, recentViewers }: BlogPostProps) {
     const { can } = usePermissions();
     const publishedDate = new Date(post.publishedAt || post.createdAt || new Date());
     const formattedDate = publishedDate.toLocaleDateString('en-US', {
@@ -127,16 +125,7 @@ export default function BlogPost({ post, comments, commentsPagination, recentVie
 
                 {post.commentsEnabled && (
                     <section className="mt-8 border-t pt-6" aria-label="Comments section">
-                        <Deferred
-                            fallback={
-                                <div className="flex items-center justify-center" role="status" aria-live="polite" aria-label="Loading comments">
-                                    <Spinner />
-                                </div>
-                            }
-                            data="comments"
-                        >
-                            <BlogComments post={post} comments={comments} commentsPagination={commentsPagination} />
-                        </Deferred>
+                        <BlogComments post={post} comments={comments} />
                     </section>
                 )}
             </footer>

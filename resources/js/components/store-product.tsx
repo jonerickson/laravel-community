@@ -14,11 +14,10 @@ import { useEffect, useState } from 'react';
 
 interface ProductProps {
     product: App.Data.ProductData;
-    reviews: App.Data.CommentData[];
-    reviewsPagination: App.Data.PaginatedData;
+    reviews: App.Data.PaginatedData<App.Data.CommentData>;
 }
 
-export default function Product({ product: productData, reviews, reviewsPagination }: ProductProps) {
+export default function Product({ product: productData, reviews }: ProductProps) {
     const { auth } = usePage<App.Data.SharedData>().props;
     const [selectedPriceId, setSelectedPriceId] = useState<number | null>(productData?.defaultPrice?.id || null);
     const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
@@ -98,7 +97,7 @@ export default function Product({ product: productData, reviews, reviewsPaginati
                                         <DialogDescription>View the latest product reviews and ratings.</DialogDescription>
                                     </DialogHeader>
                                     <div className="pt-4">
-                                        <StoreProductReviewsList reviews={reviews || []} reviewsPagination={reviewsPagination} />
+                                        <StoreProductReviewsList reviews={reviews} />
 
                                         {auth?.user && (
                                             <div className="border-t border-muted pt-6">

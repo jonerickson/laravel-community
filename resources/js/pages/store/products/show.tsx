@@ -5,11 +5,10 @@ import { Head } from '@inertiajs/react';
 
 interface ProductPageProps {
     product: App.Data.ProductData;
-    reviews: App.Data.CommentData[];
-    reviewsPagination: App.Data.PaginatedData;
+    reviews: App.Data.PaginatedData<App.Data.CommentData>;
 }
 
-export default function StoreProductShow({ product, reviews, reviewsPagination }: ProductPageProps) {
+export default function StoreProductShow({ product, reviews }: ProductPageProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Store',
@@ -25,7 +24,7 @@ export default function StoreProductShow({ product, reviews, reviewsPagination }
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={product.name} />
             <div className="py-2">
-                <Product product={product} reviews={reviews} reviewsPagination={reviewsPagination} />
+                <Product product={product} reviews={reviews} />
             </div>
         </AppLayout>
     );

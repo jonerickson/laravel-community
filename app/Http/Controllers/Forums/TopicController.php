@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Forums;
 
 use App\Actions\Forums\DeleteTopicAction;
 use App\Data\ForumData;
-use App\Data\PaginatedData;
 use App\Data\PostData;
 use App\Data\RecentViewerData;
 use App\Data\TopicData;
@@ -19,7 +18,6 @@ use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -90,7 +88,7 @@ class TopicController extends Controller
             ->posts()
             ->with(['author', 'comments.author', 'comments.replies.author', 'reports'])
             ->latestActivity()
-            ->paginate(10)
+            ->get()
             ->filter(fn (Post $post) => Gate::check('view', [$post, $forum, $topic]))
             ->values()
             ->all(), PaginatedDataCollection::class);
@@ -98,8 +96,7 @@ class TopicController extends Controller
         return Inertia::render('forums/topics/show', [
             'forum' => ForumData::from($forum),
             'topic' => TopicData::from($topic),
-            'posts' => Inertia::merge(fn () => $posts->items()->items()),
-            'postsPagination' => PaginatedData::from(Arr::except($posts->items()->toArray(), ['data'])),
+            'posts' => Inertia::scroll(fn () => $posts->items()),
             'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($topic->getRecentViewers())),
         ]);
     }

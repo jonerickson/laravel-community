@@ -4,11 +4,10 @@ import RichEditorContent from '@/components/rich-editor-content';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Pagination } from '@/components/ui/pagination';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { formatPriority, formatStatus, getPriorityVariant, getStatusVariant } from '@/utils/support-ticket';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, InfiniteScroll, Link, router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Calendar, Clock, Flag, HelpCircle, Plus, Tag, Ticket, User } from 'lucide-react';
 
@@ -20,11 +19,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface SupportTicketsIndexProps {
-    tickets: App.Data.SupportTicketData[];
-    ticketsPagination: App.Data.PaginatedData;
+    tickets: App.Data.PaginatedData<App.Data.SupportTicketData>;
 }
 
-export default function SupportTicketsIndex({ tickets, ticketsPagination }: SupportTicketsIndexProps) {
+export default function SupportTicketsIndex({ tickets }: SupportTicketsIndexProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Support tickets" />
@@ -49,71 +47,73 @@ export default function SupportTicketsIndex({ tickets, ticketsPagination }: Supp
                     </div>
                 </div>
 
-                {tickets.length > 0 ? (
-                    <>
-                        <div className="grid gap-4">
-                            {tickets.map((ticket) => (
-                                <Card key={ticket.id} className="transition-shadow hover:shadow-md">
-                                    <CardHeader className="pb-3">
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div className="space-y-1">
-                                                <CardTitle className="flex items-center gap-2">
-                                                    <Ticket className="size-4" />
-                                                    <Link href={route('support.show', ticket.id)} className="hover:underline">
-                                                        #{ticket.id} - {ticket.subject}
-                                                    </Link>
-                                                </CardTitle>
-                                                <CardDescription className="line-clamp-2">
-                                                    <RichEditorContent content={ticket.description} />
-                                                </CardDescription>
+                <div>
+                    {tickets.data.length > 0 ? (
+                        <InfiniteScroll data="tickets">
+                            <div className="grid gap-6">
+                                {tickets.data.map((ticket) => (
+                                    <Card key={ticket.id} className="transition-shadow hover:shadow-md">
+                                        <CardHeader className="pb-3">
+                                            <div className="flex items-start justify-between gap-4">
+                                                <div className="space-y-1">
+                                                    <CardTitle className="flex items-center gap-2">
+                                                        <Ticket className="size-4" />
+                                                        <Link href={route('support.show', ticket.id)} className="hover:underline">
+                                                            #{ticket.id} - {ticket.subject}
+                                                        </Link>
+                                                    </CardTitle>
+                                                    <CardDescription className="line-clamp-2">
+                                                        <RichEditorContent content={ticket.description} />
+                                                    </CardDescription>
+                                                </div>
+                                                <div className="flex shrink-0 items-center gap-2">
+                                                    <Badge variant={getStatusVariant(ticket.status)}>
+                                                        <Clock className="size-3" />
+                                                        {formatStatus(ticket.status)}
+                                                    </Badge>
+                                                    <Badge variant={getPriorityVariant(ticket.priority)}>
+                                                        <Flag className="size-3" />
+                                                        {formatPriority(ticket.priority)}
+                                                    </Badge>
+                                                </div>
                                             </div>
-                                            <div className="flex shrink-0 items-center gap-2">
-                                                <Badge variant={getStatusVariant(ticket.status)}>
-                                                    <Clock className="size-3" />
-                                                    {formatStatus(ticket.status)}
-                                                </Badge>
-                                                <Badge variant={getPriorityVariant(ticket.priority)}>
-                                                    <Flag className="size-3" />
-                                                    {formatPriority(ticket.priority)}
-                                                </Badge>
+                                        </CardHeader>
+                                        <CardContent className="pt-0">
+                                            <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground lg:grid-cols-4">
+                                                <div className="flex items-center gap-2">
+                                                    <Tag className="size-4" />
+                                                    <span>{ticket.category?.name}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <User className="size-4" />
+                                                    <span>{ticket.author?.name}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Calendar className="size-4" />
+                                                    <span>{ticket.createdAt ? format(new Date(ticket.createdAt), 'MMM d, yyyy') : 'N/A'}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Clock className="size-4" />
+                                                    <span>
+                                                        Updated {ticket.updatedAt ? format(new Date(ticket.updatedAt), 'MMM d, yyyy') : 'N/A'}
+                                                    </span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent className="pt-0">
-                                        <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground lg:grid-cols-4">
-                                            <div className="flex items-center gap-2">
-                                                <Tag className="size-4" />
-                                                <span>{ticket.category?.name}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <User className="size-4" />
-                                                <span>{ticket.author?.name}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Calendar className="size-4" />
-                                                <span>{ticket.createdAt ? format(new Date(ticket.createdAt), 'MMM d, yyyy') : 'N/A'}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Clock className="size-4" />
-                                                <span>Updated {ticket.updatedAt ? format(new Date(ticket.updatedAt), 'MMM d, yyyy') : 'N/A'}</span>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-
-                        <Pagination pagination={ticketsPagination} baseUrl={''} entityLabel={'ticket'} />
-                    </>
-                ) : (
-                    <EmptyState
-                        icon={<Ticket />}
-                        title="No support tickets found"
-                        description="You haven't created any support tickets yet. Create one to get help from our support team."
-                        buttonText="Create Your First Ticket"
-                        onButtonClick={() => router.get(route('support.create'))}
-                    />
-                )}
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
+                        </InfiniteScroll>
+                    ) : (
+                        <EmptyState
+                            icon={<Ticket />}
+                            title="No support tickets found"
+                            description="You haven't created any support tickets yet. Create one to get help from our support team."
+                            buttonText="Create Your First Ticket"
+                            onButtonClick={() => router.get(route('support.create'))}
+                        />
+                    )}
+                </div>
 
                 <Card>
                     <CardHeader>

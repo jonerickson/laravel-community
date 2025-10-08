@@ -6,13 +6,12 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Pagination } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useApiRequest } from '@/hooks/use-api-request';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { stripCharacters } from '@/utils/truncate';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, InfiniteScroll, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, Circle, Eye, EyeOff, LibraryBig, Lock, MessageSquare, Pin, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -21,14 +20,13 @@ import usePermissions from '../../hooks/use-permissions';
 
 interface ForumShowProps {
     forum: App.Data.ForumData;
-    topics: App.Data.TopicData[];
-    topicsPagination: App.Data.PaginatedData;
+    topics: App.Data.PaginatedData<App.Data.TopicData>;
 }
 
-export default function ForumShow({ forum, topics: initialTopics, topicsPagination }: ForumShowProps) {
+export default function ForumShow({ forum, topics: initialTopics }: ForumShowProps) {
     const { can, hasAnyPermission } = usePermissions();
     const { name: siteName } = usePage<App.Data.SharedData>().props;
-    const [topics, setTopics] = useState<App.Data.TopicData[]>(initialTopics);
+    const [topics, setTopics] = useState<App.Data.TopicData[]>(initialTopics.data);
     const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
     const { loading: isDeleting, execute: executeBulkDelete } = useApiRequest();
 
@@ -204,8 +202,8 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                 )}
 
                 {topics.length > 0 ? (
-                    <>
-                        <div className="rounded-md border">
+                    <div className="rounded-md border">
+                        <InfiniteScroll data="topics">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
@@ -314,15 +312,8 @@ export default function ForumShow({ forum, topics: initialTopics, topicsPaginati
                                     ))}
                                 </TableBody>
                             </Table>
-                        </div>
-
-                        <Pagination
-                            pagination={topicsPagination}
-                            baseUrl={route('forums.show', { forum: forum.slug })}
-                            entityLabel="topic"
-                            className="py-4"
-                        />
-                    </>
+                        </InfiniteScroll>
+                    </div>
                 ) : (
                     <EmptyState icon={<LibraryBig />} title="No topics yet" description="Be the first to start a discussion in this forum." />
                 )}

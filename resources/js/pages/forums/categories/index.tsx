@@ -107,7 +107,7 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                 </div>
 
                 {categories.length > 0 ? (
-                    <div className="grid gap-4">
+                    <div className="grid gap-6">
                         {categories.map((category) => (
                             <Card key={category.id} className="overflow-hidden py-0 transition-shadow hover:shadow-sm">
                                 <CardContent className="p-0">

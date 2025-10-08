@@ -1,11 +1,9 @@
 import BlogIndexItem from '@/components/blog-index-item';
 import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
-import HeadingSmall from '@/components/heading-small';
-import { Spinner } from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { Head, usePage, WhenVisible } from '@inertiajs/react';
+import { Head, InfiniteScroll, usePage } from '@inertiajs/react';
 import { Newspaper } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -16,11 +14,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface BlogIndexProps {
-    posts: App.Data.PostData[];
-    postsPagination: App.Data.PaginatedData;
+    posts: App.Data.PaginatedData<App.Data.PostData>;
 }
 
-export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
+export default function BlogIndex({ posts }: BlogIndexProps) {
     const { name: siteName } = usePage<App.Data.SharedData>().props;
 
     const structuredData = {
@@ -43,7 +40,7 @@ export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
                 item: breadcrumb.href,
             })),
         },
-        blogPost: posts.map((post) => ({
+        blogPost: posts.data.map((post) => ({
             '@type': 'BlogPosting',
             headline: post.title,
             description: post.excerpt || post.title,
@@ -90,35 +87,14 @@ export default function BlogIndex({ posts, postsPagination }: BlogIndexProps) {
                 </div>
 
                 <div className="-mt-8">
-                    {posts.length > 0 ? (
-                        <>
+                    {posts.data.length > 0 ? (
+                        <InfiniteScroll data="posts" loading={() => 'Loading more users...'}>
                             <div className="mx-auto grid max-w-2xl grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-                                {posts.map((post) => (
+                                {posts.data.map((post) => (
                                     <BlogIndexItem key={post.id} post={post} />
                                 ))}
                             </div>
-
-                            <WhenVisible
-                                fallback={<></>}
-                                always={postsPagination.currentPage < postsPagination.lastPage}
-                                params={{
-                                    data: {
-                                        page: postsPagination.currentPage + 1,
-                                    },
-                                    only: ['posts', 'postsPagination'],
-                                }}
-                            >
-                                {postsPagination.currentPage >= postsPagination.lastPage ? (
-                                    <div className="flex items-center justify-center py-8 text-center">
-                                        <HeadingSmall title="There are no more blog posts." description="Check back later." />
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center justify-center py-8">
-                                        <Spinner />
-                                    </div>
-                                )}
-                            </WhenVisible>
-                        </>
+                        </InfiniteScroll>
                     ) : (
                         <EmptyState icon={<Newspaper />} title="No blog posts" description="Check back later to catch the latest updates." />
                     )}

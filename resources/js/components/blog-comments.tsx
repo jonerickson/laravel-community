@@ -2,19 +2,17 @@ import EmojiReactions from '@/components/emoji-reactions';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { Pagination } from '@/components/ui/pagination';
 import { Textarea } from '@/components/ui/textarea';
 import { UserInfo } from '@/components/user-info';
 import { cn } from '@/lib/utils';
-import { useForm } from '@inertiajs/react';
+import { InfiniteScroll, useForm } from '@inertiajs/react';
 import { Edit, MessageCircle, Reply, Trash } from 'lucide-react';
 import { useState } from 'react';
 import usePermissions from '../hooks/use-permissions';
 
 interface BlogCommentsProps {
     post: App.Data.PostData;
-    comments: App.Data.CommentData[];
-    commentsPagination: App.Data.PaginatedData;
+    comments: App.Data.PaginatedData<App.Data.CommentData>;
 }
 
 interface CommentItemProps {
@@ -222,7 +220,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
     );
 }
 
-export default function BlogComments({ post, comments, commentsPagination }: BlogCommentsProps) {
+export default function BlogComments({ post, comments }: BlogCommentsProps) {
     const { can } = usePermissions();
     const [replyingTo, setReplyingTo] = useState<number | null>(null);
     const {
@@ -246,7 +244,7 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
         });
     };
 
-    const topLevelComments = comments.filter((comment) => !comment.parentId) || [];
+    const topLevelComments = comments.data.filter((comment) => !comment.parentId) || [];
 
     if (!post.commentsEnabled) {
         return (
@@ -267,7 +265,7 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
         <div className="space-y-6">
             <div className="flex items-center gap-2">
                 <MessageCircle className="size-5" />
-                <HeadingSmall title={`Comments (${comments.length || 0})`} />
+                <HeadingSmall title={`Comments (${comments.data.length || 0})`} />
             </div>
 
             {can('create_comments') && (
@@ -289,13 +287,13 @@ export default function BlogComments({ post, comments, commentsPagination }: Blo
             )}
 
             {topLevelComments.length > 0 ? (
-                <div className="space-y-6">
-                    {topLevelComments.map((comment) => (
-                        <CommentItem key={comment.id} post={post} comment={comment} onReply={setReplyingTo} replyingTo={replyingTo} />
-                    ))}
-
-                    <Pagination pagination={commentsPagination} baseUrl={route('blog.show', { post: post.slug })} entityLabel="comment" />
-                </div>
+                <InfiniteScroll data="comments">
+                    <div className="space-y-6">
+                        {topLevelComments.map((comment) => (
+                            <CommentItem key={comment.id} post={post} comment={comment} onReply={setReplyingTo} replyingTo={replyingTo} />
+                        ))}
+                    </div>
+                </InfiniteScroll>
             ) : (
                 <div className="py-8 text-center text-muted-foreground">
                     <MessageCircle className="mx-auto mb-2 h-8 w-8" />

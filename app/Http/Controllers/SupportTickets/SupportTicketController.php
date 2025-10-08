@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers\SupportTickets;
 
 use App\Data\OrderData;
-use App\Data\PaginatedData;
 use App\Data\SupportTicketCategoryData;
 use App\Data\SupportTicketData;
 use App\Http\Controllers\Controller;
@@ -17,7 +16,6 @@ use App\Models\SupportTicket;
 use App\Models\SupportTicketCategory;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -47,8 +45,7 @@ class SupportTicketController extends Controller
             ->all(), PaginatedDataCollection::class);
 
         return Inertia::render('support/index', [
-            'tickets' => Inertia::merge(fn () => $tickets->items()->items()),
-            'ticketsPagination' => PaginatedData::from(Arr::except($tickets->items()->toArray(), ['data'])),
+            'tickets' => Inertia::scroll(fn () => $tickets->items()),
         ]);
     }
 

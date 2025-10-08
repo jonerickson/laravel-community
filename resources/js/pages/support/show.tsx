@@ -106,7 +106,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                     </div>
                 </div>
 
-                <div className="grid gap-4 lg:grid-cols-4">
+                <div className="grid gap-6 lg:grid-cols-4">
                     <div className="lg:col-span-3">
                         <div className="flex flex-col space-y-4">
                             <Card>
@@ -171,7 +171,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                         </div>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                         <Card>
                             <CardHeader>
                                 <CardTitle className="text-base">Details</CardTitle>
