@@ -49,6 +49,7 @@ use Laravel\Scout\Searchable;
  * @property-read int|null $follows_count
  * @property-read Forum $forum
  * @property-read bool $has_reported_content
+ * @property-read bool $has_unapproved_content
  * @property-read bool $has_unpublished_content
  * @property-read bool $is_followed_by_user
  * @property-read bool $is_hot

@@ -137,7 +137,7 @@ class Report extends Model
         }
 
         return match ($this->reportable_type) {
-            Post::class => $this->getPostUrl($reportable),
+            Post::class => $reportable->url,
             Topic::class => route('forums.topics.show', [$reportable->forum, $reportable]),
             default => null,
         };
@@ -150,16 +150,5 @@ class Report extends Model
             'status' => ReportStatus::class,
             'reviewed_at' => 'datetime',
         ];
-    }
-
-    private function getPostUrl(Post $post): ?string
-    {
-        return match ($post->type->value) {
-            'blog' => route('blog.show', $post),
-            'forum' => $post->topic
-                ? route('forums.topics.show', [$post->topic->forum, $post->topic]).'#post-'.$post->id
-                : null,
-            default => null,
-        };
     }
 }

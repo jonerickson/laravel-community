@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Posts\Widgets;
 
+use App\Filament\Admin\Resources\Posts\Actions\ApproveAction;
+use App\Filament\Admin\Resources\Posts\Actions\PublishAction;
+use App\Filament\Admin\Resources\Reports\Pages\ListReports;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Models\Post;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
-use Illuminate\Database\Eloquent\Builder;
 
 class PostModerationTable extends TableWidget
 {
@@ -20,19 +26,9 @@ class PostModerationTable extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->query(
-                Post::query()
-                    ->where(function (Builder $query): void {
-                        $query
-                            ->unpublished()
-                            ->orWhereHas('pendingReports');
-                    })
-                    ->with(['author', 'pendingReports'])
-                    ->withCount('pendingReports')
-                    ->latest()
-            )
+            ->query(Post::query()->needingModeration())
             ->heading('Posts Needing Moderation')
-            ->description('Unpublished posts and posts with pending reports.')
+            ->description('Unpublished, pending approval or posts with pending reports.')
             ->deferLoading()
             ->columns([
                 TextColumn::make('title')
@@ -43,9 +39,15 @@ class PostModerationTable extends TableWidget
                 TextColumn::make('author.name')
                     ->label('Author')
                     ->url(fn (Post $record): ?string => $record->author ? EditUser::getUrl(['record' => $record->author]) : null),
+                TextColumn::make('is_approved')
+                    ->sortable()
+                    ->label('Approval Status')
+                    ->formatStateUsing(fn (bool $state): string => $state ? 'Approved' : 'Pending Approval')
+                    ->badge()
+                    ->color(fn (bool $state): string => $state ? 'success' : 'warning'),
                 TextColumn::make('is_published')
                     ->sortable()
-                    ->label('Status')
+                    ->label('Published Status')
                     ->formatStateUsing(fn (bool $state): string => $state ? 'Published' : 'Unpublished')
                     ->badge()
                     ->color(fn (bool $state): string => $state ? 'success' : 'warning'),
@@ -59,6 +61,19 @@ class PostModerationTable extends TableWidget
                     ->label('Created')
                     ->dateTimeTooltip()
                     ->since(),
+            ])
+            ->recordActions([
+                ViewAction::make()
+                    ->url(fn (Post $record) => $record->url, shouldOpenInNewTab: true),
+                ApproveAction::make(),
+                PublishAction::make(),
+                Action::make('reports')
+                    ->label('Reports')
+                    ->color('warning')
+                    ->icon(Heroicon::OutlinedFlag)
+                    ->visible(fn (Post $record) => $record->reports->count() > 0)
+                    ->url(fn (Post $record) => ListReports::getUrl(), shouldOpenInNewTab: true),
+                DeleteAction::make(),
             ])
             ->defaultSort('created_at', 'desc');
     }

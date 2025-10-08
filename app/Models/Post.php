@@ -97,6 +97,7 @@ use Override;
  * @method static Builder<static>|Post featured()
  * @method static Builder<static>|Post forum()
  * @method static Builder<static>|Post latestActivity()
+ * @method static Builder<static>|Post needingModeration()
  * @method static Builder<static>|Post newModelQuery()
  * @method static Builder<static>|Post newQuery()
  * @method static Builder<static>|Post notFeatured()
@@ -199,11 +200,26 @@ class Post extends Model implements Sluggable
             ->orderBy('created_at');
     }
 
+    public function scopeNeedingModeration(Builder $query): void
+    {
+        $query->where(function (Builder $query): void {
+            $query
+                ->unpublished()
+                ->orWhereHas('pendingReports')
+                ->orWhere(fn (Builder $query) => $query->unapproved());
+        })
+            ->with(['author', 'pendingReports'])
+            ->withCount('pendingReports')
+            ->latest();
+    }
+
     public function getUrl(): ?string
     {
         return match ($this->type) {
             PostType::Blog => route('blog.show', $this),
-            PostType::Forum => null,
+            PostType::Forum => $this->topic
+                ? route('forums.topics.show', [$this->topic->forum, $this->topic]).'#post-'.$this->id
+                : null,
         };
     }
 

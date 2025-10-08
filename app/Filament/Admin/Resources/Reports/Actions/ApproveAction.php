@@ -20,6 +20,7 @@ class ApproveAction extends Action
         $this->color('success');
         $this->requiresConfirmation();
         $this->visible(fn (Report $record): bool => $record->isPending());
+        $this->successNotificationTitle('The report has been successfully approved.');
         $this->action(function (Report $record): void {
             $record->approve(Auth::user());
         });

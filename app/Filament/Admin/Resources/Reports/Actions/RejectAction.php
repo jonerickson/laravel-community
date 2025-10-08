@@ -20,6 +20,7 @@ class RejectAction extends Action
         $this->color('danger');
         $this->requiresConfirmation();
         $this->visible(fn (Report $record): bool => $record->isPending());
+        $this->successNotificationTitle('The report has been successfully rejected.');
         $this->action(function (Report $record): void {
             $record->reject(Auth::user());
         });

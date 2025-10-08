@@ -17,6 +17,7 @@ use App\Filament\Admin\Resources\Posts\Widgets\PostStatsOverview;
 use App\Filament\Admin\Resources\Users\Widgets\RegistrationsTable;
 use App\Filament\Admin\Resources\Users\Widgets\UsersAnalyticsChart;
 use App\Filament\Admin\Resources\Users\Widgets\UserStatsOverview;
+use App\Models\Post;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
@@ -83,6 +84,8 @@ class Dashboard extends BaseDashboard
                     ]),
                 Tabs\Tab::make('Forums')
                     ->icon(Heroicon::OutlinedChatBubbleLeftRight)
+                    ->badge((string) Post::query()->needingModeration()->count())
+                    ->badgeColor('warning')
                     ->schema([
                         Grid::make($this->getColumns())
                             ->schema($this->getWidgetsSchemaComponents($this->getForumWidgets())),

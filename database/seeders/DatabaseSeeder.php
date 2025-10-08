@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             GroupSeeder::class,
+            WarningSeeder::class,
         ]);
 
         Announcement::factory()->state([

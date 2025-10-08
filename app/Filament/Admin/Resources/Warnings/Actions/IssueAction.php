@@ -11,7 +11,6 @@ use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Notifications\Notification;
 use Override;
 
 class IssueAction extends Action
@@ -26,6 +25,7 @@ class IssueAction extends Action
         $this->label('Issue warning');
         $this->color('warning');
         $this->modalDescription('Issue a warning to this user.');
+        $this->successNotificationTitle('The warning has been successfully issued.');
         $this->schema([
             Select::make('warning_id')
                 ->label('Warning Type')
@@ -54,12 +54,6 @@ class IssueAction extends Action
                 $warning,
                 $data['reason'] ?? null
             );
-
-            Notification::make()
-                ->title('Warning Issued')
-                ->success()
-                ->body("Warning '$warning->name' has been issued to the user.")
-                ->send();
         });
     }
 

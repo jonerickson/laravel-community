@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Users\Widgets;
 
+use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Models\User;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
@@ -31,6 +34,11 @@ class RegistrationsTable extends TableWidget
                     ->alignEnd()
                     ->dateTime()
                     ->sortable(),
+            ])
+            ->recordActions([
+                EditAction::make()
+                    ->url(fn (User $record): string => EditUser::getUrl(['record' => $record])),
+                DeleteAction::make(),
             ]);
     }
 }
