@@ -448,6 +448,13 @@ class StripeDriver implements PaymentProcessor
                             'message' => "Order Number: $order->reference_id",
                         ],
                     ],
+                    'branding_settings' => [
+                        'display_name' => config('app.name'),
+                        'border_style' => 'rounded',
+                        'background_color' => '#f9f9f9',
+                        'button_color' => '#171719',
+                        'font_family' => 'inter',
+                    ],
                     'success_url' => URL::signedRoute('store.checkout.success', [
                         'order' => $order,
                         'redirect' => route('store.subscriptions', absolute: false),
@@ -611,7 +618,15 @@ class StripeDriver implements PaymentProcessor
                         'metadata' => $metadata,
                     ],
                 ],
+                'branding_settings' => [
+                    'display_name' => config('app.name'),
+                    'border_style' => 'rounded',
+                    'background_color' => '#f9f9f9',
+                    'button_color' => '#171719',
+                    'font_family' => 'inter',
+                ],
                 'payment_intent_data' => [
+                    'setup_future_usage' => 'off_session',
                     'receipt_email' => $order->user->email,
                     'metadata' => $metadata,
                 ],

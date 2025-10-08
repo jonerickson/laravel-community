@@ -110,7 +110,6 @@ class CheckoutController
 
         return ApiResource::success(
             resource: $checkoutData,
-            message: 'Checkout session created successfully.',
         );
     }
 }
