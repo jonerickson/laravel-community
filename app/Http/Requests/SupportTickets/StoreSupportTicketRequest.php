@@ -4,22 +4,24 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\SupportTickets;
 
+use App\Rules\NoProfanity;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Override;
+use PHPUnit\Framework\Attributes\Ticket;
 
 class StoreSupportTicketRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check();
+        return Auth::user()->can('create', Ticket::class);
     }
 
     public function rules(): array
     {
         return [
-            'subject' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'max:10000'],
+            'subject' => ['required', 'string', 'max:255', new NoProfanity],
+            'description' => ['required', 'string', 'max:10000', new NoProfanity],
             'support_ticket_category_id' => ['required', 'exists:support_tickets_categories,id'],
             'order_id' => ['nullable', 'exists:orders,id,user_id,'.Auth::id()],
         ];

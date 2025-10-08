@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Forums;
 
+use App\Rules\NoProfanity;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Override;
@@ -12,13 +13,13 @@ class UpdatePostRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check();
+        return Auth::user()->can('update', $this->route('post'));
     }
 
     public function rules(): array
     {
         return [
-            'content' => ['required', 'string'],
+            'content' => ['required', 'string', new NoProfanity],
         ];
     }
 

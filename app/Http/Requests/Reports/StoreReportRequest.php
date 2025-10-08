@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests\Reports;
 
 use App\Enums\ReportReason;
+use App\Rules\NoProfanity;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -23,7 +24,7 @@ class StoreReportRequest extends FormRequest
             'reportable_type' => ['required', 'string'],
             'reportable_id' => ['required', 'integer', 'min:1'],
             'reason' => ['required', Rule::enum(ReportReason::class)],
-            'additional_info' => ['nullable', 'string', 'max:1000'],
+            'additional_info' => ['nullable', 'string', 'max:1000', new NoProfanity],
         ];
     }
 

@@ -89,6 +89,11 @@ class AppServiceProvider extends ServiceProvider
             Limit::perHour(5)->by($request->fingerprintId() ?: $request->ip()),
         ]);
 
+        RateLimiter::for('post', fn (\Illuminate\Http\Request $request): array => [
+            Limit::perMinute(2)->by($request->fingerprintId() ?: $request->ip()),
+            Limit::perHour(5)->by($request->fingerprintId() ?: $request->ip()),
+        ]);
+
         Socialite::extend('discord', fn () => Socialite::buildProvider(
             provider: DiscordProvider::class,
             config: config('services.discord')

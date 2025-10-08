@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Http\Requests\Store;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Override;
 
 class StoreProductRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return Auth::user()->can('view', $this->route('product'));
     }
 
     public function rules(): array
