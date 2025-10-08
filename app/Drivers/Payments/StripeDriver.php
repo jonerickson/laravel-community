@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Drivers\Payments;
 
 use App\Contracts\PaymentProcessor;
+use App\Data\CustomerData;
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\PriceData;
@@ -327,6 +328,58 @@ class StripeDriver implements PaymentProcessor
             }
 
             $user->deletePaymentMethod($paymentMethodId);
+
+            return true;
+        }, false);
+    }
+
+    public function createCustomer(User $user): bool
+    {
+        return $this->executeWithErrorHandling('createCustomer', function () use ($user): bool {
+            if ($user->hasStripeId()) {
+                return true;
+            }
+
+            $user->createAsStripeCustomer();
+
+            return true;
+        }, false);
+    }
+
+    public function getCustomer(User $user): ?CustomerData
+    {
+        return $this->executeWithErrorHandling('getCustomer', function () use ($user): ?CustomerData {
+            if (! $user->hasStripeId()) {
+                return null;
+            }
+
+            $customer = $this->stripe->customers->retrieve($user->stripeId());
+
+            return CustomerData::from([
+                'id' => $customer->id,
+                'email' => $customer->email,
+                'name' => $customer->name,
+                'phone' => $customer->phone,
+                'currency' => $customer->currency,
+                'metadata' => $customer->metadata->toArray(),
+            ]);
+        });
+    }
+
+    public function deleteCustomer(User $user): bool
+    {
+        return $this->executeWithErrorHandling('deleteCustomer', function () use ($user): bool {
+            if (! $user->hasStripeId()) {
+                return false;
+            }
+
+            $this->stripe->customers->delete($user->stripeId(), null, [
+                'idempotency_key' => $this->getIdempotencyKey(),
+            ]);
+
+            $user->forceFill([
+                'stripe_id' => null,
+            ])->save();
 
             return true;
         }, false);

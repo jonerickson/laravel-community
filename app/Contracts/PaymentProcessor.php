@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Contracts;
 
+use App\Data\CustomerData;
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\PriceData;
@@ -55,6 +56,12 @@ interface PaymentProcessor
     public function updatePaymentMethod(User $user, string $paymentMethodId, bool $isDefault): ?PaymentMethodData;
 
     public function deletePaymentMethod(User $user, string $paymentMethodId): bool;
+
+    public function createCustomer(User $user): bool;
+
+    public function getCustomer(User $user): ?CustomerData;
+
+    public function deleteCustomer(User $user): bool;
 
     public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true): bool|string|SubscriptionData;
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Managers;
 
 use App\Contracts\PaymentProcessor;
+use App\Data\CustomerData;
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\PriceData;
@@ -96,6 +97,21 @@ class PaymentManager extends Manager implements PaymentProcessor
     public function deletePaymentMethod(User $user, string $paymentMethodId): bool
     {
         return $this->driver()->deletePaymentMethod($user, $paymentMethodId);
+    }
+
+    public function createCustomer(User $user): bool
+    {
+        return $this->driver()->createCustomer($user);
+    }
+
+    public function getCustomer(User $user): ?CustomerData
+    {
+        return $this->driver()->getCustomer($user);
+    }
+
+    public function deleteCustomer(User $user): bool
+    {
+        return $this->driver()->deleteCustomer($user);
     }
 
     public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true): bool|string|SubscriptionData

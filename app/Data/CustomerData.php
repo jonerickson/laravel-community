@@ -11,18 +11,17 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 #[TypeScript]
 #[MapInputName(SnakeCaseMapper::class)]
-class PaymentSetupIntentData extends Data
+class CustomerData extends Data
 {
     public string $id;
 
-    public string $clientSecret;
+    public string $email;
 
-    public string $status;
+    public ?string $name = null;
 
-    public ?string $customer;
+    public ?string $phone = null;
 
-    /** @var string[] */
-    public array $paymentMethodTypes;
+    public ?string $currency = null;
 
-    public string $usage;
+    public ?array $metadata = null;
 }

@@ -14,14 +14,16 @@ interface AddPaymentMethodDialogProps {
 export default function AddPaymentMethodDialog({ open, onOpenChange }: AddPaymentMethodDialogProps) {
     const stripe = useStripe();
     const elements = useElements();
-    const { addPaymentMethod, addLoading: loading } = usePaymentMethods();
+    const { addPaymentMethod } = usePaymentMethods();
     const [error, setError] = useState<string | null>(null);
     const [holderName, setHolderName] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         setError(null);
+        setLoading(true);
 
         try {
             await addPaymentMethod({ holderName });
@@ -30,6 +32,8 @@ export default function AddPaymentMethodDialog({ open, onOpenChange }: AddPaymen
         } catch (err) {
             console.error('Error adding payment method:', err);
             setError((err as Error).message || 'An unexpected error occurred.');
+        } finally {
+            setLoading(false);
         }
     };
 

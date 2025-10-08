@@ -36,6 +36,18 @@ class PaymentMethodController extends Controller
 
         $user = Auth::user();
 
+        $result = true;
+        if (! $this->paymentManager->getCustomer($user)) {
+            $result = $this->paymentManager->createCustomer($user);
+        }
+
+        if (! $result) {
+            return back()->with([
+                'message' => 'The payment method creation failed. Please try again later.',
+                'messageVariant' => 'error',
+            ]);
+        }
+
         $created = $this->paymentManager->createPaymentMethod(
             user: $user,
             paymentMethodId: $validated['method']
