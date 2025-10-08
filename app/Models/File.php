@@ -60,7 +60,7 @@ class File extends Model
     public function url(): Attribute
     {
         return Attribute::get(fn (): ?string => $this->path
-            ? Storage::disk('private')->temporaryUrl($this->path, now()->addHour())
+            ? Storage::temporaryUrl($this->path, now()->addHour())
             : null
         )->shouldCache();
     }

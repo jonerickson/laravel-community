@@ -63,6 +63,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
         }));
 
         updateForm.patch(route('support.update', ticket.id), {
+            preserveScroll: true,
             onSuccess: () => {
                 router.reload({ only: ['ticket'] });
             },
@@ -75,6 +76,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
         }
 
         deleteAttachmentForm.delete(route('support.attachments.destroy', [ticket.id, fileId]), {
+            preserveScroll: true,
             onSuccess: () => {
                 router.reload({ only: ['ticket'] });
             },
@@ -108,7 +110,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
 
                 <div className="grid gap-6 lg:grid-cols-4">
                     <div className="lg:col-span-3">
-                        <div className="flex flex-col space-y-4">
+                        <div className="flex flex-col space-y-6">
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">Support ticket #{ticket.id}</CardTitle>

@@ -15,6 +15,7 @@ export function EmailVerificationBanner() {
 
     const handleResendVerification = () => {
         post(route('verification.send'), {
+            preserveScroll: true,
             onSuccess: () => toast.success('The email verification was successfully resent.'),
         });
     };

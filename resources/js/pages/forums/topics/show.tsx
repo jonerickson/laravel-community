@@ -12,7 +12,7 @@ import type { BreadcrumbItem } from '@/types';
 import { Deferred, Head, InfiniteScroll, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, ArrowDown, ArrowLeft, Clock, Eye, EyeOff, Lock, MessageSquare, Pin, Reply, User } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { route } from 'ziggy-js';
 import usePermissions from '../../../hooks/use-permissions';
 
@@ -26,10 +26,8 @@ interface TopicShowProps {
 export default function ForumTopicShow({ forum, topic, posts, recentViewers }: TopicShowProps) {
     const { can } = usePermissions();
     const { name: siteName } = usePage<App.Data.SharedData>().props;
-    const [showReplyForm, setShowReplyForm] = useState(false);
     const [quotedContent, setQuotedContent] = useState<string>('');
     const [quotedAuthor, setQuotedAuthor] = useState<string>('');
-    const scrollToBottom = usePage<App.Data.SharedData>().props.flash?.scrollToBottom;
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -56,18 +54,10 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
         isRead: topic.isReadByUser,
     });
 
-    useEffect(() => {
-        if (scrollToBottom) {
-            setTimeout(() => {
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            }, 100);
-        }
-    }, [scrollToBottom]);
-
     const goToLatestPost = () => {
         router.reload({
             data: { page: posts.lastPage },
-            only: ['posts', 'postsPagination'],
+            only: ['posts'],
             onSuccess: () => {
                 setTimeout(() => {
                     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -79,7 +69,6 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
     const handleQuotePost = (postContent: string, authorName: string) => {
         setQuotedContent(postContent);
         setQuotedAuthor(authorName);
-        setShowReplyForm(true);
 
         setTimeout(() => {
             const replyForm = document.querySelector('[data-reply-form]');
@@ -87,18 +76,6 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
                 replyForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }, 100);
-    };
-
-    const handleReplySuccess = () => {
-        setShowReplyForm(false);
-        setQuotedContent('');
-        setQuotedAuthor('');
-    };
-
-    const handleReplyCancel = () => {
-        setShowReplyForm(false);
-        setQuotedContent('');
-        setQuotedAuthor('');
     };
 
     const currentUrl = route('forums.topics.show', { forum: forum.slug, topic: topic.slug });
@@ -208,7 +185,10 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
                             Latest
                         </Button>
                         {can('reply_topics') && !topic.isLocked && (
-                            <Button onClick={() => setShowReplyForm(!showReplyForm)} variant={showReplyForm ? 'outline' : 'default'}>
+                            <Button
+                                onClick={() => document.querySelector('[data-reply-form]')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                                variant="outline"
+                            >
                                 <Reply className="mr-2 size-4" />
                                 Reply
                             </Button>
@@ -239,17 +219,6 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
                     </div>
                 </div>
 
-                {showReplyForm && (
-                    <ForumTopicReply
-                        forumSlug={forum.slug}
-                        topicSlug={topic.slug}
-                        onCancel={handleReplyCancel}
-                        onSuccess={handleReplySuccess}
-                        quotedContent={quotedContent}
-                        quotedAuthor={quotedAuthor}
-                    />
-                )}
-
                 <div className="mt-2">
                     {posts.data.length > 0 ? (
                         <InfiniteScroll data="posts">
@@ -268,7 +237,9 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
                     <RecentViewers viewers={recentViewers} />
                 </Deferred>
 
-                {can('reply_topics') && !topic.isLocked && posts.data.length > 0 && <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} />}
+                {can('reply_topics') && !topic.isLocked && posts.data.length > 0 && (
+                    <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} quotedContent={quotedContent} quotedAuthor={quotedAuthor} />
+                )}
 
                 <div className="flex justify-start py-4">
                     <Link

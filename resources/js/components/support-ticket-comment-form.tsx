@@ -19,6 +19,7 @@ export default function SupportTicketCommentForm({ ticket, onCancel, onSuccess }
         e.preventDefault();
 
         post(route('support.comments.store', ticket.id), {
+            preserveScroll: true,
             onSuccess: () => {
                 reset();
                 onSuccess?.();

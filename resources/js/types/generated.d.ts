@@ -97,7 +97,6 @@ declare namespace App.Data {
         lastSeen: string | null;
     };
     export type FlashData = {
-        scrollToBottom: boolean | null;
         message: string | null;
         messageVariant: string | null;
     };

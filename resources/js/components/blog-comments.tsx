@@ -61,6 +61,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
         e.preventDefault();
 
         submitComment(route('blog.comments.store', { post }), {
+            preserveScroll: true,
             onSuccess: () => {
                 reset();
                 onReply(0);
@@ -77,7 +78,9 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
             return;
         }
 
-        deleteComment(route('blog.comments.destroy', { post, comment }));
+        deleteComment(route('blog.comments.destroy', { post, comment }), {
+            preserveScroll: true,
+        });
     };
 
     const handleEditSubmit = (e: React.FormEvent) => {
@@ -88,6 +91,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
         }
 
         updateComment(route('blog.comments.update', { post, comment }), {
+            preserveScroll: true,
             onSuccess: () => {
                 setIsEditing(false);
             },
@@ -238,6 +242,7 @@ export default function BlogComments({ post, comments }: BlogCommentsProps) {
         e.preventDefault();
 
         submitComment(route('blog.comments.store', { post }), {
+            preserveScroll: true,
             onSuccess: () => {
                 reset();
             },

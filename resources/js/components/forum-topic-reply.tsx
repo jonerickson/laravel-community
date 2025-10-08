@@ -30,6 +30,7 @@ export default function ForumTopicReply({ forumSlug, topicSlug, onCancel, onSucc
         e.preventDefault();
 
         post(route('forums.posts.store', { forum: forumSlug, topic: topicSlug }), {
+            preserveScroll: true,
             onSuccess: () => {
                 if (onSuccess) {
                     onSuccess();

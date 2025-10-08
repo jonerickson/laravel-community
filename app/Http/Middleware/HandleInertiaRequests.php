@@ -64,7 +64,6 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             ...$sharedData->toArray(),
             'flash' => fn (): FlashData => FlashData::from([
-                'scrollToBottom' => $request->session()->pull('scrollToBottom'),
                 'message' => $request->session()->pull('message'),
                 'messageVariant' => $request->session()->pull('messageVariant'),
             ]),

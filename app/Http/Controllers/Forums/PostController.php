@@ -47,7 +47,7 @@ class PostController extends Controller
             'forum' => $forum,
             'topic' => $topic,
             'page' => $lastPage,
-        ])->with('scrollToBottom', true)->with('message', 'Your reply was successfully added.');
+        ])->with('message', 'Your reply was successfully added.');
     }
 
     /**

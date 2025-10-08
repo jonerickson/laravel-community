@@ -30,6 +30,9 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
                 forum: forum.slug,
                 topic: topic.slug,
             }),
+            {
+                preserveScroll: true,
+            },
         );
     };
 

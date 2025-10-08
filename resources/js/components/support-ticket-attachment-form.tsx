@@ -29,6 +29,7 @@ export default function SupportTicketAttachmentForm({ ticket, onCancel, onSucces
         e.preventDefault();
 
         post(route('support.attachments.store', ticket.id), {
+            preserveScroll: true,
             onSuccess: () => {
                 reset();
                 onSuccess?.();

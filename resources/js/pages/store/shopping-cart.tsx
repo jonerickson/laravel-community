@@ -38,6 +38,7 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
         }
 
         clearCartForm(route('store.cart.destroy'), {
+            preserveScroll: true,
             onSuccess: () => {
                 setItems([]);
 

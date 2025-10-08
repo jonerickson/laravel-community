@@ -62,6 +62,9 @@ export default function Product({ product: productData, reviews }: ProductProps)
             route('store.products.store', {
                 product: productData.slug,
             }),
+            {
+                preserveScroll: true,
+            },
         );
     };
 
