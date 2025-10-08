@@ -64,7 +64,7 @@ const supportNavItems: NavItem[] = [
 
 export function AppFooter() {
     const page = usePage<App.Data.SharedData>();
-    const { auth, name } = page.props;
+    const { auth, name, phone, email, address, slogan } = page.props;
     const { layout } = useLayout();
 
     return (
@@ -75,21 +75,19 @@ export function AppFooter() {
                         <Link href={route('dashboard')} className="flex items-center space-x-2">
                             <AppLogo />
                         </Link>
-                        <p className="text-sm text-muted-foreground">
-                            Building the future of digital experiences with innovative solutions and community-driven development.
-                        </p>
+                        <p className="text-sm text-muted-foreground">{slogan}</p>
                         <div className="space-y-2">
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <Mail className="size-4" />
-                                <span>contact@mountaininteractive.com</span>
+                                <span>{email}</span>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <Phone className="size-4" />
-                                <span>+1 (555) 123-4567</span>
+                                <span>{phone}</span>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <MapPin className="size-4" />
-                                <span>San Francisco, CA</span>
+                                <span>{address}</span>
                             </div>
                         </div>
                     </div>

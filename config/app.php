@@ -6,7 +6,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Application Name
+    | Application Information
     |--------------------------------------------------------------------------
     |
     | This value is the name of your application, which will be used when the
@@ -16,6 +16,10 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
+    'email' => env('APP_EMAIL', ''),
+    'phone' => env('APP_PHONE', ''),
+    'address' => env('APP_ADDRESS', ''),
+    'slogan' => env('APP_SLOGAN', ''),
 
     /*
     |--------------------------------------------------------------------------

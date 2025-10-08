@@ -356,7 +356,12 @@ declare namespace App.Data {
         auth: App.Data.AuthData;
         announcements: Array<App.Data.AnnouncementData>;
         name: string;
+        email: string | null;
+        phone: string | null;
+        address: string | null;
+        slogan: string | null;
         cartCount: number | null;
+        memberCount: number | null;
         flash: App.Data.FlashData | null;
         sidebarOpen: boolean;
         ziggy: Config & { location: string };

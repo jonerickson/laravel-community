@@ -33,7 +33,7 @@ interface HomeProps {
 
 export default function Home({ subscriptions = [] }: HomeProps) {
     const page = usePage<App.Data.SharedData>();
-    const { name, auth } = page.props;
+    const { name, auth, memberCount } = page.props;
 
     return (
         <div className="min-h-screen bg-background text-foreground">
@@ -49,7 +49,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                         <div className="mx-auto max-w-5xl">
                             <div className="mb-8 inline-flex items-center rounded-full border border-border/40 bg-muted/20 px-3 py-1 text-sm text-muted-foreground">
                                 <Rocket className="text-gaming-blue mr-2 h-4 w-4" />
-                                Now powering 10,000+ members
+                                Now powering {memberCount}+ members
                             </div>
 
                             <h1 className="mb-6 text-4xl font-bold tracking-tight text-balance md:text-6xl lg:text-7xl">
