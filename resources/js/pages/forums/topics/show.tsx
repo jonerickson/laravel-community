@@ -11,7 +11,7 @@ import { pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { Deferred, Head, InfiniteScroll, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
-import { AlertTriangle, ArrowDown, ArrowLeft, Clock, Eye, EyeOff, Lock, MessageSquare, Pin, Reply, User } from 'lucide-react';
+import { AlertTriangle, ArrowDown, ArrowLeft, Clock, Eye, EyeOff, Lock, MessageSquare, Pin, Reply, ThumbsDown, User } from 'lucide-react';
 import { useState } from 'react';
 import { route } from 'ziggy-js';
 import usePermissions from '../../../hooks/use-permissions';
@@ -163,8 +163,9 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
                                 {topic.isHot && <span className="text-sm">🔥</span>}
                                 {topic.isPinned && <Pin className="size-4 text-info" />}
                                 {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
-                                {topic.hasReportedContent && <AlertTriangle className="size-4 text-destructive" />}
-                                {topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
+                                {can('report_posts') && topic.hasReportedContent && <AlertTriangle className="size-4 text-destructive" />}
+                                {can('publish_posts') && topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
+                                {can('approve_posts') && topic.hasUnapprovedContent && <ThumbsDown className="size-4 text-warning" />}
                                 <h1 className="text-xl font-semibold tracking-tight">{topic.title}</h1>
                             </div>
 

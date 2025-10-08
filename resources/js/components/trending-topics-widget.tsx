@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { Link } from '@inertiajs/react';
 import { format, formatDistanceToNow } from 'date-fns';
-import { AlertTriangle, Eye, EyeOff, Flame, Lock, MessageSquare, Pin, TrendingUp } from 'lucide-react';
+import { AlertTriangle, Eye, EyeOff, Flame, Lock, MessageSquare, Pin, ThumbsDown, TrendingUp } from 'lucide-react';
+import usePermissions from '../hooks/use-permissions';
 
 interface TrendingTopicsWidgetProps {
     topics?: App.Data.TopicData[];
@@ -12,6 +13,8 @@ interface TrendingTopicsWidgetProps {
 }
 
 export default function TrendingTopicsWidget({ topics = [], className }: TrendingTopicsWidgetProps) {
+    const { can } = usePermissions();
+
     if (topics.length === 0) {
         return (
             <div className={`relative ${className}`}>
@@ -92,8 +95,11 @@ export default function TrendingTopicsWidget({ topics = [], className }: Trendin
                                                 {topic.isHot && <span className="text-sm">🔥</span>}
                                                 {topic.isPinned && <Pin className="size-3 text-info" />}
                                                 {topic.isLocked && <Lock className="size-3 text-muted-foreground" />}
-                                                {topic.hasReportedContent && <AlertTriangle className="size-3 text-destructive" />}
-                                                {topic.hasUnpublishedContent && <EyeOff className="size-3 text-warning" />}
+                                                {can('report_posts') && topic.hasReportedContent && (
+                                                    <AlertTriangle className="size-3 text-destructive" />
+                                                )}
+                                                {can('publish_posts') && topic.hasUnpublishedContent && <EyeOff className="size-3 text-warning" />}
+                                                {can('approve_posts') && topic.hasUnapprovedContent && <ThumbsDown className="size-3 text-warning" />}
                                                 <span className="line-clamp-1 text-sm font-medium">{topic.title}</span>
                                             </div>
                                             <div className="text-xs text-muted-foreground">

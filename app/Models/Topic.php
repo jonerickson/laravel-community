@@ -119,6 +119,7 @@ class Topic extends Model implements Sluggable
         'is_hot',
         'has_reported_content',
         'has_unpublished_content',
+        'has_unapproved_content',
     ];
 
     protected $touches = [
@@ -189,6 +190,15 @@ class Topic extends Model implements Sluggable
         return Attribute::make(
             get: fn (): bool => $this->posts()
                 ->unpublished()
+                ->exists()
+        )->shouldCache();
+    }
+
+    public function hasUnapprovedContent(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): bool => $this->posts()
+                ->unapproved()
                 ->exists()
         )->shouldCache();
     }

@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { stripCharacters } from '@/utils/truncate';
 import { formatDistanceToNow } from 'date-fns';
-import { EyeOff, Flag, Pin, Quote, ThumbsUp } from 'lucide-react';
+import { EyeOff, Flag, Pin, Quote, ThumbsDown } from 'lucide-react';
 import usePermissions from '../hooks/use-permissions';
 
 interface ForumTopicPostProps {
@@ -86,7 +86,7 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                                 )}
                                 {!post.isApproved && (
                                     <Badge variant="warning">
-                                        <ThumbsUp className="mr-1 size-3" />
+                                        <ThumbsDown className="mr-1 size-3" />
                                         Pending Approval
                                     </Badge>
                                 )}

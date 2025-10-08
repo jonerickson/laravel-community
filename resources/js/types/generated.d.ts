@@ -438,6 +438,7 @@ declare namespace App.Data {
         followersCount: number | null;
         hasReportedContent: boolean;
         hasUnpublishedContent: boolean;
+        hasUnapprovedContent: boolean;
         forum: App.Data.ForumData | null;
         author: App.Data.UserData;
         lastPost: App.Data.PostData | null;

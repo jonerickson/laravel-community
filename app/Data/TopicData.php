@@ -60,6 +60,8 @@ class TopicData extends Data
 
     public bool $hasUnpublishedContent = false;
 
+    public bool $hasUnapprovedContent = false;
+
     #[LoadRelation]
     public ?ForumData $forum = null;
 
