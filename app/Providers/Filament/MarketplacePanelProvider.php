@@ -13,7 +13,6 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
-use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Contracts\View\Factory;
@@ -34,6 +33,7 @@ class MarketplacePanelProvider extends PanelProvider
             ->path('marketplace')
             ->domain(config('app.url'))
             ->brandLogo(fn (): View|Factory => view('filament.components.logo'))
+            ->darkModeBrandLogo(fn (): View|Factory => view('filament.components.logo', ['dark' => true]))
             ->colors([
                 'primary' => Color::Zinc,
             ])
@@ -65,11 +65,6 @@ class MarketplacePanelProvider extends PanelProvider
             ->maxContentWidth(Width::Full)
             ->sidebarCollapsibleOnDesktop()
             ->darkMode()
-            ->theme(asset('css/filament/marketplace/theme.css'))
-            ->renderHook(
-                PanelsRenderHook::HEAD_END,
-                fn (): View => view('filament.components.head'),
-            )
             ->viteTheme('resources/css/filament/marketplace/theme.css');
     }
 }

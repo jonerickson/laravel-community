@@ -15,7 +15,6 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
-use Filament\View\PanelsRenderHook;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -35,6 +34,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->domain(config('app.url'))
             ->brandLogo(fn (): View|Factory => view('filament.components.logo'))
+            ->darkModeBrandLogo(fn (): View|Factory => view('filament.components.logo', ['dark' => true]))
             ->colors([
                 'primary' => Color::Zinc,
             ])
@@ -71,11 +71,6 @@ class AdminPanelProvider extends PanelProvider
             ->maxContentWidth(Width::Full)
             ->sidebarCollapsibleOnDesktop()
             ->darkMode()
-            ->theme(asset('css/filament/admin/theme.css'))
-            ->renderHook(
-                PanelsRenderHook::HEAD_END,
-                fn (): View => view('filament.components.head'),
-            )
             ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }
