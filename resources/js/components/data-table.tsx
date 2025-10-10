@@ -54,7 +54,7 @@ export function DataTable<TData, TValue>({ columns, data, loading = false }: Dat
                     />
                 )}
             </div>
-            <div className="rounded-md border">
+            <div className="overflow-auto rounded-md border">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (

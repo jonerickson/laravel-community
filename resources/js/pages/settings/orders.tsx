@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { currency, date } from '@/lib/utils';
+import { truncate } from '@/utils/truncate';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, Copy, CreditCard, ExternalLink, FileText, Repeat } from 'lucide-react';
 import { toast } from 'sonner';
@@ -65,7 +66,7 @@ export default function Orders({ orders }: OrdersProps) {
                         className="group flex items-center gap-2 font-mono text-sm hover:text-primary focus:text-primary focus:outline-none"
                         title="Click to copy"
                     >
-                        {orderNumber}
+                        {truncate(orderNumber, 20)}
                         <Copy className="size-3 opacity-0 transition-opacity group-hover:opacity-100" />
                     </button>
                 );
@@ -85,7 +86,7 @@ export default function Orders({ orders }: OrdersProps) {
                         className="group flex items-center gap-2 font-mono text-sm hover:text-primary focus:text-primary focus:outline-none"
                         title="Click to copy"
                     >
-                        {invoiceNumber}
+                        {truncate(invoiceNumber, 20)}
                         <Copy className="size-3 opacity-0 transition-opacity group-hover:opacity-100" />
                     </button>
                 );
@@ -181,7 +182,7 @@ export default function Orders({ orders }: OrdersProps) {
                 <div className="space-y-6">
                     <HeadingSmall title="Order information" description="View your current and past order information" />
 
-                    <div className="-mt-2">
+                    <div className="-mt-2 max-w-4xl">
                         <Deferred fallback={<DataTable columns={columns} data={[]} loading={true} />} data={['orders']}>
                             {orders && orders.length > 0 ? (
                                 <DataTable columns={columns} data={orders} />
