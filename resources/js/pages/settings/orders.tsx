@@ -182,7 +182,7 @@ export default function Orders({ orders }: OrdersProps) {
                 <div className="space-y-6">
                     <HeadingSmall title="Order information" description="View your current and past order information" />
 
-                    <div className="-mt-2 max-w-4xl">
+                    <div className="-mt-2 w-full max-w-full overflow-x-hidden">
                         <Deferred fallback={<DataTable columns={columns} data={[]} loading={true} />} data={['orders']}>
                             {orders && orders.length > 0 ? (
                                 <DataTable columns={columns} data={orders} />
