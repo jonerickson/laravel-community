@@ -45,17 +45,17 @@ class NullDriver implements PaymentProcessor
         return collect();
     }
 
-    public function createPrice(Product $product, Price $price): ?PriceData
+    public function createPrice(Price $price): ?PriceData
     {
         return null;
     }
 
-    public function updatePrice(Product $product, Price $price): ?PriceData
+    public function updatePrice(Price $price): ?PriceData
     {
         return null;
     }
 
-    public function deletePrice(Product $product, Price $price): bool
+    public function deletePrice(Price $price): bool
     {
         return false;
     }

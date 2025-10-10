@@ -53,7 +53,7 @@ class StripeDriver implements PaymentProcessor
             $stripeProduct = $this->stripe->products->create([
                 'name' => $product->name,
                 'description' => Str::limit(strip_tags($product->description)),
-                'tax_code' => $product->tax_code->getStripeCode(),
+                'tax_code' => $product->tax_code?->getStripeCode(),
                 'metadata' => Arr::dot([
                     'product_id' => $product->reference_id,
                     ...$product->metadata ?? [],
@@ -133,19 +133,19 @@ class StripeDriver implements PaymentProcessor
         }, collect());
     }
 
-    public function createPrice(Product $product, Price $price): ?PriceData
+    public function createPrice(Price $price): ?PriceData
     {
-        return $this->executeWithErrorHandling('createPrice', function () use ($product, $price): PriceData {
-            if (! $product->external_product_id) {
+        return $this->executeWithErrorHandling('createPrice', function () use ($price): PriceData {
+            if (! $price->product->external_product_id) {
                 throw new Exception('Product must have an external price ID to update.');
             }
 
             $stripeParams = [
-                'product' => $product->external_product_id,
+                'product' => $price->product->external_product_id,
                 'unit_amount' => $price->amount,
                 'currency' => strtolower($price->currency),
                 'metadata' => Arr::dot([
-                    'product_id' => $product->reference_id,
+                    'product_id' => $price->product->reference_id,
                     'price_id' => $price->reference_id,
                     ...$price->metadata ?? [],
                 ]),
@@ -170,16 +170,16 @@ class StripeDriver implements PaymentProcessor
         });
     }
 
-    public function updatePrice(Product $product, Price $price): ?PriceData
+    public function updatePrice(Price $price): ?PriceData
     {
-        return $this->executeWithErrorHandling('updatePrice', function () use ($product, $price): ?\App\Data\PriceData {
+        return $this->executeWithErrorHandling('updatePrice', function () use ($price): ?PriceData {
             if (! $price->external_price_id) {
                 return null;
             }
 
             $this->stripe->prices->update($price->external_price_id, [
                 'metadata' => Arr::dot([
-                    'product_id' => $product->reference_id,
+                    'product_id' => $price->product->reference_id,
                     'price_id' => $price->reference_id,
                     ...$price->metadata ?? [],
                 ]),
@@ -191,7 +191,7 @@ class StripeDriver implements PaymentProcessor
         });
     }
 
-    public function deletePrice(Product $product, Price $price): bool
+    public function deletePrice(Price $price): bool
     {
         return $this->executeWithErrorHandling('deletePrice', function () use ($price): bool {
             if (! $price->external_price_id) {

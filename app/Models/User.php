@@ -91,6 +91,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read SubscriptionData|null $current_subscription
  * @property-read Collection<int, Fingerprint> $fingerprints
  * @property-read int|null $fingerprints_count
+ * @property-read UserGroup|null $pivot
  * @property-read Collection<int, Group> $groups
  * @property-read int|null $groups_count
  * @property-read bool $has_password

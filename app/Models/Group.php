@@ -39,6 +39,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read int|null $permissions_count
  * @property-read Collection<int, Role> $roles
  * @property-read int|null $roles_count
+ * @property-read UserGroup|null $pivot
  * @property-read Collection<int, User> $users
  * @property-read int|null $users_count
  *

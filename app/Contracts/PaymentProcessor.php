@@ -33,11 +33,11 @@ interface PaymentProcessor
      */
     public function listProducts(array $filters = []): mixed;
 
-    public function createPrice(Product $product, Price $price): ?PriceData;
+    public function createPrice(Price $price): ?PriceData;
 
-    public function updatePrice(Product $product, Price $price): ?PriceData;
+    public function updatePrice(Price $price): ?PriceData;
 
-    public function deletePrice(Product $product, Price $price): bool;
+    public function deletePrice(Price $price): bool;
 
     /**
      * @return Collection<int, PriceData>

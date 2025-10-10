@@ -80,6 +80,24 @@ declare namespace App.Data {
         currency: string | null;
         metadata: Array<string, unknown> | null;
     };
+    export type DiscountData = {
+        id: number;
+        code: string;
+        type: App.Enums.DiscountType;
+        discountType: App.Enums.DiscountValueType;
+        value: number;
+        currentBalance: number | null;
+        maxUses: number | null;
+        timesUsed: number;
+        minOrderAmount: number | null;
+        expiresAt: string | null;
+        activatedAt: string | null;
+        isExpired: boolean;
+        isValid: boolean;
+        hasBalance: boolean;
+        createdAt: string | null;
+        updatedAt: string | null;
+    };
     export type DownloadData = {
         id: string;
         name: string;
@@ -483,6 +501,8 @@ declare namespace App.Data {
 }
 declare namespace App.Enums {
     export type AnnouncementType = 'info' | 'success' | 'warning' | 'error';
+    export type DiscountType = 'gift_card' | 'promo_code' | 'manual';
+    export type DiscountValueType = 'fixed' | 'percentage';
     export type OrderRefundReason = 'duplicate' | 'fraudulent' | 'requested_by_customer' | 'other';
     export type OrderStatus =
         | 'pending'
@@ -518,7 +538,7 @@ declare namespace App.Enums {
         | 'website_information_services_personal'
         | 'electronically_delivered_information_business'
         | 'electronically_delivered_information_personal';
-    export type ProductType = 'product' | 'subscription';
+    export type ProductType = 'product' | 'subscription' | 'gift_card';
     export type PublishableStatus = 'published' | 'draft';
     export type ReportReason = 'spam' | 'harassment' | 'inappropriate_content' | 'abuse' | 'impersonation' | 'false_information' | 'other';
     export type ReportStatus = 'pending' | 'reviewed' | 'approved' | 'rejected';

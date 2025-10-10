@@ -26,6 +26,12 @@ const sidebarNavItems: NavItem[] = [
         isActive: () => true,
     },
     {
+        title: 'Discounts',
+        href: '/settings/discounts',
+        icon: null,
+        isActive: () => true,
+    },
+    {
         title: 'Downloads',
         href: '/settings/downloads',
         icon: null,

@@ -54,51 +54,48 @@ class SyncPriceWithPaymentProvider implements ShouldQueue
     protected function handleProductPriceCreated(PriceCreated $event): void
     {
         $price = $event->price;
-        $product = $price->product;
 
         if ($price->external_price_id) {
             return;
         }
 
-        $this->paymentManager->createPrice($product, $price);
+        $this->paymentManager->createPrice($price);
 
         Log::info('Product price created in payment provider', [
             'product_price_id' => $price->id,
-            'product_id' => $product->id,
+            'product_id' => $price->product?->id,
         ]);
     }
 
     protected function handleProductPriceUpdated(PriceUpdated $event): void
     {
         $price = $event->price;
-        $product = $price->product;
 
         if (! $price->external_price_id) {
             return;
         }
 
-        $this->paymentManager->updatePrice($product, $price);
+        $this->paymentManager->updatePrice($price);
 
         Log::info('Product price updated in payment provider', [
             'product_price_id' => $price->id,
-            'product_id' => $product->id,
+            'product_id' => $price->product?->id,
         ]);
     }
 
     protected function handleProductPriceDeleted(PriceDeleted $event): void
     {
         $price = $event->price;
-        $product = $price->product;
 
         if (! $price->external_price_id) {
             return;
         }
 
-        $this->paymentManager->deletePrice($product, $price);
+        $this->paymentManager->deletePrice($price);
 
         Log::info('Product price deleted in payment provider', [
             'product_price_id' => $price->id,
-            'product_id' => $product->id,
+            'product_id' => $price->product?->id,
         ]);
     }
 }

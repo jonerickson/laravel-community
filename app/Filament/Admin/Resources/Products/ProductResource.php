@@ -152,19 +152,20 @@ class ProductResource extends Resource
                                     ->columnSpanFull(),
                                 Toggle::make('is_subscription_only')
                                     ->visible(fn (Get $get): bool => $get('type') === ProductType::Subscription)
-                                    ->label('Subscription only')
+                                    ->label('Subscription Only')
                                     ->helperText('Only show this product on the subscriptions page - not in the store.')
                                     ->columnSpanFull(),
                             ]),
                         Section::make('Purchasing')
                             ->components([
                                 Toggle::make('allow_promotion_codes')
+                                    ->label('Allow Promotion Codes')
                                     ->helperText('Allow customers to use promotion codes when purchasing this product.')
                                     ->columnSpanFull(),
                                 TextInput::make('trial_days')
                                     ->default(0)
                                     ->visible(fn (Get $get): bool => $get('type') === ProductType::Subscription)
-                                    ->label('Trial mode')
+                                    ->label('Trial Mode')
                                     ->suffix('days')
                                     ->helperText('Enable trial mode for this product by providing the number of days the trial is active.')
                                     ->columnSpanFull(),
@@ -172,7 +173,7 @@ class ProductResource extends Resource
                         Section::make('Compliance')
                             ->components([
                                 Select::make('policies')
-                                    ->label('Required policies')
+                                    ->label('Required Policies')
                                     ->helperText('Select policies that customers must agree to when purchasing this product.')
                                     ->columnSpanFull()
                                     ->preload()
@@ -217,6 +218,10 @@ class ProductResource extends Resource
                     ->default(0)
                     ->money()
                     ->sortable(),
+                IconColumn::make('external_product_id')
+                    ->label('External Product')
+                    ->default(false)
+                    ->boolean(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

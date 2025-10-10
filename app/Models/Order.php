@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
@@ -33,6 +34,8 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read mixed $amount
  * @property-read mixed $checkout_url
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Discount> $discounts
+ * @property-read int|null $discounts_count
  * @property-read bool $is_one_time
  * @property-read bool $is_recurring
  * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $items
@@ -111,6 +114,13 @@ class Order extends Model
     public function products(): HasManyThrough
     {
         return $this->hasManyThrough(Product::class, OrderItem::class, 'order_id', 'id', 'id', 'product_id');
+    }
+
+    public function discounts(): BelongsToMany
+    {
+        return $this->belongsToMany(Discount::class, 'orders_discounts')
+            ->withPivot('amount_applied', 'balance_before', 'balance_after')
+            ->withTimestamps();
     }
 
     public function amount(): Attribute

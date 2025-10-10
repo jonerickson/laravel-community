@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Products\Pages;
 
+use App\Filament\Admin\Resources\Products\Actions\CreateExternalProductAction;
+use App\Filament\Admin\Resources\Products\Actions\DeleteExternalProductAction;
 use App\Filament\Admin\Resources\Products\ProductResource;
 use App\Models\Product;
 use Filament\Actions\Action;
@@ -20,9 +22,9 @@ class EditProduct extends EditRecord
         return [
             Action::make('link')
                 ->color('gray')
-                ->label('Link external ID')
+                ->label('Link existing external product')
                 ->visible(fn (Product $record): bool => blank($record->external_product_id))
-                ->modalDescription('Provide an external product ID links this product with a product you have already created in your payment processor.')
+                ->modalDescription('Provide an external product ID to link this product with a product you have already created in your payment processor.')
                 ->schema([
                     TextInput::make('external_product_id')
                         ->label('External Product ID')
@@ -48,8 +50,9 @@ class EditProduct extends EditRecord
                     $record->forceFill(['external_product_id' => null])->save();
                     $action->success();
                 }),
+            CreateExternalProductAction::make(),
+            DeleteExternalProductAction::make(),
             DeleteAction::make(),
-
         ];
     }
 }

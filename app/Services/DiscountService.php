@@ -1,0 +1,153 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services;
+
+use App\Enums\DiscountType;
+use App\Enums\DiscountValueType;
+use App\Models\Discount;
+use App\Models\Order;
+use DateTime;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use RuntimeException;
+
+class DiscountService
+{
+    public function validateDiscount(string $code): ?Discount
+    {
+        $discount = Discount::query()
+            ->byCode($code)
+            ->active()
+            ->withBalance()
+            ->first();
+
+        if (blank($discount)) {
+            return null;
+        }
+
+        if (! $discount->is_valid) {
+            return null;
+        }
+
+        return $discount;
+    }
+
+    public function calculateOrderDiscounts(Order $order, array $discountCodes): Collection
+    {
+        $orderTotal = $order->amount;
+        $discounts = collect();
+        $remainingTotal = $orderTotal;
+
+        foreach ($discountCodes as $code) {
+            $discount = $this->validateDiscount($code);
+
+            if (blank($discount)) {
+                continue;
+            }
+
+            $discountAmount = $discount->calculateDiscount($remainingTotal);
+
+            if ($discountAmount > 0) {
+                $discounts->push([
+                    'discount' => $discount,
+                    'amount' => $discountAmount,
+                ]);
+
+                $remainingTotal -= $discountAmount;
+            }
+
+            if ($remainingTotal <= 0) {
+                break;
+            }
+        }
+
+        return $discounts;
+    }
+
+    public function applyDiscountsToOrder(Order $order, array $discountCodes): int
+    {
+        return DB::transaction(function () use ($order, $discountCodes): int|float {
+            $discounts = $this->calculateOrderDiscounts($order, $discountCodes);
+            $totalDiscount = 0;
+
+            foreach ($discounts as $discountData) {
+                /** @var Discount $discount */
+                $discount = $discountData['discount'];
+                $amount = $discountData['amount'];
+
+                $discount->applyToOrder($order, $amount);
+                $totalDiscount += $amount;
+            }
+
+            return $totalDiscount;
+        });
+    }
+
+    public function createGiftCard(int $value, ?int $productId = null, ?int $userId = null, ?string $recipientEmail = null): Discount
+    {
+        return Discount::create([
+            'code' => $this->generateUniqueCode(DiscountType::GiftCard),
+            'type' => DiscountType::GiftCard,
+            'discount_type' => DiscountValueType::Fixed,
+            'value' => $value,
+            'current_balance' => $value,
+            'product_id' => $productId,
+            'user_id' => $userId,
+            'recipient_email' => $recipientEmail,
+        ]);
+    }
+
+    public function createPromoCode(string $code, int $value, DiscountValueType $discountType, ?int $maxUses = null, ?int $minOrderAmount = null, ?DateTime $expiresAt = null): Discount
+    {
+        return Discount::create([
+            'code' => Str::upper($code),
+            'type' => DiscountType::PromoCode,
+            'discount_type' => $discountType,
+            'value' => $value,
+            'max_uses' => $maxUses,
+            'min_order_amount' => $minOrderAmount,
+            'expires_at' => $expiresAt,
+        ]);
+    }
+
+    public function generateUniqueCode(DiscountType $type, int $attempts = 5): string
+    {
+        for ($i = 0; $i < $attempts; $i++) {
+            $prefix = match ($type) {
+                DiscountType::GiftCard => 'GIFT',
+                DiscountType::PromoCode => 'PROMO',
+                DiscountType::Manual => 'MANUAL',
+            };
+
+            $code = Str::upper("{$prefix}-".Str::random(4).'-'.Str::random(4).'-'.Str::random(4));
+
+            if (! Discount::query()->where('code', $code)->exists()) {
+                return $code;
+            }
+        }
+
+        throw new RuntimeException('Failed to generate unique discount code after '.$attempts.' attempts.');
+    }
+
+    public function getAvailableBalance(Discount $discount): int
+    {
+        if ($discount->type !== DiscountType::GiftCard) {
+            return 0;
+        }
+
+        return $discount->current_balance ?? 0;
+    }
+
+    public function getDiscountsByUser(int $userId): Collection
+    {
+        return Discount::query()
+            ->where('user_id', $userId)
+            ->active()
+            ->withBalance()
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+}

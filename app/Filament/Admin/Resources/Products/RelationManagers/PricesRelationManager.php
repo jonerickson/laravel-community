@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Products\RelationManagers;
 
 use App\Enums\SubscriptionInterval;
+use App\Filament\Admin\Resources\Products\Actions\CreateExternalPriceAction;
+use App\Filament\Admin\Resources\Products\Actions\DeleteExternalPriceAction;
 use App\Managers\PaymentManager;
+use App\Models\Price;
 use App\Models\Product;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -42,27 +45,27 @@ class PricesRelationManager extends RelationManager
                     ->maxLength(255)
                     ->helperText('Display name for this price option.'),
                 TextInput::make('amount')
-                    ->disabledOn('edit')
+                    ->disabled(fn ($operation, ?Price $record): bool => $operation === 'edit' && filled($record->external_price_id))
                     ->required()
                     ->numeric()
                     ->prefix('$')
                     ->suffix('USD')
                     ->helperText('The amount in cents.'),
                 Select::make('currency')
-                    ->disabledOn('edit')
+                    ->disabled(fn ($operation, ?Price $record): bool => $operation === 'edit' && filled($record->external_price_id))
                     ->options([
                         'USD' => 'US Dollar',
                     ])
                     ->default('USD')
                     ->required(),
                 Select::make('interval')
-                    ->disabledOn('edit')
+                    ->disabled(fn ($operation, ?Price $record): bool => $operation === 'edit' && filled($record->external_price_id))
                     ->options(SubscriptionInterval::class)
                     ->nullable()
                     ->visible(fn () => $this->getOwnerRecord()->isSubscription())
                     ->helperText('Subscription billing interval.'),
                 TextInput::make('interval_count')
-                    ->disabledOn('edit')
+                    ->disabled(fn ($operation, ?Price $record): bool => $operation === 'edit' && filled($record->external_price_id))
                     ->label('Interval Count')
                     ->numeric()
                     ->default(1)
@@ -110,6 +113,10 @@ class PricesRelationManager extends RelationManager
                 IconColumn::make('is_default')
                     ->boolean()
                     ->label('Default'),
+                IconColumn::make('external_price_id')
+                    ->label('External Price')
+                    ->default(false)
+                    ->boolean(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -161,6 +168,8 @@ class PricesRelationManager extends RelationManager
                 CreateAction::make(),
             ])
             ->recordActions([
+                CreateExternalPriceAction::make(),
+                DeleteExternalPriceAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])

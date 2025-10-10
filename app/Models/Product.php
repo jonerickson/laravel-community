@@ -63,6 +63,7 @@ use Laravel\Scout\Searchable;
  * @property-read File|null $file
  * @property-read Collection<int, File> $files
  * @property-read int|null $files_count
+ * @property-read UserGroup|null $pivot
  * @property-read Collection<int, Group> $groups
  * @property-read int|null $groups_count
  * @property-read Collection<int, OrderItem> $orderItems

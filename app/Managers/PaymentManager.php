@@ -60,19 +60,19 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->findInvoice($order);
     }
 
-    public function createPrice(Product $product, Price $price): ?PriceData
+    public function createPrice(Price $price): ?PriceData
     {
-        return $this->driver()->createPrice($product, $price);
+        return $this->driver()->createPrice($price);
     }
 
-    public function updatePrice(Product $product, Price $price): ?PriceData
+    public function updatePrice(Price $price): ?PriceData
     {
-        return $this->driver()->updatePrice($product, $price);
+        return $this->driver()->updatePrice($price);
     }
 
-    public function deletePrice(Product $product, Price $price): bool
+    public function deletePrice(Price $price): bool
     {
-        return $this->driver()->deletePrice($product, $price);
+        return $this->driver()->deletePrice($price);
     }
 
     public function listPrices(Product $product, array $filters = []): mixed

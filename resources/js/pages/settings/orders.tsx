@@ -182,16 +182,18 @@ export default function Orders({ orders }: OrdersProps) {
                 <div className="space-y-6">
                     <HeadingSmall title="Order information" description="View your current and past order information" />
 
-                    <div className="-mt-2 w-full max-w-full overflow-x-hidden">
+                    <div className="-mt-4 w-full max-w-full overflow-x-hidden">
                         <Deferred fallback={<DataTable columns={columns} data={[]} loading={true} />} data={['orders']}>
                             {orders && orders.length > 0 ? (
                                 <DataTable columns={columns} data={orders} />
                             ) : (
-                                <EmptyState
-                                    icon={<FileText />}
-                                    title="No orders found"
-                                    description="You don't have any orders yet. Orders will appear here when you make purchases or subscriptions."
-                                />
+                                <div className='mt-4'>
+                                    <EmptyState
+                                        icon={<FileText />}
+                                        title="No orders found"
+                                        description="You don't have any orders yet. Orders will appear here when you make purchases or subscriptions."
+                                    />
+                                </div>
                             )}
                         </Deferred>
                     </div>

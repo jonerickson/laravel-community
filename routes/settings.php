@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Settings\AppearanceController;
 use App\Http\Controllers\Settings\BillingController;
+use App\Http\Controllers\Settings\DiscountController;
 use App\Http\Controllers\Settings\DownloadsController;
 use App\Http\Controllers\Settings\IntegrationsController;
 use App\Http\Controllers\Settings\OrderController;
@@ -30,6 +31,7 @@ Route::group(['middleware' => ['auth', 'verified']], function (): void {
     Route::post('settings/billing', [BillingController::class, 'update'])->name('settings.billing.update');
 
     Route::get('settings/orders', OrderController::class)->name('settings.orders');
+    Route::get('settings/discounts', DiscountController::class)->name('settings.discounts');
     Route::get('settings/downloads', DownloadsController::class)->name('settings.downloads');
     Route::get('settings/payment-methods', [PaymentMethodController::class, 'index'])->name('settings.payment-methods');
     Route::post('settings/payment-methods', [PaymentMethodController::class, 'store'])->name('settings.payment-methods.store');
