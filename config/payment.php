@@ -28,17 +28,13 @@ return [
     */
 
     'drivers' => [
+        'null' => [
+            'driver' => App\Drivers\Payments\NullDriver::class,
+        ],
+
         'stripe' => [
             'driver' => App\Drivers\Payments\StripeDriver::class,
             'api_key' => env('STRIPE_SECRET'),
         ],
-
-        // Add more payment drivers here as needed
-        // 'paypal' => [
-        //     'driver' => \App\Services\Drivers\PayPalDriver::class,
-        //     'client_id' => env('PAYPAL_CLIENT_ID'),
-        //     'client_secret' => env('PAYPAL_CLIENT_SECRET'),
-        //     'sandbox' => env('PAYPAL_SANDBOX', true),
-        // ],
     ],
 ];

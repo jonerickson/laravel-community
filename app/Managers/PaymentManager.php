@@ -11,6 +11,7 @@ use App\Data\PaymentMethodData;
 use App\Data\PriceData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
+use App\Drivers\Payments\NullDriver;
 use App\Drivers\Payments\StripeDriver;
 use App\Enums\OrderRefundReason;
 use App\Models\Order;
@@ -26,7 +27,7 @@ class PaymentManager extends Manager implements PaymentProcessor
 {
     public function getDefaultDriver(): string
     {
-        return $this->config->get('payment.default', 'stripe');
+        return $this->config->get('payment.default') ?? 'null';
     }
 
     public function createProduct(Product $product): ?ProductData
@@ -180,5 +181,10 @@ class PaymentManager extends Manager implements PaymentProcessor
         return new StripeDriver(
             stripeSecret: $stripeSecret,
         );
+    }
+
+    protected function createNullDriver(): PaymentProcessor
+    {
+        return new NullDriver;
     }
 }
