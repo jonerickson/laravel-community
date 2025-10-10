@@ -1,5 +1,5 @@
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Deferred, Head } from '@inertiajs/react';
 
 import { DataTable } from '@/components/data-table';
 import { EmptyState } from '@/components/empty-state';
@@ -181,15 +181,19 @@ export default function Orders({ orders }: OrdersProps) {
                 <div className="space-y-6">
                     <HeadingSmall title="Order information" description="View your current and past order information" />
 
-                    {orders && orders.length > 0 ? (
-                        <DataTable columns={columns} data={orders} />
-                    ) : (
-                        <EmptyState
-                            icon={<FileText />}
-                            title="No orders found"
-                            description="You don't have any orders yet. Orders will appear here when you make purchases or subscriptions."
-                        />
-                    )}
+                    <div className="-mt-2">
+                        <Deferred fallback={<DataTable columns={columns} data={[]} loading={true} />} data={['orders']}>
+                            {orders && orders.length > 0 ? (
+                                <DataTable columns={columns} data={orders} />
+                            ) : (
+                                <EmptyState
+                                    icon={<FileText />}
+                                    title="No orders found"
+                                    description="You don't have any orders yet. Orders will appear here when you make purchases or subscriptions."
+                                />
+                            )}
+                        </Deferred>
+                    </div>
                 </div>
             </SettingsLayout>
         </AppLayout>

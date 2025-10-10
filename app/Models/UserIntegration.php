@@ -8,8 +8,8 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
-use App\Events\UserSocialCreated;
-use App\Events\UserSocialDeleted;
+use App\Events\UserIntegrationCreated;
+use App\Events\UserIntegrationDeleted;
 use App\Traits\HasLogging;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -73,8 +73,8 @@ class UserIntegration extends Model
     ];
 
     protected $dispatchesEvents = [
-        'created' => UserSocialCreated::class,
-        'deleting' => UserSocialDeleted::class,
+        'created' => UserIntegrationCreated::class,
+        'deleting' => UserIntegrationDeleted::class,
     ];
 
     public function user(): BelongsTo

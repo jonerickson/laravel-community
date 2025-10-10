@@ -6,17 +6,25 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\UpdateBillingRequest;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class BillingController extends Controller
 {
+    public function __construct(
+        #[CurrentUser]
+        private readonly User $user,
+    ) {
+        //
+    }
+
     public function __invoke(): Response
     {
         return Inertia::render('settings/billing', [
-            'user' => Auth::user()->only([
+            'user' => $this->user->only([
                 'billing_address',
                 'billing_address_line_2',
                 'billing_city',
@@ -31,8 +39,7 @@ class BillingController extends Controller
 
     public function update(UpdateBillingRequest $request): RedirectResponse
     {
-        $user = Auth::user();
-        $user->update($request->validated());
+        $this->user->update($request->validated());
 
         return back()->with('message', 'Your billing information was updated successfully.');
     }

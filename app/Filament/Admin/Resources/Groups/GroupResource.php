@@ -10,6 +10,7 @@ use App\Filament\Admin\Resources\Groups\Pages\ListGroups;
 use App\Models\Group;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Services\DiscordApiService;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -18,6 +19,7 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -105,6 +107,26 @@ class GroupResource extends Resource
                                     ->preload()
                                     ->getOptionLabelUsing(fn (Permission $permission) => Str::of($permission->name)->replace('_', ' ')->title()->toString())
                                     ->helperText('The permissions that are assigned to the group. These are in addition to the permissions already inherited by any assigned roles.'),
+                            ]),
+                        Section::make('Discord')
+                            ->collapsible()
+                            ->persistCollapsed()
+                            ->visible(fn (): bool => config('services.discord.enabled') && config('services.discord.guild_id'))
+                            ->components([
+                                Repeater::make('discord_role_id')
+                                    ->relationship('discordRoles')
+                                    ->helperText('Link this group with a Discord role. When a member is add/removed from a group, they will be added/removed from the associated Discord role.')
+                                    ->label('Role(s)')
+                                    ->addActionLabel('Add role')
+                                    ->simple(Select::make('discord_role_id')
+                                        ->searchable()
+                                        ->hiddenLabel()
+                                        ->options(function () {
+                                            $discordApi = app(DiscordApiService::class);
+
+                                            return $discordApi->listRoles()->pluck('name', 'id');
+                                        })
+                                    ),
                             ]),
                     ]),
             ]);

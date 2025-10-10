@@ -21,9 +21,11 @@ type LoginForm = {
 interface LoginProps {
     status?: string;
     canResetPassword: boolean;
+    discordEnabled: boolean;
+    robloxEnabled: boolean;
 }
 
-export default function AuthLogin({ status, canResetPassword }: LoginProps) {
+export default function AuthLogin({ status, canResetPassword, discordEnabled, robloxEnabled }: LoginProps) {
     const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
         email: '',
         password: '',
@@ -121,19 +123,23 @@ export default function AuthLogin({ status, canResetPassword }: LoginProps) {
                             </a>
                         </Button>
 
-                        <Button className="w-full bg-[#424549] text-white" tabIndex={4} size="icon" asChild>
-                            <a href={route('oauth.redirect', { provider: 'discord' })}>
-                                <IconBrandDiscord />
-                                Login with Discord
-                            </a>
-                        </Button>
+                        {discordEnabled && (
+                            <Button className="w-full bg-[#424549] text-white" tabIndex={4} size="icon" asChild>
+                                <a href={route('oauth.redirect', { provider: 'discord' })}>
+                                    <IconBrandDiscord />
+                                    Login with Discord
+                                </a>
+                            </Button>
+                        )}
 
-                        <Button className="w-full bg-[#FF0000] text-white" tabIndex={4} size="icon" asChild>
-                            <a href={route('oauth.redirect', { provider: 'roblox' })}>
-                                <IconRobot />
-                                Login with Roblox
-                            </a>
-                        </Button>
+                        {robloxEnabled && (
+                            <Button className="w-full bg-[#FF0000] text-white" tabIndex={4} size="icon" asChild>
+                                <a href={route('oauth.redirect', { provider: 'roblox' })}>
+                                    <IconRobot />
+                                    Login with Roblox
+                                </a>
+                            </Button>
+                        )}
                     </div>
                 </div>
 

@@ -14,7 +14,7 @@ class StoreSupportTicketCommentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::user()->can('create', Comment::class);
+        return Auth::check() && Auth::user()->can('create', Comment::class);
     }
 
     public function rules(): array

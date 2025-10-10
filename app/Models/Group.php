@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
@@ -29,6 +30,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @property bool $is_default_member
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read Collection<int, GroupDiscordRole> $discordRoles
+ * @property-read int|null $discord_roles_count
  * @property-read File|null $file
  * @property-read Collection<int, File> $files
  * @property-read int|null $files_count
@@ -91,7 +94,13 @@ class Group extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'users_groups');
+        return $this->belongsToMany(User::class, 'users_groups')
+            ->using(UserGroup::class);
+    }
+
+    public function discordRoles(): HasMany
+    {
+        return $this->hasMany(GroupDiscordRole::class);
     }
 
     public function scopeDefaultMemberGroups(Builder $query): void

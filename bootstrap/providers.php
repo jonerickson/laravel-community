@@ -9,4 +9,5 @@ return [
     App\Providers\HorizonServiceProvider::class,
     App\Providers\PaymentServiceProvider::class,
     App\Providers\SupportTicketServiceProvider::class,
+    App\Providers\TelescopeServiceProvider::class,
 ];

@@ -18,9 +18,10 @@ import React from 'react';
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
+    loading?: boolean;
 }
 
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data, loading = false }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 
@@ -42,12 +43,16 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
     return (
         <div>
             <div className="flex items-center py-4">
-                <Input
-                    placeholder="Search..."
-                    value={(table.getColumn('status')?.getFilterValue() as string) ?? ''}
-                    onChange={(event) => table.getColumn('status')?.setFilterValue(event.target.value)}
-                    className="max-w-sm"
-                />
+                {loading ? (
+                    <div className="h-10 w-full max-w-sm animate-pulse rounded-md bg-muted" />
+                ) : (
+                    <Input
+                        placeholder="Search..."
+                        value={(table.getColumn('status')?.getFilterValue() as string) ?? ''}
+                        onChange={(event) => table.getColumn('status')?.setFilterValue(event.target.value)}
+                        className="max-w-sm"
+                    />
+                )}
             </div>
             <div className="rounded-md border">
                 <Table>
@@ -57,7 +62,11 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
                                 {headerGroup.headers.map((header) => {
                                     return (
                                         <TableHead key={header.id}>
-                                            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                                            {loading ? (
+                                                <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+                                            ) : header.isPlaceholder ? null : (
+                                                flexRender(header.column.columnDef.header, header.getContext())
+                                            )}
                                         </TableHead>
                                     );
                                 })}
@@ -65,7 +74,17 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {table.getRowModel().rows?.length ? (
+                        {loading ? (
+                            Array.from({ length: 5 }).map((_, i) => (
+                                <TableRow key={i}>
+                                    {columns.map((_, j) => (
+                                        <TableCell key={j}>
+                                            <div className="h-4 w-full animate-pulse rounded bg-muted" />
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                                     {row.getVisibleCells().map((cell) => (
@@ -83,13 +102,22 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex items-center justify-end space-x-2 py-4">
-                <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-                    Previous
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-                    Next
-                </Button>
+            <div className="flex items-center justify-end gap-2 py-4">
+                {loading ? (
+                    <>
+                        <div className="h-9 w-20 animate-pulse rounded-md bg-muted" />
+                        <div className="h-9 w-20 animate-pulse rounded-md bg-muted" />
+                    </>
+                ) : (
+                    <>
+                        <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+                            Previous
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+                            Next
+                        </Button>
+                    </>
+                )}
             </div>
         </div>
     );

@@ -18,7 +18,9 @@ class ShoppingCartController extends Controller
 {
     public function __construct(
         private readonly ShoppingCartService $cartService
-    ) {}
+    ) {
+        //
+    }
 
     public function update(Request $request): JsonResource
     {

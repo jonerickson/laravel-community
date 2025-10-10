@@ -8,12 +8,20 @@ use App\Data\FingerprintData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ApiResource;
 use App\Models\Fingerprint;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 
 class FingerprintController extends Controller
 {
+    public function __construct(
+        #[CurrentUser]
+        private readonly User $user,
+    ) {
+        //
+    }
+
     public function __invoke(Request $request): ApiResource
     {
         $request->validate([
@@ -22,7 +30,7 @@ class FingerprintController extends Controller
         ]);
 
         $fingerprint = Fingerprint::trackFingerprint(
-            userId: Auth::id(),
+            userId: $this->user->id ?? null,
             fingerprintId: $request->input('fingerprint_id'),
             fingerprintData: $request->input('fingerprint_data'),
             ipAddress: $request->ip(),

@@ -19,7 +19,7 @@ class PaymentSetupIntentData extends Data
 
     public string $status;
 
-    public ?string $customer;
+    public ?string $customer = null;
 
     /** @var string[] */
     public array $paymentMethodTypes;

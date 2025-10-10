@@ -40,6 +40,7 @@
         "laravel/pail": "^1.2.3",
         "laravel/pint": "^v1.24.0",
         "laravel/sail": "^1.45",
+        "laravel/telescope": "^5.14",
         "laravel/tinker": "^2.10",
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "^8.8.2",

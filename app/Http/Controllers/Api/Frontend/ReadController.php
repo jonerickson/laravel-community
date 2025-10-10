@@ -11,12 +11,20 @@ use App\Models\Announcement;
 use App\Models\Forum;
 use App\Models\Post;
 use App\Models\Topic;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class ReadController extends Controller
 {
+    public function __construct(
+        #[CurrentUser]
+        private readonly User $user,
+    ) {
+        //
+    }
+
     public function __invoke(Request $request): ApiResource
     {
         $validated = $request->validate([
@@ -32,7 +40,7 @@ class ReadController extends Controller
             ]);
         }
 
-        $result = $readable->markAsRead(Auth::user());
+        $result = $readable->markAsRead($this->user);
 
         $readData = ReadData::from([
             'markedAsRead' => ! is_bool($result),

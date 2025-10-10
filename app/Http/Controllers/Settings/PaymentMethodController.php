@@ -9,24 +9,26 @@ use App\Http\Requests\Settings\DestroyPaymentMethodRequest;
 use App\Http\Requests\Settings\StorePaymentMethodRequest;
 use App\Http\Requests\Settings\UpdatePaymentMethodRequest;
 use App\Managers\PaymentManager;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PaymentMethodController extends Controller
 {
-    public function __construct(private readonly PaymentManager $paymentManager)
-    {
+    public function __construct(
+        #[CurrentUser]
+        private readonly User $user,
+        private readonly PaymentManager $paymentManager
+    ) {
         //
     }
 
     public function index(): Response
     {
-        $user = Auth::user();
-
         return Inertia::render('settings/payment-methods', [
-            'paymentMethods' => $this->paymentManager->listPaymentMethods($user),
+            'paymentMethods' => $this->paymentManager->listPaymentMethods($this->user),
         ]);
     }
 
@@ -34,11 +36,9 @@ class PaymentMethodController extends Controller
     {
         $validated = $request->validated();
 
-        $user = Auth::user();
-
         $result = true;
-        if (! $this->paymentManager->getCustomer($user)) {
-            $result = $this->paymentManager->createCustomer($user);
+        if (! $this->paymentManager->getCustomer($this->user) instanceof CustomerData) {
+            $result = $this->paymentManager->createCustomer($this->user);
         }
 
         if (! $result) {
@@ -49,7 +49,7 @@ class PaymentMethodController extends Controller
         }
 
         $created = $this->paymentManager->createPaymentMethod(
-            user: $user,
+            user: $this->user,
             paymentMethodId: $validated['method']
         );
 
@@ -70,10 +70,8 @@ class PaymentMethodController extends Controller
     {
         $validated = $request->validated();
 
-        $user = Auth::user();
-
         $updated = $this->paymentManager->updatePaymentMethod(
-            user: $user,
+            user: $this->user,
             paymentMethodId: $validated['method'],
             isDefault: $validated['is_default']
         );
@@ -95,10 +93,8 @@ class PaymentMethodController extends Controller
     {
         $validated = $request->validated();
 
-        $user = Auth::user();
-
         $deleted = $this->paymentManager->deletePaymentMethod(
-            user: $user,
+            user: $this->user,
             paymentMethodId: $validated['method']
         );
 

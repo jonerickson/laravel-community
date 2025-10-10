@@ -12,23 +12,25 @@ use App\Http\Requests\Store\SubscriptionUpdateRequest;
 use App\Managers\PaymentManager;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class SubscriptionsController extends Controller
 {
-    public function __construct(private readonly PaymentManager $paymentManager)
-    {
+    public function __construct(
+        #[CurrentUser]
+        private readonly User $user,
+        private readonly PaymentManager $paymentManager
+    ) {
         //
     }
 
     public function index(): Response
     {
-        $user = Auth::user();
-
         $subscriptions = Product::query()
             ->subscriptions()
             ->with('prices')
@@ -41,17 +43,16 @@ class SubscriptionsController extends Controller
 
         return Inertia::render('store/subscriptions', [
             'subscriptionProducts' => ProductData::collect($subscriptions),
-            'currentSubscription' => $user ? $this->paymentManager->currentSubscription($user) : null,
+            'currentSubscription' => $this->user ? $this->paymentManager->currentSubscription($this->user) : null,
         ]);
     }
 
     public function store(SubscriptionCheckoutRequest $request)
     {
-        $user = Auth::user();
         $price = $request->getPrice();
 
         $order = Order::create([
-            'user_id' => $user->id,
+            'user_id' => $this->user->id,
         ]);
 
         $order->items()->create([
@@ -63,7 +64,7 @@ class SubscriptionsController extends Controller
             order: $order,
         );
 
-        if ($result === false || ($result === '' || $result === '0')) {
+        if (! $result) {
             return back()
                 ->with('message', 'We were unable to start your subscription. Please try again later.');
         }
@@ -78,9 +79,7 @@ class SubscriptionsController extends Controller
 
     public function update(SubscriptionUpdateRequest $request): RedirectResponse
     {
-        $user = Auth::user();
-
-        $success = $this->paymentManager->continueSubscription($user);
+        $success = $this->paymentManager->continueSubscription($this->user);
 
         if ($success) {
             return to_route('store.subscriptions')
@@ -92,11 +91,10 @@ class SubscriptionsController extends Controller
 
     public function destroy(SubscriptionCancelRequest $request): RedirectResponse
     {
-        $user = Auth::user();
         $immediate = $request->isImmediate();
 
         $success = $this->paymentManager->cancelSubscription(
-            user: $user,
+            user: $this->user,
             cancelNow: $immediate
         );
 

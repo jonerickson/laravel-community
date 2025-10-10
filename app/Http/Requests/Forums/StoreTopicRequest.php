@@ -14,7 +14,7 @@ class StoreTopicRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::user()->can('create', Topic::class);
+        return Auth::check() && Auth::user()->can('create', Topic::class);
     }
 
     public function rules(): array

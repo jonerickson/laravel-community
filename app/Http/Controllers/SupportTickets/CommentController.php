@@ -9,16 +9,19 @@ use App\Http\Requests\SupportTickets\StoreSupportTicketCommentRequest;
 use App\Managers\SupportTicketManager;
 use App\Models\Comment;
 use App\Models\SupportTicket;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
     use AuthorizesRequests;
 
     public function __construct(
-        protected readonly SupportTicketManager $supportTicketManager
+        #[CurrentUser]
+        private readonly User $user,
+        private readonly SupportTicketManager $supportTicketManager
     ) {
         //
     }
@@ -33,7 +36,7 @@ class CommentController extends Controller
         $this->supportTicketManager->addComment(
             ticket: $ticket,
             content: $validated['content'],
-            userId: Auth::id(),
+            userId: $this->user->id,
         );
 
         return to_route('support.show', $ticket)

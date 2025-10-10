@@ -12,15 +12,23 @@ use App\Models\Post;
 use App\Models\Product;
 use App\Models\SupportTicket;
 use App\Models\Topic;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DashboardController
 {
+    public function __construct(
+        #[CurrentUser]
+        private readonly User $user,
+    ) {
+        //
+    }
+
     public function __invoke(): Response
     {
         return Inertia::render('dashboard', [
@@ -38,7 +46,7 @@ class DashboardController
         return SupportTicketData::collect(SupportTicket::query()
             ->with('category')
             ->with('author')
-            ->whereBelongsTo(Auth::user(), 'author')
+            ->whereBelongsTo($this->user, 'author')
             ->active()
             ->latest()
             ->limit(5)

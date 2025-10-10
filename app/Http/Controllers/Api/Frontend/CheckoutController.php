@@ -9,22 +9,23 @@ use App\Http\Resources\ApiResource;
 use App\Managers\PaymentManager;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\User;
 use App\Services\ShoppingCartService;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class CheckoutController
 {
     public function __construct(
+        #[CurrentUser]
+        private readonly ?User $user,
         private readonly ShoppingCartService $cartService,
         private readonly PaymentManager $paymentManager,
     ) {}
 
     public function __invoke(Request $request): ApiResource
     {
-        $user = Auth::user();
-
-        if (! $user) {
+        if (! $this->user instanceof User) {
             return ApiResource::error(
                 message: 'Authentication is required to checkout.',
                 errors: ['auth' => ['User must be authenticated.']],
@@ -84,7 +85,7 @@ class CheckoutController
         }
 
         $order = Order::create([
-            'user_id' => $user->id,
+            'user_id' => $this->user->id,
         ]);
 
         foreach ($productPrices as $price) {
@@ -98,7 +99,7 @@ class CheckoutController
             order: $order,
         );
 
-        if (blank($result)) {
+        if ($result === false || ($result === '' || $result === '0')) {
             return ApiResource::error(
                 message: 'Failed to create checkout session. Please try again.',
             );

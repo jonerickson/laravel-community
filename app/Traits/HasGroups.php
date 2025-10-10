@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Traits;
 
 use App\Models\Group;
+use App\Models\UserGroup;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 trait HasGroups
@@ -14,7 +15,8 @@ trait HasGroups
         $table = $this->getTable();
         $groupsForeignPivotKey = $this->groupsForeignPivotKey ?? null;
 
-        return $this->belongsToMany(Group::class, "{$table}_groups", $groupsForeignPivotKey);
+        return $this->belongsToMany(Group::class, "{$table}_groups", $groupsForeignPivotKey)
+            ->using(UserGroup::class);
     }
 
     public function assignToGroup(Group $group): void

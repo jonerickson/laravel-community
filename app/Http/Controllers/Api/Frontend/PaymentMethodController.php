@@ -6,14 +6,21 @@ namespace App\Http\Controllers\Api\Frontend;
 
 use App\Data\PaymentSetupIntentData;
 use App\Http\Resources\ApiResource;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 
 class PaymentMethodController
 {
+    public function __construct(
+        #[CurrentUser]
+        private readonly User $user,
+    ) {
+        //
+    }
+
     public function __invoke(): ApiResource
     {
-        $user = Auth::user();
-        $setupIntent = $user->createSetupIntent();
+        $setupIntent = $this->user->createSetupIntent();
 
         $setupIntentData = PaymentSetupIntentData::from([
             'id' => $setupIntent->id,

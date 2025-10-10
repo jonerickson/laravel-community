@@ -6,19 +6,25 @@ namespace App\Http\Controllers\Settings;
 
 use App\Data\UserIntegrationData;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\UserIntegration;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Container\Attributes\CurrentUser;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class IntegrationsController extends Controller
 {
+    public function __construct(
+        #[CurrentUser]
+        private readonly User $user,
+    ) {
+        //
+    }
+
     public function index(): Response
     {
-        $user = Auth::user();
-
-        $connectedAccounts = $user
+        $connectedAccounts = $this->user
             ->integrations()
             ->select(['id', 'user_id', 'provider', 'provider_id', 'provider_name', 'provider_email', 'provider_avatar', 'created_at', 'updated_at'])
             ->get();
@@ -30,7 +36,7 @@ class IntegrationsController extends Controller
 
     public function destroy(UserIntegration $social): RedirectResponse
     {
-        abort_unless($social->user_id === Auth::id(), 403);
+        abort_unless($social->user_id === $this->user->id, 403);
 
         $social->delete();
 

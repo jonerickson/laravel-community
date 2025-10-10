@@ -14,7 +14,7 @@ class StoreSupportTicketRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::user()->can('create', Ticket::class);
+        return Auth::check() && Auth::user()->can('create', Ticket::class);
     }
 
     public function rules(): array

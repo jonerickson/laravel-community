@@ -8,13 +8,21 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Reports\StoreReportRequest;
 use App\Http\Resources\ApiResource;
 use App\Models\Report;
+use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
     use AuthorizesRequests;
+
+    public function __construct(
+        #[CurrentUser]
+        private readonly User $user,
+    ) {
+        //
+    }
 
     /**
      * @throws AuthorizationException
@@ -24,7 +32,7 @@ class ReportController extends Controller
         $validated = $request->validated();
 
         $existingReport = Report::query()
-            ->where('created_by', Auth::id())
+            ->whereBelongsTo($this->user, 'author')
             ->where('reportable_type', $validated['reportable_type'])
             ->where('reportable_id', $validated['reportable_id'])
             ->exists();

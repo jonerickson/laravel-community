@@ -14,9 +14,10 @@ use App\Managers\SupportTicketManager;
 use App\Models\Order;
 use App\Models\SupportTicket;
 use App\Models\SupportTicketCategory;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -27,8 +28,12 @@ class SupportTicketController extends Controller
     use AuthorizesRequests;
 
     public function __construct(
+        #[CurrentUser]
+        private readonly User $user,
         private readonly SupportTicketManager $supportTicketManager
-    ) {}
+    ) {
+        //
+    }
 
     public function index(): Response
     {
@@ -38,7 +43,7 @@ class SupportTicketController extends Controller
             ->with('category')
             ->with('author')
             ->with('order')
-            ->whereBelongsTo(Auth::user(), 'author')
+            ->whereBelongsTo($this->user, 'author')
             ->latest()
             ->get()
             ->filter(fn (SupportTicket $ticket) => Gate::check('view', $ticket))
@@ -56,7 +61,7 @@ class SupportTicketController extends Controller
         $categories = SupportTicketCategory::active()->ordered()->get();
 
         $orders = Order::query()
-            ->whereBelongsTo(Auth::user())
+            ->whereBelongsTo($this->user)
             ->latest()
             ->get();
 

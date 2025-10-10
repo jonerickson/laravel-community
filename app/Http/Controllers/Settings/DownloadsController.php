@@ -8,19 +8,25 @@ use App\Data\DownloadData;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Number;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DownloadsController extends Controller
 {
+    public function __construct(
+        #[CurrentUser]
+        private readonly User $user,
+    ) {
+        //
+    }
+
     public function __invoke(): Response
     {
-        $user = Auth::user();
-
         $completedOrderIds = Order::query()
-            ->whereBelongsTo($user)
+            ->whereBelongsTo($this->user)
             ->completed()
             ->pluck('id');
 

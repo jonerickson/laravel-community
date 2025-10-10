@@ -71,8 +71,8 @@ class PostModerationTable extends TableWidget
                     ->label('Reports')
                     ->color('warning')
                     ->icon(Heroicon::OutlinedFlag)
-                    ->visible(fn (Post $record) => $record->reports->count() > 0)
-                    ->url(fn (Post $record) => ListReports::getUrl(), shouldOpenInNewTab: true),
+                    ->visible(fn (Post $record): bool => $record->reports->count() > 0)
+                    ->url(fn (Post $record): string => ListReports::getUrl(), shouldOpenInNewTab: true),
                 DeleteAction::make(),
             ])
             ->defaultSort('created_at', 'desc');
