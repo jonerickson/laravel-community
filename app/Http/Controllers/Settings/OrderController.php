@@ -25,7 +25,7 @@ class OrderController extends Controller
     public function __invoke(): Response
     {
         return Inertia::render('settings/orders', [
-            'orders' => Inertia::defer(fn () => OrderData::collect(Order::query()
+            'orders' => Inertia::defer(fn (): array|\Illuminate\Contracts\Pagination\CursorPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Support\Enumerable|\Spatie\LaravelData\CursorPaginatedDataCollection|\Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection => OrderData::collect(Order::query()
                 ->whereBelongsTo($this->user)
                 ->readyToView()
                 ->with(['items.product'])

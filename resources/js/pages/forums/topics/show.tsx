@@ -5,6 +5,7 @@ import ForumTopicPost from '@/components/forum-topic-post';
 import ForumTopicReply from '@/components/forum-topic-reply';
 import RecentViewers from '@/components/recent-viewers';
 import { Button } from '@/components/ui/button';
+import WidgetLoading from '@/components/widget-loading';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
@@ -234,7 +235,7 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
                     )}
                 </div>
 
-                <Deferred fallback={null} data="recentViewers">
+                <Deferred fallback={<WidgetLoading />} data="recentViewers">
                     <RecentViewers viewers={recentViewers} />
                 </Deferred>
 

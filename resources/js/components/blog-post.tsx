@@ -4,6 +4,7 @@ import RecentViewers from '@/components/recent-viewers';
 import RichEditorContent from '@/components/rich-editor-content';
 import { Badge } from '@/components/ui/badge';
 import { UserInfo } from '@/components/user-info';
+import WidgetLoading from '@/components/widget-loading';
 import { pluralize } from '@/lib/utils';
 import { Deferred } from '@inertiajs/react';
 import { Calendar, Clock, Eye, MessageSquare } from 'lucide-react';
@@ -117,7 +118,7 @@ export default function BlogPost({ post, comments, recentViewers }: BlogPostProp
                     </section>
                 )}
 
-                <Deferred fallback={null} data="recentViewers">
+                <Deferred fallback={<WidgetLoading />} data="recentViewers">
                     <div className="mt-6">
                         <RecentViewers viewers={recentViewers} />
                     </div>
