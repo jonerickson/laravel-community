@@ -104,6 +104,43 @@ CREATE TABLE `comments` (
   CONSTRAINT `comments_parent_id_foreign` FOREIGN KEY (`parent_id`) REFERENCES `comments` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `discounts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `discounts` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `reference_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `discount_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` int unsigned NOT NULL,
+  `current_balance` int unsigned DEFAULT NULL,
+  `product_id` bigint unsigned DEFAULT NULL,
+  `created_by` bigint unsigned DEFAULT NULL,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `recipient_email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `max_uses` int unsigned DEFAULT NULL,
+  `times_used` int unsigned NOT NULL DEFAULT '0',
+  `min_order_amount` int unsigned DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `activated_at` timestamp NULL DEFAULT NULL,
+  `metadata` json DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `discounts_reference_id_unique` (`reference_id`),
+  UNIQUE KEY `discounts_code_unique` (`code`),
+  KEY `discounts_product_id_foreign` (`product_id`),
+  KEY `discounts_created_by_foreign` (`created_by`),
+  KEY `discounts_user_id_foreign` (`user_id`),
+  KEY `discounts_code_index` (`code`),
+  KEY `discounts_type_index` (`type`),
+  KEY `discounts_expires_at_index` (`expires_at`),
+  CONSTRAINT `discounts_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `discounts_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `discounts_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `failed_jobs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -172,7 +209,7 @@ DROP TABLE IF EXISTS `follows`;
 CREATE TABLE `follows` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `created_by` bigint unsigned NOT NULL,
-  `followable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `followable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `followable_id` bigint unsigned NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -263,6 +300,20 @@ CREATE TABLE `groups` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `groups_is_active_order_index` (`is_active`,`order`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `groups_discord_roles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `groups_discord_roles` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `group_id` bigint unsigned NOT NULL,
+  `discord_role_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `groups_discord_roles_group_id_foreign` (`group_id`),
+  CONSTRAINT `groups_discord_roles_group_id_foreign` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `images`;
@@ -377,11 +428,11 @@ DROP TABLE IF EXISTS `notifications`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `notifications` (
-  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `notifiable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `notifiable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `notifiable_id` bigint unsigned NOT NULL,
-  `data` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `data` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `read_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -492,6 +543,25 @@ CREATE TABLE `orders` (
   KEY `orders_user_id_foreign` (`user_id`),
   KEY `orders_status_index` (`status`),
   CONSTRAINT `orders_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `orders_discounts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `orders_discounts` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `order_id` bigint unsigned NOT NULL,
+  `discount_id` bigint unsigned NOT NULL,
+  `amount_applied` int unsigned NOT NULL,
+  `balance_before` int unsigned DEFAULT NULL,
+  `balance_after` int unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `orders_discounts_discount_id_foreign` (`discount_id`),
+  KEY `orders_discounts_order_id_discount_id_index` (`order_id`,`discount_id`),
+  CONSTRAINT `orders_discounts_discount_id_foreign` FOREIGN KEY (`discount_id`) REFERENCES `discounts` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `orders_discounts_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `orders_items`;
@@ -623,6 +693,7 @@ CREATE TABLE `posts` (
   `excerpt` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `is_published` tinyint(1) NOT NULL DEFAULT '0',
+  `is_approved` tinyint(1) NOT NULL DEFAULT '0',
   `is_featured` tinyint(1) NOT NULL DEFAULT '0',
   `is_pinned` tinyint(1) NOT NULL DEFAULT '0',
   `comments_enabled` tinyint(1) NOT NULL DEFAULT '1',
@@ -949,6 +1020,45 @@ CREATE TABLE `tax_rates` (
   KEY `tax_rates_percentage_index` (`percentage`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `telescope_entries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `telescope_entries` (
+  `sequence` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `uuid` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `batch_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `family_hash` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `should_display_on_index` tinyint(1) NOT NULL DEFAULT '1',
+  `type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`sequence`),
+  UNIQUE KEY `telescope_entries_uuid_unique` (`uuid`),
+  KEY `telescope_entries_batch_id_index` (`batch_id`),
+  KEY `telescope_entries_family_hash_index` (`family_hash`),
+  KEY `telescope_entries_created_at_index` (`created_at`),
+  KEY `telescope_entries_type_should_display_on_index_index` (`type`,`should_display_on_index`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `telescope_entries_tags`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `telescope_entries_tags` (
+  `entry_uuid` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tag` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`entry_uuid`,`tag`),
+  KEY `telescope_entries_tags_tag_index` (`tag`),
+  CONSTRAINT `telescope_entries_tags_entry_uuid_foreign` FOREIGN KEY (`entry_uuid`) REFERENCES `telescope_entries` (`uuid`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `telescope_monitoring`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `telescope_monitoring` (
+  `tag` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`tag`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `topics`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -1193,11 +1303,16 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (75,'2025_10_02_234
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (76,'2025_10_05_212730_create_warnings_table',26);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (77,'2025_10_05_212738_create_user_warnings_table',26);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (78,'2025_10_05_213137_create_warning_consequences_table',27);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (79,'2025_09_28_202015_create_email_settings',28);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (80,'2025_09_28_202053_create_general_settings',28);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (81,'2025_10_06_165201_create_notifications_table',28);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (82,'2025_10_06_171446_add_duration_days_to_warnings_consequences_table',29);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (83,'2025_10_06_172442_add_warning_consequence_to_users_warnings_table',30);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (84,'2025_10_06_173141_add_points_and_consequence_expiration_to_users_warnings',31);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (85,'2025_10_06_212630_create_follows_table',32);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (86,'2025_10_07_151006_add_last_seen_at_to_users_table',33);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (87,'2025_09_28_202015_create_email_settings',34);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (88,'2025_09_28_202053_create_general_settings',34);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (89,'2025_10_07_202428_add_is_approved_to_posts_table',34);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (90,'2025_10_09_204919_create_group_discord_roles_table',34);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (91,'2025_10_09_215140_create_telescope_entries_table',34);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (92,'2025_10_10_205442_create_discounts_table',35);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (93,'2025_10_10_205445_create_orders_discounts_table',35);
