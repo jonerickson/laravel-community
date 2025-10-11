@@ -24,7 +24,7 @@ class StoreController extends Controller
                 ->ordered()
                 ->with('image')
                 ->latest()
-                ->take(5)
+                ->take(4)
                 ->get()
                 ->filter(fn (ProductCategory $category) => Gate::check('view', $category))
                 ->values()),

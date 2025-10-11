@@ -17,7 +17,7 @@ export default function StoreIndexCategoriesItem({ item }: { item: App.Data.Prod
                         aria-hidden="true"
                         className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/20 to-transparent"
                     />
-                    <span className="relative mt-auto text-center text-base font-bold text-nowrap text-white">{item.name}</span>
+                    <span className="relative mt-auto text-center text-base font-bold text-white">{item.name}</span>
                 </>
             ) : (
                 <>
@@ -28,7 +28,7 @@ export default function StoreIndexCategoriesItem({ item }: { item: App.Data.Prod
                         aria-hidden="true"
                         className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/20 to-transparent"
                     />
-                    <span className="relative mt-auto text-center text-base font-bold text-nowrap text-white">{item.name}</span>
+                    <span className="relative mt-auto text-center text-base font-bold text-white">{item.name}</span>
                 </>
             )}
         </Link>
