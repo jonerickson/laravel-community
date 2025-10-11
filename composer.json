@@ -88,6 +88,15 @@
         "install-hooks": [
             ".githooks/install.sh"
         ],
+        "setup": [
+            "composer install",
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "@php artisan key:generate",
+            "@php artisan migrate --force",
+            "npm install",
+            "npm run build",
+            "@php artisan mi:install"
+        ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "npx concurrently -k -c \"#2563eb,#d4d4d8,#4f46e5\" \"php artisan horizon\" \"php artisan pail\" \"npm run dev\" --names=queue,logs,vite"

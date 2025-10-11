@@ -95,6 +95,9 @@ declare namespace App.Data {
         isExpired: boolean;
         isValid: boolean;
         hasBalance: boolean;
+        amountApplied: number | null;
+        balanceBefore: number | null;
+        balanceAfter: number | null;
         createdAt: string | null;
         updatedAt: string | null;
     };
@@ -208,6 +211,7 @@ declare namespace App.Data {
         externalPaymentId: string | null;
         externalInvoiceId: string | null;
         items: Array<App.Data.OrderItemData>;
+        discounts: Array<App.Data.DiscountData>;
         createdAt: string | null;
         updatedAt: string | null;
     };
@@ -331,6 +335,7 @@ declare namespace App.Data {
         interval: App.Enums.SubscriptionInterval;
         isDefault: boolean;
         isActive: boolean;
+        externalPriceId: string | null;
     };
     export type ProductCategoryData = {
         id: number;
@@ -538,7 +543,7 @@ declare namespace App.Enums {
         | 'website_information_services_personal'
         | 'electronically_delivered_information_business'
         | 'electronically_delivered_information_personal';
-    export type ProductType = 'product' | 'subscription' | 'gift_card';
+    export type ProductType = 'product' | 'subscription';
     export type PublishableStatus = 'published' | 'draft';
     export type ReportReason = 'spam' | 'harassment' | 'inappropriate_content' | 'abuse' | 'impersonation' | 'false_information' | 'other';
     export type ReportStatus = 'pending' | 'reviewed' | 'approved' | 'rejected';

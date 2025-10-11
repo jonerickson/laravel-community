@@ -7,8 +7,6 @@ namespace App\Http\Controllers\Api\Frontend;
 use App\Data\CheckoutData;
 use App\Http\Resources\ApiResource;
 use App\Managers\PaymentManager;
-use App\Models\Order;
-use App\Models\Product;
 use App\Models\User;
 use App\Services\ShoppingCartService;
 use Illuminate\Container\Attributes\CurrentUser;
@@ -33,9 +31,9 @@ class CheckoutController
             );
         }
 
-        $cartItems = $this->cartService->getCartItems();
+        $cart = $this->cartService->getCart();
 
-        if (blank($cartItems)) {
+        if (blank($cart->cartItems)) {
             return ApiResource::error(
                 message: 'Your cart is currently empty.',
                 errors: ['cart' => ['Cart cannot be empty.']],
@@ -43,55 +41,44 @@ class CheckoutController
             );
         }
 
-        $productPrices = [];
-        foreach ($cartItems as $item) {
-            /** @var Product $product */
-            $product = $item['product'];
-
-            if (! $product || ! $product->external_product_id) {
+        foreach ($cart->cartItems as $item) {
+            if (! $item->product || ! $item->product->externalProductId) {
                 return ApiResource::error(
-                    message: "{$item['name']} is not available for purchase.",
-                    errors: ['product' => ["{$item['name']} is not configured for purchase."]],
+                    message: "$item->name is not available for purchase.",
+                    errors: ['product' => ["$item->name is not configured for purchase."]],
                     status: 400
                 );
             }
 
-            $selectedPrice = null;
-            if ($item['price_id']) {
-                $selectedPrice = $product->prices()->where('id', $item['price_id'])->first();
-            }
+            $selectedPrice = $item->selectedPrice ?? $item->product->defaultPrice;
 
-            if (! $selectedPrice) {
-                $selectedPrice = $product->defaultPrice;
-            }
-
-            if (! $selectedPrice || ! $selectedPrice->external_price_id) {
+            if (! $selectedPrice || ! $selectedPrice->externalPriceId) {
                 return ApiResource::error(
-                    message: "No prices are configured for {$item['name']}.",
-                    errors: ['price' => ["Price not configured for {$item['name']}."]],
+                    message: "No prices are configured for $item->name.",
+                    errors: ['price' => ["Price not configured for $item->name."]],
                     status: 400
                 );
             }
-
-            $productPrices[] = $selectedPrice;
         }
 
-        if ($productPrices === []) {
+        $order = $this->cartService->getOrCreatePendingOrder();
+
+        if (! $order instanceof \App\Models\Order) {
             return ApiResource::error(
-                message: 'Your cart is currently empty.',
-                errors: ['cart' => ['Cart cannot be empty.']],
-                status: 400
+                message: 'Failed to create order.',
+                errors: ['order' => ['Unable to create order.']],
             );
         }
 
-        $order = Order::create([
-            'user_id' => $this->user->id,
-        ]);
+        $order->items()->delete();
 
-        foreach ($productPrices as $price) {
+        foreach ($cart->cartItems as $item) {
+            $selectedPrice = $item->selectedPrice ?? $item->product->defaultPrice;
+
             $order->items()->create([
-                'product_id' => $price->product_id,
-                'price_id' => $price->id,
+                'product_id' => $item->product->id,
+                'price_id' => $selectedPrice->id,
+                'quantity' => $item->quantity,
             ]);
         }
 

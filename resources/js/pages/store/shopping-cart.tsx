@@ -3,13 +3,17 @@ import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useApiRequest } from '@/hooks';
 import { useCartOperations } from '@/hooks/use-cart-operations';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { ImageIcon, ShoppingCart as ShoppingCartIcon, Trash2, XIcon } from 'lucide-react';
-import { useState } from 'react';
+import { Check, ImageIcon, ShoppingCart as ShoppingCartIcon, Ticket, Trash2, XIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { route } from 'ziggy-js';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -24,13 +28,58 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface ShoppingCartProps {
     cartItems: App.Data.CartItemData[];
+    cartCount?: number;
+    order?: App.Data.OrderData | null;
 }
 
-export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
+interface DiscountInfo {
+    id: number;
+    code: string;
+    type: string;
+    discount_type: string;
+    discount_value: string;
+    discount_amount: number;
+    discount_amount_formatted: string;
+    new_total: number;
+    new_total_formatted: string;
+}
+
+export default function ShoppingCart({ cartItems = [], order = null }: ShoppingCartProps) {
     const { items, setItems, updateQuantity, removeItem, proceedToCheckout, calculateTotals, loading } = useCartOperations(cartItems);
     const [policiesAgreed, setPoliciesAgreed] = useState(false);
+    const [discountCode, setDiscountCode] = useState('');
+    const [appliedDiscount, setAppliedDiscount] = useState<DiscountInfo | null>(null);
     const { delete: clearCartForm, processing: clearCartProcessing } = useForm();
     const { subtotal, total } = calculateTotals();
+    const totalInCents = Math.round(total * 100);
+    const finalTotal = appliedDiscount ? appliedDiscount.new_total / 100 : total;
+    const { loading: validatingDiscount, execute: validateDiscount } = useApiRequest();
+    const { loading: removingDiscount, execute: removeDiscountRequest } = useApiRequest();
+
+    useEffect(() => {
+        if (order && order.discounts && order.discounts.length > 0) {
+            const firstDiscount = order.discounts[0];
+
+            const discountValue =
+                firstDiscount.discountType === 'percentage' ? `${firstDiscount.value}%` : `$${(firstDiscount.value / 100).toFixed(2)}`;
+
+            setAppliedDiscount({
+                id: firstDiscount.id,
+                code: firstDiscount.code,
+                type: firstDiscount.type,
+                discount_type: firstDiscount.discountType,
+                discount_value: discountValue,
+                discount_amount: firstDiscount.amountApplied ?? 0,
+                discount_amount_formatted: `$${((firstDiscount.amountApplied ?? 0) / 100).toFixed(2)}`,
+                new_total: firstDiscount.balanceAfter ?? totalInCents,
+                new_total_formatted: `$${((firstDiscount.balanceAfter ?? totalInCents) / 100).toFixed(2)}`,
+            });
+            setDiscountCode(firstDiscount.code);
+        } else if (order && (!order.discounts || order.discounts.length === 0)) {
+            setAppliedDiscount(null);
+            setDiscountCode('');
+        }
+    }, [order, totalInCents]);
 
     const clearCart = () => {
         if (!window.confirm('Are you sure you want to empty your cart? This action cannot be undone.')) {
@@ -83,6 +132,51 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
         if (!item) return;
 
         removeItem(productId, item.name, priceId);
+    };
+
+    const handleApplyDiscount = async () => {
+        if (!discountCode.trim()) {
+            toast.error('Please enter a discount code.');
+            return;
+        }
+
+        await validateDiscount(
+            {
+                url: route('api.discount.store'),
+                method: 'POST',
+                data: {
+                    code: discountCode.trim(),
+                    order_total: totalInCents,
+                },
+            },
+            {
+                onSuccess: (data) => {
+                    setAppliedDiscount(data as DiscountInfo);
+                    router.reload({ only: ['order'] });
+                },
+            },
+        );
+    };
+
+    const handleRemoveDiscount = async () => {
+        if (!appliedDiscount) return;
+
+        await removeDiscountRequest(
+            {
+                url: route('api.discount.destroy'),
+                method: 'POST',
+                data: {
+                    discount_id: appliedDiscount.id,
+                },
+            },
+            {
+                onSuccess: () => {
+                    setAppliedDiscount(null);
+                    setDiscountCode('');
+                    router.reload({ only: ['order'] });
+                },
+            },
+        );
     };
 
     return (
@@ -240,9 +334,67 @@ export default function ShoppingCart({ cartItems = [] }: ShoppingCartProps) {
                                     <dt className="text-sm text-muted-foreground">Subtotal</dt>
                                     <dd className="text-sm font-medium text-primary">${subtotal.toFixed(2)}</dd>
                                 </div>
+
+                                <div className="py-3">
+                                    <dt className="mb-2 flex items-center gap-2">
+                                        <Ticket className="size-4" />
+                                        <h4 className="text-sm font-medium">Discount code</h4>
+                                    </dt>
+                                    {appliedDiscount ? (
+                                        <dd className="space-y-2">
+                                            <div className="flex items-center justify-between rounded-md bg-green-50 px-3 py-2 dark:bg-green-900/20">
+                                                <div className="flex items-center gap-2">
+                                                    <Check className="size-4 text-green-600 dark:text-green-400" />
+                                                    <span className="font-mono text-sm font-medium">{appliedDiscount.code}</span>
+                                                    <span className="text-xs text-muted-foreground">({appliedDiscount.discount_value})</span>
+                                                </div>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={handleRemoveDiscount}
+                                                    disabled={removingDiscount}
+                                                    className="h-6 px-2 text-xs"
+                                                >
+                                                    {removingDiscount ? 'Removing...' : 'Remove'}
+                                                </Button>
+                                            </div>
+                                            <div className="flex items-center justify-between text-sm">
+                                                <span className="text-green-600 dark:text-green-400">Discount</span>
+                                                <span className="font-medium text-green-600 dark:text-green-400">
+                                                    -{appliedDiscount.discount_amount_formatted}
+                                                </span>
+                                            </div>
+                                        </dd>
+                                    ) : (
+                                        <dd className="flex gap-2">
+                                            <Input
+                                                type="text"
+                                                placeholder="Enter code"
+                                                value={discountCode}
+                                                onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault();
+                                                        void handleApplyDiscount();
+                                                    }
+                                                }}
+                                                className="flex-1"
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="secondary"
+                                                onClick={() => void handleApplyDiscount()}
+                                                disabled={validatingDiscount || !discountCode.trim()}
+                                            >
+                                                {validatingDiscount ? 'Applying...' : 'Apply'}
+                                            </Button>
+                                        </dd>
+                                    )}
+                                </div>
+
                                 <div className="flex items-center justify-between py-3">
                                     <dt className="text-base font-medium text-muted-foreground">Order total</dt>
-                                    <dd className="text-base font-medium text-primary">${total.toFixed(2)}</dd>
+                                    <dd className="text-base font-medium text-primary">${finalTotal.toFixed(2)}</dd>
                                 </div>
 
                                 {policies.length > 0 && (

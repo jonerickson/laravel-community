@@ -50,6 +50,9 @@ class OrderData extends Data
     /** @var OrderItemData[] */
     public array $items;
 
+    /** @var DiscountData[] */
+    public array $discounts = [];
+
     public ?CarbonImmutable $createdAt = null;
 
     public ?CarbonImmutable $updatedAt = null;

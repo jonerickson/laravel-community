@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\Frontend;
 
-use App\Data\CartData;
-use App\Data\CartItemData;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Frontend\AddToCartRequest;
+use App\Http\Requests\Api\Frontend\RemoveFromCartRequest;
+use App\Http\Requests\Api\Frontend\UpdateCartRequest;
 use App\Http\Resources\ApiResource;
-use App\Models\Product;
 use App\Services\ShoppingCartService;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Session;
 
 class ShoppingCartController extends Controller
 {
@@ -22,45 +20,27 @@ class ShoppingCartController extends Controller
         //
     }
 
-    public function update(Request $request): JsonResource
+    public function store(AddToCartRequest $request): JsonResource
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'price_id' => 'nullable|exists:prices,id',
-            'quantity' => 'required|integer|min:1|max:99',
-        ]);
+        $cartResponse = $this->cartService->addItem(
+            productId: $request->integer('product_id'),
+            priceId: $request->integer('price_id'),
+            quantity: $request->integer('quantity')
+        );
 
-        $cart = Session::get('shopping_cart', []);
-        $productId = $request->input('product_id');
-        $priceId = $request->input('price_id');
-        $quantity = $request->input('quantity');
+        return ApiResource::created(
+            resource: $cartResponse,
+            message: 'The item was successfully added to your cart.'
+        );
+    }
 
-        $existingKeys = array_filter(array_keys($cart), fn (int|string $key): bool => str_starts_with((string) $key, $productId.'_'));
-
-        foreach ($existingKeys as $key) {
-            unset($cart[$key]);
-        }
-
-        $product = Product::findOrFail($productId);
-        $newCartKey = $productId.'_'.$priceId;
-
-        $cart[$newCartKey] = [
-            'product_id' => $productId,
-            'price_id' => $priceId,
-            'name' => $product->name,
-            'slug' => $product->slug,
-            'quantity' => $quantity,
-            'added_at' => now(),
-        ];
-
-        Session::put('shopping_cart', $cart);
-
-        $cartItems = $this->cartService->getCartItems();
-
-        $cartResponse = CartData::from([
-            'cartCount' => count($cartItems),
-            'cartItems' => CartItemData::collect($cartItems),
-        ]);
+    public function update(UpdateCartRequest $request): JsonResource
+    {
+        $cartResponse = $this->cartService->updateItem(
+            productId: $request->integer('product_id'),
+            priceId: $request->integer('price_id'),
+            quantity: $request->integer('quantity')
+        );
 
         return ApiResource::updated(
             resource: $cartResponse,
@@ -68,29 +48,12 @@ class ShoppingCartController extends Controller
         );
     }
 
-    public function destroy(Request $request): JsonResource
+    public function destroy(RemoveFromCartRequest $request): JsonResource
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'price_id' => 'nullable|exists:prices,id',
-        ]);
-
-        $cart = Session::get('shopping_cart', []);
-        $productId = $request->input('product_id');
-        $priceId = $request->input('price_id');
-        $cartKey = $productId.'_'.$priceId;
-
-        if (isset($cart[$cartKey])) {
-            unset($cart[$cartKey]);
-            Session::put('shopping_cart', $cart);
-        }
-
-        $cartItems = $this->cartService->getCartItems();
-
-        $cartResponse = CartData::from([
-            'cartCount' => count($cartItems),
-            'cartItems' => CartItemData::collect($cartItems),
-        ]);
+        $cartResponse = $this->cartService->removeItem(
+            productId: $request->integer('product_id'),
+            priceId: $request->integer('price_id')
+        );
 
         return ApiResource::success(
             resource: $cartResponse,

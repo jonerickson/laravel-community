@@ -14,7 +14,7 @@ interface CreateTopicProps {
 }
 
 export default function ForumTopicCreate({ forum }: CreateTopicProps) {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         title: '',
         description: '',
         content: '',

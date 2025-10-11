@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\Frontend\ApproveController;
 use App\Http\Controllers\Api\Frontend\CheckoutController;
+use App\Http\Controllers\Api\Frontend\DiscountController;
 use App\Http\Controllers\Api\Frontend\FingerprintController;
 use App\Http\Controllers\Api\Frontend\FollowController;
 use App\Http\Controllers\Api\Frontend\LikeController;
@@ -21,8 +22,11 @@ use App\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['domain' => config('app.url'), 'middleware' => [EnsureFrontendRequestsAreStateful::class], 'as' => 'api.'], function (): void {
+    Route::post('/cart', [ShoppingCartController::class, 'store'])->name('cart.store');
     Route::put('/cart', [ShoppingCartController::class, 'update'])->name('cart.update');
     Route::delete('/cart', [ShoppingCartController::class, 'destroy'])->name('cart.destroy');
+    Route::post('/discount/validate', [DiscountController::class, 'store'])->name('discount.store');
+    Route::post('/discount/remove', [DiscountController::class, 'destroy'])->name('discount.destroy');
     Route::post('/fingerprint', FingerprintController::class)->name('fingerprint');
     Route::get('/search', SearchController::class)->name('search');
 

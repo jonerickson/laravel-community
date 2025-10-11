@@ -189,7 +189,7 @@ export default function Discounts({ discounts }: DiscountsProps) {
                             {discounts && discounts.length > 0 ? (
                                 <DataTable columns={columns} data={discounts} />
                             ) : (
-                                <div className='mt-4'>
+                                <div className="mt-4">
                                     <EmptyState
                                         icon={<Gift />}
                                         title="No discounts found"

@@ -187,7 +187,7 @@ export default function Orders({ orders }: OrdersProps) {
                             {orders && orders.length > 0 ? (
                                 <DataTable columns={columns} data={orders} />
                             ) : (
-                                <div className='mt-4'>
+                                <div className="mt-4">
                                     <EmptyState
                                         icon={<FileText />}
                                         title="No orders found"

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Store;
 
-use App\Data\CartItemData;
+use App\Data\DiscountData;
+use App\Data\OrderData;
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Services\ShoppingCartService;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -19,11 +21,30 @@ class ShoppingCartController extends Controller
 
     public function index(): Response
     {
-        $cartItems = $this->cartService->getCartItems();
+        $cart = $this->cartService->getCart();
+        $order = $this->cartService->getOrCreatePendingOrder();
+
+        if ($order instanceof Order) {
+            $discounts = $order->discounts->map(fn ($discount): array => array_merge(
+                DiscountData::from($discount)->toArray(),
+                [
+                    'amountApplied' => $discount->pivot->amount_applied,
+                    'balanceBefore' => $discount->pivot->balance_before,
+                    'balanceAfter' => $discount->pivot->balance_after,
+                ]
+            ))->toArray();
+
+            $orderArray = OrderData::from($order)->toArray();
+            $orderArray['discounts'] = $discounts;
+            $orderData = $orderArray;
+        } else {
+            $orderData = null;
+        }
 
         return Inertia::render('store/shopping-cart', [
-            'cartItems' => CartItemData::collect($cartItems),
-            'cartCount' => $this->cartService->getCartCount(),
+            'cartItems' => $cart->cartItems,
+            'cartCount' => $cart->cartCount,
+            'order' => $orderData,
         ]);
     }
 

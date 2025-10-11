@@ -4,29 +4,208 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Data\CartData;
+use App\Data\CartItemData;
+use App\Enums\OrderStatus;
+use App\Models\Discount;
+use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use RuntimeException;
 
 class ShoppingCartService
 {
-    public function __construct(private readonly Request $request)
-    {
+    public function __construct(
+        private readonly Request $request,
+        #[CurrentUser]
+        private readonly ?User $user = null,
+    ) {
         //
     }
 
-    public function getCartItems(): array
+    public function getCart(): CartData
+    {
+        $cartItems = $this->getCartItems();
+
+        return CartData::from([
+            'cartCount' => count($cartItems),
+            'cartItems' => CartItemData::collect($cartItems),
+        ]);
+    }
+
+    public function getCartCount(): int
+    {
+        if (! $this->request->hasSession()) {
+            return 0;
+        }
+
+        $cart = $this->getRawCart();
+
+        return count($cart);
+    }
+
+    public function clearCart(): void
+    {
+        if (! $this->request->hasSession()) {
+            return;
+        }
+
+        $this->request->session()->forget('shopping_cart');
+        $this->clearPendingOrder();
+    }
+
+    public function getOrCreatePendingOrder(): ?Order
+    {
+        if (! $this->user instanceof User) {
+            return null;
+        }
+
+        $orderId = $this->request->session()->get('pending_order_id');
+
+        if ($orderId) {
+            $order = Order::query()
+                ->where('id', $orderId)
+                ->whereBelongsTo($this->user)
+                ->where('status', OrderStatus::Pending)
+                ->with('discounts')
+                ->first();
+
+            if ($order) {
+                return $order;
+            }
+        }
+
+        $order = Order::create([
+            'user_id' => $this->user->id,
+            'status' => OrderStatus::Pending,
+        ]);
+
+        $this->request->session()->put('pending_order_id', $order->id);
+
+        return $order->load('discounts');
+    }
+
+    public function clearPendingOrder(): void
+    {
+        $orderId = $this->request->session()->get('pending_order_id');
+
+        if ($orderId && $this->user) {
+            Order::query()
+                ->where('id', $orderId)
+                ->whereBelongsTo($this->user)
+                ->where('status', OrderStatus::Pending)
+                ->delete();
+
+            $this->request->session()->forget('pending_order_id');
+        }
+    }
+
+    public function applyDiscount(Order $order, Discount $discount, int $orderTotal): void
+    {
+        if ($order->discounts()->where('discount_id', $discount->id)->exists()) {
+            throw new RuntimeException('This discount has already been applied to your order.');
+        }
+
+        $discountAmount = $discount->calculateDiscount($orderTotal);
+
+        $order->discounts()->attach($discount->id, [
+            'amount_applied' => $discountAmount,
+            'balance_before' => $orderTotal,
+            'balance_after' => max(0, $orderTotal - $discountAmount),
+        ]);
+    }
+
+    public function removeDiscount(Order $order, int $discountId): void
+    {
+        $order->discounts()->detach($discountId);
+    }
+
+    public function addItem(int $productId, ?int $priceId, int $quantity): CartData
+    {
+        $cart = $this->getRawCart();
+        $cartKey = $productId.'_'.$priceId;
+
+        $product = Product::findOrFail($productId);
+
+        if (isset($cart[$cartKey])) {
+            $cart[$cartKey]['quantity'] += $quantity;
+        } else {
+            $cart[$cartKey] = [
+                'product_id' => $productId,
+                'price_id' => $priceId,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'quantity' => $quantity,
+                'added_at' => now(),
+            ];
+        }
+
+        $this->saveCart($cart);
+
+        return $this->getCart();
+    }
+
+    public function updateItem(int $productId, ?int $priceId, int $quantity): CartData
+    {
+        $cart = $this->getRawCart();
+
+        $existingKeys = array_filter(
+            array_keys($cart),
+            fn (int|string $key): bool => str_starts_with((string) $key, $productId.'_')
+        );
+
+        foreach ($existingKeys as $key) {
+            unset($cart[$key]);
+        }
+
+        $product = Product::findOrFail($productId);
+        $newCartKey = $productId.'_'.$priceId;
+
+        $cart[$newCartKey] = [
+            'product_id' => $productId,
+            'price_id' => $priceId,
+            'name' => $product->name,
+            'slug' => $product->slug,
+            'quantity' => $quantity,
+            'added_at' => now(),
+        ];
+
+        $this->saveCart($cart);
+
+        return $this->getCart();
+    }
+
+    public function removeItem(int $productId, ?int $priceId): CartData
+    {
+        $cart = $this->getRawCart();
+        $cartKey = $productId.'_'.$priceId;
+
+        if (isset($cart[$cartKey])) {
+            unset($cart[$cartKey]);
+            $this->saveCart($cart);
+        }
+
+        return $this->getCart();
+    }
+
+    /**
+     * @return array<int, array{product_id: int, price_id: ?int, name: string, slug: string, quantity: int, product: ?Product, selected_price: ?Price, available_prices: Collection, added_at: mixed}>
+     */
+    private function getCartItems(): array
     {
         if (! $this->request->hasSession()) {
             return [];
         }
 
-        $cart = $this->request->session()->get('shopping_cart', []);
+        $cart = $this->getRawCart();
 
-        if (empty($cart)) {
+        if ($cart === []) {
             return [];
         }
 
@@ -39,18 +218,22 @@ class ShoppingCartService
         return $this->mapCartItems($cart, $products, $prices);
     }
 
-    public function getCartCount(): int
+    private function getRawCart(): array
     {
-        return count($this->getCartItems());
+        if (! $this->request->hasSession()) {
+            return [];
+        }
+
+        return $this->request->session()->get('shopping_cart', []);
     }
 
-    public function clearCart(): void
+    private function saveCart(array $cart): void
     {
         if (! $this->request->hasSession()) {
             return;
         }
 
-        $this->request->session()->forget('shopping_cart');
+        $this->request->session()->put('shopping_cart', $cart);
     }
 
     private function getProducts(array $productIds): Collection

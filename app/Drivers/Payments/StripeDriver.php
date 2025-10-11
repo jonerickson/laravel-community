@@ -577,13 +577,47 @@ class StripeDriver implements PaymentProcessor
             }
 
             /** @var ?OrderItem $allowPromotionCodes */
-            $allowPromotionCodes = $order->items()->with('product')->get()->firstWhere('product.allow_promotion_codes', true);
+            $allowPromotionCodes = $order->items()
+                ->with('product')
+                ->get()
+                ->firstWhere('product.allow_promotion_codes', true);
 
-            $metadata = array_merge_recursive([
-                'order_id' => $order->reference_id,
-            ], ...$order->items->map(fn (OrderItem $orderItem) => data_get($orderItem->product->metadata, 'metadata', []))->toArray());
+            $metadata = array_merge_recursive(
+                [
+                    'order_id' => $order->reference_id,
+                ],
+                ...$order->items
+                    ->map(fn (OrderItem $orderItem) => data_get($orderItem->product->metadata, 'metadata', []))
+                    ->toArray()
+            );
 
-            $checkoutSession = $order->user->checkout($lineItems, [
+            $discounts = [];
+            if ($order->discounts->isNotEmpty()) {
+                foreach ($order->discounts as $discount) {
+                    $couponParams = [
+                        'name' => $discount->code,
+                        'metadata' => [
+                            'order_id' => $order->reference_id,
+                            'discount_id' => $discount->id,
+                        ],
+                    ];
+
+                    if ($discount->discount_type->value === 'percentage') {
+                        $couponParams['percent_off'] = $discount->value;
+                    } else {
+                        $couponParams['amount_off'] = $discount->pivot->amount_applied;
+                        $couponParams['currency'] = 'usd';
+                    }
+
+                    $stripeCoupon = $this->stripe->coupons->create($couponParams, [
+                        'idempotency_key' => $this->getIdempotencyKey().'-'.$discount->id,
+                    ]);
+
+                    $discounts[] = ['coupon' => $stripeCoupon->id];
+                }
+            }
+
+            $checkoutParams = [
                 'client_reference_id' => $order->reference_id,
                 'success_url' => URL::signedRoute('store.checkout.success', [
                     'order' => $order,
@@ -591,9 +625,9 @@ class StripeDriver implements PaymentProcessor
                 'cancel_url' => URL::signedRoute('store.checkout.cancel', [
                     'order' => $order,
                 ]),
-                'allow_promotion_codes' => filled($allowPromotionCodes),
                 'mode' => 'payment',
-                'origin_context' => 'web',
+                'line_items' => $lineItems,
+                'metadata' => $metadata,
                 'consent_collection' => [
                     'terms_of_service' => 'required',
                 ],
@@ -602,10 +636,9 @@ class StripeDriver implements PaymentProcessor
                         'message' => 'I accept the Terms of Service outlined by '.config('app.name'),
                     ],
                     'submit' => [
-                        'message' => "Order Number: $order->reference_id",
+                        'message' => "Order Number: {$order->reference_id}",
                     ],
                 ],
-                'metadata' => $metadata,
                 'invoice_creation' => [
                     'enabled' => true,
                     'invoice_data' => [
@@ -618,19 +651,23 @@ class StripeDriver implements PaymentProcessor
                         'metadata' => $metadata,
                     ],
                 ],
-                'branding_settings' => [
-                    'display_name' => config('app.name'),
-                    'border_style' => 'rounded',
-                    'background_color' => '#f9f9f9',
-                    'button_color' => '#171719',
-                    'font_family' => 'inter',
-                ],
                 'payment_intent_data' => [
                     'setup_future_usage' => 'off_session',
                     'receipt_email' => $order->user->email,
                     'metadata' => $metadata,
                 ],
-            ])->asStripeCheckoutSession();
+            ];
+
+            if (filled($discounts)) {
+                $checkoutParams['discounts'] = $discounts;
+            } else {
+                $checkoutParams['allow_promotion_codes'] = filled($allowPromotionCodes);
+            }
+
+            $checkoutSession = $this->stripe->checkout->sessions->create(
+                $checkoutParams,
+                ['idempotency_key' => $this->getIdempotencyKey().'-checkout']
+            );
 
             $order->update([
                 'external_checkout_id' => $checkoutSession->id,

@@ -27,4 +27,6 @@ class PriceData extends Data
     public bool $isDefault;
 
     public bool $isActive;
+
+    public ?string $externalPriceId = null;
 }

@@ -44,6 +44,12 @@ class DiscountData extends Data
 
     public bool $hasBalance = false;
 
+    public ?int $amountApplied = null;
+
+    public ?int $balanceBefore = null;
+
+    public ?int $balanceAfter = null;
+
     public ?CarbonImmutable $createdAt = null;
 
     public ?CarbonImmutable $updatedAt = null;

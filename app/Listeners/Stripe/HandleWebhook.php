@@ -35,7 +35,7 @@ class HandleWebhook implements ShouldQueue
 
     private ?User $user = null;
 
-    private array $payload;
+    private ?array $payload = null;
 
     public function __construct(private readonly PaymentManager $paymentManager)
     {
@@ -83,9 +83,9 @@ class HandleWebhook implements ShouldQueue
         };
     }
 
-    public function tags(WebhookReceived $event): array
+    public function tags(): array
     {
-        return array_filter(['stripe', data_get($event->payload, 'type')]);
+        return array_filter(['stripe', data_get($this->payload, 'type')]);
     }
 
     protected function handleCustomerDeleted(): void {}
