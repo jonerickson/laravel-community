@@ -70,7 +70,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
 
     return (
         <div className="sm:flex sm:items-baseline sm:justify-between">
-            <div className="lg:grid lg:auto-rows-min lg:grid-cols-12 lg:items-stretch lg:gap-x-8">
+            <div className="w-full lg:grid lg:auto-rows-min lg:grid-cols-12 lg:items-stretch lg:gap-x-8">
                 <div className="lg:col-span-5 lg:col-start-8">
                     <Heading
                         title={productData.name}
@@ -140,7 +140,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
 
                     <div className="mt-4">
                         <div className="flex gap-2 overflow-x-auto">
-                            <div className="h-16 w-16 flex-shrink-0 rounded border border-border">
+                            <div className="aspect-square h-16 w-16 flex-shrink-0 rounded border border-border">
                                 {productData?.featuredImageUrl ? (
                                     <img
                                         alt={`${productData.name} thumbnail`}
