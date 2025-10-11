@@ -12,6 +12,7 @@ use App\Filament\Admin\Resources\Users\RelationManagers\OrdersRelationManager;
 use App\Filament\Admin\Resources\Users\RelationManagers\SocialsRelationManager;
 use App\Filament\Admin\Resources\Users\Widgets\RegistrationsTable;
 use App\Filament\Admin\Resources\Users\Widgets\UserStatsOverview;
+use App\Filament\Exports\UserExporter;
 use App\Livewire\PaymentMethods\ListPaymentMethods;
 use App\Livewire\Subscriptions\ListSubscriptions;
 use App\Models\Fingerprint;
@@ -24,6 +25,7 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportBulkAction;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
@@ -373,6 +375,8 @@ class UserResource extends Resource
                     ->modalSubmitActionLabel('Unban User'),
             ])
             ->toolbarActions([
+                ExportBulkAction::make()
+                    ->exporter(UserExporter::class),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     BulkAction::make('bulk_ban')

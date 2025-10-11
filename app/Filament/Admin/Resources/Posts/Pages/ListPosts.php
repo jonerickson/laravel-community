@@ -6,7 +6,9 @@ namespace App\Filament\Admin\Resources\Posts\Pages;
 
 use App\Filament\Admin\Resources\Posts\PostResource;
 use App\Filament\Admin\Resources\Posts\Widgets\PostStatsOverview;
+use App\Filament\Imports\PostImporter;
 use Filament\Actions\CreateAction;
+use Filament\Actions\ImportAction;
 use Filament\Resources\Pages\ListRecords;
 use Override;
 
@@ -19,6 +21,8 @@ class ListPosts extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            ImportAction::make()
+                ->importer(PostImporter::class),
             CreateAction::make(),
         ];
     }

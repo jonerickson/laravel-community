@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\ForumCategories\Pages;
 
 use App\Filament\Admin\Resources\ForumCategories\ForumCategoryResource;
+use App\Filament\Imports\ForumCategoryImporter;
 use Filament\Actions\CreateAction;
+use Filament\Actions\ImportAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListForumCategories extends ListRecords
@@ -17,6 +19,8 @@ class ListForumCategories extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            ImportAction::make()
+                ->importer(ForumCategoryImporter::class),
             CreateAction::make(),
         ];
     }

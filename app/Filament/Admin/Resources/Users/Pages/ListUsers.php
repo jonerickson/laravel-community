@@ -6,7 +6,9 @@ namespace App\Filament\Admin\Resources\Users\Pages;
 
 use App\Filament\Admin\Resources\Users\UserResource;
 use App\Filament\Admin\Resources\Users\Widgets\UserStatsOverview;
+use App\Filament\Imports\UserImporter;
 use Filament\Actions\CreateAction;
+use Filament\Actions\ImportAction;
 use Filament\Resources\Pages\ListRecords;
 use Override;
 
@@ -19,6 +21,8 @@ class ListUsers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            ImportAction::make()
+                ->importer(UserImporter::class),
             CreateAction::make(),
         ];
     }
