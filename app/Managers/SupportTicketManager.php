@@ -74,7 +74,7 @@ class SupportTicketManager extends Manager implements SupportTicketProvider
         return $this->driver()->deleteComment($ticket, $comment);
     }
 
-    public function assignTicket(SupportTicket $ticket, ?string $externalUserId = null): bool
+    public function assignTicket(SupportTicket $ticket, string|int|null $externalUserId = null): bool
     {
         return $this->driver()->assignTicket($ticket, $externalUserId);
     }

@@ -27,9 +27,7 @@ class DiscountsTable
                 TextColumn::make('code')
                     ->searchable()
                     ->sortable()
-                    ->copyable()
-                    ->copyMessage('Code copied')
-                    ->copyMessageDuration(1500),
+                    ->copyable(),
                 TextColumn::make('type')
                     ->badge()
                     ->sortable(),

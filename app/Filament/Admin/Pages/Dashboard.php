@@ -14,10 +14,13 @@ use App\Filament\Admin\Resources\Orders\Widgets\TopProductsTable;
 use App\Filament\Admin\Resources\Posts\Widgets\ModerationStatsOverview;
 use App\Filament\Admin\Resources\Posts\Widgets\PostModerationTable;
 use App\Filament\Admin\Resources\Posts\Widgets\PostStatsOverview;
+use App\Filament\Admin\Resources\SupportTickets\Widgets\SupportTicketStatsOverview;
+use App\Filament\Admin\Resources\SupportTickets\Widgets\UnassignedTicketsTable;
 use App\Filament\Admin\Resources\Users\Widgets\RegistrationsTable;
 use App\Filament\Admin\Resources\Users\Widgets\UsersAnalyticsChart;
 use App\Filament\Admin\Resources\Users\Widgets\UserStatsOverview;
 use App\Models\Post;
+use App\Models\SupportTicket;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
@@ -31,6 +34,8 @@ class Dashboard extends BaseDashboard
     use BaseDashboard\Concerns\HasFiltersForm;
 
     protected ?string $heading = 'Administration';
+
+    protected static ?int $navigationSort = -1;
 
     public function getDashboardWidgets(): array
     {
@@ -69,6 +74,14 @@ class Dashboard extends BaseDashboard
         ];
     }
 
+    public function getSupportWidgets(): array
+    {
+        return [
+            SupportTicketStatsOverview::make(),
+            UnassignedTicketsTable::make(),
+        ];
+    }
+
     #[Override]
     public function getWidgetsContentComponent(): Component
     {
@@ -101,6 +114,14 @@ class Dashboard extends BaseDashboard
                     ->schema([
                         Grid::make($this->getColumns())
                             ->schema($this->getWidgetsSchemaComponents($this->getSubscriptionWidgets())),
+                    ]),
+                Tabs\Tab::make('Support')
+                    ->icon(Heroicon::OutlinedLifebuoy)
+                    ->badge((string) SupportTicket::query()->unassigned()->active()->count())
+                    ->badgeColor('warning')
+                    ->schema([
+                        Grid::make($this->getColumns())
+                            ->schema($this->getWidgetsSchemaComponents($this->getSupportWidgets())),
                     ]),
             ]);
     }

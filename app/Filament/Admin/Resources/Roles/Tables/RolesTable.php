@@ -29,9 +29,9 @@ class RolesTable
             ])
             ->recordActions([
                 EditAction::make()
-                    ->visible(fn (Role $record): bool => ! in_array($record->name, ['super-admin', 'guests'])),
+                    ->visible(fn (Role $record): bool => $record->name !== 'super-admin'),
                 DeleteAction::make()
-                    ->visible(fn (Role $record): bool => ! in_array($record->name, ['super-admin', 'guests'])),
+                    ->visible(fn (Role $record): bool => ! in_array($record->name, ['super-admin', 'support-agent', 'guest', 'user', 'moderator'])),
             ]);
     }
 }

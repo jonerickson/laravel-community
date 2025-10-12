@@ -61,11 +61,11 @@ class RoleResource extends Resource
 
     public static function canEdit(Model $record): bool
     {
-        return parent::canEdit($record) && ! in_array($record->name, ['super-admin', 'guests']);
+        return parent::canEdit($record) && $record->name !== 'super-admin';
     }
 
     public static function canDelete(Model $record): bool
     {
-        return parent::canDelete($record) && ! in_array($record->name, ['super-admin', 'guests']);
+        return parent::canDelete($record) && ! in_array($record->name, ['super-admin', 'support-agent', 'guest', 'user', 'moderator']);
     }
 }

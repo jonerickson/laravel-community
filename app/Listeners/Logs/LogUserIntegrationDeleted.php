@@ -6,7 +6,7 @@ namespace App\Listeners\Logs;
 
 use App\Events\UserIntegrationDeleted;
 
-class LogSocialConnectionDeleted
+class LogUserIntegrationDeleted
 {
     public function handle(UserIntegrationDeleted $event): void
     {

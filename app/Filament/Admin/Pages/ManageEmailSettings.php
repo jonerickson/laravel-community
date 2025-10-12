@@ -23,8 +23,6 @@ class ManageEmailSettings extends SettingsPage
 
     protected static string|UnitEnum|null $navigationGroup = 'Settings';
 
-    protected static ?int $navigationSort = 1;
-
     protected static ?string $navigationLabel = 'Emails';
 
     protected static ?string $title = 'Email Settings';

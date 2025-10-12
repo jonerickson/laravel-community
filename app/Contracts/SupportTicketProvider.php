@@ -33,7 +33,7 @@ interface SupportTicketProvider
 
     public function deleteComment(SupportTicket $ticket, Comment $comment): bool;
 
-    public function assignTicket(SupportTicket $ticket, ?string $externalUserId = null): bool;
+    public function assignTicket(SupportTicket $ticket, string|int|null $externalUserId = null): bool;
 
     public function updateStatus(SupportTicket $ticket, SupportTicketStatus $status): bool;
 

@@ -153,8 +153,6 @@ class ActivityLogResource extends Resource
                             ->label('Properties')
                             ->grammar(Grammar::Json)
                             ->copyable()
-                            ->copyMessage('Copied!')
-                            ->copyMessageDuration(1500)
                             ->visible(fn (Activity $record): bool => ! empty($record->changes))
                             ->getStateUsing(function (Activity $record): string {
                                 if (empty($record->properties)) {
@@ -168,8 +166,6 @@ class ActivityLogResource extends Resource
                             ->label('Changes')
                             ->grammar(Grammar::Json)
                             ->copyable()
-                            ->copyMessage('Copied!')
-                            ->copyMessageDuration(1500)
                             ->visible(fn (Activity $record): bool => ! empty($record->changes))
                             ->getStateUsing(function (Activity $record): string {
                                 if (empty($record->properties)) {

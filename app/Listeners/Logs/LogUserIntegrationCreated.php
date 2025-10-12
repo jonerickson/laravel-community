@@ -6,7 +6,7 @@ namespace App\Listeners\Logs;
 
 use App\Events\UserIntegrationCreated;
 
-class LogSocialConnectionCreated
+class LogUserIntegrationCreated
 {
     public function handle(UserIntegrationCreated $event): void
     {

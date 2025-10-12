@@ -22,8 +22,6 @@ class WarningResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-exclamation-triangle';
 
-    protected static ?int $navigationSort = 1;
-
     #[Override]
     public static function form(Schema $schema): Schema
     {

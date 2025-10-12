@@ -27,6 +27,7 @@ class PermissionSeeder extends Seeder
         $guestRole = Role::firstOrCreate(['name' => 'guest']);
         $moderatorRole = Role::firstOrCreate(['name' => 'moderator']);
         $userRole = Role::firstOrCreate(['name' => 'user']);
+        Role::firstOrCreate(['name' => 'support-agent']);
 
         $this->seedGuestPermissions($guestRole);
         $this->seedModeratorPermissions($moderatorRole);

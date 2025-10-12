@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @property int $id
@@ -85,6 +86,8 @@ class Report extends Model
 
     public function markAsReviewed(?User $reviewer = null, ?string $notes = null): bool
     {
+        $reviewer ??= Auth::user();
+
         return $this->update([
             'status' => ReportStatus::Reviewed,
             'reviewed_by' => $reviewer?->id,
@@ -95,6 +98,8 @@ class Report extends Model
 
     public function approve(?User $reviewer = null, ?string $notes = null): bool
     {
+        $reviewer ??= Auth::user();
+
         return $this->update([
             'status' => ReportStatus::Approved,
             'reviewed_by' => $reviewer?->id,
@@ -105,6 +110,8 @@ class Report extends Model
 
     public function reject(?User $reviewer = null, ?string $notes = null): bool
     {
+        $reviewer ??= Auth::user();
+
         return $this->update([
             'status' => ReportStatus::Rejected,
             'reviewed_by' => $reviewer?->id,

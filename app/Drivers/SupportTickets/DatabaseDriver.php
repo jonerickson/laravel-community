@@ -97,7 +97,7 @@ class DatabaseDriver implements SupportTicketProvider
         return $comment->delete();
     }
 
-    public function assignTicket(SupportTicket $ticket, ?string $externalUserId = null): bool
+    public function assignTicket(SupportTicket $ticket, string|int|null $externalUserId = null): bool
     {
         if ($externalUserId && $user = User::find($externalUserId)) {
             return $ticket->assign($user);
