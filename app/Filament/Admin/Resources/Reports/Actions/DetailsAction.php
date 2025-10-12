@@ -7,6 +7,8 @@ namespace App\Filament\Admin\Resources\Reports\Actions;
 use App\Models\Report;
 use Filament\Actions\Action;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\HtmlString;
 use Override;
 
 class DetailsAction extends Action
@@ -25,8 +27,16 @@ class DetailsAction extends Action
         $this->modalCancelActionLabel('Close');
         $this->schema([
             TextEntry::make('additional_info')
-                ->hiddenLabel()
+                ->label('Report')
                 ->default('There is no additional information.'),
+            TextEntry::make('author')
+                ->getStateUsing(fn (Report $record) => $record->getContentAuthor()->name ?? 'Unknown'),
+            TextEntry::make('content')
+                ->hintIcon(Heroicon::OutlinedArrowTopRightOnSquare)
+                ->hintAction(fn (): Action => Action::make('url')
+                    ->url(fn (Report $record): ?string => $record->getUrl(), shouldOpenInNewTab: true)
+                    ->label('Go to content'))
+                ->getStateUsing(fn (Report $record): HtmlString => new HtmlString($record->getContent() ?? 'Unknown')),
         ]);
     }
 

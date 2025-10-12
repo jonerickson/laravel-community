@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests\Api\Frontend;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Override;
 
 class ApplyDiscountRequest extends FormRequest
 {
@@ -21,6 +22,7 @@ class ApplyDiscountRequest extends FormRequest
         ];
     }
 
+    #[Override]
     public function messages(): array
     {
         return [

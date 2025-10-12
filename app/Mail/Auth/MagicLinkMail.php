@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Mail;
+namespace App\Mail\Auth;
 
 use App\Models\User;
 use Illuminate\Bus\Queueable;

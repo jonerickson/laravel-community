@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications\Warnings;
 
-use App\Mail\WarningIssuedMail;
+use App\Mail\Warnings\WarningIssuedMail;
 use App\Models\User;
 use App\Models\UserWarning;
 use Illuminate\Bus\Queueable;

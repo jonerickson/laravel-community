@@ -6,8 +6,8 @@ namespace App\Listeners;
 
 use App\Enums\DiscountType;
 use App\Events\OrderSucceeded;
-use App\Mail\GiftCardReceived;
-use App\Mail\PromoCodeReceived;
+use App\Mail\Store\GiftCardReceived;
+use App\Mail\Store\PromoCodeReceived;
 use App\Models\Discount;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;

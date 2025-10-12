@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Mail;
+namespace App\Mail\Store;
 
+use App\Enums\DiscountValueType;
 use App\Models\Discount;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,31 +14,36 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Support\Number;
 
-class GiftCardReceived extends Mailable implements ShouldQueue
+class PromoCodeReceived extends Mailable implements ShouldQueue
 {
     use Queueable;
 
     public function __construct(
-        public Discount $giftCard,
+        public Discount $promoCode,
         public User $user
     ) {}
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your Gift Card is Ready!',
+            subject: 'Your Promo Code is Ready!',
         );
     }
 
     public function content(): Content
     {
+        $discountValue = $this->promoCode->discount_type === DiscountValueType::Percentage
+            ? $this->promoCode->value.'%'
+            : Number::currency($this->promoCode->value / 100);
+
         return new Content(
-            markdown: 'emails.gift-card-received',
+            markdown: 'emails.store.promo-code-received',
             with: [
-                'giftCard' => $this->giftCard,
+                'promoCode' => $this->promoCode,
                 'user' => $this->user,
-                'code' => $this->giftCard->code,
-                'balance' => Number::currency($this->giftCard->current_balance / 100),
+                'code' => $this->promoCode->code,
+                'discountValue' => $discountValue,
+                'expiresAt' => $this->promoCode->expires_at?->format('F j, Y'),
             ],
         );
     }

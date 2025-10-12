@@ -132,7 +132,7 @@ class PolicyResource extends Resource
                     ->label('Effective')
                     ->dateTime()
                     ->sortable()
-                    ->placeholder('Effective immediately'),
+                    ->placeholder('Effective Immediately'),
                 IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean(),

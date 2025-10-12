@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\ReportReason;
 use App\Enums\ReportStatus;
+use App\Events\ReportCreated;
 use App\Traits\HasAuthor;
 use Eloquent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -66,6 +67,10 @@ class Report extends Model
         'reviewed_by',
         'reviewed_at',
         'admin_notes',
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => ReportCreated::class,
     ];
 
     public function reportable(): MorphTo
@@ -136,9 +141,37 @@ class Report extends Model
             return null;
         }
 
-        return match ($this->reportable_type) {
+        return match ($reportable::class) {
             Post::class => $reportable->url,
             Topic::class => route('forums.topics.show', [$reportable->forum, $reportable]),
+            default => null,
+        };
+    }
+
+    public function getContent(): ?string
+    {
+        $reportable = $this->reportable;
+
+        if (! $reportable) {
+            return null;
+        }
+
+        return match ($reportable::class) {
+            Post::class => $reportable->content,
+            default => null,
+        };
+    }
+
+    public function getContentAuthor(): ?User
+    {
+        $reportable = $this->reportable;
+
+        if (! $reportable) {
+            return null;
+        }
+
+        return match ($reportable::class) {
+            Post::class => $reportable->author,
             default => null,
         };
     }

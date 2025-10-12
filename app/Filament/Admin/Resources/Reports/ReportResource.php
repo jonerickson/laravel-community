@@ -116,7 +116,7 @@ class ReportResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('reviewer.name')
                     ->label('Reviewed By')
-                    ->placeholder('Not reviewed'),
+                    ->placeholder('Not Reviewed'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')

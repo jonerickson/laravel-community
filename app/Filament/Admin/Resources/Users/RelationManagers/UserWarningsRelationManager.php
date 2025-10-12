@@ -17,6 +17,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class UserWarningsRelationManager extends RelationManager
 {
@@ -35,15 +36,7 @@ class UserWarningsRelationManager extends RelationManager
                     ->label('Warning Type')
                     ->options(Warning::active()->pluck('name', 'id'))
                     ->required()
-                    ->searchable()
-                    ->live()
-                    ->afterStateUpdated(function ($state, $set): void {
-                        $warning = Warning::find($state);
-                        if ($warning) {
-                            $set('points_preview', $warning->points);
-                            $set('days_preview', $warning->days_applied);
-                        }
-                    }),
+                    ->searchable(),
                 Textarea::make('reason')
                     ->label('Specific Reason')
                     ->rows(3)
@@ -80,17 +73,12 @@ class UserWarningsRelationManager extends RelationManager
                     ->label('Points Total At Issue')
                     ->badge()
                     ->color('info'),
-                TextColumn::make('reason')
-                    ->label('Reason')
-                    ->limit(50)
-                    ->placeholder('No specific reason provided')
-                    ->wrap(),
                 TextColumn::make('warningConsequence.type')
-                    ->placeholder('No consequence issued')
+                    ->placeholder('No Consequence Issued')
                     ->label('Consequence Issued')
                     ->badge(),
                 TextColumn::make('consequence_expires_at')
-                    ->placeholder('No consequence expiration')
+                    ->placeholder('No Consequence Expiration')
                     ->label('Consequence Expire At')
                     ->dateTime()
                     ->since()
@@ -118,7 +106,7 @@ class UserWarningsRelationManager extends RelationManager
             ->defaultSort('created_at', 'desc')
             ->headerActions([
                 IssueAction::make()
-                    ->user(fn (): \Illuminate\Database\Eloquent\Model => $this->getOwnerRecord()),
+                    ->user(fn (): Model => $this->getOwnerRecord()),
             ])
             ->recordActions([
                 EditAction::make(),

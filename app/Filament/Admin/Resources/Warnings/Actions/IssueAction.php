@@ -31,15 +31,7 @@ class IssueAction extends Action
                 ->label('Warning Type')
                 ->options(Warning::active()->pluck('name', 'id'))
                 ->required()
-                ->searchable()
-                ->live()
-                ->afterStateUpdated(function ($state, $set): void {
-                    $warning = Warning::find($state);
-                    if ($warning) {
-                        $set('points_preview', $warning->points);
-                        $set('days_preview', $warning->days_applied);
-                    }
-                }),
+                ->searchable(),
             Textarea::make('reason')
                 ->label('Specific Reason')
                 ->rows(3)

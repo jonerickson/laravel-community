@@ -90,7 +90,7 @@ class CommentsRelationManager extends RelationManager
                 TextColumn::make('parent.content')
                     ->label('Reply To')
                     ->limit(30)
-                    ->placeholder('Top-level comment')
+                    ->placeholder('Top-Level Comment')
                     ->toggleable(),
                 TextColumn::make('replies_count')
                     ->label('Replies')

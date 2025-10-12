@@ -9,22 +9,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { Check, Crown, Package, RefreshCw, Rocket, Shield, Star, Users, X, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Store',
-        href: route('store.index'),
-    },
-    {
-        title: 'Subscriptions',
-        href: route('store.subscriptions'),
-    },
-];
 
 interface SubscriptionsProps {
     subscriptionProducts: App.Data.ProductData[];
@@ -386,111 +374,106 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout>
             <Head title="Subscriptions" />
 
-            <div className="py-4">
-                <div className="mb-8 text-center">
-                    <Heading
-                        title="Choose your plan"
-                        description="Select the perfect subscription plan for your needs. Upgrade or downgrade anytime."
-                    />
-                </div>
-
-                {subscriptionProducts.length > 0 ? (
-                    <div className="flex flex-col gap-6">
-                        {availableIntervals.length > 1 && (
-                            <div className="flex justify-center pb-4">
-                                <Tabs value={billingCycle} onValueChange={(value) => setBillingCycle(value as App.Enums.SubscriptionInterval)}>
-                                    <TabsList className={`grid w-full max-w-2xl grid-cols-${availableIntervals.length}`}>
-                                        {availableIntervals.map((interval) => (
-                                            <TabsTrigger key={interval} value={interval} className="relative">
-                                                {interval.charAt(0).toUpperCase() + interval.slice(1)}
-                                            </TabsTrigger>
-                                        ))}
-                                    </TabsList>
-                                </Tabs>
-                            </div>
-                        )}
-                        <div
-                            className={cn(
-                                'grid grid-cols-1 gap-6',
-                                subscriptionProducts.length === 1
-                                    ? 'md:grid-cols-1'
-                                    : subscriptionProducts.length === 2
-                                      ? 'md:grid-cols-2'
-                                      : 'md:grid-cols-2 lg:grid-cols-3',
-                            )}
-                        >
-                            {subscriptionProducts.map((plan: App.Data.ProductData) => {
-                                const priceData = plan.prices.find((price: App.Data.PriceData) => price.interval === billingCycle);
-                                const priceId = priceData?.id || null;
-                                const isCurrentPlan = currentSubscription?.externalProductId === plan.externalProductId;
-                                const isSubscribing = processingPriceId === priceId && priceId !== null;
-                                const isCancelling = cancellingPriceId === priceId && priceId !== null;
-                                const isContinuing = continuingPriceId === priceId && priceId !== null;
-
-                                return (
-                                    <div key={plan.id} className="flex justify-center">
-                                        <PricingCard
-                                            plan={plan}
-                                            billingCycle={billingCycle}
-                                            onSubscribe={handleSubscribe}
-                                            onCancel={handleCancel}
-                                            onContinue={handleContinue}
-                                            isCurrentPlan={isCurrentPlan}
-                                            isSubscribing={isSubscribing}
-                                            isCancelling={isCancelling}
-                                            isContinuing={isContinuing}
-                                            policiesAgreed={policiesAgreed}
-                                            onPolicyAgreementChange={handlePolicyAgreementChange}
-                                            currentSubscription={currentSubscription}
-                                        />
-                                    </div>
-                                );
-                            })}
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                            <Card>
-                                <CardContent className="p-6 text-center">
-                                    <Shield className="mx-auto mb-4 size-12 text-info" />
-                                    <h3 className="mb-2 font-semibold">Secure payments</h3>
-                                    <p className="text-sm text-muted-foreground">
-                                        All payments are processed securely through Stripe with industry-standard encryption.
-                                    </p>
-                                </CardContent>
-                            </Card>
-
-                            <Card>
-                                <CardContent className="p-6 text-center">
-                                    <Users className="mx-auto mb-4 size-12 text-success" />
-                                    <h3 className="mb-2 font-semibold">24/7 support</h3>
-                                    <p className="text-sm text-muted-foreground">
-                                        Get help when you need it with our dedicated support team available around the clock.
-                                    </p>
-                                </CardContent>
-                            </Card>
-
-                            <Card>
-                                <CardContent className="p-6 text-center">
-                                    <Rocket className="mx-auto mb-4 size-12 text-destructive" />
-                                    <h3 className="mb-2 font-semibold">Cancel anytime</h3>
-                                    <p className="text-sm text-muted-foreground">
-                                        No long-term commitments. Cancel your subscription at any time with just a few clicks.
-                                    </p>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </div>
-                ) : (
-                    <EmptyState
-                        icon={<Package />}
-                        title="No subscription plans available"
-                        description="We're currently working on our subscription offerings. Check back soon for exciting plans and features!"
-                    />
-                )}
+            <div className="text-center">
+                <Heading title="Choose your plan" description="Select the perfect subscription plan for your needs. Upgrade or downgrade anytime." />
             </div>
+
+            {subscriptionProducts.length > 0 ? (
+                <div className="flex flex-col gap-6">
+                    {availableIntervals.length > 1 && (
+                        <div className="flex justify-center pb-4">
+                            <Tabs value={billingCycle} onValueChange={(value) => setBillingCycle(value as App.Enums.SubscriptionInterval)}>
+                                <TabsList className={`grid w-full max-w-2xl grid-cols-${availableIntervals.length}`}>
+                                    {availableIntervals.map((interval) => (
+                                        <TabsTrigger key={interval} value={interval} className="relative">
+                                            {interval.charAt(0).toUpperCase() + interval.slice(1)}
+                                        </TabsTrigger>
+                                    ))}
+                                </TabsList>
+                            </Tabs>
+                        </div>
+                    )}
+                    <div
+                        className={cn(
+                            'grid grid-cols-1 gap-6',
+                            subscriptionProducts.length === 1
+                                ? 'md:grid-cols-1'
+                                : subscriptionProducts.length === 2
+                                  ? 'md:grid-cols-2'
+                                  : 'md:grid-cols-2 lg:grid-cols-3',
+                        )}
+                    >
+                        {subscriptionProducts.map((plan: App.Data.ProductData) => {
+                            const priceData = plan.prices.find((price: App.Data.PriceData) => price.interval === billingCycle);
+                            const priceId = priceData?.id || null;
+                            const isCurrentPlan = currentSubscription?.externalProductId === plan.externalProductId;
+                            const isSubscribing = processingPriceId === priceId && priceId !== null;
+                            const isCancelling = cancellingPriceId === priceId && priceId !== null;
+                            const isContinuing = continuingPriceId === priceId && priceId !== null;
+
+                            return (
+                                <div key={plan.id} className="flex justify-center">
+                                    <PricingCard
+                                        plan={plan}
+                                        billingCycle={billingCycle}
+                                        onSubscribe={handleSubscribe}
+                                        onCancel={handleCancel}
+                                        onContinue={handleContinue}
+                                        isCurrentPlan={isCurrentPlan}
+                                        isSubscribing={isSubscribing}
+                                        isCancelling={isCancelling}
+                                        isContinuing={isContinuing}
+                                        policiesAgreed={policiesAgreed}
+                                        onPolicyAgreementChange={handlePolicyAgreementChange}
+                                        currentSubscription={currentSubscription}
+                                    />
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                        <Card>
+                            <CardContent className="p-6 text-center">
+                                <Shield className="mx-auto mb-4 size-12 text-info" />
+                                <h3 className="mb-2 font-semibold">Secure payments</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    All payments are processed securely through Stripe with industry-standard encryption.
+                                </p>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardContent className="p-6 text-center">
+                                <Users className="mx-auto mb-4 size-12 text-success" />
+                                <h3 className="mb-2 font-semibold">24/7 support</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Get help when you need it with our dedicated support team available around the clock.
+                                </p>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardContent className="p-6 text-center">
+                                <Rocket className="mx-auto mb-4 size-12 text-destructive" />
+                                <h3 className="mb-2 font-semibold">Cancel anytime</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    No long-term commitments. Cancel your subscription at any time with just a few clicks.
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            ) : (
+                <EmptyState
+                    icon={<Package />}
+                    title="No subscription plans available"
+                    description="We're currently working on our subscription offerings. Check back soon for exciting plans and features!"
+                />
+            )}
 
             <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
                 <DialogContent className="mx-4 max-w-lg">

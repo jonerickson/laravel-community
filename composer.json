@@ -37,6 +37,7 @@
         "larastan/larastan": "^3.7.1",
         "laravel/boost": "^1.1.4",
         "laravel/facade-documenter": "dev-main",
+        "laravel/horizon": "^5.35",
         "laravel/pail": "^1.2.3",
         "laravel/pint": "^v1.24.0",
         "laravel/sail": "^1.45",

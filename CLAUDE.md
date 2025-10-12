@@ -102,6 +102,9 @@ This is a Laravel + React application built using the Laravel React Starter Kit.
 - Uses modern React patterns with hooks and functional components
 - Git hooks in `.githooks/` directory ensure code quality and consistent formatting across the team
 - Events do not need manually registering in Laravel 12.
+- Use composer:types to generate typescript definitions
+- Always create mail using a mailable.
+- Do not run tests after a prompt unless otherwise instructed.
 
 ### React Component Guidelines
 - Always create individual, reusable components for UI elements rather than inline JSX
@@ -737,4 +740,3 @@ export default function Edit() {
 - Every change must be programmatically tested. Write a new test or update an existing test, then run the affected tests to make sure they pass.
 - Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test` with a specific filename or filter.
 </laravel-boost-guidelines>
-- Use composer:types to generate typescript definitions
