@@ -22,6 +22,7 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
+use Override;
 
 class ItemsRelationManager extends RelationManager
 {
@@ -31,6 +32,7 @@ class ItemsRelationManager extends RelationManager
 
     protected static ?string $badgeColor = 'info';
 
+    #[Override]
     public static function getBadge(Model $ownerRecord, string $pageClass): ?string
     {
         /** @var Order $ownerRecord */

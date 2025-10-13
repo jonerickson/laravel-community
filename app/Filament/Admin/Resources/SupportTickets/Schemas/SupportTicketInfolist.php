@@ -120,7 +120,7 @@ class SupportTicketInfolist
 
                         Tabs\Tab::make('Replies')
                             ->icon(Heroicon::OutlinedChatBubbleLeftRight)
-                            ->badge(fn (SupportTicket $record) => (string) $record->comments->count())
+                            ->badge(fn (SupportTicket $record): string => (string) $record->comments->count())
                             ->badgeColor('info')
                             ->schema([
                                 Livewire::make(CommentsRelationManager::class, fn (SupportTicket $record): array => [
@@ -131,7 +131,7 @@ class SupportTicketInfolist
 
                         Tabs\Tab::make('Notes')
                             ->icon(Heroicon::OutlinedDocument)
-                            ->badge(fn (SupportTicket $record) => (string) $record->notes->count())
+                            ->badge(fn (SupportTicket $record): string => (string) $record->notes->count())
                             ->badgeColor('gray')
                             ->schema([
                                 Livewire::make(NotesRelationManager::class, fn (SupportTicket $record): array => [

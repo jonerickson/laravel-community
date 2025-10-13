@@ -11,17 +11,31 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
- * @property-read User|null $author
+ * @property int $id
+ * @property string $notable_type
+ * @property int $notable_id
+ * @property string $content
+ * @property int $created_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read User $author
  * @property-read mixed $author_name
- * @property-read User|null $creator
+ * @property-read User $creator
  * @property-read Model|Eloquent $notable
  *
  * @method static \Database\Factories\NoteFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Note newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Note newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Note query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Note whereContent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Note whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Note whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Note whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Note whereNotableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Note whereNotableType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Note whereUpdatedAt($value)
  *
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class Note extends Model
 {

@@ -22,6 +22,7 @@ class CommentsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'content';
 
+    #[Override]
     public function isReadOnly(): bool
     {
         return false;

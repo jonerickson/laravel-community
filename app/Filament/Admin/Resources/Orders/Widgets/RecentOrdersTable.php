@@ -40,6 +40,7 @@ class RecentOrdersTable extends TableWidget
                     ->url(fn (Order $record): ?string => $record->invoice_url, shouldOpenInNewTab: true)
                     ->placeholder('N/A'),
                 TextColumn::make('items.product.name')
+                    ->placeholder('N/A')
                     ->label('Product(s)'),
                 TextColumn::make('user.name')
                     ->label('Customer')

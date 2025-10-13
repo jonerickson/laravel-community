@@ -15,6 +15,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Override;
 
 class NotesRelationManager extends RelationManager
 {
@@ -24,11 +25,13 @@ class NotesRelationManager extends RelationManager
 
     protected static ?string $badgeColor = 'gray';
 
+    #[Override]
     public static function getBadge(Model $ownerRecord, string $pageClass): ?string
     {
         return (string) $ownerRecord->notes->count();
     }
 
+    #[Override]
     public function isReadOnly(): bool
     {
         return false;
