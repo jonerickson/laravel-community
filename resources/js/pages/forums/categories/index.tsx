@@ -27,7 +27,7 @@ interface ForumsIndexProps {
 
 export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
     const { can } = usePermissions();
-    const { name: siteName } = usePage<App.Data.SharedData>().props;
+    const { name: siteName, auth } = usePage<App.Data.SharedData>().props;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const allForums = categories.flatMap((category) => category.forums || []);
@@ -172,7 +172,9 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                                                             </div>
                                                             <div className="min-w-0 flex-1">
                                                                 <div className="flex items-center gap-2">
-                                                                    {!topic.isReadByUser && <Circle className="size-3 fill-info text-info" />}
+                                                                    {auth && auth.user && !topic.isReadByUser && (
+                                                                        <Circle className="size-3 fill-info text-info" />
+                                                                    )}
                                                                     {topic.isHot && <span className="text-sm">🔥</span>}
                                                                     {topic.isPinned && <Pin className="size-4 text-info" />}
                                                                     {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
@@ -187,7 +189,9 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                                                                     )}
                                                                     <span
                                                                         className={`truncate font-medium ${
-                                                                            topic.isReadByUser ? 'text-muted-foreground' : 'text-foreground'
+                                                                            auth && auth.user && topic.isReadByUser
+                                                                                ? 'text-muted-foreground'
+                                                                                : 'text-foreground'
                                                                         }`}
                                                                     >
                                                                         {topic.title}

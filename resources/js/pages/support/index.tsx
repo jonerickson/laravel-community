@@ -53,20 +53,41 @@ export default function SupportTicketsIndex({ tickets }: SupportTicketsIndexProp
                             <div className="grid gap-6">
                                 {tickets.data.map((ticket) => (
                                     <Card key={ticket.id} className="transition-shadow hover:shadow-md">
-                                        <CardHeader className="pb-3">
+                                        <CardHeader>
                                             <div className="flex items-start justify-between gap-4">
-                                                <div className="space-y-1">
-                                                    <CardTitle className="flex items-center gap-2">
-                                                        <Ticket className="size-4" />
-                                                        <Link href={route('support.show', ticket.id)} className="hover:underline">
-                                                            #{ticket.id} - {ticket.subject}
-                                                        </Link>
-                                                    </CardTitle>
-                                                    <CardDescription className="line-clamp-2">
-                                                        <RichEditorContent content={ticket.description} />
-                                                    </CardDescription>
+                                                <div className="flex-1 space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <CardTitle className="flex items-center gap-2">
+                                                            <Ticket className="size-4" />
+                                                            <Link href={route('support.show', ticket.id)} className="hover:underline">
+                                                                #{ticket.id} - {ticket.subject}
+                                                            </Link>
+                                                        </CardTitle>
+                                                        {ticket.category?.name && (
+                                                            <Badge variant="outline" className="shrink-0">
+                                                                <Tag className="size-3" />
+                                                                {ticket.category.name}
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                                        <span className="hidden items-center gap-1.5 sm:flex">
+                                                            <User className="size-3.5" />
+                                                            {ticket.author?.name}
+                                                        </span>
+                                                        <span className="hidden items-center gap-1.5 sm:flex">
+                                                            <Calendar className="size-3.5" />
+                                                            {ticket.createdAt ? format(new Date(ticket.createdAt), 'MMM d, yyyy') : 'N/A'}
+                                                        </span>
+                                                        {ticket.updatedAt && (
+                                                            <span className="flex items-center gap-1.5">
+                                                                <Clock className="size-3.5" />
+                                                                Updated {format(new Date(ticket.updatedAt), 'MMM d, yyyy')}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                                <div className="flex shrink-0 items-center gap-2">
+                                                <div className="hidden shrink-0 items-center gap-2 sm:flex">
                                                     <Badge variant={getStatusVariant(ticket.status)}>
                                                         <Clock className="size-3" />
                                                         {formatStatus(ticket.status)}
@@ -78,28 +99,25 @@ export default function SupportTicketsIndex({ tickets }: SupportTicketsIndexProp
                                                 </div>
                                             </div>
                                         </CardHeader>
-                                        <CardContent className="pt-0">
-                                            <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground lg:grid-cols-4">
-                                                <div className="flex items-center gap-2">
-                                                    <Tag className="size-4" />
-                                                    <span>{ticket.category?.name}</span>
+                                        {ticket.latestComment && (
+                                            <CardContent className="pt-0">
+                                                <div className="rounded-lg border border-sidebar-border/50 bg-muted/30 p-3">
+                                                    <div className="mb-1.5 flex items-center gap-2 text-xs text-muted-foreground">
+                                                        <User className="size-3" />
+                                                        <span className="font-medium">{ticket.latestComment.author?.name}</span>
+                                                        <span>•</span>
+                                                        <span>
+                                                            {ticket.latestComment.createdAt
+                                                                ? format(new Date(ticket.latestComment.createdAt), 'MMM d, yyyy')
+                                                                : 'N/A'}
+                                                        </span>
+                                                    </div>
+                                                    <div className="line-clamp-2 text-sm text-muted-foreground">
+                                                        <RichEditorContent content={ticket.latestComment.content} />
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center gap-2">
-                                                    <User className="size-4" />
-                                                    <span>{ticket.author?.name}</span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <Calendar className="size-4" />
-                                                    <span>{ticket.createdAt ? format(new Date(ticket.createdAt), 'MMM d, yyyy') : 'N/A'}</span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <Clock className="size-4" />
-                                                    <span>
-                                                        Updated {ticket.updatedAt ? format(new Date(ticket.updatedAt), 'MMM d, yyyy') : 'N/A'}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </CardContent>
+                                            </CardContent>
+                                        )}
                                     </Card>
                                 ))}
                             </div>

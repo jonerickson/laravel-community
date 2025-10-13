@@ -7,6 +7,7 @@ namespace App\Traits;
 use App\Models\Comment;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 trait Commentable
 {
@@ -14,6 +15,12 @@ trait Commentable
     {
         return $this->morphMany(Comment::class, 'commentable')
             ->latest();
+    }
+
+    public function latestComment(): MorphOne
+    {
+        return $this->morphOne(Comment::class, 'commentable')
+            ->ofMany();
     }
 
     public function approvedComments(): MorphMany

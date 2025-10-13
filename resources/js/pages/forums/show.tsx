@@ -25,7 +25,7 @@ interface ForumShowProps {
 
 export default function ForumShow({ forum, topics: initialTopics }: ForumShowProps) {
     const { can, hasAnyPermission } = usePermissions();
-    const { name: siteName } = usePage<App.Data.SharedData>().props;
+    const { name: siteName, auth } = usePage<App.Data.SharedData>().props;
     const [topics, setTopics] = useState<App.Data.TopicData[]>(initialTopics.data);
     const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
     const { loading: isDeleting, execute: executeBulkDelete } = useApiRequest();
@@ -253,7 +253,9 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                                                     )}
                                                     <div className="min-w-0 flex-1">
                                                         <div className="mb-1 flex items-center gap-2">
-                                                            {!topic.isReadByUser && <Circle className="size-3 fill-info text-info" />}
+                                                            {auth && auth.user && !topic.isReadByUser && (
+                                                                <Circle className="size-3 fill-info text-info" />
+                                                            )}
                                                             {topic.isHot && <span className="text-sm">🔥</span>}
                                                             {topic.isPinned && <Pin className="size-4 text-info" />}
                                                             {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
@@ -269,7 +271,9 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                                                             <Link
                                                                 href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
                                                                 className={`hover:underline ${
-                                                                    topic.isReadByUser ? 'font-normal text-muted-foreground' : 'font-medium'
+                                                                    auth && auth.user && topic.isReadByUser
+                                                                        ? 'font-normal text-muted-foreground'
+                                                                        : 'font-medium'
                                                                 }`}
                                                             >
                                                                 {topic.title}

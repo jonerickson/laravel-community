@@ -61,6 +61,9 @@ class SupportTicketData extends Data
     public ?CarbonImmutable $updatedAt = null;
 
     #[LoadRelation]
+    public ?CommentData $latestComment = null;
+
+    #[LoadRelation]
     /** @var CommentData[] */
     public Collection $comments;
 

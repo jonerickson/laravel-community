@@ -30,7 +30,7 @@ export default function DashboardProductGrid({ newestProduct, popularProduct, fe
                                 <Button asChild variant="outline" size="sm">
                                     <Link href={route('store.index')}>
                                         <Store className="size-4" />
-                                        Shop Store
+                                        Shop store
                                     </Link>
                                 </Button>
                             </div>
@@ -51,7 +51,7 @@ export default function DashboardProductGrid({ newestProduct, popularProduct, fe
                                 <Button asChild variant="outline" size="sm">
                                     <Link href={route('store.index')}>
                                         <Store className="size-4" />
-                                        Shop Store
+                                        Shop store
                                     </Link>
                                 </Button>
                             </div>
@@ -72,7 +72,7 @@ export default function DashboardProductGrid({ newestProduct, popularProduct, fe
                                 <Button asChild variant="outline" size="sm">
                                     <Link href={route('store.index')}>
                                         <Store className="size-4" />
-                                        Shop Store
+                                        Shop store
                                     </Link>
                                 </Button>
                             </div>

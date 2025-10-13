@@ -230,19 +230,6 @@ export default function Product({ product: productData, reviews }: ProductProps)
                         <h2 id="policies-heading" className="sr-only">
                             Our Policies
                         </h2>
-
-                        {/*<dl className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">*/}
-                        {/*    {policies.map((policy) => (*/}
-                        {/*        <div key={policy.name} className="rounded-lg border border-border bg-accent p-6 text-center">*/}
-                        {/*            <dt>*/}
-                        {/*                <policy.icon aria-hidden="true" className="mx-auto size-6 shrink-0 text-sidebar-accent-foreground" />*/}
-                        {/*                <div className="mt-2">*/}
-                        {/*                    <HeadingSmall title={policy.name} description={policy.description} />*/}
-                        {/*                </div>*/}
-                        {/*            </dt>*/}
-                        {/*        </div>*/}
-                        {/*    ))}*/}
-                        {/*</dl>*/}
                     </section>
                 </div>
             </div>

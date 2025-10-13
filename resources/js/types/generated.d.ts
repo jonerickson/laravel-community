@@ -443,6 +443,7 @@ declare namespace App.Data {
         closedAt: string | null;
         createdAt: string | null;
         updatedAt: string | null;
+        latestComment: App.Data.CommentData | null;
         comments: Array<App.Data.CommentData>;
         files: Array<App.Data.FileData>;
         isActive: boolean;

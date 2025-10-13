@@ -451,7 +451,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                     {loading
                                         ? 'Processing...'
                                         : policies.length > 0 && !policiesAgreed
-                                          ? 'Agree to Policies to Checkout'
+                                          ? 'Agree to policies to checkout'
                                           : 'Checkout'}
                                 </Button>
                             </div>

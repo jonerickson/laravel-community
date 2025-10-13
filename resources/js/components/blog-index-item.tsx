@@ -3,14 +3,16 @@ import { Badge } from '@/components/ui/badge';
 import { UserInfo } from '@/components/user-info';
 import { pluralize } from '@/lib/utils';
 import { stripCharacters, truncate } from '@/utils/truncate';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { Clock, Eye, ImageIcon, MessageCircle } from 'lucide-react';
+import SharedData = App.Data.SharedData;
 
 interface BlogIndexItemProps {
     post: App.Data.PostData;
 }
 
 export default function BlogIndexItem({ post }: BlogIndexItemProps) {
+    const { auth } = usePage<SharedData>().props;
     const publishedDate = new Date(post.publishedAt || post.createdAt || new Date());
     const formattedDate = publishedDate.toLocaleDateString('en-US', {
         year: 'numeric',
@@ -38,7 +40,7 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                 <div className="mt-4 flex max-w-xl grow flex-col justify-between">
                     <div className="flex flex-row gap-2">
                         {post.isFeatured && <Badge variant="secondary">Featured</Badge>}
-                        {!post.isReadByUser && <Badge variant="default">New</Badge>}
+                        {auth && auth.user && !post.isReadByUser && <Badge variant="default">New</Badge>}
                     </div>
                     <div className="mt-2 flex items-center gap-x-4 text-xs">
                         <time dateTime={post.publishedAt || post.createdAt || undefined} className="text-muted-foreground">
