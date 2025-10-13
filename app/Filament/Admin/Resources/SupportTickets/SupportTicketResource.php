@@ -7,7 +7,6 @@ namespace App\Filament\Admin\Resources\SupportTickets;
 use App\Filament\Admin\Resources\SupportTickets\Pages\EditSupportTicket;
 use App\Filament\Admin\Resources\SupportTickets\Pages\ListSupportTickets;
 use App\Filament\Admin\Resources\SupportTickets\Pages\ViewSupportTicket;
-use App\Filament\Admin\Resources\SupportTickets\RelationManagers\CommentsRelationManager;
 use App\Filament\Admin\Resources\SupportTickets\Schemas\SupportTicketForm;
 use App\Filament\Admin\Resources\SupportTickets\Schemas\SupportTicketInfolist;
 use App\Filament\Admin\Resources\SupportTickets\Tables\SupportTicketsTable;
@@ -62,14 +61,6 @@ class SupportTicketResource extends Resource
     public static function infolist(Schema $schema): Schema
     {
         return SupportTicketInfolist::configure($schema);
-    }
-
-    #[Override]
-    public static function getRelations(): array
-    {
-        return [
-            CommentsRelationManager::class,
-        ];
     }
 
     public static function getPages(): array

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Orders;
 
+use App\Filament\Admin\Resources\Notes\RelationManagers\NotesRelationManager;
 use App\Filament\Admin\Resources\Orders\Pages\CreateOrder;
 use App\Filament\Admin\Resources\Orders\Pages\EditOrder;
 use App\Filament\Admin\Resources\Orders\Pages\ListOrders;
@@ -51,6 +52,7 @@ class OrderResource extends Resource
     {
         return [
             ItemsRelationManager::make(),
+            NotesRelationManager::make(),
         ];
     }
 

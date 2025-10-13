@@ -64,16 +64,16 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property string|null $pm_type
  * @property string|null $pm_last_four
  * @property string|null $pm_expiration
- * @property string|null $extra_billing_information
- * @property Carbon|null $trial_ends_at
  * @property string|null $billing_address
  * @property string|null $billing_address_line_2
  * @property string|null $billing_city
  * @property string|null $billing_state
  * @property string|null $billing_postal_code
- * @property string|null $vat_id
- * @property string|null $invoice_emails
  * @property string|null $billing_country
+ * @property string|null $extra_billing_information
+ * @property string|null $invoice_emails
+ * @property string|null $vat_id
+ * @property Carbon|null $trial_ends_at
  * @property Carbon|null $last_seen_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at

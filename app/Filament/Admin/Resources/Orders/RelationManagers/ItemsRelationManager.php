@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Orders\RelationManagers;
 
+use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Price;
+use BackedEnum;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -14,14 +16,26 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
 
 class ItemsRelationManager extends RelationManager
 {
     protected static string $relationship = 'items';
+
+    protected static string|BackedEnum|null $icon = Heroicon::OutlinedListBullet;
+
+    protected static ?string $badgeColor = 'info';
+
+    public static function getBadge(Model $ownerRecord, string $pageClass): ?string
+    {
+        /** @var Order $ownerRecord */
+        return (string) $ownerRecord->items->count();
+    }
 
     public function form(Schema $schema): Schema
     {

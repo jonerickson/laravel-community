@@ -11,6 +11,7 @@ use App\Events\SupportTicketUpdated;
 use App\Traits\Commentable;
 use App\Traits\HasAuthor;
 use App\Traits\HasFiles;
+use App\Traits\HasNotes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -52,6 +53,8 @@ use Override;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, File> $files
  * @property-read int|null $files_count
  * @property-read bool $is_active
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Note> $notes
+ * @property-read int|null $notes_count
  * @property-read Order|null $order
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $topLevelComments
  * @property-read int|null $top_level_comments_count
@@ -94,6 +97,7 @@ class SupportTicket extends Model
     use HasAuthor;
     use HasFactory;
     use HasFiles;
+    use HasNotes;
 
     protected $dispatchesEvents = [
         'created' => SupportTicketCreated::class,

@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Enums\OrderStatus;
 use App\Events\OrderSaving;
 use App\Managers\PaymentManager;
+use App\Traits\HasNotes;
 use App\Traits\HasReferenceId;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -40,6 +41,8 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property-read bool $is_recurring
  * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $items
  * @property-read int|null $items_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Note> $notes
+ * @property-read int|null $notes_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
  * @property-read int|null $products_count
  * @property-read User $user
@@ -70,6 +73,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 class Order extends Model
 {
     use HasFactory;
+    use HasNotes;
     use HasReferenceId;
 
     protected $attributes = [

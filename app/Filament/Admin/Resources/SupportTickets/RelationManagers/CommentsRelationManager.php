@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\SupportTickets\RelationManagers;
 
-use App\Filament\Admin\Resources\SupportTickets\Actions\AddCommentAction;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
@@ -18,9 +18,14 @@ class CommentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'comments';
 
-    protected static ?string $title = 'Ticket Replies';
+    protected static ?string $title = 'Replies';
 
     protected static ?string $recordTitleAttribute = 'content';
+
+    public function isReadOnly(): bool
+    {
+        return false;
+    }
 
     #[Override]
     public function form(Schema $schema): Schema
@@ -30,11 +35,9 @@ class CommentsRelationManager extends RelationManager
                 Forms\Components\RichEditor::make('content')
                     ->required()
                     ->label('Reply')
+                    ->hiddenLabel()
+                    ->maxLength(65535)
                     ->columnSpanFull(),
-                Forms\Components\Toggle::make('is_approved')
-                    ->label('Approved')
-                    ->default(true)
-                    ->helperText('Unapproved comments will not be visible to the customer'),
             ]);
     }
 
@@ -42,19 +45,18 @@ class CommentsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->description('The replies belonging to this support ticket.')
             ->emptyStateDescription('No replies yet.')
             ->defaultSort('created_at', 'desc')
             ->columns([
+                Tables\Columns\TextColumn::make('content')
+                    ->label('Reply')
+                    ->html()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('author.name')
                     ->label('Author')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('content')
-                    ->label('Reply')
-                    ->html()
-                    ->limit(100)
-                    ->searchable()
-                    ->tooltip(fn ($record): string => strip_tags((string) $record->content)),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Posted')
                     ->dateTime()
@@ -70,8 +72,9 @@ class CommentsRelationManager extends RelationManager
                     ->searchable(),
             ])
             ->headerActions([
-                AddCommentAction::make()
-                    ->supportTicket(fn (): \Illuminate\Database\Eloquent\Model => $this->getOwnerRecord()),
+                CreateAction::make()
+                    ->modalHeading('Add Reply')
+                    ->modalDescription('Add a new reply to this support ticket.'),
             ])
             ->recordActions([
                 EditAction::make(),
