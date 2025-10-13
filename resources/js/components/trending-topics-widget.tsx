@@ -31,7 +31,7 @@ export default function TrendingTopicsWidget({ topics = [] }: TrendingTopicsWidg
                 <table className="w-full">
                     <thead className="bg-muted/50">
                         <tr className="border-b border-sidebar-border/50">
-                            <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground uppercase">#</th>
+                            <th className="w-0 px-4 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground uppercase">#</th>
                             <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-muted-foreground uppercase">Topic</th>
                             <th className="px-4 py-3 text-center text-xs font-medium tracking-wider text-muted-foreground uppercase">Score</th>
                             <th className="px-4 py-3 text-center text-xs font-medium tracking-wider text-muted-foreground uppercase">Views</th>
@@ -67,7 +67,7 @@ export default function TrendingTopicsWidget({ topics = [] }: TrendingTopicsWidg
                                         </div>
                                     </Link>
                                 </td>
-                                <td className="px-4 py-3 text-center">
+                                <td className="w-0 px-4 py-3 text-center">
                                     <Badge variant={getTrendingScoreVariant(topic.trendingScore)} className="px-2 py-1 text-xs">
                                         <TrendingUp className="mr-1 size-3" />
                                         {formatTrendingScore(topic.trendingScore)}

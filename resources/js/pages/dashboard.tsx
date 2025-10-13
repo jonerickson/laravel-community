@@ -50,6 +50,7 @@ export default function Dashboard({
                             </div>
                             <Link href={route('store.index')} className="text-sm font-medium text-primary hover:underline">
                                 View store
+                                <span aria-hidden="true"> &rarr;</span>
                             </Link>
                         </div>
 
@@ -82,6 +83,7 @@ export default function Dashboard({
                             </div>
                             <Link href={route('blog.index')} className="text-sm font-medium text-primary hover:underline">
                                 View all posts
+                                <span aria-hidden="true"> &rarr;</span>
                             </Link>
                         </div>
 
@@ -110,6 +112,7 @@ export default function Dashboard({
                             </div>
                             <Link href={route('forums.index')} className="text-sm font-medium text-primary hover:underline">
                                 View all forums
+                                <span aria-hidden="true"> &rarr;</span>
                             </Link>
                         </div>
 
@@ -138,6 +141,7 @@ export default function Dashboard({
                             </div>
                             <Link href={route('support.index')} className="text-sm font-medium text-primary hover:underline">
                                 View all tickets
+                                <span aria-hidden="true"> &rarr;</span>
                             </Link>
                         </div>
 
