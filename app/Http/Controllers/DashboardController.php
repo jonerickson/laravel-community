@@ -32,9 +32,9 @@ class DashboardController
     public function __invoke(): Response
     {
         return Inertia::render('dashboard', [
-            'newestProduct' => $this->getNewestProduct(),
-            'popularProduct' => $this->getPopularProduct(),
-            'featuredProduct' => $this->getFeaturedProduct(),
+            'newestProduct' => Inertia::defer(fn (): ?ProductData => $this->getNewestProduct()),
+            'popularProduct' => Inertia::defer(fn (): ?ProductData => $this->getPopularProduct()),
+            'featuredProduct' => Inertia::defer(fn (): ?ProductData => $this->getFeaturedProduct()),
             'supportTickets' => Inertia::defer(fn (): Collection => $this->getSupportTickets()),
             'trendingTopics' => Inertia::defer(fn (): Collection => $this->getTrendingTopics()),
             'latestBlogPosts' => Inertia::defer(fn (): Collection => $this->getLatestBlogPosts()),

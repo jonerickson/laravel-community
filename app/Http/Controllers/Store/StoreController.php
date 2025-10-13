@@ -19,7 +19,7 @@ class StoreController extends Controller
     public function __invoke(): Response
     {
         return Inertia::render('store/index', [
-            'categories' => ProductCategoryData::collect(ProductCategory::query()
+            'categories' => Inertia::defer(fn () => ProductCategoryData::collect(ProductCategory::query()
                 ->active()
                 ->ordered()
                 ->with('image')
@@ -27,8 +27,8 @@ class StoreController extends Controller
                 ->take(4)
                 ->get()
                 ->filter(fn (ProductCategory $category) => Gate::check('view', $category))
-                ->values()),
-            'featuredProducts' => ProductData::collect(Product::query()
+                ->values())),
+            'featuredProducts' => Inertia::defer(fn () => ProductData::collect(Product::query()
                 ->products()
                 ->featured()
                 ->with('categories')
@@ -39,8 +39,8 @@ class StoreController extends Controller
                 ->take(6)
                 ->get()
                 ->filter(fn (Product $product) => Gate::check('view', $product))
-                ->values()),
-            'userProvidedProducts' => [],
+                ->values())),
+            'userProvidedProducts' => Inertia::defer(fn () => []),
         ]);
     }
 }

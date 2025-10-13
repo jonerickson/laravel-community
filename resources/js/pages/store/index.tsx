@@ -1,12 +1,13 @@
-import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
-import StoreIndexCategories from '@/components/store-index-categories';
-import StoreIndexFeatured from '@/components/store-index-featured';
-import StoreIndexUserProvided from '@/components/store-index-user-provided';
+import StoreIndexCategoriesItem from '@/components/store-index-categories-item';
+import StoreUserProvidedItem from '@/components/store-index-user-provided-item';
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
+import WidgetLoading from '@/components/widget-loading';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, WhenVisible } from '@inertiajs/react';
-import { ShoppingCart } from 'lucide-react';
+import { Deferred, Head, Link } from '@inertiajs/react';
+import { ImageIcon } from 'lucide-react';
+import { route } from 'ziggy-js';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -26,35 +27,110 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Store" />
             <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto">
-                {categories.length > 0 && (
-                    <WhenVisible fallback={<div className="h-64 animate-pulse rounded-lg bg-muted" />} data={['categories']}>
-                        <StoreIndexCategories categories={categories} />
-                    </WhenVisible>
-                )}
-
-                {featuredProducts.length > 0 && (
-                    <WhenVisible fallback={<div className="h-64 animate-pulse rounded-lg bg-muted" />} data={['featuredProducts']}>
-                        <StoreIndexFeatured products={featuredProducts} />
-                    </WhenVisible>
-                )}
-
-                {userProvidedProducts.length > 0 && (
-                    <WhenVisible fallback={<div className="h-64 animate-pulse rounded-lg bg-muted" />} data={['userProvidedProducts']}>
-                        <StoreIndexUserProvided products={userProvidedProducts} />
-                    </WhenVisible>
-                )}
-
-                {categories.length === 0 && featuredProducts.length === 0 && userProvidedProducts.length === 0 && (
-                    <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto">
-                        <div className="sm:flex sm:items-baseline sm:justify-between">
-                            <Heading title="Store" description="No products available" />
-                        </div>
-
-                        <div className="-mt-8">
-                            <EmptyState icon={<ShoppingCart />} title="No products available" description="Check back later for new categories." />
-                        </div>
+                <div>
+                    <div className="sm:flex sm:items-baseline sm:justify-between">
+                        <Heading title="Shop by category" description="Browse our most popular products" />
+                        <Link href={route('store.categories.index')} className="hidden text-sm font-semibold sm:block">
+                            Browse all categories
+                            <span aria-hidden="true"> &rarr;</span>
+                        </Link>
                     </div>
-                )}
+
+                    <Deferred fallback={<WidgetLoading />} data={'categories'}>
+                        <div className="flow-root">
+                            <div className="-my-2">
+                                <div className="h-full py-2">
+                                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                                        {categories && categories.map((category) => <StoreIndexCategoriesItem key={category.id} item={category} />)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-6 sm:hidden">
+                            <Link href={route('store.categories.index')} className="block text-sm font-semibold">
+                                Browse all categories
+                                <span aria-hidden="true"> &rarr;</span>
+                            </Link>
+                        </div>
+                    </Deferred>
+                </div>
+
+                <div>
+                    <div className="sm:flex sm:items-baseline sm:justify-between">
+                        <Heading title="Featured products" description="Our most popular products" />
+                    </div>
+
+                    <Deferred fallback={<WidgetLoading />} data={'featuredProducts'}>
+                        <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:grid-rows-2 sm:gap-x-6 lg:gap-8">
+                            {featuredProducts &&
+                                featuredProducts.slice(0, 3).map((product, index) => (
+                                    <div
+                                        key={product.id}
+                                        className={`group relative aspect-[2/1] overflow-hidden rounded-lg ${
+                                            index === 0 ? 'sm:row-span-2 sm:aspect-square' : 'sm:aspect-auto'
+                                        }`}
+                                    >
+                                        {product.featuredImageUrl ? (
+                                            <img
+                                                alt={product.name}
+                                                src={product.featuredImageUrl}
+                                                className="absolute size-full object-cover group-hover:opacity-75"
+                                            />
+                                        ) : (
+                                            <div className="absolute flex size-full items-center justify-center bg-muted group-hover:opacity-75">
+                                                <ImageIcon className="h-16 w-16 text-muted-foreground" />
+                                            </div>
+                                        )}
+                                        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-50" />
+                                        <div className="absolute inset-0 flex items-end p-6">
+                                            <div>
+                                                <h3 className="font-semibold text-white">
+                                                    <Link href={route('store.products.show', { slug: product.slug })}>
+                                                        <span className="absolute inset-0" />
+                                                        {product.name}
+                                                    </Link>
+                                                </h3>
+                                                <p aria-hidden="true" className="mt-1 text-sm text-white">
+                                                    Shop now
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                        </div>
+                    </Deferred>
+                </div>
+
+                <div>
+                    <div className="sm:flex sm:items-baseline sm:justify-between">
+                        <Heading title="Marketplace products" description="Broswer community submitted products" />
+                    </div>
+
+                    <Deferred fallback={<WidgetLoading />} data={'userProvidedProducts'}>
+                        {userProvidedProducts && userProvidedProducts.length > 0 ? (
+                            <>
+                                <div className="space-y-12 lg:grid lg:grid-cols-3 lg:space-y-0 lg:gap-x-6">
+                                    {userProvidedProducts && userProvidedProducts.map((item) => <StoreUserProvidedItem key={item.id} item={item} />)}
+                                </div>
+
+                                <div className="mt-6 sm:hidden">
+                                    <Link href="#" className="block text-sm font-semibold">
+                                        Browse all community products
+                                        <span aria-hidden="true"> &rarr;</span>
+                                    </Link>
+                                </div>
+                            </>
+                        ) : (
+                            <Empty className="border border-dashed">
+                                <EmptyHeader>
+                                    <EmptyTitle>No community-submitted products</EmptyTitle>
+                                    <EmptyDescription>Check back later for more product options.</EmptyDescription>
+                                </EmptyHeader>
+                            </Empty>
+                        )}
+                    </Deferred>
+                </div>
             </div>
         </AppLayout>
     );

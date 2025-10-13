@@ -36,7 +36,9 @@ export default function Dashboard({
             <Head title="Dashboard" />
             <div className="relative flex h-full flex-1 flex-col gap-4 overflow-x-auto">
                 <div className="relative z-10 flex flex-col gap-6">
-                    <DashboardProductGrid newestProduct={newestProduct} popularProduct={popularProduct} featuredProduct={featuredProduct} />
+                    <Deferred fallback={<WidgetLoading />} data={['newestProduct', 'popularProduct', 'featuredProduct']}>
+                        <DashboardProductGrid newestProduct={newestProduct} popularProduct={popularProduct} featuredProduct={featuredProduct} />
+                    </Deferred>
 
                     <Deferred fallback={<WidgetLoading />} data={'latestBlogPosts'}>
                         <BlogPostsGrid posts={latestBlogPosts} />
