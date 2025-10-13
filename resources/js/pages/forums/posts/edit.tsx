@@ -65,7 +65,7 @@ export default function ForumPostEdit({ forum, topic, post }: EditPostProps) {
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <Heading title="Edit post" description={`Editing your post in "${topic.title}"`} />
 
-                <Card className="-mt-8">
+                <Card className="-mt-6">
                     <CardHeader>
                         <CardTitle>Post content</CardTitle>
                         <CardDescription>Make your changes to the post content below.</CardDescription>

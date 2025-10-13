@@ -19,7 +19,7 @@ class StoreController extends Controller
     public function __invoke(): Response
     {
         return Inertia::render('store/index', [
-            'categories' => Inertia::defer(fn () => ProductCategoryData::collect(ProductCategory::query()
+            'categories' => Inertia::defer(fn (): \Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection|\Spatie\LaravelData\CursorPaginatedDataCollection|\Illuminate\Support\Enumerable|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Contracts\Pagination\CursorPaginator|array => ProductCategoryData::collect(ProductCategory::query()
                 ->active()
                 ->ordered()
                 ->with('image')
@@ -28,7 +28,7 @@ class StoreController extends Controller
                 ->get()
                 ->filter(fn (ProductCategory $category) => Gate::check('view', $category))
                 ->values())),
-            'featuredProducts' => Inertia::defer(fn () => ProductData::collect(Product::query()
+            'featuredProducts' => Inertia::defer(fn (): \Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection|\Spatie\LaravelData\CursorPaginatedDataCollection|\Illuminate\Support\Enumerable|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Contracts\Pagination\CursorPaginator|array => ProductData::collect(Product::query()
                 ->products()
                 ->featured()
                 ->with('categories')
@@ -40,7 +40,7 @@ class StoreController extends Controller
                 ->get()
                 ->filter(fn (Product $product) => Gate::check('view', $product))
                 ->values())),
-            'userProvidedProducts' => Inertia::defer(fn () => []),
+            'userProvidedProducts' => Inertia::defer(fn (): array => []),
         ]);
     }
 }

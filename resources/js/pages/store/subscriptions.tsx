@@ -382,7 +382,7 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
             </div>
 
             {subscriptionProducts.length > 0 ? (
-                <div className="flex flex-col gap-6">
+                <div className="-mt-4 flex flex-col gap-6">
                     {availableIntervals.length > 1 && (
                         <div className="flex justify-center pb-4">
                             <Tabs value={billingCycle} onValueChange={(value) => setBillingCycle(value as App.Enums.SubscriptionInterval)}>

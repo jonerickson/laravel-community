@@ -56,7 +56,7 @@ export default function ForumTopicCreate({ forum }: CreateTopicProps) {
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <Heading title="Create new topic" description={`Start a new discussion in ${forum.name}`} />
 
-                <Card className="-mt-8">
+                <Card className="-mt-6">
                     <CardHeader>
                         <CardTitle>Topic details</CardTitle>
                         <CardDescription>

@@ -26,7 +26,7 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Store" />
-            <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div>
                     <div className="sm:flex sm:items-baseline sm:justify-between">
                         <Heading title="Shop by category" description="Browse our most popular products" />
@@ -36,24 +36,29 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
                         </Link>
                     </div>
 
-                    <Deferred fallback={<WidgetLoading />} data={'categories'}>
-                        <div className="flow-root">
-                            <div className="-my-2">
-                                <div className="h-full py-2">
-                                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-                                        {categories && categories.map((category) => <StoreIndexCategoriesItem key={category.id} item={category} />)}
-                                    </div>
-                                </div>
+                    <Deferred fallback={<WidgetLoading variant="grid" />} data={'categories'}>
+                        {categories && categories.length > 0 ? (
+                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                                {categories.map((category) => (
+                                    <StoreIndexCategoriesItem key={category.id} item={category} />
+                                ))}
                             </div>
-                        </div>
-
-                        <div className="mt-6 sm:hidden">
-                            <Link href={route('store.categories.index')} className="block text-sm font-semibold">
-                                Browse all categories
-                                <span aria-hidden="true"> &rarr;</span>
-                            </Link>
-                        </div>
+                        ) : (
+                            <Empty className="border border-dashed">
+                                <EmptyHeader>
+                                    <EmptyTitle>No product categories</EmptyTitle>
+                                    <EmptyDescription>Check back later for more product options.</EmptyDescription>
+                                </EmptyHeader>
+                            </Empty>
+                        )}
                     </Deferred>
+
+                    <div className="mt-6 sm:hidden">
+                        <Link href={route('store.categories.index')} className="block text-sm font-semibold">
+                            Browse all categories
+                            <span aria-hidden="true"> &rarr;</span>
+                        </Link>
+                    </div>
                 </div>
 
                 <div>
@@ -61,10 +66,10 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
                         <Heading title="Featured products" description="Our most popular products" />
                     </div>
 
-                    <Deferred fallback={<WidgetLoading />} data={'featuredProducts'}>
-                        <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:grid-rows-2 sm:gap-x-6 lg:gap-8">
-                            {featuredProducts &&
-                                featuredProducts.slice(0, 3).map((product, index) => (
+                    <Deferred fallback={<WidgetLoading variant="masonry" />} data={'featuredProducts'}>
+                        {featuredProducts && featuredProducts.length > 0 ? (
+                            <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:grid-rows-2 sm:gap-x-6 lg:gap-8">
+                                {featuredProducts.slice(0, 3).map((product, index) => (
                                     <div
                                         key={product.id}
                                         className={`group relative aspect-[2/1] overflow-hidden rounded-lg ${
@@ -98,38 +103,48 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
                                         </div>
                                     </div>
                                 ))}
-                        </div>
-                    </Deferred>
-                </div>
-
-                <div>
-                    <div className="sm:flex sm:items-baseline sm:justify-between">
-                        <Heading title="Marketplace products" description="Broswer community submitted products" />
-                    </div>
-
-                    <Deferred fallback={<WidgetLoading />} data={'userProvidedProducts'}>
-                        {userProvidedProducts && userProvidedProducts.length > 0 ? (
-                            <>
-                                <div className="space-y-12 lg:grid lg:grid-cols-3 lg:space-y-0 lg:gap-x-6">
-                                    {userProvidedProducts && userProvidedProducts.map((item) => <StoreUserProvidedItem key={item.id} item={item} />)}
-                                </div>
-
-                                <div className="mt-6 sm:hidden">
-                                    <Link href="#" className="block text-sm font-semibold">
-                                        Browse all community products
-                                        <span aria-hidden="true"> &rarr;</span>
-                                    </Link>
-                                </div>
-                            </>
+                            </div>
                         ) : (
                             <Empty className="border border-dashed">
                                 <EmptyHeader>
-                                    <EmptyTitle>No community-submitted products</EmptyTitle>
+                                    <EmptyTitle>No featured products</EmptyTitle>
                                     <EmptyDescription>Check back later for more product options.</EmptyDescription>
                                 </EmptyHeader>
                             </Empty>
                         )}
                     </Deferred>
+                </div>
+
+                <div>
+                    <div className="sm:flex sm:items-baseline sm:justify-between">
+                        <Heading title="Community provided" description="Broswer community-submitted products" />
+                        <Link href={route('store.categories.index')} className="hidden text-sm font-semibold sm:block">
+                            Browse all community products
+                            <span aria-hidden="true"> &rarr;</span>
+                        </Link>
+                    </div>
+
+                    <Deferred fallback={<WidgetLoading variant="grid" />} data={'userProvidedProducts'}>
+                        {userProvidedProducts && userProvidedProducts.length > 0 ? (
+                            <div className="space-y-12 lg:grid lg:grid-cols-3 lg:space-y-0 lg:gap-x-6">
+                                {userProvidedProducts && userProvidedProducts.map((item) => <StoreUserProvidedItem key={item.id} item={item} />)}
+                            </div>
+                        ) : (
+                            <Empty className="border border-dashed">
+                                <EmptyHeader>
+                                    <EmptyTitle>No community submitted products</EmptyTitle>
+                                    <EmptyDescription>Check back later for more product options.</EmptyDescription>
+                                </EmptyHeader>
+                            </Empty>
+                        )}
+                    </Deferred>
+
+                    <div className="mt-6 sm:hidden">
+                        <Link href={route('store.categories.index')} className="block text-sm font-semibold">
+                            Browse all community products
+                            <span aria-hidden="true"> &rarr;</span>
+                        </Link>
+                    </div>
                 </div>
             </div>
         </AppLayout>

@@ -48,7 +48,7 @@ export default function DashboardProductCard({ product, type, className }: Dashb
     const IconComponent = config.icon;
 
     return (
-        <Card className={cn('group relative overflow-hidden transition-all hover:shadow-lg', className, config.borderCss)}>
+        <Card className={cn('group relative flex h-full flex-col overflow-hidden transition-all hover:shadow-lg', className, config.borderCss)}>
             <div className={cn('absolute inset-0 bg-gradient-to-br opacity-50', config.gradient)} />
 
             <CardHeader className="relative pb-1">
@@ -63,7 +63,7 @@ export default function DashboardProductCard({ product, type, className }: Dashb
                 </div>
             </CardHeader>
 
-            <CardContent className="relative space-y-6">
+            <CardContent className="relative flex-1 space-y-6">
                 <div className="aspect-[4/3] overflow-hidden rounded-md bg-muted">
                     {product.featuredImageUrl ? (
                         <img

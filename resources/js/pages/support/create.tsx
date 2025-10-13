@@ -57,7 +57,7 @@ export default function CreateSupportTicket({ categories, orders }: CreateSuppor
                     description="Need help? Create a support ticket and our team will get back to you as soon as possible."
                 />
 
-                <Card className="-mt-8">
+                <Card className="-mt-6">
                     <CardHeader>
                         <CardTitle>Support request details</CardTitle>
                         <CardDescription>

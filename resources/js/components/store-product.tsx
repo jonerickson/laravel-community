@@ -85,7 +85,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
                                 : '$0.00'
                         }
                     />
-                    <div className="-mt-2 flex items-center gap-4">
+                    <div className="flex items-center gap-4">
                         <StarRating rating={productData.averageRating || 0} showValue={true} />
                         <Deferred fallback={<div className="text-sm text-primary">Loading reviews...</div>} data="reviews">
                             <Dialog open={isRatingModalOpen} onOpenChange={setIsRatingModalOpen}>
@@ -121,7 +121,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
                     </div>
                 </div>
 
-                <div className="mt-8 lg:col-span-7 lg:col-start-1 lg:row-span-3 lg:row-start-1 lg:mt-0 lg:flex lg:flex-col">
+                <div className="mt-6 lg:col-span-7 lg:col-start-1 lg:row-span-3 lg:row-start-1 lg:mt-0 lg:flex lg:flex-col">
                     <h2 className="sr-only">Images</h2>
 
                     <div className="grid grid-cols-1 lg:flex-1 lg:grid-cols-2 lg:gap-8">

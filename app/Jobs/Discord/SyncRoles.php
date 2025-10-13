@@ -17,13 +17,9 @@ class SyncRoles implements ShouldQueue
 {
     use Queueable;
 
-    protected DiscordApiService $discordApiService;
-
     public function __construct(
         protected User $user,
-    ) {
-        $this->discordApiService = app(DiscordApiService::class);
-    }
+    ) {}
 
     /**
      * @throws RequestException
@@ -31,6 +27,8 @@ class SyncRoles implements ShouldQueue
      */
     public function handle(): void
     {
+        $discordApiService = app(DiscordApiService::class);
+
         if (! $discordIntegration = $this->user->integrations()->latest()->firstWhere('provider', 'discord')) {
             return;
         }
@@ -40,17 +38,17 @@ class SyncRoles implements ShouldQueue
         }
 
         $expectedRoleIds = $this->getExpectedDiscordRoleIds();
-        $currentRoleIds = $this->discordApiService->getUserRoleIds($discordId);
+        $currentRoleIds = $discordApiService->getUserRoleIds($discordId);
 
         $rolesToAdd = $expectedRoleIds->diff($currentRoleIds);
         $rolesToRemove = $currentRoleIds->diff($expectedRoleIds);
 
         foreach ($rolesToAdd as $roleId) {
-            $this->discordApiService->addRole($discordId, $roleId);
+            $discordApiService->addRole($discordId, $roleId);
         }
 
         foreach ($rolesToRemove as $roleId) {
-            $this->discordApiService->removeRole($discordId, $roleId);
+            $discordApiService->removeRole($discordId, $roleId);
         }
 
         Log::info("Synced Discord roles for user {$this->user->id}. Added: {$rolesToAdd->implode(',')}, Removed: {$rolesToRemove->implode(',')}.");

@@ -28,7 +28,7 @@ export default function StoreCategoriesIndex({ categories }: StoreCategoriesInde
             <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto">
                 <Heading title="All product categories" description="Browse all product categories" />
 
-                <div className="-mt-8">
+                <div className="-mt-6">
                     {categories.length > 0 ? (
                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
                             {categories.map((category) => (

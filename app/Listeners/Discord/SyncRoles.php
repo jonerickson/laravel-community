@@ -12,6 +12,10 @@ class SyncRoles
 {
     public function handle(UserGroupCreated|UserGroupDeleted $event): void
     {
-        SyncRolesJob::dispatch($event->userGroup->user);
+        if (! $user = $event->userGroup->user) {
+            return;
+        }
+
+        SyncRolesJob::dispatch($user);
     }
 }

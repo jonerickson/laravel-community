@@ -221,7 +221,7 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
                     </div>
                 </div>
 
-                <div className="mt-2">
+                <div className="mt-0">
                     {posts.data.length > 0 ? (
                         <InfiniteScroll data="posts">
                             <div className="grid gap-6">

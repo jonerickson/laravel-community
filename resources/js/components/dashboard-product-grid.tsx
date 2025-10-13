@@ -3,7 +3,7 @@ import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { Link } from '@inertiajs/react';
-import { ShoppingCart, Store } from 'lucide-react';
+import { Store } from 'lucide-react';
 
 interface DashboardProductGridProps {
     newestProduct?: App.Data.ProductData;
@@ -17,82 +17,68 @@ export default function DashboardProductGrid({ newestProduct, popularProduct, fe
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h2 className="flex items-center gap-2 text-lg font-semibold">
-                        <ShoppingCart className="size-4 text-destructive" />
-                        Top rated products
-                    </h2>
-                    <p className="text-sm text-muted-foreground">View the most recent, latest and trending products</p>
-                </div>
-                <Link href={route('store.index')} className="text-sm font-medium text-primary hover:underline">
-                    View store
-                </Link>
+        <div className="grid auto-rows-min gap-6 md:grid-cols-3">
+            <div className="relative">
+                {newestProduct ? (
+                    <DashboardProductCard product={newestProduct} type="newest" />
+                ) : (
+                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="space-y-3 text-center">
+                                <HeadingSmall title="Newest arrival" description="No products available" />
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href={route('store.index')}>
+                                        <Store className="size-4" />
+                                        Shop Store
+                                    </Link>
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
-            <div className="grid auto-rows-min gap-6 md:grid-cols-3">
-                <div className="relative">
-                    {newestProduct ? (
-                        <DashboardProductCard product={newestProduct} type="newest" />
-                    ) : (
-                        <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                            <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="space-y-3 text-center">
-                                    <HeadingSmall title="Newest arrival" description="No products available" />
-                                    <Button asChild variant="outline" size="sm">
-                                        <Link href={route('store.index')}>
-                                            <Store className="size-4" />
-                                            Shop Store
-                                        </Link>
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
 
-                <div className="relative">
-                    {popularProduct ? (
-                        <DashboardProductCard product={popularProduct} type="popular" />
-                    ) : (
-                        <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                            <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="space-y-3 text-center">
-                                    <HeadingSmall title="Most popular" description="No products available" />
-                                    <Button asChild variant="outline" size="sm">
-                                        <Link href={route('store.index')}>
-                                            <Store className="size-4" />
-                                            Shop Store
-                                        </Link>
-                                    </Button>
-                                </div>
+            <div className="relative">
+                {popularProduct ? (
+                    <DashboardProductCard product={popularProduct} type="popular" />
+                ) : (
+                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="space-y-3 text-center">
+                                <HeadingSmall title="Most popular" description="No products available" />
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href={route('store.index')}>
+                                        <Store className="size-4" />
+                                        Shop Store
+                                    </Link>
+                                </Button>
                             </div>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
+            </div>
 
-                <div className="relative">
-                    {featuredProduct ? (
-                        <DashboardProductCard product={featuredProduct} type="featured" />
-                    ) : (
-                        <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                            <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="space-y-3 text-center">
-                                    <HeadingSmall title="Featured product" description="No products available" />
-                                    <Button asChild variant="outline" size="sm">
-                                        <Link href={route('store.index')}>
-                                            <Store className="size-4" />
-                                            Shop Store
-                                        </Link>
-                                    </Button>
-                                </div>
+            <div className="relative">
+                {featuredProduct ? (
+                    <DashboardProductCard product={featuredProduct} type="featured" />
+                ) : (
+                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="space-y-3 text-center">
+                                <HeadingSmall title="Featured product" description="No products available" />
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href={route('store.index')}>
+                                        <Store className="size-4" />
+                                        Shop Store
+                                    </Link>
+                                </Button>
                             </div>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
         </div>
     );

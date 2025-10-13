@@ -35,7 +35,7 @@ class InstallCommand extends Command
             $this->call('db:seed', ['--class' => PermissionSeeder::class]);
         }
 
-        if ($this->confirm('Would you like to install all the required permissions?', true)) {
+        if ($this->confirm('Would you like to install all the default member groups?', true)) {
             Schema::disableForeignKeyConstraints();
             Group::truncate();
             Schema::enableForeignKeyConstraints();
@@ -62,6 +62,7 @@ class InstallCommand extends Command
                 'password' => Hash::make($password),
             ]);
 
+            $user->markEmailAsVerified();
             $user->assignRole('super-admin');
 
             $this->comment('User created successfully.');
