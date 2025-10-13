@@ -3,14 +3,10 @@
 
 Hello! The status of support ticket **{{ $supportTicket->ticket_number }}** has been updated.
 
-## Ticket Details
-
 **Subject:** {{ $supportTicket->subject }}<br />
 **Previous Status:** {{ $oldStatus->getLabel() }}<br />
 **New Status:** {{ $newStatus->getLabel() }}<br />
 **Priority:** {{ $supportTicket->priority->getLabel() }}<br />
-
-## Status Change Summary
 
 Your support ticket has been moved from **{{ $oldStatus->getLabel() }}** to **{{ $newStatus->getLabel() }}**.
 

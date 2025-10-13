@@ -51,7 +51,7 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
             category: category.name,
             offers: {
                 '@type': 'Offer',
-                price: product.defaultPrice?.amount ? product.defaultPrice.amount / 100 : 0,
+                price: product.defaultPrice?.amount ? product.defaultPrice.amount : 0,
                 priceCurrency: 'USD',
             },
         })),
@@ -71,7 +71,7 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
                 <Heading title={category.name} description={category.description || undefined} />
 
                 {products.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                         {products.map((product) => (
                             <StoreCategoriesProductItem key={product.id} product={product} />
                         ))}

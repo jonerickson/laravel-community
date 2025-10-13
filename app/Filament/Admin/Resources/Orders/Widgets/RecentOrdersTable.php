@@ -10,7 +10,6 @@ use App\Models\Order;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
-use Illuminate\Support\Number;
 
 class RecentOrdersTable extends TableWidget
 {
@@ -33,6 +32,7 @@ class RecentOrdersTable extends TableWidget
             ->deferLoading()
             ->columns([
                 TextColumn::make('reference_id')
+                    ->copyable()
                     ->label('Order #')
                     ->url(fn (Order $record): string => ViewOrder::getUrl(['record' => $record])),
                 TextColumn::make('invoice_number')
@@ -49,7 +49,7 @@ class RecentOrdersTable extends TableWidget
                     ->badge(),
                 TextColumn::make('amount')
                     ->label('Amount')
-                    ->formatStateUsing(fn (Order $record): string => Number::currency($record->amount / 100, 'USD'))
+                    ->money()
                     ->sortable(),
                 TextColumn::make('items_count')
                     ->label('Items')

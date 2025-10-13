@@ -7,7 +7,9 @@ namespace App\Http\Controllers\Store;
 use App\Data\ProductCategoryData;
 use App\Data\ProductData;
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use App\Models\ProductCategory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Gate;
@@ -38,8 +40,9 @@ class CategoryController extends Controller
     {
         $this->authorize('view', $category);
 
-        $products = $category
-            ->products()
+        $products = Product::query()
+            ->whereHas('categories', fn (Builder $query) => $query->whereKey($category->id))
+            ->approved()
             ->with('defaultPrice')
             ->with(['prices' => function (HasMany $query): void {
                 $query->active();

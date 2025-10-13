@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Products;
 
+use App\Enums\ProductApprovalStatus;
 use App\Enums\ProductTaxCode;
 use App\Enums\ProductType;
 use App\Filament\Admin\Resources\Products\Pages\CreateProduct;
@@ -180,6 +181,25 @@ class ProductResource extends Resource
                                     ->relationship('policies', 'title', fn (Builder $query) => $query->active()->effective()->orderBy('title'))
                                     ->multiple(),
                             ]),
+                        Section::make('Marketplace')
+                            ->components([
+                                Select::make('seller_id')
+                                    ->relationship('seller', 'name')
+                                    ->searchable()
+                                    ->preload(),
+                                Select::make('approval_status')
+                                    ->label('Approval Status')
+                                    ->requiredWith('seller_id')
+                                    ->default(ProductApprovalStatus::Approved)
+                                    ->options(ProductApprovalStatus::class),
+                                TextInput::make('commission_rate')
+                                    ->label('Commission Rate')
+                                    ->requiredWith('seller_id')
+                                    ->rules('lte:1')
+                                    ->suffix('%')
+                                    ->helperText('The commission rate of the product as a decimal.')
+                                    ->numeric(),
+                            ]),
                         Section::make('Metadata')
                             ->components([
                                 KeyValue::make('metadata.metadata')
@@ -202,8 +222,24 @@ class ProductResource extends Resource
                 TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('seller.name')
+                    ->label('Seller')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('approval_status')
+                    ->label('Approval Status')
+                    ->badge()
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('type')
                     ->badge(),
+                TextColumn::make('commission_rate')
+                    ->label('Commission Rate')
+                    ->suffix('%')
+                    ->sortable()
+                    ->toggleable()
+                    ->formatStateUsing(fn ($state): int|float => $state * 100),
                 IconColumn::make('is_featured')
                     ->label('Featured')
                     ->boolean()
@@ -232,6 +268,9 @@ class ProductResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('approval_status')
+                    ->options(ProductApprovalStatus::class)
+                    ->native(false),
                 SelectFilter::make('categories')
                     ->relationship('categories', 'name')
                     ->multiple()
@@ -240,15 +279,18 @@ class ProductResource extends Resource
                 SelectFilter::make('type')
                     ->options(ProductType::class)
                     ->native(false),
+                Filter::make('marketplace')
+                    ->label('Marketplace Products')
+                    ->query(fn (Builder|Product $query): Builder => $query->marketplace()),
+                Filter::make('featured')
+                    ->label('Featured Products')
+                    ->query(fn (Builder|Product $query): Builder => $query->featured()),
                 Filter::make('with_external_product_id')
                     ->label('Linked to External Product')
                     ->query(fn (Builder|Product $query): Builder => $query->withExternalProduct()),
                 Filter::make('without_external_product_id')
                     ->label('Not Linked to External Product')
                     ->query(fn (Builder|Product $query): Builder => $query->withoutExternalProduct()),
-                Filter::make('featured')
-                    ->label('Featured Products')
-                    ->query(fn (Builder|Product $query): Builder => $query->featured()),
             ])
             ->recordActions([
                 EditAction::make(),
@@ -280,17 +322,13 @@ class ProductResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::getModel()::count();
+        $pendingCount = static::getModel()::where('approval_status', ProductApprovalStatus::Pending)->count();
+
+        return $pendingCount > 0 ? (string) $pendingCount : null;
     }
 
     public static function getNavigationBadgeColor(): string|array|null
     {
-        $count = static::getNavigationBadge();
-
-        return match (true) {
-            $count > 20 => 'warning',
-            $count > 0 => 'success',
-            default => 'gray',
-        };
+        return 'warning';
     }
 }

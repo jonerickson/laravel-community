@@ -9,7 +9,6 @@ use App\Events\OrderPending;
 use App\Events\OrderProcessing;
 use App\Events\OrderSucceeded;
 use App\Mail\Orders\OrderCancelled as OrderCancelledMail;
-use App\Mail\Orders\OrderPending as OrderPendingMail;
 use App\Mail\Orders\OrderProcessing as OrderProcessingMail;
 use App\Mail\Orders\OrderSucceeded as OrderSucceededMail;
 use Illuminate\Contracts\Mail\Mailable;
@@ -22,10 +21,6 @@ class HandleOrderEvent
         match ($event::class) {
             OrderCancelled::class => $this->sendMail(
                 new OrderCancelledMail($event->order),
-                $event->order
-            ),
-            OrderPending::class => $this->sendMail(
-                new OrderPendingMail($event->order),
                 $event->order
             ),
             OrderProcessing::class => $this->sendMail(

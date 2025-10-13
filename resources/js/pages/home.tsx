@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import WidgetLoading from '@/components/widget-loading';
-import { cn } from '@/lib/utils';
+import { cn, currency } from '@/lib/utils';
 import { stripCharacters } from '@/utils/truncate';
 import { Deferred, Link, usePage } from '@inertiajs/react';
 import {
@@ -364,7 +364,7 @@ function SubscriptionCards({ subscriptions }: SubscriptionCardsProps) {
                             <CardDescription>{stripCharacters(subscription.description)}</CardDescription>
                             {defaultPrice && (
                                 <div className="mt-4 text-3xl font-bold">
-                                    ${(defaultPrice.amount / 100).toFixed(2)}
+                                    ${currency(defaultPrice.amount)}
                                     <span className="text-lg font-normal text-muted-foreground"> / {defaultPrice.interval}</span>
                                 </div>
                             )}

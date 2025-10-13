@@ -5,12 +5,10 @@ Hello {{ $order->user->name }},
 
 Your refund for order **#{{ $order->reference_id }}** has been successfully processed.
 
-## Refund Details
-
 **Order Number:** {{ $order->reference_id }}<br>
 **Invoice Number:** {{ $order->invoice_number }}<br>
 **Status:** {{ $order->status->getLabel() }}<br>
-**Refund Amount:** ${{ number_format($order->amount / 100, 2) }}<br>
+**Refund Amount:** {{ \Illuminate\Support\Number::currency($order->amount) }}<br>
 **Refund Reason:** {{ $reason->getLabel() }}<br>
 
 @if(count($order->items))
@@ -18,7 +16,7 @@ Your refund for order **#{{ $order->reference_id }}** has been successfully proc
 | Item | Quantity |
 |:-----|---------:|
 @foreach($order->items as $item)
-| {{ $item->getLabel() }} | {{ $item->quantity }} |
+| {{ $item->name }} | {{ $item->quantity }} |
 @endforeach
 </x-mail::table>
 @endif

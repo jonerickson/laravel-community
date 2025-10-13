@@ -5,8 +5,10 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export function currency(value: string | null | undefined) {
+export function currency(value: string | number | null | undefined) {
     if (!value) return '0.00';
+
+    if (typeof value !== 'string') value = String(value);
 
     const amount = parseFloat(value);
 

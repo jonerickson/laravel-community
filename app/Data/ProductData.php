@@ -34,6 +34,8 @@ class ProductData extends Data
 
     public bool $isSubscriptionOnly;
 
+    public bool $isMarketplaceProduct;
+
     public int $trialDays;
 
     public bool $allowPromotionCodes;

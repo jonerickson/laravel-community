@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useApiRequest } from '@/hooks';
 import { useCartOperations } from '@/hooks/use-cart-operations';
 import AppLayout from '@/layouts/app-layout';
+import { currency } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { Check, ImageIcon, ShoppingCart as ShoppingCartIcon, Ticket, Trash2, XIcon } from 'lucide-react';
@@ -52,7 +53,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
     const { delete: clearCartForm, processing: clearCartProcessing } = useForm();
     const { subtotal, total } = calculateTotals();
     const totalInCents = Math.round(total * 100);
-    const finalTotal = appliedDiscount ? appliedDiscount.new_total / 100 : total;
+    const finalTotal = appliedDiscount ? appliedDiscount.new_total : total;
     const { loading: validatingDiscount, execute: validateDiscount } = useApiRequest();
     const { loading: removingDiscount, execute: removeDiscountRequest } = useApiRequest();
 
@@ -60,8 +61,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
         if (order && order.discounts && order.discounts.length > 0) {
             const firstDiscount = order.discounts[0];
 
-            const discountValue =
-                firstDiscount.discountType === 'percentage' ? `${firstDiscount.value}%` : `$${(firstDiscount.value / 100).toFixed(2)}`;
+            const discountValue = firstDiscount.discountType === 'percentage' ? `${firstDiscount.value}%` : `${currency(firstDiscount.value / 100)}`;
 
             setAppliedDiscount({
                 id: firstDiscount.id,
@@ -70,9 +70,9 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                 discount_type: firstDiscount.discountType,
                 discount_value: discountValue,
                 discount_amount: firstDiscount.amountApplied ?? 0,
-                discount_amount_formatted: `$${((firstDiscount.amountApplied ?? 0) / 100).toFixed(2)}`,
+                discount_amount_formatted: currency((firstDiscount.amountApplied ?? 0) / 100),
                 new_total: firstDiscount.balanceAfter ?? totalInCents,
-                new_total_formatted: `$${((firstDiscount.balanceAfter ?? totalInCents) / 100).toFixed(2)}`,
+                new_total_formatted: `$${(firstDiscount.balanceAfter ?? totalInCents).toFixed(2)}`,
             });
             setDiscountCode(firstDiscount.code);
         } else if (order && (!order.discounts || order.discounts.length === 0)) {
@@ -244,9 +244,9 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                                         </div>
                                                         <p className="mt-3 text-sm font-medium text-foreground">
                                                             {item.selectedPrice
-                                                                ? `$${(item.selectedPrice.amount / 100).toFixed(2)} ${item.selectedPrice.currency}${item.selectedPrice.interval ? ` / ${item.selectedPrice.interval}` : ''}`
+                                                                ? `${currency(item.selectedPrice.amount)} ${item.selectedPrice.currency}${item.selectedPrice.interval ? ` / ${item.selectedPrice.interval}` : ''}`
                                                                 : item.product?.defaultPrice
-                                                                  ? `$${(item.product.defaultPrice.amount / 100).toFixed(2)} ${item.product.defaultPrice.currency}${item.product.defaultPrice.interval ? ` / ${item.product.defaultPrice.interval}` : ''}`
+                                                                  ? `${currency(item.product.defaultPrice.amount)} ${item.product.defaultPrice.currency}${item.product.defaultPrice.interval ? ` / ${item.product.defaultPrice.interval}` : ''}`
                                                                   : 'Price TBD'}
                                                         </p>
                                                     </div>
@@ -272,7 +272,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                                                     <SelectContent>
                                                                         {item.availablePrices.map((price) => (
                                                                             <SelectItem key={price.id} value={price.id.toString()}>
-                                                                                {price.name} - ${(price.amount / 100).toFixed(2)} {price.currency}
+                                                                                {price.name} - {currency(price.amount)} {price.currency}
                                                                                 {price.interval && ` / ${price.interval}`}
                                                                             </SelectItem>
                                                                         ))}
@@ -332,7 +332,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                             <dl className="divide-shadow-muted mt-6 divide-y">
                                 <div className="flex items-center justify-between py-3">
                                     <dt className="text-sm text-muted-foreground">Subtotal</dt>
-                                    <dd className="text-sm font-medium text-primary">${subtotal.toFixed(2)}</dd>
+                                    <dd className="text-sm font-medium text-primary">{currency(subtotal)}</dd>
                                 </div>
 
                                 <div className="py-3">
@@ -394,7 +394,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
 
                                 <div className="flex items-center justify-between py-3">
                                     <dt className="text-base font-medium text-muted-foreground">Order total</dt>
-                                    <dd className="text-base font-medium text-primary">${finalTotal.toFixed(2)}</dd>
+                                    <dd className="text-base font-medium text-primary">{currency(finalTotal)}</dd>
                                 </div>
 
                                 {policies.length > 0 && (

@@ -42,7 +42,7 @@ class OrdersTable
                     ->searchable(),
                 TextColumn::make('amount')
                     ->label('Total')
-                    ->money('USD', divideBy: 100)
+                    ->money()
                     ->sortable(),
                 TextColumn::make('items.product.name')
                     ->searchable(),

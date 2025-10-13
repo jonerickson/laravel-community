@@ -15,6 +15,8 @@ class OrderPending extends Mailable implements ShouldQueue
 {
     use Queueable;
 
+    public bool $deleteWhenMissingModels = true;
+
     public function __construct(public Order $order)
     {
         //

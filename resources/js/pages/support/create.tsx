@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
+import { currency } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 
@@ -104,7 +105,7 @@ export default function CreateSupportTicket({ categories, orders }: CreateSuppor
                                                         ?.map((item) => item.product?.name || item.name)
                                                         .filter(Boolean)
                                                         .join(', ') || 'N/A'}{' '}
-                                                    - ${((order.amount || 0) / 100).toFixed(2)}
+                                                    - {currency(order.amount || 0)}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>

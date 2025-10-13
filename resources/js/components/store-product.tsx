@@ -7,7 +7,7 @@ import { StoreProductReviewsList } from '@/components/store-product-reviews-list
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { pluralize } from '@/lib/utils';
+import { currency, pluralize } from '@/lib/utils';
 import { Deferred, router, useForm, usePage } from '@inertiajs/react';
 import { ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -79,7 +79,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
                                 ? (() => {
                                       const selectedPrice = productData.prices?.find((p) => p.id === selectedPriceId) || productData.defaultPrice;
                                       return selectedPrice?.amount
-                                          ? `$${(selectedPrice.amount / 100).toFixed(2)} ${selectedPrice.currency}${selectedPrice.interval ? ` / ${selectedPrice.interval}` : ''}`
+                                          ? `${currency(selectedPrice.amount)} ${selectedPrice.currency}${selectedPrice.interval ? ` / ${selectedPrice.interval}` : ''}`
                                           : 'Price TBD';
                                   })()
                                 : '$0.00'
@@ -157,11 +157,11 @@ export default function Product({ product: productData, reviews }: ProductProps)
                     </div>
                 </div>
 
-                <div className="mt-8 lg:col-span-5 lg:flex lg:h-full lg:flex-col">
+                <div className="mt-6 lg:col-span-5 lg:flex lg:h-full lg:flex-col">
                     {productData?.description && (
                         <>
                             <HeadingSmall title="Description" />
-                            <RichEditorContent className="mt-2 text-sm text-muted-foreground" content={productData.description} />
+                            <RichEditorContent className="text-sm text-muted-foreground" content={productData.description} />
                         </>
                     )}
 
@@ -180,7 +180,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
                                             <SelectContent>
                                                 {productData.prices.map((price) => (
                                                     <SelectItem key={price.id} value={price.id.toString()}>
-                                                        {price.name} - ${(price.amount / 100).toFixed(2)} {price.currency}
+                                                        {price.name} - {currency(price.amount)} {price.currency}
                                                         {price.interval && ` / ${price.interval}`}
                                                     </SelectItem>
                                                 ))}

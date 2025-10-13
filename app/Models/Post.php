@@ -68,6 +68,7 @@ use Override;
  * @property-read string|null $featured_image_url
  * @property-read bool $is_read_by_user
  * @property-read bool $is_reported
+ * @property-read Comment|null $latestComment
  * @property-read Collection<int, Like> $likes
  * @property-read int $likes_count
  * @property-read array $likes_summary

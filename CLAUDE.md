@@ -152,18 +152,30 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 ## Foundational Context
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an expert with them all. Ensure you abide by these specific packages & versions.
 
-- php - 8.4.10
+- php - 8.4.13
 - filament/filament (FILAMENT) - v4
 - inertiajs/inertia-laravel (INERTIA) - v2
+- laravel/cashier (CASHIER) - v15
 - laravel/framework (LARAVEL) - v12
+- laravel/nightwatch (NIGHTWATCH) - v1
+- laravel/passport (PASSPORT) - v13
 - laravel/prompts (PROMPTS) - v0
 - laravel/scout (SCOUT) - v10
+- laravel/socialite (SOCIALITE) - v5
 - livewire/livewire (LIVEWIRE) - v3
 - tightenco/ziggy (ZIGGY) - v2
+- larastan/larastan (LARASTAN) - v3
+- laravel/horizon (HORIZON) - v5
 - laravel/pint (PINT) - v1
+- laravel/sail (SAIL) - v1
+- laravel/telescope (TELESCOPE) - v5
 - pestphp/pest (PEST) - v3
-- @inertiajs/react (INERTIA) - v2
+- phpunit/phpunit (PHPUNIT) - v11
+- rector/rector (RECTOR) - v2
 - react (REACT) - v19
+- @inertiajs/react (INERTIA) - v2
+- eslint (ESLINT) - v9
+- prettier (PRETTIER) - v3
 - tailwindcss (TAILWINDCSS) - v4
 
 
@@ -370,12 +382,14 @@ Forms\Components\Select::make('user_id')
 - Table filters: `Tables/Filters/`
 - Actions: `Actions/`
 
+
 === inertia-laravel/core rules ===
 
 ## Inertia Core
 
 - Inertia.js components should be placed in the `resources/js/Pages` directory unless specified differently in the JS bundler (vite.config.js).
 - Use `Inertia::render()` for server-side routing instead of traditional Blade views.
+- Use `search-docs` for accurate guidance on all things Inertia.
 
 <code-snippet lang="php" name="Inertia::render Example">
 // routes/web.php example
@@ -402,6 +416,11 @@ Route::get('/users', function () {
 
 ### Deferred Props & Empty States
 - When using deferred props on the frontend, you should add a nice empty state with pulsing / animated skeleton.
+
+### Inertia Form General Guidance
+- The recommended way to build forms when using Inertia is with the `<Form>` component - a useful example is below. Use `search-docs` with a query of `form component` for guidance.
+- Forms can also be built using the `useForm` helper for more programmatic control, or to follow existing conventions. Use `search-docs` with a query of `useForm helper` for guidance.
+- `resetOnError`, `resetOnSuccess`, and `setDefaultsOnSuccess` are available on the `<Form>` component. Use `search-docs` with a query of 'form component resetting' for guidance.
 
 
 === laravel/core rules ===
@@ -623,53 +642,49 @@ it('has emails', function (string $email) {
 
 - Use `router.visit()` or `<Link>` for navigation instead of traditional links.
 
-<code-snippet lang="react" name="Inertia Client Navigation">
-    import { Link } from '@inertiajs/react'
+<code-snippet name="Inertia Client Navigation" lang="react">
 
-    <Link href="/">Home</Link>
+import { Link } from '@inertiajs/react'
+<Link href="/">Home</Link>
+
 </code-snippet>
 
-- For form handling, use `router.post` and related methods. Do not use regular forms.
 
-<code-snippet lang="react" name="Inertia React Form Example">
-import { useState } from 'react'
-import { router } from '@inertiajs/react'
+=== inertia-react/v2/forms rules ===
 
-export default function Edit() {
-    const [values, setValues] = useState({
-        first_name: "",
-        last_name: "",
-        email: "",
-    })
+## Inertia + React Forms
 
-    function handleChange(e) {
-        const key = e.target.id;
-        const value = e.target.value
+<code-snippet name="`<Form>` Component Example" lang="react">
 
-        setValues(values => ({
-            ...values,
-            [key]: value,
-        }))
-    }
+import { Form } from '@inertiajs/react'
 
-    function handleSubmit(e) {
-        e.preventDefault()
+export default () => (
+    <Form action="/users" method="post">
+        {({
+            errors,
+            hasErrors,
+            processing,
+            wasSuccessful,
+            recentlySuccessful,
+            clearErrors,
+            resetAndClearErrors,
+            defaults
+        }) => (
+        <>
+        <input type="text" name="name" />
 
-        router.post('/users', values)
-    }
+        {errors.name && <div>{errors.name}</div>}
 
-    return (
-    <form onSubmit={handleSubmit}>
-        <label htmlFor="first_name">First name:</label>
-        <input id="first_name" value={values.first_name} onChange={handleChange} />
-        <label htmlFor="last_name">Last name:</label>
-        <input id="last_name" value={values.last_name} onChange={handleChange} />
-        <label htmlFor="email">Email:</label>
-        <input id="email" value={values.email} onChange={handleChange} />
-        <button type="submit">Submit</button>
-    </form>
-    )
-}
+        <button type="submit" disabled={processing}>
+            {processing ? 'Creating...' : 'Create User'}
+        </button>
+
+        {wasSuccessful && <div>User created successfully!</div>}
+        </>
+    )}
+    </Form>
+)
+
 </code-snippet>
 
 

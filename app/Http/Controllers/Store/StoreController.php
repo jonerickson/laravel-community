@@ -30,6 +30,7 @@ class StoreController extends Controller
                 ->values())),
             'featuredProducts' => Inertia::defer(fn (): \Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection|\Spatie\LaravelData\CursorPaginatedDataCollection|\Illuminate\Support\Enumerable|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Contracts\Pagination\CursorPaginator|array => ProductData::collect(Product::query()
                 ->products()
+                ->approved()
                 ->featured()
                 ->with('categories')
                 ->with(['prices' => function (HasMany $query): void {
@@ -40,7 +41,19 @@ class StoreController extends Controller
                 ->get()
                 ->filter(fn (Product $product) => Gate::check('view', $product))
                 ->values())),
-            'userProvidedProducts' => Inertia::defer(fn (): array => []),
+            'userProvidedProducts' => Inertia::defer(fn (): \Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection|\Spatie\LaravelData\CursorPaginatedDataCollection|\Illuminate\Support\Enumerable|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Contracts\Pagination\CursorPaginator|array => ProductData::collect(Product::query()
+                ->products()
+                ->marketplace()
+                ->approved()
+                ->with('categories')
+                ->with(['prices' => function (HasMany $query): void {
+                    $query->active();
+                }])
+                ->latest()
+                ->take(5)
+                ->get()
+                ->filter(fn (Product $product) => Gate::check('view', $product))
+                ->values())),
         ]);
     }
 }

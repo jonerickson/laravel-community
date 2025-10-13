@@ -53,6 +53,7 @@ use Override;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, File> $files
  * @property-read int|null $files_count
  * @property-read bool $is_active
+ * @property-read Comment|null $latestComment
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Note> $notes
  * @property-read int|null $notes_count
  * @property-read Order|null $order

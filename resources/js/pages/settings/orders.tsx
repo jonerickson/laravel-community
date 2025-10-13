@@ -138,7 +138,7 @@ export default function Orders({ orders }: OrdersProps) {
             },
             cell: ({ row }) => {
                 const amount = row.getValue('amount') as number | null;
-                const formattedAmount = amount ? currency((amount / 100).toString()) : 'N/A';
+                const formattedAmount = amount ? currency(amount) : 'N/A';
 
                 return <div className="text-right font-medium">{formattedAmount}</div>;
             },

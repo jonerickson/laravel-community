@@ -31,29 +31,27 @@ Your subscription **#{{ $order->reference_id }}** has been updated.
   ℹ️ Your subscription status has been updated.
 @endswitch
 
-## Subscription Details
-
 **Order Number:** {{ $order->reference_id }}<br />
 **Invoice Number:** {{ $order->invoice_number }}<br />
 **Current Status:** {{ $newStatus?->getLabel() ?? $order->status->getLabel() }}<br />
-**Total:** ${{ number_format($order->amount / 100, 2) }}<br />
+**Total:** {{ \Illuminate\Support\Number::currency($order->amount) }}<br />
 
 @if(count($order->items))
 <x-mail::table>
 | Item | Quantity |
 |:-----|---------:|
 @foreach($order->items as $item)
-| {{ $item->getLabel() }} | {{ $item->quantity }} |
+| {{ $item->name }} | {{ $item->quantity }} |
 @endforeach
 </x-mail::table>
 @endif
 
-<x-mail::button :url="route('settings.orders')">Manage subscription</x-mail::button>
+<x-mail::button :url="route('store.subscriptions')">Manage subscription</x-mail::button>
 
 @if ($newStatus && in_array($newStatus, [\App\Enums\SubscriptionStatus::PastDue, \App\Enums\SubscriptionStatus::Unpaid, \App\Enums\SubscriptionStatus::Incomplete]))
 If you need assistance with payment or have any questions, our support team is here to help.
 @else
-  If you have any questions about this status change, our support team is here to help.
+If you have any questions about this status change, our support team is here to help.
 @endif
 
 Thanks,

@@ -149,13 +149,21 @@ class Price extends Model implements HasLabel
 
     public function getLabel(): string|Htmlable|null
     {
-        $amount = Number::currency($this->amount / 100);
+        $amount = Number::currency($this->amount);
         $interval = $this->interval?->getLabel();
 
         return Str::of($this->name)
             ->append(" - $amount")
             ->when(filled($interval), fn (Stringable $str): Stringable => $str->append(" / $interval"))
             ->toString();
+    }
+
+    public function amount(): Attribute
+    {
+        return Attribute::make(
+            get: fn (int $value): float => $value / 100,
+            set: fn (float $value): int => (int) ($value * 100),
+        );
     }
 
     protected function casts(): array

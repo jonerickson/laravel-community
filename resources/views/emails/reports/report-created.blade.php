@@ -3,8 +3,6 @@
 
 A new report has been submitted by **{{ $report->author?->name ?? 'A user' }}**.
 
-## Report Details
-
 **Reportable Type:** {{ class_basename($report->reportable_type) }}<br>
 **Reason:** {{ $report->reason->getLabel() }}<br>
 @if(filled($report->additional_info))
@@ -13,8 +11,6 @@ A new report has been submitted by **{{ $report->author?->name ?? 'A user' }}**.
 **Submitted At:** {{ $report->created_at->format('M d, Y \a\t g:i A') }}<br>
 
 @if($content = $report->getContent())
-## Reported Content
-
 <x-mail::panel>
 {!! $content !!}
 </x-mail::panel>

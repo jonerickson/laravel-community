@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Orders\RelationManagers;
 
 use App\Models\Order;
-use App\Models\OrderItem;
 use App\Models\Price;
 use BackedEnum;
 use Filament\Actions\CreateAction;
@@ -72,7 +71,6 @@ class ItemsRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('name')
                     ->default(new HtmlString('&ndash;'))
-                    ->formatStateUsing(fn (OrderItem $item): string => $item->getLabel())
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('price')
@@ -85,7 +83,7 @@ class ItemsRelationManager extends RelationManager
                     ->sortable(),
                 TextColumn::make('amount')
                     ->label('Total')
-                    ->money('USD', divideBy: 100)
+                    ->money()
                     ->sortable(),
             ])
             ->headerActions([

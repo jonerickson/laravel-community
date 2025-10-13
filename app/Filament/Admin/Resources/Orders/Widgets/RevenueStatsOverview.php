@@ -25,22 +25,22 @@ class RevenueStatsOverview extends StatsOverviewWidget
         $arr = $mrr * 12;
 
         return [
-            Stat::make('Total Revenue', Number::currency($totalRevenue / 100, 'USD'))
+            Stat::make('Total Revenue', Number::currency($totalRevenue))
                 ->description('All-time revenue')
                 ->icon(Heroicon::OutlinedCurrencyDollar)
                 ->color('success'),
 
-            Stat::make('Revenue This Month', Number::currency($revenueThisMonth / 100, 'USD'))
+            Stat::make('Revenue This Month', Number::currency($revenueThisMonth))
                 ->description('Revenue in '.now()->format('F'))
                 ->icon(Heroicon::OutlinedCalendarDays)
                 ->color('primary'),
 
-            Stat::make('MRR', Number::currency($mrr / 100, 'USD'))
+            Stat::make('MRR', Number::currency($mrr))
                 ->description('Monthly recurring revenue')
                 ->icon(Heroicon::OutlinedArrowPath)
                 ->color('info'),
 
-            Stat::make('ARR', Number::currency($arr / 100, 'USD'))
+            Stat::make('ARR', Number::currency($arr))
                 ->description('Annual recurring revenue')
                 ->icon(Heroicon::OutlinedChartBar)
                 ->color('success'),
@@ -80,7 +80,7 @@ class RevenueStatsOverview extends StatsOverviewWidget
                 $stripeSubscription = $subscription->asStripeSubscription();
 
                 foreach ($stripeSubscription->items->data as $item) {
-                    $amount = $item->price->unit_amount ?? 0;
+                    $amount = ($item->price->unit_amount / 100) ?? 0;
                     $interval = $item->price->recurring->interval ?? 'month';
 
                     if ($interval === 'year') {

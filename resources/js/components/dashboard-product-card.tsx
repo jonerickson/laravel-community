@@ -79,7 +79,15 @@ export default function DashboardProductCard({ product, type, className }: Dashb
                 </div>
 
                 <div className="space-y-1.5">
-                    <h3 className="line-clamp-1 text-sm leading-tight font-semibold">{product.name}</h3>
+                    <div className="flex items-center gap-2">
+                        <h3 className="line-clamp-1 text-sm leading-tight font-semibold">{product.name}</h3>
+                        {product.isFeatured && (
+                            <Badge variant="default" className="bg-info text-xs text-info-foreground">
+                                Featured
+                            </Badge>
+                        )}
+                        {product.isMarketplaceProduct && <Badge variant="secondary">Community Provided</Badge>}
+                    </div>
 
                     {product.description && <p className="line-clamp-2 text-sm text-muted-foreground">{stripCharacters(product.description)}</p>}
 

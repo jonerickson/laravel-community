@@ -3,7 +3,6 @@
 
 You have been issued a warning on {{ config('app.name') }}.
 
-## Warning Details
 **Warning Type:** {{ $userWarning->warning->name }}<br />
 **Points:** {{ $userWarning->warning->points }}<br />
 **Points Expire:** {{ $userWarning->points_expire_at->format('F j, Y') }}<br />
@@ -11,10 +10,7 @@ You have been issued a warning on {{ config('app.name') }}.
 **Reason:** {{ $userWarning->reason }}<br />
 @endif
 
-**Your current warning points:** {{ $userWarning->points_at_issue }}
-
 @if ($userWarning->warningConsequence)
-## Current Restriction
 **{{ $userWarning->warningConsequence->type->getLabel() }}:** {{ $userWarning->warningConsequence->type->getDescription() }}<br />
 **Restriction Expires:** {{ $userWarning->consequence_expires_at->format('F j, Y') }}<br />
 @endif

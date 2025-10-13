@@ -6,6 +6,8 @@ use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\Config\RectorConfig;
 
 return RectorConfig::configure()
+    ->withSetProviders(RectorLaravel\Set\LaravelSetProvider::class)
+    ->withComposerBased(laravel: true)
     ->withCache(
         cacheDirectory: '/tmp/rector',
         cacheClass: FileCacheStorage::class

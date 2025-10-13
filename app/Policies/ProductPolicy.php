@@ -27,6 +27,7 @@ class ProductPolicy
 
     public function view(?User $user, Product $product): bool
     {
-        return $product->categories === null || $product->categories->some(fn (ProductCategory $category) => Gate::forUser($user)->check('view', $category));
+        return $product->isApproved()
+            && ($product->categories === null || $product->categories->some(fn (ProductCategory $category) => Gate::forUser($user)->check('view', $category)));
     }
 }

@@ -5,8 +5,6 @@ Hello {{ $user->name }},
 
 Great news! You've received a promo code worth **{{ $discountValue }}** off your next purchase.
 
-## Promo Code Details
-
 **Promo Code:** `{{ $code }}`<br>
 **Discount:** {{ $discountValue }}<br>
 @if($expiresAt)

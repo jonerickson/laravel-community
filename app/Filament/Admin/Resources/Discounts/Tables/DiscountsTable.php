@@ -17,6 +17,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Number;
 
 class DiscountsTable
 {
@@ -41,7 +42,7 @@ class DiscountsTable
                             return $record->value.'%';
                         }
 
-                        return '$'.number_format($record->value / 100, 2);
+                        return Number::currency($record->value / 100);
                     })
                     ->sortable(),
                 TextColumn::make('current_balance')
@@ -52,7 +53,7 @@ class DiscountsTable
                             return '—';
                         }
 
-                        return '$'.number_format($state / 100, 2);
+                        return Number::currency($state / 100);
                     })
                     ->sortable(),
                 TextColumn::make('times_used')
@@ -62,7 +63,7 @@ class DiscountsTable
                         $max = $record->max_uses;
 
                         if ($max) {
-                            return "{$used} / {$max}";
+                            return "$used / $max";
                         }
 
                         return (string) $used;

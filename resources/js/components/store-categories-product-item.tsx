@@ -40,12 +40,13 @@ export default function StoreCategoriesProductItem({ product }: { product: App.D
                 </div>
                 <div className="mt-3 space-y-2">
                     <div className="flex items-center gap-2">
+                        <p className="text-base font-medium text-primary">{getPriceDisplay(product)}</p>
                         {product.isFeatured && (
                             <Badge variant="default" className="bg-info text-xs text-info-foreground">
                                 Featured
                             </Badge>
                         )}
-                        <p className="text-base font-medium text-primary">{getPriceDisplay(product)}</p>
+                        {product.isMarketplaceProduct && <Badge variant="secondary">Community Provided</Badge>}
                     </div>
                     <Button className="w-full" variant="outline" asChild>
                         <Link href={route('store.products.show', { product: product.slug })}>View</Link>

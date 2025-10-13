@@ -29,7 +29,7 @@ class OrderInfolist
                         TextEntry::make('status')
                             ->badge(),
                         TextEntry::make('amount')
-                            ->money(divideBy: 100),
+                            ->money(),
                     ]),
                 Section::make('Payment Processor')
                     ->columnSpanFull()

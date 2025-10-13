@@ -23,6 +23,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Support\RawJs;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -48,9 +49,12 @@ class PricesRelationManager extends RelationManager
                     ->disabled(fn ($operation, ?Price $record): bool => $operation === 'edit' && filled($record->external_price_id))
                     ->required()
                     ->numeric()
+                    ->mask(RawJs::make('$money($input)'))
+                    ->stripCharacters(',')
                     ->prefix('$')
                     ->suffix('USD')
-                    ->helperText('The amount in cents.'),
+                    ->step(0.01)
+                    ->minValue(0),
                 Select::make('currency')
                     ->disabled(fn ($operation, ?Price $record): bool => $operation === 'edit' && filled($record->external_price_id))
                     ->options([
@@ -101,7 +105,7 @@ class PricesRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('amount')
-                    ->money('USD', divideBy: 100)
+                    ->money()
                     ->sortable(),
                 TextColumn::make('interval')
                     ->badge()

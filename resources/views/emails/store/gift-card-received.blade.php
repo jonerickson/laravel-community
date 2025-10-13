@@ -5,8 +5,6 @@ Hello {{ $user->name }},
 
 Great news! You've received a gift card worth **{{ $balance }}**.
 
-## Gift Card Details
-
 **Gift Card Code:** `{{ $code }}`<br>
 **Balance:** {{ $balance }}<br>
 **Status:** Active<br>

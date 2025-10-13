@@ -3,8 +3,6 @@
 
 Hello! A new support ticket has been created and requires your attention.
 
-## Ticket Details
-
 **Ticket Number:** {{ $supportTicket->ticket_number }}<br />
 **Subject:** {{ $supportTicket->subject }}<br />
 **Priority:** {{ $supportTicket->priority->getLabel() }}<br />
@@ -12,8 +10,6 @@ Hello! A new support ticket has been created and requires your attention.
 **Category:** {{ $supportTicket->category->name ?? 'Not specified' }}<br />
 **Created By:** {{ $supportTicket->author->name }}<br />
 **Created At:** {{ $supportTicket->created_at->format('M j, Y \a\t g:i A') }}<br />
-
-## Description
 
 <x-mail::panel>
 {!! $supportTicket->description !!}

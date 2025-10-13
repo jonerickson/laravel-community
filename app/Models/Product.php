@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\Sluggable;
+use App\Enums\ProductApprovalStatus;
 use App\Enums\ProductTaxCode;
 use App\Enums\ProductType;
 use App\Events\ProductCreated;
@@ -22,9 +23,11 @@ use App\Traits\LogsMarketplaceActivity;
 use App\Traits\Reviewable;
 use App\Traits\Trendable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -34,6 +37,12 @@ use Laravel\Scout\Searchable;
 
 /**
  * @property int $id
+ * @property int|null $seller_id
+ * @property ProductApprovalStatus $approval_status
+ * @property numeric $commission_rate
+ * @property Carbon|null $approved_at
+ * @property int|null $approved_by
+ * @property string|null $rejection_reason
  * @property string $reference_id
  * @property string $name
  * @property string $slug
@@ -53,6 +62,7 @@ use Laravel\Scout\Searchable;
  * @property-read int|null $active_prices_count
  * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
+ * @property-read User|null $approver
  * @property-read int|float $average_rating
  * @property-read Collection<int, ProductCategory> $categories
  * @property-read int|null $categories_count
@@ -74,21 +84,30 @@ use Laravel\Scout\Searchable;
  * @property-read int|null $prices_count
  * @property-read Collection<int, Comment> $reviews
  * @property-read int|null $reviews_count
+ * @property-read User|null $seller
  * @property-read float $trending_score
  *
+ * @method static Builder<static>|Product approved()
  * @method static \Database\Factories\ProductFactory factory($count = null, $state = [])
  * @method static Builder<static>|Product featured()
  * @method static Builder<static>|Product hotTopics(?int $limit = null)
+ * @method static Builder<static>|Product marketplace()
  * @method static Builder<static>|Product newModelQuery()
  * @method static Builder<static>|Product newQuery()
  * @method static Builder<static>|Product notFeatured()
+ * @method static Builder<static>|Product pending()
  * @method static Builder<static>|Product products()
  * @method static Builder<static>|Product query()
+ * @method static Builder<static>|Product rejected()
  * @method static Builder<static>|Product risingTopics(?int $limit = null)
  * @method static Builder<static>|Product subscriptions()
  * @method static Builder<static>|Product trending(?int $limit = null, ?\Illuminate\Support\Carbon $referenceTime = null)
  * @method static Builder<static>|Product trendingInTimeframe(string $timeframe = 'week', ?int $limit = null)
  * @method static Builder<static>|Product whereAllowPromotionCodes($value)
+ * @method static Builder<static>|Product whereApprovalStatus($value)
+ * @method static Builder<static>|Product whereApprovedAt($value)
+ * @method static Builder<static>|Product whereApprovedBy($value)
+ * @method static Builder<static>|Product whereCommissionRate($value)
  * @method static Builder<static>|Product whereCreatedAt($value)
  * @method static Builder<static>|Product whereDescription($value)
  * @method static Builder<static>|Product whereExternalProductId($value)
@@ -99,6 +118,8 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Product whereMetadata($value)
  * @method static Builder<static>|Product whereName($value)
  * @method static Builder<static>|Product whereReferenceId($value)
+ * @method static Builder<static>|Product whereRejectionReason($value)
+ * @method static Builder<static>|Product whereSellerId($value)
  * @method static Builder<static>|Product whereSlug($value)
  * @method static Builder<static>|Product whereTaxCode($value)
  * @method static Builder<static>|Product whereTrialDays($value)
@@ -126,11 +147,20 @@ class Product extends Model implements Sluggable
     use Trendable;
 
     protected $attributes = [
+        'type' => ProductType::Product,
         'allow_promotion_codes' => false,
         'trial_days' => 0,
+        'approval_status' => ProductApprovalStatus::Approved,
+        'commission_rate' => 0,
     ];
 
     protected $fillable = [
+        'seller_id',
+        'approval_status',
+        'commission_rate',
+        'approved_at',
+        'approved_by',
+        'rejection_reason',
         'name',
         'description',
         'type',
@@ -145,6 +175,10 @@ class Product extends Model implements Sluggable
         'created' => ProductCreated::class,
         'updated' => ProductUpdated::class,
         'deleting' => ProductDeleted::class,
+    ];
+
+    protected $appends = [
+        'is_marketplace_product',
     ];
 
     public function categories(): BelongsToMany
@@ -179,6 +213,16 @@ class Product extends Model implements Sluggable
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function seller(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'seller_id');
+    }
+
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 
     public function generateSlug(): ?string
@@ -221,6 +265,47 @@ class Product extends Model implements Sluggable
         $query->whereNull('external_product_id');
     }
 
+    public function scopeMarketplace(Builder $query): void
+    {
+        $query->whereNotNull('seller_id');
+    }
+
+    public function scopeApproved(Builder $query): void
+    {
+        $query->where('approval_status', ProductApprovalStatus::Approved);
+    }
+
+    public function scopePending(Builder $query): void
+    {
+        $query->where('approval_status', ProductApprovalStatus::Pending);
+    }
+
+    public function scopeRejected(Builder $query): void
+    {
+        $query->where('approval_status', ProductApprovalStatus::Rejected);
+    }
+
+    public function isMarketplaceProduct(): Attribute
+    {
+        return Attribute::get(fn (): bool => ! is_null($this->seller_id))
+            ->shouldCache();
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->approval_status === ProductApprovalStatus::Approved;
+    }
+
+    public function isPending(): bool
+    {
+        return $this->approval_status === ProductApprovalStatus::Pending;
+    }
+
+    public function isRejected(): bool
+    {
+        return $this->approval_status === ProductApprovalStatus::Rejected;
+    }
+
     public function toSearchableArray(): array
     {
         return [
@@ -259,6 +344,9 @@ class Product extends Model implements Sluggable
     protected function casts(): array
     {
         return [
+            'approval_status' => ProductApprovalStatus::class,
+            'commission_rate' => 'decimal:2',
+            'approved_at' => 'datetime',
             'type' => ProductType::class,
             'tax_code' => ProductTaxCode::class,
             'is_subscription_only' => 'boolean',

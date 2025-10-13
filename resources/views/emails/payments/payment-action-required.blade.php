@@ -5,19 +5,17 @@ Hello {{ $order->user->name }},
 
 Your payment for order **#{{ $order->reference_id }}** requires additional verification to complete the transaction.
 
-## Order Details
-
 **Order Number:** {{ $order->reference_id }}<br>
 **Invoice Number:** {{ $order->invoice_number }}<br>
 **Status:** {{ $order->status->getLabel() }}<br>
-**Amount:** ${{ number_format($order->amount / 100, 2) }}<br>
+**Amount:** {{ \Illuminate\Support\Number::currency($order->amount) }}<br>
 
 @if(count($order->items))
 <x-mail::table>
 | Item | Quantity |
 |:-----|---------:|
 @foreach($order->items as $item)
-| {{ $item->getLabel() }} | {{ $item->quantity }} |
+| {{ $item->name }} | {{ $item->quantity }} |
 @endforeach
 </x-mail::table>
 @endif

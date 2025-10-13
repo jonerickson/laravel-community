@@ -80,6 +80,7 @@ class DashboardController
     {
         $product = Product::query()
             ->products()
+            ->approved()
             ->with('defaultPrice')
             ->with('categories')
             ->with(['prices' => function (HasMany $query): void {
@@ -101,6 +102,7 @@ class DashboardController
     {
         $product = Product::query()
             ->products()
+            ->approved()
             ->with('defaultPrice')
             ->with('categories')
             ->with(['prices' => function (HasMany $query): void {
@@ -122,6 +124,7 @@ class DashboardController
     {
         $product = Product::query()
             ->products()
+            ->approved()
             ->featured()
             ->with('defaultPrice')
             ->with('categories')

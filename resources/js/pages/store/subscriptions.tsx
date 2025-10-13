@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
-import { cn } from '@/lib/utils';
+import { cn, currency } from '@/lib/utils';
 import { Head, useForm } from '@inertiajs/react';
 import { Check, Crown, Package, RefreshCw, Rocket, Shield, Star, Users, X, Zap } from 'lucide-react';
 import { useState } from 'react';
@@ -73,9 +73,7 @@ function PricingCard({
     const monthlyPrice = plan.prices.find((price: App.Data.PriceData) => price.interval === 'month');
     const yearlyPrice = plan.prices.find((price: App.Data.PriceData) => price.interval === 'year');
     const yearlyDiscount =
-        billingCycle === 'year' && monthlyPrice && yearlyPrice
-            ? Math.round((1 - yearlyPrice.amount / 100 / 12 / (monthlyPrice.amount / 100)) * 100)
-            : 0;
+        billingCycle === 'year' && monthlyPrice && yearlyPrice ? Math.round((1 - yearlyPrice.amount / 12 / monthlyPrice.amount) * 100) : 0;
 
     return (
         <Card className={cn('relative flex w-full flex-col', isCurrentPlan && 'ring-2 ring-success', plan.isFeatured && 'ring-2 ring-info')}>
@@ -104,7 +102,7 @@ function PricingCard({
 
                 <div className="mt-6">
                     <div className="flex items-baseline justify-center">
-                        <span className="text-4xl font-bold">${(price / 100).toFixed(2)}</span>
+                        <span className="text-4xl font-bold">{currency(price)}</span>
                         <span className="ml-1 text-muted-foreground">/ {billingCycle}</span>
                     </div>
                     {billingCycle === 'year' && yearlyDiscount > 0 && (

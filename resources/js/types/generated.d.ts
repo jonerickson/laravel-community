@@ -353,6 +353,7 @@ declare namespace App.Data {
         taxCode: App.Enums.ProductTaxCode | null;
         isFeatured: boolean;
         isSubscriptionOnly: boolean;
+        isMarketplaceProduct: boolean;
         trialDays: number;
         allowPromotionCodes: boolean;
         featuredImage: string | null;
@@ -521,6 +522,7 @@ declare namespace App.Enums {
         | 'succeeded'
         | 'refunded';
     export type PostType = 'blog' | 'forum';
+    export type ProductApprovalStatus = 'pending' | 'approved' | 'rejected';
     export type ProductTaxCode =
         | 'general_tangible_goods'
         | 'general_electronically_supplied_services'

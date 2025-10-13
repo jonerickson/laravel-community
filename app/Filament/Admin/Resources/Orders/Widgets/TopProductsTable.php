@@ -46,7 +46,7 @@ class TopProductsTable extends TableWidget
                     ->sortable(),
                 TextColumn::make('total_revenue')
                     ->label('Revenue')
-                    ->formatStateUsing(fn ($state) => Number::currency(($state ?? 0) / 100, 'USD'))
+                    ->money(divideBy: 100)
                     ->sortable(),
             ]);
     }

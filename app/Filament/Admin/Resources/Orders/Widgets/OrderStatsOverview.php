@@ -33,7 +33,7 @@ class OrderStatsOverview extends StatsOverviewWidget
                 ->icon(Heroicon::OutlinedCalendarDays)
                 ->color('success'),
 
-            Stat::make('Avg. Order Value', Number::currency($averageOrderValue / 100, 'USD'))
+            Stat::make('Avg. Order Value', Number::currency($averageOrderValue))
                 ->description('Average per order')
                 ->icon(Heroicon::OutlinedCurrencyDollar)
                 ->color('info'),

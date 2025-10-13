@@ -1,6 +1,6 @@
 import Heading from '@/components/heading';
+import StoreCategoriesProductItem from '@/components/store-categories-product-item';
 import StoreIndexCategoriesItem from '@/components/store-index-categories-item';
-import StoreUserProvidedItem from '@/components/store-index-user-provided-item';
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import WidgetLoading from '@/components/widget-loading';
 import AppLayout from '@/layouts/app-layout';
@@ -126,8 +126,10 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
 
                     <Deferred fallback={<WidgetLoading variant="grid" />} data={'userProvidedProducts'}>
                         {userProvidedProducts && userProvidedProducts.length > 0 ? (
-                            <div className="space-y-12 lg:grid lg:grid-cols-3 lg:space-y-0 lg:gap-x-6">
-                                {userProvidedProducts && userProvidedProducts.map((item) => <StoreUserProvidedItem key={item.id} item={item} />)}
+                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                                {userProvidedProducts.map((product) => (
+                                    <StoreCategoriesProductItem key={product.id} product={product} />
+                                ))}
                             </div>
                         ) : (
                             <Empty className="border border-dashed">

@@ -278,6 +278,11 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         return $this->hasMany(UserIntegration::class);
     }
 
+    public function payouts(): HasMany
+    {
+        return $this->hasMany(Payout::class);
+    }
+
     public function userWarnings(): HasMany
     {
         return $this->hasMany(UserWarning::class);
