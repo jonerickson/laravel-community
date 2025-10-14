@@ -116,9 +116,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                         {item.icon && <Icon iconNode={item.icon} className="size-5" />}
                                                         <span>{item.title}</span>
                                                     </Link>
-                                                ) : (
-                                                    <></>
-                                                );
+                                                ) : null;
                                             })}
                                         </div>
 
@@ -164,9 +162,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                 <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
                                             )}
                                         </NavigationMenuItem>
-                                    ) : (
-                                        <></>
-                                    );
+                                    ) : null;
                                 })}
                             </NavigationMenuList>
                         </NavigationMenu>
@@ -175,13 +171,13 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     <div className="ml-auto flex items-center space-x-2">
                         <div className="relative flex items-center space-x-1">
                             <Tooltip>
-                                <TooltipTrigger>
+                                <TooltipTrigger asChild>
                                     <GlobalSearch />
                                 </TooltipTrigger>
                                 <TooltipContent>Search</TooltipContent>
                             </Tooltip>
                             <Tooltip>
-                                <TooltipTrigger>
+                                <TooltipTrigger asChild>
                                     <ShoppingCartIcon />
                                 </TooltipTrigger>
                                 <TooltipContent>Shopping Cart</TooltipContent>
