@@ -91,7 +91,7 @@ class DiscountController
                 'new_total' => max(0, $orderTotal - $discountAmount),
                 'new_total_formatted' => Number::currency(max(0, $orderTotal - $discountAmount) / 100),
             ],
-            message: 'The discount code applied successfully.',
+            message: 'The discount code was applied successfully.',
         );
     }
 
