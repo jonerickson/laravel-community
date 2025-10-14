@@ -42,7 +42,7 @@ class DiscountsTable
                             return $record->value.'%';
                         }
 
-                        return Number::currency($record->value / 100);
+                        return Number::currency($record->value);
                     })
                     ->sortable(),
                 TextColumn::make('current_balance')
@@ -53,7 +53,7 @@ class DiscountsTable
                             return '—';
                         }
 
-                        return Number::currency($state / 100);
+                        return Number::currency($state);
                     })
                     ->sortable(),
                 TextColumn::make('times_used')

@@ -87,7 +87,7 @@ export default function Discounts({ discounts }: DiscountsProps) {
                 if (discount.discountType === 'percentage') {
                     return `${discount.value}%`;
                 }
-                return currency((discount.value / 100).toString());
+                return currency(discount.value);
             },
         },
         {
@@ -98,7 +98,7 @@ export default function Discounts({ discounts }: DiscountsProps) {
                 if (discount.type !== 'gift_card' || discount.currentBalance === null) {
                     return <span className="text-muted-foreground">—</span>;
                 }
-                return <span className="font-medium">{currency((discount.currentBalance / 100).toString())}</span>;
+                return <span className="font-medium">{currency(discount.currentBalance)}</span>;
             },
         },
         {

@@ -61,7 +61,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
         if (order && order.discounts && order.discounts.length > 0) {
             const firstDiscount = order.discounts[0];
 
-            const discountValue = firstDiscount.discountType === 'percentage' ? `${firstDiscount.value}%` : `${currency(firstDiscount.value / 100)}`;
+            const discountValue = firstDiscount.discountType === 'percentage' ? `${firstDiscount.value}%` : currency(firstDiscount.value);
 
             setAppliedDiscount({
                 id: firstDiscount.id,
@@ -70,9 +70,9 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                 discount_type: firstDiscount.discountType,
                 discount_value: discountValue,
                 discount_amount: firstDiscount.amountApplied ?? 0,
-                discount_amount_formatted: currency((firstDiscount.amountApplied ?? 0) / 100),
+                discount_amount_formatted: currency(firstDiscount.amountApplied ?? 0),
                 new_total: firstDiscount.balanceAfter ?? totalInCents,
-                new_total_formatted: `$${(firstDiscount.balanceAfter ?? totalInCents).toFixed(2)}`,
+                new_total_formatted: currency(firstDiscount.balanceAfter ?? totalInCents),
             });
             setDiscountCode(firstDiscount.code);
         } else if (order && (!order.discounts || order.discounts.length === 0)) {

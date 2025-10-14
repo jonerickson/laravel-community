@@ -37,7 +37,7 @@ class GiftCardReceived extends Mailable implements ShouldQueue
                 'giftCard' => $this->giftCard,
                 'user' => $this->user,
                 'code' => $this->giftCard->code,
-                'balance' => Number::currency($this->giftCard->current_balance / 100),
+                'balance' => Number::currency($this->giftCard->current_balance),
             ],
         );
     }

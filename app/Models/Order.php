@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read mixed $amount
  * @property-read mixed $checkout_url
+ * @property-read OrderDiscount|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Discount> $discounts
  * @property-read int|null $discounts_count
  * @property-read bool $is_one_time
@@ -124,13 +125,18 @@ class Order extends Model
     {
         return $this->belongsToMany(Discount::class, 'orders_discounts')
             ->withPivot('amount_applied', 'balance_before', 'balance_after')
-            ->withTimestamps();
+            ->withTimestamps()
+            ->using(OrderDiscount::class);
     }
 
     public function amount(): Attribute
     {
-        return Attribute::get(fn () => $this->items->sum('amount'))
-            ->shouldCache();
+        return Attribute::get(function (): int|float {
+            $subtotal = $this->items->sum('amount');
+            $discountAmount = $this->discounts->sum('pivot.amount_applied');
+
+            return $subtotal - $discountAmount;
+        })->shouldCache();
     }
 
     public function checkoutUrl(): Attribute

@@ -10,6 +10,39 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property float $amount
+ * @property PayoutStatus $status
+ * @property string|null $payout_method
+ * @property string|null $external_payout_id
+ * @property string|null $notes
+ * @property \Illuminate\Support\Carbon|null $processed_at
+ * @property int|null $processed_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read User|null $processor
+ * @property-read User $user
+ *
+ * @method static \Database\Factories\PayoutFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereExternalPayoutId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout wherePayoutMethod($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereProcessedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereProcessedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereUserId($value)
+ *
+ * @mixin \Eloquent
+ */
 class Payout extends Model
 {
     use HasFactory;

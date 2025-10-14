@@ -7,6 +7,7 @@ namespace App\Filament\Admin\Resources\Orders\Widgets;
 use App\Filament\Admin\Resources\Orders\Pages\ViewOrder;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Models\Order;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
@@ -51,6 +52,13 @@ class RecentOrdersTable extends TableWidget
                     ->label('Amount')
                     ->money()
                     ->sortable(),
+                TextColumn::make('discounts_count')
+                    ->label('Discounts')
+                    ->counts('discounts')
+                    ->badge()
+                    ->color('success')
+                    ->default(0)
+                    ->sortable(),
                 TextColumn::make('items_count')
                     ->label('Items')
                     ->counts('items')
@@ -61,6 +69,10 @@ class RecentOrdersTable extends TableWidget
                     ->since()
                     ->dateTimeTooltip()
                     ->sortable(),
+            ])
+            ->recordActions([
+                ViewAction::make()
+                    ->url(fn (Order $record): string => ViewOrder::getUrl(['record' => $record])),
             ]);
     }
 }

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Orders\Widgets;
 
 use App\Enums\OrderStatus;
+use App\Filament\Admin\Resources\Products\Pages\EditProduct;
 use App\Models\Product;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
@@ -48,6 +50,12 @@ class TopProductsTable extends TableWidget
                     ->label('Revenue')
                     ->money(divideBy: 100)
                     ->sortable(),
+            ])
+            ->recordActions([
+                ViewAction::make()
+                    ->url(fn (Product $record): string => EditProduct::getUrl([
+                        'record' => $record,
+                    ])),
             ]);
     }
 }

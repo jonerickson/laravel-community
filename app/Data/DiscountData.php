@@ -24,7 +24,7 @@ class DiscountData extends Data
 
     public DiscountValueType $discountType;
 
-    public int $value;
+    public float $value;
 
     public ?int $currentBalance = null;
 

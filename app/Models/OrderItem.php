@@ -20,7 +20,7 @@ use Override;
  * @property int|null $product_id
  * @property int|null $price_id
  * @property int|float $amount
- * @property string $commission_amount
+ * @property float $commission_amount
  * @property int $quantity
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at

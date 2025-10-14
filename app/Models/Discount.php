@@ -23,15 +23,15 @@ use Illuminate\Support\Str;
  * @property string $code
  * @property DiscountType $type
  * @property DiscountValueType $discount_type
- * @property int $value
- * @property int|null $current_balance
+ * @property float $value
+ * @property float $current_balance
  * @property int|null $product_id
  * @property int|null $created_by
  * @property int|null $user_id
  * @property string|null $recipient_email
  * @property int|null $max_uses
  * @property int $times_used
- * @property int|null $min_order_amount
+ * @property float $min_order_amount
  * @property \Illuminate\Support\Carbon|null $expires_at
  * @property \Illuminate\Support\Carbon|null $activated_at
  * @property array<array-key, mixed>|null $metadata
@@ -45,6 +45,7 @@ use Illuminate\Support\Str;
  * @property-read bool $has_balance
  * @property-read bool $is_expired
  * @property-read bool $is_valid
+ * @property-read OrderDiscount|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Order> $orders
  * @property-read int|null $orders_count
  * @property-read Product|null $product
@@ -122,7 +123,8 @@ class Discount extends Model
     {
         return $this->belongsToMany(Order::class, 'orders_discounts')
             ->withPivot('amount_applied', 'balance_before', 'balance_after')
-            ->withTimestamps();
+            ->withTimestamps()
+            ->using(OrderDiscount::class);
     }
 
     public function isExpired(): Attribute
@@ -249,10 +251,36 @@ class Discount extends Model
         $query->where('code', Str::upper($code));
     }
 
+    public function getValueAttribute($value): float
+    {
+        return $this->discount_type === DiscountValueType::Fixed ? ($value / 100) : $value;
+    }
+
+    public function setValueAttribute($value): float
+    {
+        return $this->discount_type === DiscountValueType::Fixed ? ($value * 100) : $value;
+    }
+
+    public function currentBalance(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?int $value): float => ($value ?? 0) / 100,
+            set: fn (float $value): int => (int) ($value * 100),
+        );
+    }
+
+    public function minOrderAmount(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?int $value): float => ($value ?? 0) / 100,
+            set: fn (float $value): int => (int) ($value * 100),
+        );
+    }
+
     protected function calculateFixedDiscount(int $orderTotal): int
     {
         if ($this->type === DiscountType::GiftCard) {
-            return min($this->current_balance ?? 0, $orderTotal);
+            return min($this->getRawOriginal('current_balance') ?? 0, $orderTotal);
         }
 
         return min($this->value, $orderTotal);

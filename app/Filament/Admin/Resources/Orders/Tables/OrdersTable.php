@@ -44,6 +44,13 @@ class OrdersTable
                     ->label('Total')
                     ->money()
                     ->sortable(),
+                TextColumn::make('discounts_count')
+                    ->label('Discounts')
+                    ->counts('discounts')
+                    ->badge()
+                    ->color('success')
+                    ->default(0)
+                    ->sortable(),
                 TextColumn::make('items.product.name')
                     ->searchable(),
                 TextColumn::make('created_at')

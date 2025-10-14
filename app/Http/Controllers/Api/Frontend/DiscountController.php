@@ -54,7 +54,7 @@ class DiscountController
             if ($minAmount && $orderTotal < $minAmount) {
                 return ApiResource::error(
                     message: 'Order total does not meet minimum requirement.',
-                    errors: ['code' => ['Order must be at least '.Number::currency($minAmount / 100).' to use this discount.']],
+                    errors: ['code' => ['Order must be at least '.Number::currency($minAmount).' to use this discount.']],
                     status: 422
                 );
             }
@@ -78,7 +78,7 @@ class DiscountController
 
         $discountValue = $discount->discount_type === DiscountValueType::Percentage
             ? $discount->value.'%'
-            : Number::currency($discount->value / 100);
+            : Number::currency($discount->value);
 
         return ApiResource::success(
             resource: [

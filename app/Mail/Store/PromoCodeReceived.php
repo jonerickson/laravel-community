@@ -34,7 +34,7 @@ class PromoCodeReceived extends Mailable implements ShouldQueue
     {
         $discountValue = $this->promoCode->discount_type === DiscountValueType::Percentage
             ? $this->promoCode->value.'%'
-            : Number::currency($this->promoCode->value / 100);
+            : Number::currency($this->promoCode->value);
 
         return new Content(
             markdown: 'emails.store.promo-code-received',

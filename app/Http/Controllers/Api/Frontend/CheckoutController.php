@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\Frontend;
 use App\Data\CheckoutData;
 use App\Http\Resources\ApiResource;
 use App\Managers\PaymentManager;
+use App\Models\Order;
 use App\Models\User;
 use App\Services\ShoppingCartService;
 use Illuminate\Container\Attributes\CurrentUser;
@@ -63,7 +64,7 @@ class CheckoutController
 
         $order = $this->cartService->getOrCreatePendingOrder();
 
-        if (! $order instanceof \App\Models\Order) {
+        if (! $order instanceof Order) {
             return ApiResource::error(
                 message: 'Failed to create order.',
                 errors: ['order' => ['Unable to create order.']],

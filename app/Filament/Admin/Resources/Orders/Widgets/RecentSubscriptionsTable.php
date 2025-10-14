@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Orders\Widgets;
 
+use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Livewire\Subscriptions\ListSubscriptions;
 use App\Managers\PaymentManager;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 
@@ -27,6 +29,12 @@ class RecentSubscriptionsTable extends TableWidget
             ->searchable(false)
             ->deferLoading()
             ->headerActions([])
-            ->recordActions([]);
+            ->recordActions([
+                ViewAction::make()
+                    ->url(fn (array $record): string => EditUser::getUrl([
+                        'record' => data_get($record, 'user.id'),
+                        'tab' => 'subscriptions::data::tab',
+                    ])),
+            ]);
     }
 }

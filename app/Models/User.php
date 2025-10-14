@@ -105,6 +105,8 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read int|null $oauth_apps_count
  * @property-read Collection<int, Order> $orders
  * @property-read int|null $orders_count
+ * @property-read Collection<int, Payout> $payouts
+ * @property-read int|null $payouts_count
  * @property-read Collection<int, Report> $pendingReports
  * @property-read int|null $pending_reports_count
  * @property-read Collection<int, Permission> $permissions

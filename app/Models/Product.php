@@ -76,6 +76,7 @@ use Laravel\Scout\Searchable;
  * @property-read UserGroup|null $pivot
  * @property-read Collection<int, Group> $groups
  * @property-read int|null $groups_count
+ * @property-read bool $is_marketplace_product
  * @property-read Collection<int, OrderItem> $orderItems
  * @property-read int|null $order_items_count
  * @property-read Collection<int, Policy> $policies

@@ -28,7 +28,7 @@ use Illuminate\Support\Stringable;
  * @property int $product_id
  * @property string $name
  * @property string|null $description
- * @property int $amount
+ * @property float $amount
  * @property string $currency
  * @property SubscriptionInterval|null $interval
  * @property int $interval_count
