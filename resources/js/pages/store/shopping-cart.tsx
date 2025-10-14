@@ -244,9 +244,9 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                                         </div>
                                                         <p className="mt-3 text-sm font-medium text-foreground">
                                                             {item.selectedPrice
-                                                                ? `${currency(item.selectedPrice.amount)} ${item.selectedPrice.currency}${item.selectedPrice.interval ? ` / ${item.selectedPrice.interval}` : ''}`
+                                                                ? `${currency(item.selectedPrice.amount)} ${item.selectedPrice.interval ? ` / ${item.selectedPrice.interval}` : ''}`
                                                                 : item.product?.defaultPrice
-                                                                  ? `${currency(item.product.defaultPrice.amount)} ${item.product.defaultPrice.currency}${item.product.defaultPrice.interval ? ` / ${item.product.defaultPrice.interval}` : ''}`
+                                                                  ? `${currency(item.product.defaultPrice.amount)} ${item.product.defaultPrice.interval ? ` / ${item.product.defaultPrice.interval}` : ''}`
                                                                   : 'Price TBD'}
                                                         </p>
                                                     </div>
@@ -272,7 +272,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                                                     <SelectContent>
                                                                         {item.availablePrices.map((price) => (
                                                                             <SelectItem key={price.id} value={price.id.toString()}>
-                                                                                {price.name} - {currency(price.amount)} {price.currency}
+                                                                                {price.name} - {currency(price.amount)}
                                                                                 {price.interval && ` / ${price.interval}`}
                                                                             </SelectItem>
                                                                         ))}

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Frontend;
 
 use App\Data\CheckoutData;
+use App\Enums\OrderStatus;
 use App\Http\Resources\ApiResource;
 use App\Managers\PaymentManager;
 use App\Models\Order;
@@ -42,26 +43,6 @@ class CheckoutController
             );
         }
 
-        foreach ($cart->cartItems as $item) {
-            if (! $item->product || ! $item->product->externalProductId) {
-                return ApiResource::error(
-                    message: "$item->name is not available for purchase.",
-                    errors: ['product' => ["$item->name is not configured for purchase."]],
-                    status: 400
-                );
-            }
-
-            $selectedPrice = $item->selectedPrice ?? $item->product->defaultPrice;
-
-            if (! $selectedPrice || ! $selectedPrice->externalPriceId) {
-                return ApiResource::error(
-                    message: "No prices are configured for $item->name.",
-                    errors: ['price' => ["Price not configured for $item->name."]],
-                    status: 400
-                );
-            }
-        }
-
         $order = $this->cartService->getOrCreatePendingOrder();
 
         if (! $order instanceof Order) {
@@ -81,6 +62,43 @@ class CheckoutController
                 'price_id' => $selectedPrice->id,
                 'quantity' => $item->quantity,
             ]);
+        }
+
+        $order->load(['items', 'discounts']);
+
+        if ($order->amount <= 0) {
+            $order->update(['status' => OrderStatus::Succeeded]);
+
+            $this->cartService->clearCart();
+
+            $checkoutData = CheckoutData::from([
+                'checkoutUrl' => route('settings.orders'),
+            ]);
+
+            return ApiResource::success(
+                resource: $checkoutData,
+                message: 'Your order was completed successfully.',
+            );
+        }
+
+        foreach ($cart->cartItems as $item) {
+            if (! $item->product || ! $item->product->externalProductId) {
+                return ApiResource::error(
+                    message: "$item->name is not available for purchase.",
+                    errors: ['product' => ["$item->name is not configured for purchase."]],
+                    status: 400
+                );
+            }
+
+            $selectedPrice = $item->selectedPrice ?? $item->product->defaultPrice;
+
+            if (! $selectedPrice || ! $selectedPrice->externalPriceId) {
+                return ApiResource::error(
+                    message: "No prices are configured for $item->name.",
+                    errors: ['price' => ["Price not configured for $item->name."]],
+                    status: 400
+                );
+            }
         }
 
         $result = $this->paymentManager->getCheckoutUrl(

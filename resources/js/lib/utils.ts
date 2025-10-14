@@ -6,9 +6,11 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function currency(value: string | number | null | undefined) {
-    if (!value) return '0.00';
+    if (value === undefined || value === null) return '0.00';
 
     if (typeof value !== 'string') value = String(value);
+
+    if (value === '0') return 'Free';
 
     const amount = parseFloat(value);
 

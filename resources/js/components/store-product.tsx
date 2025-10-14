@@ -79,7 +79,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
                                 ? (() => {
                                       const selectedPrice = productData.prices?.find((p) => p.id === selectedPriceId) || productData.defaultPrice;
                                       return selectedPrice?.amount
-                                          ? `${currency(selectedPrice.amount)} ${selectedPrice.currency}${selectedPrice.interval ? ` / ${selectedPrice.interval}` : ''}`
+                                          ? `${currency(selectedPrice.amount)} ${selectedPrice.interval ? ` / ${selectedPrice.interval}` : ''}`
                                           : 'Price TBD';
                                   })()
                                 : '$0.00'
@@ -180,7 +180,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
                                             <SelectContent>
                                                 {productData.prices.map((price) => (
                                                     <SelectItem key={price.id} value={price.id.toString()}>
-                                                        {price.name} - {currency(price.amount)} {price.currency}
+                                                        {price.name} - {currency(price.amount)}
                                                         {price.interval && ` / ${price.interval}`}
                                                     </SelectItem>
                                                 ))}

@@ -521,6 +521,7 @@ declare namespace App.Enums {
         | 'requires_payment_method'
         | 'succeeded'
         | 'refunded';
+    export type PayoutStatus = 'pending' | 'completed' | 'failed' | 'cancelled';
     export type PostType = 'blog' | 'forum';
     export type ProductApprovalStatus = 'pending' | 'approved' | 'rejected';
     export type ProductTaxCode =

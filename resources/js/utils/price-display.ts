@@ -1,6 +1,8 @@
+import { currency } from '@/lib/utils';
+
 export const getPriceDisplay = (product: App.Data.ProductData): string => {
     if (product.defaultPrice) {
-        return `$${product.defaultPrice.amount.toFixed(2)}`;
+        return currency(product.defaultPrice.amount);
     }
 
     if (product.prices && product.prices.length > 0) {
@@ -9,11 +11,11 @@ export const getPriceDisplay = (product: App.Data.ProductData): string => {
         const maxPrice = Math.max(...amounts);
 
         if (minPrice === maxPrice) {
-            return `$${minPrice.toFixed(2)}`;
+            return currency(minPrice);
         }
 
-        return `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
+        return `${currency(minPrice)} - ${currency(maxPrice)}`;
     }
 
-    return '$0.00';
+    return currency(0);
 };
