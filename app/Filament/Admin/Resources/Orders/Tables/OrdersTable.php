@@ -44,6 +44,10 @@ class OrdersTable
                     ->label('Total')
                     ->money()
                     ->sortable(),
+                TextColumn::make('commission_amount')
+                    ->label('Commission')
+                    ->money()
+                    ->sortable(),
                 TextColumn::make('discounts_count')
                     ->label('Discounts')
                     ->counts('discounts')
@@ -54,7 +58,7 @@ class OrdersTable
                 TextColumn::make('items.product.name')
                     ->searchable(),
                 TextColumn::make('created_at')
-                    ->label('Order Placed At')
+                    ->label('Order Created At')
                     ->since()
                     ->dateTimeTooltip()
                     ->sortable(),
@@ -76,6 +80,7 @@ class OrdersTable
                     ->searchable()
                     ->multiple(),
                 SelectFilter::make('status')
+                    ->default(OrderStatus::Succeeded)
                     ->options(OrderStatus::class),
             ])
             ->recordActions([

@@ -44,6 +44,10 @@ class OrderSucceeded extends Mailable implements ShouldQueue
 
     public function attachments(): array
     {
+        if (! $this->invoice instanceof InvoiceData) {
+            return [];
+        }
+
         if (blank($url = $this->invoice->invoicePdfUrl)) {
             return [];
         }

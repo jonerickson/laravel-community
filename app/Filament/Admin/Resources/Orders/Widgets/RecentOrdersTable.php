@@ -23,12 +23,13 @@ class RecentOrdersTable extends TableWidget
         return $table
             ->query(
                 Order::query()
+                    ->completed()
                     ->with(['user', 'items.price'])
                     ->latest()
                     ->limit(15)
             )
             ->heading('Recent Orders')
-            ->description('Most recent order activity.')
+            ->description('Most recent completed order activity.')
             ->defaultSort('created_at', 'desc')
             ->deferLoading()
             ->columns([
@@ -50,6 +51,10 @@ class RecentOrdersTable extends TableWidget
                     ->badge(),
                 TextColumn::make('amount')
                     ->label('Amount')
+                    ->money()
+                    ->sortable(),
+                TextColumn::make('commission_amount')
+                    ->label('Commission')
                     ->money()
                     ->sortable(),
                 TextColumn::make('discounts_count')

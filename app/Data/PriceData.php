@@ -18,7 +18,7 @@ class PriceData extends Data
 
     public string $name;
 
-    public int $amount;
+    public float $amount;
 
     public string $currency;
 

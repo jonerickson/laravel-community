@@ -25,8 +25,8 @@ class DiscountController extends Controller
     {
         return Inertia::render('settings/discounts', [
             'discounts' => Inertia::defer(fn (): \Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection|\Spatie\LaravelData\CursorPaginatedDataCollection|\Illuminate\Support\Enumerable|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Contracts\Pagination\CursorPaginator|array => DiscountData::collect(Discount::query()
-                ->where('user_id', $this->user->id)
-                ->orderBy('created_at', 'desc')
+                ->whereBelongsTo($this->user, 'customer')
+                ->latest()
                 ->get())),
         ]);
     }

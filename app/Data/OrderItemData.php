@@ -26,7 +26,7 @@ class OrderItemData extends Data
 
     public int $quantity;
 
-    public ?int $amount = null;
+    public ?float $amount = null;
 
     public bool $isOneTime;
 

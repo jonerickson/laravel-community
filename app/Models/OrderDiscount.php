@@ -12,8 +12,8 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @property int $order_id
  * @property int $discount_id
  * @property float $amount_applied
- * @property float $balance_before
- * @property float $balance_after
+ * @property float|null $balance_before
+ * @property float|null $balance_after
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
@@ -46,7 +46,7 @@ class OrderDiscount extends Pivot
     public function amountApplied(): Attribute
     {
         return Attribute::make(
-            get: fn (?int $value): float => ($value ?? 0) / 100,
+            get: fn (int $value): float => $value / 100,
             set: fn (float $value): int => (int) ($value * 100),
         );
     }
@@ -54,16 +54,16 @@ class OrderDiscount extends Pivot
     public function balanceBefore(): Attribute
     {
         return Attribute::make(
-            get: fn (?int $value): float => ($value ?? 0) / 100,
-            set: fn (float $value): int => (int) ($value * 100),
+            get: fn (?int $value): ?float => filled($value) ? $value / 100 : null,
+            set: fn (?float $value): ?int => filled($value) ? (int) ($value * 100) : null,
         );
     }
 
     public function balanceAfter(): Attribute
     {
         return Attribute::make(
-            get: fn (?int $value): float => ($value ?? 0) / 100,
-            set: fn (float $value): int => (int) ($value * 100),
+            get: fn (?int $value): ?float => filled($value) ? $value / 100 : null,
+            set: fn (?float $value): ?int => filled($value) ? (int) ($value * 100) : null,
         );
     }
 }

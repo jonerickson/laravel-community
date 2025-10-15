@@ -7,15 +7,17 @@ namespace App\Filament\Admin\Resources\Discounts\Schemas;
 use App\Enums\DiscountType;
 use App\Enums\DiscountValueType;
 use App\Models\Discount;
+use Closure;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Support\RawJs;
 
 class DiscountForm
 {
@@ -53,22 +55,37 @@ class DiscountForm
                                     ->required()
                                     ->columnSpanFull()
                                     ->options(DiscountValueType::class)
+                                    ->rules([
+                                        fn (Get $get): Closure => function (string $attribute, $value, Closure $fail) use ($get): void {
+                                            if (DiscountValueType::tryFrom($value) === DiscountValueType::Percentage && $get('type') === DiscountType::GiftCard) {
+                                                $fail('The :attribute field should be fixed when selecting a gift card.');
+                                            }
+                                        },
+                                    ])
                                     ->default(DiscountValueType::Percentage),
                                 TextInput::make('value')
                                     ->columnSpanFull()
                                     ->required()
                                     ->numeric()
+                                    ->mask(RawJs::make('$money($input)'))
+                                    ->stripCharacters(',')
+                                    ->prefix(fn (Get $get): string => $get('discount_type') === DiscountValueType::Percentage ? '' : '$')
+                                    ->step(0.01)
                                     ->minValue(0)
-                                    ->suffix(fn (Get $get): string => $get('discount_type') === DiscountValueType::Percentage ? '%' : 'cents')
-                                    ->helperText(fn (Get $get): string => $get('discount_type') === DiscountValueType::Fixed ? 'Enter amount in cents (e.g., 1000 = $10.00)' : 'Enter percentage value (e.g., 25 = 25%)'),
+                                    ->suffix(fn (Get $get): string => $get('discount_type') === DiscountValueType::Percentage ? '%' : 'USD')
+                                    ->helperText('The initial value of the discount.'),
                                 TextInput::make('current_balance')
                                     ->columnSpanFull()
                                     ->visible(fn (Get $get): bool => $get('type') === DiscountType::GiftCard)
                                     ->label('Current Balance')
                                     ->numeric()
+                                    ->mask(RawJs::make('$money($input)'))
+                                    ->stripCharacters(',')
+                                    ->prefix('$')
+                                    ->suffix('USD')
+                                    ->step(0.01)
                                     ->minValue(0)
-                                    ->suffix('cents')
-                                    ->helperText('The current balance for gift cards (in cents).')
+                                    ->helperText('The current balance of the gift card.')
                                     ->nullable(),
                             ]),
                         Section::make('Usage Limits')
@@ -84,9 +101,13 @@ class DiscountForm
                                 TextInput::make('min_order_amount')
                                     ->label('Minimum Order Amount')
                                     ->numeric()
+                                    ->mask(RawJs::make('$money($input)'))
+                                    ->stripCharacters(',')
+                                    ->prefix('$')
+                                    ->suffix('USD')
+                                    ->step(0.01)
                                     ->minValue(0)
-                                    ->suffix('cents')
-                                    ->helperText('Minimum order amount required to use this discount (in cents). Leave empty for no minimum.')
+                                    ->helperText('The minimum order amount required to use this discount. Leave empty for no minimum.')
                                     ->nullable(),
                             ]),
                     ]),
@@ -123,15 +144,14 @@ class DiscountForm
                         Section::make('Statistics')
                             ->visibleOn('edit')
                             ->components([
-                                Placeholder::make('times_used')
-                                    ->label('Times Used')
-                                    ->content(fn ($record): string => (string) $record->times_used),
-                                Placeholder::make('created_at')
+                                TextEntry::make('times_used')
+                                    ->label('Times Used'),
+                                TextEntry::make('created_at')
                                     ->label('Created At')
-                                    ->content(fn ($record): string => $record->created_at?->format('M j, Y g:i A') ?? '—'),
-                                Placeholder::make('updated_at')
+                                    ->dateTime(),
+                                TextEntry::make('updated_at')
                                     ->label('Last Updated')
-                                    ->content(fn ($record): string => $record->updated_at?->format('M j, Y g:i A') ?? '—'),
+                                    ->dateTime(),
                             ]),
                     ]),
             ]);

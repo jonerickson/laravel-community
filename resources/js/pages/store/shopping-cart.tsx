@@ -52,7 +52,6 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
     const [appliedDiscount, setAppliedDiscount] = useState<DiscountInfo | null>(null);
     const { delete: clearCartForm, processing: clearCartProcessing } = useForm();
     const { subtotal, total } = calculateTotals();
-    const totalInCents = Math.round(total * 100);
     const finalTotal = appliedDiscount ? appliedDiscount.new_total : total;
     const { loading: validatingDiscount, execute: validateDiscount } = useApiRequest();
     const { loading: removingDiscount, execute: removeDiscountRequest } = useApiRequest();
@@ -62,6 +61,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
             const firstDiscount = order.discounts[0];
 
             const discountValue = firstDiscount.discountType === 'percentage' ? `${firstDiscount.value}%` : currency(firstDiscount.value);
+            const orderAmount = order.amount ?? total;
 
             setAppliedDiscount({
                 id: firstDiscount.id,
@@ -71,15 +71,15 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                 discount_value: discountValue,
                 discount_amount: firstDiscount.amountApplied ?? 0,
                 discount_amount_formatted: currency(firstDiscount.amountApplied ?? 0),
-                new_total: firstDiscount.balanceAfter ?? totalInCents,
-                new_total_formatted: currency(firstDiscount.balanceAfter ?? totalInCents),
+                new_total: orderAmount,
+                new_total_formatted: currency(orderAmount),
             });
             setDiscountCode(firstDiscount.code);
         } else if (order && (!order.discounts || order.discounts.length === 0)) {
             setAppliedDiscount(null);
             setDiscountCode('');
         }
-    }, [order, totalInCents]);
+    }, [order, total]);
 
     const clearCart = () => {
         if (!window.confirm('Are you sure you want to empty your cart? This action cannot be undone.')) {
@@ -146,7 +146,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                 method: 'POST',
                 data: {
                     code: discountCode.trim(),
-                    order_total: totalInCents,
+                    order_total: Math.round(total * 100),
                 },
             },
             {

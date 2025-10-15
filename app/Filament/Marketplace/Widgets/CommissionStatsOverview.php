@@ -71,6 +71,7 @@ class CommissionStatsOverview extends StatsOverviewWidget
     {
         return (float) OrderItem::whereHas('product', fn ($query) => $query->where('seller_id', Auth::id()))
             ->whereHas('order', fn ($query) => $query->where('status', OrderStatus::Succeeded))
+            ->get()
             ->sum('commission_amount');
     }
 }

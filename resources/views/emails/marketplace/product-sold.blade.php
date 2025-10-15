@@ -18,7 +18,7 @@ Great news! Your product has been purchased in order **#{{ $order->reference_id 
 @endforeach
 </x-mail::table>
 
-**Total Commission:** {{ \Illuminate\Support\Number::currency($items->sum('commission_amount')) }}
+**Total Commission:** {{ \Illuminate\Support\Number::currency($order->commission_amount) }}
 @endif
 
 <x-mail::button :url="route('filament.marketplace.pages.dashboard')">

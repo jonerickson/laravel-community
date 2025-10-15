@@ -5,12 +5,12 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export function currency(value: string | number | null | undefined) {
+export function currency(value: string | number | null | undefined, showFree: boolean = true) {
     if (value === undefined || value === null) return '0.00';
 
     if (typeof value !== 'string') value = String(value);
 
-    if (value === '0') return 'Free';
+    if (value === '0' && showFree) return 'Free';
 
     const amount = parseFloat(value);
 

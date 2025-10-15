@@ -188,10 +188,11 @@ class OrdersAnalyticsChart extends ChartWidget
             ->join('orders_items', 'orders.id', '=', 'orders_items.order_id')
             ->where('orders.created_at', '<', $startDate)
             ->where('orders.status', OrderStatus::Succeeded)
+            ->get()
             ->sum('orders_items.amount');
 
         $allDates = collect();
-        $cumulativeRevenue = $initialRevenue / 100;
+        $cumulativeRevenue = $initialRevenue;
 
         for ($date = $startDate->copy(); $date->lte($now); $date->addDay()) {
             $dateKey = $date->format('Y-m-d');

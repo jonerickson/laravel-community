@@ -33,8 +33,9 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property string|null $external_payment_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read mixed $amount
+ * @property-read int|float $amount
  * @property-read mixed $checkout_url
+ * @property-read int $commission_amount
  * @property-read OrderDiscount|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Discount> $discounts
  * @property-read int|null $discounts_count
@@ -100,6 +101,7 @@ class Order extends Model
         'checkout_url',
         'is_recurring',
         'is_one_time',
+        'commission_amount',
     ];
 
     protected $dispatchesEvents = [
@@ -114,6 +116,13 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function commissionItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class)
+            ->whereNotNull('commission_amount')
+            ->where('commission_amount', '>', 0);
     }
 
     public function products(): HasManyThrough
@@ -165,6 +174,12 @@ class Order extends Model
     public function isOneTime(): Attribute
     {
         return Attribute::get(fn (): bool => ! $this->is_recurring)
+            ->shouldCache();
+    }
+
+    public function commissionAmount(): Attribute
+    {
+        return Attribute::get(fn (): float => (float) $this->items->sum('commission_amount'))
             ->shouldCache();
     }
 

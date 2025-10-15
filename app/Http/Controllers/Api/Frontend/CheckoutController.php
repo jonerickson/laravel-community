@@ -52,20 +52,6 @@ class CheckoutController
             );
         }
 
-        $order->items()->delete();
-
-        foreach ($cart->cartItems as $item) {
-            $selectedPrice = $item->selectedPrice ?? $item->product->defaultPrice;
-
-            $order->items()->create([
-                'product_id' => $item->product->id,
-                'price_id' => $selectedPrice->id,
-                'quantity' => $item->quantity,
-            ]);
-        }
-
-        $order->load(['items', 'discounts']);
-
         if ($order->amount <= 0) {
             $order->update(['status' => OrderStatus::Succeeded]);
 

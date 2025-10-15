@@ -24,17 +24,17 @@ use Illuminate\Support\Str;
  * @property DiscountType $type
  * @property DiscountValueType $discount_type
  * @property float $value
- * @property float $current_balance
+ * @property float|null $current_balance
  * @property int|null $product_id
  * @property int|null $created_by
  * @property int|null $user_id
  * @property string|null $recipient_email
  * @property int|null $max_uses
  * @property int $times_used
- * @property float $min_order_amount
+ * @property float|null $min_order_amount
+ * @property array<array-key, mixed>|null $metadata
  * @property \Illuminate\Support\Carbon|null $expires_at
  * @property \Illuminate\Support\Carbon|null $activated_at
- * @property array<array-key, mixed>|null $metadata
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read User|null $author
@@ -169,7 +169,7 @@ class Discount extends Model
             return 0;
         }
 
-        if (filled($this->min_order_amount) && $orderTotal < $this->min_order_amount) {
+        if (filled($this->min_order_amount) && $orderTotal < $this->getRawOriginal('min_order_amount')) {
             return 0;
         }
 
@@ -177,30 +177,6 @@ class Discount extends Model
             DiscountValueType::Fixed => $this->calculateFixedDiscount($orderTotal),
             DiscountValueType::Percentage => $this->calculatePercentageDiscount($orderTotal),
         };
-    }
-
-    public function applyToOrder(Order $order, int $amountToApply): bool
-    {
-        $balanceBefore = $this->current_balance;
-
-        if ($this->type === DiscountType::GiftCard) {
-            $this->current_balance = max(0, $this->current_balance - $amountToApply);
-        }
-
-        if (blank($this->activated_at)) {
-            $this->activated_at = now();
-        }
-
-        $this->times_used++;
-        $this->save();
-
-        $this->orders()->attach($order->id, [
-            'amount_applied' => $amountToApply,
-            'balance_before' => $balanceBefore,
-            'balance_after' => $this->current_balance,
-        ]);
-
-        return true;
     }
 
     public function generateCode(): string
@@ -253,27 +229,27 @@ class Discount extends Model
 
     public function getValueAttribute($value): float
     {
-        return $this->discount_type === DiscountValueType::Fixed ? ($value / 100) : $value;
+        return $value / 100;
     }
 
-    public function setValueAttribute($value): float
+    public function setValueAttribute($value): void
     {
-        return $this->discount_type === DiscountValueType::Fixed ? ($value * 100) : $value;
+        $this->attributes['value'] = (int) $value * 100;
     }
 
     public function currentBalance(): Attribute
     {
         return Attribute::make(
-            get: fn (?int $value): float => ($value ?? 0) / 100,
-            set: fn (float $value): int => (int) ($value * 100),
+            get: fn (?int $value): ?float => filled($value) ? $value / 100 : null,
+            set: fn (?float $value): ?int => filled($value) ? (int) ($value * 100) : null,
         );
     }
 
     public function minOrderAmount(): Attribute
     {
         return Attribute::make(
-            get: fn (?int $value): float => ($value ?? 0) / 100,
-            set: fn (float $value): int => (int) ($value * 100),
+            get: fn (?int $value): ?float => filled($value) ? $value / 100 : null,
+            set: fn (?float $value): ?int => filled($value) ? (int) ($value * 100) : null,
         );
     }
 

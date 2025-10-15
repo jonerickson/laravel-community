@@ -26,13 +26,13 @@ class DiscountData extends Data
 
     public float $value;
 
-    public ?int $currentBalance = null;
+    public ?float $currentBalance = null;
 
     public ?int $maxUses = null;
 
     public int $timesUsed = 0;
 
-    public ?int $minOrderAmount = null;
+    public ?float $minOrderAmount = null;
 
     public ?CarbonImmutable $expiresAt = null;
 
@@ -44,11 +44,11 @@ class DiscountData extends Data
 
     public bool $hasBalance = false;
 
-    public ?int $amountApplied = null;
+    public ?float $amountApplied = null;
 
-    public ?int $balanceBefore = null;
+    public ?float $balanceBefore = null;
 
-    public ?int $balanceAfter = null;
+    public ?float $balanceAfter = null;
 
     public ?CarbonImmutable $createdAt = null;
 

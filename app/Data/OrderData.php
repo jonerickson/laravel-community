@@ -25,7 +25,7 @@ class OrderData extends Data
 
     public ?string $refundNotes = null;
 
-    public ?int $amount = null;
+    public ?float $amount = null;
 
     public bool $isOneTime;
 

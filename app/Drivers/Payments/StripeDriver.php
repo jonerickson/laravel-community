@@ -605,7 +605,7 @@ class StripeDriver implements PaymentProcessor
                     if ($discount->discount_type->value === 'percentage') {
                         $couponParams['percent_off'] = $discount->value;
                     } else {
-                        $couponParams['amount_off'] = $discount->pivot->amount_applied;
+                        $couponParams['amount_off'] = $discount->pivot->getRawOriginal('amount_applied');
                         $couponParams['currency'] = 'usd';
                     }
 

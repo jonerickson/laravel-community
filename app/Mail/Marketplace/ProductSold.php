@@ -28,7 +28,7 @@ class ProductSold extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your Product Has Been Sold - Order #'.$this->order->reference_id,
+            subject: 'You Made A Sale! - Order #'.$this->order->reference_id,
         );
     }
 

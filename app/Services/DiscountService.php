@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
+use Throwable;
 
 class DiscountService
 {
@@ -67,19 +68,35 @@ class DiscountService
         return $discounts;
     }
 
-    public function applyDiscountsToOrder(Order $order, array $discountCodes): int
+    /**
+     * @throws Throwable
+     */
+    public function applyDiscountsToOrder(Order $order, array $discounts): int
     {
-        return DB::transaction(function () use ($order, $discountCodes): int|float {
-            $discounts = $this->calculateOrderDiscounts($order, $discountCodes);
+        return DB::transaction(function () use ($order, $discounts): int|float {
+            $order->load(['items', 'discounts']);
+            $orderTotal = (int) ($order->amount * 100);
+            $remainingTotal = $orderTotal;
             $totalDiscount = 0;
 
-            foreach ($discounts as $discountData) {
-                /** @var Discount $discount */
-                $discount = $discountData['discount'];
-                $amount = $discountData['amount'];
+            /** @var Discount $discount */
+            foreach ($discounts as $discount) {
+                $discountAmount = $discount->calculateDiscount($remainingTotal);
 
-                $discount->applyToOrder($order, $amount);
-                $totalDiscount += $amount;
+                if ($discountAmount > 0) {
+                    $order->discounts()->attach($discount->id, [
+                        'amount_applied' => $discountAmount / 100,
+                        'balance_before' => $discount->type === DiscountType::GiftCard ? $discount->getRawOriginal('current_balance') / 100 : null,
+                        'balance_after' => $discount->type === DiscountType::GiftCard ? max(0, $discount->getRawOriginal('current_balance') - $discountAmount) : null,
+                    ]);
+
+                    $totalDiscount += $discountAmount;
+                    $remainingTotal -= $discountAmount;
+                }
+
+                if ($remainingTotal <= 0) {
+                    break;
+                }
             }
 
             return $totalDiscount;
@@ -130,15 +147,6 @@ class DiscountService
         }
 
         throw new RuntimeException('Failed to generate unique discount code after '.$attempts.' attempts.');
-    }
-
-    public function getAvailableBalance(Discount $discount): int
-    {
-        if ($discount->type !== DiscountType::GiftCard) {
-            return 0;
-        }
-
-        return $discount->current_balance ?? 0;
     }
 
     public function getDiscountsByUser(int $userId): Collection

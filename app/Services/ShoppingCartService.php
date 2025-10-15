@@ -9,6 +9,7 @@ use App\Data\CartItemData;
 use App\Enums\OrderStatus;
 use App\Models\Discount;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
@@ -23,6 +24,7 @@ class ShoppingCartService
 {
     public function __construct(
         private readonly Request $request,
+        private readonly DiscountService $discountService,
         #[CurrentUser]
         private readonly ?User $user = null,
     ) {
@@ -41,22 +43,17 @@ class ShoppingCartService
 
     public function getCartCount(): int
     {
-        if (! $this->request->hasSession()) {
+        $order = $this->getOrCreatePendingOrder();
+
+        if (! $order instanceof Order) {
             return 0;
         }
 
-        $cart = $this->getRawCart();
-
-        return count($cart);
+        return $order->items()->count();
     }
 
     public function clearCart(): void
     {
-        if (! $this->request->hasSession()) {
-            return;
-        }
-
-        $this->request->session()->forget('shopping_cart');
         $this->clearPendingOrder();
     }
 
@@ -73,6 +70,7 @@ class ShoppingCartService
                 ->where('id', $orderId)
                 ->whereBelongsTo($this->user)
                 ->where('status', OrderStatus::Pending)
+                ->with('items')
                 ->with('discounts')
                 ->first();
 
@@ -88,7 +86,7 @@ class ShoppingCartService
 
         $this->request->session()->put('pending_order_id', $order->id);
 
-        return $order->load('discounts');
+        return $order->loadMissing(['discounts', 'items']);
     }
 
     public function clearPendingOrder(): void
@@ -106,19 +104,13 @@ class ShoppingCartService
         }
     }
 
-    public function applyDiscount(Order $order, Discount $discount, int $orderTotal): void
+    public function applyDiscount(Order $order, Discount $discount): void
     {
         if ($order->discounts()->where('discount_id', $discount->id)->exists()) {
             throw new RuntimeException('This discount has already been applied to your order.');
         }
 
-        $discountAmount = $discount->calculateDiscount($orderTotal);
-
-        $order->discounts()->attach($discount->id, [
-            'amount_applied' => $discountAmount,
-            'balance_before' => $orderTotal,
-            'balance_after' => max(0, $orderTotal - $discountAmount),
-        ]);
+        $this->discountService->applyDiscountsToOrder($order, [$discount]);
     }
 
     public function removeDiscount(Order $order, int $discountId): void
@@ -128,67 +120,74 @@ class ShoppingCartService
 
     public function addItem(int $productId, ?int $priceId, int $quantity): CartData
     {
-        $cart = $this->getRawCart();
-        $cartKey = $productId.'_'.$priceId;
+        $order = $this->getOrCreatePendingOrder();
 
-        $product = Product::findOrFail($productId);
-
-        if (isset($cart[$cartKey])) {
-            $cart[$cartKey]['quantity'] += $quantity;
-        } else {
-            $cart[$cartKey] = [
-                'product_id' => $productId,
-                'price_id' => $priceId,
-                'name' => $product->name,
-                'slug' => $product->slug,
-                'quantity' => $quantity,
-                'added_at' => now(),
-            ];
+        if (! $order instanceof Order) {
+            return $this->getCart();
         }
 
-        $this->saveCart($cart);
+        Product::findOrFail($productId);
+
+        $existingItem = $order->items()
+            ->where('product_id', $productId)
+            ->where('price_id', $priceId)
+            ->first();
+
+        if ($existingItem instanceof OrderItem) {
+            $existingItem->update([
+                'quantity' => $existingItem->quantity + $quantity,
+            ]);
+        } else {
+            $order->items()->create([
+                'product_id' => $productId,
+                'price_id' => $priceId,
+                'quantity' => $quantity,
+            ]);
+        }
 
         return $this->getCart();
     }
 
     public function updateItem(int $productId, ?int $priceId, int $quantity): CartData
     {
-        $cart = $this->getRawCart();
+        $order = $this->getOrCreatePendingOrder();
 
-        $existingKeys = array_filter(
-            array_keys($cart),
-            fn (int|string $key): bool => str_starts_with((string) $key, $productId.'_')
-        );
-
-        foreach ($existingKeys as $key) {
-            unset($cart[$key]);
+        if (! $order instanceof Order) {
+            return $this->getCart();
         }
 
-        $product = Product::findOrFail($productId);
-        $newCartKey = $productId.'_'.$priceId;
+        $order->items()
+            ->where('product_id', $productId)
+            ->where('price_id', '!=', $priceId)
+            ->delete();
 
-        $cart[$newCartKey] = [
-            'product_id' => $productId,
-            'price_id' => $priceId,
-            'name' => $product->name,
-            'slug' => $product->slug,
-            'quantity' => $quantity,
-            'added_at' => now(),
-        ];
+        $item = $order->items()
+            ->where('product_id', $productId)
+            ->where('price_id', $priceId)
+            ->first();
 
-        $this->saveCart($cart);
+        if ($item instanceof OrderItem) {
+            $item->update(['quantity' => $quantity]);
+        } else {
+            $order->items()->create([
+                'product_id' => $productId,
+                'price_id' => $priceId,
+                'quantity' => $quantity,
+            ]);
+        }
 
         return $this->getCart();
     }
 
     public function removeItem(int $productId, ?int $priceId): CartData
     {
-        $cart = $this->getRawCart();
-        $cartKey = $productId.'_'.$priceId;
+        $order = $this->getOrCreatePendingOrder();
 
-        if (isset($cart[$cartKey])) {
-            unset($cart[$cartKey]);
-            $this->saveCart($cart);
+        if ($order instanceof Order) {
+            $order->items()
+                ->where('product_id', $productId)
+                ->where('price_id', $priceId)
+                ->delete();
         }
 
         return $this->getCart();
@@ -199,82 +198,35 @@ class ShoppingCartService
      */
     private function getCartItems(): array
     {
-        if (! $this->request->hasSession()) {
+        $order = $this->getOrCreatePendingOrder();
+
+        if (! $order instanceof Order) {
             return [];
         }
 
-        $cart = $this->getRawCart();
+        $orderItems = $order->items()->with([
+            'product' => function ($query): void {
+                $query->with('defaultPrice')
+                    ->with(['prices' => function (HasMany $query): void {
+                        $query->active()->orderBy('is_default', 'desc');
+                    }])
+                    ->with(['policies' => function (BelongsToMany $query): void {
+                        $query->active()->effective()->orderBy('title');
+                    }]);
+            },
+            'price',
+        ])->get();
 
-        if ($cart === []) {
-            return [];
-        }
-
-        $productIds = array_unique(array_column($cart, 'product_id'));
-        $priceIds = array_filter(array_column($cart, 'price_id'));
-
-        $products = $this->getProducts($productIds);
-        $prices = $this->getPrices($priceIds);
-
-        return $this->mapCartItems($cart, $products, $prices);
-    }
-
-    private function getRawCart(): array
-    {
-        if (! $this->request->hasSession()) {
-            return [];
-        }
-
-        return $this->request->session()->get('shopping_cart', []);
-    }
-
-    private function saveCart(array $cart): void
-    {
-        if (! $this->request->hasSession()) {
-            return;
-        }
-
-        $this->request->session()->put('shopping_cart', $cart);
-    }
-
-    private function getProducts(array $productIds): Collection
-    {
-        return Product::query()
-            ->with('defaultPrice')
-            ->with(['prices' => function (HasMany $query): void {
-                $query->active()->orderBy('is_default', 'desc');
-            }])
-            ->with(['policies' => function (BelongsToMany $query): void {
-                $query->active()->effective()->orderBy('title');
-            }])
-            ->whereIn('id', $productIds)
-            ->get()
-            ->keyBy('id');
-    }
-
-    private function getPrices(array $priceIds): Collection
-    {
-        return blank($priceIds)
-            ? collect()
-            : Price::whereIn('id', $priceIds)->get()->keyBy('id');
-    }
-
-    private function mapCartItems(array $cart, Collection $products, Collection $prices): array
-    {
-        return collect($cart)->map(function (array $item) use ($products, $prices): array {
-            $product = $products->get($item['product_id']);
-            $selectedPrice = $item['price_id'] ? $prices->get($item['price_id']) : null;
-
-            return [
-                'product_id' => $item['product_id'],
-                'price_id' => $item['price_id'],
-                'name' => $product?->name ?? $item['name'],
-                'slug' => $product?->slug ?? $item['slug'],
-                'quantity' => $item['quantity'],
-                'product' => $product,
-                'selected_price' => $selectedPrice,
-                'available_prices' => $product?->prices ?? collect(),
-                'added_at' => $item['added_at'],
-            ];
-        })->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->values()->toArray();
+        return $orderItems->map(fn (OrderItem $item): array => [
+            'product_id' => $item->product_id,
+            'price_id' => $item->price_id,
+            'name' => $item->product?->name ?? $item->name,
+            'slug' => $item->product?->slug ?? '',
+            'quantity' => $item->quantity,
+            'product' => $item->product,
+            'selected_price' => $item->price,
+            'available_prices' => $item->product?->prices ?? collect(),
+            'added_at' => $item->created_at,
+        ])->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->values()->toArray();
     }
 }
