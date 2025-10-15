@@ -356,6 +356,7 @@ declare namespace App.Data {
         isMarketplaceProduct: boolean;
         trialDays: number;
         allowPromotionCodes: boolean;
+        allowDiscountCodes: boolean;
         featuredImage: string | null;
         featuredImageUrl: string | null;
         externalProductId: string | null;

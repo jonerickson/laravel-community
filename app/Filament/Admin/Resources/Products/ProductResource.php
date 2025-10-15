@@ -161,7 +161,12 @@ class ProductResource extends Resource
                             ->components([
                                 Toggle::make('allow_promotion_codes')
                                     ->label('Allow Promotion Codes')
-                                    ->helperText('Allow customers to use promotion codes when purchasing this product.')
+                                    ->helperText('Allow customers to use promotion codes when purchasing this product that were generated from your payment processor. You may only use promotion codes or discount codes. You may not use both.')
+                                    ->columnSpanFull(),
+                                Toggle::make('allow_discount_codes')
+                                    ->label('Allow Discount Codes')
+                                    ->default(true)
+                                    ->helperText('Allow customers to use discount codes when purchasing this product that were generated from this platform.')
                                     ->columnSpanFull(),
                                 TextInput::make('trial_days')
                                     ->default(0)

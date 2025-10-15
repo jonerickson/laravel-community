@@ -35,7 +35,9 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read int|float $amount
  * @property-read mixed $checkout_url
- * @property-read int $commission_amount
+ * @property-read float $commission_amount
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $commissionItems
+ * @property-read int|null $commission_items_count
  * @property-read OrderDiscount|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Discount> $discounts
  * @property-read int|null $discounts_count

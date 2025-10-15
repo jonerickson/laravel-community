@@ -53,6 +53,7 @@ use Laravel\Scout\Searchable;
  * @property bool $is_subscription_only
  * @property int $trial_days
  * @property bool $allow_promotion_codes
+ * @property bool $allow_discount_codes
  * @property string|null $featured_image
  * @property string|null $external_product_id
  * @property array<array-key, mixed>|null $metadata
@@ -104,6 +105,7 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Product subscriptions()
  * @method static Builder<static>|Product trending(?int $limit = null, ?\Illuminate\Support\Carbon $referenceTime = null)
  * @method static Builder<static>|Product trendingInTimeframe(string $timeframe = 'week', ?int $limit = null)
+ * @method static Builder<static>|Product whereAllowDiscountCodes($value)
  * @method static Builder<static>|Product whereAllowPromotionCodes($value)
  * @method static Builder<static>|Product whereApprovalStatus($value)
  * @method static Builder<static>|Product whereApprovedAt($value)
@@ -168,6 +170,7 @@ class Product extends Model implements Sluggable
         'tax_code',
         'is_subscription_only',
         'allow_promotion_codes',
+        'allow_discount_codes',
         'trial_days',
         'external_product_id',
     ];
@@ -352,6 +355,7 @@ class Product extends Model implements Sluggable
             'tax_code' => ProductTaxCode::class,
             'is_subscription_only' => 'boolean',
             'allow_promotion_codes' => 'boolean',
+            'allow_discount_codes' => 'boolean',
             'trial_days' => 'integer',
         ];
     }

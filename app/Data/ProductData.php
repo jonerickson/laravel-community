@@ -40,6 +40,8 @@ class ProductData extends Data
 
     public bool $allowPromotionCodes;
 
+    public bool $allowDiscountCodes;
+
     public ?string $featuredImage = null;
 
     public ?string $featuredImageUrl = null;

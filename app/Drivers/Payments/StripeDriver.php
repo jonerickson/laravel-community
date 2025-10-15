@@ -582,6 +582,11 @@ class StripeDriver implements PaymentProcessor
                 ->get()
                 ->firstWhere('product.allow_promotion_codes', true);
 
+            $disallowDiscountCodes = $order->items()
+                ->with('product')
+                ->get()
+                ->firstWhere('product.allow_discount_codes', false);
+
             $metadata = array_merge_recursive(
                 [
                     'order_id' => $order->reference_id,
@@ -592,7 +597,7 @@ class StripeDriver implements PaymentProcessor
             );
 
             $discounts = [];
-            if ($order->discounts->isNotEmpty()) {
+            if (! $disallowDiscountCodes && $order->discounts->isNotEmpty()) {
                 foreach ($order->discounts as $discount) {
                     $couponParams = [
                         'name' => $discount->code,
