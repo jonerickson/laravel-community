@@ -9,22 +9,31 @@ use App\Services\Migration\MigrationResult;
 use App\Services\Migration\MigrationService;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\select;
 
 class MigrateCommand extends Command
 {
+    use ConfirmableTrait;
+
     protected $signature = 'mi:migrate
                             {source? : The migration source (e.g., invision-community)}
+                            {--force : Force the operation to run when in production}
                             {--entity= : Specific entity to migrate (e.g., users, posts)}
                             {--batch-size=100 : Number of records to process per batch}
+                            {--limit= : Maximum number of records to migrate (useful for testing)}
                             {--dry-run : Preview migration without making changes}';
 
     protected $description = 'Migrate data from external sources (use -v to see skipped/failed records, -vv for migrated records)';
 
     public function handle(MigrationService $migrationService): int
     {
+        if (! $this->confirmToProceed()) {
+            return self::SUCCESS;
+        }
+
         $source = $this->argument('source');
 
         if (! $source) {
@@ -36,10 +45,15 @@ class MigrateCommand extends Command
 
         $entity = $this->option('entity');
         $batchSize = (int) $this->option('batch-size');
+        $limit = $this->option('limit') ? (int) $this->option('limit') : null;
         $isDryRun = (bool) $this->option('dry-run');
 
         if ($isDryRun) {
             $this->warn('Running in DRY RUN mode - no changes will be made.');
+        }
+
+        if ($limit !== null && $limit !== 0) {
+            $this->warn("Limiting migration to $limit records.");
         }
 
         if (! in_array($source, $migrationService->getAvailableSources())) {
@@ -57,6 +71,7 @@ class MigrateCommand extends Command
                 source: $source,
                 entity: $entity,
                 batchSize: $batchSize,
+                limit: $limit,
                 isDryRun: $isDryRun,
                 output: $this->output,
             );

@@ -40,6 +40,7 @@ class MigrationService
         string $source,
         ?string $entity,
         int $batchSize,
+        ?int $limit,
         bool $isDryRun,
         OutputStyle $output,
     ): MigrationResult {
@@ -52,10 +53,10 @@ class MigrationService
         $this->migratedEntities = [];
 
         if ($entity !== null && $entity !== '' && $entity !== '0') {
-            $this->migrateEntityWithDependencies($migrationSource, $entity, $batchSize, $isDryRun, $output, $result);
+            $this->migrateEntityWithDependencies($migrationSource, $entity, $batchSize, $limit, $isDryRun, $output, $result);
         } else {
             foreach ($migrationSource->getImporters() as $importerEntity => $importer) {
-                $this->migrateEntityWithDependencies($migrationSource, $importerEntity, $batchSize, $isDryRun, $output, $result);
+                $this->migrateEntityWithDependencies($migrationSource, $importerEntity, $batchSize, $limit, $isDryRun, $output, $result);
             }
         }
 
@@ -86,6 +87,7 @@ class MigrationService
         MigrationSource $source,
         string $entity,
         int $batchSize,
+        ?int $limit,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
@@ -107,11 +109,11 @@ class MigrationService
             if ($dependency->isRequired() || in_array($dependency->entityName, $this->optionalDependencies)) {
                 $dependencyType = $dependency->isRequired() ? 'required' : 'optional';
                 $output->writeln("<comment>Migrating {$dependency->entityName} ({$dependencyType} dependency of {$entity})...</comment>");
-                $this->migrateEntityWithDependencies($source, $dependency->entityName, $batchSize, $isDryRun, $output, $result);
+                $this->migrateEntityWithDependencies($source, $dependency->entityName, $batchSize, $limit, $isDryRun, $output, $result);
             }
         }
 
-        $this->migrateEntity($source, $entity, $batchSize, $isDryRun, $output, $result);
+        $this->migrateEntity($source, $entity, $batchSize, $limit, $isDryRun, $output, $result);
 
         $this->migratedEntities[] = $entity;
 
@@ -121,7 +123,7 @@ class MigrationService
             if ($dependency->isRequired() || in_array($dependency->entityName, $this->optionalDependencies)) {
                 $dependencyType = $dependency->isRequired() ? 'required' : 'optional';
                 $output->writeln("<comment>Migrating {$dependency->entityName} ({$dependencyType} dependency of {$entity})...</comment>");
-                $this->migrateEntityWithDependencies($source, $dependency->entityName, $batchSize, $isDryRun, $output, $result);
+                $this->migrateEntityWithDependencies($source, $dependency->entityName, $batchSize, $limit, $isDryRun, $output, $result);
             }
         }
     }
@@ -130,6 +132,7 @@ class MigrationService
         MigrationSource $source,
         string $entity,
         int $batchSize,
+        ?int $limit,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
@@ -145,6 +148,7 @@ class MigrationService
         $importer->import(
             connection: $source->getConnection(),
             batchSize: $batchSize,
+            limit: $limit,
             isDryRun: $isDryRun,
             output: $output,
             result: $result,

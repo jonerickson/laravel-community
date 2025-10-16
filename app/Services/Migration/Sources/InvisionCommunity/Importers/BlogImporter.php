@@ -54,13 +54,14 @@ class BlogImporter implements EntityImporter
     {
         return [
             ImporterDependency::requiredPre('users', 'Blog posts require users to exist for author assignment'),
-            ImporterDependency::optionalPost('blog_comments', 'Import the comments that belongs to the posts'),
+            ImporterDependency::optionalPost('blog_comments', 'Import blog post comments'),
         ];
     }
 
     public function import(
         string $connection,
         int $batchSize,
+        ?int $limit,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
@@ -69,22 +70,27 @@ class BlogImporter implements EntityImporter
             $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
         }
 
-        $totalBlogs = DB::connection($connection)
+        $query = DB::connection($connection)
             ->table('blog_entries')
-            ->where('entry_status', 'published')
-            ->count();
+            ->where('entry_status', 'published');
+
+        $totalBlogs = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
         $output->writeln("Found {$totalBlogs} blog entries to migrate...");
 
         $progressBar = $output->createProgressBar($totalBlogs);
         $progressBar->start();
 
-        DB::connection($connection)
-            ->table('blog_entries')
-            ->where('entry_status', 'published')
+        $processed = 0;
+
+        $query
             ->orderBy('entry_id')
-            ->chunk($batchSize, function ($sourceBlogEntries) use ($isDryRun, $result, $progressBar, $output): void {
+            ->chunk($batchSize, function ($sourceBlogEntries) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
                 foreach ($sourceBlogEntries as $sourceBlogEntry) {
+                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                        return false;
+                    }
+
                     try {
                         $this->importBlogEntry($sourceBlogEntry, $isDryRun, $result);
                     } catch (Exception $e) {
@@ -106,8 +112,11 @@ class BlogImporter implements EntityImporter
                         $output->writeln("<error>Failed to import blog entry: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
                     }
 
+                    $processed++;
                     $progressBar->advance();
                 }
+
+                return true;
             });
 
         $progressBar->finish();

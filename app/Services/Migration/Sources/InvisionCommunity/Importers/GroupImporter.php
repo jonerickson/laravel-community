@@ -43,6 +43,7 @@ class GroupImporter implements EntityImporter
     public function import(
         string $connection,
         int $batchSize,
+        ?int $limit,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
@@ -51,20 +52,26 @@ class GroupImporter implements EntityImporter
             $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
         }
 
-        $totalGroups = DB::connection($connection)
-            ->table('core_groups')
-            ->count();
+        $query = DB::connection($connection)
+            ->table('core_groups');
+
+        $totalGroups = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
         $output->writeln("Found {$totalGroups} groups to migrate...");
 
         $progressBar = $output->createProgressBar($totalGroups);
         $progressBar->start();
 
-        DB::connection($connection)
-            ->table('core_groups')
+        $processed = 0;
+
+        $query
             ->orderBy('g_id')
-            ->chunk($batchSize, function ($sourceGroups) use ($isDryRun, $result, $progressBar, $output): void {
+            ->chunk($batchSize, function ($sourceGroups) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
                 foreach ($sourceGroups as $sourceGroup) {
+                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                        return false;
+                    }
+
                     try {
                         $this->importGroup($sourceGroup, $isDryRun, $result);
                     } catch (Exception $e) {
@@ -86,8 +93,11 @@ class GroupImporter implements EntityImporter
                         $output->writeln("<error>Failed to import group: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
                     }
 
+                    $processed++;
                     $progressBar->advance();
                 }
+
+                return true;
             });
 
         $progressBar->finish();

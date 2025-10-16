@@ -20,6 +20,7 @@ interface EntityImporter
     public function import(
         string $connection,
         int $batchSize,
+        ?int $limit,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,

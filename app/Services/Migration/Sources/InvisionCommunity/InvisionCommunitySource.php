@@ -8,9 +8,13 @@ use App\Services\Migration\Contracts\EntityImporter;
 use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\Sources\InvisionCommunity\Importers\BlogCommentImporter;
 use App\Services\Migration\Sources\InvisionCommunity\Importers\BlogImporter;
+use App\Services\Migration\Sources\InvisionCommunity\Importers\ForumImporter;
 use App\Services\Migration\Sources\InvisionCommunity\Importers\GroupImporter;
+use App\Services\Migration\Sources\InvisionCommunity\Importers\OrderImporter;
+use App\Services\Migration\Sources\InvisionCommunity\Importers\PostImporter;
 use App\Services\Migration\Sources\InvisionCommunity\Importers\ProductImporter;
 use App\Services\Migration\Sources\InvisionCommunity\Importers\SubscriptionImporter;
+use App\Services\Migration\Sources\InvisionCommunity\Importers\TopicImporter;
 use App\Services\Migration\Sources\InvisionCommunity\Importers\UserImporter;
 
 class InvisionCommunitySource implements MigrationSource
@@ -26,6 +30,10 @@ class InvisionCommunitySource implements MigrationSource
             'blog_comments' => new BlogCommentImporter,
             'products' => new ProductImporter,
             'subscriptions' => new SubscriptionImporter,
+            'forums' => new ForumImporter,
+            'topics' => new TopicImporter,
+            'posts' => new PostImporter,
+            'orders' => new OrderImporter,
         ];
     }
 

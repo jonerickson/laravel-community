@@ -56,26 +56,32 @@ class BlogCommentImporter implements EntityImporter
     public function import(
         string $connection,
         int $batchSize,
+        ?int $limit,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
     ): void {
-        $totalComments = DB::connection($connection)
+        $query = DB::connection($connection)
             ->table('blog_comments')
-            ->where('comment_approved', 1)
-            ->count();
+            ->where('comment_approved', 1);
+
+        $totalComments = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
         $output->writeln("Found {$totalComments} blog comments to migrate...");
 
         $progressBar = $output->createProgressBar($totalComments);
         $progressBar->start();
 
-        DB::connection($connection)
-            ->table('blog_comments')
-            ->where('comment_approved', 1)
+        $processed = 0;
+
+        $query
             ->orderBy('comment_id')
-            ->chunk($batchSize, function ($sourceComments) use ($isDryRun, $result, $progressBar, $output): void {
+            ->chunk($batchSize, function ($sourceComments) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
                 foreach ($sourceComments as $sourceComment) {
+                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                        return false;
+                    }
+
                     try {
                         $this->importComment($sourceComment, $isDryRun, $result);
                     } catch (Exception $e) {
@@ -97,8 +103,11 @@ class BlogCommentImporter implements EntityImporter
                         $output->writeln("<error>Failed to import blog comment: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
                     }
 
+                    $processed++;
                     $progressBar->advance();
                 }
+
+                return true;
             });
 
         $progressBar->finish();

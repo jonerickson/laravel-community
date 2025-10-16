@@ -11,11 +11,14 @@ use App\Models\User;
 use Database\Seeders\GroupSeeder;
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 
 class InstallCommand extends Command
 {
+    use ConfirmableTrait;
+
     protected $signature = 'mi:install
                             {--name= : The super admin\'s name}
                             {--email= : The super admin\'s email}
@@ -23,8 +26,12 @@ class InstallCommand extends Command
 
     protected $description = 'Install and configure the application for use.';
 
-    public function handle(): void
+    public function handle(): int
     {
+        if (! $this->confirmToProceed()) {
+            return self::SUCCESS;
+        }
+
         if ($this->confirm('Would you like to install all the required permissions?', true)) {
             Schema::disableForeignKeyConstraints();
             Permission::truncate();
@@ -52,7 +59,7 @@ class InstallCommand extends Command
             if (blank($name) || blank($email) || blank($password)) {
                 $this->error('Please provide a name, email and password when creating a new account.');
 
-                return;
+                return self::FAILURE;
             }
 
             $user = User::updateOrCreate([
@@ -69,5 +76,7 @@ class InstallCommand extends Command
         }
 
         $this->comment('Application installed successfully.');
+
+        return self::SUCCESS;
     }
 }

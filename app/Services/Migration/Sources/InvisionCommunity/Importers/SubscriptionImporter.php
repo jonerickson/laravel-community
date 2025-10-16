@@ -59,6 +59,7 @@ class SubscriptionImporter implements EntityImporter
     public function import(
         string $connection,
         int $batchSize,
+        ?int $limit,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
@@ -67,22 +68,27 @@ class SubscriptionImporter implements EntityImporter
             $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
         }
 
-        $totalSubscriptions = DB::connection($connection)
+        $query = DB::connection($connection)
             ->table('nexus_member_subscription_packages')
-            ->where('sp_enabled', 1)
-            ->count();
+            ->where('sp_enabled', 1);
+
+        $totalSubscriptions = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
         $output->writeln("Found {$totalSubscriptions} subscription packages to migrate...");
 
         $progressBar = $output->createProgressBar($totalSubscriptions);
         $progressBar->start();
 
-        DB::connection($connection)
-            ->table('nexus_member_subscription_packages')
-            ->where('sp_enabled', 1)
+        $processed = 0;
+
+        $query
             ->orderBy('sp_id')
-            ->chunk($batchSize, function ($sourceSubscriptions) use ($isDryRun, $result, $progressBar, $output): void {
+            ->chunk($batchSize, function ($sourceSubscriptions) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
                 foreach ($sourceSubscriptions as $sourceSubscription) {
+                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                        return false;
+                    }
+
                     try {
                         $this->importSubscription($sourceSubscription, $isDryRun, $result);
                     } catch (Exception $e) {
@@ -102,8 +108,11 @@ class SubscriptionImporter implements EntityImporter
                         $output->writeln("<error>Failed to import subscription: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
                     }
 
+                    $processed++;
                     $progressBar->advance();
                 }
+
+                return true;
             });
 
         $progressBar->finish();
@@ -148,8 +157,6 @@ class SubscriptionImporter implements EntityImporter
             'allow_discount_codes' => true,
             'trial_days' => 0,
             'commission_rate' => 0,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
         ]);
 
         $prices = $this->createPrices($sourceSubscription, $product, $isDryRun, $result);

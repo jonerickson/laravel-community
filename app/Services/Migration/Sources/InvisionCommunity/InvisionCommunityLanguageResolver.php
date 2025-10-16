@@ -67,6 +67,11 @@ class InvisionCommunityLanguageResolver
         return $this->resolve("nexus_subs_$packageId");
     }
 
+    public function resolveForumName(int|string $forumId): ?string
+    {
+        return $this->resolve("forums_forum_$forumId");
+    }
+
     public function batchResolve(array $keys): array
     {
         $missingKeys = array_diff($keys, array_keys($this->languageCache));

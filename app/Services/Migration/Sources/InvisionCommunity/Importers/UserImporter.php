@@ -43,24 +43,31 @@ class UserImporter implements EntityImporter
     public function import(
         string $connection,
         int $batchSize,
+        ?int $limit,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
     ): void {
-        $totalUsers = DB::connection($connection)
-            ->table('core_members')
-            ->count();
+        $query = DB::connection($connection)
+            ->table('core_members');
+
+        $totalUsers = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
         $output->writeln("Found {$totalUsers} users to migrate...");
 
         $progressBar = $output->createProgressBar($totalUsers);
         $progressBar->start();
 
-        DB::connection($connection)
-            ->table('core_members')
+        $processed = 0;
+
+        $query
             ->orderBy('member_id')
-            ->chunk($batchSize, function ($sourceUsers) use ($isDryRun, $result, $progressBar, $output): void {
+            ->chunk($batchSize, function ($sourceUsers) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
                 foreach ($sourceUsers as $sourceUser) {
+                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                        return false;
+                    }
+
                     try {
                         $this->importUser($sourceUser, $isDryRun, $result);
                     } catch (Exception $e) {
@@ -82,8 +89,11 @@ class UserImporter implements EntityImporter
                         $output->writeln("<error>Failed to import user {$sourceUser->email}: {$e->getMessage()}</error>");
                     }
 
+                    $processed++;
                     $progressBar->advance();
                 }
+
+                return true;
             });
 
         $progressBar->finish();

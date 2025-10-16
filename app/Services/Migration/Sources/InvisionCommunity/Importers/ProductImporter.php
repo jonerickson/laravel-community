@@ -67,6 +67,7 @@ class ProductImporter implements EntityImporter
     public function import(
         string $connection,
         int $batchSize,
+        ?int $limit,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
@@ -75,24 +76,29 @@ class ProductImporter implements EntityImporter
             $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
         }
 
-        $this->importCategories($connection, $batchSize, $isDryRun, $output, $result);
+        $this->importCategories($connection, $batchSize, $limit, $isDryRun, $output, $result);
 
-        $totalProducts = DB::connection($connection)
+        $query = DB::connection($connection)
             ->table('nexus_packages')
-            ->where('p_store', 1)
-            ->count();
+            ->where('p_store', 1);
+
+        $totalProducts = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
         $output->writeln("Found {$totalProducts} products to migrate...");
 
         $progressBar = $output->createProgressBar($totalProducts);
         $progressBar->start();
 
-        DB::connection($connection)
-            ->table('nexus_packages')
-            ->where('p_store', 1)
+        $processed = 0;
+
+        $query
             ->orderBy('p_id')
-            ->chunk($batchSize, function ($sourceProducts) use ($isDryRun, $result, $progressBar, $output): void {
+            ->chunk($batchSize, function ($sourceProducts) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
                 foreach ($sourceProducts as $sourceProduct) {
+                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                        return false;
+                    }
+
                     try {
                         $this->importProduct($sourceProduct, $isDryRun, $result);
                     } catch (Exception $e) {
@@ -114,8 +120,11 @@ class ProductImporter implements EntityImporter
                         $output->writeln("<error>Failed to import product: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
                     }
 
+                    $processed++;
                     $progressBar->advance();
                 }
+
+                return true;
             });
 
         $progressBar->finish();
@@ -125,24 +134,31 @@ class ProductImporter implements EntityImporter
     protected function importCategories(
         string $connection,
         int $batchSize,
+        ?int $limit,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
     ): void {
-        $totalCategories = DB::connection($connection)
-            ->table('nexus_package_groups')
-            ->count();
+        $query = DB::connection($connection)
+            ->table('nexus_package_groups');
+
+        $totalCategories = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
         $output->writeln("Found {$totalCategories} product categories to migrate...");
 
         $progressBar = $output->createProgressBar($totalCategories);
         $progressBar->start();
 
-        DB::connection($connection)
-            ->table('nexus_package_groups')
+        $processed = 0;
+
+        $query
             ->orderBy('pg_id')
-            ->chunk($batchSize, function ($sourceCategories) use ($isDryRun, $result, $progressBar, $output): void {
+            ->chunk($batchSize, function ($sourceCategories) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
                 foreach ($sourceCategories as $sourceCategory) {
+                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                        return false;
+                    }
+
                     try {
                         $this->importCategory($sourceCategory, $isDryRun, $result);
                     } catch (Exception $e) {
@@ -164,8 +180,11 @@ class ProductImporter implements EntityImporter
                         $output->writeln("<error>Failed to import product category: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
                     }
 
+                    $processed++;
                     $progressBar->advance();
                 }
+
+                return true;
             });
 
         $progressBar->finish();
@@ -266,8 +285,6 @@ class ProductImporter implements EntityImporter
                 : Carbon::now(),
         ]);
 
-        $prices = $this->createPrices($sourceProduct, $product, $isDryRun, $result);
-
         if (! $isDryRun) {
             $product->save();
 
@@ -277,7 +294,11 @@ class ProductImporter implements EntityImporter
                     $product->categories()->attach($categoryId);
                 }
             }
+        }
 
+        $prices = $this->createPrices($sourceProduct, $product, $isDryRun, $result);
+
+        if (! $isDryRun) {
             /** @var Price $price */
             foreach ($prices as $price) {
                 $price->save();
@@ -295,7 +316,7 @@ class ProductImporter implements EntityImporter
             $this->cacheProductMapping($sourceProduct->p_id, $product->id);
         }
 
-        $pricesSummary = collect($prices)->map(fn (Price $price): string => $price->amount.' '.$price->currency.' ('.($price->interval?->value ?? 'one-time').')')->implode(', ');
+        $pricesSummary = collect($prices)->map(fn (Price $price): string => ($price->getOriginal('amount') / 100).' '.$price->currency.' ('.($price->interval?->value ?? 'one-time').')')->implode(', ');
 
         $result->incrementMigrated(self::ENTITY_NAME);
         $result->recordMigrated(self::ENTITY_NAME, [
