@@ -114,6 +114,19 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'invision_community' => [
+            'driver' => env('MIGRATION_IC_DRIVER', 'mysql'),
+            'host' => env('MIGRATION_IC_HOST', '127.0.0.1'),
+            'port' => env('MIGRATION_IC_PORT', env('MIGRATION_IC_DRIVER', 'mysql') === 'pgsql' ? '5432' : '3306'),
+            'database' => env('MIGRATION_IC_DATABASE'),
+            'username' => env('MIGRATION_IC_USERNAME'),
+            'password' => env('MIGRATION_IC_PASSWORD'),
+            'charset' => env('MIGRATION_IC_CHARSET', env('MIGRATION_IC_DRIVER', 'mysql') === 'pgsql' ? 'utf8' : 'utf8mb4'),
+            'collation' => env('MIGRATION_IC_COLLATION', env('MIGRATION_IC_DRIVER', 'mysql') === 'pgsql' ? null : 'utf8mb4_unicode_ci'),
+            'prefix' => env('MIGRATION_IC_PREFIX', ''),
+            'strict' => false,
+        ],
+
     ],
 
     /*
