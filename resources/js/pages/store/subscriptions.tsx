@@ -79,7 +79,7 @@ function PricingCard({
         billingCycle === 'year' && monthlyPrice && yearlyPrice ? Math.round((1 - yearlyPrice.amount / 12 / monthlyPrice.amount) * 100) : 0;
 
     return (
-        <Card className={cn('relative flex w-full flex-col', isCurrentPlan && 'ring-2 ring-success', plan.isFeatured && 'ring-2 ring-info')}>
+        <Card className={cn('relative flex w-full flex-col', isCurrentPlan && 'ring-2 ring-success', plan.isFeatured && ! isCurrentPlan && 'ring-2 ring-info')}>
             {plan.isFeatured && !isCurrentPlan && (
                 <div className="absolute -top-4 left-1/2 z-10 -translate-x-1/2">
                     <Badge variant="default" className="bg-info text-info-foreground">
