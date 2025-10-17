@@ -150,10 +150,7 @@ export default function Reviews({ subscription, reviews }: ReviewsPageProps) {
 
                 <Card>
                     <CardHeader>
-                        <Heading
-                            title="Customer reviews"
-                            description={`See what others are saying about ${subscription.name}`}
-                        />
+                        <Heading title="Customer reviews" description={`See what others are saying about ${subscription.name}`} />
                     </CardHeader>
                     <CardContent>
                         {reviews && reviews.data.length > 0 ? (
@@ -188,11 +185,7 @@ export default function Reviews({ subscription, reviews }: ReviewsPageProps) {
                                 </div>
                             </InfiniteScroll>
                         ) : (
-                            <EmptyState
-                                icon={<MessageSquare />}
-                                title="No reviews yet"
-                                description="Be the first to review this subscription!"
-                            />
+                            <EmptyState icon={<MessageSquare />} title="No reviews yet" description="Be the first to review this subscription!" />
                         )}
                     </CardContent>
                 </Card>
