@@ -78,7 +78,6 @@ class ProductSeeder extends Seeder
 
         $subscriptionCategory = ProductCategory::factory()->active()->state([
             'name' => $name = 'Subscription Category 1',
-            'is_active' => false,
             'slug' => Str::slug($name),
         ])->create();
 
@@ -94,6 +93,7 @@ class ProductSeeder extends Seeder
                     'slug' => Str::slug($name),
                     'featured_image' => null,
                     'external_product_id' => null,
+                    'is_featured' => $sequence->index === 1,
                     'is_subscription_only' => true,
                     'metadata' => [
                         'features' => [

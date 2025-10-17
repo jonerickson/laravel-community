@@ -85,8 +85,9 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         RateLimiter::for('register', fn (\Illuminate\Http\Request $request): array => [
-            Limit::perMinute(2)->by($request->fingerprintId() ?: $request->ip()),
-            Limit::perHour(5)->by($request->fingerprintId() ?: $request->ip()),
+            Limit::none(),
+            //            Limit::perMinute(2)->by($request->fingerprintId() ?: $request->ip()),
+            //            Limit::perHour(5)->by($request->fingerprintId() ?: $request->ip()),
         ]);
 
         RateLimiter::for('post', fn (\Illuminate\Http\Request $request): array => [

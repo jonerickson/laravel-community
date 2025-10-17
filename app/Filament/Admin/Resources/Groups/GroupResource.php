@@ -117,9 +117,11 @@ class GroupResource extends Resource
                                     ->relationship('discordRoles')
                                     ->helperText('Link this group with a Discord role. When a member is add/removed from a group, they will be added/removed from the associated Discord role.')
                                     ->label('Role(s)')
+                                    ->default([])
                                     ->addActionLabel('Add role')
                                     ->simple(Select::make('discord_role_id')
                                         ->searchable()
+                                        ->required()
                                         ->hiddenLabel()
                                         ->options(function () {
                                             $discordApi = app(DiscordApiService::class);

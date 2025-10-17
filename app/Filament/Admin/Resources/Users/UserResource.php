@@ -294,8 +294,10 @@ class UserResource extends Resource
                 TextColumn::make('email')
                     ->searchable(),
                 TextColumn::make('groups.name')
+                    ->placeholder('No Groups')
                     ->badge(),
                 TextColumn::make('roles.name')
+                    ->placeholder('No Roles')
                     ->badge(),
                 IconColumn::make('is_banned')
                     ->label('Banned')
@@ -380,7 +382,7 @@ class UserResource extends Resource
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     BulkAction::make('bulk_ban')
-                        ->label('Ban Selected Users')
+                        ->label('Ban selected users')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
                         ->schema([

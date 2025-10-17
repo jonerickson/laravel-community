@@ -125,19 +125,22 @@ class ProductResource extends Resource
                             ->description('Add files the customer will have access to if they have purchased this product.')
                             ->schema([
                                 Repeater::make('files')
+                                    ->default([])
                                     ->hiddenLabel()
                                     ->relationship('files')
                                     ->addActionLabel('Add file')
                                     ->schema([
                                         TextInput::make('name')
+                                            ->required()
                                             ->maxLength(255)
                                             ->helperText('The name of the downloadable file.')
                                             ->label('Name'),
                                         Textarea::make('description')
-                                            ->helperText('An optional description.')
+                                            ->helperText('An optional description of the downloadable file.')
                                             ->maxLength(65535)
                                             ->nullable(),
                                         FileUpload::make('path')
+                                            ->required()
                                             ->visibility('private')
                                             ->hiddenLabel(),
                                     ]),

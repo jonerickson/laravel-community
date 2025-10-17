@@ -7,6 +7,7 @@ namespace App\Rules;
 use Closure;
 use Exception;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -15,6 +16,10 @@ class NoProfanity implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (empty($value) || ! is_string($value)) {
+            return;
+        }
+
+        if (! App::isProduction() || ! App::environment('staging')) {
             return;
         }
 
