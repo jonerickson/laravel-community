@@ -5,9 +5,10 @@ import { formatDistanceToNow } from 'date-fns';
 
 interface ProductReviewsListProps {
     reviews: App.Data.PaginatedData<App.Data.CommentData>;
+    scrollProp?: string;
 }
 
-export function StoreProductReviewsList({ reviews }: ProductReviewsListProps) {
+export function StoreProductReviewsList({ reviews, scrollProp = 'reviews' }: ProductReviewsListProps) {
     if (!reviews || reviews.data.length === 0) {
         return (
             <div className="py-8 text-center text-sm text-muted-foreground">
@@ -17,7 +18,7 @@ export function StoreProductReviewsList({ reviews }: ProductReviewsListProps) {
     }
 
     return (
-        <InfiniteScroll data="reviews">
+        <InfiniteScroll data={scrollProp}>
             <div className="space-y-6 divide-y divide-muted">
                 {reviews.data.map((review) => (
                     <div key={review.id} className="pb-6">

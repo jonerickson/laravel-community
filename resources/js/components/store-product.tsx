@@ -2,13 +2,11 @@ import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
 import RichEditorContent from '@/components/rich-editor-content';
 import { StarRating } from '@/components/star-rating';
-import { StoreProductRating } from '@/components/store-product-rating';
-import { StoreProductReviewsList } from '@/components/store-product-reviews-list';
+import { StoreProductRatingDialog } from '@/components/store-product-rating-dialog';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { currency, pluralize } from '@/lib/utils';
-import { Deferred, router, useForm, usePage } from '@inertiajs/react';
+import { currency } from '@/lib/utils';
+import { Deferred, useForm } from '@inertiajs/react';
 import { ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -18,9 +16,7 @@ interface ProductProps {
 }
 
 export default function Product({ product: productData, reviews }: ProductProps) {
-    const { auth } = usePage<App.Data.SharedData>().props;
     const [selectedPriceId, setSelectedPriceId] = useState<number | null>(productData?.defaultPrice?.id || null);
-    const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
         price_id: selectedPriceId,
@@ -88,35 +84,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
                     <div className="flex items-center gap-4">
                         <StarRating rating={productData.averageRating || 0} showValue={true} />
                         <Deferred fallback={<div className="text-sm text-primary">Loading reviews...</div>} data="reviews">
-                            <Dialog open={isRatingModalOpen} onOpenChange={setIsRatingModalOpen}>
-                                <DialogTrigger asChild>
-                                    <button className="text-sm text-primary hover:underline">
-                                        See all {productData.reviewsCount || 0} {pluralize('review', productData.reviewsCount || 0)}
-                                    </button>
-                                </DialogTrigger>
-                                <DialogContent className="max-h-[80vh] min-w-[90vh] overflow-y-auto">
-                                    <DialogHeader>
-                                        <DialogTitle>Product reviews</DialogTitle>
-                                        <DialogDescription>View the latest product reviews and ratings.</DialogDescription>
-                                    </DialogHeader>
-                                    <div className="pt-4">
-                                        <StoreProductReviewsList reviews={reviews} />
-
-                                        {auth?.user && (
-                                            <div className="border-t border-muted pt-6">
-                                                <h3 className="mb-4 text-lg font-medium">Write a review</h3>
-                                                <StoreProductRating
-                                                    product={productData}
-                                                    onRatingAdded={() => {
-                                                        setIsRatingModalOpen(false);
-                                                        router.reload({ only: ['product'] });
-                                                    }}
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                </DialogContent>
-                            </Dialog>
+                            <StoreProductRatingDialog product={productData} reviews={reviews} />
                         </Deferred>
                     </div>
                 </div>

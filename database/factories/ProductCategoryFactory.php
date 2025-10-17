@@ -18,7 +18,22 @@ class ProductCategoryFactory extends Factory
         return [
             'name' => $name = "Category {$this->faker->numberBetween(1, 10)}",
             'description' => $this->faker->text(),
+            'is_active' => $this->faker->boolean(80),
             'slug' => Str::slug($name),
         ];
+    }
+
+    public function active(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => true,
+        ]);
+    }
+
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => false,
+        ]);
     }
 }

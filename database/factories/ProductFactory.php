@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\ProductApprovalStatus;
 use App\Enums\ProductTaxCode;
 use App\Enums\ProductType;
 use App\Models\Product;
@@ -76,6 +77,27 @@ class ProductFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_featured' => false,
+        ]);
+    }
+
+    public function approved(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'approval_status' => ProductApprovalStatus::Approved,
+        ]);
+    }
+
+    public function pending(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'approval_status' => ProductApprovalStatus::Pending,
+        ]);
+    }
+
+    public function rejected(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'approval_status' => ProductApprovalStatus::Rejected,
         ]);
     }
 }

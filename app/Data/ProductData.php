@@ -57,7 +57,7 @@ class ProductData extends Data
     #[LoadRelation]
     public ?PriceData $defaultPrice = null;
 
-    public ?float $averageRating = null;
+    public float $averageRating;
 
     public int $reviewsCount;
 

@@ -20,7 +20,7 @@ class ProductSeeder extends Seeder
 
     public function run(): void
     {
-        $productCategory = ProductCategory::factory()->state([
+        $productCategory = ProductCategory::factory()->active()->state([
             'name' => $name = 'Product Category 1',
             'slug' => Str::slug($name),
         ])->has(Image::factory()->state([
@@ -28,6 +28,7 @@ class ProductSeeder extends Seeder
         ]))->create();
 
         $products = Product::factory()
+            ->approved()
             ->count(4)
             ->featured()
             ->recycle($productCategory)
@@ -75,13 +76,14 @@ class ProductSeeder extends Seeder
             }
         }
 
-        $subscriptionCategory = ProductCategory::factory()->state([
+        $subscriptionCategory = ProductCategory::factory()->active()->state([
             'name' => $name = 'Subscription Category 1',
             'is_active' => false,
             'slug' => Str::slug($name),
         ])->create();
 
         $subscriptions = Product::factory()
+            ->approved()
             ->count(3)
             ->recycle($subscriptionCategory)
             ->hasAttached($subscriptionCategory, relationship: 'categories')

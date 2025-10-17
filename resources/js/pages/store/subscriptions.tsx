@@ -1,6 +1,7 @@
 import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
 import RichEditorContent from '@/components/rich-editor-content';
+import { StarRating } from '@/components/star-rating';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,13 +10,14 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { cn, currency } from '@/lib/utils';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { Check, Crown, Package, RefreshCw, Rocket, Shield, Star, Users, X, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 interface SubscriptionsProps {
     subscriptionProducts: App.Data.ProductData[];
+    subscriptionReviews: Record<number, App.Data.CommentData[]>;
     currentSubscription: App.Data.SubscriptionData | null;
 }
 
@@ -37,6 +39,7 @@ const getColorForPlan = (plan: App.Data.ProductData): string => {
 
 interface PricingCardProps {
     plan: App.Data.ProductData;
+    reviews?: App.Data.CommentData[];
     billingCycle: App.Enums.SubscriptionInterval;
     onSubscribe: (planId: number | null, priceId: number | null) => void;
     onCancel: (priceId: number) => void;
@@ -97,6 +100,9 @@ function PricingCard({
                 </div>
                 <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
                 <CardDescription className="text-base">
+                    <Link href={route('store.subscriptions.reviews', plan.id)} className="my-4 flex w-full items-center justify-center text-center">
+                        <StarRating rating={plan.averageRating || 0} showValue={true} />
+                    </Link>
                     <RichEditorContent content={plan.description} />
                 </CardDescription>
 
@@ -255,7 +261,7 @@ function PricingCard({
     );
 }
 
-export default function Subscriptions({ subscriptionProducts, currentSubscription }: SubscriptionsProps) {
+export default function Subscriptions({ subscriptionProducts, subscriptionReviews, currentSubscription }: SubscriptionsProps) {
     const [billingCycle, setBillingCycle] = useState<App.Enums.SubscriptionInterval>('month');
     const [policiesAgreed, setPoliciesAgreed] = useState<Record<number, boolean>>({});
     const [processingPriceId, setProcessingPriceId] = useState<number | null>(null);
@@ -416,6 +422,7 @@ export default function Subscriptions({ subscriptionProducts, currentSubscriptio
                                 <div key={plan.id} className="flex justify-center">
                                     <PricingCard
                                         plan={plan}
+                                        reviews={subscriptionReviews[plan.id]}
                                         billingCycle={billingCycle}
                                         onSubscribe={handleSubscribe}
                                         onCancel={handleCancel}

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Store;
 
+use App\Data\CommentData;
 use App\Data\ProductData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Store\SubscriptionCancelRequest;
@@ -18,6 +19,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\LaravelData\PaginatedDataCollection;
 
 class SubscriptionsController extends Controller
 {
@@ -41,8 +43,19 @@ class SubscriptionsController extends Controller
             ->filter(fn (Product $product) => Gate::check('view', $product))
             ->values();
 
+        $subscriptionReviews = $subscriptions->mapWithKeys(function (Product $product): array {
+            $reviews = CommentData::collect($product
+                ->reviews()
+                ->latest()
+                ->get()
+                ->all(), PaginatedDataCollection::class);
+
+            return [$product->id => $reviews->items()];
+        });
+
         return Inertia::render('store/subscriptions', [
             'subscriptionProducts' => ProductData::collect($subscriptions),
+            'subscriptionReviews' => $subscriptionReviews,
             'currentSubscription' => $this->user ? $this->paymentManager->currentSubscription($this->user) : null,
         ]);
     }
