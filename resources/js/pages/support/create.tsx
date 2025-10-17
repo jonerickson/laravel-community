@@ -2,14 +2,18 @@ import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import { currency } from '@/lib/utils';
+import { cn, currency } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -28,6 +32,8 @@ interface CreateSupportTicketProps {
 }
 
 export default function CreateSupportTicket({ categories, orders }: CreateSupportTicketProps) {
+    const [orderSearchOpen, setOrderSearchOpen] = useState(false);
+
     const { data, setData, post, processing, errors, reset } = useForm({
         subject: '',
         description: '',
@@ -91,28 +97,85 @@ export default function CreateSupportTicket({ categories, orders }: CreateSuppor
 
                             {orders && orders.length > 0 && (
                                 <div className="grid gap-2">
-                                    <Label htmlFor="order_id">Related Order (optional)</Label>
-                                    <Select value={data.order_id} onValueChange={(value) => setData('order_id', value)}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select an order if this is related to a purchase" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="none">No related order</SelectItem>
-                                            {orders.map((order) => (
-                                                <SelectItem key={order.id} value={order.id.toString()}>
-                                                    #{order.referenceId} -{' '}
-                                                    {order.items
-                                                        ?.map((item) => item.product?.name || item.name)
-                                                        .filter(Boolean)
-                                                        .join(', ') || 'N/A'}{' '}
-                                                    - {currency(order.amount || 0)}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <Label htmlFor="order_id">Related Order</Label>
+                                    <Popover open={orderSearchOpen} onOpenChange={setOrderSearchOpen}>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                role="combobox"
+                                                aria-expanded={orderSearchOpen}
+                                                className={cn('w-full justify-between', !data.order_id && 'text-muted-foreground')}
+                                            >
+                                                {data.order_id && data.order_id !== 'none'
+                                                    ? (() => {
+                                                          const order = orders.find((o) => o.id.toString() === data.order_id);
+                                                          return order
+                                                              ? `#${order.referenceId} - ${
+                                                                    order.items
+                                                                        ?.map((item) => item.product?.name || item.name)
+                                                                        .filter(Boolean)
+                                                                        .join(', ') || 'N/A'
+                                                                } - ${currency(order.amount || 0)}`
+                                                              : 'Select an order';
+                                                      })()
+                                                    : data.order_id === 'none'
+                                                      ? 'No related order'
+                                                      : 'Select an order if this is related to a purchase'}
+                                                <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-full p-0" align="start">
+                                            <Command>
+                                                <CommandInput placeholder="Search orders..." />
+                                                <CommandList>
+                                                    <CommandEmpty>No orders found.</CommandEmpty>
+                                                    <CommandGroup>
+                                                        <CommandItem
+                                                            value="none"
+                                                            onSelect={() => {
+                                                                setData('order_id', 'none');
+                                                                setOrderSearchOpen(false);
+                                                            }}
+                                                        >
+                                                            <Check
+                                                                className={cn('mr-2 size-4', data.order_id === 'none' ? 'opacity-100' : 'opacity-0')}
+                                                            />
+                                                            No related order
+                                                        </CommandItem>
+                                                        {orders.map((order) => {
+                                                            const orderLabel = `#${order.referenceId} - ${
+                                                                order.items
+                                                                    ?.map((item) => item.product?.name || item.name)
+                                                                    .filter(Boolean)
+                                                                    .join(', ') || 'N/A'
+                                                            } - ${currency(order.amount || 0)}`;
+                                                            return (
+                                                                <CommandItem
+                                                                    key={order.id}
+                                                                    value={orderLabel}
+                                                                    onSelect={() => {
+                                                                        setData('order_id', order.id.toString());
+                                                                        setOrderSearchOpen(false);
+                                                                    }}
+                                                                >
+                                                                    <Check
+                                                                        className={cn(
+                                                                            'mr-2 size-4',
+                                                                            data.order_id === order.id.toString() ? 'opacity-100' : 'opacity-0',
+                                                                        )}
+                                                                    />
+                                                                    {orderLabel}
+                                                                </CommandItem>
+                                                            );
+                                                        })}
+                                                    </CommandGroup>
+                                                </CommandList>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
                                     <InputError message={errors.order_id} />
                                     <div className="text-xs text-muted-foreground">
-                                        Attaching a related order helps our support team provide better assistance.
+                                        (Optional) Attaching a related order helps our support team provide better assistance.
                                     </div>
                                 </div>
                             )}
