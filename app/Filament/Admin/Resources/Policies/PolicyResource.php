@@ -135,7 +135,8 @@ class PolicyResource extends Resource
                     ->placeholder('Effective Immediately'),
                 IconColumn::make('is_active')
                     ->label('Active')
-                    ->boolean(),
+                    ->boolean()
+                    ->sortable(),
                 TextColumn::make('author.name')
                     ->label('Created By')
                     ->sortable(),

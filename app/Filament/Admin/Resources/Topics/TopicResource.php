@@ -118,8 +118,10 @@ class TopicResource extends Resource
                     ->numeric()
                     ->sortable(),
                 ToggleColumn::make('is_pinned')
+                    ->sortable()
                     ->label('Pinned'),
                 ToggleColumn::make('is_locked')
+                    ->sortable()
                     ->label('Locked'),
                 TextColumn::make('created_at')
                     ->label('Created')

@@ -83,7 +83,7 @@ class ForumCategoryForm
                             ->schema([
                                 Toggle::make('is_active')
                                     ->label('Active')
-                                    ->helperText('Enable the category for viewing.')
+                                    ->helperText('Allow the category to be accessed.')
                                     ->required()
                                     ->default(true),
                             ]),

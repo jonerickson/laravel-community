@@ -100,4 +100,18 @@ class ProductFactory extends Factory
             'approval_status' => ProductApprovalStatus::Rejected,
         ]);
     }
+
+    public function visible(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_visible' => true,
+        ]);
+    }
+
+    public function hidden(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_visible' => false,
+        ]);
+    }
 }

@@ -36,6 +36,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
@@ -159,6 +160,10 @@ class ProductResource extends Resource
                                     ->label('Subscription Only')
                                     ->helperText('Only show this product on the subscriptions page - not in the store.')
                                     ->columnSpanFull(),
+                                Toggle::make('is_visible')
+                                    ->label('Visible')
+                                    ->helperText('Display the product for purchase. This does not prevent it from being directly accessed.')
+                                    ->default(true),
                             ]),
                         Section::make('Purchasing')
                             ->components([
@@ -252,6 +257,10 @@ class ProductResource extends Resource
                     ->label('Featured')
                     ->boolean()
                     ->sortable(),
+                IconColumn::make('is_visible')
+                    ->label('Visible')
+                    ->boolean()
+                    ->sortable(),
                 TextColumn::make('categories.name')
                     ->badge()
                     ->searchable()
@@ -277,6 +286,7 @@ class ProductResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('approval_status')
+                    ->label('Approval Status')
                     ->options(ProductApprovalStatus::class)
                     ->native(false),
                 SelectFilter::make('categories')
@@ -287,6 +297,8 @@ class ProductResource extends Resource
                 SelectFilter::make('type')
                     ->options(ProductType::class)
                     ->native(false),
+                TernaryFilter::make('is_visible')
+                    ->label('Visible'),
                 Filter::make('marketplace')
                     ->label('Marketplace Products')
                     ->query(fn (Builder|Product $query): Builder => $query->marketplace()),

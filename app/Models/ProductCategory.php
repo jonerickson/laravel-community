@@ -10,6 +10,7 @@ use App\Traits\HasImages;
 use App\Traits\HasLogging;
 use App\Traits\HasSlug;
 use App\Traits\Orderable;
+use App\Traits\Visible;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -24,6 +25,7 @@ use Illuminate\Support\Str;
  * @property string|null $description
  * @property int $order
  * @property bool $is_active
+ * @property int $is_visible
  * @property string $slug
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -37,15 +39,18 @@ use Illuminate\Support\Str;
  *
  * @method static Builder<static>|ProductCategory active()
  * @method static \Database\Factories\ProductCategoryFactory factory($count = null, $state = [])
+ * @method static Builder<static>|ProductCategory hidden()
  * @method static Builder<static>|ProductCategory inactive()
  * @method static Builder<static>|ProductCategory newModelQuery()
  * @method static Builder<static>|ProductCategory newQuery()
  * @method static Builder<static>|ProductCategory ordered()
  * @method static Builder<static>|ProductCategory query()
+ * @method static Builder<static>|ProductCategory visible()
  * @method static Builder<static>|ProductCategory whereCreatedAt($value)
  * @method static Builder<static>|ProductCategory whereDescription($value)
  * @method static Builder<static>|ProductCategory whereId($value)
  * @method static Builder<static>|ProductCategory whereIsActive($value)
+ * @method static Builder<static>|ProductCategory whereIsVisible($value)
  * @method static Builder<static>|ProductCategory whereName($value)
  * @method static Builder<static>|ProductCategory whereOrder($value)
  * @method static Builder<static>|ProductCategory whereSlug($value)
@@ -61,6 +66,7 @@ class ProductCategory extends Model implements Sluggable
     use HasLogging;
     use HasSlug;
     use Orderable;
+    use Visible;
 
     protected $table = 'products_categories';
 

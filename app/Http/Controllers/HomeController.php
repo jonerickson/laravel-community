@@ -22,6 +22,7 @@ class HomeController
     protected function getSubscriptions()
     {
         return Product::query()
+            ->visible()
             ->subscriptions()
             ->with('prices')
             ->orderBy('name')

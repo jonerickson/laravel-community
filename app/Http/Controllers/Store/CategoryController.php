@@ -25,6 +25,7 @@ class CategoryController extends Controller
 
         $categories = ProductCategory::query()
             ->active()
+            ->visible()
             ->ordered()
             ->with('image')
             ->get()
@@ -43,6 +44,7 @@ class CategoryController extends Controller
         $products = Product::query()
             ->whereHas('categories', fn (Builder $query) => $query->whereKey($category->id))
             ->approved()
+            ->visible()
             ->with('defaultPrice')
             ->with(['prices' => function (HasMany $query): void {
                 $query->active();

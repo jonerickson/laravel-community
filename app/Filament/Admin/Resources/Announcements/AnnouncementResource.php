@@ -135,8 +135,10 @@ class AnnouncementResource extends Resource
                 TextColumn::make('type')
                     ->badge(),
                 ToggleColumn::make('is_active')
+                    ->sortable()
                     ->label('Active'),
                 ToggleColumn::make('is_dismissible')
+                    ->sortable()
                     ->label('Dismissible'),
                 TextColumn::make('starts_at')
                     ->label('Starts')

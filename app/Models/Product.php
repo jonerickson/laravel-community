@@ -22,6 +22,7 @@ use App\Traits\HasSlug;
 use App\Traits\LogsMarketplaceActivity;
 use App\Traits\Reviewable;
 use App\Traits\Trendable;
+use App\Traits\Visible;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -50,6 +51,7 @@ use Laravel\Scout\Searchable;
  * @property ProductType $type
  * @property ProductTaxCode|null $tax_code
  * @property bool $is_featured
+ * @property int $is_visible
  * @property bool $is_subscription_only
  * @property int $trial_days
  * @property bool $allow_promotion_codes
@@ -92,6 +94,7 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Product approved()
  * @method static \Database\Factories\ProductFactory factory($count = null, $state = [])
  * @method static Builder<static>|Product featured()
+ * @method static Builder<static>|Product hidden()
  * @method static Builder<static>|Product hotTopics(?int $limit = null)
  * @method static Builder<static>|Product marketplace()
  * @method static Builder<static>|Product newModelQuery()
@@ -105,6 +108,7 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Product subscriptions()
  * @method static Builder<static>|Product trending(?int $limit = null, ?\Illuminate\Support\Carbon $referenceTime = null)
  * @method static Builder<static>|Product trendingInTimeframe(string $timeframe = 'week', ?int $limit = null)
+ * @method static Builder<static>|Product visible()
  * @method static Builder<static>|Product whereAllowDiscountCodes($value)
  * @method static Builder<static>|Product whereAllowPromotionCodes($value)
  * @method static Builder<static>|Product whereApprovalStatus($value)
@@ -118,6 +122,7 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Product whereId($value)
  * @method static Builder<static>|Product whereIsFeatured($value)
  * @method static Builder<static>|Product whereIsSubscriptionOnly($value)
+ * @method static Builder<static>|Product whereIsVisible($value)
  * @method static Builder<static>|Product whereMetadata($value)
  * @method static Builder<static>|Product whereName($value)
  * @method static Builder<static>|Product whereReferenceId($value)
@@ -148,6 +153,7 @@ class Product extends Model implements Sluggable
     use Reviewable;
     use Searchable;
     use Trendable;
+    use Visible;
 
     protected $attributes = [
         'type' => ProductType::Product,

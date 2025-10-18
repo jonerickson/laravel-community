@@ -31,7 +31,8 @@ class WarningConsequencesTable
                     ->numeric(),
                 IconColumn::make('is_active')
                     ->label('Active')
-                    ->boolean(),
+                    ->boolean()
+                    ->sortable(),
             ])
             ->recordActions([
                 EditAction::make(),

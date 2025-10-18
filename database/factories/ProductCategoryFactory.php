@@ -36,4 +36,18 @@ class ProductCategoryFactory extends Factory
             'is_active' => false,
         ]);
     }
+
+    public function visible(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_visible' => true,
+        ]);
+    }
+
+    public function hidden(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_visible' => false,
+        ]);
+    }
 }

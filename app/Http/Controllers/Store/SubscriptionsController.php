@@ -35,6 +35,7 @@ class SubscriptionsController extends Controller
     {
         $subscriptions = Product::query()
             ->subscriptions()
+            ->visible()
             ->with('prices')
             ->with('categories')
             ->with('policies.category')

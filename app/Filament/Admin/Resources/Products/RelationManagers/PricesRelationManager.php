@@ -113,10 +113,12 @@ class PricesRelationManager extends RelationManager
                     ->color('info'),
                 IconColumn::make('is_active')
                     ->boolean()
-                    ->label('Active'),
+                    ->label('Active')
+                    ->sortable(),
                 IconColumn::make('is_default')
                     ->boolean()
-                    ->label('Default'),
+                    ->label('Default')
+                    ->sortable(),
                 IconColumn::make('external_price_id')
                     ->label('External Price')
                     ->default(false)

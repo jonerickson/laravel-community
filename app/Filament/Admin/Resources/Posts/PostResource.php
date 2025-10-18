@@ -193,10 +193,13 @@ class PostResource extends Resource
                     ->sortable()
                     ->limit(50),
                 ToggleColumn::make('is_published')
+                    ->sortable()
                     ->label('Published'),
                 ToggleColumn::make('is_featured')
+                    ->sortable()
                     ->label('Featured'),
                 ToggleColumn::make('comments_enabled')
+                    ->sortable()
                     ->label('Comments'),
                 TextColumn::make('author.name')
                     ->label('Author')

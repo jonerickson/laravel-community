@@ -23,8 +23,10 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Override;
@@ -95,8 +97,12 @@ class ProductCategoryResource extends Resource
                             ->schema([
                                 Toggle::make('is_active')
                                     ->label('Active')
-                                    ->helperText('Enable the category for viewing.')
+                                    ->helperText('Allow the category to be accessed.')
                                     ->required()
+                                    ->default(true),
+                                Toggle::make('is_visible')
+                                    ->label('Visible')
+                                    ->helperText('Display the category in the store. This does not prevent it from being directly accessed.')
                                     ->default(true),
                             ]),
                     ]),
@@ -119,6 +125,14 @@ class ProductCategoryResource extends Resource
                     ->searchable(),
                 TextColumn::make('slug')
                     ->searchable(),
+                IconColumn::make('is_active')
+                    ->label('Active')
+                    ->boolean()
+                    ->sortable(),
+                IconColumn::make('is_visible')
+                    ->label('Visible')
+                    ->boolean()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -136,6 +150,12 @@ class ProductCategoryResource extends Resource
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
+            ])
+            ->filters([
+                TernaryFilter::make('is_active')
+                    ->label('Active'),
+                TernaryFilter::make('is_visible')
+                    ->label('Visible'),
             ])
             ->reorderable('order')
             ->defaultSort('order');

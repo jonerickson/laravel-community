@@ -20,7 +20,6 @@ class WarningForm
                     ->columnSpanFull()
                     ->columns()
                     ->schema([
-
                         TextInput::make('name')
                             ->required()
                             ->maxLength(255)
@@ -41,6 +40,7 @@ class WarningForm
                             ->minValue(1)
                             ->helperText('Number of days before the warning points expire.'),
                         Toggle::make('is_active')
+                            ->helperText('Allow this warning to be issued.')
                             ->label('Active')
                             ->default(true)
                             ->columnSpanFull(),

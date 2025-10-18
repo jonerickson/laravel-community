@@ -72,7 +72,7 @@ class PolicyCategoryResource extends Resource
                             ->schema([
                                 Toggle::make('is_active')
                                     ->label('Active')
-                                    ->helperText('Enable the category for viewing.')
+                                    ->helperText('Allow the category to be accessed.')
                                     ->required()
                                     ->default(true),
                             ]),
@@ -97,7 +97,8 @@ class PolicyCategoryResource extends Resource
                     ->label('Policies'),
                 IconColumn::make('is_active')
                     ->label('Active')
-                    ->boolean(),
+                    ->boolean()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

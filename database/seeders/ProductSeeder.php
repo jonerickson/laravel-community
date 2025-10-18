@@ -20,7 +20,7 @@ class ProductSeeder extends Seeder
 
     public function run(): void
     {
-        $productCategory = ProductCategory::factory()->active()->state([
+        $productCategory = ProductCategory::factory()->visible()->active()->state([
             'name' => $name = 'Product Category 1',
             'slug' => Str::slug($name),
         ])->has(Image::factory()->state([
@@ -76,7 +76,7 @@ class ProductSeeder extends Seeder
             }
         }
 
-        $subscriptionCategory = ProductCategory::factory()->active()->state([
+        $subscriptionCategory = ProductCategory::factory()->hidden()->active()->state([
             'name' => $name = 'Subscription Category 1',
             'slug' => Str::slug($name),
         ])->create();
