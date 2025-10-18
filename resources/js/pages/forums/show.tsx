@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useApiRequest } from '@/hooks/use-api-request';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { stripCharacters, truncate } from '@/utils/truncate';
+import { stripCharacters } from '@/utils/truncate';
 import { Head, InfiniteScroll, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, Circle, Eye, EyeOff, LibraryBig, Lock, MessageSquare, Pin, Plus, ThumbsDown, Trash2 } from 'lucide-react';
@@ -281,11 +281,6 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                                                                 {topic.title}
                                                             </Link>
                                                         </div>
-                                                        {topic.lastPost?.content && (
-                                                            <p className="mb-1 text-sm text-wrap break-words text-muted-foreground">
-                                                                {truncate(topic.lastPost.content)}
-                                                            </p>
-                                                        )}
                                                         <div className="text-xs text-muted-foreground">
                                                             Started by {topic.author.name} •{' '}
                                                             {topic.createdAt
