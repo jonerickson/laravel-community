@@ -12,7 +12,7 @@ export function Breadcrumbs({ breadcrumbs }: { breadcrumbs: BreadcrumbItemType[]
         <div
             className={cn('px-2 lg:px-0', {
                 'hidden sm:flex': layout === 'sidebar',
-                flex: layout === 'header',
+                'scrollbar-none flex overflow-x-auto whitespace-nowrap lg:overflow-x-visible': layout === 'header',
             })}
         >
             {breadcrumbs.length > 0 && (
@@ -24,10 +24,14 @@ export function Breadcrumbs({ breadcrumbs }: { breadcrumbs: BreadcrumbItemType[]
                                 <Fragment key={index}>
                                     <BreadcrumbItem>
                                         {isLast ? (
-                                            <BreadcrumbPage>{item.title}</BreadcrumbPage>
+                                            <BreadcrumbPage className="max-w-[150px] truncate" title={item.title}>
+                                                {item.title}
+                                            </BreadcrumbPage>
                                         ) : (
                                             <BreadcrumbLink asChild>
-                                                <Link href={item.href}>{item.title}</Link>
+                                                <Link className="max-w-[150px] truncate" href={item.href}>
+                                                    {item.title}
+                                                </Link>
                                             </BreadcrumbLink>
                                         )}
                                     </BreadcrumbItem>
