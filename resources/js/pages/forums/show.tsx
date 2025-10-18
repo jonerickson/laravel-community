@@ -154,42 +154,44 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                             <Heading title={forum.name} description={forum.description ?? ''} />
                         </div>
                     </div>
-                    <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row sm:items-center">
-                        <FollowButton
-                            type="forum"
-                            id={forum.id}
-                            isFollowing={forum.isFollowedByUser ?? false}
-                            followersCount={forum.followersCount ?? 0}
-                        />
-                        {hasAnyPermission(['delete_topics']) && (
-                            <>
-                                {selectedTopics.length > 0 && (
-                                    <>
-                                        <Button variant="destructive" onClick={handleBulkDelete} disabled={isDeleting}>
-                                            <Trash2 className="mr-2 size-4" />
-                                            Delete {selectedTopics.length} Topic{selectedTopics.length > 1 ? 's' : ''}
+                    {auth && auth.user && (
+                        <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row sm:items-center">
+                            <FollowButton
+                                type="forum"
+                                id={forum.id}
+                                isFollowing={forum.isFollowedByUser ?? false}
+                                followersCount={forum.followersCount ?? 0}
+                            />
+                            {can('delete_topics') && (
+                                <>
+                                    {selectedTopics.length > 0 && (
+                                        <>
+                                            <Button variant="destructive" onClick={handleBulkDelete} disabled={isDeleting}>
+                                                <Trash2 className="mr-2 size-4" />
+                                                Delete {selectedTopics.length} Topic{selectedTopics.length > 1 ? 's' : ''}
+                                            </Button>
+                                            <Button variant="outline" onClick={() => setSelectedTopics([])}>
+                                                Clear Selection
+                                            </Button>
+                                        </>
+                                    )}
+                                    {selectedTopics.length === 0 && topics.length > 0 && (
+                                        <Button variant="outline" onClick={() => handleSelectAll(true)}>
+                                            Select All
                                         </Button>
-                                        <Button variant="outline" onClick={() => setSelectedTopics([])}>
-                                            Clear Selection
-                                        </Button>
-                                    </>
-                                )}
-                                {selectedTopics.length === 0 && topics.length > 0 && (
-                                    <Button variant="outline" onClick={() => handleSelectAll(true)}>
-                                        Select All
-                                    </Button>
-                                )}
-                            </>
-                        )}
-                        {can('create_topics') && (
-                            <Button asChild>
-                                <Link href={route('forums.topics.create', { forum: forum.slug })}>
-                                    <Plus className="mr-2 size-4" />
-                                    New Topic
-                                </Link>
-                            </Button>
-                        )}
-                    </div>
+                                    )}
+                                </>
+                            )}
+                            {can('create_topics') && (
+                                <Button asChild>
+                                    <Link href={route('forums.topics.create', { forum: forum.slug })}>
+                                        <Plus className="mr-2 size-4" />
+                                        New Topic
+                                    </Link>
+                                </Button>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {forum.rules && stripCharacters(forum.rules).length > 0 && (
