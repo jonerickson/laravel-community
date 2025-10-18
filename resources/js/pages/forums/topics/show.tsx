@@ -158,19 +158,15 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
             </Head>
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex flex-col items-start justify-between gap-2 sm:flex-row">
-                    <div className="mb-4 flex w-full items-start justify-between gap-2">
-                        <div className="flex-1">
-                            <div className="mb-2 flex items-center gap-2">
-                                {topic.isHot && <span className="text-sm">🔥</span>}
-                                {topic.isPinned && <Pin className="size-4 text-info" />}
-                                {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
-                                {can('report_posts') && topic.hasReportedContent && <AlertTriangle className="size-4 text-destructive" />}
-                                {can('publish_posts') && topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
-                                {can('approve_posts') && topic.hasUnapprovedContent && <ThumbsDown className="size-4 text-warning" />}
-                                <h1 className="text-xl font-semibold tracking-tight">{topic.title}</h1>
-                            </div>
-
-                            {topic.description && <p className="max-w-3xl text-sm text-muted-foreground">{topic.description}</p>}
+                    <div className="flex w-full items-start justify-between md:items-center">
+                        <div className="mb-2 flex items-center gap-2">
+                            {topic.isHot && <span className="text-sm">🔥</span>}
+                            {topic.isPinned && <Pin className="size-4 text-info" />}
+                            {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
+                            {can('report_posts') && topic.hasReportedContent && <AlertTriangle className="size-4 text-destructive" />}
+                            {can('publish_posts') && topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
+                            {can('approve_posts') && topic.hasUnapprovedContent && <ThumbsDown className="size-4 text-warning" />}
+                            <h1 className="text-xl font-semibold tracking-tight">{topic.title}</h1>
                         </div>
 
                         <ForumTopicModerationMenu topic={topic} forum={forum} />

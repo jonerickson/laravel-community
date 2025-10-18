@@ -78,19 +78,6 @@ export default function ForumTopicCreate({ forum }: CreateTopicProps) {
                             </div>
 
                             <div className="space-y-2">
-                                <Input
-                                    id="description"
-                                    type="text"
-                                    value={data.description}
-                                    onChange={(e) => setData('description', e.target.value)}
-                                    placeholder="Description"
-                                    required
-                                />
-                                <InputError message={errors.description} />
-                                <div className="text-xs text-muted-foreground">An optional brief description of the topic.</div>
-                            </div>
-
-                            <div className="space-y-2">
                                 <RichTextEditor
                                     content={data.content}
                                     onChange={(content) => setData('content', content)}

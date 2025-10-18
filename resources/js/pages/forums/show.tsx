@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useApiRequest } from '@/hooks/use-api-request';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { stripCharacters } from '@/utils/truncate';
+import { stripCharacters, truncate } from '@/utils/truncate';
 import { Head, InfiniteScroll, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, Circle, Eye, EyeOff, LibraryBig, Lock, MessageSquare, Pin, Plus, ThumbsDown, Trash2 } from 'lucide-react';
@@ -67,7 +67,7 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
         hasPart: topics.map((topic) => ({
             '@type': 'DiscussionForumPosting',
             headline: topic.title,
-            description: topic.description,
+            description: topic.description || `Discussion topic: ${topic.title}`,
             text: topic.lastPost?.content,
             dateCreated: topic.createdAt,
             dateModified: topic.updatedAt,
@@ -279,9 +279,9 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                                                                 {topic.title}
                                                             </Link>
                                                         </div>
-                                                        {topic.description && (
+                                                        {topic.lastPost?.content && (
                                                             <p className="mb-1 text-sm text-wrap break-words text-muted-foreground">
-                                                                {topic.description}
+                                                                {truncate(topic.lastPost.content)}
                                                             </p>
                                                         )}
                                                         <div className="text-xs text-muted-foreground">
