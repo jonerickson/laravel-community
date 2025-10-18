@@ -87,7 +87,6 @@ class PolicyResource extends Resource
                                 Toggle::make('is_active')
                                     ->label('Active')
                                     ->helperText('Enable the policy for viewing.')
-                                    ->required()
                                     ->default(true),
                                 DateTimePicker::make('effective_at')
                                     ->default(today())

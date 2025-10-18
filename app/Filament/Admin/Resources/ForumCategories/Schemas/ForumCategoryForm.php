@@ -84,7 +84,6 @@ class ForumCategoryForm
                                 Toggle::make('is_active')
                                     ->label('Active')
                                     ->helperText('Allow the category to be accessed.')
-                                    ->required()
                                     ->default(true),
                             ]),
                         Section::make('Permissions')

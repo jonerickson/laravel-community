@@ -98,7 +98,6 @@ class ProductCategoryResource extends Resource
                                 Toggle::make('is_active')
                                     ->label('Active')
                                     ->helperText('Allow the category to be accessed.')
-                                    ->required()
                                     ->default(true),
                                 Toggle::make('is_visible')
                                     ->label('Visible')
