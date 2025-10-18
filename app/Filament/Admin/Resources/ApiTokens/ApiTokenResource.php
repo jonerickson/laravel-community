@@ -74,13 +74,6 @@ class ApiTokenResource extends Resource
                 TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('last_used_at')
-                    ->placeholder('Unused')
-                    ->label('Last Used At')
-                    ->since()
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(),
                 TextColumn::make('expires_at')
                     ->placeholder('Does Not Expire')
                     ->label('Expires At')
