@@ -16,10 +16,14 @@ class NotifyForumFollowers implements ShouldQueue
     {
         if ($event instanceof TopicCreated) {
             $content = $event->topic;
-            $forum = $event->topic->forum;
+            $forum = $event->topic->forum ?? null;
         } else {
             $content = $event->post;
-            $forum = $event->post->topic->forum;
+            $forum = $event->post->topic->forum ?? null;
+        }
+
+        if (blank($forum)) {
+            return;
         }
 
         $followers = $forum->follows()

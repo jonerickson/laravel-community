@@ -7,6 +7,7 @@ namespace App\Filament\Admin\Resources\ApiTokens\Pages;
 use App\Filament\Admin\Resources\ApiTokens\ApiTokenResource;
 use App\Models\User;
 use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Laravel\Passport\Token;
 use Override;
@@ -14,6 +15,8 @@ use Override;
 class CreateApiToken extends CreateRecord
 {
     use InteractsWithActions;
+
+    public ?string $token = null;
 
     protected static string $resource = ApiTokenResource::class;
 
@@ -26,6 +29,8 @@ class CreateApiToken extends CreateRecord
             $data['abilities'] ?? ['*'],
         );
 
+        $this->token = $result->accessToken;
+
         return $result->getToken();
     }
 
@@ -33,5 +38,14 @@ class CreateApiToken extends CreateRecord
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
+    }
+
+    #[Override]
+    protected function getCreatedNotification(): ?Notification
+    {
+        return Notification::make()
+            ->success()
+            ->title('Your API key was successfully created. Copy the token below as it will not be shown again.')
+            ->body($this->token ?? 'No token was specified.');
     }
 }

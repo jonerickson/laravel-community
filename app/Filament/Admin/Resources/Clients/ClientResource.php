@@ -27,7 +27,9 @@ class ClientResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedComputerDesktop;
 
-    protected static string|UnitEnum|null $navigationGroup = 'System';
+    protected static string|UnitEnum|null $navigationGroup = 'Integrations';
+
+    protected static ?int $navigationSort = -3;
 
     protected static ?string $recordTitleAttribute = 'name';
 

@@ -8,6 +8,7 @@ use App\Enums\AnnouncementType;
 use App\Models\Announcement;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Http;
 
 class DatabaseSeeder extends Seeder
@@ -20,6 +21,12 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             GroupSeeder::class,
             WarningSeeder::class,
+        ]);
+
+        Artisan::call('passport:client', [
+            '--no-interaction' => true,
+            '--personal' => true,
+            '--name' => config('app.name'),
         ]);
 
         Announcement::factory()->state([

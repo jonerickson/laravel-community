@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\ApiTokens;
 
 use App\Filament\Admin\Resources\ApiTokens\Pages\CreateApiToken;
-use App\Filament\Admin\Resources\ApiTokens\Pages\EditApiToken;
 use App\Filament\Admin\Resources\ApiTokens\Pages\ListApiTokens;
 use App\Models\User;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -25,6 +23,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Passport\Token;
 use Override;
 use UnitEnum;
@@ -35,7 +34,9 @@ class ApiTokenResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-key';
 
-    protected static string|UnitEnum|null $navigationGroup = 'System';
+    protected static string|UnitEnum|null $navigationGroup = 'Integrations';
+
+    protected static ?int $navigationSort = -3;
 
     protected static ?string $label = 'API Key';
 
@@ -74,11 +75,15 @@ class ApiTokenResource extends Resource
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('last_used_at')
+                    ->placeholder('Unused')
+                    ->label('Last Used At')
                     ->since()
                     ->dateTime()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('expires_at')
+                    ->placeholder('Does Not Expire')
+                    ->label('Expires At')
                     ->dateTime()
                     ->sortable()
                     ->badge()
@@ -108,7 +113,6 @@ class ApiTokenResource extends Resource
                     ),
             ])
             ->recordActions([
-                EditAction::make(),
                 DeleteAction::make()
                     ->label('Revoke')
                     ->modalHeading('Revoke API Token')
@@ -132,7 +136,11 @@ class ApiTokenResource extends Resource
         return [
             'index' => ListApiTokens::route('/'),
             'create' => CreateApiToken::route('/create'),
-            'edit' => EditApiToken::route('/{record}/edit'),
         ];
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
     }
 }

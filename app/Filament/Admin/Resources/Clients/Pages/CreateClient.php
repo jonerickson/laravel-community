@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Clients\Pages;
 
 use App\Filament\Admin\Resources\Clients\ClientResource;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -13,6 +15,8 @@ use Override;
 
 class CreateClient extends CreateRecord
 {
+    use InteractsWithActions;
+
     protected static string $resource = ClientResource::class;
 
     protected ClientRepository $clientRepository;
@@ -41,5 +45,14 @@ class CreateClient extends CreateRecord
                 redirectUris: $data['redirect_uris'],
             )
         };
+    }
+
+    #[Override]
+    protected function getCreatedNotification(): ?Notification
+    {
+        return Notification::make()
+            ->success()
+            ->title('Your OAuth client was successfully created. Copy the secret below as it will not be shown again.')
+            ->body($this->record->plainSecret ?? 'No secret was specified.');
     }
 }

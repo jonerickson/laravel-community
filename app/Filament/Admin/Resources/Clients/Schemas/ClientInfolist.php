@@ -24,20 +24,15 @@ class ClientInfolist
                         TextEntry::make('id')
                             ->label('Client ID')
                             ->copyable(),
-                        TextEntry::make('secret')
-                            ->label('Client Secret')
-                            ->copyable(),
                         IconEntry::make('revoked')
                             ->columnSpanFull()
                             ->boolean(),
                         TextEntry::make('grant_types')
+                            ->label('Grant Types')
                             ->badge(),
-                        TextEntry::make('created_at')
-                            ->dateTime(),
-                        TextEntry::make('updated_at')
-                            ->dateTime(),
                     ]),
                 Section::make('Endpoints')
+                    ->description('The OAuth endpoints your application can use to interact with the API.')
                     ->columnSpanFull()
                     ->schema([
                         TextEntry::make('authorize')

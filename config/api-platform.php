@@ -16,18 +16,19 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Symfony\Component\Serializer\NameConverter\SnakeCaseToCamelCaseNameConverter;
 
+$appName = env('APP_NAME');
+
 return [
     'title' => env('API_NAME', env('APP_NAME', 'Laravel')),
-    'description' => 'My awesome API',
+    'description' => "The official API of $appName.",
     'version' => '1.0.0',
     'show_webby' => true,
 
     'routes' => [
         'domain' => env('APP_URL'),
-        // Global middleware applied to every API Platform routes
         'middleware' => [
             'web',
-            'auth',
+            'auth:api,web',
         ],
     ],
 
@@ -125,11 +126,11 @@ return [
         //     'name' => 'Apache 2.0',
         //     'url' => 'https://www.apache.org/licenses/LICENSE-2.0.html',
         // ],
-        // 'contact' => [
-        //     'name' => 'API Support',
-        //     'url' => 'https://www.example.com/support',
-        //     'email' => 'support@example.com',
-        // ],
+        'contact' => [
+            'name' => $appName,
+            'url' => env('APP_URL'),
+            'email' => env('APP_EMAIL'),
+        ],
         // 'http_auth' => [
         //     'Personal Access Token' => [
         //         'scheme' => 'bearer',

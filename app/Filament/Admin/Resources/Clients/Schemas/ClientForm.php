@@ -33,7 +33,7 @@ class ClientForm
                                 ->label('Redirect URL')
                                 ->maxLength(255)
                                 ->required()
-                                ->activeUrl()),
+                                ->url()),
                         Radio::make('grant_types')
                             ->visible(fn ($operation): bool => $operation === 'create')
                             ->helperText('The grant type authorized by the client.')

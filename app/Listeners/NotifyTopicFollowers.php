@@ -16,6 +16,10 @@ class NotifyTopicFollowers implements ShouldQueue
         $post = $event->post;
         $topic = $post->topic;
 
+        if (blank($topic)) {
+            return;
+        }
+
         $followers = $topic->follows()
             ->with('author')
             ->get()
