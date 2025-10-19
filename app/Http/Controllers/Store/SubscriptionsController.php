@@ -25,8 +25,8 @@ class SubscriptionsController extends Controller
 {
     public function __construct(
         #[CurrentUser]
-        private readonly User $user,
-        private readonly PaymentManager $paymentManager
+        private readonly ?User $user = null,
+        private readonly ?PaymentManager $paymentManager = null
     ) {
         //
     }
@@ -57,7 +57,9 @@ class SubscriptionsController extends Controller
         return Inertia::render('store/subscriptions', [
             'subscriptionProducts' => ProductData::collect($subscriptions),
             'subscriptionReviews' => $subscriptionReviews,
-            'currentSubscription' => $this->user ? $this->paymentManager->currentSubscription($this->user) : null,
+            'currentSubscription' => $this->user instanceof User
+                ? $this->paymentManager->currentSubscription($this->user)
+                : null,
         ]);
     }
 

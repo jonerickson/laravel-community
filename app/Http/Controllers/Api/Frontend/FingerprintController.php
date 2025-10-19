@@ -17,7 +17,7 @@ class FingerprintController extends Controller
 {
     public function __construct(
         #[CurrentUser]
-        private readonly User $user,
+        private readonly ?User $user = null,
     ) {
         //
     }

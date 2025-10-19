@@ -9,11 +9,13 @@ use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Support\Facades\Hash;
+use Override;
 
 class ChangePasswordAction extends Action
 {
     protected Closure|User|null $user = null;
 
+    #[Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -39,8 +41,8 @@ class ChangePasswordAction extends Action
                 ->required(),
         ]);
 
-        $this->action(function (ChangePasswordAction $action, array $data) {
-            if (! $user = $action->getUser()) {
+        $this->action(function (ChangePasswordAction $action, array $data): void {
+            if (! ($user = $action->getUser()) instanceof User) {
                 $action->failure();
 
                 return;

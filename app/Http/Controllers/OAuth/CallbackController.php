@@ -9,7 +9,6 @@ use App\Models\User;
 use App\Models\UserIntegration;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -17,7 +16,7 @@ class CallbackController extends Controller
 {
     public function __construct(
         #[CurrentUser]
-        private readonly User $user,
+        private readonly ?User $user = null,
     ) {
         //
     }
@@ -27,9 +26,9 @@ class CallbackController extends Controller
         $socialUser = Socialite::driver($provider)->user();
 
         if ($this->user && $this->user->email !== $socialUser->getEmail()) {
-            throw ValidationException::withMessages([
-                'email' => 'The email connected to your social account does not match the email that is currently logged in. Please connect an account that uses the same email.',
-            ]);
+            return to_route('settings.integrations.index')
+                ->with('message', 'The email connected to your social account does not match the email that is currently logged in. Please connect an account that uses the same email.')
+                ->with('messageVariant', 'error');
         }
 
         $integration = UserIntegration::firstOrNew([
@@ -57,7 +56,7 @@ class CallbackController extends Controller
 
         $user->logSocialLogin($provider);
 
-        if (! $this->user) {
+        if (! $this->user instanceof User) {
             Auth::login($user);
         }
 
