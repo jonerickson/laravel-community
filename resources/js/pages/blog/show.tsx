@@ -1,10 +1,10 @@
 import BlogComments from '@/components/blog-comments';
 import EmojiReactions from '@/components/emoji-reactions';
+import Loading from '@/components/loading';
 import RecentViewers from '@/components/recent-viewers';
 import RichEditorContent from '@/components/rich-editor-content';
 import { Badge } from '@/components/ui/badge';
 import { UserInfo } from '@/components/user-info';
-import WidgetLoading from '@/components/widget-loading';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
@@ -207,7 +207,7 @@ export default function BlogShow({ post, comments, recentViewers }: BlogShowProp
                             </section>
                         )}
 
-                        <Deferred fallback={<WidgetLoading />} data="recentViewers">
+                        <Deferred fallback={<Loading />} data="recentViewers">
                             <div className="mt-6">
                                 <RecentViewers viewers={recentViewers} />
                             </div>

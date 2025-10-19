@@ -3,9 +3,9 @@ import { FollowButton } from '@/components/follow-button';
 import ForumTopicModerationMenu from '@/components/forum-topic-moderation-menu';
 import ForumTopicPost from '@/components/forum-topic-post';
 import ForumTopicReply from '@/components/forum-topic-reply';
+import Loading from '@/components/loading';
 import RecentViewers from '@/components/recent-viewers';
 import { Button } from '@/components/ui/button';
-import WidgetLoading from '@/components/widget-loading';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
@@ -231,7 +231,7 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
                     )}
                 </div>
 
-                <Deferred fallback={<WidgetLoading />} data="recentViewers">
+                <Deferred fallback={<Loading />} data="recentViewers">
                     <RecentViewers viewers={recentViewers} />
                 </Deferred>
 

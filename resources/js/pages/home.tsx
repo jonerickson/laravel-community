@@ -1,11 +1,11 @@
 import { AppFooter } from '@/components/app-footer';
 import { AppHeader } from '@/components/app-header';
 import HeadingLarge from '@/components/heading-large';
+import Loading from '@/components/loading';
 import { AbstractBackgroundPattern } from '@/components/ui/abstract-background-pattern';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import WidgetLoading from '@/components/widget-loading';
 import { cn, currency } from '@/lib/utils';
 import { stripCharacters } from '@/utils/truncate';
 import { Deferred, Link, usePage } from '@inertiajs/react';
@@ -276,7 +276,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                             <p className="text-lg text-muted-foreground">Choose the plan that fits you best</p>
                         </div>
 
-                        <Deferred data="subscriptions" fallback={<WidgetLoading variant='grid' cols={3} />}>
+                        <Deferred data="subscriptions" fallback={<Loading variant="grid" cols={3} />}>
                             <SubscriptionCards subscriptions={subscriptions} />
                         </Deferred>
                     </div>

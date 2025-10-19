@@ -1,8 +1,8 @@
 import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
+import Loading from '@/components/loading';
 import StoreCategoriesProductItem from '@/components/store-categories-product-item';
 import StoreIndexCategoriesItem from '@/components/store-index-categories-item';
-import WidgetLoading from '@/components/widget-loading';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Deferred, Head, Link } from '@inertiajs/react';
@@ -36,7 +36,7 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
                         </Link>
                     </div>
 
-                    <Deferred fallback={<WidgetLoading variant="grid" />} data={'categories'}>
+                    <Deferred fallback={<Loading variant="grid" />} data={'categories'}>
                         {categories && categories.length > 0 ? (
                             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
                                 {categories.map((category) => (
@@ -61,7 +61,7 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
                         <Heading title="Featured products" description="Our most popular products" />
                     </div>
 
-                    <Deferred fallback={<WidgetLoading variant="masonry" />} data={'featuredProducts'}>
+                    <Deferred fallback={<Loading variant="masonry" />} data={'featuredProducts'}>
                         {featuredProducts && featuredProducts.length > 0 ? (
                             <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:grid-rows-2 sm:gap-x-6 lg:gap-8">
                                 {featuredProducts.slice(0, 3).map((product, index) => (
@@ -114,7 +114,7 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
                         </Link>
                     </div>
 
-                    <Deferred fallback={<WidgetLoading variant="grid" />} data={'userProvidedProducts'}>
+                    <Deferred fallback={<Loading variant="grid" />} data={'userProvidedProducts'}>
                         {userProvidedProducts && userProvidedProducts.length > 0 ? (
                             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                                 {userProvidedProducts.map((product) => (

@@ -1,9 +1,9 @@
 import DashboardBlogGrid from '@/components/dashboard-blog-grid';
 import DashboardProductGrid from '@/components/dashboard-product-grid';
 import { EmptyState } from '@/components/empty-state';
+import Loading from '@/components/loading';
 import SupportTicketWidget from '@/components/support-ticket-widget';
 import TrendingTopicsWidget from '@/components/trending-topics-widget';
-import WidgetLoading from '@/components/widget-loading';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Deferred, Head, Link, router } from '@inertiajs/react';
@@ -54,7 +54,7 @@ export default function Dashboard({
                             </Link>
                         </div>
 
-                        <Deferred fallback={<WidgetLoading variant="grid" cols={3} />} data={['newestProduct', 'popularProduct', 'featuredProduct']}>
+                        <Deferred fallback={<Loading variant="grid" cols={3} />} data={['newestProduct', 'popularProduct', 'featuredProduct']}>
                             {newestProduct || popularProduct || featuredProduct ? (
                                 <DashboardProductGrid
                                     newestProduct={newestProduct}
@@ -82,7 +82,7 @@ export default function Dashboard({
                             </Link>
                         </div>
 
-                        <Deferred fallback={<WidgetLoading variant="grid" cols={4} />} data={'latestBlogPosts'}>
+                        <Deferred fallback={<Loading variant="grid" cols={4} />} data={'latestBlogPosts'}>
                             {latestBlogPosts && latestBlogPosts.length > 0 ? (
                                 <DashboardBlogGrid posts={latestBlogPosts} />
                             ) : (
@@ -106,7 +106,7 @@ export default function Dashboard({
                             </Link>
                         </div>
 
-                        <Deferred fallback={<WidgetLoading />} data={'trendingTopics'}>
+                        <Deferred fallback={<Loading />} data={'trendingTopics'}>
                             {trendingTopics && trendingTopics.length > 0 ? (
                                 <TrendingTopicsWidget topics={trendingTopics} />
                             ) : (
@@ -130,7 +130,7 @@ export default function Dashboard({
                             </Link>
                         </div>
 
-                        <Deferred fallback={<WidgetLoading />} data={'supportTickets'}>
+                        <Deferred fallback={<Loading />} data={'supportTickets'}>
                             {supportTickets && supportTickets.length > 0 ? (
                                 <SupportTicketWidget tickets={supportTickets} />
                             ) : (

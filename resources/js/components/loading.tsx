@@ -1,12 +1,12 @@
 import { cn } from '@/lib/utils';
 
-interface WidgetLoadingProps {
+interface LoadingProps {
     className?: string;
     variant?: 'default' | 'grid' | 'masonry';
     cols?: number;
 }
 
-export default function WidgetLoading({ className, variant = 'default', cols = 4 }: WidgetLoadingProps) {
+export default function Loading({ className, variant = 'default', cols = 4 }: LoadingProps) {
     if (variant === 'grid') {
         return (
             <div className={cn('overflow-hidden rounded-xl', className)}>
