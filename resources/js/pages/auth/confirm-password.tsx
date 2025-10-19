@@ -33,6 +33,7 @@ export default function AuthConfirmPassword() {
                     <div className="grid gap-2">
                         <Label htmlFor="password">Password</Label>
                         <Input
+                            className="bg-background"
                             id="password"
                             type="password"
                             name="password"

@@ -35,6 +35,7 @@ export default function AuthForgotPassword({ status }: ForgotPasswordProps) {
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email address</Label>
                         <Input
+                            className="bg-background"
                             id="email"
                             type="email"
                             name="email"

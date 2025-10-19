@@ -58,6 +58,7 @@ export default function AuthLogin({ status, canResetPassword, discordEnabled, ro
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email address</Label>
                         <Input
+                            className="bg-background"
                             id="email"
                             type="email"
                             required
@@ -81,6 +82,7 @@ export default function AuthLogin({ status, canResetPassword, discordEnabled, ro
                             )}
                         </div>
                         <Input
+                            className="bg-background"
                             id="password"
                             type="password"
                             required

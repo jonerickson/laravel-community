@@ -50,7 +50,7 @@ export default function AuthResetPassword({ token, email }: ResetPasswordProps) 
                             name="email"
                             autoComplete="email"
                             value={data.email}
-                            className="mt-1 block w-full"
+                            className="mt-1 block w-full bg-background"
                             readOnly
                             onChange={(e) => setData('email', e.target.value)}
                         />
@@ -65,7 +65,7 @@ export default function AuthResetPassword({ token, email }: ResetPasswordProps) 
                             name="password"
                             autoComplete="new-password"
                             value={data.password}
-                            className="mt-1 block w-full"
+                            className="mt-1 block w-full bg-background"
                             autoFocus
                             onChange={(e) => setData('password', e.target.value)}
                             placeholder="Password"

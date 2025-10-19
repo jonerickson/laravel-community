@@ -36,6 +36,7 @@ export default function SetEmail({ status }: { status?: string }) {
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email address</Label>
                         <Input
+                            className="bg-background"
                             id="email"
                             type="email"
                             name="email"

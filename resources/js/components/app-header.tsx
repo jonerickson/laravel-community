@@ -86,7 +86,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 
     return (
         <>
-            <nav className="border-b border-sidebar-border/80">
+            <nav className="relative z-20 border-b border-sidebar-border/80 bg-background">
                 <div className="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
                     <div className="lg:hidden">
                         <Sheet>

@@ -47,7 +47,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
 
                     <div className="container mx-auto px-6 text-center sm:px-4">
                         <div className="mx-auto max-w-5xl">
-                            <div className="mb-8 inline-flex items-center rounded-full border border-border/40 bg-muted/20 px-3 py-1 text-sm text-muted-foreground">
+                            <div className="relative z-20 mb-8 inline-flex items-center rounded-full border border-border/40 bg-background px-3 py-1 text-sm text-muted-foreground">
                                 <Rocket className="text-gaming-blue mr-2 h-4 w-4" />
                                 Now powering {memberCount}+ members
                             </div>
@@ -75,7 +75,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                                         </Link>
                                     )}
                                 </Button>
-                                <Button variant="outline" size="lg">
+                                <Button variant="outline" size="lg" className="relative z-20 bg-background">
                                     <Link href={route('store.index')} className="flex items-center gap-2">
                                         <ShoppingCart className="size-4" />
                                         Browse Store

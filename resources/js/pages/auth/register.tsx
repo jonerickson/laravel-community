@@ -40,6 +40,7 @@ export default function AuthRegister() {
                     <div className="grid gap-2">
                         <Label htmlFor="name">Name</Label>
                         <Input
+                            className="bg-background"
                             id="name"
                             type="text"
                             required
@@ -57,6 +58,7 @@ export default function AuthRegister() {
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email address</Label>
                         <Input
+                            className="bg-background"
                             id="email"
                             type="email"
                             required
@@ -73,6 +75,7 @@ export default function AuthRegister() {
                     <div className="grid gap-2">
                         <Label htmlFor="password">Password</Label>
                         <Input
+                            className="bg-background"
                             id="password"
                             type="password"
                             required
@@ -89,6 +92,7 @@ export default function AuthRegister() {
                     <div className="grid gap-2">
                         <Label htmlFor="password_confirmation">Confirm password</Label>
                         <Input
+                            className="bg-background"
                             id="password_confirmation"
                             type="password"
                             required
