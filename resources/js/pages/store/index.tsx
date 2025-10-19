@@ -1,7 +1,7 @@
+import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
 import StoreCategoriesProductItem from '@/components/store-categories-product-item';
 import StoreIndexCategoriesItem from '@/components/store-index-categories-item';
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import WidgetLoading from '@/components/widget-loading';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -44,12 +44,7 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
                                 ))}
                             </div>
                         ) : (
-                            <Empty className="border border-dashed">
-                                <EmptyHeader>
-                                    <EmptyTitle>No product categories</EmptyTitle>
-                                    <EmptyDescription>Check back later for more product options.</EmptyDescription>
-                                </EmptyHeader>
-                            </Empty>
+                            <EmptyState title="No product categories" description="Check back later for more product options." />
                         )}
                     </Deferred>
 
@@ -105,12 +100,7 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
                                 ))}
                             </div>
                         ) : (
-                            <Empty className="border border-dashed">
-                                <EmptyHeader>
-                                    <EmptyTitle>No featured products</EmptyTitle>
-                                    <EmptyDescription>Check back later for more product options.</EmptyDescription>
-                                </EmptyHeader>
-                            </Empty>
+                            <EmptyState title="No featured products" description="Check back later for more product options." />
                         )}
                     </Deferred>
                 </div>
@@ -132,12 +122,7 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
                                 ))}
                             </div>
                         ) : (
-                            <Empty className="border border-dashed">
-                                <EmptyHeader>
-                                    <EmptyTitle>No community submitted products</EmptyTitle>
-                                    <EmptyDescription>Check back later for more product options.</EmptyDescription>
-                                </EmptyHeader>
-                            </Empty>
+                            <EmptyState title="No community submitted products" description="Check back later for more product options." />
                         )}
                     </Deferred>
 

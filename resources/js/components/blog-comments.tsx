@@ -1,4 +1,5 @@
 import EmojiReactions from '@/components/emoji-reactions';
+import { EmptyState } from '@/components/empty-state';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -300,10 +301,7 @@ export default function BlogComments({ post, comments }: BlogCommentsProps) {
                     </div>
                 </InfiniteScroll>
             ) : (
-                <div className="py-8 text-center text-muted-foreground">
-                    <MessageCircle className="mx-auto mb-2 h-8 w-8" />
-                    <p className="text-sm font-medium">No comments yet. Be the first to share your thoughts!</p>
-                </div>
+                <EmptyState title="No comments yet" description="Be the first to share your thoughts!" />
             )}
         </div>
     );

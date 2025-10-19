@@ -1,14 +1,14 @@
 import DashboardBlogGrid from '@/components/dashboard-blog-grid';
 import DashboardProductGrid from '@/components/dashboard-product-grid';
+import { EmptyState } from '@/components/empty-state';
 import SupportTicketWidget from '@/components/support-ticket-widget';
 import TrendingTopicsWidget from '@/components/trending-topics-widget';
-import { Button } from '@/components/ui/button';
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import WidgetLoading from '@/components/widget-loading';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Deferred, Head, Link } from '@inertiajs/react';
-import { Flame, PlusIcon, Rss, ShoppingCart, Ticket } from 'lucide-react';
+import { Deferred, Head, Link, router } from '@inertiajs/react';
+import { Flame, Rss, ShoppingCart, Ticket } from 'lucide-react';
+import { route } from 'ziggy-js';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -62,12 +62,7 @@ export default function Dashboard({
                                     featuredProduct={featuredProduct}
                                 />
                             ) : (
-                                <Empty className="border border-dashed">
-                                    <EmptyHeader>
-                                        <EmptyTitle>No top rated products</EmptyTitle>
-                                        <EmptyDescription>Check back later for more product options.</EmptyDescription>
-                                    </EmptyHeader>
-                                </Empty>
+                                <EmptyState title="No top rated products" description="Check back later for more product options." />
                             )}
                         </Deferred>
                     </div>
@@ -91,12 +86,7 @@ export default function Dashboard({
                             {latestBlogPosts && latestBlogPosts.length > 0 ? (
                                 <DashboardBlogGrid posts={latestBlogPosts} />
                             ) : (
-                                <Empty className="border border-dashed">
-                                    <EmptyHeader>
-                                        <EmptyTitle>No recent blog posts</EmptyTitle>
-                                        <EmptyDescription>Check back later for our latest articles.</EmptyDescription>
-                                    </EmptyHeader>
-                                </Empty>
+                                <EmptyState title="No recent blog posts" description="Check back later for our latest articles." />
                             )}
                         </Deferred>
                     </div>
@@ -120,12 +110,7 @@ export default function Dashboard({
                             {trendingTopics && trendingTopics.length > 0 ? (
                                 <TrendingTopicsWidget topics={trendingTopics} />
                             ) : (
-                                <Empty className="border border-dashed">
-                                    <EmptyHeader>
-                                        <EmptyTitle>No trending topics</EmptyTitle>
-                                        <EmptyDescription>Check back later for updated content.</EmptyDescription>
-                                    </EmptyHeader>
-                                </Empty>
+                                <EmptyState title="No trending topics" description="Check back later for updated content." />
                             )}
                         </Deferred>
                     </div>
@@ -149,20 +134,12 @@ export default function Dashboard({
                             {supportTickets && supportTickets.length > 0 ? (
                                 <SupportTicketWidget tickets={supportTickets} />
                             ) : (
-                                <Empty className="border border-dashed">
-                                    <EmptyHeader>
-                                        <EmptyTitle>No support tickets</EmptyTitle>
-                                        <EmptyDescription>Open a new support ticket to get started.</EmptyDescription>
-                                    </EmptyHeader>
-                                    <EmptyContent>
-                                        <Button variant="outline" size="sm" asChild>
-                                            <Link href={route('support.create')}>
-                                                <PlusIcon />
-                                                New support ticket
-                                            </Link>
-                                        </Button>
-                                    </EmptyContent>
-                                </Empty>
+                                <EmptyState
+                                    title="No support tickets"
+                                    description="Open a new support ticket to get started."
+                                    buttonText="New support ticket"
+                                    onButtonClick={() => router.visit(route('support.index'))}
+                                />
                             )}
                         </Deferred>
                     </div>

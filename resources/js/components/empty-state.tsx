@@ -4,7 +4,7 @@ import { PlusIcon } from 'lucide-react';
 import { cloneElement, ReactElement, SVGProps } from 'react';
 
 interface EmptyStateProps {
-    icon: ReactElement;
+    icon?: ReactElement | null;
     title: string;
     description: string;
     buttonText?: string;
@@ -12,16 +12,16 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({ icon, title, description, buttonText, onButtonClick }: EmptyStateProps) {
-    const iconProps = icon.props as { className?: string };
-
     return (
         <Empty className="border border-dashed">
             <EmptyHeader>
-                <EmptyMedia variant="icon">
-                    {cloneElement(icon as ReactElement<SVGProps<SVGSVGElement>>, {
-                        className: iconProps.className,
-                    })}
-                </EmptyMedia>
+                {icon && (
+                    <EmptyMedia variant="icon">
+                        {cloneElement(icon as ReactElement<SVGProps<SVGSVGElement>>, {
+                            className: (icon.props as { className?: string }).className,
+                        })}
+                    </EmptyMedia>
+                )}
                 <EmptyTitle>{title}</EmptyTitle>
                 <EmptyDescription>{description}</EmptyDescription>
             </EmptyHeader>
