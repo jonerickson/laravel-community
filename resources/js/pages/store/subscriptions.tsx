@@ -114,7 +114,7 @@ function PricingCard({
 
                 <div className="mt-6">
                     <div className="flex items-baseline justify-center">
-                        <span className="text-4xl font-bold">{currency(price)}</span>
+                        <span className="text-4xl font-bold">{currency(price, false)}</span>
                         <span className="ml-1 text-muted-foreground">/ {billingCycle}</span>
                     </div>
                     {billingCycle === 'year' && yearlyDiscount > 0 && (

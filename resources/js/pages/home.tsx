@@ -364,7 +364,7 @@ function SubscriptionCards({ subscriptions }: SubscriptionCardsProps) {
                             <CardDescription>{stripCharacters(subscription.description)}</CardDescription>
                             {defaultPrice && (
                                 <div className="mt-4 text-3xl font-bold">
-                                    ${currency(defaultPrice.amount)}
+                                    {currency(defaultPrice.amount, false)}
                                     <span className="text-lg font-normal text-muted-foreground"> / {defaultPrice.interval}</span>
                                 </div>
                             )}
