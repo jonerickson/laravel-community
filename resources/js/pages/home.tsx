@@ -276,7 +276,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                             <p className="text-lg text-muted-foreground">Choose the plan that fits you best</p>
                         </div>
 
-                        <Deferred data="subscriptions" fallback={<WidgetLoading />}>
+                        <Deferred data="subscriptions" fallback={<WidgetLoading variant='grid' cols={3} />}>
                             <SubscriptionCards subscriptions={subscriptions} />
                         </Deferred>
                     </div>
