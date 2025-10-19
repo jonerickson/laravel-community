@@ -25,7 +25,7 @@ class CallbackController extends Controller
     {
         $socialUser = Socialite::driver($provider)->user();
 
-        if ($this->user && $this->user->email !== $socialUser->getEmail()) {
+        if ($this->user && $socialUser->getEmail() && $this->user->email !== $socialUser->getEmail()) {
             return to_route('settings.integrations.index')
                 ->with('message', 'The email connected to your social account does not match the email that is currently logged in. Please connect an account that uses the same email.')
                 ->with('messageVariant', 'error');
@@ -41,12 +41,16 @@ class CallbackController extends Controller
         ]);
 
         if (blank($integration->getKey())) {
-            $user = User::firstOrCreate([
-                'email' => $email = $socialUser->getEmail(),
-            ], [
-                'name' => $socialUser->getName(),
-                'email_verified_at' => $email ? now() : null,
-            ]);
+            if ($this->user) {
+                $user = $this->user;
+            } else {
+                $user = User::firstOrCreate([
+                    'email' => $email = $socialUser->getEmail(),
+                ], [
+                    'name' => $socialUser->getName(),
+                    'email_verified_at' => $email ? now() : null,
+                ]);
+            }
 
             $integration->user()->associate($user);
             $integration->save();

@@ -14,7 +14,7 @@ use Override;
 
 class RobloxProvider extends AbstractProvider
 {
-    protected $scopes = ['openid', 'profile', 'email'];
+    protected $scopes = ['openid', 'profile'];
 
     protected $scopeSeparator = ' ';
 

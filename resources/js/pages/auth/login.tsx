@@ -1,5 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
-import { IconBrandDiscord, IconRobot } from '@tabler/icons-react';
+import { IconBrandDiscord } from '@tabler/icons-react';
 import { LoaderCircle, Mail } from 'lucide-react';
 import { FormEventHandler, useEffect } from 'react';
 
@@ -128,15 +128,6 @@ export default function AuthLogin({ status, canResetPassword, discordEnabled, ro
                                 <a href={route('oauth.redirect', { provider: 'discord' })}>
                                     <IconBrandDiscord />
                                     Login with Discord
-                                </a>
-                            </Button>
-                        )}
-
-                        {robloxEnabled && (
-                            <Button className="w-full bg-[#FF0000] text-white" tabIndex={4} size="icon" asChild>
-                                <a href={route('oauth.redirect', { provider: 'roblox' })}>
-                                    <IconRobot />
-                                    Login with Roblox
                                 </a>
                             </Button>
                         )}
