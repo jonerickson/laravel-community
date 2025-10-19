@@ -150,6 +150,7 @@ class GroupResource extends Resource
                     ->searchable()
                     ->limit(),
                 TextColumn::make('roles.name')
+                    ->placeholder('No Roles')
                     ->badge(),
                 ColorColumn::make('color'),
                 ToggleColumn::make('is_active')

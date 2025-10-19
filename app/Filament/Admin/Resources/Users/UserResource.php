@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Users;
 
+use App\Filament\Admin\Resources\Users\Actions\ChangePasswordAction;
 use App\Filament\Admin\Resources\Users\Pages\CreateUser;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Filament\Admin\Resources\Users\Pages\ListUsers;
@@ -89,6 +90,10 @@ class UserResource extends Resource
                                         Section::make('User Information')
                                             ->description('The user\'s profile information.')
                                             ->columns(1)
+                                            ->headerActions([
+                                                ChangePasswordAction::make()
+                                                    ->user(fn (User $record): User => $record),
+                                            ])
                                             ->schema([
                                                 Flex::make([
                                                     Section::make()
@@ -292,6 +297,7 @@ class UserResource extends Resource
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('email')
+                    ->copyable()
                     ->searchable(),
                 TextColumn::make('groups.name')
                     ->placeholder('No Groups')

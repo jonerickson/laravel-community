@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
+use App\Events\OrderSucceeded;
 use App\Events\SubscriptionCreated;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -12,7 +13,7 @@ class AssignUserToProductGroups implements ShouldQueue
 {
     use InteractsWithQueue;
 
-    public function handle(SubscriptionCreated $event): void
+    public function handle(SubscriptionCreated|OrderSucceeded $event): void
     {
         $order = $event->order;
         $user = $order->user;

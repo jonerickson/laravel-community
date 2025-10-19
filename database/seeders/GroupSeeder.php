@@ -14,11 +14,12 @@ class GroupSeeder extends Seeder
     {
         Group::factory()
             ->state(new Sequence(
-                ['name' => 'Members', 'is_default_member' => true],
-                ['name' => 'Guests', 'is_default_guest' => true],
-                ['name' => 'Administrators'],
+                ['name' => 'Members', 'description' => 'The default member group that everyone is assigned.', 'is_default_member' => true],
+                ['name' => 'Guests', 'description' => 'The group that non-logged in users will assume.', 'is_default_guest' => true],
+                ['name' => 'Customers', 'description' => 'All members that have completed at least one successful order.'],
+                ['name' => 'Administrators', 'description' => 'The default administrator group.'],
             ))
-            ->count(3)
+            ->count(4)
             ->create()
             ->each(function (Group $group) {
                 match ($group->name) {

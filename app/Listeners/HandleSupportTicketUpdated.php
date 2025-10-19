@@ -11,7 +11,7 @@ class HandleSupportTicketUpdated
 {
     public function handle(SupportTicketUpdated $event): void
     {
-        if ($event->supportTicket->isDirty('status')) {
+        if ($event->supportTicket->wasChanged('status')) {
             event(new SupportTicketStatusChanged(
                 supportTicket: $event->supportTicket,
                 oldStatus: $event->supportTicket->getOriginal('status'),

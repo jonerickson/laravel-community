@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
+use App\Events\OrderCancelled;
 use App\Events\SubscriptionDeleted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -12,7 +13,7 @@ class RemoveUserFromProductGroups implements ShouldQueue
 {
     use InteractsWithQueue;
 
-    public function handle(SubscriptionDeleted $event): void
+    public function handle(SubscriptionDeleted|OrderCancelled $event): void
     {
         $order = $event->order;
         $user = $order->user;

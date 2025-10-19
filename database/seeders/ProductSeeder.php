@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Enums\SubscriptionInterval;
+use App\Models\Group;
 use App\Models\Image;
 use App\Models\Price;
 use App\Models\Product;
@@ -33,6 +34,7 @@ class ProductSeeder extends Seeder
             ->featured()
             ->recycle($productCategory)
             ->hasAttached($productCategory, relationship: 'categories')
+            ->hasAttached(Group::firstOrCreate(['name' => 'Customers']), relationship: 'groups')
             ->product()
             ->state(new Sequence(
                 fn (Sequence $sequence) => [
@@ -86,6 +88,7 @@ class ProductSeeder extends Seeder
             ->count(3)
             ->recycle($subscriptionCategory)
             ->hasAttached($subscriptionCategory, relationship: 'categories')
+            ->hasAttached(Group::firstOrCreate(['name' => 'Customers']), relationship: 'groups')
             ->subscription()
             ->state(new Sequence(
                 fn (Sequence $sequence) => [
