@@ -9,7 +9,9 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Data\Api\UserData;
+use App\Enums\OrderStatus;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class UserProvider implements ProviderInterface
 {
@@ -17,7 +19,11 @@ class UserProvider implements ProviderInterface
     {
         $query = User::query()
             ->with('integrations')
-            ->with('orders.items.product');
+            ->with(['orders' => function (HasMany $query) {
+                $query
+                    ->with('items.product')
+                    ->where('status', OrderStatus::Succeeded);
+            }]);
 
         return match ($operation::class) {
             GetCollection::class => UserData::collect($query->get()),
