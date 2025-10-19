@@ -1,5 +1,6 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { usePage } from '@inertiajs/react';
 import { CheckCircle, Info, TriangleAlert, XCircle, XIcon } from 'lucide-react';
 import { useState } from 'react';
 
@@ -28,6 +29,7 @@ const typeConfig: Record<App.Enums.AnnouncementType, { icon: React.ElementType; 
 };
 
 export default function AnnouncementsBanner({ announcement, onDismiss }: AnnouncementBannerProps) {
+    const { auth } = usePage<App.Data.SharedData>().props;
     const [isDismissed, setIsDismissed] = useState(false);
     const config = typeConfig[announcement.type as App.Enums.AnnouncementType];
     const IconComponent = config.icon;
@@ -48,11 +50,11 @@ export default function AnnouncementsBanner({ announcement, onDismiss }: Announc
                 <div>
                     <AlertTitle>{announcement.title}</AlertTitle>
                     <AlertDescription>
-                        <p className="mb-0" dangerouslySetInnerHTML={{ __html: announcement.content }} />
+                        <p className="-mb-2" dangerouslySetInnerHTML={{ __html: announcement.content }} />
                     </AlertDescription>
                 </div>
 
-                {announcement.isDismissible && (
+                {announcement.isDismissible && auth && auth.user && (
                     <Button variant="ghost" size="sm" onClick={handleDismiss} aria-label="Dismiss announcement">
                         <XIcon className="size-4" />
                     </Button>
