@@ -102,13 +102,13 @@ export function CustomFieldStep({ fields, data, errors, processing, onChange, on
                 ))}
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
                 <Button type="button" variant="outline" onClick={onPrevious} className="flex-1">
                     Back
                 </Button>
                 <Button type="button" onClick={onNext} disabled={processing} className="flex-1">
                     {processing && <LoaderCircle className="size-4 animate-spin" />}
-                    Complete onboarding
+                    Continue
                 </Button>
             </div>
         </div>

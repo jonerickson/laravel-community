@@ -16,21 +16,24 @@ type IntegrationStepProps = {
     integrations: Integration[];
     onConnect: (integrationId: string) => void;
     onNext: () => void;
+    onPrevious: () => void;
     onSkip?: () => void;
 };
 
-export function IntegrationStep({ integrations, onConnect, onNext, onSkip }: IntegrationStepProps) {
+export function IntegrationStep({ integrations, onConnect, onNext, onPrevious, onSkip }: IntegrationStepProps) {
     const hasConnectedIntegration = integrations.some((integration) => integration.connected);
 
     return (
         <div className="flex flex-col gap-6">
             <div className="rounded-lg border bg-muted/50 p-4">
                 <p className="text-sm text-muted-foreground">
+                    <strong className="font-medium text-foreground">More account providers coming soon!</strong>
+                    <br />
                     Connect your accounts to enhance your experience. You can skip this step and connect them later from your settings.
                 </p>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-6 sm:grid-cols-2">
                 {integrations.map((integration) => (
                     <Card key={integration.id} className={integration.connected ? 'border-primary bg-primary/5' : 'hover:border-primary/50'}>
                         <CardHeader>
@@ -75,7 +78,10 @@ export function IntegrationStep({ integrations, onConnect, onNext, onSkip }: Int
                 ))}
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
+                <Button type="button" variant="outline" onClick={onPrevious} className="flex-1">
+                    Back
+                </Button>
                 {!hasConnectedIntegration ? (
                     onSkip && (
                         <Button type="button" variant="outline" onClick={onSkip} className="flex-1">

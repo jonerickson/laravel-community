@@ -9,7 +9,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Override;
 
-class OnboardingCompleteRequest extends FormRequest
+class OnboardingProfileRequest extends FormRequest
 {
     public function authorize(): bool
     {

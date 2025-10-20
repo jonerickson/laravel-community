@@ -385,9 +385,9 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
-    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true): bool|string|SubscriptionData
+    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData
     {
-        return $this->executeWithErrorHandling('startSubscription', function () use ($order, $chargeNow, $firstParty) {
+        return $this->executeWithErrorHandling('startSubscription', function () use ($order, $chargeNow, $firstParty, $successUrl): bool|string|SubscriptionData {
             $lineItems = [];
 
             foreach ($order->items as $orderItem) {
@@ -457,7 +457,7 @@ class StripeDriver implements PaymentProcessor
                     ],
                     'success_url' => URL::signedRoute('store.checkout.success', [
                         'order' => $order,
-                        'redirect' => route('store.subscriptions', absolute: false),
+                        'redirect' => $successUrl ?? route('store.subscriptions', absolute: false),
                     ]),
                     'cancel_url' => URL::signedRoute('store.checkout.cancel', [
                         'order' => $order,

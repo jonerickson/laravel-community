@@ -34,20 +34,26 @@ export function EmailConfirmationStep({ verified, processing, onResend, onNext, 
 
     return (
         <div className="flex flex-col gap-6">
-            <EmptyState icon={<Mail />} title="Check your email" description="We've sent a verification link to your email address on file." />
-
             {verified ? (
                 <Alert variant="success">
                     <AlertTitle>Email verified</AlertTitle>
                     <AlertDescription>Your email has been successfully verified.</AlertDescription>
                 </Alert>
             ) : (
-                <div className="rounded-lg border bg-muted/50 p-4">
-                    <p className="text-sm text-muted-foreground">
-                        <strong className="font-medium text-foreground">Didn't receive the email?</strong>
-                        <br />
-                        Check your spam folder or click the button below to resend the verification email.
-                    </p>
+                <div className="flex flex-col gap-6">
+                    <EmptyState
+                        icon={<Mail />}
+                        title="Check your email"
+                        description="We've sent a verification link to your email address on file."
+                    />
+
+                    <div className="rounded-lg border bg-muted/50 p-4">
+                        <p className="text-sm text-muted-foreground">
+                            <strong className="font-medium text-foreground">Didn't receive the email?</strong>
+                            <br />
+                            Check your spam folder or click the button below to resend the verification email.
+                        </p>
+                    </div>
                 </div>
             )}
 
@@ -59,7 +65,7 @@ export function EmailConfirmationStep({ verified, processing, onResend, onNext, 
                     </Button>
                 )}
 
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row">
                     {onPrevious && (
                         <Button type="button" variant="outline" onClick={onPrevious} className="flex-1">
                             Back

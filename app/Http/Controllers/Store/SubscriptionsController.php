@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\LaravelData\PaginatedDataCollection;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class SubscriptionsController extends Controller
 {
@@ -63,7 +64,7 @@ class SubscriptionsController extends Controller
         ]);
     }
 
-    public function store(SubscriptionCheckoutRequest $request)
+    public function store(SubscriptionCheckoutRequest $request): SymfonyResponse
     {
         $price = $request->getPrice();
 
@@ -90,7 +91,7 @@ class SubscriptionsController extends Controller
                 ->with('message', 'Your subscription was successfully updated.');
         }
 
-        return Inertia::location($result);
+        return inertia()->location($result);
     }
 
     public function update(SubscriptionUpdateRequest $request): RedirectResponse

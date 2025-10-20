@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Onboarding;
 
+use App\Data\ProductData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Onboarding\OnboardingCompleteRequest;
 use App\Http\Requests\Onboarding\OnboardingUpdateRequest;
+use App\Managers\PaymentManager;
+use App\Models\Product;
 use App\Models\User;
 use App\Services\OnboardingService;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -19,6 +22,7 @@ class OnboardingController extends Controller
 {
     public function __construct(
         private readonly OnboardingService $onboardingService,
+        private readonly PaymentManager $paymentManager,
         #[CurrentUser]
         private readonly ?User $user = null,
     ) {}
@@ -57,12 +61,24 @@ class OnboardingController extends Controller
 
         $hasDiscordIntegration = $this->user && $this->user->integrations()->where('provider', 'discord')->exists();
         $hasRobloxIntegration = $this->user && $this->user->integrations()->where('provider', 'roblox')->exists();
+        $hasSubscription = $this->user && $this->paymentManager->currentSubscription($this->user);
+
+        $subscriptions = Product::query()
+            ->subscriptions()
+            ->visible()
+            ->with('prices')
+            ->orderBy('name')
+            ->get()
+            ->filter(fn (Product $product) => Gate::check('view', $product))
+            ->values();
 
         return Inertia::render('onboarding/index', [
             'customFields' => $customFields,
             'initialStep' => $initialStep,
             'isAuthenticated' => (bool) $this->user,
             'completedSteps' => $this->onboardingService->getCompletedSteps(),
+            'subscriptions' => ProductData::collect($subscriptions),
+            'hasSubscription' => $hasSubscription,
             'integrations' => [
                 'discord' => [
                     'enabled' => config('services.discord.enabled', false),
@@ -77,24 +93,11 @@ class OnboardingController extends Controller
         ]);
     }
 
-    public function store(OnboardingCompleteRequest $request): RedirectResponse
+    public function store(): RedirectResponse
     {
-        $request->except(['_token']);
-
-        $this->user->forceFill([
+        $this->user->update([
             'onboarded_at' => now(),
         ]);
-
-        // TODO: Finish custom fields
-        //        foreach ($customData as $key => $value) {
-        //            if (in_array($key, ['bio', 'role'])) {
-        //                $this->user->forceFill([
-        //                    $key => $value,
-        //                ]);
-        //            }
-        //        }
-
-        $this->user->save();
 
         $this->onboardingService->completeOnboarding();
 

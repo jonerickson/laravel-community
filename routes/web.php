@@ -17,6 +17,7 @@ Route::group(['domain' => config('app.url')], function (): void {
     require __DIR__.'/blog.php';
     require __DIR__.'/cashier.php';
     require __DIR__.'/forums.php';
+    require __DIR__.'/onboarding.php';
     require __DIR__.'/passport.php';
     require __DIR__.'/policies.php';
     require __DIR__.'/settings.php';

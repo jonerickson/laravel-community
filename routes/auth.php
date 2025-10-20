@@ -14,9 +14,6 @@ use App\Http\Controllers\Auth\SetEmailPromptController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\OAuth\CallbackController;
 use App\Http\Controllers\OAuth\RedirectController;
-use App\Http\Controllers\Onboarding\OnboardingController;
-use App\Http\Controllers\Onboarding\RegisterController;
-use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function (): void {
@@ -25,15 +22,6 @@ Route::middleware('guest')->group(function (): void {
 
     Route::post('register', [RegisteredUserController::class, 'store'])
         ->middleware(['throttle:register']);
-
-    Route::get('onboarding', [OnboardingController::class, 'index'])
-        ->name('onboarding')
-        ->withoutMiddleware(['guest', EnsureEmailIsVerified::class]);
-
-    Route::post('onboarding/register', RegisterController::class)
-        ->name('onboarding.register')
-        ->middleware(['throttle:register'])
-        ->withoutMiddleware('guest');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
@@ -73,14 +61,6 @@ Route::group(['prefix' => 'oauth'], function (): void {
 });
 
 Route::middleware('auth')->group(function (): void {
-    Route::put('onboarding', [OnboardingController::class, 'update'])
-        ->name('onboarding.update')
-        ->withoutMiddleware([EnsureEmailIsVerified::class]);
-
-    Route::post('onboarding', [OnboardingController::class, 'store'])
-        ->name('onboarding.store')
-        ->withoutMiddleware([EnsureEmailIsVerified::class]);
-
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
 
