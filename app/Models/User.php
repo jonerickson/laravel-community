@@ -74,6 +74,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property string|null $invoice_emails
  * @property string|null $vat_id
  * @property Carbon|null $trial_ends_at
+ * @property Carbon|null $onboarded_at
  * @property Carbon|null $last_seen_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -154,6 +155,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @method static Builder<static>|User whereInvoiceEmails($value)
  * @method static Builder<static>|User whereLastSeenAt($value)
  * @method static Builder<static>|User whereName($value)
+ * @method static Builder<static>|User whereOnboardedAt($value)
  * @method static Builder<static>|User wherePassword($value)
  * @method static Builder<static>|User wherePmExpiration($value)
  * @method static Builder<static>|User wherePmLastFour($value)
@@ -205,7 +207,9 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         'billing_postal_code',
         'billing_country',
         'vat_id',
+        'trial_ends_at',
         'last_seen_at',
+        'onboarded_at',
     ];
 
     protected $hidden = [
@@ -416,6 +420,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
             'password' => 'hashed',
             'trial_ends_at' => 'datetime',
             'last_seen_at' => 'datetime',
+            'onboarded_at' => 'datetime',
         ];
     }
 }

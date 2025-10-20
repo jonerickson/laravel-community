@@ -17,10 +17,10 @@ use Illuminate\Http\Request;
 class CheckoutController
 {
     public function __construct(
-        #[CurrentUser]
-        private readonly ?User $user,
         private readonly ShoppingCartService $cartService,
         private readonly PaymentManager $paymentManager,
+        #[CurrentUser]
+        private readonly ?User $user = null,
     ) {}
 
     public function __invoke(Request $request): ApiResource

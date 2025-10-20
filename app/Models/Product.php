@@ -51,7 +51,7 @@ use Laravel\Scout\Searchable;
  * @property ProductType $type
  * @property ProductTaxCode|null $tax_code
  * @property bool $is_featured
- * @property int $is_visible
+ * @property bool $is_visible
  * @property bool $is_subscription_only
  * @property int $trial_days
  * @property bool $allow_promotion_codes

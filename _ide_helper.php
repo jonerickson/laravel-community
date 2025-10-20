@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 12.28.1.
+ * Generated for Laravel 12.34.0.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -3869,7 +3869,6 @@ namespace Illuminate\Support\Facades {
         /**
          * Attempt to find the batch with the given ID.
          *
-         * @param string $batchId
          * @return \Illuminate\Bus\Batch|null
          * @static
          */
@@ -3962,7 +3961,6 @@ namespace Illuminate\Support\Facades {
         /**
          * Set the pipes through which commands should be piped before dispatching.
          *
-         * @param array $pipes
          * @return \Illuminate\Bus\Dispatcher
          * @static
          */
@@ -3975,7 +3973,6 @@ namespace Illuminate\Support\Facades {
         /**
          * Map a command to a handler.
          *
-         * @param array $map
          * @return \Illuminate\Bus\Dispatcher
          * @static
          */
@@ -7598,7 +7595,7 @@ namespace Illuminate\Support\Facades {
          * Register a callback to be invoked when the connection queries for longer than a given amount of time.
          *
          * @param \DateTimeInterface|\Carbon\CarbonInterval|float|int $threshold
-         * @param (callable(\Illuminate\Database\Connection, class-string<\Illuminate\Database\Events\QueryExecuted>): mixed) $handler
+         * @param (callable(\Illuminate\Database\Connection, \Illuminate\Database\Events\QueryExecuted): mixed) $handler
          * @return void
          * @static
          */
@@ -8367,6 +8364,21 @@ namespace Illuminate\Support\Facades {
             //Method inherited from \Illuminate\Database\Connection 
             /** @var \Illuminate\Database\MySqlConnection $instance */
             $instance->afterCommit($callback);
+        }
+
+        /**
+         * Execute the callback after a transaction rolls back.
+         *
+         * @param callable $callback
+         * @return void
+         * @throws \RuntimeException
+         * @static
+         */
+        public static function afterRollBack($callback)
+        {
+            //Method inherited from \Illuminate\Database\Connection 
+            /** @var \Illuminate\Database\MySqlConnection $instance */
+            $instance->afterRollBack($callback);
         }
 
             }
@@ -10152,6 +10164,7 @@ namespace Illuminate\Support\Facades {
      * @method static \Illuminate\Http\Client\Response put(string $url, array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable $data = [])
      * @method static \Illuminate\Http\Client\Response delete(string $url, array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable $data = [])
      * @method static array pool(callable $callback)
+     * @method static \Illuminate\Http\Client\Batch batch(callable $callback)
      * @method static \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
      * @method static \GuzzleHttp\Client buildClient()
      * @method static \GuzzleHttp\Client createClient(\GuzzleHttp\HandlerStack $handlerStack)
@@ -13273,6 +13286,33 @@ namespace Illuminate\Support\Facades {
         {
             //Method inherited from \Illuminate\Queue\Queue 
             \Illuminate\Queue\SyncQueue::createPayloadUsing($callback);
+        }
+
+        /**
+         * Get the queue configuration array.
+         *
+         * @return array
+         * @static
+         */
+        public static function getConfig()
+        {
+            //Method inherited from \Illuminate\Queue\Queue 
+            /** @var \Illuminate\Queue\SyncQueue $instance */
+            return $instance->getConfig();
+        }
+
+        /**
+         * Set the queue configuration array.
+         *
+         * @param array $config
+         * @return \Illuminate\Queue\SyncQueue
+         * @static
+         */
+        public static function setConfig($config)
+        {
+            //Method inherited from \Illuminate\Queue\Queue 
+            /** @var \Illuminate\Queue\SyncQueue $instance */
+            return $instance->setConfig($config);
         }
 
         /**
@@ -17976,7 +18016,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Specify the cache store that should be used to store mutexes.
          *
-         * @param string $store
+         * @param \UnitEnum|string $store
          * @return \Illuminate\Console\Scheduling\Schedule
          * @static
          */
@@ -18765,7 +18805,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Get the default session driver name.
          *
-         * @return string
+         * @return string|null
          * @static
          */
         public static function getDefaultDriver()
@@ -19198,6 +19238,18 @@ namespace Illuminate\Support\Facades {
         {
             /** @var \Illuminate\Session\Store $instance */
             $instance->flashInput($value);
+        }
+
+        /**
+         * Get the session cache instance.
+         *
+         * @return \Illuminate\Contracts\Cache\Repository
+         * @static
+         */
+        public static function cache()
+        {
+            /** @var \Illuminate\Session\Store $instance */
+            return $instance->cache();
         }
 
         /**
@@ -22891,65 +22943,6 @@ namespace AnourValar\EloquentSerialize\Facades {
             }
     }
 
-namespace Laravel\Mcp\Server\Facades {
-    /**
-     * @see \Laravel\Mcp\Server\Registrar
-     */
-    class Mcp {
-        /**
-         * Register an web-based MCP server running over HTTP.
-         *
-         * @static
-         */
-        public static function web($handle, $serverClass)
-        {
-            /** @var \Laravel\Mcp\Server\Registrar $instance */
-            return $instance->web($handle, $serverClass);
-        }
-
-        /**
-         * Register a local MCP server running over STDIO.
-         *
-         * @static
-         */
-        public static function local($handle, $serverClass)
-        {
-            /** @var \Laravel\Mcp\Server\Registrar $instance */
-            return $instance->local($handle, $serverClass);
-        }
-
-        /**
-         * Get the server class for a local MCP.
-         *
-         * @static
-         */
-        public static function getLocalServer($handle)
-        {
-            /** @var \Laravel\Mcp\Server\Registrar $instance */
-            return $instance->getLocalServer($handle);
-        }
-
-        /**
-         * @static
-         */
-        public static function getWebServer($handle)
-        {
-            /** @var \Laravel\Mcp\Server\Registrar $instance */
-            return $instance->getWebServer($handle);
-        }
-
-        /**
-         * @static
-         */
-        public static function oauthRoutes($oauthPrefix = 'oauth')
-        {
-            /** @var \Laravel\Mcp\Server\Registrar $instance */
-            return $instance->oauthRoutes($oauthPrefix);
-        }
-
-            }
-    }
-
 namespace Laravel\Socialite\Facades {
     /**
      * @method array getScopes()
@@ -24047,6 +24040,10 @@ namespace App\Http\Requests\SupportTickets {
 namespace App\Http\Requests\Auth {
     /**
      */
+    class RegisterRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    /**
+     */
     class SetEmailRequest extends \Illuminate\Foundation\Http\FormRequest {
             }
     /**
@@ -24079,6 +24076,17 @@ namespace App\Http\Requests\Api\Frontend {
     /**
      */
     class RemoveDiscountRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    }
+
+namespace App\Http\Requests\Onboarding {
+    /**
+     */
+    class OnboardingCompleteRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    /**
+     */
+    class OnboardingUpdateRequest extends \Illuminate\Foundation\Http\FormRequest {
             }
     }
 
@@ -24399,6 +24407,48 @@ namespace Livewire\Features\SupportTesting {
         }
 
         /**
+         * @see \Filament\Actions\Testing\TestsActions::assertMountedActionModalSee()
+         * @param array|string $values
+         * @param mixed $escape
+         * @static
+         */
+        public static function assertMountedActionModalSee($values, $escape = true)
+        {
+            return \Livewire\Features\SupportTesting\Testable::assertMountedActionModalSee($values, $escape);
+        }
+
+        /**
+         * @see \Filament\Actions\Testing\TestsActions::assertMountedActionModalDontSee()
+         * @param array|string $values
+         * @param bool $escape
+         * @static
+         */
+        public static function assertMountedActionModalDontSee($values, $escape = true)
+        {
+            return \Livewire\Features\SupportTesting\Testable::assertMountedActionModalDontSee($values, $escape);
+        }
+
+        /**
+         * @see \Filament\Actions\Testing\TestsActions::assertMountedActionModalSeeHtml()
+         * @param array|string $values
+         * @static
+         */
+        public static function assertMountedActionModalSeeHtml($values)
+        {
+            return \Livewire\Features\SupportTesting\Testable::assertMountedActionModalSeeHtml($values);
+        }
+
+        /**
+         * @see \Filament\Actions\Testing\TestsActions::assertMountedActionModalDontSeeHtml()
+         * @param array|string $values
+         * @static
+         */
+        public static function assertMountedActionModalDontSeeHtml($values)
+        {
+            return \Livewire\Features\SupportTesting\Testable::assertMountedActionModalDontSeeHtml($values);
+        }
+
+        /**
          * @see \Filament\Actions\Testing\TestsActions::assertActionMounted()
          * @param \Filament\Actions\Testing\TestAction|array|string $actions
          * @return static
@@ -24467,6 +24517,16 @@ namespace Livewire\Features\SupportTesting {
         public static function parseNestedActions($actions, $arguments = [], $areRelativeToMountedActions = true)
         {
             return \Livewire\Features\SupportTesting\Testable::parseNestedActions($actions, $arguments, $areRelativeToMountedActions);
+        }
+
+        /**
+         * @see \Filament\Actions\Testing\TestsActions::getMountedActionModalHtml()
+         * @return string
+         * @static
+         */
+        public static function getMountedActionModalHtml()
+        {
+            return \Livewire\Features\SupportTesting\Testable::getMountedActionModalHtml();
         }
 
         /**
@@ -26513,6 +26573,17 @@ namespace Livewire\Features\SupportTesting {
         }
 
         /**
+         * @see \Filament\Tables\Testing\TestsColumns::toggleAllTableColumns()
+         * @param bool $condition
+         * @return static
+         * @static
+         */
+        public static function toggleAllTableColumns($condition = true)
+        {
+            return \Livewire\Features\SupportTesting\Testable::toggleAllTableColumns($condition);
+        }
+
+        /**
          * @see \Filament\Tables\Testing\TestsFilters::filterTable()
          * @param string $name
          * @param mixed $data
@@ -26884,6 +26955,19 @@ namespace  {
         {
             /** @var \Illuminate\Database\Eloquent\Builder $instance */
             return $instance->withoutGlobalScopes($scopes);
+        }
+
+        /**
+         * Remove all global scopes except the given scopes.
+         *
+         * @param array $scopes
+         * @return \Illuminate\Database\Eloquent\Builder<static>
+         * @static
+         */
+        public static function withoutGlobalScopesExcept($scopes = [])
+        {
+            /** @var \Illuminate\Database\Eloquent\Builder $instance */
+            return $instance->withoutGlobalScopesExcept($scopes);
         }
 
         /**
@@ -28702,7 +28786,7 @@ namespace  {
          *
          * @param mixed $relations
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
-         * @param string $function
+         * @param string|null $function
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -32094,7 +32178,6 @@ namespace  {
     class Vite extends \Illuminate\Support\Facades\Vite {}
     class EloquentSerialize extends \AnourValar\EloquentSerialize\Facades\EloquentSerializeFacade {}
     class Horizon extends \Laravel\Horizon\Horizon {}
-    class Mcp extends \Laravel\Mcp\Server\Facades\Mcp {}
     class Socialite extends \Laravel\Socialite\Facades\Socialite {}
     class Livewire extends \Livewire\Livewire {}
 }

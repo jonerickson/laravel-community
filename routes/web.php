@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['domain' => config('app.url')], function (): void {
     Route::get('/', HomeController::class)->name('home');
 
-    Route::group(['middleware' => ['auth', 'email', 'verified']], function (): void {
+    Route::group(['middleware' => ['auth', 'email', 'verified', 'onboarded']], function (): void {
         Route::get('dashboard', DashboardController::class)->name('dashboard');
     });
 

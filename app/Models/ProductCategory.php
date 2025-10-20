@@ -25,7 +25,7 @@ use Illuminate\Support\Str;
  * @property string|null $description
  * @property int $order
  * @property bool $is_active
- * @property int $is_visible
+ * @property bool $is_visible
  * @property string $slug
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at

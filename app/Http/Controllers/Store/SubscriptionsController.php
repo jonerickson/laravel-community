@@ -24,9 +24,9 @@ use Spatie\LaravelData\PaginatedDataCollection;
 class SubscriptionsController extends Controller
 {
     public function __construct(
+        private readonly PaymentManager $paymentManager,
         #[CurrentUser]
-        private readonly ?User $user,
-        private readonly PaymentManager $paymentManager
+        private readonly ?User $user = null,
     ) {
         //
     }

@@ -4,24 +4,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a Laravel + React application built using the Laravel React Starter Kit. It features:
+This is a modern Laravel + React marketplace application. It features:
 - Laravel 12 backend with Inertia.js for SPA functionality
 - React 19 frontend with TypeScript
-- Filament admin panels (Admin and Marketplace)
-- Stripe integration via Laravel Cashier
+- Filament panels (Admin and Marketplace)
+- Modular payment processing (default: Stripe via Laravel Cashier)
+- Modular support ticket system (default: database, external services supported)
 - Role-based permissions with Spatie/Laravel-permission
-- Social authentication (Discord, Roblox)
-- E-commerce functionality with products and categories
+- Social authentication system (Discord, Roblox - extensible for other providers)
+- E-commerce store with products and categories
+- User marketplace for third-party sellers
+- Blog system with posts and categories
+- Forum platform with topics and discussions
+- Policy management system
+- API Platform integration
 
 ## Development Commands
 
 ### Backend (PHP/Laravel)
 - `composer dev` - Run development environment with Horizon queue worker, logging, and frontend
-- `composer test` - Run PHPUnit tests
-- `composer analyze` - Run PHPStan static analysis
+- `composer setup` - Complete first-time setup (install, env, key, migrate, npm, build)
+- `composer test` - Run all tests with Pest
+- `composer test-coverage` or `composer tc` - Run tests with coverage
+- `composer test-filter <pattern>` or `composer tf` - Run specific tests by pattern
+- `composer analyze` or `composer tt` - Run PHPStan static analysis
 - `composer cs-fix` or `composer lint` - Fix code style with Laravel Pint
-- `composer ide` - Generate IDE helper files
+- `composer ide` - Generate IDE helper files for better autocomplete
+- `composer facades` - Generate facade documentation for custom facades
+- `composer types` - Generate TypeScript definitions from Laravel models
 - `composer reset` - Full environment reset with fresh migrations and seeding
+- `composer rector` - Run automated refactoring with Rector
 
 ### Frontend (Node.js/React)
 - `npm run dev` - Start Vite development server
@@ -29,12 +41,14 @@ This is a Laravel + React application built using the Laravel React Starter Kit.
 - `npm run build:ssr` - Build with SSR support
 - `npm run lint` - Run ESLint and fix issues
 - `npm run format` - Format code with Prettier
+- `npm run format:check` - Check code formatting without making changes
 - `npm run types` - Type check with TypeScript
 
 ### Testing
 - `composer test` - Run all tests
-- `composer test-coverage` - Run tests with coverage
-- `composer test-filter <pattern>` - Run specific tests
+- `composer test-coverage` or `composer tc` - Run tests with coverage
+- `composer test-filter <pattern>` or `composer tf` - Run specific tests
+- `composer test-suite` or `composer ts` - Run both PHPStan analysis and tests
 - Uses Pest testing framework
 
 ### Git Hooks
@@ -45,66 +59,139 @@ This is a Laravel + React application built using the Laravel React Starter Kit.
 ## Architecture
 
 ### Backend Structure
-- **Models**: Core models include `User`, `Product`, `ProductCategory`, `Invoice` with Eloquent relationships
-- **Controllers**: Organized by feature (Auth, Blog, Store, Settings, OAuth)
-- **Filament Resources**: Admin panel resources for storeProduct/category management
-- **Providers**: Custom social auth providers (Discord, Roblox)
-- **Policies**: Authorization logic for resources
-- **Traits**: Reusable functionality like `HasSlug`, `HasFiles`
+- **Actions**: Single-purpose action classes for reusable business logic
+- **Contracts**: Interface contracts for extensible systems (payment processors, support tickets)
+- **Data**: Data transfer objects using Spatie Laravel Data
+- **Drivers**: Extensible driver implementations (PaymentProcessor, SupportTicket)
+- **Enums**: Application-wide enumerations using Spatie Enum (title case naming)
+- **Events & Listeners**: Event-driven architecture (auto-discovered in Laravel 12)
+- **Facades**: Custom facades (PaymentProcessor, SupportTicket) for accessing managers
+- **Filament**: Admin and Marketplace panels with resources, pages, exports, imports
+- **Managers**: Service managers using Laravel's Manager pattern for driver extensibility
+- **Models**: Core models include `User`, `Product`, `Order`, `Forum`, `Post`, `Topic`, `Policy`, `SupportTicket`
+- **Controllers**: Feature-organized controllers (Auth, Blog, Forums, Store, Settings, OAuth, Support, Policies)
+- **Policies**: Authorization logic for all resources
+- **Providers**: Custom social auth providers (Discord, Roblox) extending Laravel Socialite
+- **Services**: Business logic services for complex operations
+- **Traits**: Reusable functionality (`HasSlug`, `HasFiles`, `HasAuthor`, `Sluggable`)
 
 ### Frontend Structure
-- **Pages**: Inertia.js pages in `resources/js/pages/`
-- **Components**: Reusable React components using shadcn/ui and Radix UI
+- **Pages**: Inertia.js pages organized by feature (`auth/`, `blog/`, `forums/`, `store/`, `settings/`, `support/`, `policies/`)
+- **Components**: Reusable React components using shadcn/ui, Radix UI, TipTap editor
 - **Layouts**: App shell, auth, and settings layouts
-- **Hooks**: Custom React hooks for appearance, mobile detection
-- **Types**: TypeScript definitions for API responses and props
+- **Hooks**: Custom React hooks (appearance/theme, mobile detection)
+- **Types**: TypeScript definitions generated from Laravel models via Spatie TypeScript Transformer
+- **Utils**: Utility functions including `apiRequest` wrapper for API calls with proper error handling
+- **Services**: Frontend service classes for business logic
+
+### Extensible Architecture (Manager Pattern)
+- **Payment Processing**: Modular system supporting multiple drivers (default: Stripe via `StripeDriver`)
+  - Located in `app/Drivers/Payments/` and `app/Managers/PaymentManager.php`
+  - Access via `PaymentProcessor` facade
+  - Implement `PaymentProcessor` contract for custom drivers
+- **Support Tickets**: Modular ticket system supporting multiple backends (default: database via `DatabaseDriver`)
+  - Located in `app/Drivers/SupportTickets/` and `app/Managers/SupportTicketManager.php`
+  - Access via `SupportTicket` facade
+  - Implement `SupportTicketProvider` contract for external integrations (Zendesk, etc.)
 
 ### Key Integrations
-- **Inertia.js**: Bridges Laravel backend with React frontend
-- **Filament**: Provides admin panels at `/admin` and marketplace functionality
-- **Laravel Cashier**: Stripe payment processing and subscription management
+- **Inertia.js v2**: Bridges Laravel backend with React frontend (deferred props, prefetching, infinite scroll)
+- **Filament v4**: Two admin panels - `/admin` for administration and `/marketplace` for seller dashboard
+- **Laravel Cashier v15**: Default payment processor integration with Stripe
+- **Laravel Passport v13**: OAuth2 server for API authentication
 - **Spatie Permissions**: Role and permission-based access control
-- **Laravel Socialite**: OAuth authentication with custom providers
+- **Spatie Settings**: Application-wide settings management
+- **Laravel Socialite**: OAuth authentication with extensible custom providers
+- **Laravel Scout**: Full-text search capabilities
+- **Laravel Horizon**: Redis queue monitoring and management
+- **Laravel Telescope**: Application debugging and monitoring (dev only)
+- **API Platform**: RESTful API framework integration
 
 ### Database
-- Uses SQLite by default (see `.env.example`)
-- Migrations include users, products, categories, subscriptions, permissions
-- Seeders available for development data
+- **Development**: MySQL (configured in `.env`)
+- **Production**: MySQL/PostgreSQL recommended
+- **SQLite**: Available as alternative (see `.env.example`)
+- Migrations include users, products, categories, subscriptions, permissions, blog, forums, policies, support tickets
+- Comprehensive seeders available for development data
 
 ### Configuration
 - **Code Style**: Laravel Pint with custom rules in `pint.json`
-- **Static Analysis**: PHPStan level 5 configuration in `phpstan.neon`
-- **TypeScript**: Strict type checking enabled
-- **ESLint**: React and TypeScript rules with Prettier integration
+- **Static Analysis**: PHPStan level 5 in `phpstan.neon`
+- **Automated Refactoring**: Rector configuration with Laravel-specific rules
+- **TypeScript**: Strict type checking enabled in `tsconfig.json`
+- **ESLint v9**: React and TypeScript rules with Prettier integration
+- **Prettier v3**: Code formatting for JS/TS/Blade with plugins for Tailwind and imports
 
 ## File Organization
 
 ### Route Files
-- `routes/web.php` - Main application routes
-- `routes/auth.php` - Authentication routes
-- `routes/store.php` - E-commerce routes
-- `routes/settings.php` - User settings routes
+- `routes/web.php` - Main application routes and homepage
+- `routes/api.php` - API routes with versioning
+- `routes/auth.php` - Authentication routes (login, register, verify, etc.)
+- `routes/blog.php` - Blog posts and categories
+- `routes/forums.php` - Forum topics, posts, categories
+- `routes/policies.php` - Legal policies and terms
+- `routes/settings.php` - User settings and preferences
+- `routes/store.php` - E-commerce and product catalog
+- `routes/support.php` - Support ticket system
+- `routes/console.php` - Artisan console commands
+- `routes/cashier.php` - Stripe Cashier webhook routes
+- `routes/passport.php` - Laravel Passport OAuth routes
 
 ### Key Directories
-- `app/Filament/Resources/` - Admin panel resource definitions
+- `app/Actions/` - Single-purpose action classes
+- `app/Contracts/` - Interface contracts for extensibility
+- `app/Data/` - Data transfer objects (Spatie Data)
+- `app/Drivers/` - Driver implementations (Payments, SupportTickets)
+- `app/Enums/` - Application enumerations
+- `app/Facades/` - Custom facades (PaymentProcessor, SupportTicket)
+- `app/Filament/Admin/` - Admin panel resources and pages
+- `app/Filament/Marketplace/` - Marketplace seller dashboard
+- `app/Filament/Exports/` - Export definitions
+- `app/Filament/Imports/` - Import definitions
 - `app/Http/Controllers/` - Feature-organized controllers
+- `app/Managers/` - Service managers using Manager pattern
+- `app/Models/` - Eloquent models
+- `app/Policies/` - Authorization policies
+- `app/Services/` - Business logic services
 - `resources/js/components/ui/` - shadcn/ui component library
-- `resources/js/pages/` - Inertia.js page components
+- `resources/js/pages/` - Inertia.js page components by feature
+- `resources/css/filament/` - Filament panel custom styles
 - `database/migrations/` - Database schema definitions
+- `database/factories/` - Model factories for testing
+- `database/seeders/` - Database seeders
 
 ## Development Notes
 
-- The application uses Wayfinder for type-safe routing between Laravel and React
-- Filament Shield provides role-based access to admin panels
-- Custom social providers extend Laravel Socialite
-- SQLite is used for local development; production likely uses MySQL/PostgreSQL
-- The app includes subscription/billing functionality via Stripe
-- Uses modern React patterns with hooks and functional components
-- Git hooks in `.githooks/` directory ensure code quality and consistent formatting across the team
-- Events do not need manually registering in Laravel 12.
-- Use composer:types to generate typescript definitions
-- Always create mail using a mailable.
-- Do not run tests after a prompt unless otherwise instructed.
+### Application-Specific Features
+- **Type-Safe Routing**: Ziggy provides type-safe routing between Laravel and React
+- **TypeScript Generation**: Use `composer types` to generate TypeScript definitions from Laravel models
+- **Custom Facades**: `PaymentProcessor` and `SupportTicket` facades provide access to extensible managers
+- **Manager Pattern**: Payment and support ticket systems use Laravel's Manager pattern for driver extensibility
+- **Filament Panels**: Two separate panels - Admin (`/admin`) and Marketplace (`/marketplace`) for sellers
+- **Social Auth**: Extensible OAuth system with Discord and Roblox providers (custom provider support)
+- **API Platform**: RESTful API with versioning and API resources
+- **Email**: Always create email using Mailable classes (never inline)
+- **Webhooks**: Stripe webhooks handled at `/stripe/webhook` when using default payment driver
+
+### Laravel 12 Conventions
+- Events auto-discover and don't need manual registration
+- No `app/Http/Middleware/` directory - register middleware in `bootstrap/app.php`
+- No `app/Console/Kernel.php` - commands auto-register from `app/Console/Commands/`
+- Service providers register in `bootstrap/providers.php`
+
+### Development Workflow
+- MySQL is configured by default (see `.env`) - SQLite available as alternative
+- Git hooks in `.githooks/` ensure code quality and consistent formatting
+- Use `composer dev` to run full dev environment (Horizon, logs, Vite)
+- Horizon handles queued jobs and provides dashboard at `/horizon`
+- Telescope available at `/telescope` for debugging (dev only)
+- **Do not run tests after a prompt unless otherwise instructed**
+
+### Code Generation
+- Use `php artisan types` to update TypeScript definitions after model changes
+- Use `composer facades` to generate documentation for custom facades
+- Use `composer ide` to regenerate IDE helper files after significant changes
 
 ### React Component Guidelines
 - Always create individual, reusable components for UI elements rather than inline JSX
