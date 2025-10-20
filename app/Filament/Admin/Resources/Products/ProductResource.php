@@ -48,6 +48,8 @@ class ProductResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shopping-cart';
 
+    protected static ?string $recordTitleAttribute = 'name';
+
     #[Override]
     public static function form(Schema $schema): Schema
     {

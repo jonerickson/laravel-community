@@ -43,6 +43,8 @@ class ForumResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChatBubbleLeftRight;
 
+    protected static ?string $recordTitleAttribute = 'name';
+
     #[Override]
     public static function form(Schema $schema): Schema
     {

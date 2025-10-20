@@ -10,7 +10,7 @@ use App\Services\OnboardingService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class RegisterController
 {
@@ -18,7 +18,7 @@ class RegisterController
         private readonly OnboardingService $onboardingService,
     ) {}
 
-    public function __invoke(RegisterRequest $request): RedirectResponse
+    public function __invoke(RegisterRequest $request): Response
     {
         $user = User::create([
             'name' => $request->validated('name'),
@@ -32,6 +32,6 @@ class RegisterController
 
         $this->onboardingService->advanceToStep(1);
 
-        return to_route('onboarding');
+        return inertia()->location(route('onboarding'));
     }
 }

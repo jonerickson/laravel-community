@@ -29,11 +29,11 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
         <LayoutComponent breadcrumbs={breadcrumbs} {...props}>
             <div
                 className={clsx({
-                    'px-6 py-6 pb-8 lg:px-8': LayoutComponent === AppSidebarLayout,
-                    'px-6 pt-6 pb-8 lg:px-4': LayoutComponent === AppHeaderLayout,
+                    'px-6 py-6 lg:px-8': LayoutComponent === AppSidebarLayout,
+                    'px-6 py-6 lg:px-4': LayoutComponent === AppHeaderLayout,
                 })}
             >
-                <div className="flex flex-col space-y-4">
+                <div className="flex flex-col space-y-6">
                     <EmailVerificationBanner />
                     <UserWarningBanner />
                     <AnnouncementsList announcements={announcements} />

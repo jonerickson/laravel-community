@@ -61,6 +61,8 @@ class UserResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
+    protected static ?string $recordTitleAttribute = 'name';
+
     #[Override]
     public static function getWidgets(): array
     {
