@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Store;
 use App\Data\DiscountData;
 use App\Data\OrderData;
 use App\Http\Controllers\Controller;
+use App\Managers\PaymentManager;
 use App\Models\Order;
 use App\Services\ShoppingCartService;
 use Illuminate\Http\RedirectResponse;
@@ -16,7 +17,8 @@ use Inertia\Response;
 class ShoppingCartController extends Controller
 {
     public function __construct(
-        private readonly ShoppingCartService $cartService
+        private readonly ShoppingCartService $cartService,
+        private readonly PaymentManager $paymentManager,
     ) {}
 
     public function index(): Response
@@ -50,6 +52,9 @@ class ShoppingCartController extends Controller
 
     public function destroy(): RedirectResponse
     {
+        $order = $this->cartService->getOrCreatePendingOrder();
+
+        $this->paymentManager->cancelOrder($order);
         $this->cartService->clearCart();
 
         return back()->with('message', 'Your cart has been successfully emptied.');

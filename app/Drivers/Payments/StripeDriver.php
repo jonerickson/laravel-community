@@ -722,7 +722,11 @@ class StripeDriver implements PaymentProcessor
             }
 
             $order->update([
-                'status' => OrderStatus::Cancelled,
+                'status' => OrderStatus::Pending,
+                'external_checkout_id' => null,
+                'external_payment_id' => null,
+                'external_order_id' => null,
+                'external_invoice_id' => null,
             ]);
 
             return true;
