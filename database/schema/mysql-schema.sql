@@ -429,9 +429,9 @@ DROP TABLE IF EXISTS `notes`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `notes` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `notable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `notable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `notable_id` bigint unsigned NOT NULL,
-  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_by` bigint unsigned NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -622,10 +622,10 @@ CREATE TABLE `payouts` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
   `amount` int NOT NULL,
-  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
-  `payout_method` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `external_payout_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `notes` text COLLATE utf8mb4_unicode_ci,
+  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `payout_method` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `external_payout_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `processed_at` timestamp NULL DEFAULT NULL,
   `processed_by` bigint unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -786,11 +786,11 @@ DROP TABLE IF EXISTS `products`;
 CREATE TABLE `products` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `seller_id` bigint unsigned DEFAULT NULL,
-  `approval_status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `approval_status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `commission_rate` decimal(5,2) NOT NULL DEFAULT '0.00',
   `approved_at` timestamp NULL DEFAULT NULL,
   `approved_by` bigint unsigned DEFAULT NULL,
-  `rejection_reason` text COLLATE utf8mb4_unicode_ci,
+  `rejection_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `reference_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -798,6 +798,7 @@ CREATE TABLE `products` (
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'storeProduct',
   `tax_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_featured` tinyint(1) NOT NULL DEFAULT '0',
+  `is_visible` tinyint(1) NOT NULL DEFAULT '1',
   `is_subscription_only` tinyint(1) NOT NULL DEFAULT '0',
   `trial_days` int NOT NULL DEFAULT '0',
   `allow_promotion_codes` tinyint(1) NOT NULL DEFAULT '0',
@@ -825,6 +826,7 @@ CREATE TABLE `products_categories` (
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `order` int NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `is_visible` tinyint(1) NOT NULL DEFAULT '1',
   `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1163,6 +1165,7 @@ CREATE TABLE `users` (
   `invoice_emails` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `vat_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `trial_ends_at` timestamp NULL DEFAULT NULL,
+  `onboarded_at` timestamp NULL DEFAULT NULL,
   `last_seen_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1366,10 +1369,12 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (90,'2025_10_09_204
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (91,'2025_10_09_215140_create_telescope_entries_table',34);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (92,'2025_10_10_205442_create_discounts_table',35);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (93,'2025_10_10_205445_create_orders_discounts_table',35);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (94,'2025_09_28_202015_create_email_settings',36);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (95,'2025_09_28_202053_create_general_settings',36);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (96,'2025_10_13_155713_create_notes_table',36);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (97,'2025_10_13_210844_add_marketplace_fields_to_products_table',37);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (98,'2025_10_13_211112_add_commission_to_order_items_table',38);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (99,'2025_10_13_222119_create_payouts_table',39);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (100,'2025_10_15_174034_add_allow_discount_codes',40);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (101,'2025_09_28_202015_create_email_settings',41);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (102,'2025_09_28_202053_create_general_settings',41);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (103,'2025_10_18_202054_add_visible_to_product_table',41);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (104,'2025_10_20_164409_add_onboarded_at_timestamp',41);
