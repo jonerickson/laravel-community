@@ -25,8 +25,8 @@ class SubscriptionsController extends Controller
 {
     public function __construct(
         #[CurrentUser]
-        private readonly ?User $user = null,
-        private readonly ?PaymentManager $paymentManager = null
+        private readonly ?User $user,
+        private readonly PaymentManager $paymentManager
     ) {
         //
     }

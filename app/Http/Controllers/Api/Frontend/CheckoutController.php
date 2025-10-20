@@ -18,9 +18,9 @@ class CheckoutController
 {
     public function __construct(
         #[CurrentUser]
-        private readonly ?User $user = null,
-        private readonly ?ShoppingCartService $cartService = null,
-        private readonly ?PaymentManager $paymentManager = null,
+        private readonly ?User $user,
+        private readonly ShoppingCartService $cartService,
+        private readonly PaymentManager $paymentManager,
     ) {}
 
     public function __invoke(Request $request): ApiResource

@@ -41,7 +41,7 @@ class CallbackController extends Controller
         ]);
 
         if (blank($integration->getKey())) {
-            if ($this->user) {
+            if ($this->user instanceof User) {
                 $user = $this->user;
             } else {
                 $user = User::firstOrCreate([
