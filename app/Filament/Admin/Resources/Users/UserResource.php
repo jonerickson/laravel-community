@@ -306,7 +306,8 @@ class UserResource extends Resource
                     ->badge(),
                 TextColumn::make('roles.name')
                     ->placeholder('No Roles')
-                    ->badge(),
+                    ->badge()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_banned')
                     ->label('Banned')
                     ->boolean()
@@ -319,25 +320,17 @@ class UserResource extends Resource
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle'),
-                TextColumn::make('banned_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('ban_reason')
-                    ->limit(50)
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('bannedBy.name')
-                    ->label('Banned By')
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('fingerprints_count')
                     ->label('Devices')
                     ->counts('fingerprints')
                     ->sortable(),
                 TextColumn::make('created_at')
+                    ->label('Created')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label('Updated')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

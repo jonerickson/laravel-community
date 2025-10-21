@@ -89,13 +89,13 @@ class UserWarningsRelationManager extends RelationManager
                 TextColumn::make('author.name')
                     ->label('Issued By'),
                 TextColumn::make('created_at')
-                    ->label('Issued At')
+                    ->label('Issued')
                     ->dateTime()
                     ->since()
                     ->dateTimeTooltip()
                     ->sortable(),
                 TextColumn::make('points_expire_at')
-                    ->label('Points Expire At')
+                    ->label('Points Expire')
                     ->dateTime()
                     ->since()
                     ->dateTimeTooltip()

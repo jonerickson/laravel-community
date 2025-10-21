@@ -17,6 +17,7 @@ class PageSeeder extends Seeder
         $pages = [
             [
                 'title' => 'About Us',
+                'is_published' => false,
                 'description' => 'Learn more about our company and mission',
                 'show_in_navigation' => true,
                 'navigation_label' => 'About',
@@ -29,11 +30,27 @@ class PageSeeder extends Seeder
 HTML
             ],
             [
+                'title' => 'FAQ',
+                'is_published' => false,
+                'description' => 'Frequently asked questions',
+                'show_in_navigation' => true,
+                'navigation_label' => 'FAQ',
+                'navigation_order' => 11,
+                'html_content' => <<<'HTML'
+<div class="flex flex-col gap-1">
+  <div class="font-bold text-xl">Frequently Asked Questions</div>
+  <p class="font-light">Find answers to common questions about our platform.</p>
+</div>
+HTML
+            ],
+            [
                 'title' => 'Contact',
+                'is_published' => true,
+                'published_at' => now(),
                 'description' => 'Get in touch with our team',
                 'show_in_navigation' => true,
                 'navigation_label' => 'Contact',
-                'navigation_order' => 20,
+                'navigation_order' => 12,
                 'html_content' => <<<'HTML'
 <div class="flex flex-col gap-6">
   <div class="flex flex-col gap-1">
@@ -62,24 +79,10 @@ HTML
 </div>
 HTML
             ],
-            [
-                'title' => 'FAQ',
-                'description' => 'Frequently asked questions',
-                'show_in_navigation' => true,
-                'navigation_label' => 'FAQ',
-                'navigation_order' => 30,
-                'html_content' => <<<'HTML'
-<div class="flex flex-col gap-1">
-  <div class="font-bold text-xl">Frequently Asked Questions</div>
-  <p class="font-light">Find answers to common questions about our platform.</p>
-</div>
-HTML
-            ],
         ];
 
         foreach ($pages as $pageData) {
             Page::factory()
-                ->published()
                 ->create(array_merge($pageData, [
                     'created_by' => $admin?->id ?? User::factory(),
                 ]));
@@ -87,7 +90,7 @@ HTML
 
         Page::factory()
             ->count(5)
-            ->published()
+            ->unpublished()
             ->create([
                 'created_by' => $admin?->id ?? User::factory(),
             ]);

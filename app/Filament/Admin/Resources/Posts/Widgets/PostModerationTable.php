@@ -57,8 +57,8 @@ class PostModerationTable extends TableWidget
                     ->badge()
                     ->color(fn ($state): string => $state > 0 ? 'danger' : 'gray'),
                 TextColumn::make('created_at')
-                    ->sortable()
                     ->label('Created')
+                    ->sortable()
                     ->dateTimeTooltip()
                     ->since(),
             ])

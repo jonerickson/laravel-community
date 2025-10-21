@@ -140,10 +140,12 @@ class ForumResource extends Resource
                     ->getStateUsing(fn (Forum $record): int => $record->posts_count)
                     ->sortable(),
                 TextColumn::make('created_at')
+                    ->label('Created')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label('Updated')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

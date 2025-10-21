@@ -98,6 +98,7 @@ class CommentsRelationManager extends RelationManager
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('created_at')
+                    ->label('Created')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(),

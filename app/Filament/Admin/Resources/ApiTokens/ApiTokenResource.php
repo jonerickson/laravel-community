@@ -85,6 +85,7 @@ class ApiTokenResource extends Resource
                 IconColumn::make('revoked')
                     ->boolean(),
                 TextColumn::make('created_at')
+                    ->label('Created')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

@@ -58,12 +58,12 @@ class OrdersTable
                 TextColumn::make('items.product.name')
                     ->searchable(),
                 TextColumn::make('created_at')
-                    ->label('Order Created At')
+                    ->label('Created')
                     ->since()
                     ->dateTimeTooltip()
                     ->sortable(),
                 TextColumn::make('updated_at')
-                    ->label('Order Updated At')
+                    ->label('Updated')
                     ->since()
                     ->dateTimeTooltip()
                     ->sortable(),

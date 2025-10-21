@@ -127,6 +127,11 @@ class TopicResource extends Resource
                     ->label('Created')
                     ->dateTime()
                     ->sortable(),
+                TextColumn::make('updated_at')
+                    ->label('Updated')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('author')

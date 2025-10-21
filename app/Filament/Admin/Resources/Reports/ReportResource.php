@@ -111,7 +111,7 @@ class ReportResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Reported At')
+                    ->label('Reported')
                     ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('reviewer.name')

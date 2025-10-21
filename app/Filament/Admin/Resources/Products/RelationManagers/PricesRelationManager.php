@@ -124,6 +124,7 @@ class PricesRelationManager extends RelationManager
                     ->default(false)
                     ->boolean(),
                 TextColumn::make('created_at')
+                    ->label('Created')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use App\Enums\AnnouncementType;
 use App\Models\Announcement;
+use App\Models\Group;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
@@ -29,14 +30,7 @@ class DatabaseSeeder extends Seeder
             '--name' => config('app.name'),
         ]);
 
-        Announcement::factory()->state([
-            'title' => 'Test Announcement',
-            'slug' => 'test-announcement',
-            'type' => AnnouncementType::Info,
-            'content' => 'This is a test announcement.',
-        ])->create();
-
-        User::factory()->create([
+        $admin = User::factory()->hasAttached(Group::firstOrCreate(['name' => 'Administrators']))->create([
             'name' => 'Test Admin',
             'email' => 'test@deschutesdesigngroup.com',
         ])->assignRole('super-admin');
@@ -51,12 +45,20 @@ class DatabaseSeeder extends Seeder
             'email' => 'user@deschutesdesigngroup.com',
         ])->assignRole('user');
 
+        Announcement::factory()->state([
+            'title' => 'Test Announcement',
+            'slug' => 'test-announcement',
+            'type' => AnnouncementType::Info,
+            'content' => 'This is a test announcement.',
+        ])->for($admin, 'author')->create();
+
         $this->call([
             BlogSeeder::class,
             ProductSeeder::class,
             ForumSeeder::class,
             PolicySeeder::class,
             SupportTicketCategorySeeder::class,
+            PageSeeder::class,
         ]);
     }
 }
