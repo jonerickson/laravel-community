@@ -8,10 +8,8 @@ use App\Events\PriceCreated;
 use App\Events\PriceDeleted;
 use App\Events\PriceUpdated;
 use App\Managers\PaymentManager;
-use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Log;
 
 class SyncPriceWithPaymentProvider implements ShouldQueue
 {
@@ -25,30 +23,14 @@ class SyncPriceWithPaymentProvider implements ShouldQueue
     public function handle(PriceCreated|PriceUpdated|PriceDeleted $event): void
     {
         if (! $event->price->product->external_product_id) {
-            Log::warning('Cannot sync price - product has no external_product_id', [
-                'product_price_id' => $event->price->id,
-                'product_id' => $event->price->product->id,
-            ]);
-
             return;
         }
 
-        try {
-            match (true) {
-                $event instanceof PriceCreated => $this->handleProductPriceCreated($event),
-                $event instanceof PriceUpdated => $this->handleProductPriceUpdated($event),
-                $event instanceof PriceDeleted => $this->handleProductPriceDeleted($event),
-            };
-        } catch (Exception $e) {
-            Log::error('Failed to sync product price with payment provider', [
-                'product_price_id' => $event->price->id,
-                'product_id' => $event->price->product_id,
-                'event_type' => $event::class,
-                'error' => $e->getMessage(),
-            ]);
-
-            throw $e;
-        }
+        match (true) {
+            $event instanceof PriceCreated => $this->handleProductPriceCreated($event),
+            $event instanceof PriceUpdated => $this->handleProductPriceUpdated($event),
+            $event instanceof PriceDeleted => $this->handleProductPriceDeleted($event),
+        };
     }
 
     protected function handleProductPriceCreated(PriceCreated $event): void
@@ -60,11 +42,6 @@ class SyncPriceWithPaymentProvider implements ShouldQueue
         }
 
         $this->paymentManager->createPrice($price);
-
-        Log::info('Product price created in payment provider', [
-            'product_price_id' => $price->id,
-            'product_id' => $price->product?->id,
-        ]);
     }
 
     protected function handleProductPriceUpdated(PriceUpdated $event): void
@@ -76,11 +53,6 @@ class SyncPriceWithPaymentProvider implements ShouldQueue
         }
 
         $this->paymentManager->updatePrice($price);
-
-        Log::info('Product price updated in payment provider', [
-            'product_price_id' => $price->id,
-            'product_id' => $price->product?->id,
-        ]);
     }
 
     protected function handleProductPriceDeleted(PriceDeleted $event): void
@@ -92,10 +64,5 @@ class SyncPriceWithPaymentProvider implements ShouldQueue
         }
 
         $this->paymentManager->deletePrice($price);
-
-        Log::info('Product price deleted in payment provider', [
-            'product_price_id' => $price->id,
-            'product_id' => $price->product?->id,
-        ]);
     }
 }
