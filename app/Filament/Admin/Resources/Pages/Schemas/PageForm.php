@@ -37,7 +37,12 @@ class PageForm
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (string $context, $state, Set $set): mixed => $context === 'create' ? $set('slug', Str::slug($state)) : null),
+                                    ->afterStateUpdated(function (string $context, $state, Set $set) {
+                                        if ($context === 'create') {
+                                            $set('slug', Str::slug($state));
+                                            $set('navigation_label', Str::title($state));
+                                        }
+                                    }),
                                 TextInput::make('slug')
                                     ->disabledOn('edit')
                                     ->required()
@@ -105,16 +110,16 @@ class PageForm
                             ->schema([
                                 Toggle::make('show_in_navigation')
                                     ->label('Show in Navigation')
-                                    ->default(false)
+                                    ->default(true)
                                     ->helperText('Display this page in the site navigation.'),
                                 TextInput::make('navigation_label')
                                     ->label('Label')
                                     ->maxLength(255)
-                                    ->helperText('Optional custom label for navigation (uses title if empty).'),
+                                    ->helperText('Optional custom label for navigation. The title will be used if empty.'),
                                 TextInput::make('navigation_order')
                                     ->label('Order')
                                     ->numeric()
-                                    ->default(0)
+                                    ->default(10)
                                     ->helperText('Order in which this page appears in navigation.'),
                             ]),
                     ]),

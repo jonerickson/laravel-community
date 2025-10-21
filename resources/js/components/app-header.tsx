@@ -81,7 +81,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const page = usePage<App.Data.SharedData>();
-    const { auth } = page.props;
+    const { auth, navigationPages } = page.props;
     const getInitials = useInitials();
 
     return (
@@ -118,6 +118,19 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                     </Link>
                                                 ) : null;
                                             })}
+
+                                            {navigationPages && navigationPages.length > 0 && (
+                                                <>
+                                                    <div className="my-2 border-t border-sidebar-border/80" />
+                                                    {navigationPages
+                                                        .sort((a, b) => a.order - b.order)
+                                                        .map((page) => (
+                                                            <Link key={page.id} href={page.url} className="flex items-center space-x-2 font-medium">
+                                                                <span>{page.label}</span>
+                                                            </Link>
+                                                        ))}
+                                                </>
+                                            )}
                                         </div>
 
                                         <div className="flex flex-col space-y-4">
@@ -163,6 +176,24 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                             )}
                                         </NavigationMenuItem>
                                     ) : null;
+                                })}
+
+                                {navigationPages?.map((page) => {
+                                    const isActive = route().current('pages.show', { slug: page.slug });
+
+                                    return (
+                                        <NavigationMenuItem key={page.id} className="relative flex h-full items-center">
+                                            <Link
+                                                href={page.url}
+                                                className={cn(navigationMenuTriggerStyle(), isActive && activeItemStyles, 'h-9 px-3')}
+                                            >
+                                                {page.label}
+                                            </Link>
+                                            {isActive && (
+                                                <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
+                                            )}
+                                        </NavigationMenuItem>
+                                    );
                                 })}
                             </NavigationMenuList>
                         </NavigationMenu>

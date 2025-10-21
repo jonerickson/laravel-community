@@ -22,30 +22,38 @@ import {
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
+interface MainNavItem extends NavItem {
+    order: number;
+}
+
+const mainNavItems: MainNavItem[] = [
     {
         title: 'Home',
         href: () => route('home'),
         icon: HouseIcon,
         isActive: () => route().current('home'),
+        order: 1,
     },
     {
         title: 'Dashboard',
         href: () => route('dashboard'),
         icon: LayoutGrid,
         isActive: () => route().current('dashboard'),
+        order: 2,
     },
     {
         title: 'Blog',
         href: () => route('blog.index'),
         icon: Newspaper,
         isActive: () => route().current('blog.*'),
+        order: 3,
     },
     {
         title: 'Forums',
         href: () => route('forums.index'),
         icon: LibraryBig,
         isActive: () => route().current('forums.*'),
+        order: 4,
     },
 ];
 
@@ -126,7 +134,25 @@ const adminNavItems: NavItem[] = [
 const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
-    const { isAdmin } = usePage<App.Data.SharedData>().props.auth;
+    const page = usePage<App.Data.SharedData>();
+    const { isAdmin } = page.props.auth;
+    const { navigationPages } = page.props;
+
+    const customNavItems =
+        navigationPages?.map((navPage) => ({
+            title: navPage.label,
+            href: navPage.url,
+            isActive: () => route().current('pages.show', { slug: navPage.slug }),
+            order: navPage.order,
+            isCustom: true,
+        })) ?? [];
+
+    const platformNavItems = [...mainNavItems.map((item) => ({ ...item, isCustom: false })), ...customNavItems].sort((a, b) => {
+        if (a.order === b.order) {
+            return a.isCustom ? -1 : 1;
+        }
+        return a.order - b.order;
+    });
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -143,7 +169,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain title="Platform" items={mainNavItems} />
+                <NavMain title="Platform" items={platformNavItems} />
                 <NavMain title="Account" items={accountNavItems} />
                 <NavMain title="Store" items={storeNavItems} />
                 <NavMain title="Support" items={supportNavItems} />

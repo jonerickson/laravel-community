@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\Sluggable;
+use App\Events\PageUpdated;
 use App\Traits\HasAuthor;
 use App\Traits\HasSlug;
 use App\Traits\HasUrl;
@@ -80,6 +81,10 @@ class Page extends Model implements Sluggable
         'show_in_navigation',
         'navigation_label',
         'navigation_order',
+    ];
+
+    protected $dispatchesEvents = [
+        'updated' => PageUpdated::class,
     ];
 
     public function generateSlug(): ?string

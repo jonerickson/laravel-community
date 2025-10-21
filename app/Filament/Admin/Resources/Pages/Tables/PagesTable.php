@@ -79,7 +79,6 @@ class PagesTable
                     DeleteBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('created_at', 'desc')
-            ->reorderable('navigation_order');
+            ->defaultSort('navigation_order');
     }
 }
