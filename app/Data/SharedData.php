@@ -19,6 +19,9 @@ class SharedData extends Data
     /** @var AnnouncementData[] */
     public array $announcements;
 
+    /** @var NavigationPageData[] */
+    public array $navigationPages;
+
     public string $name;
 
     public ?string $email = null;

@@ -11,6 +11,7 @@
         "types": "tsc --noEmit"
     },
     "dependencies": {
+        "@monaco-editor/react": "4.7.0",
         "@radix-ui/react-popover": "1.1.15",
         "react": "^19.0.0",
         "react-dom": "^19.0.0"

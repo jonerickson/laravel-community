@@ -19,6 +19,8 @@ export function useFlashMessages() {
         if (flash?.message && flash.message !== lastMessageRef.current) {
             lastMessageRef.current = flash.message;
 
+            console.log(flash);
+
             const variant = flash.messageVariant;
 
             switch (variant) {

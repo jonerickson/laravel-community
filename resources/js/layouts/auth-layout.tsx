@@ -1,4 +1,5 @@
 import { AbstractBackgroundPattern } from '@/components/ui/abstract-background-pattern';
+import { Toaster } from '@/components/ui/sonner';
 import { useFingerprint } from '@/hooks';
 import { useFlashMessages } from '@/hooks/use-flash-messages';
 import AuthLayoutTemplate from '@/layouts/auth/auth-simple-layout';
@@ -14,6 +15,7 @@ export default function AuthLayout({ children, title, description, ...props }: {
             </div>
             <AuthLayoutTemplate title={title} description={description} {...props}>
                 {children}
+                <Toaster />
             </AuthLayoutTemplate>
         </div>
     );

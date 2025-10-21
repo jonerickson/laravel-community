@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Onboarding;
 
 use App\Http\Requests\Onboarding\OnboardingSubscribeRequest;
 use App\Managers\PaymentManager;
+use App\Models\Order;
 use App\Services\ShoppingCartService;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,7 +21,7 @@ class SubscriptionController
     {
         $order = $this->shoppingCartService->getOrCreatePendingOrder();
 
-        if (! $order instanceof \App\Models\Order) {
+        if (! $order instanceof Order) {
             return back()
                 ->with('message', 'Unable to checkout. Please try again later.')
                 ->with('messageVariant', 'error');

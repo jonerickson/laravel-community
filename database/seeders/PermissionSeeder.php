@@ -87,11 +87,13 @@ class PermissionSeeder extends Seeder
             'view_any_forums_categories',
             'view_any_posts',
             'view_any_topics',
+            'view_any_pages',
             'view_comments',
             'view_forums',
             'view_forums_category',
             'view_posts',
             'view_topics',
+            'view_pages',
         ]);
     }
 
@@ -124,11 +126,13 @@ class PermissionSeeder extends Seeder
             'view_any_forums_categories',
             'view_any_posts',
             'view_any_topics',
+            'view_any_pages',
             'view_comments',
             'view_forums',
             'view_forums_category',
             'view_posts',
             'view_topics',
+            'view_pages',
             'like_comments',
             'like_posts',
             'reply_topics',

@@ -193,6 +193,14 @@ declare namespace App.Data {
         likesSummary: Array<App.Data.LikeData>;
         userReactions: Array<string>;
     };
+    export type NavigationPageData = {
+        id: number;
+        title: string;
+        slug: string;
+        label: string;
+        order: number;
+        url: string;
+    };
     export type OrderData = {
         id: number;
         userId: number;
@@ -227,6 +235,23 @@ declare namespace App.Data {
         isRecurring: boolean;
         product: App.Data.ProductData | null;
         price: App.Data.PriceData | null;
+        createdAt: string | null;
+        updatedAt: string | null;
+    };
+    export type PageData = {
+        id: number;
+        title: string;
+        slug: string;
+        description: string | null;
+        htmlContent: string;
+        cssContent: string | null;
+        jsContent: string | null;
+        isPublished: boolean;
+        publishedAt: string | null;
+        showInNavigation: boolean;
+        navigationLabel: string | null;
+        navigationOrder: number;
+        author: App.Data.UserData | null;
         createdAt: string | null;
         updatedAt: string | null;
     };
@@ -363,7 +388,7 @@ declare namespace App.Data {
         metadata: Array<string, unknown> | null;
         prices: Array<App.Data.PriceData>;
         defaultPrice: App.Data.PriceData | null;
-        averageRating: number | null;
+        averageRating: number;
         reviewsCount: number;
         categories: Array<App.Data.ProductCategoryData>;
         policies: Array<App.Data.PolicyData>;
@@ -388,6 +413,7 @@ declare namespace App.Data {
     export type SharedData = {
         auth: App.Data.AuthData;
         announcements: Array<App.Data.AnnouncementData>;
+        navigationPages: Array<App.Data.NavigationPageData>;
         name: string;
         email: string | null;
         phone: string | null;
@@ -567,4 +593,7 @@ declare namespace App.Enums {
     export type SupportTicketPriority = 'low' | 'medium' | 'high' | 'critical';
     export type SupportTicketStatus = 'new' | 'open' | 'in_progress' | 'resolved' | 'closed';
     export type WarningConsequenceType = 'none' | 'moderate_content' | 'post_restriction' | 'ban';
+}
+declare namespace App.Services.Migration {
+    export type DependencyType = 'pre' | 'post';
 }

@@ -5,6 +5,12 @@ export interface BreadcrumbItem {
     href: string;
 }
 
+export interface File {
+    name: string;
+    language: 'html' | 'css' | 'javascript';
+    content: string;
+}
+
 export interface NavGroup {
     title: string;
     items: NavItem[];

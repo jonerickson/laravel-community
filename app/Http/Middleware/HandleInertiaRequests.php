@@ -7,9 +7,11 @@ namespace App\Http\Middleware;
 use App\Data\AnnouncementData;
 use App\Data\AuthData;
 use App\Data\FlashData;
+use App\Data\NavigationPageData;
 use App\Data\SharedData;
 use App\Data\UserData;
 use App\Models\Announcement;
+use App\Models\Page;
 use App\Models\Permission;
 use App\Models\User;
 use App\Services\ShoppingCartService;
@@ -48,6 +50,19 @@ class HandleInertiaRequests extends Middleware
                 ->unread()
                 ->latest()
                 ->get()),
+            'navigationPages' => Cache::remember('navigation_pages', now()->addHour(), fn () => Page::query()
+                ->published()
+                ->inNavigation()
+                ->get()
+                ->map(fn (Page $page): NavigationPageData => NavigationPageData::from([
+                    'id' => $page->id,
+                    'title' => $page->title,
+                    'slug' => $page->slug,
+                    'label' => $page->navigation_label ?? $page->title,
+                    'order' => $page->navigation_order,
+                    'url' => $page->url,
+                ]))
+                ->toArray()),
             'cartCount' => $this->shoppingCartService->getCartCount(),
             'memberCount' => Cache::remember('member_count', now()->addHour(), fn () => Number::format(User::count())),
             'flash' => null,
