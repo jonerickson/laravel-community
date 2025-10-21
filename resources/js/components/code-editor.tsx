@@ -14,7 +14,7 @@ import { Kbd } from '@/components/ui/kbd';
 import { Separator } from '@/components/ui/separator';
 import { File } from '@/types';
 import { usePage } from '@inertiajs/react';
-import { Editor, OnMount } from '@monaco-editor/react';
+import { Editor, Monaco, OnMount } from '@monaco-editor/react';
 import { Code2, Copy, Download, Eye, EyeOff, FileCode, Maximize2, Minimize2, Moon, Sun } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import SharedData = App.Data.SharedData;
@@ -227,6 +227,10 @@ export function CodeEditor({ html, css, js, onSave, defaultHtml, defaultCss, def
         setFiles((prev) => prev.map((f) => (f.id === activeFileId ? { ...f, content: value } : f)));
     };
 
+    const handleBeforeMount = (monaco: Monaco) => {
+        //
+    };
+
     const handleEditorOnMount: OnMount = (editor) => {
         editorRef.current = editor;
     };
@@ -421,6 +425,7 @@ export function CodeEditor({ html, css, js, onSave, defaultHtml, defaultCss, def
                         height="100%"
                         language={activeFile.language}
                         value={activeFile.content}
+                        beforeMount={handleBeforeMount}
                         onMount={handleEditorOnMount}
                         onChange={handleEditorChange}
                         theme={theme === 'dark' ? 'vs-dark' : 'light'}
