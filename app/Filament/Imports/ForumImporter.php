@@ -21,22 +21,15 @@ class ForumImporter extends Importer
             ImportColumn::make('name')
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
-            ImportColumn::make('slug')
-                ->requiredMapping()
-                ->rules(['required', 'max:255']),
-            ImportColumn::make('description'),
+            ImportColumn::make('description')
+                ->rules(['nullable', 'max:65535']),
             ImportColumn::make('category')
                 ->relationship(),
-            ImportColumn::make('rules'),
-            ImportColumn::make('icon')
-                ->rules(['max:255']),
+            ImportColumn::make('rules')
+                ->rules(['nullable', 'max:65535']),
             ImportColumn::make('color')
                 ->requiredMapping()
                 ->rules(['required', 'max:7']),
-            ImportColumn::make('order')
-                ->requiredMapping()
-                ->numeric()
-                ->rules(['required', 'integer']),
             ImportColumn::make('is_active')
                 ->requiredMapping()
                 ->boolean()

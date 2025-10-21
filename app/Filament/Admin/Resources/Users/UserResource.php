@@ -161,10 +161,12 @@ class UserResource extends Resource
                                             ->persistCollapsed()
                                             ->components([
                                                 TextEntry::make('created_at')
+                                                    ->label('Created')
                                                     ->dateTime()
                                                     ->since()
                                                     ->dateTimeTooltip(),
                                                 TextEntry::make('updated_at')
+                                                    ->label('Updated')
                                                     ->dateTime()
                                                     ->since()
                                                     ->dateTimeTooltip(),

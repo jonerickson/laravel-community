@@ -39,6 +39,7 @@ class UserExporter extends Exporter
             ExportColumn::make('vat_id')
                 ->label('VAT ID'),
             ExportColumn::make('trial_ends_at'),
+            ExportColumn::make('onboarded_at'),
             ExportColumn::make('last_seen_at'),
             ExportColumn::make('created_at'),
             ExportColumn::make('updated_at'),

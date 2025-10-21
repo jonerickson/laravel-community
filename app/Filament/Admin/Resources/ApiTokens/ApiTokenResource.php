@@ -59,7 +59,7 @@ class ApiTokenResource extends Resource
                             ->searchable()
                             ->required(),
                         DateTimePicker::make('expires_at')
-                            ->label('Expires At')
+                            ->label('Expires')
                             ->helperText('Leave empty for tokens that never expire'),
                     ]),
             ]);
@@ -76,7 +76,7 @@ class ApiTokenResource extends Resource
                     ->sortable(),
                 TextColumn::make('expires_at')
                     ->placeholder('Does Not Expire')
-                    ->label('Expires At')
+                    ->label('Expires')
                     ->dateTime()
                     ->sortable()
                     ->badge()

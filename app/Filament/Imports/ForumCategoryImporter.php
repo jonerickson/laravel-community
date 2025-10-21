@@ -21,18 +21,10 @@ class ForumCategoryImporter extends Importer
             ImportColumn::make('name')
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
-            ImportColumn::make('slug')
-                ->requiredMapping()
-                ->rules(['required', 'max:255']),
-            ImportColumn::make('description'),
-            ImportColumn::make('icon')
-                ->rules(['max:255']),
+            ImportColumn::make('description')
+                ->rules(['nullable', 'max:65535']),
             ImportColumn::make('color')
-                ->rules(['max:7']),
-            ImportColumn::make('order')
-                ->requiredMapping()
-                ->numeric()
-                ->rules(['required', 'integer']),
+                ->rules(['required', 'max:7']),
             ImportColumn::make('is_active')
                 ->requiredMapping()
                 ->boolean()

@@ -104,7 +104,7 @@ class PageForm
                                     ->label('Published')
                                     ->default(false),
                                 DateTimePicker::make('published_at')
-                                    ->label('Published At'),
+                                    ->label('Publish Date'),
                             ]),
                         Section::make('Navigation')
                             ->schema([

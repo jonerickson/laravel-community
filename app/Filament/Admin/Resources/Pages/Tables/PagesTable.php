@@ -50,6 +50,7 @@ class PagesTable
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('published_at')
+                    ->label('Publish Date')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

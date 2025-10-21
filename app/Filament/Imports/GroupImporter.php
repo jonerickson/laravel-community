@@ -21,16 +21,11 @@ class GroupImporter extends Importer
             ImportColumn::make('name')
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
-            ImportColumn::make('description'),
-            ImportColumn::make('image')
-                ->rules(['max:255']),
+            ImportColumn::make('description')
+                ->rules(['nullable', 'max:65535']),
             ImportColumn::make('color')
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
-            ImportColumn::make('order')
-                ->requiredMapping()
-                ->numeric()
-                ->rules(['required', 'integer']),
             ImportColumn::make('is_active')
                 ->requiredMapping()
                 ->boolean()

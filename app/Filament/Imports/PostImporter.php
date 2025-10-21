@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Imports;
 
+use App\Enums\PostType;
 use App\Models\Post;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Support\Number;
+use Illuminate\Validation\Rule;
 use Override;
 
 class PostImporter extends Importer
@@ -20,16 +22,15 @@ class PostImporter extends Importer
         return [
             ImportColumn::make('type')
                 ->requiredMapping()
-                ->rules(['required', 'max:255']),
+                ->rules(['required', 'max:255', Rule::enum(PostType::class)]),
             ImportColumn::make('title')
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
-            ImportColumn::make('slug')
-                ->rules(['max:255']),
-            ImportColumn::make('excerpt'),
+            ImportColumn::make('excerpt')
+                ->rules(['nullable', 'max:65535']),
             ImportColumn::make('content')
                 ->requiredMapping()
-                ->rules(['required']),
+                ->rules(['required', 'max:65535']),
             ImportColumn::make('is_published')
                 ->requiredMapping()
                 ->boolean()
@@ -52,15 +53,10 @@ class PostImporter extends Importer
                 ->rules(['required', 'boolean']),
             ImportColumn::make('topic')
                 ->relationship(),
-            ImportColumn::make('featured_image')
-                ->rules(['max:255']),
-            ImportColumn::make('metadata'),
             ImportColumn::make('published_at')
-                ->rules(['datetime']),
+                ->rules(['nullable', 'datetime']),
             ImportColumn::make('created_by')
-                ->requiredMapping()
-                ->numeric()
-                ->rules(['required', 'integer']),
+                ->relationship('author'),
         ];
     }
 

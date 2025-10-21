@@ -18,56 +18,23 @@ class UserImporter extends Importer
     public static function getColumns(): array
     {
         return [
-            ImportColumn::make('reference_id')
-                ->requiredMapping()
-                ->rules(['required', 'max:36']),
             ImportColumn::make('name')
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
             ImportColumn::make('email')
-                ->rules(['email', 'max:255']),
-            ImportColumn::make('email_verified_at')
-                ->rules(['email', 'datetime']),
-            ImportColumn::make('signature'),
-            ImportColumn::make('password')
-                ->rules(['max:255']),
-            ImportColumn::make('app_authentication_secret'),
-            ImportColumn::make('app_authentication_recovery_codes'),
-            ImportColumn::make('has_email_authentication')
                 ->requiredMapping()
-                ->boolean()
-                ->rules(['required', 'email', 'boolean']),
-            ImportColumn::make('avatar')
-                ->rules(['max:255']),
-            ImportColumn::make('stripe_id')
-                ->rules(['max:255']),
-            ImportColumn::make('pm_type')
-                ->rules(['max:255']),
-            ImportColumn::make('pm_last_four')
-                ->rules(['max:4']),
-            ImportColumn::make('pm_expiration')
-                ->rules(['max:255']),
-            ImportColumn::make('extra_billing_information'),
-            ImportColumn::make('trial_ends_at')
-                ->rules(['datetime']),
-            ImportColumn::make('billing_address')
-                ->rules(['max:255']),
-            ImportColumn::make('billing_address_line_2')
-                ->rules(['max:255']),
-            ImportColumn::make('billing_city')
-                ->rules(['max:255']),
-            ImportColumn::make('billing_state')
-                ->rules(['max:255']),
-            ImportColumn::make('billing_postal_code')
-                ->rules(['max:25']),
-            ImportColumn::make('vat_id')
-                ->rules(['max:50']),
-            ImportColumn::make('invoice_emails')
-                ->rules(['email']),
-            ImportColumn::make('billing_country')
-                ->rules(['max:2']),
+                ->rules(['required', 'email', 'max:255']),
+            ImportColumn::make('email_verified_at')
+                ->requiredMapping()
+                ->rules(['nullable', 'email', 'datetime']),
+            ImportColumn::make('signature')
+                ->rules(['nullable', 'max:65535']),
+            ImportColumn::make('onboarded_at')
+                ->requiredMapping()
+                ->rules(['nullable', 'datetime']),
             ImportColumn::make('last_seen_at')
-                ->rules(['datetime']),
+                ->requiredMapping()
+                ->rules(['nullable', 'datetime']),
         ];
     }
 

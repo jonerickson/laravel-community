@@ -144,7 +144,7 @@ class ActivityLogResource extends Resource
                                     ->label('Subject Type')
                                     ->formatStateUsing(fn (?string $state): string => filled($state) ? class_basename($state) : 'N/A'),
                                 TextEntry::make('created_at')
-                                    ->label('Created At')
+                                    ->label('Created')
                                     ->dateTime(),
                             ])
                             ->columns(2),

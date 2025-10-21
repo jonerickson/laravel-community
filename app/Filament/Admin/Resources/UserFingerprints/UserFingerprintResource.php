@@ -70,7 +70,7 @@ class UserFingerprintResource extends Resource
                     ->label('Banned')
                     ->reactive(),
                 DateTimePicker::make('banned_at')
-                    ->label('Banned At')
+                    ->label('Ban Date')
                     ->visible(fn (Get $get): mixed => $get('is_banned'))
                     ->disabled(),
                 Textarea::make('ban_reason')

@@ -43,11 +43,11 @@ class UserWarningsRelationManager extends RelationManager
                     ->maxLength(1000)
                     ->placeholder('Optional: provide specific details about this warning instance'),
                 DateTimePicker::make('consequence_expires_at')
-                    ->label('Consequence Expires At')
+                    ->label('Consequence Expires')
                     ->helperText('The date at which the issue consequence expires.')
                     ->nullable(),
                 DateTimePicker::make('points_expire_at')
-                    ->label('Points Expire At')
+                    ->label('Points Expire')
                     ->helperText('The date at which the issued points expire.')
                     ->required(),
             ]);
@@ -79,7 +79,7 @@ class UserWarningsRelationManager extends RelationManager
                     ->badge(),
                 TextColumn::make('consequence_expires_at')
                     ->placeholder('No Consequence Expiration')
-                    ->label('Consequence Expire At')
+                    ->label('Consequence Expire')
                     ->dateTime()
                     ->since()
                     ->dateTimeTooltip()
