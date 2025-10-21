@@ -24056,6 +24056,13 @@ namespace App\Http\Requests\Auth {
             }
     }
 
+namespace App\Http\Requests\Admin\Pages {
+    /**
+     */
+    class StorePageRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    }
+
 namespace App\Http\Requests\Api\Frontend {
     /**
      */
@@ -24082,11 +24089,15 @@ namespace App\Http\Requests\Api\Frontend {
 namespace App\Http\Requests\Onboarding {
     /**
      */
-    class OnboardingCompleteRequest extends \Illuminate\Foundation\Http\FormRequest {
+    class OnboardingSubscribeRequest extends \Illuminate\Foundation\Http\FormRequest {
             }
     /**
      */
     class OnboardingUpdateRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    /**
+     */
+    class OnboardingProfileRequest extends \Illuminate\Foundation\Http\FormRequest {
             }
     }
 

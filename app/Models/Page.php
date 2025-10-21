@@ -31,15 +31,35 @@ use Illuminate\Support\Str;
  * @property int $created_by
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property \App\Enums\PublishableStatus $status
  * @property-read User $author
+ * @property-read mixed $author_name
+ * @property-read User $creator
  * @property-read string|null $url
  *
+ * @method static \Database\Factories\PageFactory factory($count = null, $state = [])
  * @method static Builder<static>|Page inNavigation()
  * @method static Builder<static>|Page newModelQuery()
  * @method static Builder<static>|Page newQuery()
  * @method static Builder<static>|Page published()
  * @method static Builder<static>|Page query()
+ * @method static Builder<static>|Page recent()
  * @method static Builder<static>|Page unpublished()
+ * @method static Builder<static>|Page whereCreatedAt($value)
+ * @method static Builder<static>|Page whereCreatedBy($value)
+ * @method static Builder<static>|Page whereCssContent($value)
+ * @method static Builder<static>|Page whereDescription($value)
+ * @method static Builder<static>|Page whereHtmlContent($value)
+ * @method static Builder<static>|Page whereId($value)
+ * @method static Builder<static>|Page whereIsPublished($value)
+ * @method static Builder<static>|Page whereJsContent($value)
+ * @method static Builder<static>|Page whereNavigationLabel($value)
+ * @method static Builder<static>|Page whereNavigationOrder($value)
+ * @method static Builder<static>|Page wherePublishedAt($value)
+ * @method static Builder<static>|Page whereShowInNavigation($value)
+ * @method static Builder<static>|Page whereSlug($value)
+ * @method static Builder<static>|Page whereTitle($value)
+ * @method static Builder<static>|Page whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */
