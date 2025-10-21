@@ -267,16 +267,13 @@ export function CodeEditor({ html, css, js, onSave, defaultHtml, defaultCss, def
 
     const toggleFullscreen = () => {
         if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-            setIsFullscreen(true);
+            document.documentElement.requestFullscreen().then(() => setIsFullscreen(true));
         } else {
-            document.exitFullscreen();
-            setIsFullscreen(false);
+            document.exitFullscreen().then(() => setIsFullscreen(false));
         }
     };
 
     const handleFormat = async () => {
-        console.log(editorRef);
         if (!editorRef.current) {
             return;
         }
