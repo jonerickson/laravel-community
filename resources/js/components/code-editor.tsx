@@ -17,6 +17,7 @@ import { usePage } from '@inertiajs/react';
 import { Editor, Monaco, OnMount } from '@monaco-editor/react';
 import { Code2, Copy, Download, Eye, EyeOff, FileCode, Maximize2, Minimize2, Moon, Sun } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import SharedData = App.Data.SharedData;
 
 export interface FileTab {
@@ -237,6 +238,7 @@ export function CodeEditor({ html, css, js, onSave, defaultHtml, defaultCss, def
 
     const handleCopyCode = async () => {
         await navigator.clipboard.writeText(activeFile.content);
+        toast.info('Copied!');
     };
 
     const handleSave = () => {
@@ -260,6 +262,7 @@ export function CodeEditor({ html, css, js, onSave, defaultHtml, defaultCss, def
         a.download = activeFile.name;
         a.click();
         URL.revokeObjectURL(url);
+        toast.info('Downloading...');
     };
 
     const toggleFullscreen = () => {
