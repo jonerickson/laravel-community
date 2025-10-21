@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Users\Pages;
 
+use App\Filament\Admin\Resources\Users\Actions\SyncGroupsAction;
 use App\Filament\Admin\Resources\Users\UserResource;
+use App\Models\User;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -16,6 +19,10 @@ class EditUser extends EditRecord
     {
         return [
             DeleteAction::make(),
+            ActionGroup::make([
+                SyncGroupsAction::make()
+                    ->user(fn (User $record) => $this->record),
+            ]),
         ];
     }
 }

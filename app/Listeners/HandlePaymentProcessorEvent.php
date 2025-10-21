@@ -8,24 +8,22 @@ use App\Enums\OrderStatus;
 use App\Events\PaymentActionRequired;
 use App\Events\PaymentSucceeded;
 use App\Events\RefundCreated;
-use App\Events\SubscriptionCreated;
-use App\Events\SubscriptionDeleted;
-use App\Events\SubscriptionUpdated;
 use App\Mail\Payments\PaymentActionRequired as PaymentActionRequiredMail;
 use App\Mail\Payments\PaymentSucceeded as PaymentSucceededMail;
 use App\Mail\Payments\RefundCreated as RefundCreatedMail;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Mail;
 
-class HandlePaymentProcessorEvent
+class HandlePaymentProcessorEvent implements ShouldQueue
 {
-    public function handle(PaymentSucceeded|PaymentActionRequired|SubscriptionCreated|SubscriptionUpdated|SubscriptionDeleted|RefundCreated $event): void
+    use Queueable;
+
+    public function handle(PaymentSucceeded|PaymentActionRequired|RefundCreated $event): void
     {
         match ($event::class) {
             PaymentSucceeded::class => $this->handlePaymentSucceeded($event),
             PaymentActionRequired::class => $this->handlePaymentActionRequired($event),
-            SubscriptionCreated::class => $this->handleSubscriptionCreated(),
-            SubscriptionUpdated::class => $this->handleSubscriptionUpdated(),
-            SubscriptionDeleted::class => $this->handleSubscriptionDeleted(),
             RefundCreated::class => $this->handleRefundCreated($event),
         };
     }
@@ -58,21 +56,6 @@ class HandlePaymentProcessorEvent
         $event->order->update([
             'status' => OrderStatus::RequiresAction,
         ]);
-    }
-
-    private function handleSubscriptionCreated(): void
-    {
-        //
-    }
-
-    private function handleSubscriptionUpdated(): void
-    {
-        //
-    }
-
-    private function handleSubscriptionDeleted(): void
-    {
-        //
     }
 
     private function handleRefundCreated(RefundCreated $event): void

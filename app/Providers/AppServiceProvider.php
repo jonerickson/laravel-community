@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Enums\Role;
 use App\Models\Permission;
 use App\Models\Subscription;
 use App\Models\User;
@@ -55,7 +56,7 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Gate::before(function (?User $user = null) {
-            if ($user?->hasRole('super-admin') === true) {
+            if ($user?->hasRole(Role::Administrator) === true) {
                 return true;
             }
         });

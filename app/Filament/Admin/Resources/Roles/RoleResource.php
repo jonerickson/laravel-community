@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Roles;
 
+use App\Enums\Role as RoleEnum;
 use App\Filament\Admin\Resources\Roles\Pages\CreateRole;
 use App\Filament\Admin\Resources\Roles\Pages\EditRole;
 use App\Filament\Admin\Resources\Roles\Pages\ListRoles;
@@ -61,7 +62,7 @@ class RoleResource extends Resource
 
     public static function canEdit(Model $record): bool
     {
-        return parent::canEdit($record) && $record->name !== 'super-admin';
+        return parent::canEdit($record) && $record->name !== RoleEnum::Administrator->value;
     }
 
     public static function canDelete(Model $record): bool

@@ -10,10 +10,13 @@ use App\Mail\Store\GiftCardReceived;
 use App\Mail\Store\PromoCodeReceived;
 use App\Models\Discount;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Mail;
 
 class GenerateDiscountsForOrder implements ShouldQueue
 {
+    use Queueable;
+
     public function handle(OrderSucceeded $event): void
     {
         $order = $event->order;

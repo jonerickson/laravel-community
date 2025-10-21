@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\SupportTickets\Schemas;
 
+use App\Enums\Role;
 use App\Enums\SupportTicketPriority;
 use App\Enums\SupportTicketStatus;
 use Filament\Forms;
@@ -39,7 +40,7 @@ class SupportTicketForm
                             ->searchable(),
                         Forms\Components\Select::make('assigned_to')
                             ->label('Assigned Agent')
-                            ->relationship('assignedTo', 'name', fn (Builder $query) => $query->role(['super-admin', 'support-agent']))
+                            ->relationship('assignedTo', 'name', fn (Builder $query) => $query->role([Role::Administrator, Role::SupportAgent]))
                             ->searchable()
                             ->preload()
                             ->placeholder('Unassigned'),

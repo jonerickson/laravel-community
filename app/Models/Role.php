@@ -14,7 +14,6 @@ use Spatie\Permission\Models\Role as BaseRole;
  * @property string $guard_name
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read UserGroup|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Group> $groups
  * @property-read int|null $groups_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Permission> $permissions

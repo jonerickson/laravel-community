@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Forums;
 
 use App\Actions\Action;
+use App\Enums\Role;
 use App\Models\Forum;
 use App\Models\Topic;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +25,7 @@ class DeleteTopicAction extends Action
     public function __invoke(): ?bool
     {
         abort_if(
-            boolean: $this->topic->created_by !== Auth::id() && ! request()->user()?->hasRole('super-admin'),
+            boolean: $this->topic->created_by !== Auth::id() && ! request()->user()?->hasRole(Role::Administrator),
             code: 403,
             message: 'You are not authorized to delete this topic.'
         );

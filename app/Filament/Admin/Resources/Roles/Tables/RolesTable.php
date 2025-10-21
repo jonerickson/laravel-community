@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Roles\Tables;
 
+use App\Enums\Role as RoleEnum;
 use App\Models\Role;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -31,7 +32,7 @@ class RolesTable
             ])
             ->recordActions([
                 EditAction::make()
-                    ->visible(fn (Role $record): bool => $record->name !== 'super-admin'),
+                    ->visible(fn (Role $record): bool => $record->name !== RoleEnum::Administrator->value),
                 DeleteAction::make()
                     ->visible(fn (Role $record): bool => ! in_array($record->name, ['super-admin', 'support-agent', 'guest', 'user', 'moderator'])),
             ]);

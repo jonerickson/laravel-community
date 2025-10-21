@@ -10,12 +10,12 @@ use App\Events\ProductUpdated;
 use App\Managers\PaymentManager;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 
 class SyncProductWithPaymentProvider implements ShouldQueue
 {
-    use InteractsWithQueue;
+    use Queueable;
 
     public function __construct(private readonly PaymentManager $paymentManager)
     {

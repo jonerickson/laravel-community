@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
+use App\Enums\Role;
 use App\Models\Group;
+use App\Models\User;
 use App\Models\UserGroup;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Collection;
 
 trait HasGroups
 {
@@ -15,23 +19,53 @@ trait HasGroups
         $table = $this->getTable();
         $groupsForeignPivotKey = $this->groupsForeignPivotKey ?? null;
 
-        return $this->belongsToMany(Group::class, "{$table}_groups", $groupsForeignPivotKey)
-            ->using(UserGroup::class);
+        $relation = $this->belongsToMany(Group::class, "{$table}_groups", $groupsForeignPivotKey);
+
+        if (static::class === User::class) {
+            $relation = $relation->using(UserGroup::class);
+        }
+
+        return $relation;
     }
 
     public function assignToGroup(Group $group): void
     {
-        $this->groups()->syncWithoutDetaching([$group->id]);
+        $this->groups()->syncWithoutDetaching($group);
     }
 
     public function removeFromGroup(Group $group): void
     {
-        $this->groups()->detach($group->id);
+        $this->groups()->detach($group);
     }
 
-    public function syncGroups(array $groupIds): void
+    public function syncGroups(bool $detaching = true): void
     {
-        $this->groups()->sync($groupIds);
+        $baseGroupIds = match (static::class) {
+            User::class => Group::query()->whereHas('roles', function (Builder $query) {
+                $query->whereIn('name', Collection::wrap(Role::cases())->map->value->toArray());
+            })->pluck('id'),
+            default => collect(),
+        };
+
+        $additionalGroupIds = match (static::class) {
+            User::class => $this->orders()
+                ->completed()
+                ->with('products.groups')
+                ->get()
+                ->pluck('products')
+                ->flatten()
+                ->pluck('groups')
+                ->flatten()
+                ->pluck('id')
+                ->unique(),
+            default => collect(),
+        };
+
+        $groupsUnique = $baseGroupIds
+            ->merge($additionalGroupIds)
+            ->unique();
+
+        $this->groups()->sync($groupsUnique, $detaching);
     }
 
     public function hasGroup(Group $group): bool

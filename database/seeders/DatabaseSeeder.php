@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Enums\AnnouncementType;
+use App\Enums\Role;
 use App\Models\Announcement;
 use App\Models\Group;
 use App\Models\User;
@@ -33,17 +34,17 @@ class DatabaseSeeder extends Seeder
         $admin = User::factory()->hasAttached(Group::firstOrCreate(['name' => 'Administrators']))->create([
             'name' => 'Test Admin',
             'email' => 'test@deschutesdesigngroup.com',
-        ])->assignRole('super-admin');
+        ])->assignRole(Role::Administrator);
 
         User::factory()->create([
             'name' => 'Test Moderator',
             'email' => 'moderator@deschutesdesigngroup.com',
-        ])->assignRole('moderator');
+        ])->assignRole(Role::Moderator);
 
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'user@deschutesdesigngroup.com',
-        ])->assignRole('user');
+        ])->assignRole(Role::User);
 
         Announcement::factory()->state([
             'title' => 'Test Announcement',

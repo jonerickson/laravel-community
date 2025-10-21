@@ -12,10 +12,14 @@ use App\Mail\SupportTickets\SupportTicketCommentAdded as SupportTicketCommentAdd
 use App\Mail\SupportTickets\SupportTicketCreated as SupportTicketCreatedMail;
 use App\Mail\SupportTickets\SupportTicketStatusChanged as SupportTicketStatusChangedMail;
 use Illuminate\Contracts\Mail\Mailable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Mail;
 
-class HandleSupportTicketEvent
+class HandleSupportTicketEvent implements ShouldQueue
 {
+    use Queueable;
+
     public function handle(SupportTicketCreated|SupportTicketCommentAdded|SupportTicketStatusChanged|SupportTicketUpdated $event): void
     {
         match ($event::class) {

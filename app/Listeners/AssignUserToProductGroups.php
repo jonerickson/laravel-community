@@ -7,31 +7,21 @@ namespace App\Listeners;
 use App\Events\OrderSucceeded;
 use App\Events\SubscriptionCreated;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Foundation\Queue\Queueable;
 
 class AssignUserToProductGroups implements ShouldQueue
 {
-    use InteractsWithQueue;
+    use Queueable;
 
     public function handle(SubscriptionCreated|OrderSucceeded $event): void
     {
         $order = $event->order;
         $user = $order->user;
 
-        $products = $order->products()->with('groups')->get();
-
-        foreach ($products as $product) {
-            $groups = $product->groups;
-
-            if ($groups->isEmpty()) {
-                continue;
-            }
-
-            foreach ($groups as $group) {
-                if (! $user->groups->contains($group->id)) {
-                    $user->assignToGroup($group);
-                }
-            }
+        if (! $user) {
+            return;
         }
+
+        $user->syncGroups();
     }
 }

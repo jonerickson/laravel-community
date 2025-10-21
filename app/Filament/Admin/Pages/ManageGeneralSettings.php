@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Pages;
 
+use App\Enums\Role;
 use App\Settings\GeneralSettings;
 use BackedEnum;
 use Filament\Forms\Components\TextInput;
@@ -31,7 +32,7 @@ class ManageGeneralSettings extends SettingsPage
 
     public static function canAccess(): bool
     {
-        return Auth::user()->hasRole('super-admin');
+        return Auth::user()->hasRole(Role::Administrator);
     }
 
     #[Override]

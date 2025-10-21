@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Store;
 
+use App\Models\Comment;
+use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Validator;
 use Override;
 
 class StoreReviewRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check();
+        return Auth::check() && Auth::user()->can('create', Comment::class);
     }
 
     public function rules(): array
@@ -35,5 +38,27 @@ class StoreReviewRequest extends FormRequest
             'rating.min' => 'Rating must be at least 1 star.',
             'rating.max' => 'Rating cannot exceed 5 stars.',
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            $product = $this->route('subscription');
+
+            if (! $product instanceof Product) {
+                return;
+            }
+
+            $existingReview = $product->reviews()
+                ->whereBelongsTo(Auth::user(), 'author')
+                ->exists();
+
+            if ($existingReview) {
+                $validator->errors()->add(
+                    'content',
+                    'You have already submitted a review for this product.'
+                );
+            }
+        });
     }
 }

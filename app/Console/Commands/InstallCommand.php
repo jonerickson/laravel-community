@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Enums\Role as RoleEnum;
 use App\Models\Group;
 use App\Models\Permission;
 use App\Models\Role;
@@ -70,7 +71,7 @@ class InstallCommand extends Command
             ]);
 
             $user->markEmailAsVerified();
-            $user->assignRole('super-admin');
+            $user->assignRole(RoleEnum::Administrator);
 
             $this->comment('User created successfully.');
         }

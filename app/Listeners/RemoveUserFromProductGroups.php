@@ -7,29 +7,21 @@ namespace App\Listeners;
 use App\Events\OrderCancelled;
 use App\Events\SubscriptionDeleted;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Foundation\Queue\Queueable;
 
 class RemoveUserFromProductGroups implements ShouldQueue
 {
-    use InteractsWithQueue;
+    use Queueable;
 
     public function handle(SubscriptionDeleted|OrderCancelled $event): void
     {
         $order = $event->order;
         $user = $order->user;
 
-        $products = $order->products()->with('groups')->get();
-
-        foreach ($products as $product) {
-            $groups = $product->groups;
-
-            if ($groups->isEmpty()) {
-                continue;
-            }
-
-            foreach ($groups as $group) {
-                $user->removeFromGroup($group);
-            }
+        if (! $user) {
+            return;
         }
+
+        $user->syncGroups();
     }
 }

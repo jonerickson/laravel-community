@@ -21,13 +21,13 @@ class PermissionSeeder extends Seeder
 
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $role = Role::firstOrCreate(['name' => 'super-admin']);
+        $role = Role::firstOrCreate(['name' => \App\Enums\Role::Administrator->value]);
         $role->givePermissionTo(Permission::all());
 
-        $guestRole = Role::firstOrCreate(['name' => 'guest']);
-        $moderatorRole = Role::firstOrCreate(['name' => 'moderator']);
-        $userRole = Role::firstOrCreate(['name' => 'user']);
-        Role::firstOrCreate(['name' => 'support-agent']);
+        $guestRole = Role::firstOrCreate(['name' => \App\Enums\Role::Guest->value]);
+        $moderatorRole = Role::firstOrCreate(['name' => \App\Enums\Role::Moderator->value]);
+        $userRole = Role::firstOrCreate(['name' => \App\Enums\Role::User->value]);
+        Role::firstOrCreate(['name' => \App\Enums\Role::SupportAgent->value]);
 
         $this->seedGuestPermissions($guestRole);
         $this->seedModeratorPermissions($moderatorRole);

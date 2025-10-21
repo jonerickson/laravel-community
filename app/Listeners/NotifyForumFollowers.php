@@ -8,10 +8,13 @@ use App\Events\PostCreated;
 use App\Events\TopicCreated;
 use App\Notifications\Forums\NewContentNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Notification;
 
 class NotifyForumFollowers implements ShouldQueue
 {
+    use Queueable;
+
     public function handle(TopicCreated|PostCreated $event): void
     {
         if ($event instanceof TopicCreated) {

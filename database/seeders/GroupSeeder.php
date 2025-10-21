@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\Role;
 use App\Models\Group;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Seeder;
@@ -23,9 +24,9 @@ class GroupSeeder extends Seeder
             ->create()
             ->each(function (Group $group) {
                 match ($group->name) {
-                    'Administrators' => $group->assignRole('super-admin'),
-                    'Members' => $group->assignRole('user'),
-                    'Guests' => $group->assignRole('guest'),
+                    'Administrators' => $group->assignRole(Role::Administrator),
+                    'Members' => $group->assignRole(Role::User),
+                    'Guests' => $group->assignRole(Role::Guest),
                     default => null,
                 };
             });

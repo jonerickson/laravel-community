@@ -30,7 +30,6 @@ use Illuminate\Support\Str;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Forum> $forums
  * @property-read int|null $forums_count
- * @property-read UserGroup|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Group> $groups
  * @property-read int|null $groups_count
  * @property-read Image|null $image

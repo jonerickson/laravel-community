@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Listeners\Reports;
 
+use App\Enums\Role;
 use App\Events\ReportCreated;
 use App\Models\User;
 use App\Notifications\Reports\NewReportCreatedNotification;
@@ -18,7 +19,7 @@ class SendAdminNotification implements ShouldQueue
     public function handle(ReportCreated $event): void
     {
         $admins = User::query()
-            ->role('super-admin')
+            ->role(Role::Administrator)
             ->get();
 
         if ($admins->isEmpty()) {

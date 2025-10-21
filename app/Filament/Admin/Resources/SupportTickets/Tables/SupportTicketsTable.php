@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\SupportTickets\Tables;
 
+use App\Enums\Role;
 use App\Enums\SupportTicketPriority;
 use App\Enums\SupportTicketStatus;
 use App\Filament\Admin\Resources\SupportTickets\Actions\AssignToMeAction;
@@ -89,7 +90,7 @@ class SupportTicketsTable
                     ->searchable(),
                 Tables\Filters\SelectFilter::make('assigned_to')
                     ->label('Assigned Agent')
-                    ->relationship('assignedTo', 'name', fn (Builder|User $query) => $query->role(['super-admin', 'support-agent']))
+                    ->relationship('assignedTo', 'name', fn (Builder|User $query) => $query->role([Role::Administrator, Role::SupportAgent]))
                     ->multiple()
                     ->preload()
                     ->searchable(),
@@ -128,7 +129,7 @@ class SupportTicketsTable
                     ->schema([
                         Forms\Components\Select::make('assigned_to')
                             ->label('Agent')
-                            ->options(fn () => User::role(['super-admin', 'support-agent'])->pluck('name', 'id'))
+                            ->options(fn () => User::role([Role::Administrator, Role::SupportAgent])->pluck('name', 'id'))
                             ->required()
                             ->searchable(),
                     ])

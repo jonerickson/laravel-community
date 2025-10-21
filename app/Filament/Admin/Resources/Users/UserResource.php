@@ -138,7 +138,7 @@ class UserResource extends Resource
                                                         ]),
                                                 ])->verticallyAlignCenter(),
                                                 Select::make('groups')
-                                                    ->helperText('The groups the user is assigned to.')
+                                                    ->helperText('The groups the user is assigned to. Some of these may be auto-assigned based on products they\'ve purchased or through other platform features. You may manually sync a user\'s groups with the actions above.')
                                                     ->relationship('groups', 'name')
                                                     ->multiple()
                                                     ->searchable()

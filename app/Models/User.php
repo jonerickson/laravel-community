@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Data\SubscriptionData;
 use App\Enums\OrderStatus;
+use App\Enums\Role;
 use App\Enums\WarningConsequenceType;
 use App\Events\UserCreated;
 use App\Events\UserDeleted;
@@ -117,7 +118,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read int $report_count
  * @property-read Collection<int, Report> $reports
  * @property-read int|null $reports_count
- * @property-read Collection<int, Role> $roles
+ * @property-read Collection<int, \App\Models\Role> $roles
  * @property-read int|null $roles_count
  * @property-read Collection<int, Subscription> $subscriptions
  * @property-read int|null $subscriptions_count
@@ -246,7 +247,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {
-            return $this->hasRole('super-admin');
+            return $this->hasRole(Role::Administrator);
         }
 
         return $panel->getId() === 'marketplace';
