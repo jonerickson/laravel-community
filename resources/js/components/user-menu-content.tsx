@@ -1,6 +1,5 @@
 import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
-import { useLayout } from '@/hooks';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { Link, router, usePage } from '@inertiajs/react';
 import { BookOpen, CircleDollarSign, CircleUser, CreditCard, DollarSign, LogOut, Settings, ShieldIcon, TowerControl } from 'lucide-react';
@@ -12,7 +11,6 @@ interface UserMenuContentProps {
 export function UserMenuContent({ user }: UserMenuContentProps) {
     const { isAdmin } = usePage<App.Data.SharedData>().props.auth;
     const cleanup = useMobileNavigation();
-    const { layout } = useLayout();
 
     const handleLogout = () => {
         cleanup();
@@ -27,37 +25,33 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                 </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {layout === 'header' && (
-                <>
-                    <DropdownMenuGroup>
-                        <DropdownMenuItem asChild>
-                            <Link className="block w-full" href={route('settings.profile.edit')} as="button" prefetch onClick={cleanup}>
-                                <CircleUser className="mr-2" />
-                                My Account
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link className="block w-full" href={route('settings.billing')} as="button" prefetch onClick={cleanup}>
-                                <DollarSign className="mr-2" />
-                                Billing
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link className="block w-full" href={route('settings.orders')} as="button" prefetch onClick={cleanup}>
-                                <CircleDollarSign className="mr-2" />
-                                Orders
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link className="block w-full" href={route('settings.payment-methods')} as="button" prefetch onClick={cleanup}>
-                                <CreditCard className="mr-2" />
-                                Payment Methods
-                            </Link>
-                        </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuSeparator />
-                </>
-            )}
+            <DropdownMenuGroup>
+                <DropdownMenuItem asChild>
+                    <Link className="block w-full" href={route('settings.profile.edit')} as="button" prefetch onClick={cleanup}>
+                        <CircleUser className="mr-2" />
+                        My Account
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link className="block w-full" href={route('settings.billing')} as="button" prefetch onClick={cleanup}>
+                        <DollarSign className="mr-2" />
+                        Billing
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link className="block w-full" href={route('settings.orders')} as="button" prefetch onClick={cleanup}>
+                        <CircleDollarSign className="mr-2" />
+                        Orders
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link className="block w-full" href={route('settings.payment-methods')} as="button" prefetch onClick={cleanup}>
+                        <CreditCard className="mr-2" />
+                        Payment Methods
+                    </Link>
+                </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
             <DropdownMenuGroup>
                 {isAdmin && (
                     <DropdownMenuItem asChild>
