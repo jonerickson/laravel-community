@@ -783,15 +783,21 @@ class StripeDriver implements PaymentProcessor
                 return false;
             }
 
-            if (filled($order->external_checkout_id)) {
-                $this->stripe->checkout->sessions->expire($order->external_checkout_id, null, [
-                    'idempotency_key' => $this->getIdempotencyKey(),
-                ]);
-            }
-
             $order->update([
                 'status' => OrderStatus::Cancelled,
             ]);
+
+            if (filled($order->external_checkout_id)) {
+                $session = $this->stripe->checkout->sessions->retrieve($order->external_checkout_id, null, [
+                    'idempotency_key' => $this->getIdempotencyKey(),
+                ]);
+
+                if ($session->status === 'open') {
+                    $this->stripe->checkout->sessions->expire($order->external_checkout_id, null, [
+                        'idempotency_key' => $this->getIdempotencyKey(),
+                    ]);
+                }
+            }
 
             return true;
         }, false);

@@ -37,7 +37,7 @@ class PageForm
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(function (string $context, $state, Set $set) {
+                                    ->afterStateUpdated(function (string $context, $state, Set $set): void {
                                         if ($context === 'create') {
                                             $set('slug', Str::slug($state));
                                             $set('navigation_label', Str::title($state));
@@ -69,7 +69,7 @@ class PageForm
                                             ->hiddenLabel()
                                             ->copyable()
                                             ->helperText('Click to copy to clipboard.')
-                                            ->getStateUsing(fn () => PageResource::defaultHtml())
+                                            ->getStateUsing(fn (): string => PageResource::defaultHtml())
                                             ->grammar(Grammar::Html),
                                     ]),
                             ])

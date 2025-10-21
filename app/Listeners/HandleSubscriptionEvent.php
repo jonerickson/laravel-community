@@ -10,6 +10,7 @@ use App\Events\SubscriptionUpdated;
 use App\Mail\Subscriptions\SubscriptionCreated as SubscriptionCreatedMail;
 use App\Mail\Subscriptions\SubscriptionDeleted as SubscriptionDeletedMail;
 use App\Mail\Subscriptions\SubscriptionUpdated as SubscriptionUpdatedMail;
+use App\Models\Order;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -58,7 +59,7 @@ class HandleSubscriptionEvent implements ShouldQueue
         );
     }
 
-    private function sendMail(Mailable $mailable, $order): void
+    private function sendMail(Mailable $mailable, Order $order): void
     {
         if ($order->user) {
             Mail::to($order->user->email)->send($mailable);

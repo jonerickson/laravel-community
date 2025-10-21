@@ -22,7 +22,7 @@ trait HasGroups
         $relation = $this->belongsToMany(Group::class, "{$table}_groups", $groupsForeignPivotKey);
 
         if (static::class === User::class) {
-            $relation = $relation->using(UserGroup::class);
+            return $relation->using(UserGroup::class);
         }
 
         return $relation;
@@ -41,7 +41,7 @@ trait HasGroups
     public function syncGroups(bool $detaching = true): void
     {
         $baseGroupIds = match (static::class) {
-            User::class => Group::query()->whereHas('roles', function (Builder $query) {
+            User::class => Group::query()->whereHas('roles', function (Builder $query): void {
                 $query->whereIn('name', Collection::wrap(Role::cases())->map->value->toArray());
             })->pluck('id'),
             default => collect(),

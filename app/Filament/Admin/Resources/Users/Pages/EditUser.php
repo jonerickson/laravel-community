@@ -10,6 +10,7 @@ use App\Models\User;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 
 class EditUser extends EditRecord
 {
@@ -21,7 +22,7 @@ class EditUser extends EditRecord
             DeleteAction::make(),
             ActionGroup::make([
                 SyncGroupsAction::make()
-                    ->user(fn (User $record) => $this->record),
+                    ->user(fn (User $record): Model|int|string|null => $this->record),
             ]),
         ];
     }
