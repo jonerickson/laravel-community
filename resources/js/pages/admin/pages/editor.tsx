@@ -6,9 +6,12 @@ import { useForm } from '@inertiajs/react';
 
 interface EditorProps {
     page: App.Data.PageData;
+    defaultHtml: string;
+    defaultCss: string;
+    defaultJavascript: string;
 }
 
-export default function Editor({ page }: EditorProps) {
+export default function Editor({ page, defaultHtml, defaultCss, defaultJavascript }: EditorProps) {
     useFlashMessages();
 
     const { post, transform } = useForm({
@@ -25,7 +28,15 @@ export default function Editor({ page }: EditorProps) {
 
     return (
         <main className="h-screen w-full">
-            <CodeEditor html={page.htmlContent} js={page.jsContent} css={page.cssContent} onSave={handleOnSave} />
+            <CodeEditor
+                html={page.htmlContent}
+                js={page.jsContent}
+                css={page.cssContent}
+                onSave={handleOnSave}
+                defaultHtml={defaultHtml}
+                defaultCss={defaultCss}
+                defaultJavascript={defaultJavascript}
+            />
             <Toaster />
         </main>
     );

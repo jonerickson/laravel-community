@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin\Pages;
 
 use App\Data\PageData;
+use App\Filament\Admin\Resources\Pages\PageResource;
 use App\Http\Requests\Admin\Pages\StorePageRequest;
 use App\Models\Page;
 use Inertia\Inertia;
@@ -17,6 +18,9 @@ class EditorController
     {
         return Inertia::render('admin/pages/editor', [
             'page' => PageData::from($page),
+            'defaultHtml' => PageResource::defaultHtml(),
+            'defaultCss' => PageResource::defaultCss(),
+            'defaultJavascript' => PageResource::defaultJavascript(),
         ]);
     }
 

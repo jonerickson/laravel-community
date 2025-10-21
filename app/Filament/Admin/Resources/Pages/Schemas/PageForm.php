@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Pages\Schemas;
 
+use App\Filament\Admin\Resources\Pages\PageResource;
+use Filament\Actions\Action;
 use Filament\Forms\Components\CodeEditor;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\CodeEntry;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Phiki\Grammar\Grammar;
 
 class PageForm
 {
@@ -46,12 +51,29 @@ class PageForm
                             ]),
                         Section::make('HTML Content')
                             ->columnSpanFull()
+                            ->headerActions([
+                                Action::make('html_example')
+                                    ->label('See HTML Example')
+                                    ->color('gray')
+                                    ->modalHeading('HTML Example')
+                                    ->modalDescription('This example uses a mix of CSS for styling and the lightweight JavaScript package, Alpine.js, for some interactivity.')
+                                    ->modalCancelActionLabel('Close')
+                                    ->modalSubmitAction(false)
+                                    ->schema([
+                                        CodeEntry::make('html')
+                                            ->hiddenLabel()
+                                            ->copyable()
+                                            ->helperText('Click to copy to clipboard.')
+                                            ->getStateUsing(fn () => PageResource::defaultHtml())
+                                            ->grammar(Grammar::Html),
+                                    ]),
+                            ])
                             ->schema([
                                 CodeEditor::make('html_content')
                                     ->hiddenLabel()
                                     ->required()
                                     ->columnSpanFull()
-                                    ->helperText('The HTML content of the page.')
+                                    ->helperText(new HtmlString("The HTML content of the page. This application uses Tailwind CSS for styling. We suggest you use tailwind to style your content rather than building custom CSS. See the <a href='https://tailwindcss.com/' class='font-medium underline' target='_blank'>docs</a> for more. If a class is not available, you may need to incude it in your custom CSS."))
                                     ->language(CodeEditor\Enums\Language::Html),
                             ]),
                         Section::make('Custom Styles & Scripts')
@@ -77,7 +99,7 @@ class PageForm
                                     ->label('Published')
                                     ->default(false),
                                 DateTimePicker::make('published_at')
-                                    ->label('Publish Date'),
+                                    ->label('Published At'),
                             ]),
                         Section::make('Navigation')
                             ->schema([

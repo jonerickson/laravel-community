@@ -35,14 +35,6 @@ class PageResource extends Resource
         return PagesTable::configure($table);
     }
 
-    #[Override]
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
@@ -50,5 +42,38 @@ class PageResource extends Resource
             'create' => CreatePage::route('/create'),
             'edit' => EditPage::route('/{record}/edit'),
         ];
+    }
+
+    public static function defaultHtml(): string
+    {
+        return <<<'HTML'
+<script src="https://unpkg.com/alpinejs" defer></script>
+
+<div class="p-4" x-data="{
+  show: false
+}">
+  <div id="hello-world" class="tracking-tight leading-8 text-xl font-bold">Hello, World!</div>
+  <div x-on:click="show = ! show">Click Me</div>
+  <div x-cloak x-show="show">Surprise</div>
+</div>
+HTML;
+    }
+
+    public static function defaultCss(): string
+    {
+        return <<<'CSS'
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+CSS;
+    }
+
+    public static function defaultJavascript(): string
+    {
+        return <<<'JS'
+console.log("Page loaded!");
+JS;
     }
 }

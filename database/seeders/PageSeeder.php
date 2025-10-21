@@ -18,26 +18,62 @@ class PageSeeder extends Seeder
             [
                 'title' => 'About Us',
                 'description' => 'Learn more about our company and mission',
-                'html_content' => '<div class="prose"><h1>About Us</h1><p>Welcome to our platform. We are dedicated to providing the best service possible.</p></div>',
                 'show_in_navigation' => true,
                 'navigation_label' => 'About',
                 'navigation_order' => 10,
+                'html_content' => <<<'HTML'
+<div class="flex flex-col gap-1">
+  <div class="font-bold text-xl">About Us</div>
+  <p class="font-light">Welcome to our platform. We are dedicated to providing the best service possible.</p>
+</div>
+HTML
             ],
             [
                 'title' => 'Contact',
                 'description' => 'Get in touch with our team',
-                'html_content' => '<div class="prose"><h1>Contact Us</h1><p>We\'d love to hear from you. Reach out to our team anytime.</p></div>',
                 'show_in_navigation' => true,
                 'navigation_label' => 'Contact',
                 'navigation_order' => 20,
+                'html_content' => <<<'HTML'
+<div class="flex flex-col gap-6">
+  <div class="flex flex-col gap-1">
+    <div class="font-bold text-xl">Contact Us</div>
+    <p class="font-light">Learn how to get a hold of us below.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="flex flex-col gap-2 p-4 rounded-lg border border-border shadow-sm">
+      <div class="font-semibold text-lg text-primary">Phone</div>
+      <p class="font-light text-foreground">+1 (555) 123-4567</p>
+      <p class="text-sm text-muted-foreground">Mon-Fri 9am-5pm EST</p>
+    </div>
+
+    <div class="flex flex-col gap-2 p-4 rounded-lg border border-border shadow-sm">
+      <div class="font-semibold text-lg">Email</div>
+      <p class="font-light text-foreground">support@example.com</p>
+      <p class="text-sm text-muted-foreground">We'll respond within 24 hours</p>
+    </div>
+
+    <div class="flex flex-col gap-2 p-4 rounded-lg border border-border shadow-sm">
+      <div class="font-semibold text-lg">Address</div>
+      <p class="font-light text-foreground">123 Business Street<br>Suite 100<br>City, State 12345</p>
+    </div>
+  </div>
+</div>
+HTML
             ],
             [
                 'title' => 'FAQ',
                 'description' => 'Frequently asked questions',
-                'html_content' => '<div class="prose"><h1>Frequently Asked Questions</h1><p>Find answers to common questions about our platform.</p></div>',
                 'show_in_navigation' => true,
                 'navigation_label' => 'FAQ',
                 'navigation_order' => 30,
+                'html_content' => <<<'HTML'
+<div class="flex flex-col gap-1">
+  <div class="font-bold text-xl">Frequently Asked Questions</div>
+  <p class="font-light">Find answers to common questions about our platform.</p>
+</div>
+HTML
             ],
         ];
 

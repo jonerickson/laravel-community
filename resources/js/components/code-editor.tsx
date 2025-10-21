@@ -20,7 +20,7 @@ import { useEffect, useRef, useState } from 'react';
 import SharedData = App.Data.SharedData;
 
 export interface FileTab {
-    id: string;
+    id: number;
     name: string;
     language: 'html' | 'javascript' | 'css';
     content: string;
@@ -28,53 +28,21 @@ export interface FileTab {
 
 const FONT_SIZES = [10, 12, 14, 16, 18, 20, 24];
 
-const DEFAULT_FILES: FileTab[] = [
-    {
-        id: '1',
-        name: 'index.html',
-        language: 'html',
-        content: `<script src="https://unpkg.com/alpinejs" defer></script>
-
-<div class="p-4" x-data="{
-  show: false
-}">
-  <div id="hello-world" class="tracking-tight leading-8 text-xl font-bold">Hello, World!</div>
-  <div x-on:click="show = ! show">Click Me</div>
-  <div x-cloak x-show="show">Surprise</div>
-</div>`,
-    },
-    {
-        id: '2',
-        name: 'index.js',
-        language: 'javascript',
-        content: `// Add some javascript here`,
-    },
-    {
-        id: '3',
-        name: 'index.css',
-        language: 'css',
-        content: `[x-cloak] {
-    display: none !important;
-}
-
-#hello-world {
-    text-transform: uppercase;
-}`,
-    },
-];
-
 interface CodeEditorProps {
     html: string;
     css?: string | null;
     js?: string | null;
     onSave?: (files: File[]) => void;
+    defaultHtml: string;
+    defaultCss: string;
+    defaultJavascript: string;
 }
 
-export function CodeEditor({ html, css, js, onSave }: CodeEditorProps) {
+export function CodeEditor({ html, css, js, onSave, defaultHtml, defaultCss, defaultJavascript }: CodeEditorProps) {
     const { name } = usePage<SharedData>().props;
     const previewRef = useRef<HTMLIFrameElement>(null);
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
-    const [activeFileId, setActiveFileId] = useState(DEFAULT_FILES[0].id);
+    const [activeFileId, setActiveFileId] = useState(1);
     const [theme, setTheme] = useState<'light' | 'dark'>('dark');
     const [fontSize, setFontSize] = useState(14);
     const [lineNumbers, setLineNumbers] = useState(true);
@@ -84,42 +52,42 @@ export function CodeEditor({ html, css, js, onSave }: CodeEditorProps) {
     const [showPreview, setShowPreview] = useState(false);
     const [files, setFiles] = useState<FileTab[]>(() => [
         {
-            id: '1',
+            id: 1,
             name: 'index.html',
             language: 'html',
-            content: html || DEFAULT_FILES[0].content,
+            content: html || defaultHtml,
         },
         {
-            id: '2',
+            id: 2,
             name: 'index.js',
             language: 'javascript',
-            content: js || DEFAULT_FILES[1].content,
+            content: js || defaultJavascript,
         },
         {
-            id: '3',
+            id: 3,
             name: 'index.css',
             language: 'css',
-            content: css || DEFAULT_FILES[2].content,
+            content: css || defaultCss,
         },
     ]);
     const [savedFiles, setSavedFiles] = useState<FileTab[]>(() => [
         {
-            id: '1',
+            id: 1,
             name: 'index.html',
             language: 'html',
-            content: html || DEFAULT_FILES[0].content,
+            content: html || defaultHtml,
         },
         {
-            id: '2',
+            id: 2,
             name: 'index.js',
             language: 'javascript',
-            content: js || DEFAULT_FILES[1].content,
+            content: js || defaultJavascript,
         },
         {
-            id: '3',
+            id: 3,
             name: 'index.css',
             language: 'css',
-            content: css || DEFAULT_FILES[2].content,
+            content: css || defaultCss,
         },
     ]);
 

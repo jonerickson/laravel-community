@@ -144,6 +144,7 @@ class PostResource extends Resource
                                     ->live()
                                     ->helperText('Publish this post immediately.'),
                                 DateTimePicker::make('published_at')
+                                    ->label('Published At')
                                     ->columnSpanFull()
                                     ->native(false)
                                     ->helperText('Schedule when this post should be published. Leave blank to keep the post in a draft state.')
