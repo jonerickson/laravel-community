@@ -102,8 +102,30 @@ export function CodeEditor({ html, css, js, onSave }: CodeEditorProps) {
             content: css || DEFAULT_FILES[2].content,
         },
     ]);
+    const [savedFiles, setSavedFiles] = useState<FileTab[]>(() => [
+        {
+            id: '1',
+            name: 'index.html',
+            language: 'html',
+            content: html || DEFAULT_FILES[0].content,
+        },
+        {
+            id: '2',
+            name: 'index.js',
+            language: 'javascript',
+            content: js || DEFAULT_FILES[1].content,
+        },
+        {
+            id: '3',
+            name: 'index.css',
+            language: 'css',
+            content: css || DEFAULT_FILES[2].content,
+        },
+    ]);
 
     const activeFile = files.find((f) => f.id === activeFileId) || files[0];
+
+    const hasUnsavedChanges = files.some((file, index) => file.content !== savedFiles[index]?.content);
 
     const canPreview = ['html', 'javascript', 'typescript', 'css'].includes(activeFile.language);
 
@@ -121,6 +143,21 @@ export function CodeEditor({ html, css, js, onSave }: CodeEditorProps) {
             updatePreview();
         }
     }, [activeFile.content, showPreview, canPreview, files]);
+
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [hasUnsavedChanges]);
 
     const updatePreview = () => {
         if (!previewRef.current) return;
@@ -240,6 +277,7 @@ export function CodeEditor({ html, css, js, onSave }: CodeEditorProps) {
                 })),
             );
         }
+        setSavedFiles(files);
     };
 
     const handleDownload = () => {
@@ -283,6 +321,11 @@ export function CodeEditor({ html, css, js, onSave }: CodeEditorProps) {
                     <Badge variant="secondary" className="font-mono text-xs">
                         {name}
                     </Badge>
+                    {hasUnsavedChanges && (
+                        <Badge variant="outline" className="text-xs text-amber-600 dark:text-amber-400">
+                            Unsaved Changes
+                        </Badge>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-1">
