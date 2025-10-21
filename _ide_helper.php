@@ -24188,6 +24188,10 @@ namespace App\Http\Requests\Api\Frontend {
             }
     /**
      */
+    class StoreReviewRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    /**
+     */
     class UpdateCartRequest extends \Illuminate\Foundation\Http\FormRequest {
             }
     /**

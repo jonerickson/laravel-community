@@ -40,7 +40,7 @@ class SubscriptionsController extends Controller
             ->with('prices')
             ->with('categories')
             ->with('policies.category')
-            ->orderBy('name')
+            ->ordered()
             ->get()
             ->filter(fn (Product $product) => Gate::check('view', $product))
             ->values();

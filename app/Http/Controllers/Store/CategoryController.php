@@ -50,6 +50,7 @@ class CategoryController extends Controller
                 $query->active();
             }])
             ->where('is_subscription_only', false)
+            ->ordered()
             ->get()
             ->values();
 

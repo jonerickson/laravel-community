@@ -324,7 +324,9 @@ class ProductResource extends Resource
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('order')
+            ->reorderable('order');
     }
 
     #[Override]

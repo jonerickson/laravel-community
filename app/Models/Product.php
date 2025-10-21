@@ -20,6 +20,7 @@ use App\Traits\HasMetadata;
 use App\Traits\HasReferenceId;
 use App\Traits\HasSlug;
 use App\Traits\LogsMarketplaceActivity;
+use App\Traits\Orderable;
 use App\Traits\Reviewable;
 use App\Traits\Trendable;
 use App\Traits\Visible;
@@ -57,6 +58,7 @@ use Laravel\Scout\Searchable;
  * @property bool $allow_promotion_codes
  * @property bool $allow_discount_codes
  * @property string|null $featured_image
+ * @property int $order
  * @property string|null $external_product_id
  * @property array<array-key, mixed>|null $metadata
  * @property Carbon|null $created_at
@@ -99,6 +101,7 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Product newModelQuery()
  * @method static Builder<static>|Product newQuery()
  * @method static Builder<static>|Product notFeatured()
+ * @method static Builder<static>|Product ordered()
  * @method static Builder<static>|Product pending()
  * @method static Builder<static>|Product products()
  * @method static Builder<static>|Product query()
@@ -124,6 +127,7 @@ use Laravel\Scout\Searchable;
  * @method static Builder<static>|Product whereIsVisible($value)
  * @method static Builder<static>|Product whereMetadata($value)
  * @method static Builder<static>|Product whereName($value)
+ * @method static Builder<static>|Product whereOrder($value)
  * @method static Builder<static>|Product whereReferenceId($value)
  * @method static Builder<static>|Product whereRejectionReason($value)
  * @method static Builder<static>|Product whereSellerId($value)
@@ -149,6 +153,7 @@ class Product extends Model implements Sluggable
     use HasReferenceId;
     use HasSlug;
     use LogsMarketplaceActivity;
+    use Orderable;
     use Reviewable;
     use Searchable;
     use Trendable;
