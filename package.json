@@ -16,7 +16,7 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.19.0",
-        "@fingerprintjs/fingerprintjs": "4.6.2",
+        "@fingerprintjs/fingerprintjs-pro-react": "2.7.1",
         "@headlessui/react": "^2.2.0",
         "@inertiajs/react": "^2.2.7",
         "@monaco-editor/react": "4.7.0",

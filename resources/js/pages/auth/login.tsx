@@ -22,10 +22,9 @@ interface LoginProps {
     status?: string;
     canResetPassword: boolean;
     discordEnabled: boolean;
-    robloxEnabled: boolean;
 }
 
-export default function AuthLogin({ status, canResetPassword, discordEnabled, robloxEnabled }: LoginProps) {
+export default function AuthLogin({ status, canResetPassword, discordEnabled }: LoginProps) {
     const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
         email: '',
         password: '',

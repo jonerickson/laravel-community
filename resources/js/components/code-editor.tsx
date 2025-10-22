@@ -12,16 +12,21 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Kbd } from '@/components/ui/kbd';
 import { Separator } from '@/components/ui/separator';
-import { File } from '@/types';
 import { usePage } from '@inertiajs/react';
-import { Editor, Monaco, OnMount } from '@monaco-editor/react';
+import { Editor, OnMount } from '@monaco-editor/react';
 import { Code2, Copy, Download, Eye, EyeOff, FileCode, Maximize2, Minimize2, Moon, Sun } from 'lucide-react';
+import type * as Monaco from 'monaco-editor';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import SharedData = App.Data.SharedData;
 
 export interface FileTab {
     id: number;
+    name: string;
+    language: 'html' | 'javascript' | 'css';
+    content: string;
+}
+
+export interface CodeFile {
     name: string;
     language: 'html' | 'javascript' | 'css';
     content: string;
@@ -33,16 +38,16 @@ interface CodeEditorProps {
     html: string;
     css?: string | null;
     js?: string | null;
-    onSave?: (files: File[]) => void;
+    onSave?: (files: CodeFile[]) => void;
     defaultHtml: string;
     defaultCss: string;
     defaultJavascript: string;
 }
 
 export function CodeEditor({ html, css, js, onSave, defaultHtml, defaultCss, defaultJavascript }: CodeEditorProps) {
-    const { name } = usePage<SharedData>().props;
+    const { name } = usePage<App.Data.SharedData>().props;
     const previewRef = useRef<HTMLIFrameElement>(null);
-    const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+    const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
     const [activeFileId, setActiveFileId] = useState(1);
     const [theme, setTheme] = useState<'light' | 'dark'>('dark');
     const [fontSize, setFontSize] = useState(14);
@@ -226,10 +231,6 @@ export function CodeEditor({ html, css, js, onSave, defaultHtml, defaultCss, def
     const handleEditorChange = (value: string | undefined) => {
         if (value === undefined) return;
         setFiles((prev) => prev.map((f) => (f.id === activeFileId ? { ...f, content: value } : f)));
-    };
-
-    const handleBeforeMount = (monaco: Monaco) => {
-        //
     };
 
     const handleEditorOnMount: OnMount = (editor) => {
@@ -425,7 +426,6 @@ export function CodeEditor({ html, css, js, onSave, defaultHtml, defaultCss, def
                         height="100%"
                         language={activeFile.language}
                         value={activeFile.content}
-                        beforeMount={handleBeforeMount}
                         onMount={handleEditorOnMount}
                         onChange={handleEditorChange}
                         theme={theme === 'dark' ? 'vs-dark' : 'light'}

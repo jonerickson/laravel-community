@@ -26,13 +26,13 @@ class FingerprintController extends Controller
     {
         $request->validate([
             'fingerprint_id' => 'required|string|max:255',
-            'fingerprint_data' => 'nullable|array',
+            'request_id' => 'required|string|max:255',
         ]);
 
         $fingerprint = Fingerprint::trackFingerprint(
             userId: $this->user->id ?? null,
             fingerprintId: $request->input('fingerprint_id'),
-            fingerprintData: $request->input('fingerprint_data'),
+            requestId: $request->input('request_id'),
             ipAddress: $request->ip(),
             userAgent: $request->userAgent()
         )->refresh();

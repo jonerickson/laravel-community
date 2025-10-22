@@ -42,5 +42,5 @@ export function useFlashMessages() {
                     break;
             }
         }
-    }, [flash?.message, flash?.messageVariant]);
+    }, [flash]);
 }

@@ -25,6 +25,11 @@ return [
         'bot_token' => env('DISCORD_BOT_TOKEN'),
     ],
 
+    'fingerprint' => [
+        'api_key' => env('FINGERPRINT_API_KEY'),
+        'suspect_score_threshold' => env('FINGERPRINT_SUSPECT_THRESHOLD', 0.75),
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],

@@ -19,8 +19,6 @@ class AuthenticatedSessionController extends Controller
     public function __construct(
         #[Config('services.discord.enabled')]
         protected bool $discordEnabled,
-        #[Config('services.roblox.enabled')]
-        protected bool $robloxEnabled
     ) {
         //
     }
@@ -35,7 +33,6 @@ class AuthenticatedSessionController extends Controller
             'canResetPassword' => Route::has('password.request'),
             'status' => $request->session()->get('status'),
             'discordEnabled' => $this->discordEnabled,
-            'robloxEnabled' => $this->robloxEnabled,
         ]);
     }
 
