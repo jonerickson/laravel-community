@@ -42,7 +42,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
             <main>
                 <section className="relative py-20 md:py-32">
                     <div className="pointer-events-none absolute right-0 bottom-0 z-10">
-                        <AbstractBackgroundPattern className="h-[800px] w-[1000px]" corner="bottom-right" />
+                        <AbstractBackgroundPattern className="h-[800px] w-[400px] sm:w-[800px]" corner="bottom-right" />
                     </div>
 
                     <div className="container mx-auto px-6 text-center sm:px-4">
@@ -62,7 +62,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                             </p>
 
                             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-                                <Button size="lg" className="glow-blue">
+                                <Button size="lg">
                                     {auth.user ? (
                                         <Link href={route('dashboard')} className="flex items-center gap-2">
                                             <Rocket className="size-4" />
@@ -119,7 +119,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                         </div>
 
                         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                            <Card className="glow-blue/20 hover:glow-blue transition-all duration-300">
+                            <Card gradient className="transition-all duration-300">
                                 <CardHeader>
                                     <Users className="text-gaming-blue mb-4 h-10 w-10" />
                                     <CardTitle>Player Management</CardTitle>
@@ -130,7 +130,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                                 </CardHeader>
                             </Card>
 
-                            <Card className="glow-purple/20 hover:glow-purple transition-all duration-300">
+                            <Card gradient className="transition-all duration-300">
                                 <CardHeader>
                                     <MessageSquare className="text-gaming-purple mb-4 h-10 w-10" />
                                     <CardTitle>Community Forums</CardTitle>
@@ -140,7 +140,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                                 </CardHeader>
                             </Card>
 
-                            <Card className="glow-green/20 hover:glow-green transition-all duration-300">
+                            <Card gradient className="transition-all duration-300">
                                 <CardHeader>
                                     <BarChart3 className="text-gaming-green mb-4 h-10 w-10" />
                                     <CardTitle>Analytics Dashboard</CardTitle>
@@ -151,7 +151,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                                 </CardHeader>
                             </Card>
 
-                            <Card className="glow-blue/20 hover:glow-blue transition-all duration-300">
+                            <Card gradient className="transition-all duration-300">
                                 <CardHeader>
                                     <Gamepad2 className="text-gaming-blue mb-4 h-10 w-10" />
                                     <CardTitle>Game Integration</CardTitle>
@@ -162,7 +162,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                                 </CardHeader>
                             </Card>
 
-                            <Card className="glow-purple/20 hover:glow-purple transition-all duration-300">
+                            <Card gradient className="transition-all duration-300">
                                 <CardHeader>
                                     <Shield className="text-gaming-purple mb-4 h-10 w-10" />
                                     <CardTitle>Security & Moderation</CardTitle>
@@ -173,7 +173,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                                 </CardHeader>
                             </Card>
 
-                            <Card className="glow-green/20 hover:glow-green transition-all duration-300">
+                            <Card gradient className="transition-all duration-300">
                                 <CardHeader>
                                     <Globe className="text-gaming-green mb-4 h-10 w-10" />
                                     <CardTitle>Global Infrastructure</CardTitle>
@@ -187,7 +187,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                     </div>
                 </section>
 
-                <section className="bg-muted/20 py-20">
+                <section className="bg-white py-20">
                     <div className="container mx-auto px-6 sm:px-4">
                         <div className="mb-16 text-center">
                             <HeadingLarge
@@ -269,7 +269,10 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                     </div>
                 </section>
 
-                <section id="pricing" className="py-20">
+                <section id="pricing" className="relative py-20">
+                    <div className="pointer-events-none absolute bottom-0 left-0">
+                        <AbstractBackgroundPattern className="h-[800px] w-[700px] scale-x-[-1] transform" corner="bottom-left" />
+                    </div>
                     <div className="container mx-auto px-6 sm:px-4">
                         <div className="mb-16 text-center">
                             <h2 className="mb-4 text-3xl font-bold md:text-4xl">Simple, transparent pricing</h2>
@@ -291,7 +294,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                                 accessible environment.
                             </p>
                             <div className="flex flex-col justify-center gap-4 sm:flex-row">
-                                <Button size="lg" className="glow-blue" asChild>
+                                <Button size="lg" asChild>
                                     <Link href={route('forums.index')} className="flex items-center gap-2">
                                         Start Connecting
                                         <ArrowRight className="size-4" />
@@ -349,8 +352,9 @@ function SubscriptionCards({ subscriptions }: SubscriptionCardsProps) {
 
                 return (
                     <Card
+                        gradient
                         key={subscription.id}
-                        className={cn('relative flex flex-col justify-between', subscription.isFeatured && 'ring-2 ring-info')}
+                        className={cn('relative flex flex-col justify-between bg-background', subscription.isFeatured && 'ring-2 ring-info')}
                     >
                         {subscription.isFeatured && (
                             <div className="absolute -top-4 left-1/2 z-10 -translate-x-1/2">
