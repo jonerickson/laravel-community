@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\SupportTickets;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SupportTickets\StoreSupportTicketAttachmentRequest;
 use App\Models\File;
 use App\Models\SupportTicket;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,16 +16,13 @@ class AttachmentController extends Controller
 {
     use AuthorizesRequests;
 
-    public function store(Request $request, SupportTicket $ticket): Response
+    public function store(StoreSupportTicketAttachmentRequest $request, SupportTicket $ticket): Response
     {
-        $this->authorize('create', [File::class, $ticket]);
-
-        $validated = $request->validate([
-            'attachment' => ['required', 'file', 'max:10240', 'mimes:pdf,doc,docx,txt,png,jpg,jpeg,gif,heif'],
-        ]);
+        $this->authorize('update', $ticket);
+        $this->authorize('create', File::class);
 
         /** @var UploadedFile $file */
-        $file = $validated['attachment'];
+        $file = $request->validated('attachment');
         $path = $file->store('support-attachments');
 
         $ticket->files()->create([
@@ -40,7 +37,8 @@ class AttachmentController extends Controller
 
     public function destroy(SupportTicket $ticket, File $file): Response
     {
-        $this->authorize('delete', [$file, $ticket]);
+        $this->authorize('update', $ticket);
+        $this->authorize('delete', $file);
 
         $file->delete();
 

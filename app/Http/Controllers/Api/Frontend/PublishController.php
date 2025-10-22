@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Frontend\StorePublishRequest;
 use App\Http\Resources\ApiResource;
-use App\Models\Post;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class PublishController extends Controller
@@ -19,42 +18,34 @@ class PublishController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function store(Request $request): JsonResource
+    public function store(StorePublishRequest $request): JsonResource
     {
-        $request->validate([
-            'post_id' => 'required|exists:posts,id',
-        ]);
+        $publishable = $request->resolvePublishable();
 
-        $post = Post::findOrFail($request->input('post_id'));
+        $this->authorize('publish', $publishable);
 
-        $this->authorize('publish', $post);
-
-        $post->publish();
+        $publishable->publish();
 
         return ApiResource::success(
-            resource: $post->fresh(),
-            message: 'The post has been successfully published.'
+            resource: $publishable->fresh(),
+            message: 'The item has been successfully published.'
         );
     }
 
     /**
      * @throws AuthorizationException
      */
-    public function destroy(Request $request): JsonResource
+    public function destroy(StorePublishRequest $request): JsonResource
     {
-        $request->validate([
-            'post_id' => 'required|exists:posts,id',
-        ]);
+        $publishable = $request->resolvePublishable();
 
-        $post = Post::findOrFail($request->input('post_id'));
+        $this->authorize('publish', $publishable);
 
-        $this->authorize('publish', $post);
-
-        $post->unpublish();
+        $publishable->unpublish();
 
         return ApiResource::success(
-            resource: $post->fresh(),
-            message: 'The post has been successfully unpublished.'
+            resource: $publishable->fresh(),
+            message: 'The item has been successfully unpublished.'
         );
     }
 }

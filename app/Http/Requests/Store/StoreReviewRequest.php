@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Store;
 
+use App\Enums\WarningConsequenceType;
 use App\Models\Comment;
 use App\Models\Product;
+use App\Rules\BlacklistRule;
+use App\Rules\NoProfanity;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Validator;
@@ -21,7 +24,7 @@ class StoreReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => ['required', 'string', 'min:10', 'max:1000'],
+            'content' => ['required', 'string', 'min:10', 'max:1000', new NoProfanity, new BlacklistRule],
             'rating' => ['required', 'integer', 'min:1', 'max:5'],
         ];
     }
@@ -43,6 +46,13 @@ class StoreReviewRequest extends FormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator): void {
+            if (Auth::user()->active_consequence_type === WarningConsequenceType::PostRestriction) {
+                $validator->errors()->add(
+                    'content',
+                    'You have been restricted from posting.'
+                );
+            }
+
             $product = $this->route('subscription');
 
             if (! $product instanceof Product) {

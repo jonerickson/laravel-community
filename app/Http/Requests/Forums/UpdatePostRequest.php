@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Forums;
 
+use App\Enums\WarningConsequenceType;
+use App\Rules\BlacklistRule;
 use App\Rules\NoProfanity;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Validator;
 use Override;
 
 class UpdatePostRequest extends FormRequest
@@ -19,7 +22,7 @@ class UpdatePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => ['required', 'string', new NoProfanity],
+            'content' => ['required', 'string', new NoProfanity, new BlacklistRule],
         ];
     }
 
@@ -29,5 +32,17 @@ class UpdatePostRequest extends FormRequest
         return [
             'content.required' => 'Post content cannot be empty.',
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            if (Auth::user()->active_consequence_type === WarningConsequenceType::PostRestriction) {
+                $validator->errors()->add(
+                    'content',
+                    'You have been restricted from posting.'
+                );
+            }
+        });
     }
 }

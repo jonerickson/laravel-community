@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Enums\WarningConsequenceType;
-use App\Models\Forum;
 use App\Models\Post;
 use App\Models\Topic;
 use App\Models\User;
@@ -27,14 +26,13 @@ class TopicPolicy
         return Gate::forUser($user)->check('view_any_topics');
     }
 
-    public function view(?User $user, Topic $topic, ?Forum $forum = null): bool
+    public function view(?User $user, Topic $topic): bool
     {
         return Gate::forUser($user)->check('view_topics')
-            && ($topic->posts->some(fn (Post $post) => Gate::forUser($user)->check('view', $post)))
-            && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum));
+            && ($topic->posts->some(fn (Post $post) => Gate::forUser($user)->check('view', $post)));
     }
 
-    public function create(?User $user, ?Forum $forum = null): bool
+    public function create(?User $user): bool
     {
         if (! $user instanceof User) {
             return false;
@@ -44,11 +42,10 @@ class TopicPolicy
             return false;
         }
 
-        return Gate::forUser($user)->check('create_topics')
-            && (! $forum instanceof Forum || Gate::forUser($user)->check('view', $forum));
+        return Gate::forUser($user)->check('create_topics');
     }
 
-    public function update(?User $user, Topic $topic, ?Forum $forum = null): bool
+    public function update(?User $user, Topic $topic): bool
     {
         if (! $user instanceof User) {
             return false;
@@ -59,11 +56,10 @@ class TopicPolicy
         }
 
         return $topic->isAuthoredBy($user)
-            && ! $topic->is_locked
-            && $this->view($user, $topic, $forum);
+            && ! $topic->is_locked;
     }
 
-    public function delete(?User $user, Topic $topic, ?Forum $forum = null): bool
+    public function delete(?User $user, Topic $topic): bool
     {
         if (! $user instanceof User) {
             return false;
@@ -73,11 +69,10 @@ class TopicPolicy
             return true;
         }
 
-        return $topic->isAuthoredBy($user)
-            && $this->view($user, $topic, $forum);
+        return $topic->isAuthoredBy($user);
     }
 
-    public function reply(?User $user, Topic $topic, ?Forum $forum = null): bool
+    public function reply(?User $user, Topic $topic): bool
     {
         if (! $user instanceof User) {
             return false;
@@ -88,8 +83,7 @@ class TopicPolicy
         }
 
         return Gate::forUser($user)->check('reply_topics')
-            && ! $topic->is_locked
-            && $this->view($user, $topic, $forum);
+            && ! $this->view($user, $topic);
     }
 
     public function report(?User $user, Topic $topic): bool

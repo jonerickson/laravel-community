@@ -24,7 +24,7 @@ class DiscountController
 
     public function store(ApplyDiscountRequest $request): ApiResource
     {
-        $code = $request->input('code');
+        $code = $request->validated('code');
         $orderTotal = $request->integer('order_total');
 
         $order = $this->cartService->getOrCreatePendingOrder();

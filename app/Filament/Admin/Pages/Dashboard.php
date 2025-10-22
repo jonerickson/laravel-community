@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Pages;
 
+use App\Filament\Admin\Resources\Comments\Widgets\CommentModerationTable;
 use App\Filament\Admin\Resources\Orders\Widgets\OrdersAnalyticsChart;
 use App\Filament\Admin\Resources\Orders\Widgets\OrderStatsOverview;
 use App\Filament\Admin\Resources\Orders\Widgets\RecentOrdersTable;
@@ -19,6 +20,7 @@ use App\Filament\Admin\Resources\SupportTickets\Widgets\UnassignedTicketsTable;
 use App\Filament\Admin\Resources\Users\Widgets\RegistrationsTable;
 use App\Filament\Admin\Resources\Users\Widgets\UsersAnalyticsChart;
 use App\Filament\Admin\Resources\Users\Widgets\UserStatsOverview;
+use App\Models\Comment;
 use App\Models\Post;
 use App\Models\SupportTicket;
 use Filament\Pages\Dashboard as BaseDashboard;
@@ -44,6 +46,13 @@ class Dashboard extends BaseDashboard
             UserStatsOverview::make(),
             UsersAnalyticsChart::make(),
             RegistrationsTable::make(),
+        ];
+    }
+
+    public function getCommentWidgets(): array
+    {
+        return [
+            CommentModerationTable::make(),
         ];
     }
 
@@ -94,6 +103,14 @@ class Dashboard extends BaseDashboard
                     ->schema([
                         Grid::make($this->getColumns())
                             ->schema($this->getWidgetsSchemaComponents($this->getDashboardWidgets())),
+                    ]),
+                Tabs\Tab::make('Comments')
+                    ->icon(Heroicon::OutlinedMegaphone)
+                    ->badge((string) Comment::query()->unapproved()->count())
+                    ->badgeColor('warning')
+                    ->schema([
+                        Grid::make($this->getColumns())
+                            ->schema($this->getWidgetsSchemaComponents($this->getCommentWidgets())),
                     ]),
                 Tabs\Tab::make('Forums')
                     ->icon(Heroicon::OutlinedChatBubbleLeftRight)

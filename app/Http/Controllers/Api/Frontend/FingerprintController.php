@@ -6,11 +6,11 @@ namespace App\Http\Controllers\Api\Frontend;
 
 use App\Data\FingerprintData;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Frontend\StoreFingerprintRequest;
 use App\Http\Resources\ApiResource;
 use App\Models\Fingerprint;
 use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 
 class FingerprintController extends Controller
@@ -22,17 +22,12 @@ class FingerprintController extends Controller
         //
     }
 
-    public function __invoke(Request $request): ApiResource
+    public function __invoke(StoreFingerprintRequest $request): ApiResource
     {
-        $request->validate([
-            'fingerprint_id' => 'required|string|max:255',
-            'request_id' => 'required|string|max:255',
-        ]);
-
         $fingerprint = Fingerprint::trackFingerprint(
             userId: $this->user->id ?? null,
-            fingerprintId: $request->input('fingerprint_id'),
-            requestId: $request->input('request_id'),
+            fingerprintId: $request->validated('fingerprint_id'),
+            requestId: $request->validated('request_id'),
             ipAddress: $request->ip(),
             userAgent: $request->userAgent()
         )->refresh();

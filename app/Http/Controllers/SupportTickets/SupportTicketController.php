@@ -96,9 +96,7 @@ class SupportTicketController extends Controller
     {
         $this->authorize('update', $ticket);
 
-        $validated = $request->validated();
-
-        $result = match ($validated['action']) {
+        $result = match ($request->validated('action')) {
             'close' => $this->closeTicket($ticket),
             'resolve' => $this->resolveTicket($ticket),
             'open' => $this->openTicket($ticket),

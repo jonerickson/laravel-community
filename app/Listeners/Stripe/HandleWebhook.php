@@ -60,25 +60,14 @@ class HandleWebhook implements ShouldQueue
         }
 
         match (data_get($event->payload, 'type')) {
-            'invoice.payment_succeeded' => event(new PaymentSucceeded($order)),
-            'invoice.payment_action_required' => event(new PaymentActionRequired(
-                order: $order,
-                confirmationUrl: $this->resolvePaymentConfirmationUrl($order),
-            )),
-            'customer.subscription.created' => event(new SubscriptionCreated($order)),
-            'customer.subscription.updated' => event(new SubscriptionUpdated(
-                order: $order,
-                currentStatus: SubscriptionStatus::tryFrom(data_get($event->payload, 'data.object.status') ?? ''),
-                previousStatus: SubscriptionStatus::tryFrom(data_get($event->payload, 'data.previous_attributes.status') ?? ''),
-            )),
-            'customer.subscription.deleted' => event(new SubscriptionDeleted($order)),
-            'customer.updated' => event(new CustomerUpdated($this->user)),
-            'customer.deleted' => event(new CustomerDeleted($this->user)),
-            'refund.created' => event(new RefundCreated(
-                order: $order,
-                reason: OrderRefundReason::tryFrom(data_get($event->payload, 'data.object.reason') ?? '') ?? OrderRefundReason::Other,
-                notes: data_get($event->payload, 'data.object.reason')
-            )),
+            'invoice.payment_succeeded' => PaymentSucceeded::dispatch($order),
+            'invoice.payment_action_required' => PaymentActionRequired::dispatch($order, $this->resolvePaymentConfirmationUrl($order)),
+            'customer.subscription.created' => SubscriptionCreated::dispatch($order),
+            'customer.subscription.updated' => SubscriptionUpdated::dispatch($order, SubscriptionStatus::tryFrom(data_get($event->payload, 'data.object.status') ?? ''), SubscriptionStatus::tryFrom(data_get($event->payload, 'data.previous_attributes.status') ?? '')),
+            'customer.subscription.deleted' => SubscriptionDeleted::dispatch($order),
+            'customer.updated' => CustomerUpdated::dispatch($this->user),
+            'customer.deleted' => CustomerDeleted::dispatch($this->user),
+            'refund.created' => RefundCreated::dispatch($order, OrderRefundReason::tryFrom(data_get($event->payload, 'data.object.reason') ?? '') ?? OrderRefundReason::Other, data_get($event->payload, 'data.object.reason')),
             default => null,
         };
     }
@@ -87,10 +76,6 @@ class HandleWebhook implements ShouldQueue
     {
         return array_filter(['stripe', data_get($this->payload, 'type')]);
     }
-
-    protected function handleCustomerDeleted(): void {}
-
-    protected function handleCustomerUpdated(): void {}
 
     protected function handleSubscriptionCreated(): ?Order
     {

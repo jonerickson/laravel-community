@@ -15,6 +15,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -24,6 +25,8 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class SubscriptionsController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly PaymentManager $paymentManager,
         #[CurrentUser]
@@ -34,6 +37,8 @@ class SubscriptionsController extends Controller
 
     public function index(): Response
     {
+        $this->authorize('viewAny', Product::class);
+
         $subscriptions = Product::query()
             ->subscriptions()
             ->visible()
@@ -48,6 +53,7 @@ class SubscriptionsController extends Controller
         $subscriptionReviews = $subscriptions->mapWithKeys(function (Product $product): array {
             $reviews = CommentData::collect($product
                 ->reviews()
+                ->approved()
                 ->latest()
                 ->get()
                 ->all(), PaginatedDataCollection::class);
@@ -67,6 +73,8 @@ class SubscriptionsController extends Controller
     public function store(SubscriptionCheckoutRequest $request): SymfonyResponse
     {
         $price = $request->getPrice();
+
+        $this->authorize('view', $price->product);
 
         $order = Order::create([
             'user_id' => $this->user->id,
@@ -96,6 +104,10 @@ class SubscriptionsController extends Controller
 
     public function update(SubscriptionUpdateRequest $request): RedirectResponse
     {
+        $price = $request->getPrice();
+
+        $this->authorize('view', $price->product);
+
         $success = $this->paymentManager->continueSubscription($this->user);
 
         if ($success) {
@@ -108,6 +120,10 @@ class SubscriptionsController extends Controller
 
     public function destroy(SubscriptionCancelRequest $request): RedirectResponse
     {
+        $price = $request->getPrice();
+
+        $this->authorize('view', $price->product);
+
         $immediate = $request->isImmediate();
 
         $success = $this->paymentManager->cancelSubscription(

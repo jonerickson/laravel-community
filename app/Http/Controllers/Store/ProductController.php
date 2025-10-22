@@ -8,6 +8,7 @@ use App\Data\CommentData;
 use App\Data\ProductData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Store\StoreProductRequest;
+use App\Models\Comment;
 use App\Models\Price;
 use App\Models\Product;
 use App\Services\ShoppingCartService;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\LaravelData\PaginatedDataCollection;
@@ -33,10 +35,8 @@ class ProductController extends Controller
     {
         $this->authorize('view', $product);
 
-        $validated = $request->validated();
-
-        $priceId = $validated['price_id'];
-        $quantity = $validated['quantity'] ?? 1;
+        $priceId = $request->validated('price_id');
+        $quantity = $request->validated('quantity', 1);
 
         if (! $priceId) {
             $defaultPrice = $product->defaultPrice;
@@ -62,8 +62,11 @@ class ProductController extends Controller
 
         $reviews = CommentData::collect($product
             ->reviews()
+            ->approved()
             ->latest()
             ->get()
+            ->filter(fn (Comment $comment) => Gate::check('view', $comment))
+            ->values()
             ->all(), PaginatedDataCollection::class);
 
         $product->load(['prices' => function (HasMany|Price $query): void {

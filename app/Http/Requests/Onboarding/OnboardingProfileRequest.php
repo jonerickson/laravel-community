@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Onboarding;
 
+use App\Rules\BlacklistRule;
 use App\Rules\NoProfanity;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +20,7 @@ class OnboardingProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'bio' => ['nullable', 'string', 'max:500', new NoProfanity],
+            'bio' => ['nullable', 'string', 'max:500', new NoProfanity, new BlacklistRule],
             'role' => ['required', 'string', 'in:developer,creator,player,other'],
         ];
     }

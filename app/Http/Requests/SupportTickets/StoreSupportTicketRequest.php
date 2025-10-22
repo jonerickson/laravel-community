@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\SupportTickets;
 
+use App\Rules\BlacklistRule;
 use App\Rules\NoProfanity;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -20,8 +21,8 @@ class StoreSupportTicketRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'subject' => ['required', 'string', 'max:255', new NoProfanity],
-            'description' => ['required', 'string', 'max:10000', new NoProfanity],
+            'subject' => ['required', 'string', 'max:255', new NoProfanity, new BlacklistRule],
+            'description' => ['required', 'string', 'max:10000', new NoProfanity, new BlacklistRule],
             'support_ticket_category_id' => ['required', 'exists:support_tickets_categories,id'],
             'order_id' => ['nullable', 'exists:orders,id,user_id,'.Auth::id()],
         ];

@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Frontend\StoreLockRequest;
 use App\Http\Resources\ApiResource;
-use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class LockController extends Controller
@@ -19,42 +18,34 @@ class LockController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function store(Request $request): JsonResource
+    public function store(StoreLockRequest $request): JsonResource
     {
-        $request->validate([
-            'topic_id' => 'required|exists:topics,id',
-        ]);
+        $lockable = $request->resolveLockable();
 
-        $topic = Topic::findOrFail($request->input('topic_id'));
+        $this->authorize('lock', $lockable);
 
-        $this->authorize('lock', $topic);
-
-        $topic->lock();
+        $lockable->lock();
 
         return ApiResource::success(
-            resource: $topic,
-            message: 'The topic has been successfully locked.'
+            resource: $lockable,
+            message: 'The item has been successfully locked.'
         );
     }
 
     /**
      * @throws AuthorizationException
      */
-    public function destroy(Request $request): JsonResource
+    public function destroy(StoreLockRequest $request): JsonResource
     {
-        $request->validate([
-            'topic_id' => 'required|exists:topics,id',
-        ]);
+        $lockable = $request->resolveLockable();
 
-        $topic = Topic::findOrFail($request->input('topic_id'));
+        $this->authorize('lock', $lockable);
 
-        $this->authorize('lock', $topic);
-
-        $topic->unlock();
+        $lockable->unlock();
 
         return ApiResource::success(
-            resource: $topic,
-            message: 'The topic has been successfully unlocked.'
+            resource: $lockable,
+            message: 'The item has been successfully unlocked.'
         );
     }
 }

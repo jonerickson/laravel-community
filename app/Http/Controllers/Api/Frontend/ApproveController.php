@@ -5,14 +5,11 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Frontend\StoreApproveRequest;
 use App\Http\Resources\ApiResource;
-use App\Models\Comment;
-use App\Models\Post;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Validation\ValidationException;
 
 class ApproveController extends Controller
 {
@@ -21,19 +18,14 @@ class ApproveController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function store(Request $request): JsonResource
+    public function store(StoreApproveRequest $request): JsonResource
     {
-        $validated = $request->validate([
-            'type' => 'required|string|in:post,comment',
-            'id' => 'required|integer',
-        ]);
-
-        $approvable = $this->resolveApprovable($validated['type'], $validated['id']);
+        $approvable = $request->resolveApprovable();
 
         if (! $approvable) {
-            throw ValidationException::withMessages([
-                'id' => ['The specified item could not be found.'],
-            ]);
+            return ApiResource::error(
+                message: 'The specified item could not be found.'
+            );
         }
 
         $this->authorize('approve', $approvable);
@@ -42,26 +34,21 @@ class ApproveController extends Controller
 
         return ApiResource::success(
             resource: $approvable->fresh(),
-            message: "The {$validated['type']} has been successfully approved."
+            message: "The {$request->validated('type')} has been successfully approved."
         );
     }
 
     /**
      * @throws AuthorizationException
      */
-    public function destroy(Request $request): JsonResource
+    public function destroy(StoreApproveRequest $request): JsonResource
     {
-        $validated = $request->validate([
-            'type' => 'required|string|in:post,comment',
-            'id' => 'required|integer',
-        ]);
-
-        $approvable = $this->resolveApprovable($validated['type'], $validated['id']);
+        $approvable = $request->resolveApprovable();
 
         if (! $approvable) {
-            throw ValidationException::withMessages([
-                'id' => ['The specified item could not be found.'],
-            ]);
+            return ApiResource::error(
+                message: 'The specified item could not be found.'
+            );
         }
 
         $this->authorize('approve', $approvable);
@@ -70,16 +57,7 @@ class ApproveController extends Controller
 
         return ApiResource::success(
             resource: $approvable->fresh(),
-            message: "The {$validated['type']} has been successfully unapproved."
+            message: "The {$request->validated('type')} has been successfully unapproved."
         );
-    }
-
-    private function resolveApprovable(string $type, int $id): Post|Comment|null
-    {
-        return match ($type) {
-            'post' => Post::find($id),
-            'comment' => Comment::find($id),
-            default => null,
-        };
     }
 }

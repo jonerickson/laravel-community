@@ -184,6 +184,9 @@ class OrdersAnalyticsChart extends ChartWidget
             ->orderBy('date')
             ->pluck('revenue', 'date');
 
+        // This is necessary because we want to sum using the `amount` computed
+        // value, not the value from the DB column.
+        /** @phpstan-ignore-next-line larastan.noUnnecessaryCollectionCall */
         $initialRevenue = DB::table('orders')
             ->join('orders_items', 'orders.id', '=', 'orders_items.order_id')
             ->where('orders.created_at', '<', $startDate)

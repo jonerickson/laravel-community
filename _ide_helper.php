@@ -24173,10 +24173,25 @@ namespace App\Http\Requests\Admin\Pages {
             }
     }
 
+namespace App\Http\Requests\Blog {
+    /**
+     */
+    class StoreCommentRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    /**
+     */
+    class UpdateCommentRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    }
+
 namespace App\Http\Requests\Api\Frontend {
     /**
      */
     class AddToCartRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    /**
+     */
+    class StoreApproveRequest extends \Illuminate\Foundation\Http\FormRequest {
             }
     /**
      */
@@ -24188,7 +24203,15 @@ namespace App\Http\Requests\Api\Frontend {
             }
     /**
      */
+    class StoreFollowRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    /**
+     */
     class StoreReviewRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    /**
+     */
+    class DestroyTopicRequest extends \Illuminate\Foundation\Http\FormRequest {
             }
     /**
      */
@@ -24197,6 +24220,14 @@ namespace App\Http\Requests\Api\Frontend {
     /**
      */
     class RemoveDiscountRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    /**
+     */
+    class StoreLikeRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    /**
+     */
+    class StoreReadRequest extends \Illuminate\Foundation\Http\FormRequest {
             }
     }
 

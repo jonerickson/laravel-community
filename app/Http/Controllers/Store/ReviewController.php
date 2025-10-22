@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Store\StoreReviewRequest;
 use App\Models\Comment;
 use App\Models\Product;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -18,8 +19,12 @@ use Spatie\LaravelData\PaginatedDataCollection;
 
 class ReviewController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index(Product $subscription): Response
     {
+        $this->authorize('viewAny', Comment::class);
+
         $reviews = CommentData::collect($subscription->reviews()
             ->with('author')
             ->approved()
@@ -37,6 +42,8 @@ class ReviewController extends Controller
 
     public function store(StoreReviewRequest $request, Product $subscription): RedirectResponse
     {
+        $this->authorize('create', Comment::class);
+
         $subscription->comments()->create([
             'content' => $request->validated('content'),
             'rating' => $request->validated('rating'),

@@ -17,10 +17,10 @@ class HandleOrderSaving
     {
         if ($event->order->isDirty('status')) {
             match ($event->order->status) {
-                OrderStatus::Cancelled => event(new OrderCancelled($event->order)),
-                OrderStatus::Pending => event(new OrderPending($event->order)),
-                OrderStatus::Processing => event(new OrderProcessing($event->order)),
-                OrderStatus::Succeeded => event(new OrderSucceeded($event->order)),
+                OrderStatus::Cancelled => OrderCancelled::dispatch($event->order),
+                OrderStatus::Pending => OrderPending::dispatch($event->order),
+                OrderStatus::Processing => OrderProcessing::dispatch($event->order),
+                OrderStatus::Succeeded => OrderSucceeded::dispatch($event->order),
                 default => null
             };
         }

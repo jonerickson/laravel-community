@@ -6,15 +6,10 @@ namespace App\Http\Controllers\Api\Frontend;
 
 use App\Data\ReadData;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Frontend\StoreReadRequest;
 use App\Http\Resources\ApiResource;
-use App\Models\Announcement;
-use App\Models\Forum;
-use App\Models\Post;
-use App\Models\Topic;
 use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
-use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 
 class ReadController extends Controller
 {
@@ -25,19 +20,14 @@ class ReadController extends Controller
         //
     }
 
-    public function __invoke(Request $request): ApiResource
+    public function __invoke(StoreReadRequest $request): ApiResource
     {
-        $validated = $request->validate([
-            'type' => 'required|string|in:topic,post,forum,announcement',
-            'id' => 'required|integer',
-        ]);
-
-        $readable = $this->resolveReadable($validated['type'], $validated['id']);
+        $readable = $request->resolveReadable();
 
         if (! $readable) {
-            throw ValidationException::withMessages([
-                'id' => ['The specified item could not be found.'],
-            ]);
+            return ApiResource::error(
+                message: 'The specified item could not be found.'
+            );
         }
 
         $result = $readable->markAsRead($this->user);
@@ -45,23 +35,12 @@ class ReadController extends Controller
         $readData = ReadData::from([
             'markedAsRead' => ! is_bool($result),
             'isReadByUser' => $readable->fresh()->is_read_by_user,
-            'type' => $validated['type'],
-            'id' => $validated['id'],
+            'type' => $request->validated('type'),
+            'id' => $request->validated('id'),
         ]);
 
         return new ApiResource(
             resource: $readData,
         );
-    }
-
-    private function resolveReadable(string $type, int $id): Topic|Post|Forum|Announcement|null
-    {
-        return match ($type) {
-            'topic' => Topic::find($id),
-            'post' => Post::find($id),
-            'forum' => Forum::find($id),
-            'announcement' => Announcement::find($id),
-            default => null,
-        };
     }
 }

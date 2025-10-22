@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Settings;
 
+use App\Data\CustomerData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\DestroyPaymentMethodRequest;
 use App\Http\Requests\Settings\StorePaymentMethodRequest;
@@ -34,8 +35,6 @@ class PaymentMethodController extends Controller
 
     public function store(StorePaymentMethodRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
-
         $result = true;
         if (! $this->paymentManager->getCustomer($this->user) instanceof CustomerData) {
             $result = $this->paymentManager->createCustomer($this->user);
@@ -50,7 +49,7 @@ class PaymentMethodController extends Controller
 
         $created = $this->paymentManager->createPaymentMethod(
             user: $this->user,
-            paymentMethodId: $validated['method']
+            paymentMethodId: $request->validated('method'),
         );
 
         if (blank($created)) {
@@ -68,12 +67,10 @@ class PaymentMethodController extends Controller
 
     public function update(UpdatePaymentMethodRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
-
         $updated = $this->paymentManager->updatePaymentMethod(
             user: $this->user,
-            paymentMethodId: $validated['method'],
-            isDefault: $validated['is_default']
+            paymentMethodId: $request->validated('method'),
+            isDefault: $request->validated('is_default'),
         );
 
         if (blank($updated)) {
@@ -91,11 +88,9 @@ class PaymentMethodController extends Controller
 
     public function destroy(DestroyPaymentMethodRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
-
         $deleted = $this->paymentManager->deletePaymentMethod(
             user: $this->user,
-            paymentMethodId: $validated['method']
+            paymentMethodId: $request->validated('method'),
         );
 
         if (blank($deleted)) {

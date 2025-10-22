@@ -34,7 +34,7 @@ Route::group(['domain' => config('app.url'), 'middleware' => [EnsureFrontendRequ
         Route::post('/approve', [ApproveController::class, 'store'])->name('approve.store');
         Route::delete('/approve', [ApproveController::class, 'destroy'])->name('approve.destroy');
         Route::post('/checkout', CheckoutController::class)->name('checkout');
-        Route::post('/comments', [ReviewController::class, 'store'])->name('comments.store');
+        Route::post('/comments', [ReviewController::class, 'store'])->middleware('throttle:comment')->name('comments.store');
         Route::post('/follow', [FollowController::class, 'store'])->name('follow.store');
         Route::delete('/follow/', [FollowController::class, 'destroy'])->name('follow.destroy');
         Route::delete('/forums/topics', [TopicController::class, 'destroy'])->name('forums.topics.destroy');
@@ -47,6 +47,6 @@ Route::group(['domain' => config('app.url'), 'middleware' => [EnsureFrontendRequ
         Route::post('/lock', [LockController::class, 'store'])->name('lock.store');
         Route::delete('/lock', [LockController::class, 'destroy'])->name('lock.destroy');
         Route::post('/read', ReadController::class)->name('read');
-        Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
+        Route::post('/reports', [ReportController::class, 'store'])->middleware('throttle:report')->name('reports.store');
     });
 });

@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Blog;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Blog\StoreCommentRequest;
+use App\Http\Requests\Blog\UpdateCommentRequest;
 use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
@@ -19,18 +20,14 @@ class CommentController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function store(Request $request, Post $post): RedirectResponse
+    public function store(StoreCommentRequest $request, Post $post): RedirectResponse
     {
-        $this->authorize('create', [Comment::class, $post]);
-
-        $validated = $request->validate([
-            'content' => 'required|string',
-            'parent_id' => 'nullable|int',
-        ]);
+        $this->authorize('view', $post);
+        $this->authorize('create', Comment::class);
 
         $post->comments()->create([
-            'content' => $validated['content'],
-            'parent_id' => $validated['parent_id'] ?? null,
+            'content' => $request->validated('content'),
+            'parent_id' => $request->validated('parent_id'),
         ]);
 
         return to_route('blog.show', [$post])
@@ -40,15 +37,12 @@ class CommentController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function update(Request $request, Post $post, Comment $comment): RedirectResponse
+    public function update(UpdateCommentRequest $request, Post $post, Comment $comment): RedirectResponse
     {
-        $this->authorize('update', [$comment, $post]);
+        $this->authorize('view', $post);
+        $this->authorize('update', $comment);
 
-        $validated = $request->validate([
-            'content' => 'required|string',
-        ]);
-
-        $comment->update($validated);
+        $comment->update($request->only('content'));
 
         return to_route('blog.show', [$post])
             ->with('message', 'The comment has been successfully updated.');
@@ -59,7 +53,8 @@ class CommentController extends Controller
      */
     public function destroy(Post $post, Comment $comment): RedirectResponse
     {
-        $this->authorize('delete', [$comment, $post]);
+        $this->authorize('view', $comment);
+        $this->authorize('delete', $comment);
 
         $comment->delete();
 

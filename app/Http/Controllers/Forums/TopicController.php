@@ -34,7 +34,8 @@ class TopicController extends Controller
      */
     public function create(Forum $forum): Response
     {
-        $this->authorize('create', [Topic::class, $forum]);
+        $this->authorize('view', $forum);
+        $this->authorize('create', Topic::class);
 
         return Inertia::render('forums/topics/create', [
             'forum' => ForumData::from($forum),
@@ -46,21 +47,19 @@ class TopicController extends Controller
      */
     public function store(StoreTopicRequest $request, Forum $forum): RedirectResponse
     {
-        $this->authorize('create', [Topic::class, $forum]);
+        $this->authorize('view', $forum);
+        $this->authorize('create', Topic::class);
 
-        $validated = $request->validated();
-
-        $topic = DB::transaction(function () use ($validated, $forum) {
+        $topic = DB::transaction(function () use ($request, $forum) {
             $topic = Topic::create([
-                'title' => $validated['title'],
-                'description' => $validated['description'],
+                'title' => $request->validated('title'),
                 'forum_id' => $forum->id,
             ]);
 
             $topic->posts()->create([
                 'type' => PostType::Forum,
-                'title' => $validated['title'],
-                'content' => $validated['content'],
+                'title' => $request->validated('title'),
+                'content' => $request->validated('content'),
             ]);
 
             return $topic;
@@ -80,7 +79,8 @@ class TopicController extends Controller
      */
     public function show(Forum $forum, Topic $topic): Response
     {
-        $this->authorize('view', [$topic, $forum]);
+        $this->authorize('view', $forum);
+        $this->authorize('view', $topic);
 
         $topic->incrementViews();
 
@@ -106,7 +106,8 @@ class TopicController extends Controller
      */
     public function destroy(Forum $forum, Topic $topic): RedirectResponse
     {
-        $this->authorize('delete', [$topic, $forum]);
+        $this->authorize('view', $forum);
+        $this->authorize('delete', $topic);
 
         DeleteTopicAction::execute($topic, $forum);
 

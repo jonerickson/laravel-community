@@ -29,12 +29,10 @@ class ReportController extends Controller
      */
     public function store(StoreReportRequest $request): ApiResource
     {
-        $validated = $request->validated();
-
         $existingReport = Report::query()
             ->whereBelongsTo($this->user, 'author')
-            ->where('reportable_type', $validated['reportable_type'])
-            ->where('reportable_id', $validated['reportable_id'])
+            ->where('reportable_type', $request->validated('reportable_type'))
+            ->where('reportable_id', $request->validated('reportable_type'))
             ->exists();
 
         if ($existingReport) {
@@ -46,10 +44,10 @@ class ReportController extends Controller
         }
 
         $report = Report::create([
-            'reportable_type' => $validated['reportable_type'],
-            'reportable_id' => $validated['reportable_id'],
-            'reason' => $validated['reason'],
-            'additional_info' => $validated['additional_info'],
+            'reportable_type' => $request->validated('reportable_type'),
+            'reportable_id' => $request->validated('reportable_id'),
+            'reason' => $request->validated('reason'),
+            'additional_info' => $request->validated('additional_info'),
             'status' => 'pending',
         ]);
 

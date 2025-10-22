@@ -31,11 +31,9 @@ class CommentController extends Controller
         $this->authorize('update', $ticket);
         $this->authorize('create', Comment::class);
 
-        $validated = $request->validated();
-
         $this->supportTicketManager->addComment(
             ticket: $ticket,
-            content: $validated['content'],
+            content: $request->validated('content'),
             userId: $this->user->id,
         );
 

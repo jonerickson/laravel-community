@@ -7,7 +7,6 @@ namespace App\Policies;
 use App\Enums\WarningConsequenceType;
 use App\Models\Comment;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
 
 class CommentPolicy
@@ -26,14 +25,13 @@ class CommentPolicy
         return Gate::forUser($user)->check('view_any_comments');
     }
 
-    public function view(?User $user, Comment $comment, ?Model $commentable = null): bool
+    public function view(?User $user, Comment $comment): bool
     {
         return Gate::forUser($user)->check('view_comments')
-            && ($comment->is_approved || (! $comment->is_approved && (($user && $comment->isAuthoredBy($user)) || Gate::forUser($user)->check('approve', $comment))))
-            && (! $commentable instanceof Model || Gate::forUser($user)->check('view', $commentable));
+            && ($comment->is_approved || (! $comment->is_approved && (($user && $comment->isAuthoredBy($user)) || Gate::forUser($user)->check('approve', $comment))));
     }
 
-    public function create(?User $user, ?Model $commentable = null): bool
+    public function create(?User $user): bool
     {
         if (! $user instanceof User) {
             return false;
@@ -43,11 +41,10 @@ class CommentPolicy
             return false;
         }
 
-        return Gate::forUser($user)->check('create_comments')
-            && (! $commentable instanceof Model || Gate::forUser($user)->check('view', $commentable));
+        return Gate::forUser($user)->check('create_comments');
     }
 
-    public function update(?User $user, Comment $comment, ?Model $commentable = null): bool
+    public function update(?User $user, Comment $comment): bool
     {
         if (! $user instanceof User) {
             return false;
@@ -57,11 +54,10 @@ class CommentPolicy
             return true;
         }
 
-        return $comment->isAuthoredBy($user)
-            && $this->view($user, $comment, $commentable);
+        return $comment->isAuthoredBy($user);
     }
 
-    public function delete(?User $user, Comment $comment, ?Model $commentable = null): bool
+    public function delete(?User $user, Comment $comment): bool
     {
         if (! $user instanceof User) {
             return false;
@@ -71,8 +67,7 @@ class CommentPolicy
             return true;
         }
 
-        return $comment->isAuthoredBy($user)
-            && $this->view($user, $comment, $commentable);
+        return $comment->isAuthoredBy($user);
     }
 
     public function like(?User $user, Comment $comment): bool

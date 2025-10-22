@@ -31,11 +31,9 @@ class ProfileController extends Controller
 
     public function update(UpdateProfileRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
-
         $data = [
-            'name' => $validated['name'],
-            'signature' => $validated['signature'],
+            'name' => $request->validated('name'),
+            'signature' => $request->validated('signature'),
         ];
 
         if ($request->hasFile('avatar')) {

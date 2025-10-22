@@ -40,7 +40,7 @@ class DiscountForm
                                     ->maxLength(255)
                                     ->rules(['alpha_dash'])
                                     ->helperText('A unique code for this discount.')
-                                    ->default(fn (Get $get) => Discount::make([
+                                    ->default(fn (Get $get): string => new Discount([
                                         'type' => $get('type') ?? DiscountType::PromoCode,
                                     ])->generateCode()),
                                 Radio::make('type')

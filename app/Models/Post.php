@@ -23,6 +23,8 @@ use App\Traits\Publishable;
 use App\Traits\Readable;
 use App\Traits\Reportable;
 use App\Traits\Viewable;
+use Filament\Support\Contracts\HasLabel;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -132,7 +134,7 @@ use Override;
  *
  * @mixin \Eloquent
  */
-class Post extends Model implements Sluggable
+class Post extends Model implements HasLabel, Sluggable
 {
     use Approvable;
     use Commentable;
@@ -280,6 +282,11 @@ class Post extends Model implements Sluggable
                 return max(1, (int) ceil($wordCount / 200));
             }
         )->shouldCache();
+    }
+
+    public function getLabel(): string|Htmlable|null
+    {
+        return $this->title;
     }
 
     #[Override]

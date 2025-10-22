@@ -40,15 +40,15 @@ trait HasGroups
 
     public function syncGroups(bool $detaching = true): void
     {
-        $baseGroupIds = match (static::class) {
-            User::class => Group::query()->whereHas('roles', function (Builder $query): void {
+        $baseGroupIds = match (true) {
+            $this instanceof User => Group::query()->whereHas('roles', function (Builder $query): void {
                 $query->whereIn('name', Collection::wrap(Role::cases())->map->value->toArray());
             })->pluck('id'),
             default => collect(),
         };
 
-        $additionalGroupIds = match (static::class) {
-            User::class => $this->orders()
+        $additionalGroupIds = match (true) {
+            $this instanceof User => $this->orders()
                 ->completed()
                 ->with('products.groups')
                 ->get()

@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Frontend\StorePinRequest;
 use App\Http\Resources\ApiResource;
-use App\Models\Post;
-use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
 
@@ -21,25 +19,13 @@ class PinController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function store(Request $request): JsonResource
+    public function store(StorePinRequest $request): JsonResource
     {
-        $request->validate([
-            'topic_id' => 'sometimes|required|exists:topics,id',
-            'post_id' => 'sometimes|required|exists:posts,id',
-        ]);
+        $pinnable = $request->resolvePinnable();
 
-        $pinnable = null;
-        if ($request->filled('topic_id')) {
-            $pinnable = Topic::findOrFail($request->input('topic_id'));
-        }
-
-        if ($request->filled('post_id')) {
-            $pinnable = Post::findOrFail($request->input('post_id'));
-        }
-
-        if (blank($pinnable)) {
+        if (! $pinnable) {
             return ApiResource::error(
-                message: 'Please select either a topic or post is required.'
+                message: 'Please select either a topic or post to pin.'
             );
         }
 
@@ -58,25 +44,13 @@ class PinController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function destroy(Request $request): JsonResource
+    public function destroy(StorePinRequest $request): JsonResource
     {
-        $request->validate([
-            'topic_id' => 'sometimes|required|exists:topics,id',
-            'post_id' => 'sometimes|required|exists:posts,id',
-        ]);
+        $pinnable = $request->resolvePinnable();
 
-        $pinnable = null;
-        if ($request->filled('topic_id')) {
-            $pinnable = Topic::findOrFail($request->input('topic_id'));
-        }
-
-        if ($request->filled('post_id')) {
-            $pinnable = Post::findOrFail($request->input('post_id'));
-        }
-
-        if (blank($pinnable)) {
+        if (! $pinnable) {
             return ApiResource::error(
-                message: 'Please select either a topic or post is required.'
+                message: 'Please select either a topic or post to unpin.'
             );
         }
 

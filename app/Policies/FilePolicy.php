@@ -6,8 +6,6 @@ namespace App\Policies;
 
 use App\Models\File;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Gate;
 
 class FilePolicy
 {
@@ -25,39 +23,23 @@ class FilePolicy
         return $user instanceof User;
     }
 
-    public function view(?User $user, File $file, ?Model $resource = null): bool
+    public function view(?User $user, File $file): bool
     {
-        if (! $user instanceof User) {
-            return false;
-        }
-
-        return ! $resource instanceof Model || Gate::forUser($user)->check('view', $resource);
+        return $user instanceof User;
     }
 
-    public function create(?User $user, ?Model $resource = null): bool
+    public function create(?User $user): bool
     {
-        if (! $user instanceof User) {
-            return false;
-        }
-
-        return ! $resource instanceof Model || Gate::forUser($user)->check('view', $resource);
+        return $user instanceof User;
     }
 
-    public function update(?User $user, File $file, ?Model $resource = null): bool
+    public function update(?User $user, File $file): bool
     {
-        if (! $user instanceof User) {
-            return false;
-        }
-
-        return $this->view($user, $file, $resource);
+        return $user instanceof User;
     }
 
-    public function delete(?User $user, File $file, ?Model $resource = null): bool
+    public function delete(?User $user, File $file): bool
     {
-        if (! $user instanceof User) {
-            return false;
-        }
-
-        return $this->view($user, $file, $resource);
+        return $user instanceof User;
     }
 }

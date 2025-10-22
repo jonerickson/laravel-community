@@ -81,21 +81,14 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
             return;
         }
 
-        await approvePost(
-            {
-                url,
-                method,
-                data: {
-                    type: 'post',
-                    id: post.id,
-                },
+        await approvePost({
+            url,
+            method,
+            data: {
+                type: 'post',
+                id: post.id,
             },
-            {
-                onSuccess: () => {
-                    router.reload();
-                },
-            },
-        );
+        });
     };
 
     const handleTogglePin = async () => {

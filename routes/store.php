@@ -27,7 +27,7 @@ Route::group(['as' => 'store.', 'prefix' => 'store'], function (): void {
         Route::post('subscriptions', [SubscriptionsController::class, 'store'])->name('subscriptions.store');
         Route::put('subscriptions', [SubscriptionsController::class, 'update'])->name('subscriptions.update');
         Route::delete('subscriptions', [SubscriptionsController::class, 'destroy'])->name('subscriptions.destroy');
-        Route::post('subscriptions/{subscription}/reviews', [ReviewController::class, 'store'])->name('subscriptions.reviews.store');
+        Route::post('subscriptions/{subscription}/reviews', [ReviewController::class, 'store'])->middleware('throttle:comment')->name('subscriptions.reviews.store');
     });
 
     Route::group(['middleware' => ['auth', 'verified', 'signed']], function (): void {

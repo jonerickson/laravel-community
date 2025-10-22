@@ -52,6 +52,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
         patch: updateComment,
         processing: editing,
         reset: resetEdit,
+        errors,
     } = useForm({
         content: comment.content,
     });
@@ -133,12 +134,16 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
 
                 {isEditing ? (
                     <form onSubmit={handleEditSubmit} className="space-y-3">
-                        <Textarea
-                            value={editData.content}
-                            onChange={(e) => setEditData('content', e.target.value)}
-                            className="min-h-[80px]"
-                            required
-                        />
+                        <div className="grid gap-2">
+                            <Textarea
+                                value={editData.content}
+                                onChange={(e) => setEditData('content', e.target.value)}
+                                className="min-h-[80px]"
+                                required
+                            />
+                            <InputError message={errors.content} />
+                        </div>
+
                         <div className="flex gap-2">
                             <Button type="submit" size="sm" disabled={editing}>
                                 {editing ? 'Saving...' : 'Save'}
@@ -195,13 +200,16 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
 
                 {replyingTo === comment.id && (
                     <form onSubmit={handleReplySubmit} className="mt-3 space-y-3">
-                        <Textarea
-                            value={data.content}
-                            onChange={(e) => setData('content', e.target.value)}
-                            placeholder="Write a reply..."
-                            className="min-h-[80px]"
-                            required
-                        />
+                        <div className="grid gap-2">
+                            <Textarea
+                                value={data.content}
+                                onChange={(e) => setData('content', e.target.value)}
+                                placeholder="Write a reply..."
+                                className="min-h-[80px]"
+                                required
+                            />
+                            <InputError message={errors.content} />
+                        </div>
                         <div className="flex gap-2">
                             <Button type="submit" size="sm" disabled={processing}>
                                 {processing ? 'Posting...' : 'Post reply'}
@@ -276,7 +284,7 @@ export default function BlogComments({ post, comments }: BlogCommentsProps) {
 
             {can('create_comments') && (
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
+                    <div className="grid gap-2">
                         <Textarea
                             value={data.content}
                             onChange={(e) => setData('content', e.target.value)}

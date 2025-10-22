@@ -7,28 +7,17 @@ namespace App\Http\Controllers\Api\Frontend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Frontend\StoreReviewRequest;
 use App\Http\Resources\ApiResource;
-use App\Models\Comment;
-use App\Models\Post;
-use App\Models\Product;
 
 class ReviewController extends Controller
 {
     public function store(StoreReviewRequest $request): ApiResource
     {
-        $validated = $request->validated();
+        $commentable = $request->resolveCommentable();
 
-        $commentableType = match ($validated['commentable_type']) {
-            'post' => Post::class,
-            'comment' => Comment::class,
-            'product' => Product::class,
-        };
-
-        $comment = Comment::create([
-            'commentable_type' => $commentableType,
-            'commentable_id' => $validated['commentable_id'],
-            'content' => $validated['content'],
-            'rating' => $validated['rating'] ?? null,
-            'parent_id' => $validated['parent_id'] ?? null,
+        $comment = $commentable->comments()->create([
+            'content' => $request->validated('content'),
+            'rating' => $request->validated('rating'),
+            'parent_id' => $request->validated('parent_id'),
         ]);
 
         $comment->load('author');

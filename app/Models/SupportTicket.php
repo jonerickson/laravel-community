@@ -12,6 +12,8 @@ use App\Traits\Commentable;
 use App\Traits\HasAuthor;
 use App\Traits\HasFiles;
 use App\Traits\HasNotes;
+use Filament\Support\Contracts\HasLabel;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -92,7 +94,7 @@ use Override;
  *
  * @mixin \Eloquent
  */
-class SupportTicket extends Model
+class SupportTicket extends Model implements HasLabel
 {
     use Commentable;
     use HasAuthor;
@@ -257,6 +259,11 @@ class SupportTicket extends Model
         return Attribute::make(
             get: fn (): ?string => $this->assignedTo?->name
         );
+    }
+
+    public function getLabel(): string|Htmlable|null
+    {
+        return $this->ticket_number;
     }
 
     #[Override]

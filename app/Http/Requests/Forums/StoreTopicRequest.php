@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Forums;
 
+use App\Enums\WarningConsequenceType;
 use App\Models\Topic;
+use App\Rules\BlacklistRule;
 use App\Rules\NoProfanity;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Validator;
 use Override;
 
 class StoreTopicRequest extends FormRequest
@@ -20,9 +23,8 @@ class StoreTopicRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:255', new NoProfanity],
-            'description' => ['nullable', 'string', 'max:500', new NoProfanity],
-            'content' => ['required', 'string', new NoProfanity],
+            'title' => ['required', 'string', 'max:255', new NoProfanity, new BlacklistRule],
+            'content' => ['required', 'string', new NoProfanity, new BlacklistRule],
         ];
     }
 
@@ -32,8 +34,19 @@ class StoreTopicRequest extends FormRequest
         return [
             'title.required' => 'Please provide a title for your topic.',
             'title.max' => 'The title cannot be longer than 255 characters.',
-            'description.max' => 'The description cannot be longer than 500 characters.',
             'content.required' => 'Please provide content for your topic.',
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            if (Auth::user()->active_consequence_type === WarningConsequenceType::PostRestriction) {
+                $validator->errors()->add(
+                    'content',
+                    'You have been restricted from posting.'
+                );
+            }
+        });
     }
 }

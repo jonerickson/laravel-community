@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Store;
 use App\Data\ProductCategoryData;
 use App\Data\ProductData;
 use App\Http\Controllers\Controller;
+use App\Models\Price;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Database\Eloquent\Builder;
@@ -46,12 +47,13 @@ class CategoryController extends Controller
             ->approved()
             ->visible()
             ->with('defaultPrice')
-            ->with(['prices' => function (HasMany $query): void {
+            ->with(['prices' => function (Price|HasMany $query): void {
                 $query->active();
             }])
             ->where('is_subscription_only', false)
             ->ordered()
             ->get()
+            ->filter(fn (Product $product) => Gate::check('view', $product))
             ->values();
 
         return Inertia::render('store/categories/show', [

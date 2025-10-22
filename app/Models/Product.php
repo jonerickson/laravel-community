@@ -24,6 +24,8 @@ use App\Traits\Orderable;
 use App\Traits\Reviewable;
 use App\Traits\Trendable;
 use App\Traits\Visible;
+use Filament\Support\Contracts\HasLabel;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -141,7 +143,7 @@ use Laravel\Scout\Searchable;
  *
  * @mixin \Eloquent
  */
-class Product extends Model implements Sluggable
+class Product extends Model implements HasLabel, Sluggable
 {
     use Featureable;
     use HasFactory;
@@ -353,6 +355,11 @@ class Product extends Model implements Sluggable
     public function getActivityLogName(): string
     {
         return 'store';
+    }
+
+    public function getLabel(): string|Htmlable|null
+    {
+        return $this->name;
     }
 
     protected function casts(): array

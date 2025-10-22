@@ -21,18 +21,19 @@ Route::middleware('guest')->group(function (): void {
         ->name('register');
 
     Route::post('register', [RegisteredUserController::class, 'store'])
-        ->middleware(['throttle:register']);
+        ->middleware('throttle:register');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store'])
-        ->middleware(['throttle:login']);
+        ->middleware('throttle:login');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
 
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+        ->middleware('throttle:6,1')
         ->name('password.email');
 
     Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
@@ -45,11 +46,11 @@ Route::middleware('guest')->group(function (): void {
         ->name('magic-link.request');
 
     Route::post('magic-link', [MagicLinkController::class, 'store'])
-        ->middleware(['throttle:login'])
+        ->middleware('throttle:login')
         ->name('magic-link.send');
 
     Route::get('magic-link/login/{user}', [MagicLinkController::class, 'index'])
-        ->middleware(['signed'])
+        ->middleware(['signed', 'throttle:login'])
         ->name('magic-link.login');
 });
 
