@@ -334,9 +334,16 @@ function SubscriptionCards({ subscriptions }: SubscriptionCardsProps) {
     return (
         <div
             className={cn(
-                'mx-auto grid max-w-5xl grid-cols-1 gap-6',
-                subscriptions.length === 1 ? 'md:grid-cols-1' : subscriptions.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3',
+                'grid grid-cols-1 gap-6',
+                subscriptions.length === 1
+                    ? 'md:grid-cols-1'
+                    : subscriptions.length === 2
+                      ? 'md:grid-cols-2'
+                      : subscriptions.length === 4
+                        ? 'md:grid-cols-2 lg:grid-cols-4'
+                        : 'md:grid-cols-2 lg:grid-cols-3',
             )}
+            style={{ gridAutoRows: '1fr' }}
         >
             {subscriptions.map((subscription) => {
                 const defaultPrice = subscription.prices.find((price: App.Data.PriceData) => price.isDefault) ||
@@ -354,7 +361,7 @@ function SubscriptionCards({ subscriptions }: SubscriptionCardsProps) {
                     <Card
                         gradient
                         key={subscription.id}
-                        className={cn('relative flex flex-col justify-between bg-background', subscription.isFeatured && 'ring-2 ring-info')}
+                        className={cn('relative flex h-full flex-col justify-between bg-background', subscription.isFeatured && 'ring-2 ring-info')}
                     >
                         {subscription.isFeatured && (
                             <div className="absolute -top-4 left-1/2 z-10 -translate-x-1/2">

@@ -413,7 +413,9 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                                 ? 'md:grid-cols-1'
                                 : subscriptionProducts.length === 2
                                   ? 'md:grid-cols-2'
-                                  : 'md:grid-cols-2 lg:grid-cols-3',
+                                  : subscriptionProducts.length === 4
+                                    ? 'md:grid-cols-2 lg:grid-cols-4'
+                                    : 'md:grid-cols-2 lg:grid-cols-3',
                         )}
                     >
                         {subscriptionProducts.map((plan: App.Data.ProductData) => {

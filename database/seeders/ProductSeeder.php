@@ -85,7 +85,7 @@ class ProductSeeder extends Seeder
 
         $subscriptions = Product::factory()
             ->approved()
-            ->count(3)
+            ->count(4)
             ->recycle($subscriptionCategory)
             ->hasAttached($subscriptionCategory, relationship: 'categories')
             ->hasAttached(Group::firstOrCreate(['name' => 'Customers']), relationship: 'groups')
