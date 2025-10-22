@@ -41,8 +41,8 @@ export default function Home({ subscriptions = [] }: HomeProps) {
 
             <main>
                 <section className="relative py-20 md:py-32">
-                    <div className="pointer-events-none absolute right-0 bottom-0 z-10">
-                        <AbstractBackgroundPattern className="h-[800px] w-[400px] sm:w-[800px]" corner="bottom-right" />
+                    <div className="pointer-events-none absolute right-0 bottom-0 z-10 overflow-hidden">
+                        <AbstractBackgroundPattern className="h-[800px] w-[800px] md:h-[1000px] md:w-[1000px]" />
                     </div>
 
                     <div className="container mx-auto px-6 text-center sm:px-4">
@@ -205,8 +205,8 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                                         ))}
                                     </div>
                                     <p className="mb-4 text-muted-foreground">
-                                        "Mountain Interactive's platform revolutionized our community management. The high-fidelity game development
-                                        tools are exceptional and our players love the seamless experience."
+                                        "The {name} platform revolutionized our community management. The high-fidelity game development tools are
+                                        exceptional and our players love the seamless experience."
                                     </p>
                                     <div className="flex items-center">
                                         <div className="bg-gaming-blue mr-3 flex h-10 w-10 items-center justify-center rounded-full font-bold text-white">
@@ -270,10 +270,10 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                 </section>
 
                 <section id="pricing" className="relative py-20">
-                    <div className="pointer-events-none absolute bottom-0 left-0">
-                        <AbstractBackgroundPattern className="h-[800px] w-[700px] scale-x-[-1] transform" corner="bottom-left" />
+                    <div className="pointer-events-none absolute bottom-0 left-0 z-10 overflow-hidden">
+                        <AbstractBackgroundPattern className="h-[800px] w-[800px] md:w-[1000px]" corner="bottom-left" />
                     </div>
-                    <div className="container mx-auto px-6 sm:px-4">
+                    <div className="relative z-20 container mx-auto px-6 sm:px-4">
                         <div className="mb-16 text-center">
                             <h2 className="mb-4 text-3xl font-bold md:text-4xl">Simple, transparent pricing</h2>
                             <p className="text-lg text-muted-foreground">Choose the plan that fits you best</p>
