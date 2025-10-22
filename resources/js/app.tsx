@@ -8,6 +8,8 @@ import { initializeTheme } from './hooks/use-appearance';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 const fingerprintApiKey = import.meta.env.VITE_FINGERPRINT_PUBLIC_KEY;
+const fingerprintEndpoint = import.meta.env.VITE_FINGERPRINT_ENDPOINT || FingerprintJSPro.defaultEndpoint;
+const fingerprintScriptUrlPattern = import.meta.env.VITE_FINGERPRINT_SCRIPT_URL_PATTERN || FingerprintJSPro.defaultScriptUrlPattern;
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
@@ -19,8 +21,8 @@ createInertiaApp({
             <FpjsProvider
                 loadOptions={{
                     apiKey: fingerprintApiKey,
-                    endpoint: [FingerprintJSPro.defaultEndpoint],
-                    scriptUrlPattern: [FingerprintJSPro.defaultScriptUrlPattern],
+                    endpoint: [fingerprintEndpoint],
+                    scriptUrlPattern: [fingerprintScriptUrlPattern],
                 }}
             >
                 <App {...props} />
