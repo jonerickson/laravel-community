@@ -40,14 +40,14 @@ export function AbstractBackgroundPattern({ className, opacity = 0.08, corner = 
                                 fill="none"
                                 stroke="#8b5cf6"
                                 strokeWidth="0.8"
-                                opacity={opacity * 1.2}
+                                opacity={opacity * 0.8}
                             />
-                            <circle cx="6" cy="34" r="1.5" fill="#ec4899" opacity={opacity} />
-                            <circle cx="34" cy="6" r="1.5" fill="#06b6d4" opacity={opacity} />
-                            <line x1="0" y1="20" x2="40" y2="20" stroke="#a78bfa" strokeWidth="0.3" opacity={opacity * 0.5} />
-                            <line x1="20" y1="0" x2="20" y2="40" stroke="#a78bfa" strokeWidth="0.3" opacity={opacity * 0.5} />
-                            <polygon points="2,2 6,2 4,6" fill="#10b981" opacity={opacity * 0.6} />
-                            <polygon points="34,34 38,34 36,38" fill="#f59e0b" opacity={opacity * 0.6} />
+                            <circle cx="6" cy="34" r="1.5" fill="#ec4899" opacity={opacity * 0.7} />
+                            <circle cx="34" cy="6" r="1.5" fill="#06b6d4" opacity={opacity * 0.7} />
+                            <line x1="0" y1="20" x2="40" y2="20" stroke="#a78bfa" strokeWidth="0.3" opacity={opacity * 0.3} />
+                            <line x1="20" y1="0" x2="20" y2="40" stroke="#a78bfa" strokeWidth="0.3" opacity={opacity * 0.3} />
+                            <polygon points="2,2 6,2 4,6" fill="#10b981" opacity={opacity * 0.4} />
+                            <polygon points="34,34 38,34 36,38" fill="#f59e0b" opacity={opacity * 0.4} />
                         </g>
                     </pattern>
 
