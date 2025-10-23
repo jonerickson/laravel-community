@@ -8,7 +8,7 @@ import SettingsLayout from '@/layouts/settings/layout';
 import { BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { Link2, Plus, Trash2, User } from 'lucide-react';
+import { Link2, Plus, User } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -145,15 +145,15 @@ export default function Integrations({ connectedAccounts }: ConnectedAccountsPro
                                                 </div>
                                             </div>
                                         </div>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => handleRemoveAccount(account.id, getProviderDisplayName(account.provider))}
-                                            className="text-destructive hover:text-destructive"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                            Remove
-                                        </Button>
+                                        {/*<Button*/}
+                                        {/*    variant="ghost"*/}
+                                        {/*    size="sm"*/}
+                                        {/*    onClick={() => handleRemoveAccount(account.id, getProviderDisplayName(account.provider))}*/}
+                                        {/*    className="text-destructive hover:text-destructive"*/}
+                                        {/*>*/}
+                                        {/*    <Trash2 className="h-4 w-4" />*/}
+                                        {/*    Remove*/}
+                                        {/*</Button>*/}
                                     </div>
                                 ))}
                             </div>
