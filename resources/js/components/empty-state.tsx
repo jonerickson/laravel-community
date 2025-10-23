@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
+import { cn } from '@/lib/utils';
 import { PlusIcon } from 'lucide-react';
 import { cloneElement, ReactElement, SVGProps } from 'react';
 
@@ -9,11 +10,16 @@ interface EmptyStateProps {
     description: string;
     buttonText?: string;
     onButtonClick?: () => void;
+    border?: boolean;
 }
 
-export function EmptyState({ icon, title, description, buttonText, onButtonClick }: EmptyStateProps) {
+export function EmptyState({ icon, title, description, buttonText, onButtonClick, border = true }: EmptyStateProps) {
     return (
-        <Empty className="border border-dashed">
+        <Empty
+            className={cn({
+                'border border-dashed': border,
+            })}
+        >
             <EmptyHeader>
                 {icon && (
                     <EmptyMedia variant="icon">

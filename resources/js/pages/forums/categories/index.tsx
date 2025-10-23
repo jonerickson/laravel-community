@@ -220,7 +220,7 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                                                     )),
                                                 )}
                                                 {!category.forums?.some((forum) => forum.latestTopics && forum.latestTopics.length > 0) && (
-                                                    <EmptyState title="No topics" description="There are no recent topics to show." />
+                                                    <EmptyState title="No topics" description="There are no recent topics to show." border={false} />
                                                 )}
                                             </div>
                                         </div>
