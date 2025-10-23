@@ -187,7 +187,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                     </div>
                 </section>
 
-                <section className="bg-white py-20">
+                <section className="py-20">
                     <div className="container mx-auto px-6 sm:px-4">
                         <div className="mb-16 text-center">
                             <HeadingLarge
@@ -271,7 +271,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
 
                 <section id="pricing" className="relative overflow-x-hidden py-20">
                     <div className="pointer-events-none absolute bottom-0 -left-150 z-10 md:-left-75 lg:left-0">
-                        <AbstractBackgroundPattern className="h-[800px] w-[1000px] md:w-[1600px]" corner="bottom-left" />
+                        <AbstractBackgroundPattern className="h-[800px] w-[1000px] md:w-[1600px]" corner="bottom-right" />
                     </div>
                     <div className="relative z-20 container mx-auto px-6 sm:px-4">
                         <div className="mb-16 text-center">
