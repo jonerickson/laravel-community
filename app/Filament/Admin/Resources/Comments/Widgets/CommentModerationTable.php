@@ -28,6 +28,7 @@ class CommentModerationTable extends TableWidget
             ->columns([
                 TextColumn::make('content')
                     ->sortable()
+                    ->html()
                     ->label('Comment')
                     ->limit(50),
                 TextColumn::make('commentable.name')
