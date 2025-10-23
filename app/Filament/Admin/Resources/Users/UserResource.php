@@ -20,6 +20,7 @@ use App\Models\Fingerprint;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\DiscordApiService;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -52,6 +53,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Override;
 
@@ -229,6 +231,46 @@ class UserResource extends Resource
                             ->icon(Heroicon::OutlinedLink)
                             ->visibleOn('edit')
                             ->schema([
+                                Section::make('Discord Roles')
+                                    ->description('Current Discord server roles assigned to this user.')
+                                    ->collapsible()
+                                    ->persistCollapsed()
+                                    ->visible(fn (): bool => config('services.discord.enabled') && config('services.discord.guild_id'))
+                                    ->headerActions([
+                                        Action::make('refresh_discord_roles')
+                                            ->label('Refresh')
+                                            ->color('gray')
+                                            ->successNotificationTitle('Discord roles cache successfully cleared.')
+                                            ->requiresConfirmation(false)
+                                            ->action(function (User $record): void {
+                                                $discordIntegration = $record->integrations()->where('provider', 'discord')->first();
+
+                                                if ($discordIntegration?->provider_id) {
+                                                    Cache::forget("discord_user_roles.{$discordIntegration->provider_id}");
+                                                }
+
+                                                Cache::forget('discord_guild_roles');
+                                            }),
+                                    ])
+                                    ->schema([
+                                        TextEntry::make('discord_roles')
+                                            ->label('Assigned Roles')
+                                            ->badge()
+                                            ->placeholder('No Discord Roles Assigned')
+                                            ->state(function (User $record): array {
+                                                $discordIntegration = $record->integrations()->where('provider', 'discord')->first();
+
+                                                if (! $discordIntegration?->provider_id) {
+                                                    return [];
+                                                }
+
+                                                $discordApi = app(DiscordApiService::class);
+                                                $roleIds = $discordApi->getCachedUserRoleIds($discordIntegration->provider_id);
+                                                $guildRoles = $discordApi->getCachedGuildRoles();
+
+                                                return $roleIds->map(fn (string $roleId): string => $guildRoles->get($roleId, $roleId))->toArray();
+                                            }),
+                                    ]),
                                 Livewire::make(SocialsRelationManager::class, fn (User $record): array => [
                                     'ownerRecord' => $record,
                                     'pageClass' => EditUser::class,

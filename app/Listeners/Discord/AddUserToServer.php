@@ -41,9 +41,12 @@ class AddUserToServer implements ShouldQueue
             return;
         }
 
+        $roleIds = $event->integration->user->getExpectedDiscordRoleIds()->toArray();
+
         $this->discord->addUserToServer(
             discordUserId: $discordId,
             accessToken: $accessToken,
+            roleIds: $roleIds,
         );
     }
 }

@@ -20,6 +20,7 @@ use App\Traits\HasLogging;
 use App\Traits\HasMultiFactorAuthentication;
 use App\Traits\HasPermissions;
 use App\Traits\HasReferenceId;
+use App\Traits\Integrations\DiscordUser;
 use App\Traits\LogsAuthActivity;
 use App\Traits\Reportable;
 use Exception;
@@ -176,6 +177,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 class User extends Authenticatable implements EmailAuthenticationContract, FilamentAvatar, FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery, HasName, MustVerifyEmail, OAuthenticatable
 {
     use Billable;
+    use DiscordUser;
     use HasApiTokens;
     use HasAvatar;
     use HasEmailAuthentication;

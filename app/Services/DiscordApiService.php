@@ -14,6 +14,7 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Sleep;
 use Psr\Log\LoggerInterface;
@@ -91,6 +92,11 @@ class DiscordApiService
         return collect($response->json('roles'));
     }
 
+    public function getCachedUserRoleIds(string $discordUserId): Collection
+    {
+        return Cache::remember("discord_user_roles.{$discordUserId}", now()->addMinutes(5), fn (): Collection => $this->getUserRoleIds($discordUserId));
+    }
+
     /**
      * @throws RequestException
      * @throws ConnectionException
@@ -104,6 +110,15 @@ class DiscordApiService
         }
 
         return collect($response->json());
+    }
+
+    public function getCachedGuildRoles(): Collection
+    {
+        return Cache::remember('discord_guild_roles', now()->addHour(), function (): Collection {
+            $roles = $this->listRoles();
+
+            return $roles->mapWithKeys(fn (array $role): array => [$role['id'] => $role['name']]);
+        });
     }
 
     /**

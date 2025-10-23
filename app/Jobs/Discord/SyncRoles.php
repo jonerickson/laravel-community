@@ -10,7 +10,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
 class SyncRoles implements ShouldQueue
@@ -48,7 +47,7 @@ class SyncRoles implements ShouldQueue
             );
         }
 
-        $expectedRoleIds = $this->getExpectedDiscordRoleIds();
+        $expectedRoleIds = $this->user->getExpectedDiscordRoleIds();
         $currentRoleIds = $discordApiService->getUserRoleIds($discordId);
 
         $rolesToAdd = $expectedRoleIds->diff($currentRoleIds);
@@ -63,17 +62,5 @@ class SyncRoles implements ShouldQueue
         }
 
         Log::info("Synced Discord roles for user {$this->user->id}. Added: {$rolesToAdd->implode(',')}, Removed: {$rolesToRemove->implode(',')}.");
-    }
-
-    protected function getExpectedDiscordRoleIds(): Collection
-    {
-        return $this->user->groups()
-            ->with('discordRoles')
-            ->get()
-            ->pluck('discordRoles')
-            ->flatten()
-            ->pluck('discord_role_id')
-            ->unique()
-            ->values();
     }
 }
