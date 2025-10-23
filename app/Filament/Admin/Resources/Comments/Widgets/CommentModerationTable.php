@@ -31,7 +31,7 @@ class CommentModerationTable extends TableWidget
                     ->label('Comment')
                     ->limit(50),
                 TextColumn::make('commentable.name')
-                    ->getStateUsing(fn (Comment $record) => method_exists($record->commentable, 'getLabel') ? $record->commentable->getLabel() : null)
+                    ->getStateUsing(fn (Comment $record) => $record->commentable && method_exists($record->commentable, 'getLabel') ? $record->commentable->getLabel() : null)
                     ->placeholder('Unknown')
                     ->label('Parent Item')
                     ->sortable(),
