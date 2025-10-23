@@ -41,7 +41,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
 
             <main>
                 <section className="relative overflow-x-hidden py-20 md:py-32">
-                    <div className="pointer-events-none absolute -right-150 bottom-0 z-10 md:-right-75 lg:right-0">
+                    <div className="pointer-events-none absolute -right-100 bottom-0 z-10 md:-right-75 lg:right-0">
                         <AbstractBackgroundPattern className="h-[800px] w-[1000px] md:w-[1600px]" />
                     </div>
 
@@ -270,7 +270,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                 </section>
 
                 <section id="pricing" className="relative overflow-x-hidden py-20">
-                    <div className="pointer-events-none absolute bottom-0 -left-150 z-10 md:-left-75 lg:left-0">
+                    <div className="pointer-events-none absolute bottom-0 -left-100 z-10 md:-left-75 lg:left-0">
                         <AbstractBackgroundPattern className="h-[800px] w-[1000px] md:w-[1600px]" corner="bottom-right" />
                     </div>
                     <div className="relative z-20 container mx-auto px-6 sm:px-4">
