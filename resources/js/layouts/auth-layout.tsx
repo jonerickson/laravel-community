@@ -10,8 +10,8 @@ export default function AuthLayout({ children, title, description, ...props }: {
 
     return (
         <div className="relative overflow-hidden">
-            <div className="pointer-events-none absolute top-0 -left-75 z-10 md:left-0">
-                <AbstractBackgroundPattern className="h-[800px] w-[800px] md:w-[1000px]" corner="bottom-left" />
+            <div className="pointer-events-none absolute top-0 -left-150 z-10 md:-left-75 lg:left-0">
+                <AbstractBackgroundPattern className="h-[800px] w-[1000px] md:w-[1600px]" corner="bottom-left" />
             </div>
             <AuthLayoutTemplate title={title} description={description} {...props}>
                 {children}

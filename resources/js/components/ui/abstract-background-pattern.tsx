@@ -13,6 +13,7 @@ export function AbstractBackgroundPattern({ className, opacity = 0.08, corner = 
     const colorGradient2Id = useId();
     const colorGradient3Id = useId();
     const colorGradient4Id = useId();
+    const colorGradient5Id = useId();
     const blurFilterId = useId();
 
     const isLeft = corner === 'bottom-left';
@@ -21,8 +22,8 @@ export function AbstractBackgroundPattern({ className, opacity = 0.08, corner = 
         <div className={className}>
             <svg
                 fill="none"
-                viewBox="0 0 1000 800"
-                width="1000"
+                viewBox="0 0 1600 800"
+                width="1600"
                 height="800"
                 preserveAspectRatio={isLeft ? 'xMinYMax meet' : 'xMaxYMax meet'}
                 style={{
@@ -100,6 +101,12 @@ export function AbstractBackgroundPattern({ className, opacity = 0.08, corner = 
                         <stop offset="100%" stopColor="#14b8a6" stopOpacity="0" />
                     </radialGradient>
 
+                    <radialGradient id={colorGradient5Id} cx="10%" cy="90%" r="35%">
+                        <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.25" />
+                        <stop offset="40%" stopColor="#f59e0b" stopOpacity="0.12" />
+                        <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
+                    </radialGradient>
+
                     <filter id={blurFilterId}>
                         <feGaussianBlur in="SourceGraphic" stdDeviation="80" />
                     </filter>
@@ -114,6 +121,7 @@ export function AbstractBackgroundPattern({ className, opacity = 0.08, corner = 
                                 <rect width="100%" height="100%" fill={`url(#${colorGradient2Id})`} style={{ mixBlendMode: 'overlay' }} />
                                 <rect width="100%" height="100%" fill={`url(#${colorGradient3Id})`} style={{ mixBlendMode: 'overlay' }} />
                                 <rect width="100%" height="100%" fill={`url(#${colorGradient4Id})`} style={{ mixBlendMode: 'overlay' }} />
+                                <rect width="100%" height="100%" fill={`url(#${colorGradient5Id})`} style={{ mixBlendMode: 'overlay' }} />
                             </>
                         ) : (
                             <>
@@ -121,6 +129,7 @@ export function AbstractBackgroundPattern({ className, opacity = 0.08, corner = 
                                 <rect width="100%" height="100%" fill={`url(#${colorGradient2Id})`} style={{ mixBlendMode: 'overlay' }} />
                                 <rect width="100%" height="100%" fill={`url(#${colorGradient3Id})`} style={{ mixBlendMode: 'overlay' }} />
                                 <rect width="100%" height="100%" fill={`url(#${colorGradient4Id})`} style={{ mixBlendMode: 'overlay' }} />
+                                <rect width="100%" height="100%" fill={`url(#${colorGradient5Id})`} style={{ mixBlendMode: 'overlay' }} />
                             </>
                         )}
                     </g>
