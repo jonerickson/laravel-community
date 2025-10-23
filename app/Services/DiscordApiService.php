@@ -92,9 +92,40 @@ class DiscordApiService
         return collect($response->json('roles'));
     }
 
+    /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
+    public function addRole(string $discordUserId, string $roleId): bool
+    {
+        $response = $this->makeRequest('put', "/guilds/$this->guildId/members/$discordUserId/roles/$roleId");
+
+        $this->resetCachedUserRoles($discordUserId);
+
+        return ! is_null($response);
+    }
+
+    /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
+    public function removeRole(string $discordUserId, string $roleId): bool
+    {
+        $response = $this->makeRequest('delete', "/guilds/$this->guildId/members/$discordUserId/roles/$roleId");
+
+        $this->resetCachedUserRoles($discordUserId);
+
+        return ! is_null($response);
+    }
+
     public function getCachedUserRoleIds(string $discordUserId): Collection
     {
         return Cache::remember("discord_user_roles.{$discordUserId}", now()->addMinutes(5), fn (): Collection => $this->getUserRoleIds($discordUserId));
+    }
+
+    public function resetCachedUserRoles(string $discordUserId): void
+    {
+        Cache::forget("discord_user_roles.$discordUserId");
     }
 
     /**
@@ -119,28 +150,6 @@ class DiscordApiService
 
             return $roles->mapWithKeys(fn (array $role): array => [$role['id'] => $role['name']]);
         });
-    }
-
-    /**
-     * @throws RequestException
-     * @throws ConnectionException
-     */
-    public function addRole(string $discordUserId, string $roleId): bool
-    {
-        $response = $this->makeRequest('put', "/guilds/$this->guildId/members/$discordUserId/roles/$roleId");
-
-        return ! is_null($response);
-    }
-
-    /**
-     * @throws RequestException
-     * @throws ConnectionException
-     */
-    public function removeRole(string $discordUserId, string $roleId): bool
-    {
-        $response = $this->makeRequest('delete', "/guilds/$this->guildId/members/$discordUserId/roles/$roleId");
-
-        return ! is_null($response);
     }
 
     /**

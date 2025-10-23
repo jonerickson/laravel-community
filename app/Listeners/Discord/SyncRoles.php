@@ -16,6 +16,6 @@ class SyncRoles
             return;
         }
 
-        SyncRolesJob::dispatch($user);
+        SyncRolesJob::dispatch($user->id);
     }
 }

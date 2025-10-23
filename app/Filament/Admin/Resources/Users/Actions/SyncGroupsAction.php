@@ -21,6 +21,7 @@ class SyncGroupsAction extends Action
         parent::setUp();
 
         $this->color('gray');
+        $this->label('Sync Groups');
         $this->icon(Heroicon::OutlinedUserGroup);
         $this->requiresConfirmation();
         $this->modalHeading('Sync Groups');
@@ -39,7 +40,7 @@ class SyncGroupsAction extends Action
             $user->syncGroups();
 
             if (config('services.discord.enabled') && config('services.discord.guild_id')) {
-                SyncRoles::dispatch($user);
+                SyncRoles::dispatch($user->id);
             }
 
             $action->success();

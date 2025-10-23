@@ -13,6 +13,7 @@ use App\Events\UserIntegrationDeleted;
 use App\Traits\HasLogging;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Override;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
@@ -24,6 +25,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
  * @property string|null $provider_email
  * @property string|null $provider_avatar
  * @property string|null $access_token
+ * @property \Illuminate\Support\Carbon|null $last_synced_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
@@ -36,6 +38,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereAccessToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereLastSyncedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereProvider($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereProviderAvatar($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereProviderEmail($value)
@@ -73,6 +76,7 @@ class UserIntegration extends Model
         'provider_email',
         'provider_avatar',
         'access_token',
+        'last_synced_at',
     ];
 
     protected $dispatchesEvents = [
@@ -106,10 +110,21 @@ class UserIntegration extends Model
         return 'auth';
     }
 
+    #[Override]
+    protected static function booted(): void
+    {
+        static::creating(function (UserIntegration $model): void {
+            $model->fill([
+                'last_synced_at' => now(),
+            ]);
+        });
+    }
+
     protected function casts(): array
     {
         return [
             'access_token' => 'encrypted',
+            'last_synced_at' => 'datetime',
         ];
     }
 }

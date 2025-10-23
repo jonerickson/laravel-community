@@ -10,8 +10,8 @@ class LogUserIntegrationCreated
 {
     public function handle(UserIntegrationCreated $event): void
     {
-        if ($event->integration->user && method_exists($event->integration->user, 'logSocialConnected')) {
-            $event->integration->user->logSocialConnected($event->integration->provider);
+        if ($event->integration->user && method_exists($event->integration->user, 'logIntegrationConnected')) {
+            $event->integration->user->logIntegrationConnected($event->integration->provider);
         }
     }
 }

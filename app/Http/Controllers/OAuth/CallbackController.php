@@ -59,7 +59,7 @@ class CallbackController extends Controller
             $user = $integration->user;
         }
 
-        $user->logSocialLogin($provider);
+        $user->logIntegrationLogin($provider);
 
         if (! $this->user instanceof User) {
             Auth::login($user);

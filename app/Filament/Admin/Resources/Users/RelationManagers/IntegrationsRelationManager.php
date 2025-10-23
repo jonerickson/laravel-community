@@ -16,7 +16,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 
-class SocialsRelationManager extends RelationManager
+class IntegrationsRelationManager extends RelationManager
 {
     protected static string $relationship = 'integrations';
 
@@ -75,6 +75,11 @@ class SocialsRelationManager extends RelationManager
                 ImageColumn::make('provider_avatar')
                     ->label('Avatar')
                     ->circular(),
+                TextColumn::make('last_synced_at')
+                    ->label('Last Synced')
+                    ->dateTime()
+                    ->since()
+                    ->dateTimeTooltip(),
             ])
             ->headerActions([
                 CreateAction::make()

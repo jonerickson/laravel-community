@@ -9,8 +9,8 @@ use App\Filament\Admin\Resources\Users\Pages\CreateUser;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Filament\Admin\Resources\Users\Pages\ListUsers;
 use App\Filament\Admin\Resources\Users\RelationManagers\FingerprintsRelationManager;
+use App\Filament\Admin\Resources\Users\RelationManagers\IntegrationsRelationManager;
 use App\Filament\Admin\Resources\Users\RelationManagers\OrdersRelationManager;
-use App\Filament\Admin\Resources\Users\RelationManagers\SocialsRelationManager;
 use App\Filament\Admin\Resources\Users\Widgets\RegistrationsTable;
 use App\Filament\Admin\Resources\Users\Widgets\UserStatsOverview;
 use App\Filament\Exports\UserExporter;
@@ -271,7 +271,7 @@ class UserResource extends Resource
                                                 return $roleIds->map(fn (string $roleId): string => $guildRoles->get($roleId, $roleId))->toArray();
                                             }),
                                     ]),
-                                Livewire::make(SocialsRelationManager::class, fn (User $record): array => [
+                                Livewire::make(IntegrationsRelationManager::class, fn (User $record): array => [
                                     'ownerRecord' => $record,
                                     'pageClass' => EditUser::class,
                                 ]),

@@ -4,21 +4,23 @@ declare(strict_types=1);
 
 namespace App\Jobs\Discord;
 
+use App\Models\Group;
 use App\Models\User;
 use App\Services\DiscordApiService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
-use Illuminate\Support\Facades\Log;
 
 class SyncRoles implements ShouldQueue
 {
     use Queueable;
 
     public function __construct(
-        protected User $user,
-    ) {}
+        protected int $userId,
+    ) {
+        //
+    }
 
     /**
      * @throws RequestException
@@ -26,9 +28,11 @@ class SyncRoles implements ShouldQueue
      */
     public function handle(): void
     {
+        $user = User::findOrFail($this->userId);
+
         $discordApiService = app(DiscordApiService::class);
 
-        if (! $discordIntegration = $this->user->integrations()->latest()->firstWhere('provider', 'discord')) {
+        if (! $discordIntegration = $user->integrations()->latest()->firstWhere('provider', 'discord')) {
             return;
         }
 
@@ -47,11 +51,24 @@ class SyncRoles implements ShouldQueue
             );
         }
 
-        $expectedRoleIds = $this->user->getExpectedDiscordRoleIds();
+        $expectedRoleIds = $user->getExpectedDiscordRoleIds();
+
+        $platformRoleIds = Group::query()
+            ->with('discordRoles')
+            ->whereHas('discordRoles')
+            ->get()
+            ->pluck('discordRoles')
+            ->flatten()
+            ->pluck('discord_role_id')
+            ->unique()
+            ->values();
+
         $currentRoleIds = $discordApiService->getUserRoleIds($discordId);
 
         $rolesToAdd = $expectedRoleIds->diff($currentRoleIds);
-        $rolesToRemove = $currentRoleIds->diff($expectedRoleIds);
+        $rolesToRemove = $currentRoleIds
+            ->intersect($platformRoleIds)
+            ->diff($expectedRoleIds);
 
         foreach ($rolesToAdd as $roleId) {
             $discordApiService->addRole($discordId, $roleId);
@@ -61,6 +78,17 @@ class SyncRoles implements ShouldQueue
             $discordApiService->removeRole($discordId, $roleId);
         }
 
-        Log::info("Synced Discord roles for user {$this->user->id}. Added: {$rolesToAdd->implode(',')}, Removed: {$rolesToRemove->implode(',')}.");
+        $discordIntegration->update([
+            'last_synced_at' => now(),
+        ]);
+
+        $user->logIntegrationSync(
+            provider: 'discord',
+            type: 'roles',
+            details: [
+                'roles_added' => $rolesToAdd,
+                'roles_removed' => $rolesToRemove,
+            ]
+        );
     }
 }

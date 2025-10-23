@@ -104,7 +104,6 @@ class ActivityLogResource extends Resource
                         'store' => 'Store',
                         'marketplace' => 'Marketplace',
                     ]),
-
                 SelectFilter::make('event')
                     ->label('Event Type')
                     ->options([

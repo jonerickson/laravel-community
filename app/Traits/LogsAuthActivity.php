@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
+use App\Events\UserIntegrationCreated;
+use App\Events\UserIntegrationDeleted;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\PasswordResetLinkSent;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -99,37 +102,40 @@ trait LogsAuthActivity
         );
     }
 
-    public function logSocialLogin(string $provider): void
+    public function logIntegrationLogin(string $provider): void
     {
         $this->logAuthActivity(
-            description: 'Social login',
+            description: 'Account integration login',
+            event: Login::class,
             properties: [
                 'provider' => $provider,
-                'login_method' => 'social',
+                'login_method' => 'integration',
             ],
             userId: $this->id
         );
     }
 
-    public function logSocialConnected(string $provider): void
+    public function logIntegrationConnected(string $provider): void
     {
         $this->logAuthActivity(
-            description: 'Social account connected',
+            description: 'Account integration connected',
+            event: UserIntegrationDeleted::class,
             properties: [
                 'provider' => $provider,
-                'login_method' => 'social',
+                'login_method' => 'integration',
             ],
             userId: $this->id
         );
     }
 
-    public function logSocialDisconnected(string $provider): void
+    public function logIntegrationDisconnected(string $provider): void
     {
         $this->logAuthActivity(
-            description: 'Social account disconnected',
+            description: 'Account integration disconnected',
+            event: UserIntegrationCreated::class,
             properties: [
                 'provider' => $provider,
-                'login_method' => 'social',
+                'login_method' => 'integration',
             ],
             userId: $this->id
         );
@@ -174,6 +180,7 @@ trait LogsAuthActivity
     {
         $this->logAuthActivity(
             description: 'Two-factor authentication login',
+            event: Login::class,
             userId: $this->id
         );
     }
@@ -190,6 +197,7 @@ trait LogsAuthActivity
     {
         $this->logAuthActivity(
             description: 'Account registered',
+            event: Registered::class,
             userId: $this->id
         );
     }
@@ -230,6 +238,18 @@ trait LogsAuthActivity
                 'role' => $role,
                 'action' => $action,
             ],
+            userId: $this->id
+        );
+    }
+
+    public function logIntegrationSync(string $provider, string $type, array $details = []): void
+    {
+        $this->logAuthActivity(
+            description: 'Account integration synced',
+            properties: array_merge([
+                'provider' => $provider,
+                'sync_type' => $type,
+            ], $details),
             userId: $this->id
         );
     }
