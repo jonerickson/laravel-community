@@ -8,7 +8,7 @@ use App\Models\UserIntegration;
 
 class UserIntegrationDeleted
 {
-    public function __construct(public UserIntegration $social)
+    public function __construct(public UserIntegration $integration)
     {
         //
     }

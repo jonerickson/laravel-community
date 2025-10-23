@@ -7,12 +7,14 @@ namespace App\Listeners;
 use App\Actions\Warnings\IssueWarningAction;
 use App\Events\BlacklistMatch;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
 use Throwable;
 
 class IssueBlacklistWarning implements ShouldQueue
 {
-    use Queueable;
+    use Dispatchable;
+    use InteractsWithQueue;
 
     /**
      * @throws Throwable

@@ -7,12 +7,14 @@ namespace App\Listeners;
 use App\Events\OrderSucceeded;
 use App\Mail\Marketplace\ProductSold;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Mail;
 
 class CalculateOrderCommissions implements ShouldQueue
 {
-    use Queueable;
+    use Dispatchable;
+    use InteractsWithQueue;
 
     public function handle(OrderSucceeded $event): void
     {

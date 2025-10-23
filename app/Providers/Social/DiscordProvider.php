@@ -14,7 +14,7 @@ use Override;
 
 class DiscordProvider extends AbstractProvider
 {
-    protected $scopes = ['email', 'identify'];
+    protected $scopes = ['email', 'identify', 'guilds.join'];
 
     protected $scopeSeparator = ' ';
 

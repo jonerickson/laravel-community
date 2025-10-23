@@ -10,8 +10,8 @@ class LogUserIntegrationDeleted
 {
     public function handle(UserIntegrationDeleted $event): void
     {
-        if ($event->social->user && method_exists($event->social->user, 'logSocialDisconnected')) {
-            $event->social->user->logSocialDisconnected($event->social->provider);
+        if ($event->integration->user && method_exists($event->integration->user, 'logSocialDisconnected')) {
+            $event->integration->user->logSocialDisconnected($event->integration->provider);
         }
     }
 }

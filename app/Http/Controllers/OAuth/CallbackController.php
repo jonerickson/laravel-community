@@ -38,6 +38,7 @@ class CallbackController extends Controller
             'provider_name' => $socialUser->getName(),
             'provider_email' => $socialUser->getEmail(),
             'provider_avatar' => $socialUser->getAvatar(),
+            'access_token' => property_exists($socialUser, 'token') ? $socialUser->token : null,
         ]);
 
         if (blank($integration->getKey())) {

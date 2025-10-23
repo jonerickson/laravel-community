@@ -23,6 +23,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
  * @property string|null $provider_name
  * @property string|null $provider_email
  * @property string|null $provider_avatar
+ * @property string|null $access_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
@@ -32,6 +33,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereAccessToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereProvider($value)
@@ -70,6 +72,7 @@ class UserIntegration extends Model
         'provider_name',
         'provider_email',
         'provider_avatar',
+        'access_token',
     ];
 
     protected $dispatchesEvents = [
@@ -101,5 +104,12 @@ class UserIntegration extends Model
     public function getActivityLogName(): string
     {
         return 'auth';
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'access_token' => 'encrypted',
+        ];
     }
 }

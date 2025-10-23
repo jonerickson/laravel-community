@@ -9,11 +9,13 @@ use App\Events\ReportCreated;
 use App\Models\User;
 use App\Notifications\Reports\NewReportCreatedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Notification;
 
 class SendAdminNotification implements ShouldQueue
 {
+    use Dispatchable;
     use InteractsWithQueue;
 
     public function handle(ReportCreated $event): void

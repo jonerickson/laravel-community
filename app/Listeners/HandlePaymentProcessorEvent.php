@@ -12,12 +12,14 @@ use App\Mail\Payments\PaymentActionRequired as PaymentActionRequiredMail;
 use App\Mail\Payments\PaymentSucceeded as PaymentSucceededMail;
 use App\Mail\Payments\RefundCreated as RefundCreatedMail;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Mail;
 
 class HandlePaymentProcessorEvent implements ShouldQueue
 {
-    use Queueable;
+    use Dispatchable;
+    use InteractsWithQueue;
 
     public function handle(PaymentSucceeded|PaymentActionRequired|RefundCreated $event): void
     {

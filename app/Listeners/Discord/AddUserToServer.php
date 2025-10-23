@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Listeners\Discord;
+
+use App\Events\UserIntegrationCreated;
+use App\Services\DiscordApiService;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Queue\InteractsWithQueue;
+
+class AddUserToServer implements ShouldQueue
+{
+    use Dispatchable;
+    use InteractsWithQueue;
+
+    public function __construct(
+        private readonly DiscordApiService $discord,
+    ) {
+        //
+    }
+
+    /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
+    public function handle(UserIntegrationCreated $event): void
+    {
+        if ($event->integration->provider !== 'discord') {
+            return;
+        }
+
+        if (blank($discordId = $event->integration->provider_id) || blank($accessToken = $event->integration->access_token)) {
+            return;
+        }
+
+        if ($this->discord->isUserInServer($discordId)) {
+            return;
+        }
+
+        $this->discord->addUserToServer(
+            discordUserId: $discordId,
+            accessToken: $accessToken,
+        );
+    }
+}

@@ -39,9 +39,54 @@ class DiscordApiService
      * @throws RequestException
      * @throws ConnectionException
      */
+    public function isUserInServer(string $discordUserId): bool
+    {
+        $response = $this->makeRequest('get', "/guilds/$this->guildId/members/$discordUserId");
+
+        return ! is_null($response);
+    }
+
+    /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
+    public function addUserToServer(string $discordUserId, string $accessToken, array $roleIds = []): bool
+    {
+        $payload = [
+            'access_token' => $accessToken,
+        ];
+
+        if ($roleIds !== []) {
+            $payload['roles'] = $roleIds;
+        }
+
+        $response = $this->makeRequest('put', "/guilds/$this->guildId/members/$discordUserId", $payload);
+
+        return ! is_null($response);
+    }
+
+    /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
+    public function removeUserFromServer(string $discordUserId): bool
+    {
+        $response = $this->makeRequest('delete', "/guilds/$this->guildId/members/$discordUserId");
+
+        return ! is_null($response);
+    }
+
+    /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
     public function getUserRoleIds(string $discordUserId): Collection
     {
         $response = $this->makeRequest('get', "/guilds/$this->guildId/members/$discordUserId");
+
+        if (is_null($response)) {
+            return new Collection;
+        }
 
         return collect($response->json('roles'));
     }
@@ -54,6 +99,10 @@ class DiscordApiService
     {
         $response = $this->makeRequest('get', "/guilds/$this->guildId/roles");
 
+        if (is_null($response)) {
+            return new Collection;
+        }
+
         return collect($response->json());
     }
 
@@ -61,18 +110,22 @@ class DiscordApiService
      * @throws RequestException
      * @throws ConnectionException
      */
-    public function addRole(string $discordUserId, string $roleId): void
+    public function addRole(string $discordUserId, string $roleId): bool
     {
-        $this->makeRequest('put', "/guilds/$this->guildId/members/$discordUserId/roles/$roleId");
+        $response = $this->makeRequest('put', "/guilds/$this->guildId/members/$discordUserId/roles/$roleId");
+
+        return ! is_null($response);
     }
 
     /**
      * @throws RequestException
      * @throws ConnectionException
      */
-    public function removeRole(string $discordUserId, string $roleId): void
+    public function removeRole(string $discordUserId, string $roleId): bool
     {
-        $this->makeRequest('delete', "/guilds/$this->guildId/members/$discordUserId/roles/$roleId");
+        $response = $this->makeRequest('delete', "/guilds/$this->guildId/members/$discordUserId/roles/$roleId");
+
+        return ! is_null($response);
     }
 
     /**
@@ -81,56 +134,54 @@ class DiscordApiService
      * @throws RequestException
      * @throws ConnectionException
      */
-    protected function makeRequest(string $method, string $url, array $options = []): Response
+    protected function makeRequest(string $method, string $url, array $options = []): ?Response
     {
-        return $this->client()
-            ->retry($this->maxRetries, 0, function (Exception $exception) use ($url): bool {
-                if ($exception instanceof ConnectionException) {
-                    $this->log->warning('Discord API connection error, retrying...', [
-                        'url' => $url,
-                        'exception' => $exception->getMessage(),
-                    ]);
-
-                    return true;
-                }
-
-                if ($exception instanceof RequestException) {
-                    $response = $exception->response;
-
-                    if ($response->status() === 429) {
-                        $retryAfter = $response->header('Retry-After');
-
-                        $this->log->warning('Discord API rate limit hit, waiting before retry', [
-                            'url' => $url,
-                            'retry_after' => $retryAfter,
-                        ]);
-
-                        Sleep::until(Carbon::now()->addMilliseconds($retryAfter));
-
+        try {
+            return $this->client()
+                ->retry($this->maxRetries, 0, function (Exception $exception): bool {
+                    if ($exception instanceof ConnectionException) {
                         return true;
                     }
 
-                    if ($response->serverError()) {
-                        $this->log->warning('Discord API server error, retrying...', [
-                            'url' => $url,
-                            'status' => $response->status(),
-                        ]);
+                    if ($exception instanceof RequestException) {
+                        $response = $exception->response;
+                        if ($response->status() === 429) {
+                            $retryAfter = $response->header('Retry-After');
 
-                        return true;
+                            Sleep::until(Carbon::now()->addMilliseconds($retryAfter));
+
+                            return true;
+                        }
+
+                        return $response->serverError();
                     }
-
-                    $this->log->error('Discord API client error', [
-                        'url' => $url,
-                        'status' => $response->status(),
-                        'body' => $response->body(),
-                    ]);
 
                     return false;
-                }
+                })
+                ->{$method}($url, $options);
+        } catch (ConnectionException $exception) {
+            $this->log->error('Discord API connection failed after retries', [
+                'url' => $url,
+                'method' => $method,
+                'exception' => $exception->getMessage(),
+            ]);
+        } catch (RequestException $exception) {
+            $this->log->error('Discord API request failed', [
+                'url' => $url,
+                'method' => $method,
+                'status' => $exception->response->status(),
+                'body' => $exception->response->body(),
+            ]);
+        } catch (Exception $exception) {
+            $this->log->error('Unexpected error during Discord API request', [
+                'url' => $url,
+                'method' => $method,
+                'exception' => $exception->getMessage(),
+                'trace' => $exception->getTraceAsString(),
+            ]);
+        }
 
-                return false;
-            })
-            ->{$method}($url, $options);
+        return null;
     }
 
     protected function client(): PendingRequest|Factory

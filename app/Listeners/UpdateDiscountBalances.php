@@ -7,13 +7,15 @@ namespace App\Listeners;
 use App\Enums\DiscountType;
 use App\Events\OrderSucceeded;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class UpdateDiscountBalances implements ShouldQueue
 {
-    use Queueable;
+    use Dispatchable;
+    use InteractsWithQueue;
 
     /**
      * @throws Throwable

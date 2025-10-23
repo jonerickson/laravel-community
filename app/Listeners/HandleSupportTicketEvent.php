@@ -13,12 +13,14 @@ use App\Mail\SupportTickets\SupportTicketCreated as SupportTicketCreatedMail;
 use App\Mail\SupportTickets\SupportTicketStatusChanged as SupportTicketStatusChangedMail;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Mail;
 
 class HandleSupportTicketEvent implements ShouldQueue
 {
-    use Queueable;
+    use Dispatchable;
+    use InteractsWithQueue;
 
     public function handle(SupportTicketCreated|SupportTicketCommentAdded|SupportTicketStatusChanged|SupportTicketUpdated $event): void
     {

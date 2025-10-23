@@ -7,12 +7,14 @@ namespace App\Listeners;
 use App\Events\PasswordChanged;
 use App\Mail\Auth\PasswordChangedMail;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Mail;
 
 class SendPasswordChangedNotification implements ShouldQueue
 {
-    use Queueable;
+    use Dispatchable;
+    use InteractsWithQueue;
 
     public function handle(PasswordChanged $event): void
     {

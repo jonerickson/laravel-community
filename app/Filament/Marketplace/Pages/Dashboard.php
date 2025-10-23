@@ -23,6 +23,7 @@ class Dashboard extends BaseDashboard
         ];
     }
 
+    #[Override]
     public function getSubheading(): string|Htmlable|null
     {
         $name = config('app.name');

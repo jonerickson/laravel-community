@@ -37,6 +37,17 @@ class SyncRoles implements ShouldQueue
             return;
         }
 
+        if (! $discordApiService->isUserInServer($discordId)) {
+            if (! $accessToken = $discordIntegration->access_token) {
+                return;
+            }
+
+            $discordApiService->addUserToServer(
+                discordUserId: $discordId,
+                accessToken: $accessToken,
+            );
+        }
+
         $expectedRoleIds = $this->getExpectedDiscordRoleIds();
         $currentRoleIds = $discordApiService->getUserRoleIds($discordId);
 

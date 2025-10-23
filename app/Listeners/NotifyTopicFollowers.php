@@ -7,12 +7,14 @@ namespace App\Listeners;
 use App\Events\PostCreated;
 use App\Notifications\Forums\NewContentNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Notification;
 
 class NotifyTopicFollowers implements ShouldQueue
 {
-    use Queueable;
+    use Dispatchable;
+    use InteractsWithQueue;
 
     public function handle(PostCreated $event): void
     {
