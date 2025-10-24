@@ -131,6 +131,8 @@ declare namespace App.Data {
     };
     export type ForumCategoryData = {
         id: number;
+        parentId: number | null;
+        parent: App.Data.ForumCategoryData | null;
         name: string;
         slug: string;
         description: string | null;
@@ -138,6 +140,7 @@ declare namespace App.Data {
         color: string;
         order: number;
         isActive: boolean;
+        children: Array<App.Data.ForumCategoryData> | null;
         forums: Array<App.Data.ForumData> | null;
         image: App.Data.ImageData | null;
         createdAt: string | null;
@@ -578,6 +581,7 @@ declare namespace App.Enums {
     export type PublishableStatus = 'published' | 'draft';
     export type ReportReason = 'spam' | 'harassment' | 'inappropriate_content' | 'abuse' | 'impersonation' | 'false_information' | 'other';
     export type ReportStatus = 'pending' | 'reviewed' | 'approved' | 'rejected';
+    export type Role = 'super-admin' | 'moderator' | 'user' | 'guest' | 'support-agent';
     export type SubscriptionInterval = 'month' | 'year';
     export type SubscriptionStatus =
         | 'active'

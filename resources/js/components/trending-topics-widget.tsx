@@ -1,8 +1,8 @@
 import { Badge } from '@/components/ui/badge';
+import usePermissions from '@/hooks/use-permissions';
 import { Link } from '@inertiajs/react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, Eye, EyeOff, Lock, MessageSquare, Pin, ThumbsDown, TrendingUp } from 'lucide-react';
-import usePermissions from '../hooks/use-permissions';
 
 interface TrendingTopicsWidgetProps {
     topics?: App.Data.TopicData[];

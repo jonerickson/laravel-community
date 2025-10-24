@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useApiRequest } from '@/hooks/use-api-request';
+import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { stripCharacters } from '@/utils/truncate';
@@ -16,7 +17,6 @@ import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, Circle, Eye, EyeOff, LibraryBig, Lock, MessageSquare, Pin, Plus, ThumbsDown, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { route } from 'ziggy-js';
-import usePermissions from '../../hooks/use-permissions';
 
 interface ForumShowProps {
     forum: App.Data.ForumData;
@@ -24,7 +24,7 @@ interface ForumShowProps {
 }
 
 export default function ForumShow({ forum, topics: initialTopics }: ForumShowProps) {
-    const { can, hasAnyPermission } = usePermissions();
+    const { can } = usePermissions();
     const { name: siteName, auth } = usePage<App.Data.SharedData>().props;
     const [topics, setTopics] = useState<App.Data.TopicData[]>(initialTopics.data);
     const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
@@ -35,6 +35,16 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
             title: 'Forums',
             href: route('forums.index'),
         },
+    ];
+
+    if (forum.category.parent) {
+        breadcrumbs.push({
+            title: forum.category.parent.name,
+            href: route('forums.categories.show', { category: forum.category.parent.slug }),
+        });
+    }
+
+    breadcrumbs.push(
         {
             title: forum.category.name,
             href: route('forums.categories.show', { category: forum.category.slug }),
@@ -43,7 +53,7 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
             title: forum.name,
             href: route('forums.show', { forum: forum.slug }),
         },
-    ];
+    );
 
     const structuredData = {
         '@context': 'https://schema.org',
@@ -223,7 +233,7 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                                         >
                                             <TableCell className="p-4">
                                                 <div className="flex items-start gap-3">
-                                                    {hasAnyPermission(['delete_topics']) ? (
+                                                    {can('delete_topics') ? (
                                                         <button
                                                             onClick={(e) => {
                                                                 e.preventDefault();

@@ -17,6 +17,11 @@ class ForumCategoryData extends Data
 {
     public int $id;
 
+    public ?int $parentId = null;
+
+    #[LoadRelation]
+    public ?ForumCategoryData $parent = null;
+
     public string $name;
 
     public string $slug;
@@ -30,6 +35,9 @@ class ForumCategoryData extends Data
     public int $order;
 
     public bool $isActive;
+
+    /** @var ForumCategoryData[] */
+    public ?array $children = null;
 
     /** @var ForumData[] */
     public ?array $forums = null;

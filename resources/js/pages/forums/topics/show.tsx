@@ -7,6 +7,7 @@ import Loading from '@/components/loading';
 import RecentViewers from '@/components/recent-viewers';
 import { Button } from '@/components/ui/button';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
+import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
@@ -15,7 +16,6 @@ import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, ArrowDown, ArrowLeft, Clock, Eye, EyeOff, Lock, MessageSquare, Pin, Reply, ThumbsDown, User } from 'lucide-react';
 import { useState } from 'react';
 import { route } from 'ziggy-js';
-import usePermissions from '../../../hooks/use-permissions';
 
 interface TopicShowProps {
     forum: App.Data.ForumData;

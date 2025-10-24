@@ -121,16 +121,25 @@ class ForumSeeder extends Seeder
             }
         }
 
-        Forum::factory()
-            ->for(ForumCategory::factory()
+        $internalForumCategory = ForumCategory::factory()->state([
+            'name' => 'Internal Only',
+        ])->hasAttached($adminGroup)->create();
+
+        $internalForums = ['Administrators', 'Moderators'];
+
+        foreach ($internalForums as $internalForum) {
+            $adminForumCategory = ForumCategory::factory()->state([
+                'name' => $internalForum,
+                'parent_id' => $internalForumCategory->id,
+            ])->hasAttached($adminGroup)->create();
+
+            Forum::factory()
+                ->for($adminForumCategory, 'category')
                 ->state([
-                    'name' => 'Administrators Only',
+                    'name' => 'General Discussion',
                 ])
-                ->hasAttached($adminGroup), 'category')
-            ->state([
-                'name' => 'General Discussion',
-            ])
-            ->hasAttached($adminGroup)
-            ->create();
+                ->hasAttached($adminGroup)
+                ->create();
+        }
     }
 }

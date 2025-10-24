@@ -5,11 +5,11 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { UserInfo } from '@/components/user-info';
+import usePermissions from '@/hooks/use-permissions';
 import { cn } from '@/lib/utils';
 import { InfiniteScroll, useForm } from '@inertiajs/react';
 import { Edit, MessageCircle, Reply, Trash } from 'lucide-react';
 import { useState } from 'react';
-import usePermissions from '../hooks/use-permissions';
 
 interface BlogCommentsProps {
     post: App.Data.PostData;

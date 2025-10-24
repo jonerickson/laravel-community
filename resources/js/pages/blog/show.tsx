@@ -6,13 +6,13 @@ import RichEditorContent from '@/components/rich-editor-content';
 import { Badge } from '@/components/ui/badge';
 import { UserInfo } from '@/components/user-info';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
+import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { Deferred, Head, usePage } from '@inertiajs/react';
 import { Calendar, Clock, Eye, MessageSquare } from 'lucide-react';
 import { route } from 'ziggy-js';
-import usePermissions from '../../hooks/use-permissions';
 
 interface BlogShowProps {
     post: App.Data.PostData;

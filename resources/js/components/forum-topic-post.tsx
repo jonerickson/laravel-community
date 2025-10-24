@@ -7,11 +7,11 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import usePermissions from '@/hooks/use-permissions';
 import { cn } from '@/lib/utils';
 import { stripCharacters } from '@/utils/truncate';
 import { formatDistanceToNow } from 'date-fns';
 import { EyeOff, Flag, Pin, Quote, ThumbsDown } from 'lucide-react';
-import usePermissions from '../hooks/use-permissions';
 
 interface ForumTopicPostProps {
     post: App.Data.PostData;

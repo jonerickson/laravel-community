@@ -1,9 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApiRequest } from '@/hooks/use-api-request';
+import usePermissions from '@/hooks/use-permissions';
 import { router, useForm } from '@inertiajs/react';
 import { Lock, LockOpen, MoreHorizontal, Pin, PinOff, Trash } from 'lucide-react';
-import usePermissions from '../hooks/use-permissions';
 
 interface ForumTopicModerationMenuProps {
     topic: App.Data.TopicData;

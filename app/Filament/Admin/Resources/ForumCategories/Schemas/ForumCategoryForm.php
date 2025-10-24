@@ -48,6 +48,12 @@ class ForumCategoryForm
                                 ->columnSpanFull()
                                 ->maxLength(500)
                                 ->rows(3),
+                            Select::make('parent_id')
+                                ->relationship('parent', 'name')
+                                ->columnSpanFull()
+                                ->nullable()
+                                ->preload()
+                                ->searchable(),
                             TextInput::make('icon')
                                 ->maxLength(255)
                                 ->helperText('Icon class or emoji.'),
