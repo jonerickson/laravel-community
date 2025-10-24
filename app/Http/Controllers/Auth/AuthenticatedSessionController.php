@@ -10,6 +10,7 @@ use Illuminate\Container\Attributes\Config;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -26,7 +27,7 @@ class AuthenticatedSessionController extends Controller
     public function create(Request $request): Response
     {
         if ($request->has('redirect') && $request->filled('redirect')) {
-            $request->session()->put('url.intended', urldecode($request->query('redirect')));
+            Redirect::setIntendedUrl(urldecode($request->query('redirect')));
         }
 
         return Inertia::render('auth/login', [

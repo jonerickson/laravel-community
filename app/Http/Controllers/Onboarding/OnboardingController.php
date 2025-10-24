@@ -101,7 +101,8 @@ class OnboardingController extends Controller
 
         $this->onboardingService->completeOnboarding();
 
-        return to_route('home')
+        return redirect()
+            ->intended(route('dashboard'))
             ->with('message', 'Your onboarding has been successfully completed.');
     }
 
