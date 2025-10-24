@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Subscriptions;
 
+use App\Enums\SubscriptionInterval;
 use App\Filament\Admin\Resources\Subscriptions\Actions\CancelAction;
 use App\Filament\Admin\Resources\Subscriptions\Actions\ContinueAction;
 use App\Filament\Admin\Resources\Subscriptions\Actions\NewAction;
@@ -68,6 +69,15 @@ class ListSubscriptions extends Component implements HasActions, HasSchemas, Has
                         'incomplete', 'incomplete_expired', 'past_due' => 'danger',
                         default => 'gray',
                     }),
+                TextColumn::make('price.amount')
+                    ->money()
+                    ->label('Price')
+                    ->placeholder('No Price'),
+                TextColumn::make('price.interval')
+                    ->money()
+                    ->label('Interval')
+                    ->formatStateUsing(fn ($state) => SubscriptionInterval::tryFrom($state ?? ''))
+                    ->placeholder('No Interval'),
                 TextColumn::make('trialEndsAt')
                     ->label('Trial Ends At')
                     ->since()

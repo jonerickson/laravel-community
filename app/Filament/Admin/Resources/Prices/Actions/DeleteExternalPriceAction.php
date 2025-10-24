@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Admin\Resources\Products\Actions;
+namespace App\Filament\Admin\Resources\Prices\Actions;
 
 use App\Managers\PaymentManager;
 use App\Models\Price;

@@ -28,7 +28,11 @@ class BlacklistRule implements ValidationRule
 
         foreach ($blacklists as $blacklist) {
             if ($this->isBlacklisted($value, $blacklist)) {
-                BlacklistMatch::dispatch($value, $blacklist, Auth::user());
+                event(new BlacklistMatch(
+                    content: $value,
+                    blacklist: $blacklist,
+                    user: Auth::user()
+                ));
 
                 $message = $this->message ?? 'The :attribute contains prohibited content.';
                 $fail($message);

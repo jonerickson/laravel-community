@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Subscriptions\Actions;
 
 use App\Enums\OrderStatus;
+use App\Enums\ProrationBehavior;
 use App\Managers\PaymentManager;
 use App\Models\Order;
 use App\Models\Price;
@@ -12,7 +13,7 @@ use App\Models\Product;
 use App\Models\User;
 use Closure;
 use Filament\Actions\Action;
-use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Database\Eloquent\Builder;
@@ -31,7 +32,7 @@ class SwapAction extends Action
         $this->color('primary');
         $this->successNotificationTitle('The subscription has been successfully started.');
         $this->modalHeading('Swap Subscription');
-        $this->modalDescription('Select the new product to swap the current subscription to. All charges will be prorated.');
+        $this->modalDescription('Select the new product to swap the current subscription to.');
         $this->modalSubmitActionLabel('Swap');
 
         $this->visible(function () {
@@ -56,10 +57,10 @@ class SwapAction extends Action
                 ->preload()
                 ->searchable()
                 ->options(fn (Get $get) => Price::query()->active()->whereRelation('product', fn (Builder $query) => $query->whereKey($get('product_id')))->get()->mapWithKeys(fn (Price $price): array => [$price->id => $price->getLabel()])),
-            Checkbox::make('charge_now')
-                ->default(true)
-                ->inline()
-                ->helperText('Charge the customer immediately. If left unchecked, the user will be sent an invoice to pay at a later time.'),
+            Radio::make('proration_behavior')
+                ->label('Proration Behavior')
+                ->default(ProrationBehavior::CreateProrations)
+                ->options(ProrationBehavior::class),
         ]);
 
         $this->action(function (SwapAction $action, array $data): void {
@@ -77,7 +78,7 @@ class SwapAction extends Action
             $paymentManager = app(PaymentManager::class);
             $paymentManager->startSubscription(
                 order: $order,
-                chargeNow: $data['charge_now'],
+                prorationBehavior: $data['proration_behavior'],
                 firstParty: false,
             );
 

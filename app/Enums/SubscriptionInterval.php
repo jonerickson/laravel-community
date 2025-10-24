@@ -17,6 +17,9 @@ enum SubscriptionInterval: string implements HasLabel
 
     public function getLabel(): string|Htmlable|null
     {
-        return Str::title($this->value);
+        return Str::of($this->value)
+            ->title()
+            ->append('ly')
+            ->toString();
     }
 }

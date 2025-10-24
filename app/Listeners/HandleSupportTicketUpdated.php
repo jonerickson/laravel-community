@@ -12,7 +12,11 @@ class HandleSupportTicketUpdated
     public function handle(SupportTicketUpdated $event): void
     {
         if ($event->supportTicket->wasChanged('status')) {
-            SupportTicketStatusChanged::dispatch($event->supportTicket, $event->supportTicket->getOriginal('status'), $event->supportTicket->status);
+            event(new SupportTicketStatusChanged(
+                supportTicket: $event->supportTicket,
+                oldStatus: $event->supportTicket->getOriginal('status'),
+                newStatus: $event->supportTicket->status
+            ));
         }
     }
 }

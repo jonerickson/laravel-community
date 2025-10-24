@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\OrderStatus;
-use App\Events\OrderSaving;
+use App\Events\OrderSaved;
 use App\Managers\PaymentManager;
 use App\Traits\HasNotes;
 use App\Traits\HasReferenceId;
@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property string|null $external_checkout_id
  * @property string|null $external_order_id
  * @property string|null $external_payment_id
+ * @property string|null $external_event_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read int|float $amount
@@ -59,6 +60,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @method static Builder<static>|Order readyToView()
  * @method static Builder<static>|Order whereCreatedAt($value)
  * @method static Builder<static>|Order whereExternalCheckoutId($value)
+ * @method static Builder<static>|Order whereExternalEventId($value)
  * @method static Builder<static>|Order whereExternalInvoiceId($value)
  * @method static Builder<static>|Order whereExternalOrderId($value)
  * @method static Builder<static>|Order whereExternalPaymentId($value)
@@ -95,6 +97,7 @@ class Order extends Model
         'external_checkout_id',
         'external_payment_id',
         'external_invoice_id',
+        'external_event_id',
         'invoice_url',
     ];
 
@@ -107,7 +110,7 @@ class Order extends Model
     ];
 
     protected $dispatchesEvents = [
-        'saving' => OrderSaving::class,
+        'saved' => OrderSaved::class,
     ];
 
     public function user(): BelongsTo

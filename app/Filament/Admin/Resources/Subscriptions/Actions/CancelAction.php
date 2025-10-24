@@ -24,12 +24,13 @@ class CancelAction extends Action
         $this->icon(Heroicon::OutlinedXCircle);
         $this->successNotificationTitle('The subscription has been successfully cancelled.');
         $this->requiresConfirmation();
-        $this->visible(fn (array $record): bool => SubscriptionData::from($record)->status->canCancel() && blank(data_get($record, 'endsAt')));
+        $this->visible(fn (array $record): bool => SubscriptionData::from($record)->status->canCancel());
         $this->modalHeading('Cancel Subscription');
         $this->modalDescription('Are you sure you want to cancel this subscription?');
 
         $this->schema([
             Checkbox::make('cancel_now')
+                ->label('Cancel Now')
                 ->default(false)
                 ->inline()
                 ->helperText('Cancel the subscription immediately. If left unchecked, the subscription will cancel at the end of the billing cycle.'),

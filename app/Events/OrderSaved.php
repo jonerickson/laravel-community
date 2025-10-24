@@ -6,7 +6,7 @@ namespace App\Events;
 
 use App\Models\Order;
 
-class SubscriptionCreated
+class OrderSaved
 {
     public function __construct(public Order $order)
     {

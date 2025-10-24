@@ -12,6 +12,7 @@ use App\Data\PriceData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
 use App\Enums\OrderRefundReason;
+use App\Enums\ProrationBehavior;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
@@ -105,7 +106,7 @@ class NullDriver implements PaymentProcessor
         return false;
     }
 
-    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData
+    public function startSubscription(Order $order, bool $chargeNow = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData
     {
         return false;
     }

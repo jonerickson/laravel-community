@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Products\RelationManagers;
 
 use App\Enums\SubscriptionInterval;
-use App\Filament\Admin\Resources\Products\Actions\CreateExternalPriceAction;
-use App\Filament\Admin\Resources\Products\Actions\DeleteExternalPriceAction;
-use App\Managers\PaymentManager;
+use App\Filament\Admin\Resources\Prices\Actions\CreateExternalPriceAction;
+use App\Filament\Admin\Resources\Prices\Actions\DeleteExternalPriceAction;
+use App\Filament\Admin\Resources\Prices\Actions\SyncExternalPriceAction;
+use App\Filament\Admin\Resources\Prices\Actions\UpdateExternalPriceAction;
 use App\Models\Price;
-use App\Models\Product;
-use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -22,14 +21,12 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Support\RawJs;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\DB;
 
 class PricesRelationManager extends RelationManager
 {
@@ -140,44 +137,16 @@ class PricesRelationManager extends RelationManager
                     ->visible(fn () => $this->getOwnerRecord()->isSubscription()),
             ])
             ->headerActions([
-                Action::make('sync')
-                    ->color('gray')
-                    ->label('Sync prices')
-                    ->requiresConfirmation()
-                    ->visible(fn (): bool => filled($this->getOwnerRecord()->external_product_id))
-                    ->modalHeading('Sync Product Prices')
-                    ->modalIcon(Heroicon::OutlinedArrowPath)
-                    ->modalDescription('This will remove any existing prices for this product locally and pull in the latest product prices from your payment processor.')
-                    ->modalSubmitActionLabel('Sync')
-                    ->successNotificationTitle('The prices have been successfully synced.')
-                    ->failureNotificationTitle('There was an error syncing the prices. Please try again.')
-                    ->action(function (Action $action): void {
-                        /** @var Product $product */
-                        $product = $this->getOwnerRecord();
-
-                        $result = DB::transaction(function () use ($product): true {
-                            $paymentManager = app(PaymentManager::class);
-
-                            if ($prices = $paymentManager->listPrices($product)) {
-                                $product->prices()->delete();
-                                $product->prices()->saveMany($prices);
-                            }
-
-                            return true;
-                        });
-
-                        if ($result) {
-                            $action->success();
-                        } else {
-                            $action->failure();
-                        }
-                    }),
+                SyncExternalPriceAction::make('sync')
+                    ->product(fn (): \Illuminate\Database\Eloquent\Model => $this->getOwnerRecord()),
                 CreateAction::make(),
             ])
             ->recordActions([
                 CreateExternalPriceAction::make(),
                 DeleteExternalPriceAction::make(),
-                EditAction::make(),
+                UpdateExternalPriceAction::make(),
+                EditAction::make()
+                    ->modalDescription('Use the update external price tool to update the product price.'),
                 DeleteAction::make(),
             ])
             ->toolbarActions([

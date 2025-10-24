@@ -14,6 +14,7 @@ use App\Data\SubscriptionData;
 use App\Drivers\Payments\NullDriver;
 use App\Drivers\Payments\StripeDriver;
 use App\Enums\OrderRefundReason;
+use App\Enums\ProrationBehavior;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
@@ -115,9 +116,9 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deleteCustomer($user);
     }
 
-    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData
+    public function startSubscription(Order $order, bool $chargeNow = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData
     {
-        return $this->driver()->startSubscription($order, $chargeNow, $firstParty, $successUrl);
+        return $this->driver()->startSubscription($order, $chargeNow, $prorationBehavior, $firstParty, $successUrl);
     }
 
     public function cancelSubscription(User $user, bool $cancelNow = false): bool

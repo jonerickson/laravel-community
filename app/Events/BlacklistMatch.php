@@ -6,14 +6,9 @@ namespace App\Events;
 
 use App\Models\Blacklist;
 use App\Models\User;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
-class BlacklistMatch implements ShouldQueue
+class BlacklistMatch
 {
-    use Dispatchable, SerializesModels;
-
     public function __construct(
         public string $content,
         public Blacklist $blacklist,

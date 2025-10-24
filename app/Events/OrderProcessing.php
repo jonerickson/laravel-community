@@ -5,14 +5,9 @@ declare(strict_types=1);
 namespace App\Events;
 
 use App\Models\Order;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
-class OrderProcessing implements ShouldQueue
+class OrderProcessing
 {
-    use Dispatchable, SerializesModels;
-
     public function __construct(public Order $order)
     {
         //

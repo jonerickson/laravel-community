@@ -11,6 +11,7 @@ use App\Data\PriceData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
 use App\Enums\OrderRefundReason;
+use App\Enums\ProrationBehavior;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
@@ -63,7 +64,7 @@ interface PaymentProcessor
 
     public function deleteCustomer(User $user): bool;
 
-    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData;
+    public function startSubscription(Order $order, bool $chargeNow = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData;
 
     public function cancelSubscription(User $user, bool $cancelNow = false): bool;
 

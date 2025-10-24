@@ -54,7 +54,7 @@ class NewAction extends Action
                 ->required()
                 ->preload()
                 ->searchable()
-                ->options(fn (Get $get) => Price::query()->active()->whereRelation('product', fn (Builder $query) => $query->whereKey($get('product_id')))->pluck('name', 'id')),
+                ->options(fn (Get $get) => Price::query()->active()->whereRelation('product', fn (Builder $query) => $query->whereKey($get('product_id')))->get()->mapWithKeys(fn (Price $price): array => [$price->id => $price->getLabel()])),
         ]);
 
         $this->action(function (NewAction $action, array $data): void {

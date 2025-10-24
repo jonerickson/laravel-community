@@ -16,7 +16,10 @@ class HandleCommentCreated
             /** @var SupportTicket $supportTicket */
             $supportTicket = $event->comment->commentable;
 
-            SupportTicketCommentAdded::dispatch($supportTicket, $event->comment);
+            event(new SupportTicketCommentAdded(
+                supportTicket: $supportTicket,
+                comment: $event->comment
+            ));
         }
     }
 }

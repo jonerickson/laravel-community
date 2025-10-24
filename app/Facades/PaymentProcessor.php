@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool createCustomer(\App\Models\User $user)
  * @method static \App\Data\CustomerData|null getCustomer(\App\Models\User $user)
  * @method static bool deleteCustomer(\App\Models\User $user)
- * @method static \App\Data\SubscriptionData|string|bool startSubscription(\App\Models\Order $order, bool $chargeNow = true, bool $firstParty = true)
+ * @method static \App\Data\SubscriptionData|string|bool startSubscription(\App\Models\Order $order, bool $chargeNow = true, \App\Enums\ProrationBehavior $prorationBehavior = 'create_prorations', bool $firstParty = true, string|null $successUrl = null)
  * @method static bool cancelSubscription(\App\Models\User $user, bool $cancelNow = false)
  * @method static bool continueSubscription(\App\Models\User $user)
  * @method static \App\Data\SubscriptionData|null currentSubscription(\App\Models\User $user)

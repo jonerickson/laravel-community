@@ -20,6 +20,7 @@ use Illuminate\Support\Str;
 
 /**
  * @property int $id
+ * @property int|null $parent_id
  * @property string $name
  * @property string $slug
  * @property string|null $description
@@ -55,6 +56,7 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereParentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereUpdatedAt($value)
  *

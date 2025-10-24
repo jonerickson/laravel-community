@@ -13,6 +13,7 @@ use App\Data\ProductData;
 use App\Data\SubscriptionData;
 use App\Enums\OrderRefundReason;
 use App\Enums\OrderStatus;
+use App\Enums\ProrationBehavior;
 use App\Enums\SubscriptionInterval;
 use App\Jobs\Stripe\UpdateCustomerInformation;
 use App\Models\Order;
@@ -239,6 +240,7 @@ class StripeDriver implements PaymentProcessor
                 $stripeParams['type'] = $filters['type'];
             }
 
+            $stripeProduct = $this->stripe->products->retrieve($product->external_product_id);
             $stripePrices = $this->stripe->prices->all($stripeParams);
 
             $externalPriceIds = collect($stripePrices->data)->pluck('id')->toArray();
@@ -248,7 +250,7 @@ class StripeDriver implements PaymentProcessor
                 ->get()
                 ->keyBy('external_price_id');
 
-            $prices = collect($stripePrices->data)->map(function ($stripePrice) use ($localPrices, $product) {
+            $prices = collect($stripePrices->data)->map(function ($stripePrice) use ($localPrices, $product, $stripeProduct) {
                 if ($localPrices->has($stripePrice->id)) {
                     return $localPrices->get($stripePrice->id);
                 }
@@ -263,7 +265,7 @@ class StripeDriver implements PaymentProcessor
                 $productPrice->interval = $stripePrice->recurring ? SubscriptionInterval::tryFrom($stripePrice->recurring->interval) : null;
                 $productPrice->interval_count = $stripePrice->recurrin ? $stripePrice->recurring->interval_count : 1;
                 $productPrice->is_active = $stripePrice->active;
-                $productPrice->is_default = false;
+                $productPrice->is_default = $stripePrice->id === $stripeProduct?->default_price;
                 $productPrice->metadata = $stripePrice->metadata->toArray();
 
                 return $productPrice;
@@ -385,9 +387,9 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
-    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData
+    public function startSubscription(Order $order, bool $chargeNow = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData
     {
-        return $this->executeWithErrorHandling('startSubscription', function () use ($order, $chargeNow, $firstParty, $successUrl): bool|string|SubscriptionData {
+        return $this->executeWithErrorHandling('startSubscription', function () use ($order, $chargeNow, $prorationBehavior, $firstParty, $successUrl): bool|string|SubscriptionData {
             $lineItems = [];
 
             foreach ($order->items as $orderItem) {
@@ -403,15 +405,17 @@ class StripeDriver implements PaymentProcessor
             }
 
             if (($subscription = $order->user->subscription()) && $subscription->valid()) {
-                if ($chargeNow) {
-                    $subscription->swapAndInvoice(
+                match ($prorationBehavior) {
+                    ProrationBehavior::CreateProrations => $subscription->prorate()->swap(
                         prices: $lineItems,
-                    );
-                } else {
-                    $subscription->swap(
+                    ),
+                    ProrationBehavior::AlwaysInvoice => $subscription->alwaysInvoice()->swap(
                         prices: $lineItems,
-                    );
-                }
+                    ),
+                    ProrationBehavior::None => $subscription->noProrate()->swap(
+                        prices: $lineItems,
+                    ),
+                };
 
                 return true;
             }

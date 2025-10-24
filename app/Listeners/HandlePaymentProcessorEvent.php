@@ -40,6 +40,8 @@ class HandlePaymentProcessorEvent implements ShouldQueue
             return;
         }
 
+        // 3. Pending -> Succeeded
+
         $event->order->update([
             'status' => OrderStatus::Succeeded,
         ]);
