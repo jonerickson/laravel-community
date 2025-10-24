@@ -191,7 +191,7 @@ export function GlobalSearch() {
                 <span className="sr-only">Search</span>
             </Button>
 
-            <CommandDialog open={open} onOpenChange={setOpen} className="top-[30%] w-full sm:top-[40%] lg:!max-w-5xl">
+            <CommandDialog open={open} onOpenChange={setOpen} className="w-full lg:!max-w-5xl">
                 <CommandInput placeholder="Search topics, posts, policies, and products..." value={query} onValueChange={setQuery} />
 
                 <Collapsible open={dateFiltersOpen} onOpenChange={setDateFiltersOpen}>
@@ -327,11 +327,7 @@ export function GlobalSearch() {
                         </div>
                     </CollapsibleContent>
                 </Collapsible>
-                <CommandList
-                    className={`max-h-screen transition-all duration-500 ease-in-out ${
-                        results.length > 0 || loading || (query.length >= 2 && results.length === 0) ? 'h-[30rem]' : 'h-32'
-                    }`}
-                >
+                <CommandList className="max-h-[30rem] overflow-y-auto">
                     {loading && query.length >= 2 && <div className="py-6 text-center text-sm text-muted-foreground">Searching...</div>}
 
                     {!loading && query.length >= 2 && results.length === 0 && <CommandEmpty>No results found for "{query}"</CommandEmpty>}
