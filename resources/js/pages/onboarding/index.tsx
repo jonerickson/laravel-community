@@ -36,10 +36,10 @@ type OnboardingFormData = Record<string, string> & {
 
 const wizardSteps = [
     { title: 'Account', description: 'Create your account' },
-    { title: 'Email', description: 'Verify your email address' },
+    { title: 'Email', description: 'Verify your email' },
     { title: 'Integrations', description: 'Link your accounts' },
     { title: 'Profile', description: 'Complete your profile' },
-    { title: 'Subscriptions', description: 'Begin a subscription' },
+    { title: 'Subscriptions', description: 'Start a subscription' },
 ];
 
 export default function Onboarding({
