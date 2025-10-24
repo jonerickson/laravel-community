@@ -151,11 +151,13 @@ class TopicResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->modalDescription('Are you sure you would like to do this? This will delete all posts in the topic as well.'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->modalDescription('Are you sure you would like to do this? This will delete all posts in the topics as well.'),
                 ]),
             ])
             ->defaultPaginationPageOption('all')

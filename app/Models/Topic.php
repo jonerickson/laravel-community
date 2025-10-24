@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Laravel\Scout\Searchable;
+use Override;
 
 /**
  * @property int $id
@@ -263,6 +264,14 @@ class Topic extends Model implements Sluggable
     public function getActivityLogName(): string
     {
         return 'forum';
+    }
+
+    #[Override]
+    protected static function booted(): void
+    {
+        static::deleting(function (Topic $topic): void {
+            $topic->posts()->delete();
+        });
     }
 
     protected function casts(): array

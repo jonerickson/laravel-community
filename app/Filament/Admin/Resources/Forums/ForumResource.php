@@ -168,11 +168,13 @@ class ForumResource extends Resource
                     ->url(fn (Forum $record): string => route('forums.show', $record))
                     ->openUrlInNewTab(),
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->modalDescription('Are you sure you would like to do this? This will delete all topics and posts in the forum as well.'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->modalDescription('Are you sure you would like to do this? This will delete all topics and posts in the forums as well.'),
                     BulkAction::make('activate')
                         ->label('Activate Selected')
                         ->icon('heroicon-o-check-circle')

@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Override;
 
 /**
  * @property int $id
@@ -126,5 +127,15 @@ class Forum extends Model implements Sluggable
         return Attribute::make(
             get: fn (): int => Post::whereHas('topic', fn ($query) => $query->where('forum_id', $this->id))->count()
         );
+    }
+
+    #[Override]
+    protected static function booted(): void
+    {
+        static::deleting(function (Forum $forum): void {
+            $forum->topics()->each(function (Topic $topic): void {
+                $topic->delete();
+            });
+        });
     }
 }
