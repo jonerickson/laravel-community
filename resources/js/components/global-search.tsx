@@ -372,7 +372,7 @@ export function GlobalSearch() {
                                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                 {result.author_name && (
                                                     <div className="flex items-center gap-1">
-                                                        <User className="size-3" />
+                                                        <User className="!size-3" />
                                                         {result.author_name}
                                                     </div>
                                                 )}
@@ -386,7 +386,7 @@ export function GlobalSearch() {
                                                 {result.effective_at ||
                                                     (result.created_at && (
                                                         <div className="flex items-center gap-1">
-                                                            <Calendar className="size-3" />
+                                                            <Calendar className="!size-3" />
                                                             {formatDate(result.effective_at || result.created_at)}
                                                         </div>
                                                     ))}
