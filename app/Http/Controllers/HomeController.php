@@ -25,7 +25,7 @@ class HomeController
             ->visible()
             ->subscriptions()
             ->with('prices')
-            ->orderBy('name')
+            ->ordered()
             ->get()
             ->filter(fn (Product $product) => Gate::check('view', $product));
     }
