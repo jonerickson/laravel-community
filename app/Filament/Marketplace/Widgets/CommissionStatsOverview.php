@@ -62,15 +62,17 @@ class CommissionStatsOverview extends StatsOverviewWidget
 
     protected function calculateTotalSales(): int
     {
-        return OrderItem::whereHas('product', fn ($query) => $query->where('seller_id', Auth::id()))
+        return OrderItem::whereHas('price.product', fn ($query) => $query->where('seller_id', Auth::id()))
             ->whereHas('order', fn ($query) => $query->where('status', OrderStatus::Succeeded))
+            ->whereBelongsTo(Auth::user(), 'commissionRecipient')
             ->count();
     }
 
     protected function calculateTotalCommission(): float
     {
-        return (float) OrderItem::whereHas('product', fn ($query) => $query->where('seller_id', Auth::id()))
+        return (float) OrderItem::whereHas('price.product', fn ($query) => $query->where('seller_id', Auth::id()))
             ->whereHas('order', fn ($query) => $query->where('status', OrderStatus::Succeeded))
+            ->whereBelongsTo(Auth::user(), 'commissionRecipient')
             ->get()
             ->sum('commission_amount');
     }

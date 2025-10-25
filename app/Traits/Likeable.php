@@ -6,6 +6,7 @@ namespace App\Traits;
 
 use App\Models\Like;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -176,6 +177,14 @@ trait Likeable
         }
 
         return $emoji;
+    }
+
+    protected static function bootLikeable(): void
+    {
+        static::deleting(function (Model $model): void {
+            /** @var static $model */
+            $model->likes()->delete();
+        });
     }
 
     protected function initializeLikeable(): void

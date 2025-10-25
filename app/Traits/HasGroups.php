@@ -50,9 +50,11 @@ trait HasGroups
         $additionalGroupIds = match (true) {
             $this instanceof User => $this->orders()
                 ->completed()
-                ->with('products.groups')
+                ->with('prices.product.groups')
                 ->get()
-                ->pluck('products')
+                ->pluck('prices')
+                ->flatten()
+                ->pluck('product')
                 ->flatten()
                 ->pluck('groups')
                 ->flatten()

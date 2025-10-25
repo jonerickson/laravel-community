@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Override;
@@ -23,6 +25,7 @@ use Override;
  * @property string|null $size
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read Model|Eloquent|null $resource
  * @property-read string|null $url
  *
  * @method static Builder<static>|File newModelQuery()
@@ -56,6 +59,11 @@ class File extends Model
     protected $appends = [
         'url',
     ];
+
+    public function resource(): MorphTo
+    {
+        return $this->morphTo('resource');
+    }
 
     public function url(): Attribute
     {

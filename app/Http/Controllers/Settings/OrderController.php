@@ -28,7 +28,7 @@ class OrderController extends Controller
             'orders' => Inertia::defer(fn (): array|\Illuminate\Contracts\Pagination\CursorPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Support\Enumerable|\Spatie\LaravelData\CursorPaginatedDataCollection|\Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection => OrderData::collect(Order::query()
                 ->whereBelongsTo($this->user)
                 ->readyToView()
-                ->with(['items.product'])
+                ->with(['items.price.product'])
                 ->latest()
                 ->get()
                 ->filter(fn (Order $order): bool => $order->status !== OrderStatus::Pending || filled($order->checkout_url))

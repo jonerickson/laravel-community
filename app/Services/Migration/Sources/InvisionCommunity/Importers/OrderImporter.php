@@ -185,7 +185,7 @@ class OrderImporter implements EntityImporter
                 $result->incrementMigrated('order_items');
                 $result->recordMigrated('order_items', [
                     'order_id' => $order->id,
-                    'product_id' => $orderItem->product_id,
+                    'product_id' => $orderItem->price->product_id,
                     'price_id' => $orderItem->price_id,
                     'product_name' => $orderItem->name,
                     'amount' => $orderItem->amount,

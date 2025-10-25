@@ -64,7 +64,6 @@ class NewAction extends Action
             ]);
 
             $order->items()->create([
-                'product_id' => $data['product_id'],
                 'price_id' => $data['price_id'],
                 'quantity' => 1,
             ]);

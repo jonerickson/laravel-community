@@ -240,7 +240,7 @@ class Discount extends Model
     public function currentBalance(): Attribute
     {
         return Attribute::make(
-            get: fn (?int $value): ?float => filled($value) ? $value / 100 : null,
+            get: fn (?int $value): ?float => filled($value) ? (float) $value / 100 : null,
             set: fn (?float $value): ?int => filled($value) ? (int) ($value * 100) : null,
         );
     }
@@ -248,7 +248,7 @@ class Discount extends Model
     public function minOrderAmount(): Attribute
     {
         return Attribute::make(
-            get: fn (?int $value): ?float => filled($value) ? $value / 100 : null,
+            get: fn (?int $value): ?float => filled($value) ? (float) $value / 100 : null,
             set: fn (?float $value): ?int => filled($value) ? (int) ($value * 100) : null,
         );
     }

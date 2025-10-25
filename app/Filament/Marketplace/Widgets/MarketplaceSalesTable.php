@@ -25,8 +25,8 @@ class MarketplaceSalesTable extends TableWidget
         return $table
             ->query(
                 OrderItem::query()
-                    ->with(['order.user', 'product', 'price'])
-                    ->whereHas('product', fn (Builder $query) => $query->where('seller_id', Auth::id()))
+                    ->with(['order.user', 'price.product'])
+                    ->whereHas('price.product', fn (Builder $query) => $query->where('seller_id', Auth::id()))
                     ->whereHas('order', fn (Builder $query) => $query->where('status', OrderStatus::Succeeded))
                     ->latest()
                     ->limit(15)

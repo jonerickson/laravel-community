@@ -81,7 +81,6 @@ class SubscriptionsController extends Controller
         ]);
 
         $order->items()->create([
-            'product_id' => $price->product_id,
             'price_id' => $price->id,
         ]);
 

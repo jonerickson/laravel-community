@@ -28,7 +28,6 @@ class SubscriptionController
         }
 
         $this->shoppingCartService->addItem(
-            productId: 1,
             priceId: 1,
             quantity: 1
         );

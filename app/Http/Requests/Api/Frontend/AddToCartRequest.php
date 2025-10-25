@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Api\Frontend;
 
+use App\Rules\UniqueCartItem;
 use Illuminate\Foundation\Http\FormRequest;
 use Override;
 
@@ -17,8 +18,7 @@ class AddToCartRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_id' => ['required', 'exists:products,id'],
-            'price_id' => ['nullable', 'exists:prices,id'],
+            'price_id' => ['nullable', 'exists:prices,id', new UniqueCartItem],
             'quantity' => ['required', 'integer', 'min:1', 'max:99'],
         ];
     }
@@ -27,8 +27,6 @@ class AddToCartRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'product_id.required' => 'Product is required.',
-            'product_id.exists' => 'The selected product is invalid.',
             'price_id.exists' => 'The selected price is invalid.',
             'quantity.required' => 'Quantity is required.',
             'quantity.integer' => 'Quantity must be a valid number.',

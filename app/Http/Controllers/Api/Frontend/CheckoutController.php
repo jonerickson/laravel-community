@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Frontend;
 
 use App\Data\CheckoutData;
+use App\Data\CustomerData;
 use App\Enums\OrderStatus;
 use App\Http\Resources\ApiResource;
 use App\Managers\PaymentManager;
@@ -33,6 +34,19 @@ class CheckoutController
             );
         }
 
+        $result = true;
+        if (! $this->paymentManager->getCustomer($this->user) instanceof CustomerData) {
+            $result = $this->paymentManager->createCustomer($this->user);
+        }
+
+        if (! $result) {
+            return ApiResource::error(
+                message: 'Unable to create/fetch your customer account.',
+                errors: ['auth' => ['User must be customer.']],
+                status: 401
+            );
+        }
+
         $cart = $this->cartService->getCart();
 
         if (blank($cart->cartItems)) {
@@ -53,7 +67,13 @@ class CheckoutController
         }
 
         if ($order->amount <= 0) {
-            $order->update(['status' => OrderStatus::Succeeded]);
+            $order->update([
+                'status' => OrderStatus::Succeeded,
+                'amount_paid' => 0,
+                'amount_remaining' => 0,
+                'amount_overpaid' => 0,
+                'amount_due' => 0,
+            ]);
 
             $this->cartService->clearCart();
 

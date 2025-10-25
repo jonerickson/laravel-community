@@ -22,7 +22,7 @@ class UserProvider implements ProviderInterface
             ->with('integrations')
             ->with(['orders' => function (HasMany $query): void {
                 $query
-                    ->with('items.product')
+                    ->with('items.price.product')
                     ->where('status', OrderStatus::Succeeded);
             }]);
 

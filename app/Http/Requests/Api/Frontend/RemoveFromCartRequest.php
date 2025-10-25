@@ -17,7 +17,6 @@ class RemoveFromCartRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_id' => ['required', 'exists:products,id'],
             'price_id' => ['nullable', 'exists:prices,id'],
         ];
     }
@@ -26,8 +25,6 @@ class RemoveFromCartRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'product_id.required' => 'Product is required.',
-            'product_id.exists' => 'The selected product is invalid.',
             'price_id.exists' => 'The selected price is invalid.',
         ];
     }

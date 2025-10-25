@@ -59,17 +59,9 @@ class OrderStatsOverview extends StatsOverviewWidget
 
     protected function calculateAverageOrderValue(): float
     {
-        $orders = Order::where('status', OrderStatus::Succeeded)
-            ->with(['items.price'])
-            ->get();
-
-        if ($orders->isEmpty()) {
-            return 0;
-        }
-
-        $totalRevenue = $orders->sum(fn (Order $order) => $order->items->sum(fn ($item) => $item->amount));
-
-        return $totalRevenue / $orders->count();
+        return Order::where('status', OrderStatus::Succeeded)
+            ->where('amount_paid', '>', 0)
+            ->average('amount_paid') / 100;
     }
 
     protected function calculateRefundRate(): float

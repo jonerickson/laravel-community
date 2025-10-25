@@ -74,6 +74,14 @@ trait Viewable
         $this->recordView();
     }
 
+    protected static function bootViewable(): void
+    {
+        static::deleting(function (Model $model): void {
+            /** @var static $model */
+            $model->views()->delete();
+        });
+    }
+
     protected function initializeViewable(): void
     {
         $this->mergeAppends([

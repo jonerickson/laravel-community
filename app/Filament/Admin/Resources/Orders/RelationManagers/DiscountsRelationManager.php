@@ -63,7 +63,7 @@ class DiscountsRelationManager extends RelationManager
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('pivot.created_at')
-                    ->label('Applied At')
+                    ->label('Applied')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(),

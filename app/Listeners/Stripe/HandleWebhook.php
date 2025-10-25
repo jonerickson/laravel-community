@@ -17,7 +17,6 @@ use App\Events\SubscriptionUpdated;
 use App\Managers\PaymentManager;
 use App\Models\Order;
 use App\Models\Price;
-use App\Models\Product;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -138,32 +137,50 @@ class HandleWebhook implements ShouldQueue
             'reference_id' => $orderId,
         ], [
             'user_id' => $this->user->getKey(),
+            'amount_due' => ((int) data_get($this->payload, 'data.object.amount_due') ?? 0) / 100,
+            'amount_overpaid' => ((int) data_get($this->payload, 'data.object.amount_overpaid') ?? 0) / 100,
+            'amount_paid' => ((int) data_get($this->payload, 'data.object.amount_paid') ?? 0) / 100,
+            'amount_remaining' => ((int) data_get($this->payload, 'data.object.amount_remaining') ?? 0) / 100,
             'invoice_url' => data_get($this->payload, 'data.object.hosted_invoice_url'),
             'external_invoice_id' => data_get($this->payload, 'data.object.id'),
             'external_event_id' => data_get($this->payload, 'id'),
         ]);
 
+        $lineItems = Arr::wrap(data_get($this->payload, 'data.object.lines.data'));
+
         if ($order->wasRecentlyCreated) {
-            foreach (Arr::wrap(data_get($this->payload, 'data.object.lines.data')) as $lineItem) {
+            foreach ($lineItems as $lineItem) {
                 $price = Price::firstWhere([
                     'external_price_id' => data_get($lineItem, 'pricing.price_details.price'),
                 ]);
 
-                $product = Product::firstWhere([
-                    'external_product_id' => data_get($lineItem, 'pricing.price_details.product'),
-                ]);
-
-                $item = ['quantity' => data_get($lineItem, 'quantity') ?? 1];
+                $item = [
+                    'quantity' => data_get($lineItem, 'quantity') ?? 1,
+                    'amount' => ((int) data_get($lineItem, 'amount') ?? 0) / 100,
+                ];
 
                 if ($price) {
                     $item['price_id'] = $price->getKey();
-                    $item['product_id'] = $price->product?->getKey() ?? $product?->getKey() ?? null;
                 } else {
                     $item['name'] = data_get($lineItem, 'description') ?? 'Unknown Product';
-                    $item['amount'] = data_get($lineItem, 'amount') ?? 0;
                 }
 
                 $order->items()->create($item);
+            }
+        } else {
+            foreach ($lineItems as $lineItem) {
+                $price = Price::firstWhere([
+                    'external_price_id' => data_get($lineItem, 'pricing.price_details.price'),
+                ]);
+
+                $orderItem = $order->items()
+                    ->when($price, fn ($query) => $query->where('price_id', $price->getKey()))
+                    ->first();
+
+                $orderItem?->update([
+                    'amount' => ((int) data_get($lineItem, 'amount') ?? 0) / 100,
+                    'quantity' => data_get($lineItem, 'quantity') ?? 1,
+                ]);
             }
         }
 

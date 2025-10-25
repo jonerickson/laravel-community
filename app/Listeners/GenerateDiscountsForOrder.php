@@ -24,16 +24,18 @@ class GenerateDiscountsForOrder implements ShouldQueue
         $order = $event->order;
 
         $orderItems = $order->items()
-            ->with(['product', 'price'])
+            ->with('price.product')
             ->get();
 
         foreach ($orderItems as $item) {
-            if (! $item->product) {
+            $product = $item->price->product;
+
+            if (! $product) {
                 continue;
             }
 
             $templateDiscount = Discount::query()
-                ->whereBelongsTo($item->product, 'product')
+                ->whereBelongsTo($product, 'product')
                 ->whereNull('user_id')
                 ->first();
 
@@ -55,7 +57,7 @@ class GenerateDiscountsForOrder implements ShouldQueue
                 $discount->recipient_email = $order->user->email;
                 $discount->code = $discount->generateCode();
                 $discount->times_used = 0;
-                $discount->activated_at = null;
+                $discount->activated_at = now();
                 $discount->save();
 
                 if ($order->user) {

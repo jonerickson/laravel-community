@@ -22,7 +22,6 @@ export function useCartOperations(initialItems: App.Data.CartItemData[] = []) {
                 url: route('api.cart.update'),
                 method: 'PUT',
                 data: {
-                    product_id: productId,
                     price_id: priceId,
                     quantity: quantity,
                 },
@@ -53,7 +52,6 @@ export function useCartOperations(initialItems: App.Data.CartItemData[] = []) {
                 url: route('api.cart.store'),
                 method: 'POST',
                 data: {
-                    product_id: productId,
                     price_id: priceId,
                     quantity: quantity,
                 },
@@ -88,7 +86,6 @@ export function useCartOperations(initialItems: App.Data.CartItemData[] = []) {
                 url: route('api.cart.destroy'),
                 method: 'DELETE',
                 data: {
-                    product_id: productId,
                     price_id: priceId,
                 },
             },

@@ -14,7 +14,7 @@ Great news! Your product has been purchased in order **#{{ $order->reference_id 
 | Product | Quantity | Sale Amount | Commission |
 |:--------|:--------:|-----------:|-----------:|
 @foreach($items as $item)
-| {{ $item->product->name }} | {{ $item->quantity }} | {{ \Illuminate\Support\Number::currency($item->amount) }} | {{ \Illuminate\Support\Number::currency($item->commission_amount ?? 0) }} |
+| {{ $item->price->product->name }} | {{ $item->quantity }} | {{ \Illuminate\Support\Number::currency($item->amount) }} | {{ \Illuminate\Support\Number::currency($item->commission_amount ?? 0) }} |
 @endforeach
 </x-mail::table>
 

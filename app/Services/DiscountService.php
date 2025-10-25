@@ -87,7 +87,7 @@ class DiscountService
                     $order->discounts()->attach($discount->id, [
                         'amount_applied' => $discountAmount / 100,
                         'balance_before' => $discount->type === DiscountType::GiftCard ? $discount->getRawOriginal('current_balance') / 100 : null,
-                        'balance_after' => $discount->type === DiscountType::GiftCard ? max(0, $discount->getRawOriginal('current_balance') - $discountAmount) : null,
+                        'balance_after' => $discount->type === DiscountType::GiftCard ? (max(0, $discount->getRawOriginal('current_balance') - $discountAmount)) / 100 : null,
                     ]);
 
                     $totalDiscount += $discountAmount;

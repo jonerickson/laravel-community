@@ -46,7 +46,7 @@ class OrderDiscount extends Pivot
     public function amountApplied(): Attribute
     {
         return Attribute::make(
-            get: fn (int $value): float => $value / 100,
+            get: fn (int $value): float => (float) $value / 100,
             set: fn (float $value): int => (int) ($value * 100),
         );
     }
@@ -54,7 +54,7 @@ class OrderDiscount extends Pivot
     public function balanceBefore(): Attribute
     {
         return Attribute::make(
-            get: fn (?int $value): ?float => filled($value) ? $value / 100 : null,
+            get: fn (?int $value): ?float => filled($value) ? (float) $value / 100 : null,
             set: fn (?float $value): ?int => filled($value) ? (int) ($value * 100) : null,
         );
     }
@@ -62,7 +62,7 @@ class OrderDiscount extends Pivot
     public function balanceAfter(): Attribute
     {
         return Attribute::make(
-            get: fn (?int $value): ?float => filled($value) ? $value / 100 : null,
+            get: fn (?int $value): ?float => filled($value) ? (float) $value / 100 : null,
             set: fn (?float $value): ?int => filled($value) ? (int) ($value * 100) : null,
         );
     }

@@ -47,7 +47,7 @@ class DiscountController
             );
         }
 
-        if ($product = $order->products->firstWhere('allow_discount_codes', false)) {
+        if ($product = $order->items()->with('price.product')->get()->firstWhere('price.product.allow_discount_codes', false)) {
             return ApiResource::error(
                 message: 'Invalid or expired discount code.',
                 errors: ['code' => ["$product->name does not allow the use of a discount code."]],

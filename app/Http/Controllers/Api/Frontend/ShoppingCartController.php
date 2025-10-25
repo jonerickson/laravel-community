@@ -23,7 +23,6 @@ class ShoppingCartController extends Controller
     public function store(AddToCartRequest $request): JsonResource
     {
         $cartResponse = $this->cartService->addItem(
-            productId: $request->integer('product_id'),
             priceId: $request->integer('price_id'),
             quantity: $request->integer('quantity')
         );
@@ -37,7 +36,6 @@ class ShoppingCartController extends Controller
     public function update(UpdateCartRequest $request): JsonResource
     {
         $cartResponse = $this->cartService->updateItem(
-            productId: $request->integer('product_id'),
             priceId: $request->integer('price_id'),
             quantity: $request->integer('quantity')
         );
@@ -51,7 +49,6 @@ class ShoppingCartController extends Controller
     public function destroy(RemoveFromCartRequest $request): JsonResource
     {
         $cartResponse = $this->cartService->removeItem(
-            productId: $request->integer('product_id'),
             priceId: $request->integer('price_id')
         );
 

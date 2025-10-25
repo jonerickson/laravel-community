@@ -49,22 +49,16 @@ class RevenueStatsOverview extends StatsOverviewWidget
 
     protected function calculateTotalRevenue(): float
     {
-        $orders = Order::where('status', OrderStatus::Succeeded)
-            ->with(['items.price'])
-            ->get();
-
-        return $orders->sum(fn (Order $order) => $order->items->sum(fn ($item) => $item->amount));
+        return Order::where('status', OrderStatus::Succeeded)
+            ->sum('amount_paid') / 100;
     }
 
     protected function calculateRevenueThisMonth(): float
     {
-        $orders = Order::where('status', OrderStatus::Succeeded)
+        return Order::where('status', OrderStatus::Succeeded)
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
-            ->with(['items.price'])
-            ->get();
-
-        return $orders->sum(fn (Order $order) => $order->items->sum(fn ($item) => $item->amount));
+            ->sum('amount_paid') / 100;
     }
 
     protected function calculateMRR(): float

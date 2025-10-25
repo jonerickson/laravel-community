@@ -10,6 +10,7 @@ use App\Enums\OrderStatus;
 use App\Models\Discount;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Policy;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
@@ -118,7 +119,7 @@ class ShoppingCartService
         $order->discounts()->detach($discountId);
     }
 
-    public function addItem(int $productId, ?int $priceId, int $quantity): CartData
+    public function addItem(int $priceId, int $quantity): CartData
     {
         $order = $this->getOrCreatePendingOrder();
 
@@ -126,29 +127,15 @@ class ShoppingCartService
             return $this->getCart();
         }
 
-        Product::findOrFail($productId);
-
-        $existingItem = $order->items()
-            ->where('product_id', $productId)
-            ->where('price_id', $priceId)
-            ->first();
-
-        if ($existingItem instanceof OrderItem) {
-            $existingItem->update([
-                'quantity' => $existingItem->quantity + $quantity,
-            ]);
-        } else {
-            $order->items()->create([
-                'product_id' => $productId,
-                'price_id' => $priceId,
-                'quantity' => $quantity,
-            ]);
-        }
+        $order->items()->create([
+            'price_id' => $priceId,
+            'quantity' => $quantity,
+        ]);
 
         return $this->getCart();
     }
 
-    public function updateItem(int $productId, ?int $priceId, int $quantity): CartData
+    public function updateItem(int $priceId, int $quantity): CartData
     {
         $order = $this->getOrCreatePendingOrder();
 
@@ -157,12 +144,10 @@ class ShoppingCartService
         }
 
         $order->items()
-            ->where('product_id', $productId)
             ->where('price_id', '!=', $priceId)
             ->delete();
 
         $item = $order->items()
-            ->where('product_id', $productId)
             ->where('price_id', $priceId)
             ->first();
 
@@ -170,7 +155,6 @@ class ShoppingCartService
             $item->update(['quantity' => $quantity]);
         } else {
             $order->items()->create([
-                'product_id' => $productId,
                 'price_id' => $priceId,
                 'quantity' => $quantity,
             ]);
@@ -179,13 +163,12 @@ class ShoppingCartService
         return $this->getCart();
     }
 
-    public function removeItem(int $productId, ?int $priceId): CartData
+    public function removeItem(int $priceId): CartData
     {
         $order = $this->getOrCreatePendingOrder();
 
         if ($order instanceof Order) {
             $order->items()
-                ->where('product_id', $productId)
                 ->where('price_id', $priceId)
                 ->delete();
         }
@@ -205,27 +188,26 @@ class ShoppingCartService
         }
 
         $orderItems = $order->items()->with([
-            'product' => function ($query): void {
+            'price.product' => function ($query): void {
                 $query->with('defaultPrice')
-                    ->with(['prices' => function (HasMany $query): void {
+                    ->with(['prices' => function (Price|HasMany $query): void {
                         $query->active()->orderBy('is_default', 'desc');
                     }])
-                    ->with(['policies' => function (BelongsToMany $query): void {
+                    ->with(['policies' => function (Policy|BelongsToMany $query): void {
                         $query->active()->effective()->orderBy('title');
                     }]);
             },
-            'price',
         ])->get();
 
         return $orderItems->map(fn (OrderItem $item): array => [
-            'product_id' => $item->product_id,
+            'product_id' => $item->price->product_id,
             'price_id' => $item->price_id,
-            'name' => $item->product?->name ?? $item->name,
-            'slug' => $item->product?->slug ?? '',
+            'name' => $item->price->product?->name ?? $item->name,
+            'slug' => $item->price->product?->slug ?? '',
             'quantity' => $item->quantity,
-            'product' => $item->product,
+            'product' => $item->price->product,
             'selected_price' => $item->price,
-            'available_prices' => $item->product?->prices ?? collect(),
+            'available_prices' => $item->price->product?->prices ?? collect(),
             'added_at' => $item->created_at,
         ])->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->values()->toArray();
     }

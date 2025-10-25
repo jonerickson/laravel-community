@@ -17,12 +17,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Override;
 
 /**
  * @property int $id
  * @property string $reference_id
  * @property int $user_id
  * @property OrderStatus $status
+ * @property float|null $amount_due
+ * @property float|null $amount_overpaid
+ * @property float|null $amount_paid
+ * @property float|null $amount_remaining
  * @property string|null $refund_notes
  * @property string|null $refund_reason
  * @property string|null $invoice_number
@@ -35,6 +40,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read int|float $amount
+ * @property-read float $amount_subtotal
  * @property-read mixed $checkout_url
  * @property-read float $commission_amount
  * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $commissionItems
@@ -48,8 +54,8 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property-read int|null $items_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Note> $notes
  * @property-read int|null $notes_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
- * @property-read int|null $products_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Price> $prices
+ * @property-read int|null $prices_count
  * @property-read User $user
  *
  * @method static Builder<static>|Order completed()
@@ -58,6 +64,10 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @method static Builder<static>|Order newQuery()
  * @method static Builder<static>|Order query()
  * @method static Builder<static>|Order readyToView()
+ * @method static Builder<static>|Order whereAmountDue($value)
+ * @method static Builder<static>|Order whereAmountOverpaid($value)
+ * @method static Builder<static>|Order whereAmountPaid($value)
+ * @method static Builder<static>|Order whereAmountRemaining($value)
  * @method static Builder<static>|Order whereCreatedAt($value)
  * @method static Builder<static>|Order whereExternalCheckoutId($value)
  * @method static Builder<static>|Order whereExternalEventId($value)
@@ -89,6 +99,10 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'status',
+        'amount_due',
+        'amount_overpaid',
+        'amount_paid',
+        'amount_remaining',
         'refund_reason',
         'refund_notes',
         'amount',
@@ -103,6 +117,7 @@ class Order extends Model
 
     protected $appends = [
         'amount',
+        'amount_subtotal',
         'checkout_url',
         'is_recurring',
         'is_one_time',
@@ -130,9 +145,9 @@ class Order extends Model
             ->where('commission_amount', '>', 0);
     }
 
-    public function products(): HasManyThrough
+    public function prices(): HasManyThrough
     {
-        return $this->hasManyThrough(Product::class, OrderItem::class, 'order_id', 'id', 'id', 'product_id');
+        return $this->hasManyThrough(Price::class, OrderItem::class, 'order_id', 'id', 'id', 'price_id');
     }
 
     public function discounts(): BelongsToMany
@@ -145,7 +160,11 @@ class Order extends Model
 
     public function amount(): Attribute
     {
-        return Attribute::get(function (): int|float {
+        return Attribute::get(function ($value, array $attributes): int|float {
+            if (isset($attributes['amount_paid'])) {
+                return $attributes['amount_paid'] / 100;
+            }
+
             $subtotal = $this->items->sum('amount');
             $discountAmount = $this->discounts->sum('pivot.amount_applied');
 
@@ -188,6 +207,44 @@ class Order extends Model
             ->shouldCache();
     }
 
+    public function amountSubtotal(): Attribute
+    {
+        return Attribute::get(fn (): float => $this->items->sum('amount'))
+            ->shouldCache();
+    }
+
+    public function amountDue(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?int $value): ?float => filled($value) ? (float) $value / 100 : null,
+            set: fn (float $value): int => (int) ($value * 100),
+        );
+    }
+
+    public function amountOverpaid(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?int $value): ?float => filled($value) ? (float) $value / 100 : null,
+            set: fn (float $value): int => (int) ($value * 100),
+        );
+    }
+
+    public function amountPaid(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?int $value): ?float => filled($value) ? (float) $value / 100 : null,
+            set: fn (float $value): int => (int) ($value * 100),
+        );
+    }
+
+    public function amountRemaining(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?int $value): ?float => filled($value) ? (float) $value / 100 : null,
+            set: fn (float $value): int => (int) ($value * 100),
+        );
+    }
+
     public function scopeReadyToView(Builder $query): void
     {
         $query->whereIn('status', [OrderStatus::Cancelled, OrderStatus::Pending, OrderStatus::Succeeded, OrderStatus::Refunded])
@@ -199,10 +256,22 @@ class Order extends Model
         $query->where('status', OrderStatus::Succeeded);
     }
 
+    #[Override]
+    protected static function booted(): void
+    {
+        static::deleting(function (Order $order): void {
+            $order->notes()->delete();
+        });
+    }
+
     protected function casts(): array
     {
         return [
             'status' => OrderStatus::class,
+            'amount_due' => 'integer',
+            'amount_overpaid' => 'integer',
+            'amount_paid' => 'integer',
+            'amount_remaining' => 'integer',
         ];
     }
 }

@@ -421,14 +421,20 @@ class StripeDriver implements PaymentProcessor
             }
 
             /** @var ?OrderItem $allowPromotionCodes */
-            $allowPromotionCodes = $order->items()->with('product')->get()->firstWhere('product.allow_promotion_codes', true);
+            $allowPromotionCodes = $order->items()
+                ->with('price.product')
+                ->get()
+                ->firstWhere('price.product.allow_promotion_codes', true);
 
             /** @var ?OrderItem $trialDays */
-            $trialDays = $order->items()->with('product')->get()->firstWhere('product.trial_days', '>', 0);
+            $trialDays = $order->items()
+                ->with('price.product')
+                ->get()
+                ->firstWhere('price.product.trial_days', '>', 0);
 
             $metadata = array_merge_recursive([
                 'order_id' => $order->reference_id,
-            ], ...$order->items->map(fn (OrderItem $orderItem) => data_get($orderItem->product->metadata, 'metadata', []))->toArray());
+            ], ...$order->items->map(fn (OrderItem $orderItem) => data_get($orderItem->price->product->metadata, 'metadata', []))->toArray());
 
             /** @var Subscription|Session $result */
             $result = $order->user
@@ -582,21 +588,21 @@ class StripeDriver implements PaymentProcessor
 
             /** @var ?OrderItem $allowPromotionCodes */
             $allowPromotionCodes = $order->items()
-                ->with('product')
+                ->with('price.product')
                 ->get()
-                ->firstWhere('product.allow_promotion_codes', true);
+                ->firstWhere('price.product.allow_promotion_codes', true);
 
             $disallowDiscountCodes = $order->items()
-                ->with('product')
+                ->with('price.product')
                 ->get()
-                ->firstWhere('product.allow_discount_codes', false);
+                ->firstWhere('price.product.allow_discount_codes', false);
 
             $metadata = array_merge_recursive(
                 [
                     'order_id' => $order->reference_id,
                 ],
                 ...$order->items
-                    ->map(fn (OrderItem $orderItem) => data_get($orderItem->product->metadata, 'metadata', []))
+                    ->map(fn (OrderItem $orderItem) => data_get($orderItem->price->product->metadata, 'metadata', []))
                     ->toArray()
             );
 
@@ -628,6 +634,7 @@ class StripeDriver implements PaymentProcessor
 
             $checkoutParams = [
                 'client_reference_id' => $order->reference_id,
+                'customer' => $order->user->stripeId(),
                 'success_url' => URL::signedRoute('store.checkout.success', [
                     'order' => $order,
                 ]),

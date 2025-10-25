@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Store;
 
+use App\Rules\UniqueCartItem;
 use Illuminate\Foundation\Http\FormRequest;
 use Override;
 
@@ -17,7 +18,7 @@ class StoreProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'price_id' => ['required', 'exists:prices,id'],
+            'price_id' => ['required', 'exists:prices,id', new UniqueCartItem],
             'quantity' => ['integer', 'min:1', 'max:99'],
         ];
     }

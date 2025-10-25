@@ -55,7 +55,7 @@ class OrdersTable
                     ->color('success')
                     ->default(0)
                     ->sortable(),
-                TextColumn::make('items.product.name')
+                TextColumn::make('items.price.product.name')
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->label('Created')
@@ -75,7 +75,7 @@ class OrdersTable
                     ->searchable()
                     ->multiple(),
                 SelectFilter::make('product')
-                    ->relationship('items.product', 'name')
+                    ->relationship('items.price.product', 'name')
                     ->preload()
                     ->searchable()
                     ->multiple(),

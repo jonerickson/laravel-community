@@ -17,16 +17,16 @@ use Override;
  * @property int $id
  * @property int $order_id
  * @property string|null $name
- * @property int|null $product_id
  * @property int|null $price_id
  * @property int|float $amount
  * @property float $commission_amount
+ * @property int|null $commission_recipient_id
  * @property int $quantity
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read User|null $commissionRecipient
  * @property-read Order $order
  * @property-read Price|null $price
- * @property-read Product|null $product
  *
  * @method static \Database\Factories\OrderItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem newModelQuery()
@@ -34,12 +34,12 @@ use Override;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereCommissionAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereCommissionRecipientId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem wherePriceId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereQuantity($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereUpdatedAt($value)
  *
@@ -57,12 +57,12 @@ class OrderItem extends Model implements HasLabel
 
     protected $fillable = [
         'order_id',
-        'product_id',
         'price_id',
         'quantity',
         'name',
         'amount',
         'commission_amount',
+        'commission_recipient_id',
     ];
 
     public function order(): BelongsTo
@@ -70,19 +70,19 @@ class OrderItem extends Model implements HasLabel
         return $this->belongsTo(Order::class);
     }
 
-    public function product(): BelongsTo
-    {
-        return $this->belongsTo(Product::class);
-    }
-
     public function price(): BelongsTo
     {
         return $this->belongsTo(Price::class);
     }
 
+    public function commissionRecipient(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'commission_recipient_id');
+    }
+
     public function getLabel(): string|Htmlable|null
     {
-        $product = $this->name ?? $this->product?->name ?? 'Unknown Product';
+        $product = $this->name ?? $this->price?->product?->name ?? 'Unknown Product';
         $price = ($this->getOriginal('amount')
             ? Number::currency($this->amount)
             : $this->price?->getLabel()) ?? 'Unknown Price';
@@ -93,9 +93,9 @@ class OrderItem extends Model implements HasLabel
     public function amount(): Attribute
     {
         return Attribute::make(
-            get: function ($value, $attributes): int|float {
-                if ($amount = data_get($attributes, 'amount')) {
-                    return ($amount * $this->quantity) / 100;
+            get: function ($value, array $attributes): int|float {
+                if (isset($attributes['amount'])) {
+                    return ($attributes['amount'] * $this->quantity) / 100;
                 }
 
                 return ($this->price->amount ?? 0) * $this->quantity;
@@ -107,7 +107,7 @@ class OrderItem extends Model implements HasLabel
     public function commissionAmount(): Attribute
     {
         return Attribute::make(
-            get: fn (int $value): float => $value / 100,
+            get: fn (int $value): float => (float) $value / 100,
             set: fn (float $value): int => (int) ($value * 100),
         );
     }
@@ -128,6 +128,8 @@ class OrderItem extends Model implements HasLabel
     {
         return [
             'quantity' => 'integer',
+            'commission_amount' => 'integer',
+            'amount' => 'integer',
         ];
     }
 }

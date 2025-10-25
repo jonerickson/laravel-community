@@ -43,17 +43,11 @@ class ItemsRelationManager extends RelationManager
         return $schema
             ->columns(1)
             ->components([
-                Select::make('product_id')
-                    ->required()
-                    ->relationship('product', 'name')
-                    ->preload()
-                    ->live(onBlur: true)
-                    ->searchable(),
                 Select::make('price_id')
+                    ->relationship('price', 'name')
                     ->label('Price')
-                    ->disableOptionWhen(fn (Get $get): bool => blank($get('product_id')))
                     ->required()
-                    ->options(fn (Get $get) => Price::query()->where('product_id', $get('product_id'))->pluck('name', 'id'))
+                    ->options(fn (Get $get) => Price::query()->active()->get()->mapWithKeys(fn (Price $price): array => [$price->id => $price->getLabel()]))
                     ->preload()
                     ->searchable(),
                 TextInput::make('quantity')

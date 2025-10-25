@@ -23,17 +23,36 @@ class OrderInfolist
                             ->label('Order Number')
                             ->copyable(),
                         TextEntry::make('invoice_number')
+                            ->label('Invoice Number')
                             ->default(new HtmlString('&mdash;')),
                         TextEntry::make('user.name')
                             ->label('User'),
                         TextEntry::make('status')
                             ->badge(),
+                    ]),
+                Section::make('Totals')
+                    ->columnSpanFull()
+                    ->columns(5)
+                    ->schema([
+                        TextEntry::make('amount_subtotal')
+                            ->label('Subtotal')
+                            ->money(),
+                        TextEntry::make('amount_due')
+                            ->label('Due')
+                            ->money(),
                         TextEntry::make('amount')
+                            ->label('Paid')
+                            ->money(),
+                        TextEntry::make('amount_overpaid')
+                            ->label('Overpaid')
+                            ->money(),
+                        TextEntry::make('amount_remaining')
+                            ->label('Remaining')
                             ->money(),
                     ]),
                 Section::make('Payment Processor')
                     ->columnSpanFull()
-                    ->columns()
+                    ->columns(3)
                     ->schema([
                         TextEntry::make('external_invoice_id')
                             ->copyable()
@@ -43,7 +62,12 @@ class OrderInfolist
                             ->copyable()
                             ->label('External Checkout ID')
                             ->default(new HtmlString('&mdash;')),
+                        TextEntry::make('external_event_id')
+                            ->copyable()
+                            ->label('External Event ID')
+                            ->default(new HtmlString('&mdash;')),
                         TextEntry::make('external_order_id')
+                            ->columnStart(1)
                             ->copyable()
                             ->label('External Order ID')
                             ->default(new HtmlString('&mdash;')),

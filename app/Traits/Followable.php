@@ -91,4 +91,12 @@ trait Followable
             }
         )->shouldCache();
     }
+
+    protected static function bootFollowable(): void
+    {
+        static::deleting(function (Model $model): void {
+            /** @var static $model */
+            $model->follows()->delete();
+        });
+    }
 }

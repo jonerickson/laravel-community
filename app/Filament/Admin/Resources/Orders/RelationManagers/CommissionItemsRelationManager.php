@@ -36,9 +36,9 @@ class CommissionItemsRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('name')
                     ->searchable(),
-                TextColumn::make('product.seller.name')
+                TextColumn::make('price.product.seller.name')
                     ->searchable(),
-                TextColumn::make('product.commission_rate')
+                TextColumn::make('price.product.commission_rate')
                     ->label('Commission Rate')
                     ->formatStateUsing(fn ($state) => Number::percentage($state * 100)),
                 TextColumn::make('commission_amount')

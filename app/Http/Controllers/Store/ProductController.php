@@ -46,7 +46,6 @@ class ProductController extends Controller
         }
 
         $this->cartService->addItem(
-            productId: $product->id,
             priceId: $priceId,
             quantity: $quantity
         );

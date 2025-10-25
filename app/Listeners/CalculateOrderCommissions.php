@@ -6,6 +6,7 @@ namespace App\Listeners;
 
 use App\Events\OrderSucceeded;
 use App\Mail\Marketplace\ProductSold;
+use App\Models\OrderItem;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -22,23 +23,26 @@ class CalculateOrderCommissions implements ShouldQueue
         $sellerItems = [];
 
         foreach ($order->items as $item) {
-            if (! $item->product) {
+            $product = $item->price->product;
+
+            if (! $product) {
                 continue;
             }
-            if (! $item->product->seller_id) {
+            if (! $product->seller_id) {
                 continue;
             }
 
-            $commissionRate = $item->product->commission_rate ?? 0;
+            $commissionRate = $product->commission_rate ?? 0;
 
             if ($commissionRate > 0) {
                 $commissionAmount = $item->amount * $commissionRate;
 
                 $item->update([
                     'commission_amount' => $commissionAmount,
+                    'commission_recipient_id' => $product->seller_id,
                 ]);
 
-                $sellerId = $item->product->seller_id;
+                $sellerId = $product->seller_id;
                 if (! isset($sellerItems[$sellerId])) {
                     $sellerItems[$sellerId] = [];
                 }
@@ -46,8 +50,9 @@ class CalculateOrderCommissions implements ShouldQueue
             }
         }
 
+        /** @var array<OrderItem> $items */
         foreach ($sellerItems as $items) {
-            $seller = $items[0]->product->seller;
+            $seller = $items[0]->price->product->seller;
 
             if ($seller && $seller->email) {
                 Mail::to($seller->email)->send(

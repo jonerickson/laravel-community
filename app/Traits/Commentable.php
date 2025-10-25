@@ -45,6 +45,14 @@ trait Commentable
         )->shouldCache();
     }
 
+    protected static function bootCommentable(): void
+    {
+        static::deleting(function ($model): void {
+            /** @var static $model */
+            $model->comments()->delete();
+        });
+    }
+
     protected function initializeCommentable(): void
     {
         $this->mergeFillable([

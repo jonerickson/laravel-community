@@ -6,6 +6,7 @@ namespace App\Traits;
 
 use App\Models\File;
 use Eloquent;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
@@ -22,6 +23,14 @@ trait HasFiles
     public function files(): MorphMany
     {
         return $this->morphMany(File::class, 'resource');
+    }
+
+    protected static function bootHasFiles(): void
+    {
+        static::deleting(function (Model $model): void {
+            /** @var static $model */
+            $model->files()->delete();
+        });
     }
 
     protected function initializeHasFiles(): void
