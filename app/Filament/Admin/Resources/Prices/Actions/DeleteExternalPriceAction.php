@@ -18,7 +18,7 @@ class DeleteExternalPriceAction extends Action
         parent::setUp();
 
         $this->label('Delete external price');
-        $this->visible(fn (Price $record): bool => filled($record->product->external_product_id) && filled($record->external_price_id));
+        $this->visible(fn (Price $record): bool => filled($record->product->external_product_id) && filled($record->external_price_id) && config('payment.default'));
         $this->color('danger');
         $this->icon(Heroicon::OutlinedMinus);
         $this->successNotificationTitle('The external price was successfully deleted.');

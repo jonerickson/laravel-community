@@ -18,7 +18,7 @@ class CreateExternalPriceAction extends Action
         parent::setUp();
 
         $this->label('Create external price');
-        $this->visible(fn (Price $record): bool => filled($record->product->external_product_id) && blank($record->external_price_id));
+        $this->visible(fn (Price $record): bool => filled($record->product->external_product_id) && blank($record->external_price_id) && config('payment.default'));
         $this->color('gray');
         $this->icon(Heroicon::OutlinedPlus);
         $this->successNotificationTitle('The external price was successfully created.');

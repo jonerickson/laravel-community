@@ -23,7 +23,7 @@ class EditProduct extends EditRecord
             Action::make('link')
                 ->color('gray')
                 ->label('Link existing external product')
-                ->visible(fn (Product $record): bool => blank($record->external_product_id))
+                ->visible(fn (Product $record): bool => blank($record->external_product_id) && config('payment.default'))
                 ->modalDescription('Provide an external product ID to link this product with a product you have already created in your payment processor.')
                 ->schema([
                     TextInput::make('external_product_id')
@@ -40,7 +40,7 @@ class EditProduct extends EditRecord
             Action::make('unlink')
                 ->label('Unlink external ID')
                 ->color('gray')
-                ->visible(fn (Product $record): bool => filled($record->external_product_id))
+                ->visible(fn (Product $record): bool => filled($record->external_product_id) && config('payment.default'))
                 ->requiresConfirmation()
                 ->modalSubmitActionLabel('Unlink')
                 ->modalHeading('Unlink External Product ID')

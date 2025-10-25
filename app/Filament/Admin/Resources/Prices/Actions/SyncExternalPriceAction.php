@@ -25,7 +25,7 @@ class SyncExternalPriceAction extends Action
         $this->color('gray');
         $this->label('Sync prices');
         $this->requiresConfirmation();
-        $this->visible(fn (): bool => filled($this->getProduct()->external_product_id));
+        $this->visible(fn (): bool => filled($this->getProduct()->external_product_id) && config('payment.default'));
         $this->modalHeading('Sync Product Prices');
         $this->modalIcon(Heroicon::OutlinedArrowPath);
         $this->modalDescription('This will remove any existing prices for this product locally and pull in the latest product prices from your payment processor.');

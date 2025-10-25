@@ -25,7 +25,7 @@ class UpdateExternalPriceAction extends Action
         $this->color('gray');
         $this->label('Update external price');
         $this->requiresConfirmation();
-        $this->visible(fn (Price $record): bool => filled($record->external_price_id));
+        $this->visible(fn (Price $record): bool => filled($record->external_price_id) && config('payment.default'));
         $this->icon(Heroicon::OutlinedArrowPath);
         $this->modalHeading('Update Product Price');
         $this->modalIcon(Heroicon::OutlinedArrowPath);

@@ -274,6 +274,7 @@ class ProductResource extends Resource
                     ->money()
                     ->sortable(),
                 IconColumn::make('external_product_id')
+                    ->visible(fn () => config('payment.default'))
                     ->label('External Product')
                     ->default(false)
                     ->boolean(),

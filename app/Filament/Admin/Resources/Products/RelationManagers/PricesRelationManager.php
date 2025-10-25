@@ -27,6 +27,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class PricesRelationManager extends RelationManager
 {
@@ -117,6 +118,7 @@ class PricesRelationManager extends RelationManager
                     ->label('Default')
                     ->sortable(),
                 IconColumn::make('external_price_id')
+                    ->visible(fn () => config('payment.default'))
                     ->label('External Price')
                     ->default(false)
                     ->boolean(),
@@ -138,7 +140,7 @@ class PricesRelationManager extends RelationManager
             ])
             ->headerActions([
                 SyncExternalPriceAction::make('sync')
-                    ->product(fn (): \Illuminate\Database\Eloquent\Model => $this->getOwnerRecord()),
+                    ->product(fn (): Model => $this->getOwnerRecord()),
                 CreateAction::make(),
             ])
             ->recordActions([

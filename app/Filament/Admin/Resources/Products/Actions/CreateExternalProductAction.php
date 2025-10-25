@@ -17,7 +17,7 @@ class CreateExternalProductAction extends Action
         parent::setUp();
 
         $this->label('Create external product');
-        $this->visible(fn (Product $record): bool => blank($record->external_product_id));
+        $this->visible(fn (Product $record): bool => blank($record->external_product_id) && config('payment.default'));
         $this->color('gray');
         $this->successNotificationTitle('The external product was successfully created.');
         $this->failureNotificationTitle('The external product was not created. Please try again.');
