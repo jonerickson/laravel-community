@@ -22,7 +22,6 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             GroupSeeder::class,
-            WarningSeeder::class,
         ]);
 
         Artisan::call('passport:client', [
@@ -60,6 +59,7 @@ class DatabaseSeeder extends Seeder
             PolicySeeder::class,
             SupportTicketCategorySeeder::class,
             PageSeeder::class,
+            WarningSeeder::class,
         ]);
     }
 }

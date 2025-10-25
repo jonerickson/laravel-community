@@ -9,6 +9,7 @@ use App\Models\Group;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use Database\Seeders\DemoSeeder;
 use Database\Seeders\GroupSeeder;
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Console\Command;
@@ -23,7 +24,8 @@ class InstallCommand extends Command
     protected $signature = 'mi:install
                             {--name= : The super admin\'s name}
                             {--email= : The super admin\'s email}
-                            {--password= : The super admin\'s password}';
+                            {--password= : The super admin\'s password}
+                            {--seed= : Seed some demo data}';
 
     protected $description = 'Install and configure the application for use.';
 
@@ -53,14 +55,19 @@ class InstallCommand extends Command
         }
 
         if ($this->confirm('Would you like to create a new super admin account?', true)) {
-            $name = $this->ask('Name', $this->option('name'));
-            $email = $this->ask('Email', $this->option('email'));
-            $password = $this->ask('Password', $this->option('password'));
+            $name = $this->option('name') ?? $this->ask('Name');
+            $email = $this->option('email') ?? $this->ask('Email');
+            $password = $this->option('password') ?? $this->secret('Password');
 
             if (blank($name) || blank($email) || blank($password)) {
                 $this->error('Please provide a name, email and password when creating a new account.');
 
                 return self::FAILURE;
+            }
+
+            if (Role::count() === 0 || Permission::count() === 0) {
+                $this->comment('Installing permissions...');
+                $this->call('db:seed', ['--class' => PermissionSeeder::class]);
             }
 
             $user = User::updateOrCreate([
@@ -74,6 +81,12 @@ class InstallCommand extends Command
             $user->assignRole(RoleEnum::Administrator);
 
             $this->comment('User created successfully.');
+        }
+
+        if ($this->hasOption('seed')) {
+            $this->call('db:seed', [
+                '--class' => DemoSeeder::class,
+            ]);
         }
 
         $this->comment('Application installed successfully.');
