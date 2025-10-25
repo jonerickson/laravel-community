@@ -11,7 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { cn, currency } from '@/lib/utils';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Check, Crown, Package, RefreshCw, Rocket, Shield, Star, Users, X, Zap } from 'lucide-react';
+import { Check, ChevronDown, Crown, Package, RefreshCw, Rocket, Shield, Star, Users, X, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -51,6 +51,8 @@ interface PricingCardProps {
     policiesAgreed: Record<number, boolean>;
     onPolicyAgreementChange: (planId: number, agreed: boolean) => void;
     currentSubscription: App.Data.SubscriptionData | null;
+    isExpanded: boolean;
+    onToggleExpanded: () => void;
 }
 
 function PricingCard({
@@ -66,6 +68,8 @@ function PricingCard({
     policiesAgreed,
     onPolicyAgreementChange,
     currentSubscription,
+    isExpanded,
+    onToggleExpanded,
 }: PricingCardProps) {
     const Icon = getIconForPlan(plan);
     const color = getColorForPlan(plan);
@@ -77,6 +81,10 @@ function PricingCard({
     const yearlyPrice = plan.prices.find((price: App.Data.PriceData) => price.interval === 'year');
     const yearlyDiscount =
         billingCycle === 'year' && monthlyPrice && yearlyPrice ? Math.round((1 - yearlyPrice.amount / 12 / monthlyPrice.amount) * 100) : 0;
+
+    const features = plan.metadata?.features || [];
+    const displayedFeatures = isExpanded ? features : features.slice(0, 5);
+    const hasMoreFeatures = features.length > 5;
 
     return (
         <Card
@@ -126,11 +134,11 @@ function PricingCard({
             </CardHeader>
 
             <CardContent className="flex flex-1 flex-col space-y-6">
-                {plan.metadata && plan.metadata.features?.length > 0 && (
+                {features.length > 0 && (
                     <div className="space-y-3">
                         <h4 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Features Included</h4>
                         <ul className="space-y-2">
-                            {plan.metadata.features.map((feature: string, index: number) => (
+                            {displayedFeatures.map((feature: string, index: number) => (
                                 <li key={index} className="flex items-start">
                                     <Check className="mt-0.5 mr-3 size-4 flex-shrink-0 text-success" />
                                     <span className="text-sm">{feature}</span>
@@ -172,6 +180,21 @@ function PricingCard({
                 )}
 
                 <div className="mt-auto space-y-2 pt-4">
+                    {hasMoreFeatures && (
+                        <Button variant="ghost" size="sm" onClick={onToggleExpanded} className="w-full">
+                            {isExpanded ? (
+                                <>
+                                    View less
+                                    <ChevronDown className="ml-2 size-4 rotate-180 transition-transform" />
+                                </>
+                            ) : (
+                                <>
+                                    View {features.length - 5} more
+                                    <ChevronDown className="ml-2 size-4 transition-transform" />
+                                </>
+                            )}
+                        </Button>
+                    )}
                     {isCurrentPlan ? (
                         <>
                             <Button className="w-full" variant="outline" disabled>
@@ -270,6 +293,7 @@ function PricingCard({
 export default function Subscriptions({ subscriptionProducts, subscriptionReviews, currentSubscription }: SubscriptionsProps) {
     const [billingCycle, setBillingCycle] = useState<App.Enums.SubscriptionInterval>('month');
     const [policiesAgreed, setPoliciesAgreed] = useState<Record<number, boolean>>({});
+    const [expandedCards, setExpandedCards] = useState<Record<number, boolean>>({});
     const [processingPriceId, setProcessingPriceId] = useState<number | null>(null);
     const [cancellingPriceId, setCancellingPriceId] = useState<number | null>(null);
     const [continuingPriceId, setContinuingPriceId] = useState<number | null>(null);
@@ -383,6 +407,13 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
         });
     };
 
+    const toggleExpanded = (planId: number) => {
+        setExpandedCards((prev) => ({
+            ...prev,
+            [planId]: !prev[planId],
+        }));
+    };
+
     return (
         <AppLayout background={true}>
             <Head title="Subscriptions" />
@@ -425,6 +456,7 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                             const isSubscribing = processingPriceId === priceId && priceId !== null;
                             const isCancelling = cancellingPriceId === priceId && priceId !== null;
                             const isContinuing = continuingPriceId === priceId && priceId !== null;
+                            const isExpanded = expandedCards[plan.id] || false;
 
                             return (
                                 <div key={plan.id} className="flex justify-center">
@@ -442,6 +474,8 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                                         policiesAgreed={policiesAgreed}
                                         onPolicyAgreementChange={handlePolicyAgreementChange}
                                         currentSubscription={currentSubscription}
+                                        isExpanded={isExpanded}
+                                        onToggleExpanded={() => toggleExpanded(plan.id)}
                                     />
                                 </div>
                             );
