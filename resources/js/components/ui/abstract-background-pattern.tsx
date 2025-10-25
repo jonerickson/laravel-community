@@ -24,8 +24,8 @@ export function AbstractBackgroundPattern({ className, opacity = 0.08, corner = 
                 fill="none"
                 viewBox="0 0 1600 800"
                 width="1600"
-                height="800"
-                preserveAspectRatio={isLeft ? 'xMinYMax meet' : 'xMaxYMax meet'}
+                height="auto"
+                preserveAspectRatio="none"
                 style={{
                     display: 'block',
                     position: 'absolute',

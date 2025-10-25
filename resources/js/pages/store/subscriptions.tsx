@@ -384,7 +384,7 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
     };
 
     return (
-        <AppLayout>
+        <AppLayout background={true}>
             <Head title="Subscriptions" />
 
             <div className="text-center">
@@ -392,7 +392,7 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
             </div>
 
             {subscriptionProducts.length > 0 ? (
-                <div className="-mt-4 flex flex-col gap-6">
+                <div className="z-20 -mt-4 flex flex-col gap-6">
                     {availableIntervals.length > 1 && (
                         <div className="flex justify-center pb-4">
                             <Tabs value={billingCycle} onValueChange={(value) => setBillingCycle(value as App.Enums.SubscriptionInterval)}>

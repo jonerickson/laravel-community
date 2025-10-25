@@ -14,9 +14,10 @@ import { type ReactNode } from 'react';
 interface AppLayoutProps {
     children: ReactNode;
     breadcrumbs?: BreadcrumbItem[];
+    background?: boolean;
 }
 
-export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
+export default ({ children, breadcrumbs, background = false, ...props }: AppLayoutProps) => {
     const { auth, announcements } = usePage<App.Data.SharedData>().props;
     const { layout } = useLayout();
 
@@ -26,7 +27,7 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
     const LayoutComponent = layout === 'header' || !auth?.user ? AppHeaderLayout : AppSidebarLayout;
 
     return (
-        <LayoutComponent breadcrumbs={breadcrumbs} {...props}>
+        <LayoutComponent breadcrumbs={breadcrumbs} background={background} {...props}>
             <div
                 className={clsx({
                     'px-6 py-6 lg:px-8': LayoutComponent === AppSidebarLayout,

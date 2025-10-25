@@ -9,9 +9,9 @@ export default function AuthLayout({ children, title, description, ...props }: {
     useFingerprint();
 
     return (
-        <div className="relative overflow-hidden">
-            <div className="pointer-events-none absolute top-0 -left-100 z-10 md:-left-75 lg:left-0">
-                <AbstractBackgroundPattern className="h-[800px] w-[1000px] md:w-[1600px]" corner="bottom-right" />
+        <div className="relative min-h-screen overflow-hidden">
+            <div className="pointer-events-none absolute inset-0 z-10">
+                <AbstractBackgroundPattern corner="bottom-right" />
             </div>
             <AuthLayoutTemplate title={title} description={description} {...props}>
                 {children}
