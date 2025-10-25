@@ -31,6 +31,47 @@ interface HomeProps {
     subscriptions: App.Data.ProductData[];
 }
 
+const features = [
+    {
+        icon: Users,
+        title: 'Player Management',
+        description: 'Comprehensive player management with detailed profiles, statistics tracking, and powerful community moderation tools.',
+        color: 'text-gaming-blue',
+    },
+    {
+        icon: MessageSquare,
+        title: 'Community Forums',
+        description: 'Built-in forum system with real-time chat, announcements, and engaging discussion spaces for your community.',
+        color: 'text-gaming-purple',
+    },
+    {
+        icon: BarChart3,
+        title: 'Analytics Dashboard',
+        description:
+            'Advanced analytics providing deep insights into player engagement and community growth to enhance our high-fidelity gaming experiences.',
+        color: 'text-gaming-green',
+    },
+    {
+        icon: Gamepad2,
+        title: 'Game Integration',
+        description: 'Advanced game development integration supporting high-fidelity experiences across platforms with custom server capabilities.',
+        color: 'text-gaming-blue',
+    },
+    {
+        icon: Shield,
+        title: 'Security & Moderation',
+        description: 'Advanced security systems ensuring fair play and safe gaming environments with robust anti-cheat and monitoring capabilities.',
+        color: 'text-gaming-purple',
+    },
+    {
+        icon: Globe,
+        title: 'Global Infrastructure',
+        description:
+            'Worldwide server network delivering high-fidelity gaming experiences with low latency and high availability for players globally.',
+        color: 'text-gaming-green',
+    },
+];
+
 export default function Home({ subscriptions = [] }: HomeProps) {
     const page = usePage<App.Data.SharedData>();
     const { name, auth, memberCount } = page.props;
@@ -119,70 +160,18 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                         </div>
 
                         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                            <Card gradient className="transition-all duration-300">
-                                <CardHeader>
-                                    <Users className="text-gaming-blue mb-4 h-10 w-10" />
-                                    <CardTitle>Player Management</CardTitle>
-                                    <CardDescription>
-                                        Comprehensive player management with detailed profiles, statistics tracking, and powerful community moderation
-                                        tools.
-                                    </CardDescription>
-                                </CardHeader>
-                            </Card>
-
-                            <Card gradient className="transition-all duration-300">
-                                <CardHeader>
-                                    <MessageSquare className="text-gaming-purple mb-4 h-10 w-10" />
-                                    <CardTitle>Community Forums</CardTitle>
-                                    <CardDescription>
-                                        Built-in forum system with real-time chat, announcements, and engaging discussion spaces for your community.
-                                    </CardDescription>
-                                </CardHeader>
-                            </Card>
-
-                            <Card gradient className="transition-all duration-300">
-                                <CardHeader>
-                                    <BarChart3 className="text-gaming-green mb-4 h-10 w-10" />
-                                    <CardTitle>Analytics Dashboard</CardTitle>
-                                    <CardDescription>
-                                        Advanced analytics providing deep insights into player engagement and community growth to enhance our
-                                        high-fidelity gaming experiences.
-                                    </CardDescription>
-                                </CardHeader>
-                            </Card>
-
-                            <Card gradient className="transition-all duration-300">
-                                <CardHeader>
-                                    <Gamepad2 className="text-gaming-blue mb-4 h-10 w-10" />
-                                    <CardTitle>Game Integration</CardTitle>
-                                    <CardDescription>
-                                        Advanced game development integration supporting high-fidelity experiences across platforms with custom server
-                                        capabilities.
-                                    </CardDescription>
-                                </CardHeader>
-                            </Card>
-
-                            <Card gradient className="transition-all duration-300">
-                                <CardHeader>
-                                    <Shield className="text-gaming-purple mb-4 h-10 w-10" />
-                                    <CardTitle>Security & Moderation</CardTitle>
-                                    <CardDescription>
-                                        Advanced security systems ensuring fair play and safe gaming environments with robust anti-cheat and
-                                        monitoring capabilities.
-                                    </CardDescription>
-                                </CardHeader>
-                            </Card>
-
-                            <Card gradient className="transition-all duration-300">
-                                <CardHeader>
-                                    <Globe className="text-gaming-green mb-4 h-10 w-10" />
-                                    <CardTitle>Global Infrastructure</CardTitle>
-                                    <CardDescription>
-                                        Worldwide server network delivering high-fidelity gaming experiences with low latency and high availability
-                                        for players globally.
-                                    </CardDescription>
-                                </CardHeader>
-                            </Card>
+                            {features.map((feature, index) => {
+                                const Icon = feature.icon;
+                                return (
+                                    <Card key={index} gradient className="h-full transition-all duration-300">
+                                        <CardHeader>
+                                            <Icon className={`mb-4 h-10 w-10 ${feature.color}`} />
+                                            <CardTitle>{feature.title}</CardTitle>
+                                            <CardDescription>{feature.description}</CardDescription>
+                                        </CardHeader>
+                                    </Card>
+                                );
+                            })}
                         </div>
                     </div>
                 </section>
