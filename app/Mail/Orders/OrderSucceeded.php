@@ -7,12 +7,14 @@ namespace App\Mail\Orders;
 use App\Data\InvoiceData;
 use App\Managers\PaymentManager;
 use App\Models\Order;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Support\Facades\Storage;
 
 class OrderSucceeded extends Mailable implements ShouldQueue
 {
@@ -52,9 +54,28 @@ class OrderSucceeded extends Mailable implements ShouldQueue
             return [];
         }
 
+        $filename = "invoices/{$this->order->reference_id}.pdf";
+
+        try {
+            $pdfContents = file_get_contents($url);
+        } catch (Exception) {
+            return [];
+        }
+
+        if ($pdfContents === false) {
+            return [];
+        }
+
+        $result = Storage::put($filename, $pdfContents);
+
+        if (! $result) {
+            return [];
+        }
+
         return [
-            Attachment::fromUrl($url)
-                ->as($this->order->reference_id),
+            Attachment::fromStorage($filename)
+                ->as("{$this->order->reference_id}.pdf")
+                ->withMime('application/pdf'),
         ];
     }
 }
