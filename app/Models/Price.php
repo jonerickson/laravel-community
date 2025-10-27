@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Enums\SubscriptionInterval;
 use App\Events\PriceCreated;
 use App\Events\PriceDeleted;
+use App\Events\PriceSaving;
 use App\Events\PriceUpdated;
 use App\Traits\Activateable;
 use App\Traits\HasMetadata;
@@ -102,6 +103,7 @@ class Price extends Model implements HasLabel
     ];
 
     protected $dispatchesEvents = [
+        'saving' => PriceSaving::class,
         'created' => PriceCreated::class,
         'updated' => PriceUpdated::class,
         'deleting' => PriceDeleted::class,
@@ -164,6 +166,18 @@ class Price extends Model implements HasLabel
             get: fn (int $value): float => (float) $value / 100,
             set: fn (float $value): int => (int) ($value * 100),
         );
+    }
+
+    public function toggleDefaultPrice(): void
+    {
+        $builder = static::query()
+            ->whereKeyNot($this->id);
+
+        if ($builder->exists()) {
+            $builder->update([
+                'is_default' => false,
+            ]);
+        }
     }
 
     protected function casts(): array

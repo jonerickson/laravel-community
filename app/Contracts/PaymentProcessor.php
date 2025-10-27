@@ -11,6 +11,7 @@ use App\Data\PriceData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
 use App\Enums\OrderRefundReason;
+use App\Enums\PaymentBehavior;
 use App\Enums\ProrationBehavior;
 use App\Models\Order;
 use App\Models\Price;
@@ -38,6 +39,8 @@ interface PaymentProcessor
 
     public function updatePrice(Price $price): ?PriceData;
 
+    public function changePrice(Price $price): ?PriceData;
+
     public function deletePrice(Price $price): bool;
 
     /**
@@ -64,7 +67,9 @@ interface PaymentProcessor
 
     public function deleteCustomer(User $user): bool;
 
-    public function startSubscription(Order $order, bool $chargeNow = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData;
+    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData;
+
+    public function swapSubscription(User $user, Price $price, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete): bool|SubscriptionData;
 
     public function cancelSubscription(User $user, bool $cancelNow = false): bool;
 
@@ -76,6 +81,11 @@ interface PaymentProcessor
      * @return Collection<int, SubscriptionData>
      */
     public function listSubscriptions(User $user, array $filters = []): mixed;
+
+    /**
+     * @return Collection<int, CustomerData>
+     */
+    public function listSubscribers(?Price $price = null): mixed;
 
     public function getCheckoutUrl(Order $order): bool|string;
 

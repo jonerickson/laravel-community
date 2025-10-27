@@ -1,3 +1,4 @@
 resources/js/ziggy.js
 resources/views/mail/*
 resources/views/emails/
+resources/views/vendor/*

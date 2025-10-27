@@ -53,7 +53,8 @@ class ListSubscriptions extends Component implements HasActions, HasSchemas, Has
             ->emptyStateIcon('heroicon-o-arrow-path')
             ->records(fn (): Collection => collect($this->records))
             ->columns([
-                TextColumn::make('product.name'),
+                TextColumn::make('product.name')
+                    ->placeholder('Unknown Product'),
                 TextColumn::make('user.name')
                     ->label('Customer')
                     ->searchable()

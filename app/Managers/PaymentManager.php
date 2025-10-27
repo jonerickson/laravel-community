@@ -14,6 +14,7 @@ use App\Data\SubscriptionData;
 use App\Drivers\Payments\NullDriver;
 use App\Drivers\Payments\StripeDriver;
 use App\Enums\OrderRefundReason;
+use App\Enums\PaymentBehavior;
 use App\Enums\ProrationBehavior;
 use App\Models\Order;
 use App\Models\Price;
@@ -71,6 +72,11 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->updatePrice($price);
     }
 
+    public function changePrice(Price $price): ?PriceData
+    {
+        return $this->driver()->changePrice($price);
+    }
+
     public function deletePrice(Price $price): bool
     {
         return $this->driver()->deletePrice($price);
@@ -116,9 +122,14 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deleteCustomer($user);
     }
 
-    public function startSubscription(Order $order, bool $chargeNow = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData
+    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData
     {
-        return $this->driver()->startSubscription($order, $chargeNow, $prorationBehavior, $firstParty, $successUrl);
+        return $this->driver()->startSubscription($order, $chargeNow, $firstParty, $successUrl);
+    }
+
+    public function swapSubscription(User $user, Price $price, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete): bool|SubscriptionData
+    {
+        return $this->driver()->swapSubscription($user, $price, $prorationBehavior, $paymentBehavior);
     }
 
     public function cancelSubscription(User $user, bool $cancelNow = false): bool
@@ -139,6 +150,11 @@ class PaymentManager extends Manager implements PaymentProcessor
     public function listSubscriptions(?User $user = null, array $filters = []): Collection
     {
         return $this->driver()->listSubscriptions($user, $filters);
+    }
+
+    public function listSubscribers(?Price $price = null): mixed
+    {
+        return $this->driver()->listSubscribers($price);
     }
 
     public function getCheckoutUrl(Order $order): bool|string

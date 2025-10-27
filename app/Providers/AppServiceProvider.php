@@ -46,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
         Cashier::calculateTaxes();
         Cashier::useCustomerModel(User::class);
         Cashier::useSubscriptionModel(Subscription::class);
+        Cashier::keepPastDueSubscriptionsActive();
 
         Context::add('request_id', Str::uuid()->toString());
 

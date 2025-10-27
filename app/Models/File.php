@@ -43,7 +43,7 @@ use Override;
  * @method static Builder<static>|File whereSize($value)
  * @method static Builder<static>|File whereUpdatedAt($value)
  *
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class File extends Model
 {

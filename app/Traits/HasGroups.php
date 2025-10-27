@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Traits;
 
 use App\Enums\Role;
+use App\Managers\PaymentManager;
 use App\Models\Group;
+use App\Models\Product;
 use App\Models\User;
 use App\Models\UserGroup;
 use Illuminate\Database\Eloquent\Builder;
@@ -40,6 +42,13 @@ trait HasGroups
 
     public function syncGroups(bool $detaching = true): void
     {
+        $currentSubscription = null;
+
+        if ($this instanceof User) {
+            $paymentManager = app(PaymentManager::class);
+            $currentSubscription = $paymentManager->currentSubscription($this);
+        }
+
         $baseGroupIds = match (true) {
             $this instanceof User => Group::query()->whereHas('roles', function (Builder $query): void {
                 $query->whereIn('name', Collection::wrap(Role::cases())->map->value->toArray());
@@ -56,6 +65,17 @@ trait HasGroups
                 ->flatten()
                 ->pluck('product')
                 ->flatten()
+                ->filter(function (Product $product) use ($currentSubscription): bool {
+                    if ($product->isProduct()) {
+                        return true;
+                    }
+
+                    if ($currentSubscription === null) {
+                        return false;
+                    }
+
+                    return $product->id === $currentSubscription->product?->id;
+                })
                 ->pluck('groups')
                 ->flatten()
                 ->pluck('id')

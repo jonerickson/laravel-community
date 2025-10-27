@@ -17,8 +17,10 @@ use App\Events\SubscriptionUpdated;
 use App\Managers\PaymentManager;
 use App\Models\Order;
 use App\Models\Price;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Arr;
@@ -52,6 +54,19 @@ class HandleWebhook implements ShouldQueue
             return;
         }
 
+        $product = $this->resolveProduct();
+
+        if ($product instanceof Product) {
+            match (data_get($event->payload, 'type')) {
+                'customer.subscription.created' => event(new SubscriptionCreated($this->user, $product)),
+                'customer.subscription.updated' => event(new SubscriptionUpdated($this->user, $product, SubscriptionStatus::tryFrom(data_get($event->payload, 'data.object.status') ?? ''), SubscriptionStatus::tryFrom(data_get($event->payload, 'data.previous_attributes.status') ?? ''))),
+                'customer.subscription.deleted' => event(new SubscriptionDeleted($this->user, $product)),
+                'customer.updated' => event(new CustomerUpdated($this->user)),
+                'customer.deleted' => event(new CustomerDeleted($this->user)),
+                default => null,
+            };
+        }
+
         $order = $this->resolveOrder();
 
         if (blank($order)) {
@@ -61,11 +76,6 @@ class HandleWebhook implements ShouldQueue
         match (data_get($event->payload, 'type')) {
             'invoice.payment_succeeded' => event(new PaymentSucceeded($order)),
             'invoice.payment_action_required' => event(new PaymentActionRequired($order, $this->resolvePaymentConfirmationUrl($order))),
-            'customer.subscription.created' => event(new SubscriptionCreated($order)),
-            'customer.subscription.updated' => event(new SubscriptionUpdated($order, SubscriptionStatus::tryFrom(data_get($event->payload, 'data.object.status') ?? ''), SubscriptionStatus::tryFrom(data_get($event->payload, 'data.previous_attributes.status') ?? ''))),
-            'customer.subscription.deleted' => event(new SubscriptionDeleted($order)),
-            'customer.updated' => event(new CustomerUpdated($this->user)),
-            'customer.deleted' => event(new CustomerDeleted($this->user)),
             'refund.created' => event(new RefundCreated($order, OrderRefundReason::tryFrom(data_get($event->payload, 'data.object.reason') ?? '') ?? OrderRefundReason::Other, data_get($event->payload, 'data.object.reason'))),
             default => null,
         };
@@ -76,55 +86,13 @@ class HandleWebhook implements ShouldQueue
         return array_filter(['stripe', data_get($this->payload, 'type')]);
     }
 
-    protected function handleSubscriptionCreated(): ?Order
+    protected function handleSubscriptionEvent(): ?Product
     {
-        if (blank($orderId = $this->resolveOrderId())) {
+        if (blank($productId = $this->resolveProductId())) {
             return null;
         }
 
-        return Order::updateOrCreate([
-            'reference_id' => $orderId,
-        ], [
-            'user_id' => $this->user->getKey(),
-            'external_order_id' => data_get($this->payload, 'data.object.id'),
-            'external_payment_id' => data_get($this->payload, 'data.object.default_payment_method'),
-            'external_invoice_id' => data_get($this->payload, 'data.object.latest_invoice'),
-            'external_event_id' => data_get($this->payload, 'id'),
-        ]);
-    }
-
-    protected function handleSubscriptionUpdated(): ?Order
-    {
-        if (blank($orderId = $this->resolveOrderId())) {
-            return null;
-        }
-
-        return Order::updateOrCreate([
-            'reference_id' => $orderId,
-        ], [
-            'user_id' => $this->user->getKey(),
-            'external_order_id' => data_get($this->payload, 'data.object.id'),
-            'external_payment_id' => data_get($this->payload, 'data.object.default_payment_method'),
-            'external_invoice_id' => data_get($this->payload, 'data.object.latest_invoice'),
-            'external_event_id' => data_get($this->payload, 'id'),
-        ]);
-    }
-
-    protected function handleSubscriptionDeleted(): ?Order
-    {
-        if (blank($orderId = $this->resolveOrderId())) {
-            return null;
-        }
-
-        return Order::updateOrCreate([
-            'reference_id' => $orderId,
-        ], [
-            'user_id' => $this->user->getKey(),
-            'external_order_id' => data_get($this->payload, 'data.object.id'),
-            'external_payment_id' => data_get($this->payload, 'data.object.default_payment_method'),
-            'external_invoice_id' => data_get($this->payload, 'data.object.latest_invoice'),
-            'external_event_id' => data_get($this->payload, 'id'),
-        ]);
+        return Product::query()->where('external_product_id', $productId)->first();
     }
 
     protected function handlePaymentEvent(): ?Order
@@ -142,45 +110,54 @@ class HandleWebhook implements ShouldQueue
             'amount_paid' => ((int) data_get($this->payload, 'data.object.amount_paid') ?? 0) / 100,
             'amount_remaining' => ((int) data_get($this->payload, 'data.object.amount_remaining') ?? 0) / 100,
             'invoice_url' => data_get($this->payload, 'data.object.hosted_invoice_url'),
+            'invoice_number' => data_get($this->payload, 'data.object.number'),
             'external_invoice_id' => data_get($this->payload, 'data.object.id'),
             'external_event_id' => data_get($this->payload, 'id'),
         ]);
 
         $lineItems = Arr::wrap(data_get($this->payload, 'data.object.lines.data'));
 
-        if ($order->wasRecentlyCreated) {
-            foreach ($lineItems as $lineItem) {
-                $price = Price::firstWhere([
-                    'external_price_id' => data_get($lineItem, 'pricing.price_details.price'),
-                ]);
+        foreach ($lineItems as $lineItem) {
+            $price = Price::firstWhere([
+                'external_price_id' => data_get($lineItem, 'pricing.price_details.price'),
+            ]);
 
-                $item = [
-                    'quantity' => data_get($lineItem, 'quantity') ?? 1,
-                    'amount' => ((int) data_get($lineItem, 'amount') ?? 0) / 100,
-                ];
+            $item = [
+                'description' => data_get($lineItem, 'description'),
+                'quantity' => data_get($lineItem, 'quantity') ?? 1,
+                'amount' => ((int) data_get($lineItem, 'amount') ?? 0) / 100,
+                'external_item_id' => $itemId = data_get($lineItem, 'id'),
+            ];
 
+            if ($order->wasRecentlyCreated) {
                 if ($price) {
                     $item['price_id'] = $price->getKey();
-                } else {
-                    $item['name'] = data_get($lineItem, 'description') ?? 'Unknown Product';
                 }
 
                 $order->items()->create($item);
-            }
-        } else {
-            foreach ($lineItems as $lineItem) {
-                $price = Price::firstWhere([
-                    'external_price_id' => data_get($lineItem, 'pricing.price_details.price'),
-                ]);
-
+            } else {
                 $orderItem = $order->items()
+                    ->where(function (Builder $query) use ($itemId): void {
+                        $query->where('external_item_id', $itemId)
+                            ->orWhereNull('external_item_id');
+                    })
                     ->when($price, fn ($query) => $query->where('price_id', $price->getKey()))
                     ->first();
 
-                $orderItem?->update([
-                    'amount' => ((int) data_get($lineItem, 'amount') ?? 0) / 100,
-                    'quantity' => data_get($lineItem, 'quantity') ?? 1,
-                ]);
+                if (! $orderItem) {
+                    if ($price) {
+                        $item['price_id'] = $price->getKey();
+                    }
+
+                    $order->items()->create($item);
+                } else {
+                    $orderItem->update([
+                        'description' => data_get($lineItem, 'description'),
+                        'amount' => ((int) data_get($lineItem, 'amount') ?? 0) / 100,
+                        'quantity' => data_get($lineItem, 'quantity') ?? 1,
+                        'external_item_id' => $itemId,
+                    ]);
+                }
             }
         }
 
@@ -205,10 +182,15 @@ class HandleWebhook implements ShouldQueue
     {
         return match (data_get($this->payload, 'type')) {
             'invoice.payment_succeeded', 'invoice.payment_action_required' => $this->handlePaymentEvent(),
-            'customer.subscription.created' => $this->handleSubscriptionCreated(),
-            'customer.subscription.updated' => $this->handleSubscriptionUpdated(),
-            'customer.subscription.deleted' => $this->handleSubscriptionDeleted(),
             'refund.created' => $this->handleRefundCreated(),
+            default => null,
+        };
+    }
+
+    private function resolveProduct(): ?Product
+    {
+        return match (data_get($this->payload, 'type')) {
+            'customer.subscription.created', 'customer.subscription.updated', 'customer.subscription.deleted' => $this->handleSubscriptionEvent(),
             default => null,
         };
     }
@@ -232,20 +214,16 @@ class HandleWebhook implements ShouldQueue
 
     private function resolveOrderId(): ?string
     {
-        return match (data_get($this->payload, 'type')) {
-            'invoice.payment_succeeded' => $this->findOrderIdForInvoice(),
-            'customer.subscription.created', 'customer.subscription.updated', 'customer.subscription.deleted' => data_get($this->payload, 'data.object.metadata.order_id'),
-            default => null,
-        };
-    }
-
-    private function findOrderIdForInvoice(): ?string
-    {
         // First try: Check invoice metadata for one-off purchases
         $orderId = data_get($this->payload, 'data.object.metadata.order_id');
 
         if (filled($orderId)) {
             return $orderId;
+        }
+
+        // Only search the line items if this is an initial subscription creation invoice
+        if (data_get($this->payload, 'data.object.billing_reason') !== 'subscription_create') {
+            return null;
         }
 
         // Second try: Check line items metadata for subscription purchases
@@ -254,6 +232,11 @@ class HandleWebhook implements ShouldQueue
         $lineItemWithOrderId = $lineItems->first(fn (array $item): bool => filled(data_get($item, 'metadata.order_id')));
 
         return data_get($lineItemWithOrderId, 'metadata.order_id');
+    }
+
+    private function resolveProductId(): ?string
+    {
+        return data_get($this->payload, 'data.object.plan.product');
     }
 
     private function resolvePaymentConfirmationUrl(Order $order): ?string

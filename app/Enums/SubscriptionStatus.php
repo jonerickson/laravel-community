@@ -23,7 +23,10 @@ enum SubscriptionStatus: string implements HasColor, HasLabel
 
     public function getLabel(): string
     {
-        return Str::title($this->value);
+        return Str::of($this->value)
+            ->replace('_', ' ')
+            ->title()
+            ->toString();
     }
 
     public function getColor(): string

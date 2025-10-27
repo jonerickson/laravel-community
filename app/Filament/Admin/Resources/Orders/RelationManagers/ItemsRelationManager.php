@@ -67,6 +67,10 @@ class ItemsRelationManager extends RelationManager
                     ->default(new HtmlString('&ndash;'))
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('description')
+                    ->default(new HtmlString('&ndash;'))
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('price')
                     ->default(new HtmlString('&ndash;'))
                     ->formatStateUsing(fn ($state): string|Htmlable|null => $state instanceof Price ? $state->getLabel() : $state)

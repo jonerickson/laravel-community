@@ -17,8 +17,7 @@ class RemoveUserFromProductGroups implements ShouldQueue
 
     public function handle(SubscriptionDeleted|OrderCancelled $event): void
     {
-        $order = $event->order;
-        $user = $order->user;
+        $user = $event instanceof SubscriptionDeleted ? $event->user : $event->order->user;
 
         if (! $user) {
             return;

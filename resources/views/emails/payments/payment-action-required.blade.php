@@ -11,13 +11,31 @@ Your payment for order **#{{ $order->reference_id }}** requires additional verif
 **Amount:** {{ \Illuminate\Support\Number::currency($order->amount) }}<br>
 
 @if(count($order->items))
-<x-mail::table>
-| Item | Quantity |
-|:-----|---------:|
+<table class="table" role="presentation" style="width:100%; border-collapse: collapse;">
+<thead>
+<tr>
+<th style="text-align: left;">Item</th>
+<th style="text-align: right;">Quantity</th>
+<th style="text-align: right;">Subtotal</th>
+</tr>
+</thead>
+<tbody>
 @foreach($order->items as $item)
-| {{ $item->name }} | {{ $item->quantity }} |
+<tr>
+<td>{{ $item->name }}</td>
+<td style="text-align: right;">{{ $item->quantity }}</td>
+<td style="text-align: right;">{{ \Illuminate\Support\Number::currency($item->amount) }}</td>
+</tr>
+@if($item->description)
+<tr>
+<td colspan="3" style="padding-top:0px; font-size:12px;">
+{{ $item->description }}
+</td>
+</tr>
+@endif
 @endforeach
-</x-mail::table>
+</tbody>
+</table>
 @endif
 
 <x-mail::button :url="$confirmationUrl">

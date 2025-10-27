@@ -22,6 +22,20 @@ trait Activateable
         $query->where('is_active', false);
     }
 
+    public function activate(): static
+    {
+        return tap($this)->update([
+            'is_active' => true,
+        ]);
+    }
+
+    public function deactivate(): static
+    {
+        return tap($this)->update([
+            'is_active' => false,
+        ]);
+    }
+
     protected static function bootActivateable(): void
     {
         static::creating(function (Model $model): void {

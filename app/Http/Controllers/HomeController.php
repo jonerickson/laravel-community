@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Data\ProductData;
+use App\Models\Price;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -24,7 +26,7 @@ class HomeController
         return Product::query()
             ->visible()
             ->subscriptions()
-            ->with('prices')
+            ->with(['prices' => fn (HasMany|Price $query) => $query->active()])
             ->ordered()
             ->get()
             ->filter(fn (Product $product) => Gate::check('view', $product));

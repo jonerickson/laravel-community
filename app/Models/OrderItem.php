@@ -10,18 +10,19 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Number;
 use Override;
 
 /**
  * @property int $id
  * @property int $order_id
  * @property string|null $name
+ * @property string|null $description
  * @property int|null $price_id
  * @property int|float $amount
  * @property float $commission_amount
  * @property int|null $commission_recipient_id
  * @property int $quantity
+ * @property string|null $external_item_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read User|null $commissionRecipient
@@ -36,6 +37,8 @@ use Override;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereCommissionAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereCommissionRecipientId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereExternalItemId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereOrderId($value)
@@ -60,9 +63,11 @@ class OrderItem extends Model implements HasLabel
         'price_id',
         'quantity',
         'name',
+        'description',
         'amount',
         'commission_amount',
         'commission_recipient_id',
+        'external_item_id',
     ];
 
     public function order(): BelongsTo
@@ -82,12 +87,7 @@ class OrderItem extends Model implements HasLabel
 
     public function getLabel(): string|Htmlable|null
     {
-        $product = $this->name ?? $this->price?->product?->name ?? 'Unknown Product';
-        $price = ($this->getOriginal('amount')
-            ? Number::currency($this->amount)
-            : $this->price?->getLabel()) ?? 'Unknown Price';
-
-        return "$product - $price";
+        return $this->name ?? $this->price?->product?->name ?? 'Unknown Product';
     }
 
     public function amount(): Attribute

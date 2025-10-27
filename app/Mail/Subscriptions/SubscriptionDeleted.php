@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Mail\Subscriptions;
 
-use App\Models\Order;
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Mail\Mailable;
@@ -15,15 +16,17 @@ class SubscriptionDeleted extends Mailable implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(public Order $order)
-    {
+    public function __construct(
+        public User $user,
+        public Product $product
+    ) {
         //
     }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Subscription Cancelled - #'.$this->order->reference_id,
+            subject: "Subscription Cancelled - {$this->product->name}",
         );
     }
 
@@ -32,7 +35,8 @@ class SubscriptionDeleted extends Mailable implements ShouldQueue
         return new Content(
             markdown: 'emails.subscriptions.subscription-deleted',
             with: [
-                'order' => $this->order,
+                'user' => $this->user,
+                'product' => $this->product,
             ],
         );
     }

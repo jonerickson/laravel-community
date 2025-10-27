@@ -29,6 +29,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Read;
 use App\Models\Report;
+use App\Models\Subscription;
 use App\Models\SupportTicket;
 use App\Models\SupportTicketCategory;
 use App\Models\Topic;
@@ -41,6 +42,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Laravel\Cashier\SubscriptionItem;
 use Spatie\Activitylog\Models\Activity;
 use Throwable;
 
@@ -62,6 +64,7 @@ class ResetCommand extends Command
         {--policies : Delete policies}
         {--posts : Delete blog posts}
         {--products : Delete products}
+        {--subscriptions : Delete subscriptions}
         {--support-tickets : Delete support tickets}
         {--users : Delete users (excludes admins)}
         {--warnings : Delete user warnings}';
@@ -77,6 +80,7 @@ class ResetCommand extends Command
         'policies' => ['model' => Policy::class, 'label' => 'Policies and Categories'],
         'posts' => ['model' => Post::class, 'label' => 'Blog Posts'],
         'products' => ['model' => Product::class, 'label' => 'Products and Discounts'],
+        'subscriptions' => ['model' => Subscription::class, 'label' => 'Subscriptions'],
         'support-tickets' => ['model' => SupportTicket::class, 'label' => 'Support Tickets'],
         'users' => ['model' => User::class, 'label' => 'Users (excludes admins)'],
         'warnings' => ['model' => UserWarning::class, 'label' => 'Warnings and History'],
@@ -189,6 +193,7 @@ class ResetCommand extends Command
                 'policies' => $this->deletePolicies(),
                 'posts' => $this->deletePosts(),
                 'products' => $this->deleteProducts(),
+                'subscriptions' => $this->deleteSubscriptions(),
                 'support-tickets' => $this->deleteSupportTickets(),
                 'users' => $this->deleteUsers(),
                 'warnings' => $this->deleteWarnings(),
@@ -244,6 +249,12 @@ class ResetCommand extends Command
         Price::query()->delete();
         Product::query()->delete();
         ProductCategory::query()->delete();
+    }
+
+    private function deleteSubscriptions(): void
+    {
+        Subscription::query()->delete();
+        SubscriptionItem::query()->delete();
     }
 
     private function deletePolicies(): void

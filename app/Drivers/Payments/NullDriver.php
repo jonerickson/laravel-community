@@ -12,11 +12,13 @@ use App\Data\PriceData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
 use App\Enums\OrderRefundReason;
+use App\Enums\PaymentBehavior;
 use App\Enums\ProrationBehavior;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 class NullDriver implements PaymentProcessor
@@ -52,6 +54,11 @@ class NullDriver implements PaymentProcessor
     }
 
     public function updatePrice(Price $price): ?PriceData
+    {
+        return null;
+    }
+
+    public function changePrice(Price $price): ?PriceData
     {
         return null;
     }
@@ -106,7 +113,12 @@ class NullDriver implements PaymentProcessor
         return false;
     }
 
-    public function startSubscription(Order $order, bool $chargeNow = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData
+    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData
+    {
+        return false;
+    }
+
+    public function swapSubscription(User $user, Price $price, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete): bool|SubscriptionData
     {
         return false;
     }
@@ -127,6 +139,14 @@ class NullDriver implements PaymentProcessor
     }
 
     public function listSubscriptions(User $user, array $filters = []): mixed
+    {
+        return collect();
+    }
+
+    /**
+     * @return Collection<int, CustomerData>
+     */
+    public function listSubscribers(?Price $price = null): mixed
     {
         return collect();
     }

@@ -10,7 +10,7 @@ use App\Events\SubscriptionUpdated;
 use App\Mail\Subscriptions\SubscriptionCreated as SubscriptionCreatedMail;
 use App\Mail\Subscriptions\SubscriptionDeleted as SubscriptionDeletedMail;
 use App\Mail\Subscriptions\SubscriptionUpdated as SubscriptionUpdatedMail;
-use App\Models\Order;
+use App\Models\User;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -37,8 +37,8 @@ class HandleSubscriptionEvent implements ShouldQueue
     private function handleSubscriptionCreated(SubscriptionCreated $event): void
     {
         $this->sendMail(
-            mailable: new SubscriptionCreatedMail($event->order),
-            order: $event->order
+            mailable: new SubscriptionCreatedMail($event->user, $event->product),
+            user: $event->user
         );
     }
 
@@ -47,8 +47,8 @@ class HandleSubscriptionEvent implements ShouldQueue
         $this->when(
             value: filled($event->previousStatus) && $event->currentStatus !== $event->previousStatus,
             callback: fn (HandleSubscriptionEvent $eventHandler) => $eventHandler->sendMail(
-                mailable: new SubscriptionUpdatedMail($event->order, $event->currentStatus),
-                order: $event->order
+                mailable: new SubscriptionUpdatedMail($event->user, $event->product, $event->currentStatus, $event->previousStatus),
+                user: $event->user
             )
         );
     }
@@ -56,15 +56,13 @@ class HandleSubscriptionEvent implements ShouldQueue
     private function handleSubscriptionDeleted(SubscriptionDeleted $event): void
     {
         $this->sendMail(
-            mailable: new SubscriptionDeletedMail($event->order),
-            order: $event->order
+            mailable: new SubscriptionDeletedMail($event->user, $event->product),
+            user: $event->user
         );
     }
 
-    private function sendMail(Mailable $mailable, Order $order): void
+    private function sendMail(Mailable $mailable, User $user): void
     {
-        if ($order->user) {
-            Mail::to($order->user->email)->send($mailable);
-        }
+        Mail::to($user->email)->send($mailable);
     }
 }

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Mail\Subscriptions;
 
-use App\Models\Order;
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Mail\Mailable;
@@ -15,15 +16,17 @@ class SubscriptionCreated extends Mailable implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(public Order $order)
-    {
+    public function __construct(
+        public User $user,
+        public Product $product
+    ) {
         //
     }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Subscription Created - #'.$this->order->reference_id,
+            subject: "Subscription Started - {$this->product->name}",
         );
     }
 
@@ -32,13 +35,9 @@ class SubscriptionCreated extends Mailable implements ShouldQueue
         return new Content(
             markdown: 'emails.subscriptions.subscription-created',
             with: [
-                'order' => $this->order,
+                'user' => $this->user,
+                'product' => $this->product,
             ],
         );
-    }
-
-    public function attachments(): array
-    {
-        return [];
     }
 }

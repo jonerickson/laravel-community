@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Subscriptions\Actions;
 
-use App\Enums\OrderStatus;
+use App\Actions\Payments\SwapSubscriptionAction;
+use App\Enums\PaymentBehavior;
 use App\Enums\ProrationBehavior;
 use App\Managers\PaymentManager;
-use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
@@ -30,7 +30,8 @@ class SwapAction extends Action
 
         $this->label('Swap subscription');
         $this->color('primary');
-        $this->successNotificationTitle('The subscription has been successfully started.');
+        $this->successNotificationTitle('The subscription has been successfully swapped.');
+        $this->failureNotificationTitle('The subscription could not be swapped. Please try again.');
         $this->modalHeading('Swap Subscription');
         $this->modalDescription('Select the new product to swap the current subscription to.');
         $this->modalSubmitActionLabel('Swap');
@@ -58,30 +59,20 @@ class SwapAction extends Action
                 ->searchable()
                 ->options(fn (Get $get) => Price::query()->active()->whereRelation('product', fn (Builder $query) => $query->whereKey($get('product_id')))->get()->mapWithKeys(fn (Price $price): array => [$price->id => $price->getLabel()])),
             Radio::make('proration_behavior')
+                ->required()
                 ->label('Proration Behavior')
                 ->default(ProrationBehavior::CreateProrations)
                 ->options(ProrationBehavior::class),
         ]);
 
         $this->action(function (SwapAction $action, array $data): void {
-            $order = Order::create([
-                'status' => OrderStatus::Pending,
-                'user_id' => $this->getUser()->getKey(),
-            ]);
+            $result = SwapSubscriptionAction::execute($this->getUser(), Price::findOrFail($data['price_id']), $data['proration_behavior'], PaymentBehavior::DefaultIncomplete);
 
-            $order->items()->create([
-                'price_id' => $data['price_id'],
-                'quantity' => 1,
-            ]);
-
-            $paymentManager = app(PaymentManager::class);
-            $paymentManager->startSubscription(
-                order: $order,
-                prorationBehavior: $data['proration_behavior'],
-                firstParty: false,
-            );
-
-            $action->success();
+            if ($result) {
+                $action->success();
+            } else {
+                $action->failure();
+            }
         });
     }
 

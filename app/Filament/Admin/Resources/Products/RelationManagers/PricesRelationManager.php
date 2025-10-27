@@ -130,6 +130,7 @@ class PricesRelationManager extends RelationManager
             ])
             ->filters([
                 TernaryFilter::make('is_active')
+                    ->default()
                     ->label('Active Status'),
                 TernaryFilter::make('is_default')
                     ->label('Default Price'),

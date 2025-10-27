@@ -1,27 +1,14 @@
 <x-mail::message>
-# Subscription Created
+# Subscription Started
 
-Hello {{ $order->user->name }},
+Hello {{ $user->name }},
 
-Your subscription **#{{ $order->reference_id }}** has been successfully created! Welcome to our community.
+Your subscription **{{ $product->name }}** has been successfully started! Welcome to our community.
 
-**Order Number:** {{ $order->reference_id }}<br>
-**Invoice Number:** {{ $order->invoice_number }}<br>
-**Status:** {{ $order->status->getLabel() }}<br>
-**Total:** {{ \Illuminate\Support\Number::currency($order->amount) }}<br>
+**Subscription:** {{ $product->name }}
 
-@if(count($order->items))
-<x-mail::table>
-| Item | Quantity |
-|:-----|---------:|
-@foreach($order->items as $item)
-| {{ $item->name }} | {{ $item->quantity }} |
-@endforeach
-</x-mail::table>
-@endif
-
-<x-mail::button :url="route('settings.orders')">
-View subscription
+<x-mail::button :url="route('store.subscriptions')">
+Manage subscription
 </x-mail::button>
 
 Your subscription is now active and you can begin enjoying all the benefits. If you have any questions, our support team is here to help.

@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Mail\Subscriptions;
 
 use App\Enums\SubscriptionStatus;
-use App\Models\Order;
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Mail\Mailable;
@@ -17,8 +18,10 @@ class SubscriptionUpdated extends Mailable implements ShouldQueue
     use Queueable;
 
     public function __construct(
-        public Order $order,
-        public ?SubscriptionStatus $newStatus = null
+        public User $user,
+        public Product $product,
+        public ?SubscriptionStatus $newStatus = null,
+        public ?SubscriptionStatus $oldStatus = null
     ) {
         //
     }
@@ -26,7 +29,7 @@ class SubscriptionUpdated extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Subscription Updated - #'.$this->order->reference_id,
+            subject: "Subscription Updated - {$this->product->name}",
         );
     }
 
@@ -35,9 +38,10 @@ class SubscriptionUpdated extends Mailable implements ShouldQueue
         return new Content(
             markdown: 'emails.subscriptions.subscription-updated',
             with: [
-                'order' => $this->order,
+                'user' => $this->user,
+                'product' => $this->product,
                 'newStatus' => $this->newStatus,
-                'oldStatus' => $this->order->getOriginal('subscription_status'),
+                'oldStatus' => $this->oldStatus,
             ],
         );
     }

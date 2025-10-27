@@ -8,10 +8,12 @@ use App\Data\ProductData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Onboarding\OnboardingUpdateRequest;
 use App\Managers\PaymentManager;
+use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\OnboardingService;
 use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -66,7 +68,7 @@ class OnboardingController extends Controller
         $subscriptions = Product::query()
             ->subscriptions()
             ->visible()
-            ->with('prices')
+            ->with(['prices' => fn (HasMany|Price $query) => $query->active()])
             ->orderBy('name')
             ->get()
             ->filter(fn (Product $product) => Gate::check('view', $product))

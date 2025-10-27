@@ -13,6 +13,7 @@ use App\Data\ProductData;
 use App\Data\SubscriptionData;
 use App\Enums\OrderRefundReason;
 use App\Enums\OrderStatus;
+use App\Enums\PaymentBehavior;
 use App\Enums\ProrationBehavior;
 use App\Enums\SubscriptionInterval;
 use App\Jobs\Stripe\UpdateCustomerInformation;
@@ -23,6 +24,7 @@ use App\Models\Product;
 use App\Models\Subscription as SubscriptionModel;
 use App\Models\User;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -64,7 +66,7 @@ class StripeDriver implements PaymentProcessor
                 'idempotency_key' => $this->getIdempotencyKey(),
             ]);
 
-            $product->update([
+            $product->updateQuietly([
                 'external_product_id' => $stripeProduct->id,
             ]);
 
@@ -87,6 +89,7 @@ class StripeDriver implements PaymentProcessor
             $this->stripe->products->update($product->external_product_id, [
                 'name' => $product->name,
                 'description' => Str::limit(strip_tags($product->description)),
+                'default_price' => $product->prices()->latest()->get()->firstWhere('is_default', true)->external_price_id,
                 'metadata' => Arr::dot([
                     'product_id' => $product->reference_id,
                     ...$product->metadata ?? [],
@@ -110,7 +113,7 @@ class StripeDriver implements PaymentProcessor
                 'idempotency_key' => $this->getIdempotencyKey(),
             ]);
 
-            $product->update([
+            $product->updateQuietly([
                 'external_product_id' => null,
             ]);
 
@@ -163,9 +166,13 @@ class StripeDriver implements PaymentProcessor
                 'idempotency_key' => $this->getIdempotencyKey(),
             ]);
 
-            $price->update([
+            $price->updateQuietly([
                 'external_price_id' => $stripePrice->id,
             ]);
+
+            if ($price->is_default) {
+                $this->updateProduct($price->product);
+            }
 
             return PriceData::from($price);
         });
@@ -188,7 +195,22 @@ class StripeDriver implements PaymentProcessor
                 'idempotency_key' => $this->getIdempotencyKey(),
             ]);
 
+            if ($price->is_default) {
+                $this->updateProduct($price->product);
+            }
+
             return PriceData::from($price);
+        });
+    }
+
+    public function changePrice(Price $price): ?PriceData
+    {
+        return $this->executeWithErrorHandling('changePrice', function () use ($price): ?PriceData {
+            if ($price->external_price_id) {
+                $this->deletePrice($price);
+            }
+
+            return $this->createPrice($price);
         });
     }
 
@@ -203,10 +225,6 @@ class StripeDriver implements PaymentProcessor
                 'active' => false,
             ], [
                 'idempotency_key' => $this->getIdempotencyKey(),
-            ]);
-
-            $price->update([
-                'external_price_id' => null,
             ]);
 
             return true;
@@ -387,9 +405,9 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
-    public function startSubscription(Order $order, bool $chargeNow = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData
+    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData
     {
-        return $this->executeWithErrorHandling('startSubscription', function () use ($order, $chargeNow, $prorationBehavior, $firstParty, $successUrl): bool|string|SubscriptionData {
+        return $this->executeWithErrorHandling('startSubscription', function () use ($order, $chargeNow, $firstParty, $successUrl): bool|string|SubscriptionData {
             $lineItems = [];
 
             foreach ($order->items as $orderItem) {
@@ -402,22 +420,6 @@ class StripeDriver implements PaymentProcessor
 
             if (blank($lineItems)) {
                 return false;
-            }
-
-            if (($subscription = $order->user->subscription()) && $subscription->valid()) {
-                match ($prorationBehavior) {
-                    ProrationBehavior::CreateProrations => $subscription->prorate()->swap(
-                        prices: $lineItems,
-                    ),
-                    ProrationBehavior::AlwaysInvoice => $subscription->alwaysInvoice()->swap(
-                        prices: $lineItems,
-                    ),
-                    ProrationBehavior::None => $subscription->noProrate()->swap(
-                        prices: $lineItems,
-                    ),
-                };
-
-                return true;
             }
 
             /** @var ?OrderItem $allowPromotionCodes */
@@ -476,7 +478,7 @@ class StripeDriver implements PaymentProcessor
                 ])->asStripeCheckoutSession());
 
             if ($result instanceof Session) {
-                $order->update([
+                $order->updateQuietly([
                     'external_checkout_id' => $result->id,
                 ]);
 
@@ -484,6 +486,36 @@ class StripeDriver implements PaymentProcessor
             }
 
             return SubscriptionData::from($result);
+        }, false);
+    }
+
+    public function swapSubscription(User $user, Price $price, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete): bool|SubscriptionData
+    {
+        return $this->executeWithErrorHandling('swapSubscription', function () use ($user, $price, $prorationBehavior, $paymentBehavior): bool {
+            if (! $price->external_price_id) {
+                return false;
+            }
+
+            if ((! $subscription = $user->subscription()) || ! $subscription->valid()) {
+                return false;
+            }
+
+            $subscription = match ($prorationBehavior) {
+                ProrationBehavior::CreateProrations => $subscription->prorate(),
+                ProrationBehavior::AlwaysInvoice => $subscription->alwaysInvoice(),
+                ProrationBehavior::None => $subscription->noProrate()
+            };
+
+            $subscription = match ($paymentBehavior) {
+                PaymentBehavior::DefaultIncomplete => $subscription->defaultIncomplete(),
+                PaymentBehavior::AllowIncomplete => $subscription->allowPaymentFailures(),
+                PaymentBehavior::ErrorIfIncomplete => $subscription->errorIfPaymentFails(),
+                PaymentBehavior::PendingIfIncomplete => $subscription->pendingIfPaymentFails(),
+            };
+
+            $subscription->swap($price->external_price_id);
+
+            return true;
         }, false);
     }
 
@@ -531,12 +563,12 @@ class StripeDriver implements PaymentProcessor
 
     public function currentSubscription(User $user): ?SubscriptionData
     {
-        return $this->executeWithErrorHandling('currentSubscription', function () use ($user): ?\App\Data\SubscriptionData {
+        return $this->executeWithErrorHandling('currentSubscription', function () use ($user): ?SubscriptionData {
             if (! $subscription = $user->subscription()) {
                 return null;
             }
 
-            if (! $subscription->valid()) {
+            if (! $subscription->active()) {
                 return null;
             }
 
@@ -564,6 +596,17 @@ class StripeDriver implements PaymentProcessor
 
             return SubscriptionData::collect($subscriptions->get());
         }, collect());
+    }
+
+    /**
+     * @return Collection<int, CustomerData>
+     */
+    public function listSubscribers(?Price $price = null): mixed
+    {
+        return $this->executeWithErrorHandling('listSubscribers', fn (): mixed => User::whereHas('subscriptions')
+            ->when($price && filled($price->external_price_id), fn (Builder $query) => $query->whereRelation('subscriptions', 'stripe_price', '=', $price->external_price_id))
+            ->get()
+            ->map(fn (User $user): CustomerData => CustomerData::from($user)));
     }
 
     public function getCheckoutUrl(Order $order): bool|string
@@ -685,7 +728,7 @@ class StripeDriver implements PaymentProcessor
                 ['idempotency_key' => $this->getIdempotencyKey().'-checkout']
             );
 
-            $order->update([
+            $order->updateQuietly([
                 'external_checkout_id' => $checkoutSession->id,
             ]);
 
@@ -712,13 +755,9 @@ class StripeDriver implements PaymentProcessor
                 $paymentIntent = $this->stripe->paymentIntents->retrieve($paymentIntentId);
             }
 
-            $order->update([
+            $order->updateQuietly([
                 'external_order_id' => $paymentIntentId ?? null,
                 'external_payment_id' => $paymentIntent?->payment_method ?? null,
-                'external_invoice_id' => $invoiceId ?? null,
-                'status' => $paymentIntent ? (OrderStatus::tryFrom($paymentIntent->status ?? '') ?? OrderStatus::Processing) : OrderStatus::Processing,
-                'invoice_url' => $invoice?->hosted_invoice_url ?? null,
-                'invoice_number' => $invoice?->number ?? null,
             ]);
 
             return true;
@@ -732,8 +771,7 @@ class StripeDriver implements PaymentProcessor
                 return false;
             }
 
-            $order->update([
-                'status' => OrderStatus::Pending,
+            $order->updateQuietly([
                 'external_checkout_id' => null,
                 'external_payment_id' => null,
                 'external_order_id' => null,

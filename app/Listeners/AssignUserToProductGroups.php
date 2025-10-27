@@ -17,8 +17,7 @@ class AssignUserToProductGroups implements ShouldQueue
 
     public function handle(SubscriptionCreated|OrderSucceeded $event): void
     {
-        $order = $event->order;
-        $user = $order->user;
+        $user = $event instanceof SubscriptionCreated ? $event->user : $event->order->user;
 
         if (! $user) {
             return;

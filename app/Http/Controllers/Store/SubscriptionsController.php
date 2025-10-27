@@ -12,9 +12,11 @@ use App\Http\Requests\Store\SubscriptionCheckoutRequest;
 use App\Http\Requests\Store\SubscriptionUpdateRequest;
 use App\Managers\PaymentManager;
 use App\Models\Order;
+use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
@@ -42,7 +44,7 @@ class SubscriptionsController extends Controller
         $subscriptions = Product::query()
             ->subscriptions()
             ->visible()
-            ->with('prices')
+            ->with(['prices' => fn (HasMany|Price $query) => $query->active()])
             ->with('categories')
             ->with('policies.category')
             ->ordered()

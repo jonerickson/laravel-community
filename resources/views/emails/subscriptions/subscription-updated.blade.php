@@ -1,9 +1,9 @@
 <x-mail::message>
 # Subscription Updated
 
-Hello {{ $order->user->name }},
+Hello {{ $user->name }},
 
-Your subscription **#{{ $order->reference_id }}** has been updated.
+Your subscription **{{ $product->name }}** has been updated.
 
 @switch($newStatus)
 @case(\App\Enums\SubscriptionStatus::Active)
@@ -31,22 +31,9 @@ Your subscription **#{{ $order->reference_id }}** has been updated.
   ℹ️ Your subscription status has been updated.
 @endswitch
 
-**Order Number:** {{ $order->reference_id }}<br />
-**Invoice Number:** {{ $order->invoice_number }}<br />
-**Current Status:** {{ $newStatus?->getLabel() ?? $order->status->getLabel() }}<br />
-**Total:** {{ \Illuminate\Support\Number::currency($order->amount) }}<br />
-
-@if(count($order->items))
-<x-mail::table>
-| Item | Quantity |
-|:-----|---------:|
-@foreach($order->items as $item)
-| {{ $item->name }} | {{ $item->quantity }} |
-@endforeach
-</x-mail::table>
-@endif
-
-<x-mail::button :url="route('store.subscriptions')">Manage subscription</x-mail::button>
+<x-mail::button :url="route('store.subscriptions')">
+    Manage subscription
+</x-mail::button>
 
 @if ($newStatus && in_array($newStatus, [\App\Enums\SubscriptionStatus::PastDue, \App\Enums\SubscriptionStatus::Unpaid, \App\Enums\SubscriptionStatus::Incomplete]))
 If you need assistance with payment or have any questions, our support team is here to help.
