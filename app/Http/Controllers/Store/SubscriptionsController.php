@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Store;
 
 use App\Data\CommentData;
 use App\Data\ProductData;
+use App\Data\SubscriptionData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Store\SubscriptionCancelRequest;
 use App\Http\Requests\Store\SubscriptionCheckoutRequest;
@@ -78,29 +79,41 @@ class SubscriptionsController extends Controller
 
         $this->authorize('view', $price->product);
 
-        $order = Order::create([
-            'user_id' => $this->user->id,
-        ]);
+        $currentSubscription = $this->paymentManager->currentSubscription($this->user);
 
-        $order->items()->create([
-            'price_id' => $price->id,
-        ]);
+        if (! $currentSubscription instanceof SubscriptionData) {
+            $order = Order::create([
+                'user_id' => $this->user->id,
+            ]);
 
-        $result = $this->paymentManager->startSubscription(
-            order: $order,
+            $order->items()->create([
+                'price_id' => $price->id,
+            ]);
+
+            $result = $this->paymentManager->startSubscription(
+                order: $order,
+            );
+
+            if (! $result) {
+                return back()
+                    ->with('message', 'We were unable to start your subscription. Please try again later.');
+            }
+
+            return inertia()->location($result);
+        }
+
+        $result = $this->paymentManager->swapSubscription(
+            user: $this->user,
+            price: $price,
         );
 
         if (! $result) {
             return back()
-                ->with('message', 'We were unable to start your subscription. Please try again later.');
+                ->with('message', 'We were unable to change your subscription. Please try again later.');
         }
 
-        if ($result === true) {
-            return to_route('store.subscriptions')
-                ->with('message', 'Your subscription was successfully updated.');
-        }
-
-        return inertia()->location($result);
+        return to_route('store.subscriptions')
+            ->with('message', 'Your subscription was successfully updated.');
     }
 
     public function update(SubscriptionUpdateRequest $request): RedirectResponse

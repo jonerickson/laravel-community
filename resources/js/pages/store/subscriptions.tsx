@@ -589,7 +589,7 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                             <div className="rounded-md bg-info-foreground p-3">
                                 <p className="text-xs text-info">
                                     Your billing will be prorated based on the time remaining in your current billing cycle. The change will take
-                                    effect immediately.
+                                    effect immediately and the updated charges, if any, will be available on the next invoice.
                                 </p>
                             </div>
                         </div>
