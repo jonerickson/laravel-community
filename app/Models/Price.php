@@ -172,7 +172,7 @@ class Price extends Model implements HasLabel
     {
         $builder = static::query()
             ->whereKeyNot($this->id)
-            ->where('product_id', '<>', $this->product_id);
+            ->where('product_id', $this->product_id);
 
         if ($builder->exists()) {
             $builder->update([
