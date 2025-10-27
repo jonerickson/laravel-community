@@ -25,7 +25,7 @@ class InstallCommand extends Command
                             {--name= : The super admin\'s name}
                             {--email= : The super admin\'s email}
                             {--password= : The super admin\'s password}
-                            {--seed= : Seed some demo data}';
+                            {--seed : Seed some demo data}';
 
     protected $description = 'Install and configure the application for use.';
 
@@ -83,7 +83,7 @@ class InstallCommand extends Command
             $this->comment('User created successfully.');
         }
 
-        if ($this->hasOption('seed')) {
+        if ($this->option('seed')) {
             $this->call('db:seed', [
                 '--class' => DemoSeeder::class,
             ]);
