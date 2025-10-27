@@ -29,6 +29,7 @@ class NewAction extends Action
         $this->label('New subscription');
         $this->color('primary');
         $this->successNotificationTitle('The subscription has been successfully started.');
+        $this->failureNotificationTitle('The subscription could not be started. Please try again.');
         $this->modalHeading('New subscription');
         $this->modalDescription('Enter the required information to start the user on a new subscription.');
         $this->modalSubmitActionLabel('Start');
@@ -69,12 +70,16 @@ class NewAction extends Action
             ]);
 
             $paymentManager = app(PaymentManager::class);
-            $paymentManager->startSubscription(
+            $result = $paymentManager->startSubscription(
                 order: $order,
                 firstParty: false
             );
 
-            $action->success();
+            if ($result) {
+                $action->success();
+            } else {
+                $action->failure();
+            }
         });
     }
 

@@ -130,7 +130,7 @@ This project includes automated code quality tools:
 When using the default Stripe payment processor, you can listen for webhooks locally with:
 
 ```bash
-stripe listen --forward-to=https://mi.test/stripe/webhook --events="customer.subscription.created,customer.subscription.updated,customer.subscription.deleted,customer.updated,customer.deleted,payment_method.automatically_updated,invoice.payment_action_required,invoice.payment_succeeded"
+stripe listen --forward-to=https://mi.test/stripe/webhook --events="customer.subscription.created,customer.subscription.updated,customer.subscription.deleted,customer.updated,customer.deleted,payment_method.automatically_updated,invoice.payment_action_required,invoice.payment_succeeded,refund.created"
 ```
 
 ## Project Structure

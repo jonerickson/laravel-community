@@ -22,6 +22,7 @@ class ContinueAction extends Action
         $this->color('success');
         $this->icon(Heroicon::OutlinedCheckCircle);
         $this->successNotificationTitle('The subscription has been successfully continued.');
+        $this->failureNotificationTitle('The subscription could not be continued. Please try again.');
         $this->requiresConfirmation();
         $this->visible(fn (array $record): bool => SubscriptionData::from($record)->status->canContinue() && filled(data_get($record, 'endsAt')));
         $this->modalHeading('Continue Subscription');
@@ -31,11 +32,15 @@ class ContinueAction extends Action
             $subscription = SubscriptionData::from($record);
 
             $paymentManager = app(PaymentManager::class);
-            $paymentManager->continueSubscription(
+            $result = $paymentManager->continueSubscription(
                 user: User::find($subscription->user?->id),
             );
 
-            $action->success();
+            if ($result) {
+                $action->success();
+            } else {
+                $action->failure();
+            }
         });
     }
 

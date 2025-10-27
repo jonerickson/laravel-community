@@ -23,6 +23,7 @@ class CancelAction extends Action
         $this->color('danger');
         $this->icon(Heroicon::OutlinedXCircle);
         $this->successNotificationTitle('The subscription has been successfully cancelled.');
+        $this->failureNotificationTitle('The subscription could not be cancelled. Please try again.');
         $this->requiresConfirmation();
         $this->visible(fn (array $record): bool => SubscriptionData::from($record)->status->canCancel());
         $this->modalHeading('Cancel Subscription');
@@ -40,12 +41,16 @@ class CancelAction extends Action
             $subscription = SubscriptionData::from($record);
 
             $paymentManager = app(PaymentManager::class);
-            $paymentManager->cancelSubscription(
+            $result = $paymentManager->cancelSubscription(
                 user: User::find($subscription->user?->id),
                 cancelNow: data_get($data, 'cancel_now'),
             );
 
-            $action->success();
+            if ($result) {
+                $action->success();
+            } else {
+                $action->failure();
+            }
         });
     }
 
