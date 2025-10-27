@@ -54,8 +54,8 @@ DROP TABLE IF EXISTS `blacklist`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `blacklist` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `content` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `is_regex` tinyint(1) NOT NULL DEFAULT '0',
   `warning_id` bigint unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -198,7 +198,7 @@ CREATE TABLE `fingerprints` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned DEFAULT NULL,
   `fingerprint_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `request_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `request_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ip_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_banned` tinyint(1) NOT NULL DEFAULT '0',
@@ -579,7 +579,7 @@ CREATE TABLE `orders` (
   `external_checkout_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `external_order_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `external_payment_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `external_event_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `external_event_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -614,11 +614,13 @@ CREATE TABLE `orders_items` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `order_id` bigint unsigned NOT NULL,
   `name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `description` longtext COLLATE utf8mb4_unicode_ci,
   `price_id` bigint unsigned DEFAULT NULL,
   `amount` int DEFAULT NULL,
   `commission_amount` int NOT NULL DEFAULT '0',
   `commission_recipient_id` bigint unsigned DEFAULT NULL,
   `quantity` int NOT NULL DEFAULT '1',
+  `external_item_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -635,16 +637,16 @@ DROP TABLE IF EXISTS `pages`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `pages` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `html_content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `css_content` longtext COLLATE utf8mb4_unicode_ci,
-  `js_content` longtext COLLATE utf8mb4_unicode_ci,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `html_content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `css_content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `js_content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `is_published` tinyint(1) NOT NULL DEFAULT '0',
   `published_at` timestamp NULL DEFAULT NULL,
   `show_in_navigation` tinyint(1) NOT NULL DEFAULT '0',
-  `navigation_label` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `navigation_label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `navigation_order` int NOT NULL DEFAULT '0',
   `created_by` bigint unsigned NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -1248,7 +1250,7 @@ CREATE TABLE `users_integrations` (
   `provider_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `provider_email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `provider_avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `access_token` text COLLATE utf8mb4_unicode_ci,
+  `access_token` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `last_synced_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1429,8 +1431,6 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (99,'2025_10_13_222
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (100,'2025_10_15_174034_add_allow_discount_codes',40);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (103,'2025_10_18_202054_add_visible_to_product_table',41);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (104,'2025_10_20_164409_add_onboarded_at_timestamp',41);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (105,'2025_09_28_202015_create_email_settings',42);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (106,'2025_09_28_202053_create_general_settings',42);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (107,'2025_10_20_203913_create_pages_table',42);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (108,'2025_10_21_222041_add_order_to_products_table',42);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (109,'2025_10_21_225558_add_last_checked_at_to_fingerprints_table',42);
@@ -1443,3 +1443,7 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (115,'2025_10_24_17
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (116,'2025_10_24_194615_add_amount_paid_to_orders_table',42);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (117,'2025_10_24_220924_drop_product_id_from_orders_table',42);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (118,'2025_10_25_203015_add_commission_recipient_id_to_orders_items_table',42);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (119,'2025_09_28_202015_create_email_settings',43);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (120,'2025_09_28_202053_create_general_settings',43);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (121,'2025_10_27_152729_add_description_to_orders_items_table',44);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (122,'2025_10_27_154613_add_external_item_id_to_orders_items_table',45);
