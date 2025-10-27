@@ -203,6 +203,7 @@ class ProductResource extends Resource
                                     ->searchable()
                                     ->preload(),
                                 Select::make('approval_status')
+                                    ->required()
                                     ->label('Approval Status')
                                     ->requiredWith('seller_id')
                                     ->default(ProductApprovalStatus::Approved)
@@ -220,9 +221,11 @@ class ProductResource extends Resource
                         Section::make('Metadata')
                             ->components([
                                 KeyValue::make('metadata.metadata')
+                                    ->default(null)
                                     ->helperText('Metadata will be merged with any external payment processor that is used.')
                                     ->hiddenLabel(),
                                 Repeater::make('metadata.features')
+                                    ->default([])
                                     ->visible(fn (Get $get): bool => $get('type') === ProductType::Subscription)
                                     ->addActionLabel('Add a new feature')
                                     ->simple(TextInput::make('feature')),
