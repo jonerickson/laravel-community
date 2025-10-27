@@ -171,7 +171,8 @@ class Price extends Model implements HasLabel
     public function toggleDefaultPrice(): void
     {
         $builder = static::query()
-            ->whereKeyNot($this->id);
+            ->whereKeyNot($this->id)
+            ->where('product_id', '<>', $this->product_id);
 
         if ($builder->exists()) {
             $builder->update([
