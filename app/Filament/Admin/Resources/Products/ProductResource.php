@@ -208,6 +208,8 @@ class ProductResource extends Resource
                                     ->default(ProductApprovalStatus::Approved)
                                     ->options(ProductApprovalStatus::class),
                                 TextInput::make('commission_rate')
+                                    ->default(0)
+                                    ->required()
                                     ->label('Commission Rate')
                                     ->requiredWith('seller_id')
                                     ->rules('lte:1')
