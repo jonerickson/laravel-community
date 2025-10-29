@@ -13,4 +13,6 @@ interface MigrationSource
     public function getImporters(): array;
 
     public function getImporter(string $entity): ?EntityImporter;
+
+    public function getSshConfig(): ?array;
 }

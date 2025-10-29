@@ -10,6 +10,9 @@ use App\Services\Migration\MigrationService;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Sleep;
 
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\select;
@@ -24,16 +27,14 @@ class MigrateCommand extends Command
                             {--entity= : Specific entity to migrate (e.g., users, posts)}
                             {--batch-size=100 : Number of records to process per batch}
                             {--limit= : Maximum number of records to migrate (useful for testing)}
-                            {--dry-run : Preview migration without making changes}';
+                            {--dry-run : Preview migration without making changes}
+                            {--check : Verify database connection and exit}
+                            {--ssh : Connect to the source database via SSH tunnel}';
 
     protected $description = 'Migrate data from external sources (use -v to see skipped/failed records, -vv for migrated records)';
 
     public function handle(MigrationService $migrationService): int
     {
-        if (! $this->confirmToProceed()) {
-            return self::SUCCESS;
-        }
-
         $source = $this->argument('source');
 
         if (! $source) {
@@ -43,28 +44,69 @@ class MigrateCommand extends Command
             );
         }
 
-        $entity = $this->option('entity');
-        $batchSize = (int) $this->option('batch-size');
-        $limit = $this->option('limit') ? (int) $this->option('limit') : null;
-        $isDryRun = (bool) $this->option('dry-run');
-
-        if ($isDryRun) {
-            $this->warn('Running in DRY RUN mode - no changes will be made.');
-        }
-
-        if ($limit !== null && $limit !== 0) {
-            $this->warn("Limiting migration to $limit records.");
-        }
-
         if (! in_array($source, $migrationService->getAvailableSources())) {
             $this->error("Unknown migration source: $source");
 
             return self::FAILURE;
         }
 
-        $this->promptForOptionalDependencies($migrationService, $source, $entity);
+        $sourceInstance = $migrationService->getSource($source);
+
+        if (! $sourceInstance instanceof MigrationSource) {
+            $this->error('Invalid migration source.');
+
+            return self::FAILURE;
+        }
+
+        $sshTunnel = null;
 
         try {
+            if ($this->option('ssh')) {
+                $sshConfig = $sourceInstance->getSshConfig();
+
+                if ($sshConfig === null || $sshConfig === []) {
+                    $this->error('SSH configuration not found for this source.');
+                    $this->warn('Please configure SSH credentials in your .env file:');
+                    $this->warn('MIGRATION_IC_SSH_HOST, MIGRATION_IC_SSH_USER, MIGRATION_IC_SSH_PORT, MIGRATION_IC_SSH_KEY');
+
+                    return self::FAILURE;
+                }
+
+                $this->info('Creating SSH tunnel...');
+                $sshTunnel = $this->createSshTunnel($sshConfig, $sourceInstance->getConnection());
+
+                if ($sshTunnel === null || $sshTunnel === []) {
+                    $this->error('Failed to create SSH tunnel.');
+
+                    return self::FAILURE;
+                }
+
+                $this->info('SSH tunnel established successfully.');
+            }
+
+            if ($this->option('check')) {
+                return $this->checkDatabaseConnection($sourceInstance);
+            }
+
+            if (! $this->confirmToProceed()) {
+                return self::SUCCESS;
+            }
+
+            $entity = $this->option('entity');
+            $batchSize = (int) $this->option('batch-size');
+            $limit = $this->option('limit') ? (int) $this->option('limit') : null;
+            $isDryRun = (bool) $this->option('dry-run');
+
+            if ($isDryRun) {
+                $this->warn('Running in DRY RUN mode - no changes will be made.');
+            }
+
+            if ($limit !== null && $limit !== 0) {
+                $this->warn("Limiting migration to $limit records.");
+            }
+
+            $this->promptForOptionalDependencies($migrationService, $source, $entity);
+
             $this->info("Starting migration from $source...");
 
             $result = $migrationService->migrate(
@@ -90,6 +132,10 @@ class MigrateCommand extends Command
             $this->error("Migration failed: {$e->getMessage()}");
 
             return self::FAILURE;
+        } finally {
+            if ($sshTunnel !== null && $sshTunnel !== []) {
+                $this->closeSshTunnel($sshTunnel);
+            }
         }
     }
 
@@ -178,5 +224,92 @@ class MigrateCommand extends Command
                 }
             }
         }
+    }
+
+    protected function checkDatabaseConnection(MigrationSource $source): int
+    {
+        $this->info('Checking database connection...');
+
+        try {
+            $connection = $source->getConnection();
+            DB::connection($connection)->getPdo();
+
+            $databaseName = DB::connection($connection)->getDatabaseName();
+            $driver = DB::connection($connection)->getDriverName();
+
+            $this->info("Successfully connected to database: $databaseName (Driver: $driver)");
+
+            return self::SUCCESS;
+        } catch (Exception $e) {
+            $this->error('Failed to connect to database.');
+            $this->error("Error: {$e->getMessage()}");
+
+            return self::FAILURE;
+        }
+    }
+
+    protected function createSshTunnel(array $sshConfig, string $connectionName): ?array
+    {
+        $dbConfig = config("database.connections.$connectionName");
+
+        if (! $dbConfig) {
+            return null;
+        }
+
+        $localPort = random_int(10000, 65000);
+        $remoteHost = $dbConfig['host'];
+        $remotePort = $dbConfig['port'];
+
+        $sshCommand = sprintf(
+            'ssh -f -N -L %d:%s:%d -p %d %s@%s',
+            $localPort,
+            $remoteHost,
+            $remotePort,
+            $sshConfig['port'],
+            $sshConfig['user'],
+            $sshConfig['host']
+        );
+
+        if ($sshConfig['key']) {
+            $sshCommand .= " -i {$sshConfig['key']}";
+        }
+
+        $result = Process::timeout(10)->run($sshCommand);
+
+        if ($result->failed()) {
+            $this->error('SSH tunnel creation failed: '.$result->errorOutput());
+
+            if ($result->output()) {
+                $this->error('Command output: '.$result->output());
+            }
+
+            return null;
+        }
+
+        Sleep::for(1)->second();
+
+        config(["database.connections.$connectionName.host" => '127.0.0.1']);
+        config(["database.connections.$connectionName.port" => $localPort]);
+
+        DB::purge($connectionName);
+
+        return [
+            'local_port' => $localPort,
+            'remote_host' => $remoteHost,
+            'remote_port' => $remotePort,
+            'ssh_config' => $sshConfig,
+        ];
+    }
+
+    protected function closeSshTunnel(array $sshTunnel): void
+    {
+        $localPort = $sshTunnel['local_port'];
+
+        Process::pipe([
+            "lsof -ti:$localPort",
+            'xargs kill -9',
+        ]);
+
+        $this->info('SSH tunnel closed.');
     }
 }

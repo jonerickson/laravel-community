@@ -56,4 +56,23 @@ class InvisionCommunitySource implements MigrationSource
     {
         return $this->importers[$entity] ?? null;
     }
+
+    public function getSshConfig(): ?array
+    {
+        $host = config('migration.sources.invision_community.ssh.host');
+        $user = config('migration.sources.invision_community.ssh.user');
+        $port = config('migration.sources.invision_community.ssh.port', 22);
+        $key = config('migration.sources.invision_community.ssh.key');
+
+        if (! $host || ! $user) {
+            return null;
+        }
+
+        return [
+            'host' => $host,
+            'user' => $user,
+            'port' => $port,
+            'key' => $key,
+        ];
+    }
 }
