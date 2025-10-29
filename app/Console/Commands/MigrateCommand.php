@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Services\Migration\Contracts\EntityImporter;
 use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\MigrationResult;
 use App\Services\Migration\MigrationService;
@@ -76,6 +77,12 @@ class MigrateCommand extends Command
         });
 
         try {
+            $entity = $this->option('entity');
+            $batchSize = (int) $this->option('batch');
+            $limit = $this->option('limit') ? (int) $this->option('limit') : null;
+            $offset = $this->option('offset') ? (int) $this->option('offset') : null;
+            $isDryRun = (bool) $this->option('dry-run');
+
             if ($this->option('ssh')) {
                 $sshConfig = $sourceInstance->getSshConfig();
 
@@ -104,18 +111,12 @@ class MigrateCommand extends Command
             }
 
             if ($this->option('status')) {
-                return $this->displayMigrationStatus($migrationService, $source, $sourceInstance);
+                return $this->displayMigrationStatus($migrationService, $source, $sourceInstance, $entity);
             }
 
             if (! $this->confirmToProceed()) {
                 return self::SUCCESS;
             }
-
-            $entity = $this->option('entity');
-            $batchSize = (int) $this->option('batch');
-            $limit = $this->option('limit') ? (int) $this->option('limit') : null;
-            $offset = $this->option('offset') ? (int) $this->option('offset') : null;
-            $isDryRun = (bool) $this->option('dry-run');
 
             if ($isDryRun) {
                 $this->warn('Running in DRY RUN mode - no changes will be made.');
@@ -344,13 +345,13 @@ class MigrateCommand extends Command
         $this->info('SSH tunnel closed.');
     }
 
-    protected function displayMigrationStatus(MigrationService $migrationService, string $sourceName, MigrationSource $source): int
+    protected function displayMigrationStatus(MigrationService $migrationService, string $sourceName, MigrationSource $source, ?string $entity = null): int
     {
         $this->info("Fetching migration status from $sourceName...");
         $this->newLine();
 
         $connection = $source->getConnection();
-        $importers = $source->getImporters();
+        $importers = array_filter($source->getImporters(), fn (EntityImporter $importer): bool => is_null($entity) || $importer->getEntityName() === $entity);
 
         $statusData = [];
 

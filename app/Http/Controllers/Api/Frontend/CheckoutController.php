@@ -111,7 +111,7 @@ class CheckoutController
             order: $order,
         );
 
-        if ($result === false || ($result === '' || $result === '0')) {
+        if (! is_string($result)) {
             return ApiResource::error(
                 message: 'Failed to create checkout session. Please try again.',
             );
