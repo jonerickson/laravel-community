@@ -36,6 +36,26 @@ class MigrationService
         $this->optionalDependencies = $optionalDependencies;
     }
 
+    public function getOptionalDependencies(MigrationSource $source, ?string $entity): array
+    {
+        $optional = [];
+        $importers = $entity !== null && $entity !== '' && $entity !== '0' ? [$entity => $source->getImporter($entity)] : $source->getImporters();
+
+        foreach ($importers as $importer) {
+            if (! $importer) {
+                continue;
+            }
+
+            foreach ($importer->getDependencies() as $dependency) {
+                if ($dependency->isOptional()) {
+                    $optional[$dependency->entityName] = $dependency;
+                }
+            }
+        }
+
+        return $optional;
+    }
+
     public function migrate(
         string $source,
         ?string $entity,
@@ -62,26 +82,6 @@ class MigrationService
         }
 
         return $result;
-    }
-
-    public function getOptionalDependencies(MigrationSource $source, ?string $entity): array
-    {
-        $optional = [];
-        $importers = $entity !== null && $entity !== '' && $entity !== '0' ? [$entity => $source->getImporter($entity)] : $source->getImporters();
-
-        foreach ($importers as $importer) {
-            if (! $importer) {
-                continue;
-            }
-
-            foreach ($importer->getDependencies() as $dependency) {
-                if ($dependency->isOptional()) {
-                    $optional[$dependency->entityName] = $dependency;
-                }
-            }
-        }
-
-        return $optional;
     }
 
     public function cleanup(): void

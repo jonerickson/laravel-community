@@ -111,7 +111,7 @@ class MigrateCommand extends Command
             }
 
             if ($this->option('status')) {
-                return $this->displayMigrationStatus($migrationService, $source, $sourceInstance, $entity);
+                return $this->displayMigrationStatus($sourceInstance, $entity);
             }
 
             if (! $this->confirmToProceed()) {
@@ -345,9 +345,9 @@ class MigrateCommand extends Command
         $this->info('SSH tunnel closed.');
     }
 
-    protected function displayMigrationStatus(MigrationService $migrationService, string $sourceName, MigrationSource $source, ?string $entity = null): int
+    protected function displayMigrationStatus(MigrationSource $source, ?string $entity = null): int
     {
-        $this->info("Fetching migration status from $sourceName...");
+        $this->info("Fetching migration status from {$source->getName()}...");
         $this->newLine();
 
         $connection = $source->getConnection();
