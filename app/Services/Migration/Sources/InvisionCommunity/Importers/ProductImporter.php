@@ -27,7 +27,11 @@ class ProductImporter implements EntityImporter
 
     protected const string CACHE_KEY_PREFIX = 'migration:ic:product_map:';
 
-    protected const string CATEGORY_CACHE_KEY_PREFIX = 'migration:ic:product_category_map:';
+    protected const string CACHE_KEY_CATEGORY_PREFIX = 'migration:ic:product_category_map:';
+
+    protected const string CACHE_TAG = 'migration:ic:products';
+
+    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
 
     public function __construct(
         protected ?InvisionCommunityLanguageResolver $languageResolver = null,
@@ -35,28 +39,27 @@ class ProductImporter implements EntityImporter
 
     public static function getProductMapping(int $sourceProductId): ?int
     {
-        return Cache::get(self::CACHE_KEY_PREFIX.$sourceProductId);
+        return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.$sourceProductId);
     }
 
     public static function getCategoryMapping(int $sourceCategoryId): ?int
     {
-        return Cache::get(self::CATEGORY_CACHE_KEY_PREFIX.$sourceCategoryId);
+        return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_CATEGORY_PREFIX.$sourceCategoryId);
     }
 
-    public static function clearProductMappingCache(): void
+    public function cleanup(): void
     {
-        $keys = Cache::get('migration:ic:product_map_keys', []);
-
-        foreach ($keys as $key) {
-            Cache::forget($key);
-        }
-
-        Cache::forget('migration:ic:product_map_keys');
+        Cache::tags(self::CACHE_TAG)->flush();
     }
 
     public function getEntityName(): string
     {
         return self::ENTITY_NAME;
+    }
+
+    public function getSourceTable(): string
+    {
+        return 'nexus_packages';
     }
 
     public function getDependencies(): array
@@ -68,19 +71,23 @@ class ProductImporter implements EntityImporter
         string $connection,
         int $batchSize,
         ?int $limit,
+        ?int $offset,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
     ): void {
+        DB::connection($connection)->disableQueryLog();
+
         if (! $this->languageResolver instanceof InvisionCommunityLanguageResolver) {
             $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
         }
 
-        $this->importCategories($connection, $batchSize, $limit, $isDryRun, $output, $result);
+        $this->importCategories($connection, $batchSize, $limit, $offset, $isDryRun, $output, $result);
 
         $query = DB::connection($connection)
-            ->table('nexus_packages')
-            ->where('p_store', 1);
+            ->table($this->getSourceTable())
+            ->where('p_store', 1)
+            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->skip($offset));
 
         $totalProducts = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
@@ -92,39 +99,35 @@ class ProductImporter implements EntityImporter
         $processed = 0;
 
         $query
-            ->orderBy('p_id')
-            ->chunk($batchSize, function ($sourceProducts) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
-                foreach ($sourceProducts as $sourceProduct) {
-                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                        return false;
-                    }
-
-                    try {
-                        $this->importProduct($sourceProduct, $isDryRun, $result);
-                    } catch (Exception $e) {
-                        $result->incrementFailed(self::ENTITY_NAME);
-                        $result->recordFailed(self::ENTITY_NAME, [
-                            'source_id' => $sourceProduct->p_id ?? 'unknown',
-                            'name' => $sourceProduct->p_name ?? 'unknown',
-                            'error' => $e->getMessage(),
-                        ]);
-
-                        Log::error('Failed to import product', [
-                            'source_id' => $sourceProduct->p_id ?? 'unknown',
-                            'name' => $sourceProduct->p_name ?? 'unknown',
-                            'error' => $e->getMessage(),
-                            'trace' => $e->getTraceAsString(),
-                        ]);
-
-                        $fileName = Str::of($e->getFile())->classBasename();
-                        $output->writeln("<error>Failed to import product: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
-                    }
-
-                    $processed++;
-                    $progressBar->advance();
+            ->lazyById($batchSize, 'p_id')
+            ->each(function ($sourceProduct) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): void {
+                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                    return;
                 }
 
-                return true;
+                try {
+                    $this->importProduct($sourceProduct, $isDryRun, $result);
+                } catch (Exception $e) {
+                    $result->incrementFailed(self::ENTITY_NAME);
+                    $result->recordFailed(self::ENTITY_NAME, [
+                        'source_id' => $sourceProduct->p_id ?? 'unknown',
+                        'name' => $sourceProduct->p_name ?? 'unknown',
+                        'error' => $e->getMessage(),
+                    ]);
+
+                    Log::error('Failed to import product', [
+                        'source_id' => $sourceProduct->p_id ?? 'unknown',
+                        'name' => $sourceProduct->p_name ?? 'unknown',
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+
+                    $fileName = Str::of($e->getFile())->classBasename();
+                    $output->writeln("<error>Failed to import product: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                }
+
+                $processed++;
+                $progressBar->advance();
             });
 
         $progressBar->finish();
@@ -135,12 +138,14 @@ class ProductImporter implements EntityImporter
         string $connection,
         int $batchSize,
         ?int $limit,
+        ?int $offset,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
     ): void {
         $query = DB::connection($connection)
-            ->table('nexus_package_groups');
+            ->table('nexus_package_groups')
+            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->skip($offset));
 
         $totalCategories = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
@@ -152,39 +157,35 @@ class ProductImporter implements EntityImporter
         $processed = 0;
 
         $query
-            ->orderBy('pg_id')
-            ->chunk($batchSize, function ($sourceCategories) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
-                foreach ($sourceCategories as $sourceCategory) {
-                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                        return false;
-                    }
-
-                    try {
-                        $this->importCategory($sourceCategory, $isDryRun, $result);
-                    } catch (Exception $e) {
-                        $result->incrementFailed('product_categories');
-                        $result->recordFailed('product_categories', [
-                            'source_id' => $sourceCategory->pg_id ?? 'unknown',
-                            'name' => $sourceCategory->pg_name ?? 'unknown',
-                            'error' => $e->getMessage(),
-                        ]);
-
-                        Log::error('Failed to import product category', [
-                            'source_id' => $sourceCategory->pg_id ?? 'unknown',
-                            'name' => $sourceCategory->pg_name ?? 'unknown',
-                            'error' => $e->getMessage(),
-                            'trace' => $e->getTraceAsString(),
-                        ]);
-
-                        $fileName = Str::of($e->getFile())->classBasename();
-                        $output->writeln("<error>Failed to import product category: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
-                    }
-
-                    $processed++;
-                    $progressBar->advance();
+            ->lazyById($batchSize, 'pg_id')
+            ->each(function ($sourceCategory) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): void {
+                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                    return;
                 }
 
-                return true;
+                try {
+                    $this->importCategory($sourceCategory, $isDryRun, $result);
+                } catch (Exception $e) {
+                    $result->incrementFailed('product_categories');
+                    $result->recordFailed('product_categories', [
+                        'source_id' => $sourceCategory->pg_id ?? 'unknown',
+                        'name' => $sourceCategory->pg_name ?? 'unknown',
+                        'error' => $e->getMessage(),
+                    ]);
+
+                    Log::error('Failed to import product category', [
+                        'source_id' => $sourceCategory->pg_id ?? 'unknown',
+                        'name' => $sourceCategory->pg_name ?? 'unknown',
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+
+                    $fileName = Str::of($e->getFile())->classBasename();
+                    $output->writeln("<error>Failed to import product category: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                }
+
+                $processed++;
+                $progressBar->advance();
             });
 
         $progressBar->finish();
@@ -447,11 +448,11 @@ class ProductImporter implements EntityImporter
 
     protected function cacheProductMapping(int $sourceProductId, int $targetProductId): void
     {
-        Cache::forever(self::CACHE_KEY_PREFIX.$sourceProductId, $targetProductId);
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.$sourceProductId, $targetProductId, self::CACHE_TTL);
     }
 
     protected function cacheCategoryMapping(int $sourceCategoryId, int $targetCategoryId): void
     {
-        Cache::forever(self::CATEGORY_CACHE_KEY_PREFIX.$sourceCategoryId, $targetCategoryId);
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_CATEGORY_PREFIX.$sourceCategoryId, $targetCategoryId, self::CACHE_TTL);
     }
 }

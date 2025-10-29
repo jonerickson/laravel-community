@@ -4,14 +4,22 @@ declare(strict_types=1);
 
 namespace App\Services\Migration;
 
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
+
 class MigrationResult
 {
+    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
+
+    protected const string CACHE_TAG = 'migration:result';
+
+    protected string $cachePrefix;
+
     public function __construct(
         public array $entities = [],
-        public array $skippedRecords = [],
-        public array $failedRecords = [],
-        public array $migratedRecords = [],
-    ) {}
+    ) {
+        $this->cachePrefix = 'migration:result:'.Str::random().':';
+    }
 
     public function addEntity(string $entity, int $migrated = 0, int $skipped = 0, int $failed = 0): void
     {
@@ -30,44 +38,41 @@ class MigrationResult
 
     public function recordSkipped(string $entity, array $record): void
     {
-        if (! isset($this->skippedRecords[$entity])) {
-            $this->skippedRecords[$entity] = [];
-        }
-
-        $this->skippedRecords[$entity][] = $record;
+        $key = $this->cachePrefix.'skipped:'.$entity;
+        $records = Cache::get($key, []);
+        $records[] = $record;
+        Cache::tags(self::CACHE_TAG)->put($key, $records, self::CACHE_TTL);
     }
 
     public function recordFailed(string $entity, array $record): void
     {
-        if (! isset($this->failedRecords[$entity])) {
-            $this->failedRecords[$entity] = [];
-        }
-
-        $this->failedRecords[$entity][] = $record;
+        $key = $this->cachePrefix.'failed:'.$entity;
+        $records = Cache::get($key, []);
+        $records[] = $record;
+        Cache::tags(self::CACHE_TAG)->put($key, $records, self::CACHE_TTL);
     }
 
     public function recordMigrated(string $entity, array $record): void
     {
-        if (! isset($this->migratedRecords[$entity])) {
-            $this->migratedRecords[$entity] = [];
-        }
-
-        $this->migratedRecords[$entity][] = $record;
+        $key = $this->cachePrefix.'migrated:'.$entity;
+        $records = Cache::get($key, []);
+        $records[] = $record;
+        Cache::tags(self::CACHE_TAG)->put($key, $records, self::CACHE_TTL);
     }
 
     public function getSkippedRecords(string $entity): array
     {
-        return $this->skippedRecords[$entity] ?? [];
+        return Cache::tags(self::CACHE_TAG)->get($this->cachePrefix.'skipped:'.$entity, []);
     }
 
     public function getFailedRecords(string $entity): array
     {
-        return $this->failedRecords[$entity] ?? [];
+        return Cache::tags(self::CACHE_TAG)->get($this->cachePrefix.'failed:'.$entity, []);
     }
 
     public function getMigratedRecords(string $entity): array
     {
-        return $this->migratedRecords[$entity] ?? [];
+        return Cache::tags(self::CACHE_TAG)->get($this->cachePrefix.'migrated:'.$entity, []);
     }
 
     public function incrementMigrated(string $entity, int $count = 1): void
@@ -101,18 +106,8 @@ class MigrationResult
         return $rows;
     }
 
-    public function getTotalMigrated(): int
+    public function cleanup(): void
     {
-        return array_sum(array_column($this->entities, 'migrated'));
-    }
-
-    public function getTotalSkipped(): int
-    {
-        return array_sum(array_column($this->entities, 'skipped'));
-    }
-
-    public function getTotalFailed(): int
-    {
-        return array_sum(array_column($this->entities, 'failed'));
+        Cache::tags(self::CACHE_TAG)->flush();
     }
 }

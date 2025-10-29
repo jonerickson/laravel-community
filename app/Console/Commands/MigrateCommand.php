@@ -13,6 +13,7 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Sleep;
+use Random\RandomException;
 
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\select;
@@ -25,10 +26,12 @@ class MigrateCommand extends Command
                             {source? : The migration source (e.g., invision-community)}
                             {--force : Force the operation to run when in production}
                             {--entity= : Specific entity to migrate (e.g., users, posts)}
-                            {--batch-size=100 : Number of records to process per batch}
+                            {--batch=1000 : Number of records to process per batch}
                             {--limit= : Maximum number of records to migrate (useful for testing)}
+                            {--offset= : Number of records to skip before starting migration (useful for resuming)}
                             {--dry-run : Preview migration without making changes}
                             {--check : Verify database connection and exit}
+                            {--status : Display migration status with record counts for each entity}
                             {--ssh : Connect to the source database via SSH tunnel}';
 
     protected $description = 'Migrate data from external sources (use -v to see skipped/failed records, -vv for migrated records)';
@@ -60,6 +63,18 @@ class MigrateCommand extends Command
 
         $sshTunnel = null;
 
+        $this->trap([SIGINT, SIGTERM], function () use (&$sshTunnel, $migrationService): void {
+            $this->warn('Migration interrupted. Cleaning up...');
+
+            $migrationService->cleanup();
+
+            if ($sshTunnel !== null && $sshTunnel !== []) {
+                $this->closeSshTunnel($sshTunnel);
+            }
+
+            exit(1);
+        });
+
         try {
             if ($this->option('ssh')) {
                 $sshConfig = $sourceInstance->getSshConfig();
@@ -88,13 +103,18 @@ class MigrateCommand extends Command
                 return $this->checkDatabaseConnection($sourceInstance);
             }
 
+            if ($this->option('status')) {
+                return $this->displayMigrationStatus($migrationService, $source, $sourceInstance);
+            }
+
             if (! $this->confirmToProceed()) {
                 return self::SUCCESS;
             }
 
             $entity = $this->option('entity');
-            $batchSize = (int) $this->option('batch-size');
+            $batchSize = (int) $this->option('batch');
             $limit = $this->option('limit') ? (int) $this->option('limit') : null;
+            $offset = $this->option('offset') ? (int) $this->option('offset') : null;
             $isDryRun = (bool) $this->option('dry-run');
 
             if ($isDryRun) {
@@ -103,6 +123,10 @@ class MigrateCommand extends Command
 
             if ($limit !== null && $limit !== 0) {
                 $this->warn("Limiting migration to $limit records.");
+            }
+
+            if ($offset !== null && $offset !== 0) {
+                $this->warn("Starting migration from offset $offset (skipping first $offset records).");
             }
 
             $this->promptForOptionalDependencies($migrationService, $source, $entity);
@@ -114,9 +138,13 @@ class MigrateCommand extends Command
                 entity: $entity,
                 batchSize: $batchSize,
                 limit: $limit,
+                offset: $offset,
                 isDryRun: $isDryRun,
                 output: $this->output,
             );
+
+            $migrationService->cleanup();
+            $result->cleanup();
 
             $this->newLine();
             $this->info('Migration completed successfully!');
@@ -248,6 +276,9 @@ class MigrateCommand extends Command
         }
     }
 
+    /**
+     * @throws RandomException
+     */
     protected function createSshTunnel(array $sshConfig, string $connectionName): ?array
     {
         $dbConfig = config("database.connections.$connectionName");
@@ -261,7 +292,7 @@ class MigrateCommand extends Command
         $remotePort = $dbConfig['port'];
 
         $sshCommand = sprintf(
-            'ssh -f -N -L %d:%s:%d -p %d %s@%s',
+            'ssh -f -N -L %d:%s:%d -p %d -o ServerAliveInterval=60 -o ServerAliveCountMax=3 %s@%s',
             $localPort,
             $remoteHost,
             $remotePort,
@@ -311,5 +342,46 @@ class MigrateCommand extends Command
         ]);
 
         $this->info('SSH tunnel closed.');
+    }
+
+    protected function displayMigrationStatus(MigrationService $migrationService, string $sourceName, MigrationSource $source): int
+    {
+        $this->info("Fetching migration status from $sourceName...");
+        $this->newLine();
+
+        $connection = $source->getConnection();
+        $importers = $source->getImporters();
+
+        $statusData = [];
+
+        foreach ($importers as $entityName => $importer) {
+            try {
+                $sourceTable = $importer->getSourceTable();
+                $count = DB::connection($connection)
+                    ->table($sourceTable)
+                    ->count();
+
+                $statusData[] = [
+                    'entity' => $entityName,
+                    'source_table' => $sourceTable,
+                    'record_count' => number_format($count),
+                ];
+            } catch (Exception $e) {
+                $statusData[] = [
+                    'entity' => $entityName,
+                    'source_table' => $importer->getSourceTable(),
+                    'record_count' => "Error: {$e->getMessage()}",
+                ];
+            }
+        }
+
+        usort($statusData, fn (array $a, array $b): int => strcmp((string) $a['entity'], (string) $b['entity']));
+
+        $this->table(
+            ['Entity', 'Source Table', 'Record Count'],
+            $statusData
+        );
+
+        return self::SUCCESS;
     }
 }

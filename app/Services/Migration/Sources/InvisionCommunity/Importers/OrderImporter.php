@@ -28,29 +28,32 @@ class OrderImporter implements EntityImporter
 
     protected const string CACHE_KEY_PREFIX = 'migration:ic:order_map:';
 
+    protected const string CACHE_TAG = 'migration:ic:orders';
+
+    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
+
     public function __construct(
         protected ?InvisionCommunityLanguageResolver $languageResolver = null,
     ) {}
 
     public static function getOrderMapping(int $sourceOrderId): ?int
     {
-        return Cache::get(self::CACHE_KEY_PREFIX.$sourceOrderId);
+        return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.$sourceOrderId);
     }
 
-    public static function clearOrderMappingCache(): void
+    public function cleanup(): void
     {
-        $keys = Cache::get('migration:ic:order_map_keys', []);
-
-        foreach ($keys as $key) {
-            Cache::forget($key);
-        }
-
-        Cache::forget('migration:ic:order_map_keys');
+        Cache::tags(self::CACHE_TAG)->flush();
     }
 
     public function getEntityName(): string
     {
         return self::ENTITY_NAME;
+    }
+
+    public function getSourceTable(): string
+    {
+        return 'nexus_invoices';
     }
 
     public function getDependencies(): array
@@ -65,17 +68,21 @@ class OrderImporter implements EntityImporter
         string $connection,
         int $batchSize,
         ?int $limit,
+        ?int $offset,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
     ): void {
+        DB::connection($connection)->disableQueryLog();
+
         if (! $this->languageResolver instanceof InvisionCommunityLanguageResolver) {
             $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
         }
 
         $query = DB::connection($connection)
-            ->table('nexus_invoices')
-            ->where('i_status', 'paid');
+            ->table($this->getSourceTable())
+            ->where('i_status', 'paid')
+            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->skip($offset));
 
         $totalOrders = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
@@ -87,37 +94,33 @@ class OrderImporter implements EntityImporter
         $processed = 0;
 
         $query
-            ->orderBy('i_id')
-            ->chunk($batchSize, function ($sourceOrders) use ($connection, $limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
-                foreach ($sourceOrders as $sourceOrder) {
-                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                        return false;
-                    }
-
-                    try {
-                        $this->importOrder($connection, $sourceOrder, $isDryRun, $result);
-                    } catch (Exception $e) {
-                        $result->incrementFailed(self::ENTITY_NAME);
-                        $result->recordFailed(self::ENTITY_NAME, [
-                            'source_id' => $sourceOrder->i_id ?? 'unknown',
-                            'error' => $e->getMessage(),
-                        ]);
-
-                        Log::error('Failed to import order', [
-                            'source_id' => $sourceOrder->i_id ?? 'unknown',
-                            'error' => $e->getMessage(),
-                            'trace' => $e->getTraceAsString(),
-                        ]);
-
-                        $fileName = Str::of($e->getFile())->classBasename();
-                        $output->writeln("<error>Failed to import order: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
-                    }
-
-                    $processed++;
-                    $progressBar->advance();
+            ->lazyById($batchSize, 'i_id')
+            ->each(function ($sourceOrder) use ($connection, $limit, $isDryRun, $result, $progressBar, $output, &$processed): void {
+                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                    return;
                 }
 
-                return true;
+                try {
+                    $this->importOrder($connection, $sourceOrder, $isDryRun, $result);
+                } catch (Exception $e) {
+                    $result->incrementFailed(self::ENTITY_NAME);
+                    $result->recordFailed(self::ENTITY_NAME, [
+                        'source_id' => $sourceOrder->i_id ?? 'unknown',
+                        'error' => $e->getMessage(),
+                    ]);
+
+                    Log::error('Failed to import order', [
+                        'source_id' => $sourceOrder->i_id ?? 'unknown',
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+
+                    $fileName = Str::of($e->getFile())->classBasename();
+                    $output->writeln("<error>Failed to import order: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                }
+
+                $processed++;
+                $progressBar->advance();
             });
 
         $progressBar->finish();
@@ -335,6 +338,6 @@ class OrderImporter implements EntityImporter
 
     protected function cacheOrderMapping(int $sourceOrderId, int $targetOrderId): void
     {
-        Cache::forever(self::CACHE_KEY_PREFIX.$sourceOrderId, $targetOrderId);
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.$sourceOrderId, $targetOrderId, self::CACHE_TTL);
     }
 }

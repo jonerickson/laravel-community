@@ -10,6 +10,7 @@ use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunityLanguageResolver;
 use Exception;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,18 +22,29 @@ class GroupImporter implements EntityImporter
 
     protected const string CACHE_KEY_PREFIX = 'migration:ic:group_map:';
 
+    protected const string CACHE_TAG = 'migration:ic:groups';
+
+    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
+
+    protected array $batchCache = [];
+
     public function __construct(
         protected ?InvisionCommunityLanguageResolver $languageResolver = null,
     ) {}
 
     public static function getGroupMapping(int $sourceGroupId): ?int
     {
-        return Cache::get(self::CACHE_KEY_PREFIX.$sourceGroupId);
+        return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.$sourceGroupId);
     }
 
     public function getEntityName(): string
     {
         return self::ENTITY_NAME;
+    }
+
+    public function getSourceTable(): string
+    {
+        return 'core_groups';
     }
 
     public function getDependencies(): array
@@ -44,16 +56,20 @@ class GroupImporter implements EntityImporter
         string $connection,
         int $batchSize,
         ?int $limit,
+        ?int $offset,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
     ): void {
+        DB::connection($connection)->disableQueryLog();
+
         if (! $this->languageResolver instanceof InvisionCommunityLanguageResolver) {
             $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
         }
 
         $query = DB::connection($connection)
-            ->table('core_groups');
+            ->table($this->getSourceTable())
+            ->when($offset !== null && $offset !== 0, fn (Builder $builder) => $builder->skip($offset));
 
         $totalGroups = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
@@ -65,43 +81,40 @@ class GroupImporter implements EntityImporter
         $processed = 0;
 
         $query
-            ->orderBy('g_id')
-            ->chunk($batchSize, function ($sourceGroups) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
-                foreach ($sourceGroups as $sourceGroup) {
-                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                        return false;
-                    }
+            ->lazyById($batchSize, 'g_id')
+            ->each(function (object $sourceGroup) use ($isDryRun, $result, $progressBar, $output, &$processed): void {
+                try {
+                    $this->importGroup($sourceGroup, $isDryRun, $result);
+                } catch (Exception $e) {
+                    $result->incrementFailed(self::ENTITY_NAME);
+                    $result->recordFailed(self::ENTITY_NAME, [
+                        'source_id' => $sourceGroup->g_id ?? 'unknown',
+                        'name' => $sourceGroup->g_name ?? 'unknown',
+                        'error' => $e->getMessage(),
+                    ]);
 
-                    try {
-                        $this->importGroup($sourceGroup, $isDryRun, $result);
-                    } catch (Exception $e) {
-                        $result->incrementFailed(self::ENTITY_NAME);
-                        $result->recordFailed(self::ENTITY_NAME, [
-                            'source_id' => $sourceGroup->g_id ?? 'unknown',
-                            'name' => $sourceGroup->g_name ?? 'unknown',
-                            'error' => $e->getMessage(),
-                        ]);
+                    Log::error('Failed to import group', [
+                        'source_id' => $sourceGroup->g_id ?? 'unknown',
+                        'name' => $sourceGroup->g_name ?? 'unknown',
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
 
-                        Log::error('Failed to import group', [
-                            'source_id' => $sourceGroup->g_id ?? 'unknown',
-                            'name' => $sourceGroup->g_name ?? 'unknown',
-                            'error' => $e->getMessage(),
-                            'trace' => $e->getTraceAsString(),
-                        ]);
-
-                        $fileName = Str::of($e->getFile())->classBasename();
-                        $output->writeln("<error>Failed to import group: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
-                    }
-
-                    $processed++;
-                    $progressBar->advance();
+                    $fileName = Str::of($e->getFile())->classBasename();
+                    $output->writeln("<error>Failed to import group: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
                 }
 
-                return true;
+                $processed++;
+                $progressBar->advance();
             });
 
         $progressBar->finish();
         $output->newLine(2);
+    }
+
+    public function cleanup(): void
+    {
+        Cache::tags(self::CACHE_TAG)->flush();
     }
 
     protected function importGroup(object $sourceGroup, bool $isDryRun, MigrationResult $result): void
@@ -161,6 +174,6 @@ class GroupImporter implements EntityImporter
 
     protected function cacheGroupMapping(int $sourceGroupId, int $targetGroupId): void
     {
-        Cache::forever(self::CACHE_KEY_PREFIX.$sourceGroupId, $targetGroupId);
+        Cache::put(self::CACHE_KEY_PREFIX.$sourceGroupId, $targetGroupId, 60 * 60 * 24 * 7);
     }
 }

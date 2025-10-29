@@ -24,25 +24,28 @@ class BlogCommentImporter implements EntityImporter
 
     protected const string CACHE_KEY_PREFIX = 'migration:ic:blog_comment_map:';
 
+    protected const string CACHE_TAG = 'migration:ic:blog_comments';
+
+    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
+
     public static function getCommentMapping(int $sourceCommentId): ?int
     {
-        return Cache::get(self::CACHE_KEY_PREFIX.$sourceCommentId);
+        return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.$sourceCommentId);
     }
 
-    public static function clearCommentMappingCache(): void
+    public function cleanup(): void
     {
-        $keys = Cache::get('migration:ic:blog_comment_map_keys', []);
-
-        foreach ($keys as $key) {
-            Cache::forget($key);
-        }
-
-        Cache::forget('migration:ic:blog_comment_map_keys');
+        Cache::tags(self::CACHE_TAG)->flush();
     }
 
     public function getEntityName(): string
     {
         return self::ENTITY_NAME;
+    }
+
+    public function getSourceTable(): string
+    {
+        return 'blog_comments';
     }
 
     public function getDependencies(): array
@@ -57,13 +60,17 @@ class BlogCommentImporter implements EntityImporter
         string $connection,
         int $batchSize,
         ?int $limit,
+        ?int $offset,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
     ): void {
+        DB::connection($connection)->disableQueryLog();
+
         $query = DB::connection($connection)
-            ->table('blog_comments')
-            ->where('comment_approved', 1);
+            ->table($this->getSourceTable())
+            ->where('comment_approved', 1)
+            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->skip($offset));
 
         $totalComments = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
@@ -75,39 +82,35 @@ class BlogCommentImporter implements EntityImporter
         $processed = 0;
 
         $query
-            ->orderBy('comment_id')
-            ->chunk($batchSize, function ($sourceComments) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
-                foreach ($sourceComments as $sourceComment) {
-                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                        return false;
-                    }
-
-                    try {
-                        $this->importComment($sourceComment, $isDryRun, $result);
-                    } catch (Exception $e) {
-                        $result->incrementFailed(self::ENTITY_NAME);
-                        $result->recordFailed(self::ENTITY_NAME, [
-                            'source_id' => $sourceComment->comment_id ?? 'unknown',
-                            'entry_id' => $sourceComment->comment_entry_id ?? 'unknown',
-                            'error' => $e->getMessage(),
-                        ]);
-
-                        Log::error('Failed to import blog comment', [
-                            'source_id' => $sourceComment->comment_id ?? 'unknown',
-                            'entry_id' => $sourceComment->comment_entry_id ?? 'unknown',
-                            'error' => $e->getMessage(),
-                            'trace' => $e->getTraceAsString(),
-                        ]);
-
-                        $fileName = Str::of($e->getFile())->classBasename();
-                        $output->writeln("<error>Failed to import blog comment: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
-                    }
-
-                    $processed++;
-                    $progressBar->advance();
+            ->lazyById($batchSize, 'comment_id')
+            ->each(function ($sourceComment) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): void {
+                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                    return;
                 }
 
-                return true;
+                try {
+                    $this->importComment($sourceComment, $isDryRun, $result);
+                } catch (Exception $e) {
+                    $result->incrementFailed(self::ENTITY_NAME);
+                    $result->recordFailed(self::ENTITY_NAME, [
+                        'source_id' => $sourceComment->comment_id ?? 'unknown',
+                        'entry_id' => $sourceComment->comment_entry_id ?? 'unknown',
+                        'error' => $e->getMessage(),
+                    ]);
+
+                    Log::error('Failed to import blog comment', [
+                        'source_id' => $sourceComment->comment_id ?? 'unknown',
+                        'entry_id' => $sourceComment->comment_entry_id ?? 'unknown',
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+
+                    $fileName = Str::of($e->getFile())->classBasename();
+                    $output->writeln("<error>Failed to import blog comment: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                }
+
+                $processed++;
+                $progressBar->advance();
             });
 
         $progressBar->finish();
@@ -218,6 +221,6 @@ class BlogCommentImporter implements EntityImporter
 
     protected function cacheCommentMapping(int $sourceCommentId, int $targetCommentId): void
     {
-        Cache::forever(self::CACHE_KEY_PREFIX.$sourceCommentId, $targetCommentId);
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.$sourceCommentId, $targetCommentId, self::CACHE_TTL);
     }
 }

@@ -12,6 +12,8 @@ interface EntityImporter
 {
     public function getEntityName(): string;
 
+    public function getSourceTable(): string;
+
     /**
      * @return array<ImporterDependency>
      */
@@ -21,8 +23,11 @@ interface EntityImporter
         string $connection,
         int $batchSize,
         ?int $limit,
+        ?int $offset,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
     ): void;
+
+    public function cleanup(): void;
 }

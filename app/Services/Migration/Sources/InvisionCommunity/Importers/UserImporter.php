@@ -11,6 +11,7 @@ use App\Services\Migration\MigrationResult;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -23,14 +24,23 @@ class UserImporter implements EntityImporter
 
     protected const string CACHE_KEY_PREFIX = 'migration:ic:user_map:';
 
+    protected const string CACHE_TAG = 'migration:ic:users';
+
+    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
+
     public static function getUserMapping(int $sourceUserId): ?int
     {
-        return Cache::get(self::CACHE_KEY_PREFIX.$sourceUserId);
+        return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.$sourceUserId);
     }
 
     public function getEntityName(): string
     {
         return self::ENTITY_NAME;
+    }
+
+    public function getSourceTable(): string
+    {
+        return 'core_members';
     }
 
     public function getDependencies(): array
@@ -44,16 +54,20 @@ class UserImporter implements EntityImporter
         string $connection,
         int $batchSize,
         ?int $limit,
+        ?int $offset,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
     ): void {
+        DB::connection($connection)->disableQueryLog();
+
         $query = DB::connection($connection)
-            ->table('core_members');
+            ->table($this->getSourceTable())
+            ->when($offset !== null && $offset !== 0, fn (Builder $builder) => $builder->skip($offset));
 
         $totalUsers = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
-        $output->writeln("Found {$totalUsers} users to migrate...");
+        $output->writeln("Found $totalUsers users to migrate...");
 
         $progressBar = $output->createProgressBar($totalUsers);
         $progressBar->start();
@@ -61,46 +75,46 @@ class UserImporter implements EntityImporter
         $processed = 0;
 
         $query
-            ->orderBy('member_id')
-            ->chunk($batchSize, function ($sourceUsers) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
-                foreach ($sourceUsers as $sourceUser) {
-                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                        return false;
-                    }
+            ->lazyById($batchSize, 'member_id')
+            ->each(function ($sourceUser) use ($isDryRun, $result, $progressBar, $output, &$processed): void {
+                try {
+                    $this->importUser($sourceUser, $isDryRun, $result, $output);
+                } catch (Exception $e) {
+                    $result->incrementFailed(self::ENTITY_NAME);
 
-                    try {
-                        $this->importUser($sourceUser, $isDryRun, $result);
-                    } catch (Exception $e) {
-                        $result->incrementFailed(self::ENTITY_NAME);
+                    if ($output->isVeryVerbose()) {
                         $result->recordFailed(self::ENTITY_NAME, [
                             'source_id' => $sourceUser->member_id ?? 'unknown',
                             'email' => $sourceUser->email ?? 'unknown',
                             'name' => $sourceUser->name ?? 'unknown',
                             'error' => $e->getMessage(),
                         ]);
-
-                        Log::error('Failed to import user', [
-                            'source_id' => $sourceUser->member_id ?? 'unknown',
-                            'email' => $sourceUser->email ?? 'unknown',
-                            'name' => $sourceUser->name ?? 'unknown',
-                            'error' => $e->getMessage(),
-                            'trace' => $e->getTraceAsString(),
-                        ]);
-                        $output->writeln("<error>Failed to import user {$sourceUser->email}: {$e->getMessage()}</error>");
                     }
 
-                    $processed++;
-                    $progressBar->advance();
+                    Log::error('Failed to import user', [
+                        'source_id' => $sourceUser->member_id ?? 'unknown',
+                        'email' => $sourceUser->email ?? 'unknown',
+                        'name' => $sourceUser->name ?? 'unknown',
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+                    $output->writeln("<error>Failed to import user {$sourceUser->email}: {$e->getMessage()}</error>");
                 }
 
-                return true;
+                $processed++;
+                $progressBar->advance();
             });
 
         $progressBar->finish();
         $output->newLine(2);
     }
 
-    protected function importUser(object $sourceUser, bool $isDryRun, MigrationResult $result): void
+    public function cleanup(): void
+    {
+        Cache::tags(self::CACHE_TAG)->flush();
+    }
+
+    protected function importUser(object $sourceUser, bool $isDryRun, MigrationResult $result, OutputStyle $output): void
     {
         $email = $sourceUser->email;
 
@@ -109,12 +123,15 @@ class UserImporter implements EntityImporter
         if ($existingUser) {
             $this->cacheUserMapping($sourceUser->member_id, $existingUser->id);
             $result->incrementSkipped(self::ENTITY_NAME);
-            $result->recordSkipped(self::ENTITY_NAME, [
-                'source_id' => $sourceUser->member_id,
-                'email' => $email,
-                'name' => $sourceUser->name,
-                'reason' => 'Already exists',
-            ]);
+
+            if ($output->isVeryVerbose()) {
+                $result->recordSkipped(self::ENTITY_NAME, [
+                    'source_id' => $sourceUser->member_id,
+                    'email' => $email,
+                    'name' => $sourceUser->name,
+                    'reason' => 'Already exists',
+                ]);
+            }
 
             return;
         }
@@ -137,13 +154,16 @@ class UserImporter implements EntityImporter
         }
 
         $result->incrementMigrated(self::ENTITY_NAME);
-        $result->recordMigrated(self::ENTITY_NAME, [
-            'source_id' => $sourceUser->member_id,
-            'target_id' => $user->id ?? 'N/A (dry run)',
-            'email' => $user->email,
-            'name' => $user->name,
-            'created_at' => $user->created_at?->toDateTimeString() ?? 'N/A',
-        ]);
+
+        if ($output->isVeryVerbose()) {
+            $result->recordMigrated(self::ENTITY_NAME, [
+                'source_id' => $sourceUser->member_id,
+                'target_id' => $user->id ?? 'N/A (dry run)',
+                'email' => $user->email,
+                'name' => $user->name,
+                'created_at' => $user->created_at?->toDateTimeString() ?? 'N/A',
+            ]);
+        }
     }
 
     protected function assignGroups(User $user, object $sourceUser): void
@@ -202,6 +222,6 @@ class UserImporter implements EntityImporter
 
     protected function cacheUserMapping(int $sourceUserId, int $targetUserId): void
     {
-        Cache::forever(self::CACHE_KEY_PREFIX.$sourceUserId, $targetUserId);
+        Cache::put(self::CACHE_KEY_PREFIX.$sourceUserId, $targetUserId, 60 * 60 * 24 * 7);
     }
 }

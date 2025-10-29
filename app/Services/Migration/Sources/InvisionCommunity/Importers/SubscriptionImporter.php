@@ -26,29 +26,32 @@ class SubscriptionImporter implements EntityImporter
 
     protected const string CACHE_KEY_PREFIX = 'migration:ic:subscription_map:';
 
+    protected const string CACHE_TAG = 'migration:ic:subscriptions';
+
+    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
+
     public function __construct(
         protected ?InvisionCommunityLanguageResolver $languageResolver = null,
     ) {}
 
     public static function getSubscriptionMapping(int $sourceSubscriptionId): ?int
     {
-        return Cache::get(self::CACHE_KEY_PREFIX.$sourceSubscriptionId);
+        return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.$sourceSubscriptionId);
     }
 
-    public static function clearSubscriptionMappingCache(): void
+    public function cleanup(): void
     {
-        $keys = Cache::get('migration:ic:subscription_map_keys', []);
-
-        foreach ($keys as $key) {
-            Cache::forget($key);
-        }
-
-        Cache::forget('migration:ic:subscription_map_keys');
+        Cache::tags(self::CACHE_TAG)->flush();
     }
 
     public function getEntityName(): string
     {
         return self::ENTITY_NAME;
+    }
+
+    public function getSourceTable(): string
+    {
+        return 'nexus_member_subscription_packages';
     }
 
     public function getDependencies(): array
@@ -60,17 +63,21 @@ class SubscriptionImporter implements EntityImporter
         string $connection,
         int $batchSize,
         ?int $limit,
+        ?int $offset,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
     ): void {
+        DB::connection($connection)->disableQueryLog();
+
         if (! $this->languageResolver instanceof InvisionCommunityLanguageResolver) {
             $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
         }
 
         $query = DB::connection($connection)
-            ->table('nexus_member_subscription_packages')
-            ->where('sp_enabled', 1);
+            ->table($this->getSourceTable())
+            ->where('sp_enabled', 1)
+            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->skip($offset));
 
         $totalSubscriptions = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
@@ -82,37 +89,33 @@ class SubscriptionImporter implements EntityImporter
         $processed = 0;
 
         $query
-            ->orderBy('sp_id')
-            ->chunk($batchSize, function ($sourceSubscriptions) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
-                foreach ($sourceSubscriptions as $sourceSubscription) {
-                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                        return false;
-                    }
-
-                    try {
-                        $this->importSubscription($sourceSubscription, $isDryRun, $result);
-                    } catch (Exception $e) {
-                        $result->incrementFailed(self::ENTITY_NAME);
-                        $result->recordFailed(self::ENTITY_NAME, [
-                            'source_id' => $sourceSubscription->sp_id ?? 'unknown',
-                            'error' => $e->getMessage(),
-                        ]);
-
-                        Log::error('Failed to import subscription', [
-                            'source_id' => $sourceSubscription->sp_id ?? 'unknown',
-                            'error' => $e->getMessage(),
-                            'trace' => $e->getTraceAsString(),
-                        ]);
-
-                        $fileName = Str::of($e->getFile())->classBasename();
-                        $output->writeln("<error>Failed to import subscription: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
-                    }
-
-                    $processed++;
-                    $progressBar->advance();
+            ->lazyById($batchSize, 'sp_id')
+            ->each(function ($sourceSubscription) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): void {
+                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                    return;
                 }
 
-                return true;
+                try {
+                    $this->importSubscription($sourceSubscription, $isDryRun, $result);
+                } catch (Exception $e) {
+                    $result->incrementFailed(self::ENTITY_NAME);
+                    $result->recordFailed(self::ENTITY_NAME, [
+                        'source_id' => $sourceSubscription->sp_id ?? 'unknown',
+                        'error' => $e->getMessage(),
+                    ]);
+
+                    Log::error('Failed to import subscription', [
+                        'source_id' => $sourceSubscription->sp_id ?? 'unknown',
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+
+                    $fileName = Str::of($e->getFile())->classBasename();
+                    $output->writeln("<error>Failed to import subscription: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                }
+
+                $processed++;
+                $progressBar->advance();
             });
 
         $progressBar->finish();
@@ -293,6 +296,6 @@ class SubscriptionImporter implements EntityImporter
 
     protected function cacheSubscriptionMapping(int $sourceSubscriptionId, int $targetProductId): void
     {
-        Cache::forever(self::CACHE_KEY_PREFIX.$sourceSubscriptionId, $targetProductId);
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.$sourceSubscriptionId, $targetProductId, self::CACHE_TTL);
     }
 }

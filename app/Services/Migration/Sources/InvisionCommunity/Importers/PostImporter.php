@@ -27,29 +27,32 @@ class PostImporter implements EntityImporter
 
     protected const string CACHE_KEY_PREFIX = 'migration:ic:post_map:';
 
+    protected const string CACHE_TAG = 'migration:ic:posts';
+
+    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
+
     public function __construct(
         protected ?InvisionCommunityLanguageResolver $languageResolver = null,
     ) {}
 
     public static function getPostMapping(int $sourcePostId): ?int
     {
-        return Cache::get(self::CACHE_KEY_PREFIX.$sourcePostId);
+        return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.$sourcePostId);
     }
 
-    public static function clearPostMappingCache(): void
+    public function cleanup(): void
     {
-        $keys = Cache::get('migration:ic:post_map_keys', []);
-
-        foreach ($keys as $key) {
-            Cache::forget($key);
-        }
-
-        Cache::forget('migration:ic:post_map_keys');
+        Cache::tags(self::CACHE_TAG)->flush();
     }
 
     public function getEntityName(): string
     {
         return self::ENTITY_NAME;
+    }
+
+    public function getSourceTable(): string
+    {
+        return 'forums_posts';
     }
 
     public function getDependencies(): array
@@ -64,17 +67,21 @@ class PostImporter implements EntityImporter
         string $connection,
         int $batchSize,
         ?int $limit,
+        ?int $offset,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
     ): void {
+        DB::connection($connection)->disableQueryLog();
+
         if (! $this->languageResolver instanceof InvisionCommunityLanguageResolver) {
             $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
         }
 
         $query = DB::connection($connection)
-            ->table('forums_posts')
-            ->where('queued', 0);
+            ->table($this->getSourceTable())
+            ->where('queued', 0)
+            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->skip($offset));
 
         $totalPosts = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
@@ -86,37 +93,33 @@ class PostImporter implements EntityImporter
         $processed = 0;
 
         $query
-            ->orderBy('pid')
-            ->chunk($batchSize, function ($sourcePosts) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
-                foreach ($sourcePosts as $sourcePost) {
-                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                        return false;
-                    }
-
-                    try {
-                        $this->importPost($sourcePost, $isDryRun, $result);
-                    } catch (Exception $e) {
-                        $result->incrementFailed(self::ENTITY_NAME);
-                        $result->recordFailed(self::ENTITY_NAME, [
-                            'source_id' => $sourcePost->pid ?? 'unknown',
-                            'error' => $e->getMessage(),
-                        ]);
-
-                        Log::error('Failed to import post', [
-                            'source_id' => $sourcePost->pid ?? 'unknown',
-                            'error' => $e->getMessage(),
-                            'trace' => $e->getTraceAsString(),
-                        ]);
-
-                        $fileName = Str::of($e->getFile())->classBasename();
-                        $output->writeln("<error>Failed to import post: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
-                    }
-
-                    $processed++;
-                    $progressBar->advance();
+            ->lazyById($batchSize, 'pid')
+            ->each(function ($sourcePost) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): void {
+                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                    return;
                 }
 
-                return true;
+                try {
+                    $this->importPost($sourcePost, $isDryRun, $result);
+                } catch (Exception $e) {
+                    $result->incrementFailed(self::ENTITY_NAME);
+                    $result->recordFailed(self::ENTITY_NAME, [
+                        'source_id' => $sourcePost->pid ?? 'unknown',
+                        'error' => $e->getMessage(),
+                    ]);
+
+                    Log::error('Failed to import post', [
+                        'source_id' => $sourcePost->pid ?? 'unknown',
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+
+                    $fileName = Str::of($e->getFile())->classBasename();
+                    $output->writeln("<error>Failed to import post: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                }
+
+                $processed++;
+                $progressBar->advance();
             });
 
         $progressBar->finish();
@@ -227,6 +230,6 @@ class PostImporter implements EntityImporter
 
     protected function cachePostMapping(int $sourcePostId, int $targetPostId): void
     {
-        Cache::forever(self::CACHE_KEY_PREFIX.$sourcePostId, $targetPostId);
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.$sourcePostId, $targetPostId, self::CACHE_TTL);
     }
 }

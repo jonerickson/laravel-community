@@ -25,29 +25,32 @@ class BlogImporter implements EntityImporter
 
     protected const string CACHE_KEY_PREFIX = 'migration:ic:blog_map:';
 
+    protected const string CACHE_TAG = 'migration:ic:blog';
+
+    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
+
     public function __construct(
         protected ?InvisionCommunityLanguageResolver $languageResolver = null,
     ) {}
 
     public static function getBlogMapping(int $sourceBlogId): ?int
     {
-        return Cache::get(self::CACHE_KEY_PREFIX.$sourceBlogId);
+        return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.$sourceBlogId);
     }
 
-    public static function clearBlogMappingCache(): void
+    public function cleanup(): void
     {
-        $keys = Cache::get('migration:ic:blog_map_keys', []);
-
-        foreach ($keys as $key) {
-            Cache::forget($key);
-        }
-
-        Cache::forget('migration:ic:blog_map_keys');
+        Cache::tags(self::CACHE_TAG)->flush();
     }
 
     public function getEntityName(): string
     {
         return self::ENTITY_NAME;
+    }
+
+    public function getSourceTable(): string
+    {
+        return 'blog_entries';
     }
 
     public function getDependencies(): array
@@ -62,17 +65,21 @@ class BlogImporter implements EntityImporter
         string $connection,
         int $batchSize,
         ?int $limit,
+        ?int $offset,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
     ): void {
+        DB::connection($connection)->disableQueryLog();
+
         if (! $this->languageResolver instanceof InvisionCommunityLanguageResolver) {
             $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
         }
 
         $query = DB::connection($connection)
-            ->table('blog_entries')
-            ->where('entry_status', 'published');
+            ->table($this->getSourceTable())
+            ->where('entry_status', 'published')
+            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->skip($offset));
 
         $totalBlogs = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
@@ -84,39 +91,38 @@ class BlogImporter implements EntityImporter
         $processed = 0;
 
         $query
-            ->orderBy('entry_id')
-            ->chunk($batchSize, function ($sourceBlogEntries) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
-                foreach ($sourceBlogEntries as $sourceBlogEntry) {
-                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                        return false;
-                    }
+            ->lazyById($batchSize, 'entry_id')
+            ->each(function ($sourceBlogEntry) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): void {
+                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                    return;
+                }
 
-                    try {
-                        $this->importBlogEntry($sourceBlogEntry, $isDryRun, $result);
-                    } catch (Exception $e) {
-                        $result->incrementFailed(self::ENTITY_NAME);
+                try {
+                    $this->importBlogEntry($sourceBlogEntry, $isDryRun, $result);
+                } catch (Exception $e) {
+                    $result->incrementFailed(self::ENTITY_NAME);
+
+                    if ($output->isVeryVerbose()) {
                         $result->recordFailed(self::ENTITY_NAME, [
                             'source_id' => $sourceBlogEntry->entry_id ?? 'unknown',
                             'title' => $sourceBlogEntry->entry_name ?? 'unknown',
                             'error' => $e->getMessage(),
                         ]);
-
-                        Log::error('Failed to import blog entry', [
-                            'source_id' => $sourceBlogEntry->entry_id ?? 'unknown',
-                            'title' => $sourceBlogEntry->entry_name ?? 'unknown',
-                            'error' => $e->getMessage(),
-                            'trace' => $e->getTraceAsString(),
-                        ]);
-
-                        $fileName = Str::of($e->getFile())->classBasename();
-                        $output->writeln("<error>Failed to import blog entry: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
                     }
 
-                    $processed++;
-                    $progressBar->advance();
+                    Log::error('Failed to import blog entry', [
+                        'source_id' => $sourceBlogEntry->entry_id ?? 'unknown',
+                        'title' => $sourceBlogEntry->entry_name ?? 'unknown',
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+
+                    $fileName = Str::of($e->getFile())->classBasename();
+                    $output->writeln("<error>Failed to import blog entry: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
                 }
 
-                return true;
+                $processed++;
+                $progressBar->advance();
             });
 
         $progressBar->finish();
@@ -224,6 +230,6 @@ class BlogImporter implements EntityImporter
 
     protected function cacheBlogMapping(int $sourceBlogId, int $targetPostId): void
     {
-        Cache::forever(self::CACHE_KEY_PREFIX.$sourceBlogId, $targetPostId);
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.$sourceBlogId, $targetPostId, self::CACHE_TTL);
     }
 }

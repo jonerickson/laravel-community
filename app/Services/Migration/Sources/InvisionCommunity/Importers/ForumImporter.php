@@ -22,7 +22,11 @@ class ForumImporter implements EntityImporter
 
     protected const string CACHE_KEY_PREFIX = 'migration:ic:forum_map:';
 
-    protected const string CATEGORY_CACHE_KEY_PREFIX = 'migration:ic:forum_category_map:';
+    protected const string CACHE_KEY_CATEGORY_PREFIX = 'migration:ic:forum_category_map:';
+
+    protected const string CACHE_TAG = 'migration:ic:forums';
+
+    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
 
     public function __construct(
         protected ?InvisionCommunityLanguageResolver $languageResolver = null,
@@ -30,28 +34,27 @@ class ForumImporter implements EntityImporter
 
     public static function getForumMapping(int $sourceForumId): ?int
     {
-        return Cache::get(self::CACHE_KEY_PREFIX.$sourceForumId);
+        return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.$sourceForumId);
     }
 
     public static function getCategoryMapping(int $sourceCategoryId): ?int
     {
-        return Cache::get(self::CATEGORY_CACHE_KEY_PREFIX.$sourceCategoryId);
+        return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_CATEGORY_PREFIX.$sourceCategoryId);
     }
 
-    public static function clearForumMappingCache(): void
+    public function cleanup(): void
     {
-        $keys = Cache::get('migration:ic:forum_map_keys', []);
-
-        foreach ($keys as $key) {
-            Cache::forget($key);
-        }
-
-        Cache::forget('migration:ic:forum_map_keys');
+        Cache::tags(self::CACHE_TAG)->flush();
     }
 
     public function getEntityName(): string
     {
         return self::ENTITY_NAME;
+    }
+
+    public function getSourceTable(): string
+    {
+        return 'forums_forums';
     }
 
     public function getDependencies(): array
@@ -63,19 +66,23 @@ class ForumImporter implements EntityImporter
         string $connection,
         int $batchSize,
         ?int $limit,
+        ?int $offset,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
     ): void {
+        DB::connection($connection)->disableQueryLog();
+
         if (! $this->languageResolver instanceof InvisionCommunityLanguageResolver) {
             $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
         }
 
-        $this->importCategories($connection, $batchSize, $limit, $isDryRun, $output, $result);
+        $this->importCategories($connection, $batchSize, $limit, $offset, $isDryRun, $output, $result);
 
         $query = DB::connection($connection)
-            ->table('forums_forums')
-            ->where('parent_id', '<>', -1);
+            ->table($this->getSourceTable())
+            ->where('parent_id', '<>', -1)
+            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->skip($offset));
 
         $totalForums = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
@@ -87,40 +94,35 @@ class ForumImporter implements EntityImporter
         $processed = 0;
 
         $query
-            ->orderBy('position', 'desc')
-            ->orderBy('id')
-            ->chunk($batchSize, function ($sourceForums) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
-                foreach ($sourceForums as $sourceForum) {
-                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                        return false;
-                    }
-
-                    try {
-                        $this->importForum($sourceForum, $isDryRun, $result);
-                    } catch (Exception $e) {
-                        $result->incrementFailed(self::ENTITY_NAME);
-                        $result->recordFailed(self::ENTITY_NAME, [
-                            'source_id' => $sourceForum->id ?? 'unknown',
-                            'name' => $sourceForum->name ?? 'unknown',
-                            'error' => $e->getMessage(),
-                        ]);
-
-                        Log::error('Failed to import forum', [
-                            'source_id' => $sourceForum->id ?? 'unknown',
-                            'name' => $sourceForum->name ?? 'unknown',
-                            'error' => $e->getMessage(),
-                            'trace' => $e->getTraceAsString(),
-                        ]);
-
-                        $fileName = Str::of($e->getFile())->classBasename();
-                        $output->writeln("<error>Failed to import forum: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
-                    }
-
-                    $processed++;
-                    $progressBar->advance();
+            ->lazyById($batchSize, 'id')
+            ->each(function ($sourceForum) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): void {
+                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                    return;
                 }
 
-                return true;
+                try {
+                    $this->importForum($sourceForum, $isDryRun, $result);
+                } catch (Exception $e) {
+                    $result->incrementFailed(self::ENTITY_NAME);
+                    $result->recordFailed(self::ENTITY_NAME, [
+                        'source_id' => $sourceForum->id ?? 'unknown',
+                        'name' => $sourceForum->name ?? 'unknown',
+                        'error' => $e->getMessage(),
+                    ]);
+
+                    Log::error('Failed to import forum', [
+                        'source_id' => $sourceForum->id ?? 'unknown',
+                        'name' => $sourceForum->name ?? 'unknown',
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+
+                    $fileName = Str::of($e->getFile())->classBasename();
+                    $output->writeln("<error>Failed to import forum: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                }
+
+                $processed++;
+                $progressBar->advance();
             });
 
         $progressBar->finish();
@@ -131,13 +133,15 @@ class ForumImporter implements EntityImporter
         string $connection,
         int $batchSize,
         ?int $limit,
+        ?int $offset,
         bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
     ): void {
         $query = DB::connection($connection)
             ->table('forums_forums')
-            ->where('parent_id', -1);
+            ->where('parent_id', -1)
+            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->skip($offset));
 
         $totalCategories = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
 
@@ -149,40 +153,35 @@ class ForumImporter implements EntityImporter
         $processed = 0;
 
         $query
-            ->orderBy('position', 'desc')
-            ->orderBy('id')
-            ->chunk($batchSize, function ($sourceCategories) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
-                foreach ($sourceCategories as $sourceCategory) {
-                    if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                        return false;
-                    }
-
-                    try {
-                        $this->importCategory($sourceCategory, $isDryRun, $result);
-                    } catch (Exception $e) {
-                        $result->incrementFailed('forum_categories');
-                        $result->recordFailed('forum_categories', [
-                            'source_id' => $sourceCategory->id ?? 'unknown',
-                            'name' => $sourceCategory->name ?? 'unknown',
-                            'error' => $e->getMessage(),
-                        ]);
-
-                        Log::error('Failed to import forum category', [
-                            'source_id' => $sourceCategory->id ?? 'unknown',
-                            'name' => $sourceCategory->name ?? 'unknown',
-                            'error' => $e->getMessage(),
-                            'trace' => $e->getTraceAsString(),
-                        ]);
-
-                        $fileName = Str::of($e->getFile())->classBasename();
-                        $output->writeln("<error>Failed to import forum category: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
-                    }
-
-                    $processed++;
-                    $progressBar->advance();
+            ->lazyById($batchSize, 'id')
+            ->each(function ($sourceCategory) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): void {
+                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                    return;
                 }
 
-                return true;
+                try {
+                    $this->importCategory($sourceCategory, $isDryRun, $result);
+                } catch (Exception $e) {
+                    $result->incrementFailed('forum_categories');
+                    $result->recordFailed('forum_categories', [
+                        'source_id' => $sourceCategory->id ?? 'unknown',
+                        'name' => $sourceCategory->name ?? 'unknown',
+                        'error' => $e->getMessage(),
+                    ]);
+
+                    Log::error('Failed to import forum category', [
+                        'source_id' => $sourceCategory->id ?? 'unknown',
+                        'name' => $sourceCategory->name ?? 'unknown',
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+
+                    $fileName = Str::of($e->getFile())->classBasename();
+                    $output->writeln("<error>Failed to import forum category: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                }
+
+                $processed++;
+                $progressBar->advance();
             });
 
         $progressBar->finish();
@@ -314,11 +313,11 @@ class ForumImporter implements EntityImporter
 
     protected function cacheForumMapping(int $sourceForumId, int $targetForumId): void
     {
-        Cache::forever(self::CACHE_KEY_PREFIX.$sourceForumId, $targetForumId);
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.$sourceForumId, $targetForumId, self::CACHE_TTL);
     }
 
     protected function cacheCategoryMapping(int $sourceCategoryId, int $targetCategoryId): void
     {
-        Cache::forever(self::CATEGORY_CACHE_KEY_PREFIX.$sourceCategoryId, $targetCategoryId);
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_CATEGORY_PREFIX.$sourceCategoryId, $targetCategoryId, self::CACHE_TTL);
     }
 }
