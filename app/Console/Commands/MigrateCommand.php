@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Services\Migration\ConcurrentMigrationManager;
 use App\Services\Migration\Contracts\EntityImporter;
 use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\MigrationResult;
@@ -33,32 +34,129 @@ class MigrateCommand extends Command
                             {--dry-run : Preview migration without making changes}
                             {--check : Verify database connection and exit}
                             {--status : Display migration status with record counts for each entity}
-                            {--ssh : Connect to the source database via SSH tunnel}';
+                            {--ssh : Connect to the source database via SSH tunnel}
+                            {--parallel : Enable concurrent processing with multiple processes}
+                            {--max-records-per-process=1000 : Maximum records each process should handle before terminating}
+                            {--max-processes=4 : Maximum number of concurrent processes to run}
+                            {--worker : Internal flag indicating this is a worker process (do not use manually)}';
 
     protected $description = 'Migrate data from external sources (use -v to see skipped/failed records, -vv for migrated records)';
 
     public function handle(MigrationService $migrationService): int
     {
         $source = $this->argument('source');
+        $entity = $this->option('entity');
+        $batchSize = (int) $this->option('batch');
+        $limit = $this->option('limit') ? (int) $this->option('limit') : null;
+        $offset = $this->option('offset') ? (int) $this->option('offset') : null;
+        $isDryRun = (bool) $this->option('dry-run');
 
-        if (! $source) {
-            $source = select(
-                label: 'Select migration source',
-                options: $migrationService->getAvailableSources(),
+        if ($this->option('worker')) {
+            if (! $source || ! $entity) {
+                $this->error('Worker mode requires --source and --entity');
+
+                return self::FAILURE;
+            }
+
+            return $this->handleWorkerMode(
+                migrationService: $migrationService,
+                source: $source,
+                entity: $entity,
+                batchSize: $batchSize,
+                limit: $limit,
+                offset: $offset,
+                isDryRun: $isDryRun
             );
         }
 
-        if (! in_array($source, $migrationService->getAvailableSources())) {
-            $this->error("Unknown migration source: $source");
+        $source = $this->getOrSelectSource($migrationService);
 
+        return $this->handleCoordinatorMode(
+            migrationService: $migrationService,
+            source: $source,
+            entity: $entity,
+            batchSize: $batchSize,
+            limit: $limit,
+            offset: $offset,
+            isDryRun: $isDryRun
+        );
+    }
+
+    protected function handleWorkerMode(
+        MigrationService $migrationService,
+        string $source,
+        string $entity,
+        int $batchSize,
+        ?int $limit,
+        ?int $offset,
+        bool $isDryRun,
+    ): int {
+        ini_set('memory_limit', '512M');
+
+        $startMemory = memory_get_usage(true);
+        $this->info('Starting - Memory: '.round($startMemory / 1024 / 1024, 2).'MB');
+
+        $sourceInstance = $this->getSourceInstance($migrationService, $source);
+
+        if (! $sourceInstance instanceof MigrationSource) {
             return self::FAILURE;
         }
 
-        $sourceInstance = $migrationService->getSource($source);
+        $sshTunnel = null;
+
+        try {
+            $sshTunnel = $this->setupSshTunnelIfNeeded($sourceInstance);
+
+            if ($this->option('ssh') && $sshTunnel === null) {
+                return self::FAILURE;
+            }
+
+            $this->info("Processing $entity: Batch Size $batchSize, Offset $offset, Limit $limit");
+
+            $result = $migrationService->migrate(
+                source: $source,
+                entity: $entity,
+                batchSize: $batchSize,
+                limit: $limit,
+                offset: $offset,
+                isDryRun: $isDryRun,
+                output: $this->output,
+            );
+
+            DB::disconnect($sourceInstance->getConnection());
+            gc_collect_cycles();
+
+            $stats = $result->entities[$entity] ?? ['migrated' => 0, 'skipped' => 0, 'failed' => 0];
+            $endMemory = memory_get_usage(true);
+            $peakMemory = memory_get_peak_usage(true);
+
+            $this->info("Completed: Migrated {$stats['migrated']}, Skipped {$stats['skipped']}, Failed {$stats['failed']}");
+            $this->info('Memory - Current: '.round($endMemory / 1024 / 1024, 2).'MB, Peak: '.round($peakMemory / 1024 / 1024, 2).'MB');
+
+            return self::SUCCESS;
+        } catch (Exception $e) {
+            $this->error("Migration failed: {$e->getMessage()}");
+
+            return self::FAILURE;
+        } finally {
+            if ($sshTunnel !== null && $sshTunnel !== []) {
+                $this->closeSshTunnel($sshTunnel);
+            }
+        }
+    }
+
+    protected function handleCoordinatorMode(
+        MigrationService $migrationService,
+        string $source,
+        string $entity,
+        int $batchSize,
+        ?int $limit,
+        ?int $offset,
+        bool $isDryRun,
+    ): int {
+        $sourceInstance = $this->getSourceInstance($migrationService, $source);
 
         if (! $sourceInstance instanceof MigrationSource) {
-            $this->error('Invalid migration source.');
-
             return self::FAILURE;
         }
 
@@ -66,7 +164,6 @@ class MigrateCommand extends Command
 
         $this->trap([SIGINT, SIGTERM], function () use (&$sshTunnel, $migrationService): void {
             $this->warn('Migration interrupted. Cleaning up...');
-
             $migrationService->cleanup();
 
             if ($sshTunnel !== null && $sshTunnel !== []) {
@@ -77,33 +174,10 @@ class MigrateCommand extends Command
         });
 
         try {
-            $entity = $this->option('entity');
-            $batchSize = (int) $this->option('batch');
-            $limit = $this->option('limit') ? (int) $this->option('limit') : null;
-            $offset = $this->option('offset') ? (int) $this->option('offset') : null;
-            $isDryRun = (bool) $this->option('dry-run');
+            $sshTunnel = $this->setupSshTunnelIfNeeded($sourceInstance);
 
-            if ($this->option('ssh')) {
-                $sshConfig = $sourceInstance->getSshConfig();
-
-                if ($sshConfig === null || $sshConfig === []) {
-                    $this->error('SSH configuration not found for this source.');
-                    $this->warn('Please configure SSH credentials in your .env file:');
-                    $this->warn('MIGRATION_IC_SSH_HOST, MIGRATION_IC_SSH_USER, MIGRATION_IC_SSH_PORT, MIGRATION_IC_SSH_KEY');
-
-                    return self::FAILURE;
-                }
-
-                $this->info('Creating SSH tunnel...');
-                $sshTunnel = $this->createSshTunnel($sshConfig, $sourceInstance->getConnection());
-
-                if ($sshTunnel === null || $sshTunnel === []) {
-                    $this->error('Failed to create SSH tunnel.');
-
-                    return self::FAILURE;
-                }
-
-                $this->info('SSH tunnel established successfully.');
+            if ($this->option('ssh') && $sshTunnel === null) {
+                return self::FAILURE;
             }
 
             if ($this->option('check')) {
@@ -133,6 +207,19 @@ class MigrateCommand extends Command
             $this->promptForOptionalDependencies($migrationService, $source, $entity);
 
             $this->info("Starting migration from $source...");
+
+            if ($this->option('parallel') && $entity) {
+                return $this->runConcurrentMigration(
+                    source: $source,
+                    sourceInstance: $sourceInstance,
+                    entity: $entity,
+                    batchSize: $batchSize,
+                    limit: $limit,
+                    offset: $offset,
+                    isDryRun: $isDryRun,
+                    migrationService: $migrationService,
+                );
+            }
 
             $result = $migrationService->migrate(
                 source: $source,
@@ -166,6 +253,59 @@ class MigrateCommand extends Command
                 $this->closeSshTunnel($sshTunnel);
             }
         }
+    }
+
+    protected function runConcurrentMigration(
+        string $source,
+        MigrationSource $sourceInstance,
+        string $entity,
+        int $batchSize,
+        ?int $limit,
+        ?int $offset,
+        bool $isDryRun,
+        MigrationService $migrationService,
+    ): int {
+        $maxRecordsPerProcess = (int) $this->option('max-records-per-process');
+        $maxProcesses = (int) $this->option('max-processes');
+
+        $totalRecords = DB::connection($sourceInstance->getConnection())
+            ->table($migrationService->getImporterForEntity($entity)?->getSourceTable() ?? '')
+            ->count();
+
+        if ($limit !== null && $limit !== 0) {
+            $totalRecords = min($totalRecords, $limit + ($offset ?? 0));
+        }
+
+        $manager = new ConcurrentMigrationManager(
+            maxRecordsPerProcess: $maxRecordsPerProcess,
+            maxConcurrentProcesses: $maxProcesses,
+            output: $this->output,
+        );
+
+        $this->trap([SIGINT, SIGTERM], function () use ($manager, $migrationService): void {
+            $this->warn('Concurrent migration interrupted. Terminating processes...');
+            $manager->terminateAll();
+            $migrationService->cleanup();
+            exit(1);
+        });
+
+        $result = $manager->migrate(
+            source: $source,
+            entity: $entity,
+            totalRecords: $totalRecords,
+            batchSize: $batchSize,
+            isDryRun: $isDryRun,
+            useSsh: (bool) $this->option('ssh'),
+            globalOffset: $offset,
+        );
+
+        $migrationService->cleanup();
+
+        if ($result) {
+            $sourceInstance->getImporter($entity)->markCompleted();
+        }
+
+        return self::SUCCESS;
     }
 
     protected function promptForOptionalDependencies(MigrationService $migrationService, string $sourceName, ?string $entity): void
@@ -280,6 +420,24 @@ class MigrateCommand extends Command
     /**
      * @throws RandomException
      */
+    protected function findAvailablePort(int $minPort = 10000, int $maxPort = 65000, int $maxAttempts = 100): ?int
+    {
+        for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
+            $port = random_int($minPort, $maxPort);
+
+            $result = Process::run("lsof -ti:$port");
+
+            if ($result->failed() || trim($result->output()) === '') {
+                return $port;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws RandomException
+     */
     protected function createSshTunnel(array $sshConfig, string $connectionName): ?array
     {
         $dbConfig = config("database.connections.$connectionName");
@@ -288,7 +446,14 @@ class MigrateCommand extends Command
             return null;
         }
 
-        $localPort = random_int(10000, 65000);
+        $localPort = $this->findAvailablePort();
+
+        if ($localPort === null) {
+            $this->error('Could not find an available port for SSH tunnel.');
+
+            return null;
+        }
+
         $remoteHost = $dbConfig['host'];
         $remotePort = $dbConfig['port'];
 
@@ -384,5 +549,71 @@ class MigrateCommand extends Command
         );
 
         return self::SUCCESS;
+    }
+
+    protected function getOrSelectSource(MigrationService $migrationService): ?string
+    {
+        $source = $this->argument('source');
+
+        if (! $source) {
+            $source = select(
+                label: 'Select migration source',
+                options: $migrationService->getAvailableSources(),
+            );
+        }
+
+        if (! in_array($source, $migrationService->getAvailableSources())) {
+            $this->error("Unknown migration source: $source");
+
+            return null;
+        }
+
+        return $source;
+    }
+
+    protected function getSourceInstance(MigrationService $migrationService, string $source): ?MigrationSource
+    {
+        $sourceInstance = $migrationService->getSource($source);
+
+        if (! $sourceInstance instanceof MigrationSource) {
+            $this->error('Invalid migration source.');
+
+            return null;
+        }
+
+        return $sourceInstance;
+    }
+
+    /**
+     * @throws RandomException
+     */
+    protected function setupSshTunnelIfNeeded(MigrationSource $sourceInstance): ?array
+    {
+        if (! $this->option('ssh')) {
+            return [];
+        }
+
+        $sshConfig = $sourceInstance->getSshConfig();
+
+        if ($sshConfig === null || $sshConfig === []) {
+            $this->error('SSH configuration not found for this source.');
+            $this->warn('Please configure SSH credentials in your .env file:');
+            $this->warn('MIGRATION_IC_SSH_HOST, MIGRATION_IC_SSH_USER, MIGRATION_IC_SSH_PORT, MIGRATION_IC_SSH_KEY');
+
+            return null;
+        }
+
+        $this->info('Creating SSH tunnel...');
+        $sshTunnel = $this->createSshTunnel($sshConfig, $sourceInstance->getConnection());
+
+        if ($sshTunnel === null || $sshTunnel === []) {
+            $this->error('Failed to create SSH tunnel.');
+
+            return null;
+        }
+
+        $this->info('SSH tunnel established successfully.');
+
+        return $sshTunnel;
     }
 }

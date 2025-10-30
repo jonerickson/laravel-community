@@ -29,5 +29,9 @@ interface EntityImporter
         MigrationResult $result,
     ): void;
 
+    public function isCompleted(): bool;
+
+    public function markCompleted(): void;
+
     public function cleanup(): void;
 }

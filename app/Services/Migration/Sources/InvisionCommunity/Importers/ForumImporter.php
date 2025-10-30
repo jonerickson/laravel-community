@@ -42,6 +42,16 @@ class ForumImporter implements EntityImporter
         return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_CATEGORY_PREFIX.$sourceCategoryId);
     }
 
+    public function isCompleted(): bool
+    {
+        return (bool) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.'completed');
+    }
+
+    public function markCompleted(): void
+    {
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.'completed', true, self::CACHE_TTL);
+    }
+
     public function cleanup(): void
     {
         Cache::tags(self::CACHE_TAG)->flush();
@@ -79,12 +89,14 @@ class ForumImporter implements EntityImporter
 
         $this->importCategories($connection, $batchSize, $limit, $offset, $isDryRun, $output, $result);
 
-        $query = DB::connection($connection)
+        $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->where('parent_id', '<>', -1)
-            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->skip($offset));
+            ->orderBy('id')
+            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
+            ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 
-        $totalForums = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
+        $totalForums = $limit !== null && $limit !== 0 ? min($limit, $baseQuery->count()) : $baseQuery->count();
 
         $output->writeln("Found {$totalForums} forums to migrate...");
 
@@ -93,11 +105,10 @@ class ForumImporter implements EntityImporter
 
         $processed = 0;
 
-        $query
-            ->lazyById($batchSize, 'id')
-            ->each(function ($sourceForum) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): void {
+        $baseQuery->chunk($batchSize, function ($forums) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+            foreach ($forums as $sourceForum) {
                 if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                    return;
+                    return false;
                 }
 
                 try {
@@ -123,7 +134,10 @@ class ForumImporter implements EntityImporter
 
                 $processed++;
                 $progressBar->advance();
-            });
+            }
+
+            return true;
+        });
 
         $progressBar->finish();
         $output->newLine(2);
@@ -138,12 +152,14 @@ class ForumImporter implements EntityImporter
         OutputStyle $output,
         MigrationResult $result,
     ): void {
-        $query = DB::connection($connection)
+        $baseQuery = DB::connection($connection)
             ->table('forums_forums')
             ->where('parent_id', -1)
-            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->skip($offset));
+            ->orderBy('id')
+            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
+            ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 
-        $totalCategories = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
+        $totalCategories = $limit !== null && $limit !== 0 ? min($limit, $baseQuery->count()) : $baseQuery->count();
 
         $output->writeln("Found {$totalCategories} forum categories to migrate...");
 
@@ -152,11 +168,10 @@ class ForumImporter implements EntityImporter
 
         $processed = 0;
 
-        $query
-            ->lazyById($batchSize, 'id')
-            ->each(function ($sourceCategory) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): void {
+        $baseQuery->chunk($batchSize, function ($categories) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+            foreach ($categories as $sourceCategory) {
                 if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                    return;
+                    return false;
                 }
 
                 try {
@@ -182,7 +197,10 @@ class ForumImporter implements EntityImporter
 
                 $processed++;
                 $progressBar->advance();
-            });
+            }
+
+            return true;
+        });
 
         $progressBar->finish();
         $output->newLine(2);
@@ -190,7 +208,7 @@ class ForumImporter implements EntityImporter
 
     protected function importCategory(object $sourceCategory, bool $isDryRun, MigrationResult $result): void
     {
-        $name = $this->languageResolver?->resolveForumName($sourceCategory->id) ?? "Invision Forum Category $sourceCategory->id";
+        $name = $this->languageResolver?->resolveForumName($sourceCategory->id, "Invision Forum Category $sourceCategory->id");
         $slug = $sourceCategory->name_seo ?? Str::slug($name);
 
         $existingCategory = ForumCategory::query()
@@ -238,7 +256,7 @@ class ForumImporter implements EntityImporter
 
     protected function importForum(object $sourceForum, bool $isDryRun, MigrationResult $result): void
     {
-        $name = $this->languageResolver->resolveForumName($sourceForum->id) ?? "Invision Forum $sourceForum->id";
+        $name = $this->languageResolver->resolveForumName($sourceForum->id, "Invision Forum $sourceForum->id");
         $slug = $sourceForum->name_seo ?? Str::slug($name);
 
         $existingForum = Forum::query()

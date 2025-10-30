@@ -38,6 +38,16 @@ class TopicImporter implements EntityImporter
         return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.$sourceTopicId);
     }
 
+    public function isCompleted(): bool
+    {
+        return (bool) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.'completed');
+    }
+
+    public function markCompleted(): void
+    {
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.'completed', true, self::CACHE_TTL);
+    }
+
     public function cleanup(): void
     {
         Cache::tags(self::CACHE_TAG)->flush();
@@ -76,11 +86,13 @@ class TopicImporter implements EntityImporter
             $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
         }
 
-        $query = DB::connection($connection)
+        $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
-            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->skip($offset));
+            ->orderBy('tid')
+            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
+            ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 
-        $totalTopics = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
+        $totalTopics = $baseQuery->count();
 
         $output->writeln("Found {$totalTopics} topics to migrate...");
 
@@ -89,11 +101,10 @@ class TopicImporter implements EntityImporter
 
         $processed = 0;
 
-        $query
-            ->lazyById($batchSize, 'tid')
-            ->each(function ($sourceTopic) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): void {
+        $baseQuery->chunk($batchSize, function ($topics) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+            foreach ($topics as $sourceTopic) {
                 if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                    return;
+                    return false;
                 }
 
                 try {
@@ -119,7 +130,10 @@ class TopicImporter implements EntityImporter
 
                 $processed++;
                 $progressBar->advance();
-            });
+            }
+
+            return true;
+        });
 
         $progressBar->finish();
         $output->newLine(2);

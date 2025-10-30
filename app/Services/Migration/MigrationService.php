@@ -73,7 +73,7 @@ class MigrationService
         $result = new MigrationResult;
         $this->migratedEntities = [];
 
-        if ($entity !== null && $entity !== '' && $entity !== '0') {
+        if (! is_null($entity)) {
             $this->migrateEntityWithDependencies($migrationSource, $entity, $batchSize, $limit, $offset, $isDryRun, $output, $result);
         } else {
             foreach ($migrationSource->getImporters() as $importerEntity => $importer) {
@@ -82,6 +82,19 @@ class MigrationService
         }
 
         return $result;
+    }
+
+    public function getImporterForEntity(string $entityName): ?Contracts\EntityImporter
+    {
+        foreach ($this->sources as $source) {
+            $importer = $source->getImporter($entityName);
+
+            if ($importer instanceof Contracts\EntityImporter) {
+                return $importer;
+            }
+        }
+
+        return null;
     }
 
     public function cleanup(): void
@@ -113,6 +126,13 @@ class MigrationService
             throw new InvalidArgumentException("Unknown entity: $entity");
         }
 
+        if ($importer->isCompleted()) {
+            $output->writeln("<info>Skipping $entity - already completed</info>");
+            $this->migratedEntities[] = $entity;
+
+            return;
+        }
+
         $dependencies = $importer->getDependencies();
         $preDependencies = array_filter($dependencies, fn (ImporterDependency $dep): bool => $dep->isPre());
 
@@ -125,6 +145,10 @@ class MigrationService
         }
 
         $this->migrateEntity($source, $entity, $batchSize, $limit, $offset, $isDryRun, $output, $result);
+
+        if ($limit === null && $offset === null && ! $isDryRun) {
+            $importer->markCompleted();
+        }
 
         $this->migratedEntities[] = $entity;
 

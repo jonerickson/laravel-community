@@ -40,6 +40,16 @@ class PostImporter implements EntityImporter
         return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.$sourcePostId);
     }
 
+    public function isCompleted(): bool
+    {
+        return (bool) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.'completed');
+    }
+
+    public function markCompleted(): void
+    {
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.'completed', true, self::CACHE_TTL);
+    }
+
     public function cleanup(): void
     {
         Cache::tags(self::CACHE_TAG)->flush();
@@ -78,12 +88,14 @@ class PostImporter implements EntityImporter
             $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
         }
 
-        $query = DB::connection($connection)
+        $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->where('queued', 0)
-            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->skip($offset));
+            ->orderBy('pid')
+            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
+            ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 
-        $totalPosts = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
+        $totalPosts = $limit !== null && $limit !== 0 ? min($limit, $baseQuery->count()) : $baseQuery->count();
 
         $output->writeln("Found {$totalPosts} posts to migrate...");
 
@@ -92,11 +104,10 @@ class PostImporter implements EntityImporter
 
         $processed = 0;
 
-        $query
-            ->lazyById($batchSize, 'pid')
-            ->each(function ($sourcePost) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): void {
+        $baseQuery->chunk($batchSize, function ($posts) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+            foreach ($posts as $sourcePost) {
                 if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                    return;
+                    return false;
                 }
 
                 try {
@@ -120,7 +131,10 @@ class PostImporter implements EntityImporter
 
                 $processed++;
                 $progressBar->advance();
-            });
+            }
+
+            return true;
+        });
 
         $progressBar->finish();
         $output->newLine(2);

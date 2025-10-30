@@ -41,6 +41,16 @@ class OrderImporter implements EntityImporter
         return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.$sourceOrderId);
     }
 
+    public function isCompleted(): bool
+    {
+        return (bool) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.'completed');
+    }
+
+    public function markCompleted(): void
+    {
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.'completed', true, self::CACHE_TTL);
+    }
+
     public function cleanup(): void
     {
         Cache::tags(self::CACHE_TAG)->flush();
@@ -79,12 +89,14 @@ class OrderImporter implements EntityImporter
             $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
         }
 
-        $query = DB::connection($connection)
+        $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->where('i_status', 'paid')
-            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->skip($offset));
+            ->orderBy('i_id')
+            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
+            ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 
-        $totalOrders = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
+        $totalOrders = $limit !== null && $limit !== 0 ? min($limit, $baseQuery->count()) : $baseQuery->count();
 
         $output->writeln("Found {$totalOrders} paid orders to migrate...");
 
@@ -93,11 +105,10 @@ class OrderImporter implements EntityImporter
 
         $processed = 0;
 
-        $query
-            ->lazyById($batchSize, 'i_id')
-            ->each(function ($sourceOrder) use ($connection, $limit, $isDryRun, $result, $progressBar, $output, &$processed): void {
+        $baseQuery->chunk($batchSize, function ($orders) use ($connection, $limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+            foreach ($orders as $sourceOrder) {
                 if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                    return;
+                    return false;
                 }
 
                 try {
@@ -121,7 +132,10 @@ class OrderImporter implements EntityImporter
 
                 $processed++;
                 $progressBar->advance();
-            });
+            }
+
+            return true;
+        });
 
         $progressBar->finish();
         $output->newLine(2);

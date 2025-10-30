@@ -38,6 +38,16 @@ class BlogImporter implements EntityImporter
         return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.$sourceBlogId);
     }
 
+    public function isCompleted(): bool
+    {
+        return (bool) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.'completed');
+    }
+
+    public function markCompleted(): void
+    {
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.'completed', true, self::CACHE_TTL);
+    }
+
     public function cleanup(): void
     {
         Cache::tags(self::CACHE_TAG)->flush();
@@ -76,12 +86,14 @@ class BlogImporter implements EntityImporter
             $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
         }
 
-        $query = DB::connection($connection)
+        $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->where('entry_status', 'published')
-            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->skip($offset));
+            ->orderBy('entry_id')
+            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
+            ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 
-        $totalBlogs = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
+        $totalBlogs = $limit !== null && $limit !== 0 ? min($limit, $baseQuery->count()) : $baseQuery->count();
 
         $output->writeln("Found {$totalBlogs} blog entries to migrate...");
 
@@ -90,11 +102,10 @@ class BlogImporter implements EntityImporter
 
         $processed = 0;
 
-        $query
-            ->lazyById($batchSize, 'entry_id')
-            ->each(function ($sourceBlogEntry) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): void {
+        $baseQuery->chunk($batchSize, function ($blogEntries) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+            foreach ($blogEntries as $sourceBlogEntry) {
                 if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                    return;
+                    return false;
                 }
 
                 try {
@@ -123,7 +134,10 @@ class BlogImporter implements EntityImporter
 
                 $processed++;
                 $progressBar->advance();
-            });
+            }
+
+            return true;
+        });
 
         $progressBar->finish();
         $output->newLine(2);

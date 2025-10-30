@@ -13,8 +13,6 @@ class InvisionCommunityLanguageResolver
 
     protected const int CACHE_TTL = 3600;
 
-    protected array $languageCache = [];
-
     public function __construct(
         protected string $connection,
         protected ?int $defaultLanguageId = null,
@@ -26,13 +24,7 @@ class InvisionCommunityLanguageResolver
 
     public function resolve(string $key, ?string $fallback = null): ?string
     {
-        if (isset($this->languageCache[$key])) {
-            return $this->languageCache[$key];
-        }
-
-        $cacheKey = self::CACHE_KEY_PREFIX.$key;
-
-        $value = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($key): ?string {
+        $value = Cache::remember(self::CACHE_KEY_PREFIX.$key, self::CACHE_TTL, function () use ($key): ?string {
             $result = DB::connection($this->connection)
                 ->table('core_sys_lang_words')
                 ->where('word_key', $key)
@@ -42,65 +34,55 @@ class InvisionCommunityLanguageResolver
             return $result ? (string) $result : null;
         });
 
-        $this->languageCache[$key] = $value ?? $fallback;
-
-        return $this->languageCache[$key];
+        return $value ?? $fallback;
     }
 
-    public function resolveGroupName(int|string $groupId): ?string
+    public function resolveGroupName(int|string $groupId, ?string $fallback = null): ?string
     {
-        return $this->resolve("core_group_$groupId");
+        return $this->resolve("core_group_$groupId", $fallback);
     }
 
-    public function resolveProductGroupName(int|string $groupId): ?string
+    public function resolveProductGroupName(int|string $groupId, ?string $fallback = null): ?string
     {
-        return $this->resolve("nexus_pgroup_$groupId");
+        return $this->resolve("nexus_pgroup_$groupId", $fallback);
     }
 
-    public function resolveProductName(int|string $groupId): ?string
+    public function resolveProductName(int|string $groupId, ?string $fallback = null): ?string
     {
-        return $this->resolve("nexus_package_$groupId");
+        return $this->resolve("nexus_package_$groupId", $fallback);
     }
 
-    public function resolveSubscriptionPackageName(int|string $packageId): ?string
+    public function resolveSubscriptionPackageName(int|string $packageId, ?string $fallback = null): ?string
     {
-        return $this->resolve("nexus_subs_$packageId");
+        return $this->resolve("nexus_subs_$packageId", $fallback);
     }
 
-    public function resolveForumName(int|string $forumId): ?string
+    public function resolveForumName(int|string $forumId, ?string $fallback = null): ?string
     {
-        return $this->resolve("forums_forum_$forumId");
+        return $this->resolve("forums_forum_$forumId", $fallback);
     }
 
     public function batchResolve(array $keys): array
     {
-        $missingKeys = array_diff($keys, array_keys($this->languageCache));
+        $result = [];
 
-        if ($missingKeys === []) {
-            return array_intersect_key($this->languageCache, array_flip($keys));
-        }
-
-        $results = DB::connection($this->connection)
-            ->table('core_sys_lang_words')
-            ->whereIn('word_key', $missingKeys)
-            ->where('lang_id', $this->defaultLanguageId)
-            ->pluck('word_default', 'word_key')
-            ->toArray();
-
-        foreach ($missingKeys as $key) {
-            $value = $results[$key] ?? null;
-            $this->languageCache[$key] = $value;
-
+        foreach ($keys as $key) {
             $cacheKey = self::CACHE_KEY_PREFIX.$key;
-            Cache::put($cacheKey, $value, self::CACHE_TTL);
+
+            $value = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($key): ?string {
+                $result = DB::connection($this->connection)
+                    ->table('core_sys_lang_words')
+                    ->where('word_key', $key)
+                    ->where('lang_id', $this->defaultLanguageId)
+                    ->value('word_default');
+
+                return $result ? (string) $result : null;
+            });
+
+            $result[$key] = $value;
         }
 
-        return array_intersect_key($this->languageCache, array_flip($keys));
-    }
-
-    public function clearCache(): void
-    {
-        $this->languageCache = [];
+        return $result;
     }
 
     protected function getDefaultLanguageId(): int

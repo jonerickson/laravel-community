@@ -47,6 +47,16 @@ class ProductImporter implements EntityImporter
         return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_CATEGORY_PREFIX.$sourceCategoryId);
     }
 
+    public function isCompleted(): bool
+    {
+        return (bool) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.'completed');
+    }
+
+    public function markCompleted(): void
+    {
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.'completed', true, self::CACHE_TTL);
+    }
+
     public function cleanup(): void
     {
         Cache::tags(self::CACHE_TAG)->flush();
@@ -84,12 +94,14 @@ class ProductImporter implements EntityImporter
 
         $this->importCategories($connection, $batchSize, $limit, $offset, $isDryRun, $output, $result);
 
-        $query = DB::connection($connection)
+        $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->where('p_store', 1)
-            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->skip($offset));
+            ->orderBy('p_id')
+            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
+            ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 
-        $totalProducts = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
+        $totalProducts = $limit !== null && $limit !== 0 ? min($limit, $baseQuery->count()) : $baseQuery->count();
 
         $output->writeln("Found {$totalProducts} products to migrate...");
 
@@ -98,11 +110,10 @@ class ProductImporter implements EntityImporter
 
         $processed = 0;
 
-        $query
-            ->lazyById($batchSize, 'p_id')
-            ->each(function ($sourceProduct) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): void {
+        $baseQuery->chunk($batchSize, function ($products) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+            foreach ($products as $sourceProduct) {
                 if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                    return;
+                    return false;
                 }
 
                 try {
@@ -128,7 +139,10 @@ class ProductImporter implements EntityImporter
 
                 $processed++;
                 $progressBar->advance();
-            });
+            }
+
+            return true;
+        });
 
         $progressBar->finish();
         $output->newLine(2);
@@ -143,11 +157,13 @@ class ProductImporter implements EntityImporter
         OutputStyle $output,
         MigrationResult $result,
     ): void {
-        $query = DB::connection($connection)
+        $baseQuery = DB::connection($connection)
             ->table('nexus_package_groups')
-            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->skip($offset));
+            ->orderBy('pg_id')
+            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
+            ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 
-        $totalCategories = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
+        $totalCategories = $limit !== null && $limit !== 0 ? min($limit, $baseQuery->count()) : $baseQuery->count();
 
         $output->writeln("Found {$totalCategories} product categories to migrate...");
 
@@ -156,11 +172,10 @@ class ProductImporter implements EntityImporter
 
         $processed = 0;
 
-        $query
-            ->lazyById($batchSize, 'pg_id')
-            ->each(function ($sourceCategory) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): void {
+        $baseQuery->chunk($batchSize, function ($categories) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+            foreach ($categories as $sourceCategory) {
                 if ($limit !== null && $limit !== 0 && $processed >= $limit) {
-                    return;
+                    return false;
                 }
 
                 try {
@@ -186,7 +201,10 @@ class ProductImporter implements EntityImporter
 
                 $processed++;
                 $progressBar->advance();
-            });
+            }
+
+            return true;
+        });
 
         $progressBar->finish();
         $output->newLine(2);
@@ -194,7 +212,7 @@ class ProductImporter implements EntityImporter
 
     protected function importCategory(object $sourceCategory, bool $isDryRun, MigrationResult $result): void
     {
-        $name = $this->languageResolver?->resolveProductGroupName($sourceCategory->pg_id) ?? "Invision Product Group $sourceCategory->pg_id";
+        $name = $this->languageResolver?->resolveProductGroupName($sourceCategory->pg_id, "Invision Product Group $sourceCategory->pg_id");
         $slug = $sourceCategory->pg_seo_name ?? Str::slug($name);
 
         $existingCategory = ProductCategory::query()
@@ -241,7 +259,7 @@ class ProductImporter implements EntityImporter
 
     protected function importProduct(object $sourceProduct, bool $isDryRun, MigrationResult $result): void
     {
-        $name = $this->languageResolver->resolveProductName($sourceProduct->p_id) ?? "Invision Product $sourceProduct->p_id";
+        $name = $this->languageResolver->resolveProductName($sourceProduct->p_id, "Invision Product $sourceProduct->p_id");
         $slug = $sourceProduct->p_seo_name ?? Str::slug($name);
 
         $existingProduct = Product::query()

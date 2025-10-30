@@ -67,11 +67,13 @@ class GroupImporter implements EntityImporter
             $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
         }
 
-        $query = DB::connection($connection)
+        $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
-            ->when($offset !== null && $offset !== 0, fn (Builder $builder) => $builder->skip($offset));
+            ->orderBy('g_id')
+            ->when($offset !== null && $offset !== 0, fn (Builder $builder) => $builder->offset($offset))
+            ->when($limit !== null && $limit !== 0, fn (Builder $builder) => $builder->limit($limit));
 
-        $totalGroups = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
+        $totalGroups = $baseQuery->count();
 
         $output->writeln("Found {$totalGroups} groups to migrate...");
 
@@ -80,9 +82,12 @@ class GroupImporter implements EntityImporter
 
         $processed = 0;
 
-        $query
-            ->lazyById($batchSize, 'g_id')
-            ->each(function (object $sourceGroup) use ($isDryRun, $result, $progressBar, $output, &$processed): void {
+        $baseQuery->chunk($batchSize, function ($groups) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+            foreach ($groups as $sourceGroup) {
+                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                    return false;
+                }
+
                 try {
                     $this->importGroup($sourceGroup, $isDryRun, $result);
                 } catch (Exception $e) {
@@ -106,10 +111,23 @@ class GroupImporter implements EntityImporter
 
                 $processed++;
                 $progressBar->advance();
-            });
+            }
+
+            return true;
+        });
 
         $progressBar->finish();
         $output->newLine(2);
+    }
+
+    public function isCompleted(): bool
+    {
+        return (bool) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.'completed');
+    }
+
+    public function markCompleted(): void
+    {
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.'completed', true, self::CACHE_TTL);
     }
 
     public function cleanup(): void
@@ -119,7 +137,7 @@ class GroupImporter implements EntityImporter
 
     protected function importGroup(object $sourceGroup, bool $isDryRun, MigrationResult $result): void
     {
-        $name = $this->languageResolver?->resolveGroupName($sourceGroup->g_id) ?? "Invision Group $sourceGroup->g_id";
+        $name = $this->languageResolver?->resolveGroupName($sourceGroup->g_id, "Invision Group $sourceGroup->g_id");
 
         $existingGroup = Group::query()->where('name', $name)->first();
 

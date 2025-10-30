@@ -61,11 +61,20 @@ class UserImporter implements EntityImporter
     ): void {
         DB::connection($connection)->disableQueryLog();
 
-        $query = DB::connection($connection)
+        $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
-            ->when($offset !== null && $offset !== 0, fn (Builder $builder) => $builder->skip($offset));
+            ->orderBy('member_id')
+            ->when($offset !== null && $offset !== 0, fn (Builder $builder) => $builder->offset($offset))
+            ->when($limit !== null && $limit !== 0, fn (Builder $builder) => $builder->limit($limit));
 
-        $totalUsers = $limit !== null && $limit !== 0 ? min($limit, $query->count()) : $query->count();
+        if ($offset > 0) {
+            $totalUsers = DB::connection($connection)
+                ->table(DB::raw("({$baseQuery->toSql()}) as limited"))
+                ->mergeBindings($baseQuery)
+                ->count();
+        } else {
+            $totalUsers = $baseQuery->count();
+        }
 
         $output->writeln("Found $totalUsers users to migrate...");
 
@@ -74,9 +83,12 @@ class UserImporter implements EntityImporter
 
         $processed = 0;
 
-        $query
-            ->lazyById($batchSize, 'member_id')
-            ->each(function ($sourceUser) use ($isDryRun, $result, $progressBar, $output, &$processed): void {
+        $baseQuery->chunk($batchSize, function ($users) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+            foreach ($users as $sourceUser) {
+                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                    return false;
+                }
+
                 try {
                     $this->importUser($sourceUser, $isDryRun, $result, $output);
                 } catch (Exception $e) {
@@ -103,10 +115,23 @@ class UserImporter implements EntityImporter
 
                 $processed++;
                 $progressBar->advance();
-            });
+            }
+
+            return true;
+        });
 
         $progressBar->finish();
         $output->newLine(2);
+    }
+
+    public function isCompleted(): bool
+    {
+        return (bool) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.'completed');
+    }
+
+    public function markCompleted(): void
+    {
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.'completed', true, self::CACHE_TTL);
     }
 
     public function cleanup(): void
