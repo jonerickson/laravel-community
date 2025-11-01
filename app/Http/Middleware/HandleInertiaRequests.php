@@ -65,7 +65,7 @@ class HandleInertiaRequests extends Middleware
                 ]))
                 ->toArray()),
             'cartCount' => $this->shoppingCartService->getCartCount(),
-            'memberCount' => Cache::remember('member_count', now()->addHour(), fn () => Number::format(User::count())),
+            'memberCount' => (int) Cache::remember('member_count', now()->addHour(), fn () => Number::format(User::count())),
             'flash' => null,
             'name' => config('app.name'),
             'email' => config('app.email'),
