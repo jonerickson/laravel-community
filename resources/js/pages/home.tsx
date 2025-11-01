@@ -1,5 +1,6 @@
 import { AppFooter } from '@/components/app-footer';
 import { AppHeader } from '@/components/app-header';
+import { EmptyState } from '@/components/empty-state';
 import HeadingLarge from '@/components/heading-large';
 import Loading from '@/components/loading';
 import { AbstractBackgroundPattern } from '@/components/ui/abstract-background-pattern';
@@ -18,6 +19,7 @@ import {
     Gamepad2,
     Globe,
     MessageSquare,
+    Package,
     Rocket,
     Shield,
     ShoppingCart,
@@ -269,7 +271,16 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                         </div>
 
                         <Deferred data="subscriptions" fallback={<Loading variant="grid" cols={3} />}>
-                            <SubscriptionCards subscriptions={subscriptions} />
+                            {subscriptions && subscriptions.length > 0 ? (
+                                <SubscriptionCards subscriptions={subscriptions} />
+                            ) : (
+                                <EmptyState
+                                    className="z-20 bg-background"
+                                    icon={<Package />}
+                                    title="No subscription plans available"
+                                    description="We're currently working on our subscription offerings. Check back soon for exciting plans and features!"
+                                />
+                            )}
                         </Deferred>
                     </div>
                 </section>

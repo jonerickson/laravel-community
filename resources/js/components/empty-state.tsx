@@ -11,12 +11,13 @@ interface EmptyStateProps {
     buttonText?: string;
     onButtonClick?: () => void;
     border?: boolean;
+    className?: string;
 }
 
-export function EmptyState({ icon, title, description, buttonText, onButtonClick, border = true }: EmptyStateProps) {
+export function EmptyState({ icon, title, description, buttonText, onButtonClick, border = true, className = '' }: EmptyStateProps) {
     return (
         <Empty
-            className={cn({
+            className={cn(className, {
                 'border border-dashed': border,
             })}
         >
