@@ -15,7 +15,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
@@ -26,14 +28,18 @@ use Illuminate\Support\Str;
  * @property int $order
  * @property bool $is_active
  * @property bool $is_visible
+ * @property int|null $parent_id
  * @property string $slug
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
+ * @property-read Collection<int, ProductCategory> $children
+ * @property-read int|null $children_count
  * @property-read Image|null $image
  * @property-read Collection<int, Image> $images
  * @property-read int|null $images_count
+ * @property-read ProductCategory|null $parent
  * @property-read Collection<int, Product> $products
  * @property-read int|null $products_count
  *
@@ -53,6 +59,7 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|ProductCategory whereIsVisible($value)
  * @method static Builder<static>|ProductCategory whereName($value)
  * @method static Builder<static>|ProductCategory whereOrder($value)
+ * @method static Builder<static>|ProductCategory whereParentId($value)
  * @method static Builder<static>|ProductCategory whereSlug($value)
  * @method static Builder<static>|ProductCategory whereUpdatedAt($value)
  *
@@ -74,7 +81,18 @@ class ProductCategory extends Model implements Sluggable
         'name',
         'slug',
         'description',
+        'parent_id',
     ];
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(ProductCategory::class, 'parent_id');
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(ProductCategory::class, 'parent_id');
+    }
 
     public function products(): BelongsToMany
     {

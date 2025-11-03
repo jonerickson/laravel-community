@@ -20,12 +20,13 @@ class StoreController extends Controller
     {
         return Inertia::render('store/index', [
             'categories' => Inertia::defer(fn (): \Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection|\Spatie\LaravelData\CursorPaginatedDataCollection|\Illuminate\Support\Enumerable|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Contracts\Pagination\CursorPaginator|array => ProductCategoryData::collect(ProductCategory::query()
+                ->whereNull('parent_id')
                 ->active()
                 ->visible()
                 ->ordered()
                 ->with('image')
                 ->latest()
-                ->take(4)
+                ->take(3)
                 ->get()
                 ->filter(fn (ProductCategory $category) => Gate::check('view', $category))
                 ->values())),

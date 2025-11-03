@@ -125,12 +125,12 @@ export default function Product({ product: productData, reviews }: ProductProps)
                     </div>
                 </div>
 
-                <div className="mt-6 lg:col-span-5 lg:flex lg:h-full lg:flex-col">
+                <div className="lg:col-span-5 lg:flex lg:h-full lg:flex-col">
                     {productData?.description && (
-                        <>
+                        <div className="mt-6">
                             <HeadingSmall title="Description" />
                             <RichEditorContent className="text-sm text-muted-foreground" content={productData.description} />
-                        </>
+                        </div>
                     )}
 
                     {productData && (

@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Data;
 
 use Spatie\LaravelData\Attributes\LoadRelation;
+use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 #[TypeScript]
+#[MapInputName(SnakeCaseMapper::class)]
 class ProductCategoryData extends Data
 {
     public int $id;
@@ -19,6 +22,14 @@ class ProductCategoryData extends Data
 
     public ?string $description = null;
 
+    public ?int $parentId = null;
+
     #[LoadRelation]
     public ?ImageData $image = null;
+
+    #[LoadRelation]
+    public ?ProductCategoryData $parent = null;
+
+    /** @var ProductCategoryData[] */
+    public ?array $children = null;
 }

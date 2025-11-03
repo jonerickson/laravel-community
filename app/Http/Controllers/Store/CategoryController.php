@@ -25,6 +25,7 @@ class CategoryController extends Controller
         $this->authorize('viewAny', ProductCategory::class);
 
         $categories = ProductCategory::query()
+            ->whereNull('parent_id')
             ->active()
             ->visible()
             ->ordered()
@@ -41,6 +42,8 @@ class CategoryController extends Controller
     public function show(ProductCategory $category)
     {
         $this->authorize('view', $category);
+
+        $category->load(['image', 'parent', 'children.image']);
 
         $products = Product::query()
             ->whereHas('categories', fn (Builder $query) => $query->whereKey($category->id))

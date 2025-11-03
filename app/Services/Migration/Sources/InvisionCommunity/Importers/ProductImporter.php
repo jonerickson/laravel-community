@@ -171,12 +171,15 @@ class ProductImporter implements EntityImporter
         $progressBar->start();
 
         $processed = 0;
+        $sourceCategoriesData = [];
 
-        $baseQuery->chunk($batchSize, function ($categories) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($batchSize, function ($categories) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed, &$sourceCategoriesData): bool {
             foreach ($categories as $sourceCategory) {
                 if ($limit !== null && $limit !== 0 && $processed >= $limit) {
                     return false;
                 }
+
+                $sourceCategoriesData[] = $sourceCategory;
 
                 try {
                     $this->importCategory($sourceCategory, $isDryRun, $result);
@@ -208,37 +211,21 @@ class ProductImporter implements EntityImporter
 
         $progressBar->finish();
         $output->newLine(2);
+
+        $this->updateCategoryParentRelationships($sourceCategoriesData, $isDryRun, $output, $result);
     }
 
     protected function importCategory(object $sourceCategory, bool $isDryRun, MigrationResult $result): void
     {
         $name = $this->languageResolver?->resolveProductGroupName($sourceCategory->pg_id, "Invision Product Group $sourceCategory->pg_id");
-        $slug = $sourceCategory->pg_seo_name ?? Str::slug($name);
-
-        $existingCategory = ProductCategory::query()
-            ->where(function ($query) use ($name, $slug): void {
-                $query->where('name', $name)
-                    ->orWhere('slug', $slug);
-            })
-            ->first();
-
-        if ($existingCategory) {
-            $this->cacheCategoryMapping($sourceCategory->pg_id, $existingCategory->id);
-            $result->incrementSkipped('product_categories');
-            $result->recordSkipped('product_categories', [
-                'source_id' => $sourceCategory->pg_id,
-                'name' => $name,
-                'reason' => 'Already exists',
-            ]);
-
-            return;
-        }
+        $description = $this->languageResolver?->resolveProductGroupDescription($sourceCategory->pg_id);
+        $slug = Str::unique(Str::slug($sourceCategory->pg_seo_name ?? $name), 'products_categories', 'slug');
 
         $category = new ProductCategory;
         $category->forceFill([
             'name' => $name,
             'slug' => $slug,
-            'description' => null,
+            'description' => strip_tags($description ?? ''),
             'order' => $sourceCategory->pg_position ?? 0,
             'is_active' => true,
         ]);
@@ -257,37 +244,57 @@ class ProductImporter implements EntityImporter
         ]);
     }
 
+    protected function updateCategoryParentRelationships(array $sourceCategoriesData, bool $isDryRun, OutputStyle $output, MigrationResult $result): void
+    {
+        $output->writeln('Updating product category parent relationships...');
+
+        $progressBar = $output->createProgressBar(count($sourceCategoriesData));
+        $progressBar->start();
+
+        foreach ($sourceCategoriesData as $sourceCategory) {
+            try {
+                $mappedCategoryId = static::getCategoryMapping((int) $sourceCategory->pg_id);
+
+                if ($mappedCategoryId === null || $mappedCategoryId === 0) {
+                    $progressBar->advance();
+
+                    continue;
+                }
+
+                if (isset($sourceCategory->pg_parent) && $sourceCategory->pg_parent !== null && $sourceCategory->pg_parent !== 0) {
+                    $parentCategoryId = static::getCategoryMapping((int) $sourceCategory->pg_parent);
+
+                    if ($parentCategoryId !== null && $parentCategoryId !== 0 && ! $isDryRun) {
+                        ProductCategory::query()
+                            ->where('id', $mappedCategoryId)
+                            ->update(['parent_id' => $parentCategoryId]);
+                    }
+                }
+            } catch (Exception $e) {
+                Log::error('Failed to update product category parent relationship', [
+                    'source_id' => $sourceCategory->pg_id ?? 'unknown',
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+            }
+
+            $progressBar->advance();
+        }
+
+        $progressBar->finish();
+        $output->newLine(2);
+    }
+
     protected function importProduct(object $sourceProduct, bool $isDryRun, MigrationResult $result): void
     {
         $name = $this->languageResolver->resolveProductName($sourceProduct->p_id, "Invision Product $sourceProduct->p_id");
-        $slug = $sourceProduct->p_seo_name ?? Str::slug($name);
-
-        $existingProduct = Product::query()
-            ->where(function ($query) use ($name, $slug): void {
-                $query->where('name', $name)
-                    ->orWhere('slug', $slug);
-            })
-            ->first();
-
-        if ($existingProduct) {
-            $this->cacheProductMapping($sourceProduct->p_id, $existingProduct->id);
-            $result->incrementSkipped(self::ENTITY_NAME);
-            $result->recordSkipped(self::ENTITY_NAME, [
-                'source_id' => $sourceProduct->p_id,
-                'name' => $name,
-                'reason' => 'Already exists',
-            ]);
-
-            return;
-        }
-
-        $description = $this->cleanHtml($sourceProduct->p_page ?? '');
+        $slug = Str::unique(Str::slug($sourceProduct->p_seo_name ?? $name), 'products', 'slug');
 
         $product = new Product;
         $product->forceFill([
             'name' => $name,
             'slug' => $slug,
-            'description' => $description !== null && $description !== '' && $description !== '0' ? $description : "Product imported from Invision Community: $name",
+            'description' => strip_tags($sourceProduct->p_page ?? ''),
             'type' => ProductType::Product,
             'is_featured' => (bool) $sourceProduct->p_featured,
             'approval_status' => ProductApprovalStatus::Approved,

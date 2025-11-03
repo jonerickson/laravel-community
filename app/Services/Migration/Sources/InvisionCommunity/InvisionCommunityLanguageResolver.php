@@ -47,9 +47,14 @@ class InvisionCommunityLanguageResolver
         return $this->resolve("nexus_pgroup_$groupId", $fallback);
     }
 
-    public function resolveProductName(int|string $groupId, ?string $fallback = null): ?string
+    public function resolveProductGroupDescription(int|string $groupId, ?string $fallback = null): ?string
     {
-        return $this->resolve("nexus_package_$groupId", $fallback);
+        return $this->resolve("nexus_pgroup_{$groupId}_desc", $fallback);
+    }
+
+    public function resolveProductName(int|string $productId, ?string $fallback = null): ?string
+    {
+        return $this->resolve("nexus_package_$productId", $fallback);
     }
 
     public function resolveSubscriptionPackageName(int|string $packageId, ?string $fallback = null): ?string

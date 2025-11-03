@@ -370,7 +370,10 @@ declare namespace App.Data {
         name: string;
         slug: string;
         description: string | null;
+        parentId: number | null;
         image: App.Data.ImageData | null;
+        parent: App.Data.ProductCategoryData | null;
+        children: Array<App.Data.ProductCategoryData> | null;
     };
     export type ProductData = {
         id: number;

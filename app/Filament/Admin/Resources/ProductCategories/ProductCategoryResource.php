@@ -14,6 +14,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -63,6 +64,14 @@ class ProductCategoryResource extends Resource
                                     ->helperText('A SEO friendly title.')
                                     ->unique(ignoreRecord: true)
                                     ->rules(['alpha_dash']),
+                                Select::make('parent_id')
+                                    ->label('Parent Category')
+                                    ->relationship('parent', 'name')
+                                    ->columnSpanFull()
+                                    ->nullable()
+                                    ->preload()
+                                    ->searchable()
+                                    ->helperText('Optional parent category to create a subcategory.'),
                                 Textarea::make('description')
                                     ->helperText('A helpful description on what the product category features.')
                                     ->columnSpanFull()
@@ -124,6 +133,12 @@ class ProductCategoryResource extends Resource
                     ->searchable(),
                 TextColumn::make('slug')
                     ->searchable(),
+                TextColumn::make('parent.name')
+                    ->label('Parent')
+                    ->placeholder('No Parent')
+                    ->sortable()
+                    ->searchable()
+                    ->badge(),
                 IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean()
