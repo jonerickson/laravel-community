@@ -19,6 +19,7 @@ use Random\RandomException;
 
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\select;
+use function Laravel\Prompts\text;
 
 class MigrateCommand extends Command
 {
@@ -35,6 +36,7 @@ class MigrateCommand extends Command
                             {--check : Verify database connection and exit}
                             {--status : Display migration status with record counts for each entity}
                             {--ssh : Connect to the source database via SSH tunnel}
+                            {--base-url= : Base URL of the source site for downloading files/images}
                             {--parallel : Enable concurrent processing with multiple processes}
                             {--max-records-per-process=1000 : Maximum records each process should handle before terminating}
                             {--max-processes=4 : Maximum number of concurrent processes to run}
@@ -44,15 +46,23 @@ class MigrateCommand extends Command
 
     public function handle(MigrationService $migrationService): int
     {
-        $source = $this->argument('source');
         $entity = $this->option('entity');
         $batchSize = (int) $this->option('batch');
         $limit = $this->option('limit') ? (int) $this->option('limit') : null;
         $offset = $this->option('offset') ? (int) $this->option('offset') : null;
         $isDryRun = (bool) $this->option('dry-run');
 
+        $source = $this->getOrSelectSource($migrationService);
+        $sourceInstance = $this->getSourceInstance($migrationService, $source);
+
+        if (! $sourceInstance instanceof MigrationSource) {
+            return self::FAILURE;
+        }
+
+        $this->setupBaseUrlIfNeeded($sourceInstance);
+
         if ($this->option('worker')) {
-            if (! $source || ! $entity) {
+            if (in_array($source, [null, '', '0'], true) || ! $entity) {
                 $this->error('Worker mode requires --source and --entity');
 
                 return self::FAILURE;
@@ -60,7 +70,7 @@ class MigrateCommand extends Command
 
             return $this->handleWorkerMode(
                 migrationService: $migrationService,
-                source: $source,
+                source: $sourceInstance,
                 entity: $entity,
                 batchSize: $batchSize,
                 limit: $limit,
@@ -69,11 +79,9 @@ class MigrateCommand extends Command
             );
         }
 
-        $source = $this->getOrSelectSource($migrationService);
-
         return $this->handleCoordinatorMode(
             migrationService: $migrationService,
-            source: $source,
+            source: $sourceInstance,
             entity: $entity,
             batchSize: $batchSize,
             limit: $limit,
@@ -84,7 +92,7 @@ class MigrateCommand extends Command
 
     protected function handleWorkerMode(
         MigrationService $migrationService,
-        string $source,
+        MigrationSource $source,
         string $entity,
         int $batchSize,
         ?int $limit,
@@ -96,16 +104,10 @@ class MigrateCommand extends Command
         $startMemory = memory_get_usage(true);
         $this->info('Starting - Memory: '.round($startMemory / 1024 / 1024, 2).'MB');
 
-        $sourceInstance = $this->getSourceInstance($migrationService, $source);
-
-        if (! $sourceInstance instanceof MigrationSource) {
-            return self::FAILURE;
-        }
-
         $sshTunnel = null;
 
         try {
-            $sshTunnel = $this->setupSshTunnelIfNeeded($sourceInstance);
+            $sshTunnel = $this->setupSshTunnelIfNeeded($source);
 
             if ($this->option('ssh') && $sshTunnel === null) {
                 return self::FAILURE;
@@ -114,7 +116,7 @@ class MigrateCommand extends Command
             $this->info("Processing $entity: Batch Size $batchSize, Offset $offset, Limit $limit");
 
             $result = $migrationService->migrate(
-                source: $source,
+                source: $source->getName(),
                 entity: $entity,
                 batchSize: $batchSize,
                 limit: $limit,
@@ -123,7 +125,7 @@ class MigrateCommand extends Command
                 output: $this->output,
             );
 
-            DB::disconnect($sourceInstance->getConnection());
+            DB::disconnect($source->getConnection());
             gc_collect_cycles();
 
             $stats = $result->entities[$entity] ?? ['migrated' => 0, 'skipped' => 0, 'failed' => 0];
@@ -147,19 +149,13 @@ class MigrateCommand extends Command
 
     protected function handleCoordinatorMode(
         MigrationService $migrationService,
-        string $source,
+        MigrationSource $source,
         string $entity,
         int $batchSize,
         ?int $limit,
         ?int $offset,
         bool $isDryRun,
     ): int {
-        $sourceInstance = $this->getSourceInstance($migrationService, $source);
-
-        if (! $sourceInstance instanceof MigrationSource) {
-            return self::FAILURE;
-        }
-
         $sshTunnel = null;
 
         $this->trap([SIGINT, SIGTERM], function () use (&$sshTunnel, $migrationService): void {
@@ -174,18 +170,18 @@ class MigrateCommand extends Command
         });
 
         try {
-            $sshTunnel = $this->setupSshTunnelIfNeeded($sourceInstance);
+            $sshTunnel = $this->setupSshTunnelIfNeeded($source);
 
             if ($this->option('ssh') && $sshTunnel === null) {
                 return self::FAILURE;
             }
 
             if ($this->option('check')) {
-                return $this->checkDatabaseConnection($sourceInstance);
+                return $this->checkDatabaseConnection($source);
             }
 
             if ($this->option('status')) {
-                return $this->displayMigrationStatus($sourceInstance, $entity);
+                return $this->displayMigrationStatus($source, $entity);
             }
 
             if (! $this->confirmToProceed()) {
@@ -206,12 +202,11 @@ class MigrateCommand extends Command
 
             $this->promptForOptionalDependencies($migrationService, $source, $entity);
 
-            $this->info("Starting migration from $source...");
+            $this->info("Starting migration from {$source->getConnection()}...");
 
             if ($this->option('parallel') && $entity) {
                 return $this->runConcurrentMigration(
                     source: $source,
-                    sourceInstance: $sourceInstance,
                     entity: $entity,
                     batchSize: $batchSize,
                     limit: $limit,
@@ -222,7 +217,7 @@ class MigrateCommand extends Command
             }
 
             $result = $migrationService->migrate(
-                source: $source,
+                source: $source->getName(),
                 entity: $entity,
                 batchSize: $batchSize,
                 limit: $limit,
@@ -256,8 +251,7 @@ class MigrateCommand extends Command
     }
 
     protected function runConcurrentMigration(
-        string $source,
-        MigrationSource $sourceInstance,
+        MigrationSource $source,
         string $entity,
         int $batchSize,
         ?int $limit,
@@ -268,7 +262,7 @@ class MigrateCommand extends Command
         $maxRecordsPerProcess = (int) $this->option('max-records-per-process');
         $maxProcesses = (int) $this->option('max-processes');
 
-        $totalRecords = DB::connection($sourceInstance->getConnection())
+        $totalRecords = DB::connection($source->getConnection())
             ->table($migrationService->getImporterForEntity($entity)?->getSourceTable() ?? '')
             ->count();
 
@@ -302,20 +296,14 @@ class MigrateCommand extends Command
         $migrationService->cleanup();
 
         if ($result) {
-            $sourceInstance->getImporter($entity)->markCompleted();
+            $source->getImporter($entity)->markCompleted();
         }
 
         return self::SUCCESS;
     }
 
-    protected function promptForOptionalDependencies(MigrationService $migrationService, string $sourceName, ?string $entity): void
+    protected function promptForOptionalDependencies(MigrationService $migrationService, MigrationSource $source, ?string $entity): void
     {
-        $source = $migrationService->getSource($sourceName);
-
-        if (! $source instanceof MigrationSource) {
-            return;
-        }
-
         $optionalDependencies = $migrationService->getOptionalDependencies($source, $entity);
 
         if ($optionalDependencies === []) {
@@ -615,5 +603,23 @@ class MigrateCommand extends Command
         $this->info('SSH tunnel established successfully.');
 
         return $sshTunnel;
+    }
+
+    protected function setupBaseUrlIfNeeded(MigrationSource $source): void
+    {
+        $baseUrl = $this->option('base-url') ?? $source->getBaseUrl();
+
+        if ($baseUrl === null || $baseUrl === '') {
+            $baseUrl = text(
+                label: 'Enter the base URL of the source site (for downloading files/images)',
+                placeholder: 'https://example.com',
+                hint: 'Leave empty to skip file downloads',
+            );
+        }
+
+        if ($baseUrl !== '') {
+            $source->setBaseUrl($baseUrl);
+            $this->info("Base URL configured: $baseUrl");
+        }
     }
 }

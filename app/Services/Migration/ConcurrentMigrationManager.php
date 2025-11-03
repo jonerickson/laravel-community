@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Migration;
 
+use App\Services\Migration\Contracts\MigrationSource;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Support\Sleep;
 use Symfony\Component\Process\Process;
@@ -34,7 +35,7 @@ class ConcurrentMigrationManager
     ) {}
 
     public function migrate(
-        string $source,
+        MigrationSource $source,
         string $entity,
         int $totalRecords,
         int $batchSize,
@@ -104,7 +105,7 @@ class ConcurrentMigrationManager
     }
 
     protected function spawnWorkerProcess(
-        string $source,
+        MigrationSource $source,
         string $entity,
         int $offset,
         int $limit,
@@ -116,7 +117,7 @@ class ConcurrentMigrationManager
             PHP_BINARY,
             'artisan',
             'mi:migrate',
-            $source,
+            $source->getName(),
             '--entity='.$entity,
             '--offset='.$offset,
             '--limit='.$limit,

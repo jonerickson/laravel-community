@@ -21,6 +21,8 @@ class InvisionCommunitySource implements MigrationSource
 {
     protected array $importers = [];
 
+    protected ?string $baseUrl = null;
+
     public function __construct()
     {
         $this->importers = [
@@ -35,6 +37,8 @@ class InvisionCommunitySource implements MigrationSource
             'posts' => new PostImporter,
             'orders' => new OrderImporter,
         ];
+
+        $this->baseUrl = config('migration.sources.invision_community.base_url');
     }
 
     public function getName(): string
@@ -74,5 +78,15 @@ class InvisionCommunitySource implements MigrationSource
             'port' => $port,
             'key' => $key,
         ];
+    }
+
+    public function getBaseUrl(): ?string
+    {
+        return $this->baseUrl;
+    }
+
+    public function setBaseUrl(?string $url): void
+    {
+        $this->baseUrl = $url !== null && $url !== '' ? rtrim($url, '/') : null;
     }
 }
