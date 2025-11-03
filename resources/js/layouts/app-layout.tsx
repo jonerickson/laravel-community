@@ -30,8 +30,8 @@ export default ({ children, breadcrumbs, background = false, ...props }: AppLayo
         <LayoutComponent breadcrumbs={breadcrumbs} background={background} {...props}>
             <div
                 className={clsx({
-                    'px-6 py-6 lg:px-8': LayoutComponent === AppSidebarLayout,
-                    'px-6 py-6 lg:px-4': LayoutComponent === AppHeaderLayout,
+                    'lpb-8 g:px-8 px-6 pt-6': LayoutComponent === AppSidebarLayout,
+                    'px-6 pt-6 pb-8 lg:px-4': LayoutComponent === AppHeaderLayout,
                 })}
             >
                 <div className="flex flex-col space-y-6">

@@ -107,7 +107,7 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
 
                 <div>
                     <div className="sm:flex sm:items-baseline sm:justify-between">
-                        <Heading title="Community provided" description="Broswer community-submitted products" />
+                        <Heading title="Community provided" description="Browse community-submitted products" />
                         <Link href={route('store.categories.index')} className="hidden text-sm font-semibold sm:block">
                             Browse all community products
                             <span aria-hidden="true"> &rarr;</span>
