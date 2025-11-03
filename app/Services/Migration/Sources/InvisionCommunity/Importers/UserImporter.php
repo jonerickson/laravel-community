@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Models\User;
-use App\Services\Migration\Contracts\EntityImporter;
+use App\Services\Migration\AbstractImporter;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationResult;
 use Carbon\Carbon;
@@ -18,15 +18,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class UserImporter implements EntityImporter
+class UserImporter extends AbstractImporter
 {
     protected const string ENTITY_NAME = 'users';
 
     protected const string CACHE_KEY_PREFIX = 'migration:ic:user_map:';
 
     protected const string CACHE_TAG = 'migration:ic:users';
-
-    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
 
     public static function getUserMapping(int $sourceUserId): ?int
     {
@@ -167,7 +165,7 @@ class UserImporter implements EntityImporter
             'email' => $email,
             'email_verified_at' => $this->isEmailValidated($sourceUser) ? Carbon::now() : null,
             'password' => $this->migratePassword($sourceUser),
-            'signature' => $this->cleanHtml($sourceUser->signature ?? ''),
+            'signature' => strip_tags($sourceUser->signature ?? ''),
             'last_seen_at' => $sourceUser->last_activity ? Carbon::createFromTimestamp($sourceUser->last_activity) : null,
             'created_at' => Carbon::createFromTimestamp($sourceUser->joined),
         ]);
@@ -227,15 +225,6 @@ class UserImporter implements EntityImporter
         }
 
         return Hash::make(Str::random(32));
-    }
-
-    protected function cleanHtml(?string $html): ?string
-    {
-        if (blank($html)) {
-            return null;
-        }
-
-        return strip_tags($html);
     }
 
     protected function isEmailValidated(object $sourceUser): bool

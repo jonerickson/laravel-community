@@ -24,10 +24,24 @@ export default function ForumPostEdit({ forum, topic, post }: EditPostProps) {
             title: 'Forums',
             href: route('forums.index'),
         },
-        {
-            title: forum.category.name,
-            href: route('forums.categories.show', { category: forum.category.slug }),
-        },
+        ...(forum.category
+            ? [
+                  {
+                      title: forum.category.name,
+                      href: route('forums.categories.show', { category: forum.category.slug }),
+                  },
+              ]
+            : []),
+    ];
+
+    if (forum.parent) {
+        breadcrumbs.push({
+            title: forum.parent.name,
+            href: route('forums.show', { forum: forum.parent.slug }),
+        });
+    }
+
+    breadcrumbs.push(
         {
             title: forum.name,
             href: route('forums.show', { forum: forum.slug }),
@@ -40,7 +54,7 @@ export default function ForumPostEdit({ forum, topic, post }: EditPostProps) {
             title: 'Edit Post',
             href: route('forums.posts.update', { forum: forum.slug, topic: topic.slug, post: post.slug }),
         },
-    ];
+    );
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

@@ -296,9 +296,11 @@ class Post extends Model implements HasLabel, Sluggable
             if ($author = $post->author) {
                 $requiresModeration = $author->active_consequence?->type === WarningConsequenceType::ModerateContent;
 
-                $post->forceFill([
-                    'is_approved' => ! $requiresModeration,
-                ]);
+                if (! isset($post->is_approved)) {
+                    $post->forceFill([
+                        'is_approved' => ! $requiresModeration,
+                    ]);
+                }
             }
         });
     }

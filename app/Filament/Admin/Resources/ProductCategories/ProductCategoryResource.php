@@ -78,13 +78,12 @@ class ProductCategoryResource extends Resource
                                     ->maxLength(500)
                                     ->rows(3),
                             ]),
-                        Section::make('Image')
+                        Section::make('Media')
                             ->columnSpanFull()
-                            ->relationship('image')
                             ->schema([
-                                FileUpload::make('path')
+                                FileUpload::make('featured_image')
+                                    ->label('Featured Image')
                                     ->helperText('Add a category image to be displayed on the store index.')
-                                    ->hiddenLabel()
                                     ->disk('public')
                                     ->directory('product-category-images')
                                     ->visibility('public')
@@ -122,7 +121,7 @@ class ProductCategoryResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('image.path')
+                ImageColumn::make('featured_image')
                     ->grow(false)
                     ->alignCenter()
                     ->label('')

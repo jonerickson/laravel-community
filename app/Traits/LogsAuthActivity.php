@@ -270,7 +270,7 @@ trait LogsAuthActivity
             $activity->performedOn($user);
         }
 
-        if ($event !== null && $event !== '' && $event !== '0') {
+        if (! is_null($event)) {
             $activity->event($event);
         }
 

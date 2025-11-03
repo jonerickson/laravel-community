@@ -26,16 +26,16 @@ class InvisionCommunitySource implements MigrationSource
     public function __construct()
     {
         $this->importers = [
-            'groups' => new GroupImporter,
-            'users' => new UserImporter,
-            'blogs' => new BlogImporter,
-            'blog_comments' => new BlogCommentImporter,
-            'products' => new ProductImporter,
-            'subscriptions' => new SubscriptionImporter,
-            'forums' => new ForumImporter,
-            'topics' => new TopicImporter,
-            'posts' => new PostImporter,
-            'orders' => new OrderImporter,
+            'groups' => new GroupImporter($this),
+            'users' => new UserImporter($this),
+            'blogs' => new BlogImporter($this),
+            'blog_comments' => new BlogCommentImporter($this),
+            'products' => new ProductImporter($this),
+            'subscriptions' => new SubscriptionImporter($this),
+            'forums' => new ForumImporter($this),
+            'topics' => new TopicImporter($this),
+            'posts' => new PostImporter($this),
+            'orders' => new OrderImporter($this),
         ];
 
         $this->baseUrl = config('migration.sources.invision_community.base_url');

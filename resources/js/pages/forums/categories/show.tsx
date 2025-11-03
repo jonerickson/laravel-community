@@ -118,16 +118,13 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                                                     <MessageSquare className="size-5" />
                                                 </div>
                                                 <div className="min-w-0 flex-1">
-                                                    <div className="mb-1">
-                                                        <Link
-                                                            href={route('forums.show', { forum: forum.slug })}
-                                                            className="font-medium hover:underline"
-                                                        >
-                                                            {forum.name}
-                                                        </Link>
-                                                    </div>
+                                                    <Link href={route('forums.show', { forum: forum.slug })} className="font-medium hover:underline">
+                                                        {forum.name}
+                                                    </Link>
                                                     {forum.description && (
-                                                        <p className="text-sm text-wrap break-words text-muted-foreground">{forum.description}</p>
+                                                        <p className="mt-1 text-sm text-wrap break-words text-muted-foreground">
+                                                            {forum.description}
+                                                        </p>
                                                     )}
                                                 </div>
                                             </div>

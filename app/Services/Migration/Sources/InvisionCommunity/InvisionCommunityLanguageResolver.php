@@ -17,9 +17,7 @@ class InvisionCommunityLanguageResolver
         protected string $connection,
         protected ?int $defaultLanguageId = null,
     ) {
-        if ($this->defaultLanguageId === null) {
-            $this->defaultLanguageId = $this->getDefaultLanguageId();
-        }
+        //
     }
 
     public function resolve(string $key, ?string $fallback = null): ?string
@@ -28,7 +26,7 @@ class InvisionCommunityLanguageResolver
             $result = DB::connection($this->connection)
                 ->table('core_sys_lang_words')
                 ->where('word_key', $key)
-                ->where('lang_id', $this->defaultLanguageId)
+                ->where('lang_id', $this->getDefaultLanguageId())
                 ->value('word_default');
 
             return $result ? (string) $result : null;
@@ -83,7 +81,7 @@ class InvisionCommunityLanguageResolver
                 $result = DB::connection($this->connection)
                     ->table('core_sys_lang_words')
                     ->where('word_key', $key)
-                    ->where('lang_id', $this->defaultLanguageId)
+                    ->where('lang_id', $this->getDefaultLanguageId())
                     ->value('word_default');
 
                 return $result ? (string) $result : null;
@@ -97,7 +95,11 @@ class InvisionCommunityLanguageResolver
 
     protected function getDefaultLanguageId(): int
     {
-        return (int) DB::connection($this->connection)
+        if ($this->defaultLanguageId !== null) {
+            return $this->defaultLanguageId;
+        }
+
+        return $this->defaultLanguageId = (int) DB::connection($this->connection)
             ->table('core_sys_lang')
             ->where('lang_default', 1)
             ->value('lang_id') ?? 1;

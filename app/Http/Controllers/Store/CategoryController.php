@@ -29,7 +29,6 @@ class CategoryController extends Controller
             ->active()
             ->visible()
             ->ordered()
-            ->with('image')
             ->get()
             ->filter(fn (ProductCategory $category) => Gate::check('view', $category))
             ->values();
@@ -43,7 +42,7 @@ class CategoryController extends Controller
     {
         $this->authorize('view', $category);
 
-        $category->load(['image', 'parent', 'children.image']);
+        $category->load(['parent', 'children']);
 
         $products = Product::query()
             ->whereHas('categories', fn (Builder $query) => $query->whereKey($category->id))

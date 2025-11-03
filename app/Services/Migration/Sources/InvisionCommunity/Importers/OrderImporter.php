@@ -10,7 +10,8 @@ use App\Models\OrderItem;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
-use App\Services\Migration\Contracts\EntityImporter;
+use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunityLanguageResolver;
@@ -22,7 +23,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class OrderImporter implements EntityImporter
+class OrderImporter extends AbstractImporter
 {
     protected const string ENTITY_NAME = 'orders';
 
@@ -30,11 +31,16 @@ class OrderImporter implements EntityImporter
 
     protected const string CACHE_TAG = 'migration:ic:orders';
 
-    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
+    protected ?InvisionCommunityLanguageResolver $languageResolver = null;
 
-    public function __construct(
-        protected ?InvisionCommunityLanguageResolver $languageResolver = null,
-    ) {}
+    public function __construct(MigrationSource $source)
+    {
+        parent::__construct($source);
+
+        $this->languageResolver = new InvisionCommunityLanguageResolver(
+            connection: $source->getConnection(),
+        );
+    }
 
     public static function getOrderMapping(int $sourceOrderId): ?int
     {
@@ -84,10 +90,6 @@ class OrderImporter implements EntityImporter
         MigrationResult $result,
     ): void {
         DB::connection($connection)->disableQueryLog();
-
-        if (! $this->languageResolver instanceof InvisionCommunityLanguageResolver) {
-            $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
-        }
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
@@ -143,21 +145,6 @@ class OrderImporter implements EntityImporter
 
     protected function importOrder(string $connection, object $sourceOrder, bool $isDryRun, MigrationResult $result): void
     {
-        $existingOrder = Order::query()
-            ->where('external_order_id', 'ic_'.$sourceOrder->i_id)
-            ->first();
-
-        if ($existingOrder) {
-            $this->cacheOrderMapping($sourceOrder->i_id, $existingOrder->id);
-            $result->incrementSkipped(self::ENTITY_NAME);
-            $result->recordSkipped(self::ENTITY_NAME, [
-                'source_id' => $sourceOrder->i_id,
-                'reason' => 'Already exists',
-            ]);
-
-            return;
-        }
-
         $user = $this->findUser($sourceOrder);
 
         if (! $user instanceof User) {

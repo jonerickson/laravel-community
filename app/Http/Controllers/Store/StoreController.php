@@ -24,7 +24,6 @@ class StoreController extends Controller
                 ->active()
                 ->visible()
                 ->ordered()
-                ->with('image')
                 ->latest()
                 ->take(3)
                 ->get()

@@ -6,7 +6,7 @@ namespace App\Models;
 
 use App\Contracts\Sluggable;
 use App\Traits\Activateable;
-use App\Traits\HasImages;
+use App\Traits\HasFeaturedImage;
 use App\Traits\HasLogging;
 use App\Traits\HasSlug;
 use App\Traits\Orderable;
@@ -30,15 +30,14 @@ use Illuminate\Support\Str;
  * @property bool $is_visible
  * @property int|null $parent_id
  * @property string $slug
+ * @property string|null $featured_image
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Collection<int, ProductCategory> $children
  * @property-read int|null $children_count
- * @property-read Image|null $image
- * @property-read Collection<int, Image> $images
- * @property-read int|null $images_count
+ * @property-read string|null $featured_image_url
  * @property-read ProductCategory|null $parent
  * @property-read Collection<int, Product> $products
  * @property-read int|null $products_count
@@ -54,6 +53,7 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|ProductCategory visible()
  * @method static Builder<static>|ProductCategory whereCreatedAt($value)
  * @method static Builder<static>|ProductCategory whereDescription($value)
+ * @method static Builder<static>|ProductCategory whereFeaturedImage($value)
  * @method static Builder<static>|ProductCategory whereId($value)
  * @method static Builder<static>|ProductCategory whereIsActive($value)
  * @method static Builder<static>|ProductCategory whereIsVisible($value)
@@ -69,7 +69,7 @@ class ProductCategory extends Model implements Sluggable
 {
     use Activateable;
     use HasFactory;
-    use HasImages;
+    use HasFeaturedImage;
     use HasLogging;
     use HasSlug;
     use Orderable;

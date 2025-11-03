@@ -10,7 +10,8 @@ use App\Enums\SubscriptionInterval;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\ProductCategory;
-use App\Services\Migration\Contracts\EntityImporter;
+use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunityLanguageResolver;
 use Carbon\Carbon;
@@ -21,7 +22,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class ProductImporter implements EntityImporter
+class ProductImporter extends AbstractImporter
 {
     protected const string ENTITY_NAME = 'products';
 
@@ -31,11 +32,16 @@ class ProductImporter implements EntityImporter
 
     protected const string CACHE_TAG = 'migration:ic:products';
 
-    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
+    protected ?InvisionCommunityLanguageResolver $languageResolver = null;
 
-    public function __construct(
-        protected ?InvisionCommunityLanguageResolver $languageResolver = null,
-    ) {}
+    public function __construct(MigrationSource $source)
+    {
+        parent::__construct($source);
+
+        $this->languageResolver = new InvisionCommunityLanguageResolver(
+            connection: $source->getConnection(),
+        );
+    }
 
     public static function getProductMapping(int $sourceProductId): ?int
     {
@@ -87,10 +93,6 @@ class ProductImporter implements EntityImporter
         MigrationResult $result,
     ): void {
         DB::connection($connection)->disableQueryLog();
-
-        if (! $this->languageResolver instanceof InvisionCommunityLanguageResolver) {
-            $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
-        }
 
         $this->importCategories($connection, $batchSize, $limit, $offset, $isDryRun, $output, $result);
 
@@ -233,6 +235,19 @@ class ProductImporter implements EntityImporter
         if (! $isDryRun) {
             $category->save();
             $this->cacheCategoryMapping($sourceCategory->pg_id, $category->id);
+
+            if (($imagePath = $sourceCategory->pg_image) && ($baseUrl = $this->source->getBaseUrl())) {
+                $filePath = $this->downloadAndStoreFile(
+                    baseUrl: $baseUrl.'/uploads',
+                    sourcePath: $imagePath,
+                    storagePath: 'product-categories/featured-images',
+                );
+
+                if (! is_null($filePath)) {
+                    $category->featured_image = $filePath;
+                    $category->save();
+                }
+            }
         }
 
         $result->incrementMigrated('product_categories');
@@ -318,6 +333,19 @@ class ProductImporter implements EntityImporter
                 $categoryId = static::getCategoryMapping($sourceProduct->p_group);
                 if ($categoryId !== null && $categoryId !== 0) {
                     $product->categories()->attach($categoryId);
+                }
+            }
+
+            if (($imagePath = $sourceProduct->p_image) && ($baseUrl = $this->source->getBaseUrl())) {
+                $filePath = $this->downloadAndStoreFile(
+                    baseUrl: $baseUrl.'/uploads',
+                    sourcePath: $imagePath,
+                    storagePath: 'products/featured-images',
+                );
+
+                if (! is_null($filePath)) {
+                    $product->featured_image = $filePath;
+                    $product->save();
                 }
             }
         }
@@ -460,15 +488,6 @@ class ProductImporter implements EntityImporter
         }
 
         return $prices;
-    }
-
-    protected function cleanHtml(?string $html): ?string
-    {
-        if (blank($html)) {
-            return null;
-        }
-
-        return $html;
     }
 
     protected function cacheProductMapping(int $sourceProductId, int $targetProductId): void

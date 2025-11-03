@@ -35,10 +35,24 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
             title: 'Forums',
             href: route('forums.index'),
         },
-        {
-            title: forum.category.name,
-            href: route('forums.categories.show', { category: forum.category.slug }),
-        },
+        ...(forum.category
+            ? [
+                  {
+                      title: forum.category.name,
+                      href: route('forums.categories.show', { category: forum.category.slug }),
+                  },
+              ]
+            : []),
+    ];
+
+    if (forum.parent) {
+        breadcrumbs.push({
+            title: forum.parent.name,
+            href: route('forums.show', { forum: forum.parent.slug }),
+        });
+    }
+
+    breadcrumbs.push(
         {
             title: forum.name,
             href: route('forums.show', { forum: forum.slug }),
@@ -47,7 +61,7 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
             title: topic.title,
             href: route('forums.topics.show', { forum: forum.slug, topic: topic.slug }),
         },
-    ];
+    );
 
     useMarkAsRead({
         id: topic.id,

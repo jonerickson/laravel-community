@@ -194,7 +194,7 @@ class SupportTicket extends Model implements HasLabel
     {
         $query = $query->whereNotNull('external_id');
 
-        if ($driver !== null && $driver !== '' && $driver !== '0') {
+        if (! is_null($driver)) {
             $query->where('external_driver', $driver);
         }
     }

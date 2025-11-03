@@ -6,7 +6,8 @@ namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Models\Forum;
 use App\Models\ForumCategory;
-use App\Services\Migration\Contracts\EntityImporter;
+use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunityLanguageResolver;
 use Exception;
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class ForumImporter implements EntityImporter
+class ForumImporter extends AbstractImporter
 {
     protected const string ENTITY_NAME = 'forums';
 
@@ -26,11 +27,16 @@ class ForumImporter implements EntityImporter
 
     protected const string CACHE_TAG = 'migration:ic:forums';
 
-    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
+    protected ?InvisionCommunityLanguageResolver $languageResolver = null;
 
-    public function __construct(
-        protected ?InvisionCommunityLanguageResolver $languageResolver = null,
-    ) {}
+    public function __construct(MigrationSource $source)
+    {
+        parent::__construct($source);
+
+        $this->languageResolver = new InvisionCommunityLanguageResolver(
+            connection: $source->getConnection(),
+        );
+    }
 
     public static function getForumMapping(int $sourceForumId): ?int
     {
@@ -82,10 +88,6 @@ class ForumImporter implements EntityImporter
         MigrationResult $result,
     ): void {
         DB::connection($connection)->disableQueryLog();
-
-        if (! $this->languageResolver instanceof InvisionCommunityLanguageResolver) {
-            $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
-        }
 
         $this->importCategories($connection, $batchSize, $limit, $offset, $isDryRun, $output, $result);
 

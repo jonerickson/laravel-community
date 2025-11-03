@@ -33,6 +33,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -110,11 +111,14 @@ class ProductResource extends Resource
                             ->columnSpanFull()
                             ->schema([
                                 FileUpload::make('featured_image')
+                                    ->label('Featured Image')
+                                    ->helperText('The main product image.')
                                     ->disk('public')
                                     ->directory('products/featured-images')
                                     ->visibility('public')
-                                    ->helperText('The main product image.')
-                                    ->label('Featured Image')
+                                    ->downloadable()
+                                    ->previewable()
+                                    ->openable()
                                     ->image()
                                     ->imageEditor()
                                     ->imageEditorAspectRatios([
@@ -239,6 +243,13 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
+                ImageColumn::make('featured_image')
+                    ->grow(false)
+                    ->alignCenter()
+                    ->label('')
+                    ->disk('public')
+                    ->imageSize(60)
+                    ->square(),
                 TextColumn::make('name')
                     ->searchable()
                     ->sortable(),

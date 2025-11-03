@@ -9,7 +9,8 @@ use App\Enums\ProductType;
 use App\Enums\SubscriptionInterval;
 use App\Models\Price;
 use App\Models\Product;
-use App\Services\Migration\Contracts\EntityImporter;
+use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunityLanguageResolver;
 use Carbon\Carbon;
@@ -20,7 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class SubscriptionImporter implements EntityImporter
+class SubscriptionImporter extends AbstractImporter
 {
     protected const string ENTITY_NAME = 'subscriptions';
 
@@ -28,11 +29,16 @@ class SubscriptionImporter implements EntityImporter
 
     protected const string CACHE_TAG = 'migration:ic:subscriptions';
 
-    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
+    protected ?InvisionCommunityLanguageResolver $languageResolver = null;
 
-    public function __construct(
-        protected ?InvisionCommunityLanguageResolver $languageResolver = null,
-    ) {}
+    public function __construct(MigrationSource $source)
+    {
+        parent::__construct($source);
+
+        $this->languageResolver = new InvisionCommunityLanguageResolver(
+            connection: $source->getConnection(),
+        );
+    }
 
     public static function getSubscriptionMapping(int $sourceSubscriptionId): ?int
     {
@@ -79,10 +85,6 @@ class SubscriptionImporter implements EntityImporter
         MigrationResult $result,
     ): void {
         DB::connection($connection)->disableQueryLog();
-
-        if (! $this->languageResolver instanceof InvisionCommunityLanguageResolver) {
-            $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
-        }
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
@@ -139,27 +141,7 @@ class SubscriptionImporter implements EntityImporter
     protected function importSubscription(object $sourceSubscription, bool $isDryRun, MigrationResult $result): void
     {
         $name = $this->languageResolver->resolveSubscriptionPackageName($sourceSubscription->sp_id, "Invision Subscription $sourceSubscription->sp_id");
-        $slug = Str::slug($name);
-
-        $existingProduct = Product::query()
-            ->where('type', ProductType::Subscription)
-            ->where(function ($query) use ($name, $slug): void {
-                $query->where('name', $name)
-                    ->orWhere('slug', $slug);
-            })
-            ->first();
-
-        if ($existingProduct) {
-            $this->cacheSubscriptionMapping($sourceSubscription->sp_id, $existingProduct->id);
-            $result->incrementSkipped(self::ENTITY_NAME);
-            $result->recordSkipped(self::ENTITY_NAME, [
-                'source_id' => $sourceSubscription->sp_id,
-                'name' => $name,
-                'reason' => 'Already exists',
-            ]);
-
-            return;
-        }
+        $slug = Str::unique(Str::slug($name), 'products', 'slug');
 
         $product = new Product;
         $product->forceFill([

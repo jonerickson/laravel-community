@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
+use App\Enums\Role;
 use App\Models\Forum;
 use App\Models\Topic;
 use App\Models\User;
-use App\Services\Migration\Contracts\EntityImporter;
+use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunityLanguageResolver;
@@ -19,7 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class TopicImporter implements EntityImporter
+class TopicImporter extends AbstractImporter
 {
     protected const string ENTITY_NAME = 'topics';
 
@@ -27,11 +29,16 @@ class TopicImporter implements EntityImporter
 
     protected const string CACHE_TAG = 'migration:ic:topics';
 
-    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
+    protected ?InvisionCommunityLanguageResolver $languageResolver = null;
 
-    public function __construct(
-        protected ?InvisionCommunityLanguageResolver $languageResolver = null,
-    ) {}
+    public function __construct(MigrationSource $source)
+    {
+        parent::__construct($source);
+
+        $this->languageResolver = new InvisionCommunityLanguageResolver(
+            connection: $source->getConnection(),
+        );
+    }
 
     public static function getTopicMapping(int $sourceTopicId): ?int
     {
@@ -66,7 +73,7 @@ class TopicImporter implements EntityImporter
     public function getDependencies(): array
     {
         return [
-            ImporterDependency::requiredPre('users', 'Topics require users to exist for author assignment'),
+            // ImporterDependency::requiredPre('users', 'Topics require users to exist for author assignment'),
             ImporterDependency::requiredPre('forums', 'Topics require that forums exist for proper assignment'),
         ];
     }
@@ -81,10 +88,6 @@ class TopicImporter implements EntityImporter
         MigrationResult $result,
     ): void {
         DB::connection($connection)->disableQueryLog();
-
-        if (! $this->languageResolver instanceof InvisionCommunityLanguageResolver) {
-            $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
-        }
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
@@ -142,26 +145,7 @@ class TopicImporter implements EntityImporter
     protected function importTopic(object $sourceTopic, bool $isDryRun, MigrationResult $result): void
     {
         $title = $sourceTopic->title;
-        $slug = $sourceTopic->title_seo ?? Str::slug($title);
-
-        $existingTopic = Topic::query()
-            ->where(function ($query) use ($title, $slug): void {
-                $query->where('title', $title)
-                    ->orWhere('slug', $slug);
-            })
-            ->first();
-
-        if ($existingTopic) {
-            $this->cacheTopicMapping($sourceTopic->tid, $existingTopic->id);
-            $result->incrementSkipped(self::ENTITY_NAME);
-            $result->recordSkipped(self::ENTITY_NAME, [
-                'source_id' => $sourceTopic->tid,
-                'title' => $title,
-                'reason' => 'Already exists',
-            ]);
-
-            return;
-        }
+        $slug = Str::unique(Str::slug($sourceTopic->title_seo ?? $title), 'topics', 'slug');
 
         $author = $this->findOrCreateAuthor($sourceTopic);
 
@@ -226,6 +210,10 @@ class TopicImporter implements EntityImporter
 
         if ($mappedUserId !== null && $mappedUserId !== 0) {
             return User::query()->find($mappedUserId);
+        }
+
+        if ($adminUser = User::query()->role(Role::Administrator)->oldest()->first()) {
+            return $adminUser;
         }
 
         return null;

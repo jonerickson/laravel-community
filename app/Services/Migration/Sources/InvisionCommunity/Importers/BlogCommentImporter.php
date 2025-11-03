@@ -7,7 +7,7 @@ namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
-use App\Services\Migration\Contracts\EntityImporter;
+use App\Services\Migration\AbstractImporter;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationResult;
 use Carbon\Carbon;
@@ -18,15 +18,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class BlogCommentImporter implements EntityImporter
+class BlogCommentImporter extends AbstractImporter
 {
     protected const string ENTITY_NAME = 'blog_comments';
 
     protected const string CACHE_KEY_PREFIX = 'migration:ic:blog_comment_map:';
 
     protected const string CACHE_TAG = 'migration:ic:blog_comments';
-
-    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
 
     public static function getCommentMapping(int $sourceCommentId): ?int
     {
@@ -133,24 +131,6 @@ class BlogCommentImporter implements EntityImporter
 
     protected function importComment(object $sourceComment, bool $isDryRun, MigrationResult $result): void
     {
-        $existingComment = Comment::query()
-            ->where('commentable_type', Post::class)
-            ->where('commentable_id', BlogImporter::getBlogMapping($sourceComment->comment_entry_id))
-            ->where('created_at', Carbon::createFromTimestamp($sourceComment->comment_date))
-            ->first();
-
-        if ($existingComment) {
-            $this->cacheCommentMapping($sourceComment->comment_id, $existingComment->id);
-            $result->incrementSkipped(self::ENTITY_NAME);
-            $result->recordSkipped(self::ENTITY_NAME, [
-                'source_id' => $sourceComment->comment_id,
-                'entry_id' => $sourceComment->comment_entry_id,
-                'reason' => 'Already exists',
-            ]);
-
-            return;
-        }
-
         $blogPostId = BlogImporter::getBlogMapping($sourceComment->comment_entry_id);
 
         if ($blogPostId === null || $blogPostId === 0) {
@@ -177,13 +157,11 @@ class BlogCommentImporter implements EntityImporter
             return;
         }
 
-        $content = $this->cleanHtml($sourceComment->comment_text ?? '');
-
         $comment = new Comment;
         $comment->forceFill([
             'commentable_type' => Post::class,
             'commentable_id' => $blogPostId,
-            'content' => $content,
+            'content' => $sourceComment->comment_text,
             'is_approved' => (bool) $sourceComment->comment_approved,
             'parent_id' => null,
             'created_by' => $author->id,
@@ -222,15 +200,6 @@ class BlogCommentImporter implements EntityImporter
         }
 
         return null;
-    }
-
-    protected function cleanHtml(?string $html): ?string
-    {
-        if (blank($html)) {
-            return null;
-        }
-
-        return $html;
     }
 
     protected function cacheCommentMapping(int $sourceCommentId, int $targetCommentId): void

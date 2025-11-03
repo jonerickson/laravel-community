@@ -8,10 +8,10 @@ export default function StoreIndexCategoriesItem({ item }: { item: App.Data.Prod
             href={route('store.categories.show', { slug: item.slug })}
             className="relative flex min-h-48 flex-col justify-center overflow-hidden rounded-lg bg-muted p-6 hover:opacity-75 xl:w-auto"
         >
-            {item.image?.url ? (
+            {item.featuredImageUrl ? (
                 <>
                     <span aria-hidden="true" className="absolute inset-0">
-                        <img alt={`${item.name} category image`} src={item.image.url} className="size-full object-cover" />
+                        <img alt={`${item.name} category image`} src={item.featuredImageUrl} className="size-full object-cover" />
                     </span>
                     <span
                         aria-hidden="true"

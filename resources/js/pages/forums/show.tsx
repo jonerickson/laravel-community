@@ -237,16 +237,16 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                                                     <MessageSquare className="size-5" />
                                                 </div>
                                                 <div className="min-w-0 flex-1">
-                                                    <div className="mb-1">
-                                                        <Link
-                                                            href={route('forums.show', { forum: subforum.slug })}
-                                                            className="font-medium hover:underline"
-                                                        >
-                                                            {subforum.name}
-                                                        </Link>
-                                                    </div>
+                                                    <Link
+                                                        href={route('forums.show', { forum: subforum.slug })}
+                                                        className="font-medium hover:underline"
+                                                    >
+                                                        {subforum.name}
+                                                    </Link>
                                                     {subforum.description && (
-                                                        <p className="text-sm text-wrap break-words text-muted-foreground">{subforum.description}</p>
+                                                        <p className="mt-1 text-sm text-wrap break-words text-muted-foreground">
+                                                            {subforum.description}
+                                                        </p>
                                                     )}
                                                 </div>
                                             </div>

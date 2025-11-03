@@ -40,6 +40,7 @@ class MigrateCommand extends Command
                             {--parallel : Enable concurrent processing with multiple processes}
                             {--max-records-per-process=1000 : Maximum records each process should handle before terminating}
                             {--max-processes=4 : Maximum number of concurrent processes to run}
+                            {--memory-limit= : Memory limit in MB for worker processes (automatically calculated if not provided)}
                             {--worker : Internal flag indicating this is a worker process (do not use manually)}';
 
     protected $description = 'Migrate data from external sources (use -v to see skipped/failed records, -vv for migrated records)';
@@ -99,10 +100,30 @@ class MigrateCommand extends Command
         ?int $offset,
         bool $isDryRun,
     ): int {
-        ini_set('memory_limit', '512M');
+        $memoryLimit = $this->option('memory-limit') ?: 1024;
+        $memoryLimitBytes = $memoryLimit * 1024 * 1024;
+        $memoryThresholdBytes = (int) ($memoryLimitBytes * 0.9);
+
+        ini_set('memory_limit', $memoryLimit.'M');
 
         $startMemory = memory_get_usage(true);
-        $this->info('Starting - Memory: '.round($startMemory / 1024 / 1024, 2).'MB');
+        $this->info('Starting - Memory: '.round($startMemory / 1024 / 1024, 2).'MB (Limit: '.$memoryLimit.'MB, Threshold: '.round($memoryThresholdBytes / 1024 / 1024, 2).'MB)');
+
+        $checkMemory = function () use ($memoryThresholdBytes, $memoryLimit): void {
+            $currentMemory = memory_get_usage(true);
+
+            if ($currentMemory >= $memoryThresholdBytes) {
+                $usedMB = round($currentMemory / 1024 / 1024, 2);
+                $this->warn("Memory threshold reached: {$usedMB}MB / {$memoryLimit}MB. Exiting gracefully to prevent out-of-memory error.");
+
+                DB::disconnect();
+                gc_collect_cycles();
+
+                exit(self::SUCCESS);
+            }
+        };
+
+        register_tick_function($checkMemory);
 
         $sshTunnel = null;
 
@@ -110,20 +131,26 @@ class MigrateCommand extends Command
             $sshTunnel = $this->setupSshTunnelIfNeeded($source);
 
             if ($this->option('ssh') && $sshTunnel === null) {
+                unregister_tick_function($checkMemory);
+
                 return self::FAILURE;
             }
 
             $this->info("Processing $entity: Batch Size $batchSize, Offset $offset, Limit $limit");
 
-            $result = $migrationService->migrate(
-                source: $source->getName(),
-                entity: $entity,
-                batchSize: $batchSize,
-                limit: $limit,
-                offset: $offset,
-                isDryRun: $isDryRun,
-                output: $this->output,
-            );
+            declare(ticks=100) {
+                $result = $migrationService->migrate(
+                    source: $source->getName(),
+                    entity: $entity,
+                    batchSize: $batchSize,
+                    limit: $limit,
+                    offset: $offset,
+                    isDryRun: $isDryRun,
+                    output: $this->output,
+                );
+            }
+
+            unregister_tick_function($checkMemory);
 
             DB::disconnect($source->getConnection());
             gc_collect_cycles();
@@ -137,6 +164,7 @@ class MigrateCommand extends Command
 
             return self::SUCCESS;
         } catch (Exception $e) {
+            unregister_tick_function($checkMemory);
             $this->error("Migration failed: {$e->getMessage()}");
 
             return self::FAILURE;
@@ -262,6 +290,14 @@ class MigrateCommand extends Command
         $maxRecordsPerProcess = (int) $this->option('max-records-per-process');
         $maxProcesses = (int) $this->option('max-processes');
 
+        $workerMemoryLimit = $this->calculateWorkerMemoryLimit($maxProcesses);
+
+        if ($workerMemoryLimit === null) {
+            return self::FAILURE;
+        }
+
+        $this->info("Worker memory limit calculated: {$workerMemoryLimit}MB per process");
+
         $totalRecords = DB::connection($source->getConnection())
             ->table($migrationService->getImporterForEntity($entity)?->getSourceTable() ?? '')
             ->count();
@@ -274,6 +310,7 @@ class MigrateCommand extends Command
             maxRecordsPerProcess: $maxRecordsPerProcess,
             maxConcurrentProcesses: $maxProcesses,
             output: $this->output,
+            workerMemoryLimit: $workerMemoryLimit,
         );
 
         $this->trap([SIGINT, SIGTERM], function () use ($manager, $migrationService): void {
@@ -529,7 +566,7 @@ class MigrateCommand extends Command
             }
         }
 
-        usort($statusData, fn (array $a, array $b): int => strcmp((string) $a['entity'], (string) $b['entity']));
+        usort($statusData, fn (array $a, array $b): int => strcmp($a['entity'], $b['entity']));
 
         $this->table(
             ['Entity', 'Source Table', 'Record Count'],
@@ -621,5 +658,63 @@ class MigrateCommand extends Command
             $source->setBaseUrl($baseUrl);
             $this->info("Base URL configured: $baseUrl");
         }
+    }
+
+    protected function calculateWorkerMemoryLimit(int $maxProcesses): ?int
+    {
+        $totalMemoryMB = $this->getTotalSystemMemory();
+
+        if ($totalMemoryMB === null) {
+            $this->error('Unable to determine system memory. Cannot calculate worker memory limit.');
+
+            return null;
+        }
+
+        $this->info("System Memory: {$totalMemoryMB}MB");
+
+        $osReservedMemoryMB = (int) ($totalMemoryMB * 0.25);
+        $availableMemoryMB = $totalMemoryMB - $osReservedMemoryMB;
+
+        $workerMemoryLimitMB = (int) floor($availableMemoryMB / $maxProcesses);
+
+        $memoryAfterAllocation = $totalMemoryMB - ($workerMemoryLimitMB * $maxProcesses);
+        $memoryAfterAllocationPercent = ($memoryAfterAllocation / $totalMemoryMB) * 100;
+
+        if ($memoryAfterAllocationPercent < 25) {
+            $this->error('Insufficient memory available for the requested number of processes.');
+            $this->error("Total System Memory: {$totalMemoryMB}MB");
+            $this->error("Max Processes: {$maxProcesses}");
+            $this->error("Memory per Process: {$workerMemoryLimitMB}MB");
+            $this->error("Memory Left for OS: {$memoryAfterAllocation}MB ({$memoryAfterAllocationPercent}%)");
+            $this->error('At least 25% of total memory must remain available for the OS.');
+
+            $maxSafeProcesses = (int) floor($availableMemoryMB / 256);
+            $this->warn("Consider reducing --max-processes to {$maxSafeProcesses} or fewer.");
+
+            return null;
+        }
+
+        $this->info("Memory allocation: {$workerMemoryLimitMB}MB per process, {$memoryAfterAllocation}MB ({$memoryAfterAllocationPercent}%) reserved for OS");
+
+        return $workerMemoryLimitMB;
+    }
+
+    protected function getTotalSystemMemory(): ?int
+    {
+        if (PHP_OS_FAMILY === 'Darwin') {
+            $result = Process::run('sysctl -n hw.memsize');
+
+            if ($result->successful()) {
+                return (int) round((int) trim($result->output()) / 1024 / 1024);
+            }
+        } elseif (PHP_OS_FAMILY === 'Linux') {
+            $result = Process::run('grep MemTotal /proc/meminfo | awk \'{print $2}\'');
+
+            if ($result->successful()) {
+                return (int) round((int) trim($result->output()) / 1024);
+            }
+        }
+
+        return null;
     }
 }

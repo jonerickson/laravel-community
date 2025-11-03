@@ -371,7 +371,8 @@ declare namespace App.Data {
         slug: string;
         description: string | null;
         parentId: number | null;
-        image: App.Data.ImageData | null;
+        featuredImage: string | null;
+        featuredImageUrl: string | null;
         parent: App.Data.ProductCategoryData | null;
         children: Array<App.Data.ProductCategoryData> | null;
     };

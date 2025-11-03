@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Enums\PostType;
+use App\Enums\Role;
 use App\Models\Post;
 use App\Models\User;
-use App\Services\Migration\Contracts\EntityImporter;
+use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunityLanguageResolver;
@@ -19,7 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class BlogImporter implements EntityImporter
+class BlogImporter extends AbstractImporter
 {
     protected const string ENTITY_NAME = 'blogs';
 
@@ -27,11 +29,16 @@ class BlogImporter implements EntityImporter
 
     protected const string CACHE_TAG = 'migration:ic:blog';
 
-    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
+    protected ?InvisionCommunityLanguageResolver $languageResolver = null;
 
-    public function __construct(
-        protected ?InvisionCommunityLanguageResolver $languageResolver = null,
-    ) {}
+    public function __construct(MigrationSource $source)
+    {
+        parent::__construct($source);
+
+        $this->languageResolver = new InvisionCommunityLanguageResolver(
+            connection: $source->getConnection(),
+        );
+    }
 
     public static function getBlogMapping(int $sourceBlogId): ?int
     {
@@ -81,10 +88,6 @@ class BlogImporter implements EntityImporter
         MigrationResult $result,
     ): void {
         DB::connection($connection)->disableQueryLog();
-
-        if (! $this->languageResolver instanceof InvisionCommunityLanguageResolver) {
-            $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
-        }
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
@@ -146,27 +149,7 @@ class BlogImporter implements EntityImporter
     protected function importBlogEntry(object $sourceBlogEntry, bool $isDryRun, MigrationResult $result): void
     {
         $title = $sourceBlogEntry->entry_name;
-        $slug = $sourceBlogEntry->entry_name_seo ?? Str::slug($title);
-
-        $existingPost = Post::query()
-            ->where('type', PostType::Blog)
-            ->where(function ($query) use ($title, $slug): void {
-                $query->where('title', $title)
-                    ->orWhere('slug', $slug);
-            })
-            ->first();
-
-        if ($existingPost) {
-            $this->cacheBlogMapping($sourceBlogEntry->entry_id, $existingPost->id);
-            $result->incrementSkipped(self::ENTITY_NAME);
-            $result->recordSkipped(self::ENTITY_NAME, [
-                'source_id' => $sourceBlogEntry->entry_id,
-                'title' => $title,
-                'reason' => 'Already exists',
-            ]);
-
-            return;
-        }
+        $slug = Str::unique(Str::slug($sourceBlogEntry->entry_name_seo ?? $title), 'posts', 'slug');
 
         $author = $this->findOrCreateAuthor($sourceBlogEntry);
 
@@ -181,8 +164,8 @@ class BlogImporter implements EntityImporter
             return;
         }
 
-        $content = $this->cleanHtml($sourceBlogEntry->entry_content ?? '');
-        $excerpt = Str::of($content)->stripTags()->limit(200)->toString();
+        $content = $sourceBlogEntry->entry_content ?? '';
+        $excerpt = Str::of($sourceBlogEntry->entry_content)->stripTags()->limit(200)->toString();
 
         $post = new Post;
         $post->forceFill([
@@ -192,7 +175,7 @@ class BlogImporter implements EntityImporter
             'content' => $content,
             'slug' => $slug,
             'is_published' => true,
-            'is_approved' => ! $sourceBlogEntry->entry_hidden,
+            'is_approved' => false,
             'is_featured' => (bool) $sourceBlogEntry->entry_featured,
             'is_pinned' => (bool) $sourceBlogEntry->entry_pinned,
             'comments_enabled' => true,
@@ -209,6 +192,19 @@ class BlogImporter implements EntityImporter
         if (! $isDryRun) {
             $post->save();
             $this->cacheBlogMapping($sourceBlogEntry->entry_id, $post->id);
+
+            if (($imagePath = $sourceBlogEntry->entry_cover_photo) && ($baseUrl = $this->source->getBaseUrl())) {
+                $filePath = $this->downloadAndStoreFile(
+                    baseUrl: $baseUrl.'/uploads',
+                    sourcePath: $imagePath,
+                    storagePath: 'post-images',
+                );
+
+                if (! is_null($filePath)) {
+                    $post->featured_image = $filePath;
+                    $post->save();
+                }
+            }
         }
 
         $result->incrementMigrated(self::ENTITY_NAME);
@@ -230,16 +226,11 @@ class BlogImporter implements EntityImporter
             return User::query()->find($mappedUserId);
         }
 
-        return null;
-    }
-
-    protected function cleanHtml(?string $html): ?string
-    {
-        if (blank($html)) {
-            return null;
+        if ($adminUser = User::query()->role(Role::Administrator)->oldest()->first()) {
+            return $adminUser;
         }
 
-        return $html;
+        return null;
     }
 
     protected function cacheBlogMapping(int $sourceBlogId, int $targetPostId): void

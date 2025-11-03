@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Models\Group;
-use App\Services\Migration\Contracts\EntityImporter;
+use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunityLanguageResolver;
 use Exception;
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class GroupImporter implements EntityImporter
+class GroupImporter extends AbstractImporter
 {
     protected const string ENTITY_NAME = 'groups';
 
@@ -24,13 +25,16 @@ class GroupImporter implements EntityImporter
 
     protected const string CACHE_TAG = 'migration:ic:groups';
 
-    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
+    protected ?InvisionCommunityLanguageResolver $languageResolver = null;
 
-    protected array $batchCache = [];
+    public function __construct(MigrationSource $source)
+    {
+        parent::__construct($source);
 
-    public function __construct(
-        protected ?InvisionCommunityLanguageResolver $languageResolver = null,
-    ) {}
+        $this->languageResolver = new InvisionCommunityLanguageResolver(
+            connection: $source->getConnection(),
+        );
+    }
 
     public static function getGroupMapping(int $sourceGroupId): ?int
     {
@@ -72,10 +76,6 @@ class GroupImporter implements EntityImporter
         MigrationResult $result,
     ): void {
         DB::connection($connection)->disableQueryLog();
-
-        if (! $this->languageResolver instanceof InvisionCommunityLanguageResolver) {
-            $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
-        }
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())

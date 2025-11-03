@@ -32,6 +32,7 @@ class ConcurrentMigrationManager
         protected int $maxRecordsPerProcess,
         protected int $maxConcurrentProcesses,
         protected OutputStyle $output,
+        protected ?int $workerMemoryLimit = null,
     ) {}
 
     public function migrate(
@@ -125,6 +126,10 @@ class ConcurrentMigrationManager
             '--worker',
             '--force',
         ];
+
+        if ($this->workerMemoryLimit !== null) {
+            $command[] = '--memory-limit='.$this->workerMemoryLimit;
+        }
 
         if ($isDryRun) {
             $command[] = '--dry-run';

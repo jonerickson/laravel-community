@@ -91,9 +91,9 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
                                         <CardContent className="p-4">
                                             <div className="flex items-start gap-3">
                                                 <div className="flex size-10 flex-shrink-0 items-center justify-center rounded-lg bg-muted">
-                                                    {subcategory.image ? (
+                                                    {subcategory.featuredImageUrl ? (
                                                         <img
-                                                            src={subcategory.image.url}
+                                                            src={subcategory.featuredImageUrl}
                                                             alt={subcategory.name}
                                                             className="size-10 rounded-lg object-cover"
                                                         />
@@ -117,7 +117,7 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
                 )}
 
                 {products.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {products.map((product) => (
                             <StoreCategoriesProductItem key={product.id} product={product} />
                         ))}

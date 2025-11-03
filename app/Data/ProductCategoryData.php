@@ -24,8 +24,9 @@ class ProductCategoryData extends Data
 
     public ?int $parentId = null;
 
-    #[LoadRelation]
-    public ?ImageData $image = null;
+    public ?string $featuredImage = null;
+
+    public ?string $featuredImageUrl = null;
 
     #[LoadRelation]
     public ?ProductCategoryData $parent = null;

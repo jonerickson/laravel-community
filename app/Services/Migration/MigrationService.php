@@ -39,7 +39,7 @@ class MigrationService
     public function getOptionalDependencies(MigrationSource $source, ?string $entity): array
     {
         $optional = [];
-        $importers = $entity !== null && $entity !== '' && $entity !== '0' ? [$entity => $source->getImporter($entity)] : $source->getImporters();
+        $importers = is_null($entity) ? $source->getImporters() : [$entity => $source->getImporter($entity)];
 
         foreach ($importers as $importer) {
             if (! $importer) {

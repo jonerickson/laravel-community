@@ -5,23 +5,24 @@ declare(strict_types=1);
 namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Enums\PostType;
+use App\Enums\Role;
 use App\Models\Post;
 use App\Models\Topic;
 use App\Models\User;
-use App\Services\Migration\Contracts\EntityImporter;
+use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunityLanguageResolver;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class PostImporter implements EntityImporter
+class PostImporter extends AbstractImporter
 {
     protected const string ENTITY_NAME = 'posts';
 
@@ -29,11 +30,16 @@ class PostImporter implements EntityImporter
 
     protected const string CACHE_TAG = 'migration:ic:posts';
 
-    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
+    protected ?InvisionCommunityLanguageResolver $languageResolver = null;
 
-    public function __construct(
-        protected ?InvisionCommunityLanguageResolver $languageResolver = null,
-    ) {}
+    public function __construct(MigrationSource $source)
+    {
+        parent::__construct($source);
+
+        $this->languageResolver = new InvisionCommunityLanguageResolver(
+            connection: $source->getConnection(),
+        );
+    }
 
     public static function getPostMapping(int $sourcePostId): ?int
     {
@@ -68,7 +74,7 @@ class PostImporter implements EntityImporter
     public function getDependencies(): array
     {
         return [
-            ImporterDependency::requiredPre('users', 'Posts require users to exist for author assignment'),
+            // ImporterDependency::requiredPre('users', 'Posts require users to exist for author assignment'),
             ImporterDependency::requiredPre('topics', 'Posts require topics to exist for proper assignment'),
         ];
     }
@@ -83,10 +89,6 @@ class PostImporter implements EntityImporter
         MigrationResult $result,
     ): void {
         DB::connection($connection)->disableQueryLog();
-
-        if (! $this->languageResolver instanceof InvisionCommunityLanguageResolver) {
-            $this->languageResolver = new InvisionCommunityLanguageResolver($connection);
-        }
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
@@ -142,26 +144,6 @@ class PostImporter implements EntityImporter
 
     protected function importPost(object $sourcePost, bool $isDryRun, MigrationResult $result): void
     {
-        $content = $sourcePost->post ?? '';
-
-        $authorId = UserImporter::getUserMapping((int) $sourcePost->author_id);
-        $existingPost = Post::query()
-            ->where('type', PostType::Forum)
-            ->where('content', $content)
-            ->when($authorId, fn (Builder $query) => $query->where('id', $authorId))
-            ->first();
-
-        if ($existingPost) {
-            $this->cachePostMapping($sourcePost->pid, $existingPost->id);
-            $result->incrementSkipped(self::ENTITY_NAME);
-            $result->recordSkipped(self::ENTITY_NAME, [
-                'source_id' => $sourcePost->pid,
-                'reason' => 'Already exists',
-            ]);
-
-            return;
-        }
-
         $author = $this->findOrCreateAuthor($sourcePost);
 
         if (! $author instanceof User) {
@@ -191,7 +173,7 @@ class PostImporter implements EntityImporter
             'type' => PostType::Forum,
             'topic_id' => $topic->id,
             'title' => "Re: $topic->title",
-            'content' => $content,
+            'content' => $sourcePost->post,
             'is_published' => true,
             'is_approved' => true,
             'comments_enabled' => false,
@@ -226,6 +208,10 @@ class PostImporter implements EntityImporter
 
         if ($mappedUserId !== null && $mappedUserId !== 0) {
             return User::query()->find($mappedUserId);
+        }
+
+        if ($adminUser = User::query()->role(Role::Administrator)->oldest()->first()) {
+            return $adminUser;
         }
 
         return null;
