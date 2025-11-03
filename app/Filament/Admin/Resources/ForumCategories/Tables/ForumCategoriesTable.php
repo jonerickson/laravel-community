@@ -41,9 +41,6 @@ class ForumCategoriesTable
                     ->sortable(),
                 TextColumn::make('groups.name')
                     ->badge(),
-                TextColumn::make('parent.name')
-                    ->placeholder('No Parent')
-                    ->badge(),
                 ColorColumn::make('color')
                     ->sortable(),
                 IconColumn::make('is_active')
@@ -66,11 +63,6 @@ class ForumCategoriesTable
                     ->label('Active'),
                 SelectFilter::make('groups')
                     ->relationship('groups', 'name')
-                    ->multiple()
-                    ->preload()
-                    ->searchable(),
-                SelectFilter::make('parent')
-                    ->relationship('parent', 'name')
                     ->multiple()
                     ->preload()
                     ->searchable(),

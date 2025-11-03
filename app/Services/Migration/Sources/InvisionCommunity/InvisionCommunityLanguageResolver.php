@@ -62,6 +62,11 @@ class InvisionCommunityLanguageResolver
         return $this->resolve("forums_forum_$forumId", $fallback);
     }
 
+    public function resolveForumDescription(int|string $forumId, ?string $fallback = null): ?string
+    {
+        return $this->resolve("forums_forum_{$forumId}_desc", $fallback);
+    }
+
     public function batchResolve(array $keys): array
     {
         $result = [];

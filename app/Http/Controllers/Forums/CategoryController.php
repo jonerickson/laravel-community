@@ -29,18 +29,12 @@ class CategoryController extends Controller
         $this->authorize('viewAny', ForumCategory::class);
 
         $categories = ForumCategory::query()
-            ->whereNull('parent_id')
             ->active()
             ->ordered()
             ->with('image')
-            ->with(['children' => function (HasMany|ForumCategory $query): void {
-                $query
-                    ->active()
-                    ->ordered()
-                    ->with('image');
-            }])
             ->with(['forums' => function (HasMany|Forum $query): void {
                 $query
+                    ->whereNull('parent_id')
                     ->active()
                     ->ordered()
                     ->withCount(['topics', 'posts'])
@@ -53,13 +47,6 @@ class CategoryController extends Controller
             ->get()
             ->filter(fn (ForumCategory $category) => Gate::check('view', $category))
             ->map(function (ForumCategory $category): ForumCategory {
-                $category->setRelation(
-                    'children',
-                    $category->children
-                        ->filter(fn (ForumCategory $child) => Gate::check('view', $child))
-                        ->values()
-                );
-
                 $category->setRelation(
                     'forums',
                     $category->forums
@@ -91,37 +78,11 @@ class CategoryController extends Controller
     {
         $this->authorize('view', $category);
 
-        $category->load([
-            'image',
-            'parent',
-            'children' => function (HasMany|ForumCategory $query): void {
-                $query
-                    ->active()
-                    ->ordered()
-                    ->with('image')
-                    ->with(['forums' => function (HasMany|Forum $forumsQuery): void {
-                        $forumsQuery
-                            ->active()
-                            ->ordered()
-                            ->withCount(['topics', 'posts'])
-                            ->with(['latestTopics' => function (HasMany|Topic $topicsQuery): void {
-                                $topicsQuery
-                                    ->with(['forum.category', 'author', 'lastPost.author'])
-                                    ->limit(3);
-                            }]);
-                    }]);
-            },
-        ]);
-
-        $category->setRelation(
-            'children',
-            $category->children
-                ->filter(fn (ForumCategory $child) => Gate::check('view', $child))
-                ->values()
-        );
+        $category->load(['image']);
 
         $forums = $category
             ->forums()
+            ->whereNull('parent_id')
             ->active()
             ->ordered()
             ->withCount(['topics', 'posts'])

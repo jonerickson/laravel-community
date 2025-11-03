@@ -127,16 +127,21 @@ class ForumSeeder extends Seeder
 
         $internalForums = ['Administrators', 'Moderators'];
 
-        foreach ($internalForums as $internalForum) {
-            $adminForumCategory = ForumCategory::factory()->state([
-                'name' => $internalForum,
-                'parent_id' => $internalForumCategory->id,
-            ])->hasAttached($adminGroup)->create();
+        foreach ($internalForums as $internalForumName) {
+            $parentForum = Forum::factory()
+                ->for($internalForumCategory, 'category')
+                ->state([
+                    'name' => $internalForumName,
+                    'description' => "Private discussions for $internalForumName.",
+                ])
+                ->hasAttached($adminGroup)
+                ->create();
 
             Forum::factory()
-                ->for($adminForumCategory, 'category')
+                ->for($internalForumCategory, 'category')
                 ->state([
                     'name' => 'General Discussion',
+                    'parent_id' => $parentForum->id,
                 ])
                 ->hasAttached($adminGroup)
                 ->create();

@@ -14,13 +14,11 @@ use App\Traits\HasSlug;
 use App\Traits\Orderable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 /**
  * @property int $id
- * @property int|null $parent_id
  * @property string $name
  * @property string $slug
  * @property string|null $description
@@ -30,8 +28,6 @@ use Illuminate\Support\Str;
  * @property bool $is_active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, ForumCategory> $children
- * @property-read int|null $children_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Forum> $forums
  * @property-read int|null $forums_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Group> $groups
@@ -39,7 +35,6 @@ use Illuminate\Support\Str;
  * @property-read Image|null $image
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Image> $images
  * @property-read int|null $images_count
- * @property-read ForumCategory|null $parent
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory active()
  * @method static \Database\Factories\ForumCategoryFactory factory($count = null, $state = [])
@@ -56,7 +51,6 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereOrder($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereParentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereUpdatedAt($value)
  *
@@ -76,23 +70,12 @@ class ForumCategory extends Model implements Sluggable
     protected $table = 'forums_categories';
 
     protected $fillable = [
-        'parent_id',
         'name',
         'description',
         'is_active',
     ];
 
     protected ?string $groupsForeignPivotKey = 'category_id';
-
-    public function parent(): BelongsTo
-    {
-        return $this->belongsTo(ForumCategory::class, 'parent_id');
-    }
-
-    public function children(): HasMany
-    {
-        return $this->hasMany(ForumCategory::class, 'parent_id');
-    }
 
     public function forums(): HasMany
     {

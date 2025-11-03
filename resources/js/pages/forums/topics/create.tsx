@@ -25,10 +25,23 @@ export default function ForumTopicCreate({ forum }: CreateTopicProps) {
             title: 'Forums',
             href: route('forums.index'),
         },
-        {
+    ];
+
+    if (forum.category) {
+        breadcrumbs.push({
             title: forum.category.name,
             href: route('forums.categories.show', { category: forum.category.slug }),
-        },
+        });
+    }
+
+    if (forum.parent) {
+        breadcrumbs.push({
+            title: forum.parent.name,
+            href: route('forums.show', { forum: forum.parent.slug }),
+        });
+    }
+
+    breadcrumbs.push(
         {
             title: forum.name,
             href: route('forums.show', { forum: forum.slug }),
@@ -37,7 +50,7 @@ export default function ForumTopicCreate({ forum }: CreateTopicProps) {
             title: 'Create Topic',
             href: route('forums.topics.create', { forum: forum.slug }),
         },
-    ];
+    );
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

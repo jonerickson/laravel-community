@@ -28,6 +28,7 @@ use Override;
  * @property string $slug
  * @property string|null $description
  * @property int|null $category_id
+ * @property int|null $parent_id
  * @property string|null $rules
  * @property string|null $icon
  * @property string $color
@@ -36,6 +37,8 @@ use Override;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read ForumCategory|null $category
+ * @property-read Collection<int, Forum> $children
+ * @property-read int|null $children_count
  * @property-read Collection<int, Follow> $followers
  * @property-read int $followers_count
  * @property-read Collection<int, Follow> $follows
@@ -45,6 +48,7 @@ use Override;
  * @property-read bool $is_followed_by_user
  * @property-read Collection<int, Topic> $latestTopics
  * @property-read int|null $latest_topics_count
+ * @property-read Forum|null $parent
  * @property-read Collection<int, Post> $posts
  * @property-read int $posts_count
  * @property-read Collection<int, Topic> $topics
@@ -66,6 +70,7 @@ use Override;
  * @method static Builder<static>|Forum whereIsActive($value)
  * @method static Builder<static>|Forum whereName($value)
  * @method static Builder<static>|Forum whereOrder($value)
+ * @method static Builder<static>|Forum whereParentId($value)
  * @method static Builder<static>|Forum whereRules($value)
  * @method static Builder<static>|Forum whereSlug($value)
  * @method static Builder<static>|Forum whereUpdatedAt($value)
@@ -85,6 +90,7 @@ class Forum extends Model implements Sluggable
         'name',
         'description',
         'category_id',
+        'parent_id',
         'rules',
         'icon',
         'color',
@@ -98,6 +104,16 @@ class Forum extends Model implements Sluggable
     public function category(): BelongsTo
     {
         return $this->belongsTo(ForumCategory::class);
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Forum::class, 'parent_id');
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(Forum::class, 'parent_id');
     }
 
     public function topics(): HasMany

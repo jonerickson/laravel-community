@@ -39,7 +39,7 @@ class MigrationResult
     public function recordSkipped(string $entity, array $record): void
     {
         $key = $this->cachePrefix.'skipped:'.$entity;
-        $records = Cache::get($key, []);
+        $records = Cache::tags(self::CACHE_TAG)->get($key, []);
         $records[] = $record;
         Cache::tags(self::CACHE_TAG)->put($key, $records, self::CACHE_TTL);
     }
@@ -47,7 +47,7 @@ class MigrationResult
     public function recordFailed(string $entity, array $record): void
     {
         $key = $this->cachePrefix.'failed:'.$entity;
-        $records = Cache::get($key, []);
+        $records = Cache::tags(self::CACHE_TAG)->get($key, []);
         $records[] = $record;
         Cache::tags(self::CACHE_TAG)->put($key, $records, self::CACHE_TTL);
     }
@@ -55,7 +55,7 @@ class MigrationResult
     public function recordMigrated(string $entity, array $record): void
     {
         $key = $this->cachePrefix.'migrated:'.$entity;
-        $records = Cache::get($key, []);
+        $records = Cache::tags(self::CACHE_TAG)->get($key, []);
         $records[] = $record;
         Cache::tags(self::CACHE_TAG)->put($key, $records, self::CACHE_TTL);
     }

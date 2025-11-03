@@ -25,6 +25,8 @@ class ForumData extends Data
 
     public ?int $categoryId = null;
 
+    public ?int $parentId = null;
+
     public ?string $rules = null;
 
     public ?string $icon = null;
@@ -47,7 +49,13 @@ class ForumData extends Data
     public ?array $latestTopics = null;
 
     #[LoadRelation]
-    public ForumCategoryData $category;
+    public ?ForumCategoryData $category = null;
+
+    #[LoadRelation]
+    public ?ForumData $parent = null;
+
+    /** @var ForumData[] */
+    public ?array $children = null;
 
     public ?CarbonImmutable $createdAt = null;
 

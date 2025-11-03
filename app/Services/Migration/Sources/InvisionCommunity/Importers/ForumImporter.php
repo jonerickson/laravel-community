@@ -92,24 +92,28 @@ class ForumImporter implements EntityImporter
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->where('parent_id', '<>', -1)
+            ->where('position', '<>', 0)
             ->orderBy('id')
             ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
             ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 
         $totalForums = $limit !== null && $limit !== 0 ? min($limit, $baseQuery->count()) : $baseQuery->count();
 
-        $output->writeln("Found {$totalForums} forums to migrate...");
+        $output->writeln("Found $totalForums forums to migrate...");
 
         $progressBar = $output->createProgressBar($totalForums);
         $progressBar->start();
 
         $processed = 0;
+        $sourceForumsData = [];
 
-        $baseQuery->chunk($batchSize, function ($forums) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($batchSize, function ($forums) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed, &$sourceForumsData): bool {
             foreach ($forums as $sourceForum) {
                 if ($limit !== null && $limit !== 0 && $processed >= $limit) {
                     return false;
                 }
+
+                $sourceForumsData[] = $sourceForum;
 
                 try {
                     $this->importForum($sourceForum, $isDryRun, $result);
@@ -141,6 +145,8 @@ class ForumImporter implements EntityImporter
 
         $progressBar->finish();
         $output->newLine(2);
+
+        $this->updateForumParentRelationships($sourceForumsData, $isDryRun, $output, $result);
     }
 
     protected function importCategories(
@@ -155,6 +161,7 @@ class ForumImporter implements EntityImporter
         $baseQuery = DB::connection($connection)
             ->table('forums_forums')
             ->where('parent_id', -1)
+            ->where('position', '<>', 0)
             ->orderBy('id')
             ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
             ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
@@ -209,39 +216,22 @@ class ForumImporter implements EntityImporter
     protected function importCategory(object $sourceCategory, bool $isDryRun, MigrationResult $result): void
     {
         $name = $this->languageResolver?->resolveForumName($sourceCategory->id, "Invision Forum Category $sourceCategory->id");
-        $slug = $sourceCategory->name_seo ?? Str::slug($name);
-
-        $existingCategory = ForumCategory::query()
-            ->where(function ($query) use ($name, $slug): void {
-                $query->where('name', $name)
-                    ->orWhere('slug', $slug);
-            })
-            ->first();
-
-        if ($existingCategory) {
-            $this->cacheCategoryMapping($sourceCategory->id, $existingCategory->id);
-            $result->incrementSkipped('forum_categories');
-            $result->recordSkipped('forum_categories', [
-                'source_id' => $sourceCategory->id,
-                'name' => $name,
-                'reason' => 'Already exists',
-            ]);
-
-            return;
-        }
+        $description = $this->languageResolver?->resolveForumDescription($sourceCategory->id);
+        $slug = Str::unique(Str::slug($sourceCategory->name_seo ?? $name), 'forums_categories', 'slug');
 
         $category = new ForumCategory;
         $category->forceFill([
             'name' => $name,
             'slug' => $slug,
-            'description' => null,
+            'description' => strip_tags($description ?? ''),
             'icon' => 'message-square',
-            'color' => '#94a3b8',
+            'color' => $sourceCategory->feature_color ?? '#94a3b8',
             'is_active' => true,
         ]);
 
         if (! $isDryRun) {
             $category->save();
+            $category->groups()->sync([GroupImporter::getDefaultMemberGroup(), GroupImporter::getDefaultGuestGroup()]);
             $this->cacheCategoryMapping($sourceCategory->id, $category->id);
         }
 
@@ -257,54 +247,23 @@ class ForumImporter implements EntityImporter
     protected function importForum(object $sourceForum, bool $isDryRun, MigrationResult $result): void
     {
         $name = $this->languageResolver->resolveForumName($sourceForum->id, "Invision Forum $sourceForum->id");
-        $slug = $sourceForum->name_seo ?? Str::slug($name);
-
-        $existingForum = Forum::query()
-            ->where(function ($query) use ($name, $slug): void {
-                $query->where('name', $name)
-                    ->orWhere('slug', $slug);
-            })
-            ->first();
-
-        if ($existingForum) {
-            $this->cacheForumMapping($sourceForum->id, $existingForum->id);
-            $result->incrementSkipped(self::ENTITY_NAME);
-            $result->recordSkipped(self::ENTITY_NAME, [
-                'source_id' => $sourceForum->id,
-                'name' => $name,
-                'reason' => 'Already exists',
-            ]);
-
-            return;
-        }
-
-        $category = $this->findOrCreateCategory($sourceForum);
-
-        if (! $category instanceof ForumCategory) {
-            $result->incrementFailed(self::ENTITY_NAME);
-            $result->recordFailed(self::ENTITY_NAME, [
-                'source_id' => $sourceForum->id,
-                'name' => $name,
-                'error' => 'Could not find or create category',
-            ]);
-
-            return;
-        }
+        $description = $this->languageResolver?->resolveForumDescription($sourceForum->id);
+        $slug = Str::unique(Str::slug($sourceForum->name_seo ?? $name), 'forums', 'slug');
 
         $forum = new Forum;
         $forum->forceFill([
             'name' => $name,
             'slug' => $slug,
-            'description' => null,
-            'category_id' => $category->id,
+            'description' => strip_tags($description ?? ''),
             'icon' => 'message-square',
-            'color' => '#94a3b8',
+            'color' => $sourceForum->feature_color ?? '#94a3b8',
             'order' => $sourceForum->position ?? 0,
             'is_active' => true,
         ]);
 
         if (! $isDryRun) {
             $forum->save();
+            $forum->groups()->sync([GroupImporter::getDefaultMemberGroup(), GroupImporter::getDefaultGuestGroup()]);
             $this->cacheForumMapping($sourceForum->id, $forum->id);
         }
 
@@ -314,19 +273,56 @@ class ForumImporter implements EntityImporter
             'target_id' => $forum->id ?? 'N/A (dry run)',
             'name' => $forum->name,
             'slug' => $forum->slug,
-            'category' => $category->name,
         ]);
     }
 
-    protected function findOrCreateCategory(object $sourceForum): ?ForumCategory
+    protected function updateForumParentRelationships(array $sourceForumsData, bool $isDryRun, OutputStyle $output, MigrationResult $result): void
     {
-        $mappedCategoryId = static::getCategoryMapping((int) $sourceForum->parent_id);
+        $output->writeln('Updating forum parent relationships...');
 
-        if ($mappedCategoryId !== null && $mappedCategoryId !== 0) {
-            return ForumCategory::query()->find($mappedCategoryId);
+        $progressBar = $output->createProgressBar(count($sourceForumsData));
+        $progressBar->start();
+
+        foreach ($sourceForumsData as $sourceForum) {
+            try {
+                $mappedForumId = static::getForumMapping((int) $sourceForum->id);
+
+                if ($mappedForumId === null || $mappedForumId === 0) {
+                    $progressBar->advance();
+
+                    continue;
+                }
+
+                $parentCategoryId = static::getCategoryMapping((int) $sourceForum->parent_id);
+
+                if ($parentCategoryId !== null && $parentCategoryId !== 0) {
+                    if (! $isDryRun) {
+                        Forum::query()
+                            ->where('id', $mappedForumId)
+                            ->update(['category_id' => $parentCategoryId]);
+                    }
+                } else {
+                    $parentForumId = static::getForumMapping((int) $sourceForum->parent_id);
+
+                    if ($parentForumId !== null && $parentForumId !== 0 && ! $isDryRun) {
+                        Forum::query()
+                            ->where('id', $mappedForumId)
+                            ->update(['parent_id' => $parentForumId]);
+                    }
+                }
+            } catch (Exception $e) {
+                Log::error('Failed to update forum parent relationship', [
+                    'source_id' => $sourceForum->id ?? 'unknown',
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+            }
+
+            $progressBar->advance();
         }
 
-        return null;
+        $progressBar->finish();
+        $output->newLine(2);
     }
 
     protected function cacheForumMapping(int $sourceForumId, int $targetForumId): void

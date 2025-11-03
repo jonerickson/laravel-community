@@ -231,9 +231,6 @@ class MigrateCommand extends Command
                 output: $this->output,
             );
 
-            $migrationService->cleanup();
-            $result->cleanup();
-
             $this->newLine();
             $this->info('Migration completed successfully!');
             $this->table(
@@ -242,6 +239,9 @@ class MigrateCommand extends Command
             );
 
             $this->displayVerboseOutput($result);
+
+            $migrationService->cleanup();
+            $result->cleanup();
 
             return self::SUCCESS;
         } catch (Exception $e) {

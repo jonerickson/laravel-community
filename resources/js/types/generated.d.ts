@@ -131,8 +131,6 @@ declare namespace App.Data {
     };
     export type ForumCategoryData = {
         id: number;
-        parentId: number | null;
-        parent: App.Data.ForumCategoryData | null;
         name: string;
         slug: string;
         description: string | null;
@@ -140,7 +138,6 @@ declare namespace App.Data {
         color: string;
         order: number;
         isActive: boolean;
-        children: Array<App.Data.ForumCategoryData> | null;
         forums: Array<App.Data.ForumData> | null;
         image: App.Data.ImageData | null;
         createdAt: string | null;
@@ -152,6 +149,7 @@ declare namespace App.Data {
         slug: string;
         description: string | null;
         categoryId: number | null;
+        parentId: number | null;
         rules: string | null;
         icon: string | null;
         color: string;
@@ -162,7 +160,9 @@ declare namespace App.Data {
         isFollowedByUser: boolean | null;
         followersCount: number | null;
         latestTopics: Array<App.Data.TopicData> | null;
-        category: App.Data.ForumCategoryData;
+        category: App.Data.ForumCategoryData | null;
+        parent: App.Data.ForumData | null;
+        children: Array<App.Data.ForumData> | null;
         createdAt: string | null;
         updatedAt: string | null;
     };
@@ -551,6 +551,7 @@ declare namespace App.Enums {
         | 'requires_payment_method'
         | 'succeeded'
         | 'refunded';
+    export type PaymentBehavior = 'allow_incomplete' | 'default_incomplete' | 'error_if_incomplete' | 'pending_if_incomplete';
     export type PayoutStatus = 'pending' | 'completed' | 'failed' | 'cancelled';
     export type PostType = 'blog' | 'forum';
     export type ProductApprovalStatus = 'pending' | 'approved' | 'rejected';
@@ -578,6 +579,7 @@ declare namespace App.Enums {
         | 'electronically_delivered_information_business'
         | 'electronically_delivered_information_personal';
     export type ProductType = 'product' | 'subscription';
+    export type ProrationBehavior = 'create_prorations' | 'always_invoice' | 'none';
     export type PublishableStatus = 'published' | 'draft';
     export type ReportReason = 'spam' | 'harassment' | 'inappropriate_content' | 'abuse' | 'impersonation' | 'false_information' | 'other';
     export type ReportStatus = 'pending' | 'reviewed' | 'approved' | 'rejected';

@@ -37,23 +37,24 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
         },
     ];
 
-    if (forum.category.parent) {
+    if (forum.category) {
         breadcrumbs.push({
-            title: forum.category.parent.name,
-            href: route('forums.categories.show', { category: forum.category.parent.slug }),
+            title: forum.category.name,
+            href: route('forums.categories.show', { category: forum.category.slug }),
         });
     }
 
-    breadcrumbs.push(
-        {
-            title: forum.category.name,
-            href: route('forums.categories.show', { category: forum.category.slug }),
-        },
-        {
-            title: forum.name,
-            href: route('forums.show', { forum: forum.slug }),
-        },
-    );
+    if (forum.parent) {
+        breadcrumbs.push({
+            title: forum.parent.name,
+            href: route('forums.show', { forum: forum.parent.slug }),
+        });
+    }
+
+    breadcrumbs.push({
+        title: forum.name,
+        href: route('forums.show', { forum: forum.slug }),
+    });
 
     const structuredData = {
         '@context': 'https://schema.org',
@@ -213,13 +214,108 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                     </Alert>
                 )}
 
+                {forum.children && forum.children.length > 0 && (
+                    <div className="rounded-md border">
+                        <Table className="table table-fixed">
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="w-[60%]">Subforums</TableHead>
+                                    <TableHead className="hidden w-[10%] text-center md:table-cell">Topics</TableHead>
+                                    <TableHead className="hidden w-[10%] text-center md:table-cell">Posts</TableHead>
+                                    <TableHead className="hidden w-[20%] text-right md:table-cell">Latest Activity</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {forum.children.map((subforum) => (
+                                    <TableRow key={subforum.id} className="hover:bg-muted/50">
+                                        <TableCell className="p-4">
+                                            <div className="flex items-start gap-3">
+                                                <div
+                                                    className="flex h-10 w-10 items-center justify-center rounded-lg text-white"
+                                                    style={{ backgroundColor: subforum.color }}
+                                                >
+                                                    <MessageSquare className="size-5" />
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="mb-1">
+                                                        <Link
+                                                            href={route('forums.show', { forum: subforum.slug })}
+                                                            className="font-medium hover:underline"
+                                                        >
+                                                            {subforum.name}
+                                                        </Link>
+                                                    </div>
+                                                    {subforum.description && (
+                                                        <p className="text-sm text-wrap break-words text-muted-foreground">{subforum.description}</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="hidden p-4 text-center md:table-cell">
+                                            <div className="flex items-center justify-center gap-1">
+                                                <MessageSquare className="size-4" />
+                                                <span>{subforum.topicsCount || 0}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="hidden p-4 text-center md:table-cell">
+                                            <div className="flex items-center justify-center gap-1">
+                                                <MessageSquare className="size-4" />
+                                                <span>{subforum.postsCount || 0}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="hidden p-4 text-right md:table-cell">
+                                            {subforum.latestTopics && subforum.latestTopics.length > 0 ? (
+                                                <div className="text-sm">
+                                                    <div className="mb-1">
+                                                        <Link
+                                                            href={route('forums.topics.show', {
+                                                                forum: subforum.slug,
+                                                                topic: subforum.latestTopics[0].slug,
+                                                            })}
+                                                            className="font-medium text-wrap break-words hover:underline"
+                                                        >
+                                                            {subforum.latestTopics[0].title}
+                                                        </Link>
+                                                    </div>
+                                                    <div className="flex items-center justify-end gap-2 text-xs text-muted-foreground">
+                                                        <Avatar className="size-4">
+                                                            <AvatarFallback className="text-xs">
+                                                                {subforum.latestTopics[0].author?.name?.charAt(0).toUpperCase() || 'U'}
+                                                            </AvatarFallback>
+                                                        </Avatar>
+                                                        <span>by {subforum.latestTopics[0].author?.name}</span>
+                                                        <span>•</span>
+                                                        <span>
+                                                            {subforum.latestTopics[0].lastReplyAt
+                                                                ? formatDistanceToNow(new Date(subforum.latestTopics[0].lastReplyAt), {
+                                                                      addSuffix: true,
+                                                                  })
+                                                                : subforum.latestTopics[0].createdAt
+                                                                  ? formatDistanceToNow(new Date(subforum.latestTopics[0].createdAt), {
+                                                                        addSuffix: true,
+                                                                    })
+                                                                  : 'N/A'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="text-sm text-muted-foreground">No topics yet</div>
+                                            )}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                )}
+
                 {topics.length > 0 ? (
                     <div className="rounded-md border">
                         <InfiniteScroll data="topics">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="w-[80%]"></TableHead>
+                                        <TableHead className="w-[80%]">Forums</TableHead>
                                         <TableHead className="w-[5%] text-center">Replies</TableHead>
                                         <TableHead className="w-[5%] text-center">Views</TableHead>
                                         <TableHead className="w-[10%] text-right">Last Activity</TableHead>

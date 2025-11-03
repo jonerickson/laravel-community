@@ -30,6 +30,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
@@ -73,6 +74,14 @@ class ForumResource extends Resource
                             ->columnSpanFull()
                             ->preload()
                             ->relationship('category', 'name'),
+                        Select::make('parent_id')
+                            ->label('Parent Forum')
+                            ->relationship('parent', 'name')
+                            ->columnSpanFull()
+                            ->nullable()
+                            ->preload()
+                            ->searchable()
+                            ->helperText('Optional parent forum to create a subforum.'),
                         Textarea::make('description')
                             ->helperText('A helpful description on what the forum is about.')
                             ->columnSpanFull()
@@ -125,7 +134,13 @@ class ForumResource extends Resource
                     ->badge(),
                 TextColumn::make('category.name')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->badge(),
+                TextColumn::make('parent.name')
+                    ->placeholder('No Parent')
+                    ->sortable()
+                    ->searchable()
+                    ->badge(),
                 ColorColumn::make('color')
                     ->sortable(),
                 ToggleColumn::make('is_active')
@@ -156,6 +171,11 @@ class ForumResource extends Resource
                     ->trueLabel('Active forums only')
                     ->falseLabel('Inactive forums only')
                     ->native(false),
+                SelectFilter::make('parent')
+                    ->relationship('parent', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
             ])
             ->groups([
                 Group::make('category.name')

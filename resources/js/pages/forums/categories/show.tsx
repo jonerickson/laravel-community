@@ -1,5 +1,4 @@
 import { EmptyState } from '@/components/empty-state';
-import ForumCategoryCard from '@/components/forum-category-card';
 import Heading from '@/components/heading';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -23,19 +22,11 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
             title: 'Forums',
             href: route('forums.index'),
         },
+        {
+            title: category.name,
+            href: route('forums.categories.show', { category: category.slug }),
+        },
     ];
-
-    if (category.parent) {
-        breadcrumbs.push({
-            title: category.parent.name,
-            href: route('forums.categories.show', { category: category.parent.slug }),
-        });
-    }
-
-    breadcrumbs.push({
-        title: category.name,
-        href: route('forums.categories.show', { category: category.slug }),
-    });
 
     const structuredData = {
         '@context': 'https://schema.org',
@@ -104,20 +95,12 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                     </div>
                 </div>
 
-                {category.children && category.children.length > 0 && (
-                    <div className="grid gap-6">
-                        {category.children.map((child) => (
-                            <ForumCategoryCard key={child.id} category={child} />
-                        ))}
-                    </div>
-                )}
-
                 {forums.length > 0 ? (
                     <div className="rounded-md border">
                         <Table className="table table-fixed">
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[60%]"></TableHead>
+                                    <TableHead className="w-[60%]">Forums</TableHead>
                                     <TableHead className="hidden w-[10%] text-center md:table-cell">Topics</TableHead>
                                     <TableHead className="hidden w-[10%] text-center md:table-cell">Posts</TableHead>
                                     <TableHead className="hidden w-[20%] text-right md:table-cell">Latest Activity</TableHead>
@@ -206,11 +189,7 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                         </Table>
                     </div>
                 ) : (
-                    <>
-                        {category.children && category.children.length === 0 && (
-                            <EmptyState icon={<LibraryBig />} title="No forums available" description="There are no forums in this category yet." />
-                        )}
-                    </>
+                    <EmptyState icon={<LibraryBig />} title="No forums available" description="There are no forums in this category yet." />
                 )}
             </div>
         </AppLayout>

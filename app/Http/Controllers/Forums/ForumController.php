@@ -27,6 +27,37 @@ class ForumController extends Controller
     {
         $this->authorize('view', $forum);
 
+        $forum->load([
+            'category',
+            'parent',
+            'children' => function ($query): void {
+                $query
+                    ->active()
+                    ->ordered()
+                    ->withCount(['topics', 'posts'])
+                    ->with(['latestTopics' => function ($subQuery): void {
+                        $subQuery
+                            ->with(['author', 'lastPost.author'])
+                            ->limit(3);
+                    }]);
+            },
+        ]);
+
+        $forum->setRelation(
+            'children',
+            $forum->children
+                ->filter(fn (Forum $child) => Gate::check('view', $child))
+                ->map(function (Forum $child): Forum {
+                    $child->setRelation(
+                        'latestTopics',
+                        $child->latestTopics->filter(fn (Topic $topic) => Gate::check('view', $topic))->values()
+                    );
+
+                    return $child;
+                })
+                ->values()
+        );
+
         $topics = TopicData::collect($forum
             ->topics()
             ->with(['author', 'lastPost.author'])
