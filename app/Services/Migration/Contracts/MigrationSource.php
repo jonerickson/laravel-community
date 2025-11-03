@@ -10,10 +10,16 @@ interface MigrationSource
 
     public function getConnection(): string;
 
+    /**
+     * @return array<string, EntityImporter>
+     */
     public function getImporters(): array;
 
     public function getImporter(string $entity): ?EntityImporter;
 
+    /**
+     * @return array<string, string|int>|null
+     */
     public function getSshConfig(): ?array;
 
     public function getBaseUrl(): ?string;
