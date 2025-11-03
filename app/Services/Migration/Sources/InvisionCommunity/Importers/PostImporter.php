@@ -74,7 +74,7 @@ class PostImporter extends AbstractImporter
     public function getDependencies(): array
     {
         return [
-            // ImporterDependency::requiredPre('users', 'Posts require users to exist for author assignment'),
+            ImporterDependency::requiredPre('users', 'Posts require users to exist for author assignment'),
             ImporterDependency::requiredPre('topics', 'Posts require topics to exist for proper assignment'),
         ];
     }

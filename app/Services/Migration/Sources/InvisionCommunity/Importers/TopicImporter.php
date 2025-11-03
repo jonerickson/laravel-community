@@ -73,7 +73,7 @@ class TopicImporter extends AbstractImporter
     public function getDependencies(): array
     {
         return [
-            // ImporterDependency::requiredPre('users', 'Topics require users to exist for author assignment'),
+            ImporterDependency::requiredPre('users', 'Topics require users to exist for author assignment'),
             ImporterDependency::requiredPre('forums', 'Topics require that forums exist for proper assignment'),
         ];
     }
