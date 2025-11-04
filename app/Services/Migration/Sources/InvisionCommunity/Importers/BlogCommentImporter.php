@@ -82,7 +82,7 @@ class BlogCommentImporter extends AbstractImporter
             ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
             ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 
-        $totalComments = $limit !== null && $limit !== 0 ? min($limit, $baseQuery->count()) : $baseQuery->count();
+        $totalComments = $baseQuery->count();
 
         $output->writeln("Found {$totalComments} blog comments to migrate...");
 
@@ -126,7 +126,10 @@ class BlogCommentImporter extends AbstractImporter
         });
 
         $progressBar->finish();
-        $output->newLine(2);
+
+        $output->newLine();
+        $output->writeln("Migrated $processed blog comments...");
+        $output->newLine();
     }
 
     protected function importComment(object $sourceComment, bool $isDryRun, MigrationResult $result): void

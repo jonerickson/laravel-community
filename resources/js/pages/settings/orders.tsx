@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/empty-state';
 import HeadingSmall from '@/components/heading-small';
 import OrderStatus from '@/components/order-status';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { currency, date } from '@/lib/utils';
@@ -61,14 +62,19 @@ export default function Orders({ orders }: OrdersProps) {
                     return <div className="font-mono text-sm">N/A</div>;
                 }
                 return (
-                    <button
-                        onClick={() => copyToClipboard(orderNumber, 'Order number')}
-                        className="group flex items-center gap-2 font-mono text-sm hover:text-primary focus:text-primary focus:outline-none"
-                        title="Click to copy"
-                    >
-                        {truncate(orderNumber, 20)}
-                        <Copy className="size-3 opacity-0 transition-opacity group-hover:opacity-100" />
-                    </button>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                onClick={() => copyToClipboard(orderNumber, 'Order number')}
+                                className="group flex items-center gap-2 font-mono text-sm hover:text-primary focus:text-primary focus:outline-none"
+                                title="Click to copy"
+                            >
+                                {truncate(orderNumber, 20)}
+                                <Copy className="size-3 opacity-0 transition-opacity group-hover:opacity-100" />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent>{orderNumber}</TooltipContent>
+                    </Tooltip>
                 );
             },
         },
@@ -81,14 +87,19 @@ export default function Orders({ orders }: OrdersProps) {
                     return <div className="font-mono text-sm">N/A</div>;
                 }
                 return (
-                    <button
-                        onClick={() => copyToClipboard(invoiceNumber, 'Invoice number')}
-                        className="group flex items-center gap-2 font-mono text-sm hover:text-primary focus:text-primary focus:outline-none"
-                        title="Click to copy"
-                    >
-                        {truncate(invoiceNumber, 20)}
-                        <Copy className="size-3 opacity-0 transition-opacity group-hover:opacity-100" />
-                    </button>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                onClick={() => copyToClipboard(invoiceNumber, 'Invoice number')}
+                                className="group flex items-center gap-2 font-mono text-sm hover:text-primary focus:text-primary focus:outline-none"
+                                title="Click to copy"
+                            >
+                                {truncate(invoiceNumber, 20)}
+                                <Copy className="size-3 opacity-0 transition-opacity group-hover:opacity-100" />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent>{invoiceNumber}</TooltipContent>
+                    </Tooltip>
                 );
             },
         },
@@ -99,21 +110,26 @@ export default function Orders({ orders }: OrdersProps) {
                 const order = row.original;
                 const productNames =
                     order.items
-                        ?.map((item) => item.product?.name || item.name)
+                        ?.map((item) => item.name)
                         .filter(Boolean)
                         .join(', ') || 'N/A';
 
                 return (
-                    <div className="flex max-w-[200px] items-center gap-2">
-                        <div className="truncate" title={productNames}>
-                            {productNames}
-                        </div>
-                        {order.isRecurring && (
-                            <div title="Recurring order" className="flex-shrink-0">
-                                <Repeat className="size-3 text-info" />
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <div className="flex max-w-[200px] items-center gap-2">
+                                <div className="truncate" title={productNames}>
+                                    {productNames}
+                                </div>
+                                {order.isRecurring && (
+                                    <div title="Recurring order" className="flex-shrink-0">
+                                        <Repeat className="size-3 text-info" />
+                                    </div>
+                                )}
                             </div>
-                        )}
-                    </div>
+                        </TooltipTrigger>
+                        <TooltipContent>{productNames}</TooltipContent>
+                    </Tooltip>
                 );
             },
         },

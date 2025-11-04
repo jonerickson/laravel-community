@@ -119,7 +119,10 @@ class UserImporter extends AbstractImporter
         });
 
         $progressBar->finish();
-        $output->newLine(2);
+
+        $output->newLine();
+        $output->writeln("Migrated $processed users...");
+        $output->newLine();
     }
 
     public function isCompleted(): bool
@@ -202,9 +205,7 @@ class UserImporter extends AbstractImporter
         }
 
         if (! empty($sourceUser->mgroup_others)) {
-            $secondaryGroupIds = explode(',', (string) $sourceUser->mgroup_others);
-
-            foreach ($secondaryGroupIds as $secondaryGroupId) {
+            foreach (explode(',', (string) $sourceUser->mgroup_others) as $secondaryGroupId) {
                 $mappedGroupId = GroupImporter::getGroupMapping((int) $secondaryGroupId);
 
                 if ($mappedGroupId && ! in_array($mappedGroupId, $groupIds)) {
@@ -214,7 +215,7 @@ class UserImporter extends AbstractImporter
         }
 
         if ($groupIds !== []) {
-            $user->groups()->sync($groupIds);
+            $user->groups()->sync(array_unique(array_values($groupIds)));
         }
     }
 
@@ -236,6 +237,6 @@ class UserImporter extends AbstractImporter
 
     protected function cacheUserMapping(int $sourceUserId, int $targetUserId): void
     {
-        Cache::put(self::CACHE_KEY_PREFIX.$sourceUserId, $targetUserId, 60 * 60 * 24 * 7);
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.$sourceUserId, $targetUserId, 60 * 60 * 24 * 7);
     }
 }

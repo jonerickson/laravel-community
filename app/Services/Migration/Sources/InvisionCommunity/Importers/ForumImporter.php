@@ -7,9 +7,8 @@ namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 use App\Models\Forum;
 use App\Models\ForumCategory;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\MigrationResult;
-use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunityLanguageResolver;
+use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunitySource;
 use Exception;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Support\Facades\Cache;
@@ -26,17 +25,6 @@ class ForumImporter extends AbstractImporter
     protected const string CACHE_KEY_CATEGORY_PREFIX = 'migration:ic:forum_category_map:';
 
     protected const string CACHE_TAG = 'migration:ic:forums';
-
-    protected ?InvisionCommunityLanguageResolver $languageResolver = null;
-
-    public function __construct(MigrationSource $source)
-    {
-        parent::__construct($source);
-
-        $this->languageResolver = new InvisionCommunityLanguageResolver(
-            connection: $source->getConnection(),
-        );
-    }
 
     public static function getForumMapping(int $sourceForumId): ?int
     {
@@ -99,7 +87,7 @@ class ForumImporter extends AbstractImporter
             ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
             ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 
-        $totalForums = $limit !== null && $limit !== 0 ? min($limit, $baseQuery->count()) : $baseQuery->count();
+        $totalForums = $baseQuery->count();
 
         $output->writeln("Found $totalForums forums to migrate...");
 
@@ -146,7 +134,10 @@ class ForumImporter extends AbstractImporter
         });
 
         $progressBar->finish();
-        $output->newLine(2);
+
+        $output->newLine();
+        $output->writeln("Migrated $processed forums...");
+        $output->newLine();
 
         $this->updateForumParentRelationships($sourceForumsData, $isDryRun, $output, $result);
     }
@@ -168,7 +159,7 @@ class ForumImporter extends AbstractImporter
             ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
             ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 
-        $totalCategories = $limit !== null && $limit !== 0 ? min($limit, $baseQuery->count()) : $baseQuery->count();
+        $totalCategories = $baseQuery->count();
 
         $output->writeln("Found {$totalCategories} forum categories to migrate...");
 
@@ -212,13 +203,20 @@ class ForumImporter extends AbstractImporter
         });
 
         $progressBar->finish();
-        $output->newLine(2);
+
+        $output->newLine();
+        $output->writeln("Migrated $processed forum categories...");
+        $output->newLine();
     }
 
     protected function importCategory(object $sourceCategory, bool $isDryRun, MigrationResult $result): void
     {
-        $name = $this->languageResolver?->resolveForumName($sourceCategory->id, "Invision Forum Category $sourceCategory->id");
-        $description = $this->languageResolver?->resolveForumDescription($sourceCategory->id);
+        $name = $this->source instanceof InvisionCommunitySource
+            ? $this->source->getLanguageResolver()->resolveForumName($sourceCategory->id, "Invision Forum Category $sourceCategory->id")
+            : "Invision Forum Category $sourceCategory->id";
+        $description = $this->source instanceof InvisionCommunitySource
+            ? $this->source->getLanguageResolver()->resolveForumDescription($sourceCategory->id)
+            : null;
         $slug = Str::unique(Str::slug($sourceCategory->name_seo ?? $name), 'forums_categories', 'slug');
 
         $category = new ForumCategory;
@@ -248,8 +246,12 @@ class ForumImporter extends AbstractImporter
 
     protected function importForum(object $sourceForum, bool $isDryRun, MigrationResult $result): void
     {
-        $name = $this->languageResolver->resolveForumName($sourceForum->id, "Invision Forum $sourceForum->id");
-        $description = $this->languageResolver?->resolveForumDescription($sourceForum->id);
+        $name = $this->source instanceof InvisionCommunitySource
+            ? $this->source->getLanguageResolver()->resolveForumName($sourceForum->id, "Invision Forum $sourceForum->id")
+            : "Invision Forum $sourceForum->id";
+        $description = $this->source instanceof InvisionCommunitySource
+            ? $this->source->getLanguageResolver()->resolveForumDescription($sourceForum->id)
+            : null;
         $slug = Str::unique(Str::slug($sourceForum->name_seo ?? $name), 'forums', 'slug');
 
         $forum = new Forum;

@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Enums\ProductApprovalStatus;
+use App\Enums\ProductTaxCode;
 use App\Enums\ProductType;
 use App\Enums\SubscriptionInterval;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\MigrationResult;
-use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunityLanguageResolver;
+use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunitySource;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
@@ -31,17 +31,6 @@ class ProductImporter extends AbstractImporter
     protected const string CACHE_KEY_CATEGORY_PREFIX = 'migration:ic:product_category_map:';
 
     protected const string CACHE_TAG = 'migration:ic:products';
-
-    protected ?InvisionCommunityLanguageResolver $languageResolver = null;
-
-    public function __construct(MigrationSource $source)
-    {
-        parent::__construct($source);
-
-        $this->languageResolver = new InvisionCommunityLanguageResolver(
-            connection: $source->getConnection(),
-        );
-    }
 
     public static function getProductMapping(int $sourceProductId): ?int
     {
@@ -103,7 +92,7 @@ class ProductImporter extends AbstractImporter
             ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
             ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 
-        $totalProducts = $limit !== null && $limit !== 0 ? min($limit, $baseQuery->count()) : $baseQuery->count();
+        $totalProducts = $baseQuery->count();
 
         $output->writeln("Found {$totalProducts} products to migrate...");
 
@@ -147,7 +136,10 @@ class ProductImporter extends AbstractImporter
         });
 
         $progressBar->finish();
-        $output->newLine(2);
+
+        $output->newLine();
+        $output->writeln("Migrated $processed products...");
+        $output->newLine();
     }
 
     protected function importCategories(
@@ -165,7 +157,7 @@ class ProductImporter extends AbstractImporter
             ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
             ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 
-        $totalCategories = $limit !== null && $limit !== 0 ? min($limit, $baseQuery->count()) : $baseQuery->count();
+        $totalCategories = $baseQuery->count();
 
         $output->writeln("Found {$totalCategories} product categories to migrate...");
 
@@ -211,16 +203,21 @@ class ProductImporter extends AbstractImporter
             return true;
         });
 
-        $progressBar->finish();
-        $output->newLine(2);
+        $output->newLine();
+        $output->writeln("Migrated $processed product categories...");
+        $output->newLine();
 
         $this->updateCategoryParentRelationships($sourceCategoriesData, $isDryRun, $output, $result);
     }
 
     protected function importCategory(object $sourceCategory, bool $isDryRun, MigrationResult $result): void
     {
-        $name = $this->languageResolver?->resolveProductGroupName($sourceCategory->pg_id, "Invision Product Group $sourceCategory->pg_id");
-        $description = $this->languageResolver?->resolveProductGroupDescription($sourceCategory->pg_id);
+        $name = $this->source instanceof InvisionCommunitySource
+            ? $this->source->getLanguageResolver()->resolveProductGroupName($sourceCategory->pg_id, "Invision Product Group $sourceCategory->pg_id")
+            : "Invision Product Group $sourceCategory->pg_id";
+        $description = $this->source instanceof InvisionCommunitySource
+            ? $this->source->getLanguageResolver()->resolveProductGroupDescription($sourceCategory->pg_id)
+            : null;
         $slug = Str::unique(Str::slug($sourceCategory->pg_seo_name ?? $name), 'products_categories', 'slug');
 
         $category = new ProductCategory;
@@ -302,7 +299,9 @@ class ProductImporter extends AbstractImporter
 
     protected function importProduct(object $sourceProduct, bool $isDryRun, MigrationResult $result): void
     {
-        $name = $this->languageResolver->resolveProductName($sourceProduct->p_id, "Invision Product $sourceProduct->p_id");
+        $name = $this->source instanceof InvisionCommunitySource
+            ? $this->source->getLanguageResolver()->resolveProductName($sourceProduct->p_id, "Invision Product $sourceProduct->p_id")
+            : "Invision Product $sourceProduct->p_id";
         $slug = Str::unique(Str::slug($sourceProduct->p_seo_name ?? $name), 'products', 'slug');
 
         $product = new Product;
@@ -318,6 +317,7 @@ class ProductImporter extends AbstractImporter
             'allow_discount_codes' => true,
             'trial_days' => 0,
             'commission_rate' => 0,
+            'tax_code' => ProductTaxCode::SoftwareSaasPersonalUse,
             'created_at' => $sourceProduct->p_date_added
                 ? Carbon::createFromTimestamp($sourceProduct->p_date_added)
                 : Carbon::now(),
@@ -328,13 +328,8 @@ class ProductImporter extends AbstractImporter
 
         if (! $isDryRun) {
             $product->save();
-
-            if ($sourceProduct->p_group) {
-                $categoryId = static::getCategoryMapping($sourceProduct->p_group);
-                if ($categoryId !== null && $categoryId !== 0) {
-                    $product->categories()->attach($categoryId);
-                }
-            }
+            $this->assignCategory($product, $sourceProduct);
+            $this->assignGroups($product, $sourceProduct);
 
             if (($imagePath = $sourceProduct->p_image) && ($baseUrl = $this->source->getBaseUrl())) {
                 $filePath = $this->downloadAndStoreFile(
@@ -424,8 +419,8 @@ class ProductImporter extends AbstractImporter
                             $price->forceFill([
                                 'product_id' => $product->id,
                                 'name' => $interval instanceof SubscriptionInterval
-                                    ? "$currency $intervalCount {$interval->value}"
-                                    : "$currency One-Time",
+                                    ? "$intervalCount {$interval->value}"
+                                    : 'One-Time',
                                 'description' => null,
                                 'amount' => $amount,
                                 'currency' => $currency,
@@ -488,6 +483,45 @@ class ProductImporter extends AbstractImporter
         }
 
         return $prices;
+    }
+
+    protected function assignGroups(Product $product, object $sourceProduct): void
+    {
+        $groupIds = [];
+
+        if (! empty($sourceProduct->p_primary_group)) {
+            foreach (explode(',', (string) $sourceProduct->p_primary_group) as $groupId) {
+                $mappedGroupId = GroupImporter::getGroupMapping((int) $groupId);
+
+                if ($mappedGroupId !== null && $mappedGroupId !== 0) {
+                    $groupIds[] = $mappedGroupId;
+                }
+            }
+        }
+
+        if (! empty($sourceProduct->p_secondary_group)) {
+            foreach (explode(',', (string) $sourceProduct->p_secondary_group) as $groupId) {
+                $mappedGroupId = GroupImporter::getGroupMapping((int) $groupId);
+
+                if ($mappedGroupId && ! in_array($mappedGroupId, $groupIds)) {
+                    $groupIds[] = $mappedGroupId;
+                }
+            }
+        }
+
+        if ($groupIds !== []) {
+            $product->groups()->sync(array_unique(array_values($groupIds)));
+        }
+    }
+
+    protected function assignCategory(Product $product, object $sourceProduct): void
+    {
+        if ($sourceProduct->p_group) {
+            $categoryId = static::getCategoryMapping($sourceProduct->p_group);
+            if ($categoryId !== null && $categoryId !== 0) {
+                $product->categories()->attach($categoryId);
+            }
+        }
     }
 
     protected function cacheProductMapping(int $sourceProductId, int $targetProductId): void

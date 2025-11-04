@@ -10,10 +10,8 @@ use App\Models\Post;
 use App\Models\Topic;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationResult;
-use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunityLanguageResolver;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
@@ -29,17 +27,6 @@ class PostImporter extends AbstractImporter
     protected const string CACHE_KEY_PREFIX = 'migration:ic:post_map:';
 
     protected const string CACHE_TAG = 'migration:ic:posts';
-
-    protected ?InvisionCommunityLanguageResolver $languageResolver = null;
-
-    public function __construct(MigrationSource $source)
-    {
-        parent::__construct($source);
-
-        $this->languageResolver = new InvisionCommunityLanguageResolver(
-            connection: $source->getConnection(),
-        );
-    }
 
     public static function getPostMapping(int $sourcePostId): ?int
     {
@@ -139,7 +126,10 @@ class PostImporter extends AbstractImporter
         });
 
         $progressBar->finish();
-        $output->newLine(2);
+
+        $output->newLine();
+        $output->writeln("Migrated $processed posts...");
+        $output->newLine();
     }
 
     protected function importPost(object $sourcePost, bool $isDryRun, MigrationResult $result): void

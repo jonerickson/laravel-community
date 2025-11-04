@@ -13,6 +13,7 @@ enum OrderStatus: string implements HasColor, HasLabel
 {
     case Pending = 'pending';
     case Cancelled = 'canceled';
+    case Expired = 'expired';
     case Processing = 'processing';
     case RequiresAction = 'requires_action';
     case RequiresCapture = 'requires_capture';
@@ -33,7 +34,7 @@ enum OrderStatus: string implements HasColor, HasLabel
     {
         return match ($this) {
             OrderStatus::Succeeded => 'success',
-            OrderStatus::Cancelled, OrderStatus::RequiresAction => 'danger',
+            OrderStatus::Cancelled, OrderStatus::RequiresAction, OrderStatus::Expired => 'danger',
             OrderStatus::Processing, OrderStatus::RequiresCapture => 'warning',
             default => 'info',
         };

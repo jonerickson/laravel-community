@@ -25,4 +25,6 @@ interface MigrationSource
     public function getBaseUrl(): ?string;
 
     public function setBaseUrl(?string $url): void;
+
+    public function cleanup(): void;
 }

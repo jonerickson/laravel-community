@@ -11,6 +11,8 @@ class InvisionCommunityLanguageResolver
 {
     protected const string CACHE_KEY_PREFIX = 'migration:ic:lang:';
 
+    protected const string CACHE_TAG = 'migration:ic:lang';
+
     protected const int CACHE_TTL = 3600;
 
     public function __construct(
@@ -22,7 +24,7 @@ class InvisionCommunityLanguageResolver
 
     public function resolve(string $key, ?string $fallback = null): ?string
     {
-        $value = Cache::remember(self::CACHE_KEY_PREFIX.$key, self::CACHE_TTL, function () use ($key): ?string {
+        $value = Cache::tags(self::CACHE_TAG)->remember(self::CACHE_KEY_PREFIX.$key, self::CACHE_TTL, function () use ($key): ?string {
             $result = DB::connection($this->connection)
                 ->table('core_sys_lang_words')
                 ->where('word_key', $key)
@@ -77,7 +79,7 @@ class InvisionCommunityLanguageResolver
         foreach ($keys as $key) {
             $cacheKey = self::CACHE_KEY_PREFIX.$key;
 
-            $value = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($key): ?string {
+            $value = Cache::tags(self::CACHE_TAG)->remember($cacheKey, self::CACHE_TTL, function () use ($key): ?string {
                 $result = DB::connection($this->connection)
                     ->table('core_sys_lang_words')
                     ->where('word_key', $key)
@@ -91,6 +93,11 @@ class InvisionCommunityLanguageResolver
         }
 
         return $result;
+    }
+
+    public function cleanup(): void
+    {
+        Cache::tags(self::CACHE_TAG)->flush();
     }
 
     protected function getDefaultLanguageId(): int

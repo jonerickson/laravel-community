@@ -548,6 +548,7 @@ declare namespace App.Enums {
     export type OrderStatus =
         | 'pending'
         | 'canceled'
+        | 'expired'
         | 'processing'
         | 'requires_action'
         | 'requires_capture'

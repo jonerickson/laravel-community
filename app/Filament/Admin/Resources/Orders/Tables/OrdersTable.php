@@ -28,11 +28,13 @@ class OrdersTable
                 TextColumn::make('reference_id')
                     ->label('Order Number')
                     ->copyable()
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('invoice_number')
                     ->default(new HtmlString('&mdash;'))
                     ->label('Invoice Number')
                     ->copyable()
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('user.name')
                     ->hiddenOn(OrdersRelationManager::class)
@@ -55,7 +57,7 @@ class OrdersTable
                     ->color('success')
                     ->default(0)
                     ->sortable(),
-                TextColumn::make('items.price.product.name')
+                TextColumn::make('items.name')
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->label('Created')

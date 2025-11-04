@@ -12,6 +12,7 @@ use App\Services\Migration\MigrationService;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Sleep;
@@ -35,6 +36,7 @@ class MigrateCommand extends Command
                             {--dry-run : Preview migration without making changes}
                             {--check : Verify database connection and exit}
                             {--status : Display migration status with record counts for each entity}
+                            {--cleanup=1 : Cleanup the migration after it has finished}
                             {--ssh : Connect to the source database via SSH tunnel}
                             {--base-url= : Base URL of the source site for downloading files/images}
                             {--parallel : Enable concurrent processing with multiple processes}
@@ -47,6 +49,10 @@ class MigrateCommand extends Command
 
     public function handle(MigrationService $migrationService): int
     {
+        if ($this->runChecks() === self::FAILURE) {
+            return self::FAILURE;
+        }
+
         $entity = $this->option('entity');
         $batchSize = (int) $this->option('batch');
         $limit = $this->option('limit') ? (int) $this->option('limit') : null;
@@ -89,6 +95,19 @@ class MigrateCommand extends Command
             offset: $offset,
             isDryRun: $isDryRun
         );
+    }
+
+    protected function runChecks(): int
+    {
+        if (! Cache::supportsTags()) {
+            $this->error('The current cache driver does not support tagging.');
+            $this->error('Please configure a cache driver that supports tagging (redis, memcached, or dynamodb).');
+            $this->info('Current cache driver: '.config('cache.default'));
+
+            return self::FAILURE;
+        }
+
+        return self::SUCCESS;
     }
 
     protected function handleWorkerMode(
@@ -187,8 +206,12 @@ class MigrateCommand extends Command
         $sshTunnel = null;
 
         $this->trap([SIGINT, SIGTERM], function () use (&$sshTunnel, $migrationService): void {
-            $this->warn('Migration interrupted. Cleaning up...');
-            $migrationService->cleanup();
+            $this->warn('Migration interrupted...');
+
+            if ($this->option('cleanup')) {
+                $this->warn('Cleaning up...');
+                $migrationService->cleanup();
+            }
 
             if ($sshTunnel !== null && $sshTunnel !== []) {
                 $this->closeSshTunnel($sshTunnel);
@@ -263,8 +286,11 @@ class MigrateCommand extends Command
 
             $this->displayVerboseOutput($result);
 
-            $migrationService->cleanup();
-            $result->cleanup();
+            if ($this->option('cleanup')) {
+                $this->warn('Cleaning up...');
+                $migrationService->cleanup();
+                $result->cleanup();
+            }
 
             return self::SUCCESS;
         } catch (Exception $e) {
@@ -316,7 +342,12 @@ class MigrateCommand extends Command
         $this->trap([SIGINT, SIGTERM], function () use ($manager, $migrationService): void {
             $this->warn('Concurrent migration interrupted. Terminating processes...');
             $manager->terminateAll();
-            $migrationService->cleanup();
+
+            if ($this->option('cleanup')) {
+                $this->warn('Cleaning up...');
+                $migrationService->cleanup();
+            }
+
             exit(1);
         });
 
@@ -330,7 +361,10 @@ class MigrateCommand extends Command
             globalOffset: $offset,
         );
 
-        $migrationService->cleanup();
+        if ($this->option('cleanup')) {
+            $this->warn('Cleaning up...');
+            $migrationService->cleanup();
+        }
 
         if ($result) {
             $source->getImporter($entity)->markCompleted();

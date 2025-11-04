@@ -23,8 +23,14 @@ class InvisionCommunitySource implements MigrationSource
 
     protected ?string $baseUrl = null;
 
+    protected InvisionCommunityLanguageResolver $languageResolver;
+
     public function __construct()
     {
+        $this->languageResolver = new InvisionCommunityLanguageResolver(
+            connection: $this->getConnection(),
+        );
+
         $this->importers = [
             'groups' => new GroupImporter($this),
             'users' => new UserImporter($this),
@@ -88,5 +94,19 @@ class InvisionCommunitySource implements MigrationSource
     public function setBaseUrl(?string $url): void
     {
         $this->baseUrl = $url !== null && $url !== '' ? rtrim($url, '/') : null;
+    }
+
+    public function getLanguageResolver(): InvisionCommunityLanguageResolver
+    {
+        return $this->languageResolver;
+    }
+
+    public function cleanup(): void
+    {
+        foreach ($this->getImporters() as $importer) {
+            $importer->cleanup();
+        }
+
+        $this->languageResolver->cleanup();
     }
 }

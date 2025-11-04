@@ -9,10 +9,8 @@ use App\Enums\Role;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationResult;
-use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunityLanguageResolver;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
@@ -28,17 +26,6 @@ class BlogImporter extends AbstractImporter
     protected const string CACHE_KEY_PREFIX = 'migration:ic:blog_map:';
 
     protected const string CACHE_TAG = 'migration:ic:blog';
-
-    protected ?InvisionCommunityLanguageResolver $languageResolver = null;
-
-    public function __construct(MigrationSource $source)
-    {
-        parent::__construct($source);
-
-        $this->languageResolver = new InvisionCommunityLanguageResolver(
-            connection: $source->getConnection(),
-        );
-    }
 
     public static function getBlogMapping(int $sourceBlogId): ?int
     {
@@ -96,7 +83,7 @@ class BlogImporter extends AbstractImporter
             ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
             ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 
-        $totalBlogs = $limit !== null && $limit !== 0 ? min($limit, $baseQuery->count()) : $baseQuery->count();
+        $totalBlogs = $baseQuery->count();
 
         $output->writeln("Found {$totalBlogs} blog entries to migrate...");
 
@@ -143,7 +130,10 @@ class BlogImporter extends AbstractImporter
         });
 
         $progressBar->finish();
-        $output->newLine(2);
+
+        $output->newLine();
+        $output->writeln("Migrated $processed blog entries...");
+        $output->newLine();
     }
 
     protected function importBlogEntry(object $sourceBlogEntry, bool $isDryRun, MigrationResult $result): void

@@ -9,10 +9,8 @@ use App\Models\Forum;
 use App\Models\Topic;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationResult;
-use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunityLanguageResolver;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
@@ -28,17 +26,6 @@ class TopicImporter extends AbstractImporter
     protected const string CACHE_KEY_PREFIX = 'migration:ic:topic_map:';
 
     protected const string CACHE_TAG = 'migration:ic:topics';
-
-    protected ?InvisionCommunityLanguageResolver $languageResolver = null;
-
-    public function __construct(MigrationSource $source)
-    {
-        parent::__construct($source);
-
-        $this->languageResolver = new InvisionCommunityLanguageResolver(
-            connection: $source->getConnection(),
-        );
-    }
 
     public static function getTopicMapping(int $sourceTopicId): ?int
     {
@@ -139,7 +126,10 @@ class TopicImporter extends AbstractImporter
         });
 
         $progressBar->finish();
-        $output->newLine(2);
+
+        $output->newLine();
+        $output->writeln("Migrated $processed topics...");
+        $output->newLine();
     }
 
     protected function importTopic(object $sourceTopic, bool $isDryRun, MigrationResult $result): void

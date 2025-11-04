@@ -6,9 +6,8 @@ namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Models\Group;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\MigrationResult;
-use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunityLanguageResolver;
+use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunitySource;
 use Exception;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Database\Query\Builder;
@@ -24,17 +23,6 @@ class GroupImporter extends AbstractImporter
     protected const string CACHE_KEY_PREFIX = 'migration:ic:group_map:';
 
     protected const string CACHE_TAG = 'migration:ic:groups';
-
-    protected ?InvisionCommunityLanguageResolver $languageResolver = null;
-
-    public function __construct(MigrationSource $source)
-    {
-        parent::__construct($source);
-
-        $this->languageResolver = new InvisionCommunityLanguageResolver(
-            connection: $source->getConnection(),
-        );
-    }
 
     public static function getGroupMapping(int $sourceGroupId): ?int
     {
@@ -127,7 +115,10 @@ class GroupImporter extends AbstractImporter
         });
 
         $progressBar->finish();
-        $output->newLine(2);
+
+        $output->newLine();
+        $output->writeln("Migrated $processed groups...");
+        $output->newLine();
     }
 
     public function isCompleted(): bool
@@ -147,7 +138,9 @@ class GroupImporter extends AbstractImporter
 
     protected function importGroup(object $sourceGroup, bool $isDryRun, MigrationResult $result): void
     {
-        $name = $this->languageResolver?->resolveGroupName($sourceGroup->g_id, "Invision Group $sourceGroup->g_id");
+        $name = $this->source instanceof InvisionCommunitySource
+            ? $this->source->getLanguageResolver()->resolveGroupName($sourceGroup->g_id, "Invision Group $sourceGroup->g_id")
+            : "Invision Group $sourceGroup->g_id";
 
         $existingGroup = Group::query()->where('name', $name)->first();
 
@@ -202,6 +195,6 @@ class GroupImporter extends AbstractImporter
 
     protected function cacheGroupMapping(int $sourceGroupId, int $targetGroupId): void
     {
-        Cache::put(self::CACHE_KEY_PREFIX.$sourceGroupId, $targetGroupId, 60 * 60 * 24 * 7);
+        Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.$sourceGroupId, $targetGroupId, 60 * 60 * 24 * 7);
     }
 }

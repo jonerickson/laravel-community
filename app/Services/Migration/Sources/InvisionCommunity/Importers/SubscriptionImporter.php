@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Enums\ProductApprovalStatus;
+use App\Enums\ProductTaxCode;
 use App\Enums\ProductType;
 use App\Enums\SubscriptionInterval;
 use App\Models\Price;
 use App\Models\Product;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
+use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationResult;
-use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunityLanguageResolver;
+use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunitySource;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
@@ -28,17 +29,6 @@ class SubscriptionImporter extends AbstractImporter
     protected const string CACHE_KEY_PREFIX = 'migration:ic:subscription_map:';
 
     protected const string CACHE_TAG = 'migration:ic:subscriptions';
-
-    protected ?InvisionCommunityLanguageResolver $languageResolver = null;
-
-    public function __construct(MigrationSource $source)
-    {
-        parent::__construct($source);
-
-        $this->languageResolver = new InvisionCommunityLanguageResolver(
-            connection: $source->getConnection(),
-        );
-    }
 
     public static function getSubscriptionMapping(int $sourceSubscriptionId): ?int
     {
@@ -72,7 +62,9 @@ class SubscriptionImporter extends AbstractImporter
 
     public function getDependencies(): array
     {
-        return [];
+        return [
+            ImporterDependency::optionalPre('groups', 'Active subscribers can be automatically assigned to groups when purchasing a subscription'),
+        ];
     }
 
     public function import(
@@ -93,7 +85,7 @@ class SubscriptionImporter extends AbstractImporter
             ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
             ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 
-        $totalSubscriptions = $limit !== null && $limit !== 0 ? min($limit, $baseQuery->count()) : $baseQuery->count();
+        $totalSubscriptions = $baseQuery->count();
 
         $output->writeln("Found {$totalSubscriptions} subscription packages to migrate...");
 
@@ -135,12 +127,17 @@ class SubscriptionImporter extends AbstractImporter
         });
 
         $progressBar->finish();
-        $output->newLine(2);
+
+        $output->newLine();
+        $output->writeln("Migrated $processed subscriptions...");
+        $output->newLine();
     }
 
     protected function importSubscription(object $sourceSubscription, bool $isDryRun, MigrationResult $result): void
     {
-        $name = $this->languageResolver->resolveSubscriptionPackageName($sourceSubscription->sp_id, "Invision Subscription $sourceSubscription->sp_id");
+        $name = $this->source instanceof InvisionCommunitySource
+            ? $this->source->getLanguageResolver()->resolveSubscriptionPackageName($sourceSubscription->sp_id, "Invision Subscription $sourceSubscription->sp_id")
+            : "Invision Subscription $sourceSubscription->sp_id";
         $slug = Str::unique(Str::slug($name), 'products', 'slug');
 
         $product = new Product;
@@ -150,19 +147,26 @@ class SubscriptionImporter extends AbstractImporter
             'description' => "Subscription imported from Invision Community: $name",
             'type' => ProductType::Subscription,
             'is_featured' => (bool) $sourceSubscription->sp_featured,
+            'is_subscription_only' => true,
             'approval_status' => ProductApprovalStatus::Approved,
             'approved_at' => Carbon::now(),
             'allow_promotion_codes' => false,
             'allow_discount_codes' => true,
             'trial_days' => 0,
             'commission_rate' => 0,
+            'tax_code' => ProductTaxCode::SoftwareSaasPersonalUse,
         ]);
+
+        if (! $isDryRun) {
+            $product->save();
+            $this->assignGroups($product, $sourceSubscription);
+            $this->assignCategory($product);
+            $this->cacheSubscriptionMapping($sourceSubscription->sp_id, $product->id);
+        }
 
         $prices = $this->createPrices($sourceSubscription, $product, $isDryRun, $result);
 
         if (! $isDryRun) {
-            $product->save();
-
             /** @var Price $price */
             foreach ($prices as $price) {
                 $price->save();
@@ -176,8 +180,6 @@ class SubscriptionImporter extends AbstractImporter
                     'interval' => $price->interval?->value ?? 'one-time',
                 ]);
             }
-
-            $this->cacheSubscriptionMapping($sourceSubscription->sp_id, $product->id);
         }
 
         $pricesSummary = collect($prices)->map(fn (Price $price): string => $price->amount.' '.$price->currency.' ('.($price->interval?->value ?? 'one-time').')')->implode(', ');
@@ -225,8 +227,8 @@ class SubscriptionImporter extends AbstractImporter
                         $price->forceFill([
                             'product_id' => $product->id,
                             'name' => $interval instanceof SubscriptionInterval
-                                ? "$currency $term {$interval->value}"
-                                : "$currency One-Time",
+                                ? "$term {$interval->value}"
+                                : 'One-Time',
                             'description' => null,
                             'amount' => $amount,
                             'currency' => $currency,
@@ -288,6 +290,45 @@ class SubscriptionImporter extends AbstractImporter
         }
 
         return $prices;
+    }
+
+    protected function assignGroups(Product $product, object $sourceSubscription): void
+    {
+        $groupIds = [];
+
+        if (! empty($sourceSubscription->sp_primary_group)) {
+            foreach (explode(',', (string) $sourceSubscription->sp_primary_group) as $groupId) {
+                $mappedGroupId = GroupImporter::getGroupMapping((int) $groupId);
+
+                if ($mappedGroupId !== null && $mappedGroupId !== 0) {
+                    $groupIds[] = $mappedGroupId;
+                }
+            }
+        }
+
+        if (! empty($sourceSubscription->sp_secondary_group)) {
+            foreach (explode(',', (string) $sourceSubscription->sp_secondary_group) as $groupId) {
+                $mappedGroupId = GroupImporter::getGroupMapping((int) $groupId);
+
+                if ($mappedGroupId && ! in_array($mappedGroupId, $groupIds)) {
+                    $groupIds[] = $mappedGroupId;
+                }
+            }
+        }
+
+        if ($groupIds !== []) {
+            $product->groups()->sync(array_unique(array_values($groupIds)));
+        }
+    }
+
+    protected function assignCategory(Product $product): void
+    {
+        $product->categories()->firstOrCreate([
+            'name' => 'Subscriptions',
+            'slug' => 'subscriptions',
+        ], [
+            'is_visible' => false,
+        ]);
     }
 
     protected function cacheSubscriptionMapping(int $sourceSubscriptionId, int $targetProductId): void

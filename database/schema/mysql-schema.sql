@@ -245,6 +245,7 @@ CREATE TABLE `forums` (
   `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `category_id` bigint unsigned DEFAULT NULL,
+  `parent_id` bigint unsigned DEFAULT NULL,
   `rules` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `color` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#3b82f6',
@@ -256,7 +257,9 @@ CREATE TABLE `forums` (
   UNIQUE KEY `forums_slug_unique` (`slug`),
   KEY `forums_is_active_order_index` (`is_active`,`order`),
   KEY `forums_category_id_foreign` (`category_id`),
-  CONSTRAINT `forums_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `forums_categories` (`id`) ON DELETE CASCADE
+  KEY `forums_parent_id_foreign` (`parent_id`),
+  CONSTRAINT `forums_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `forums_categories` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `forums_parent_id_foreign` FOREIGN KEY (`parent_id`) REFERENCES `forums` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `forums_categories`;
@@ -264,7 +267,6 @@ DROP TABLE IF EXISTS `forums_categories`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `forums_categories` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `parent_id` bigint unsigned DEFAULT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
@@ -274,9 +276,7 @@ CREATE TABLE `forums_categories` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `forums_categories_parent_id_foreign` (`parent_id`),
-  CONSTRAINT `forums_categories_parent_id_foreign` FOREIGN KEY (`parent_id`) REFERENCES `forums_categories` (`id`) ON DELETE SET NULL
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `forums_categories_groups`;
@@ -614,13 +614,13 @@ CREATE TABLE `orders_items` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `order_id` bigint unsigned NOT NULL,
   `name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `description` longtext COLLATE utf8mb4_unicode_ci,
+  `description` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `price_id` bigint unsigned DEFAULT NULL,
   `amount` int DEFAULT NULL,
   `commission_amount` int NOT NULL DEFAULT '0',
   `commission_recipient_id` bigint unsigned DEFAULT NULL,
   `quantity` int NOT NULL DEFAULT '1',
-  `external_item_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `external_item_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -837,17 +837,14 @@ DROP TABLE IF EXISTS `products`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `products` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `seller_id` bigint unsigned DEFAULT NULL,
-  `approval_status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
-  `commission_rate` decimal(5,2) NOT NULL DEFAULT '0.00',
-  `approved_at` timestamp NULL DEFAULT NULL,
-  `approved_by` bigint unsigned DEFAULT NULL,
-  `rejection_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `reference_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'storeProduct',
+  `seller_id` bigint unsigned DEFAULT NULL,
+  `commission_rate` decimal(5,2) NOT NULL DEFAULT '0.00',
+  `rejection_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `tax_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_featured` tinyint(1) NOT NULL DEFAULT '0',
   `is_visible` tinyint(1) NOT NULL DEFAULT '1',
@@ -858,6 +855,9 @@ CREATE TABLE `products` (
   `featured_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `order` int NOT NULL DEFAULT '0',
   `external_product_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `approval_status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `approved_by` bigint unsigned DEFAULT NULL,
+  `approved_at` timestamp NULL DEFAULT NULL,
   `metadata` json DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -880,10 +880,14 @@ CREATE TABLE `products_categories` (
   `order` int NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `is_visible` tinyint(1) NOT NULL DEFAULT '1',
+  `parent_id` bigint unsigned DEFAULT NULL,
   `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `featured_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `products_categories_parent_id_foreign` (`parent_id`),
+  CONSTRAINT `products_categories_parent_id_foreign` FOREIGN KEY (`parent_id`) REFERENCES `products_categories` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `products_groups`;
@@ -1443,7 +1447,11 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (115,'2025_10_24_17
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (116,'2025_10_24_194615_add_amount_paid_to_orders_table',42);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (117,'2025_10_24_220924_drop_product_id_from_orders_table',42);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (118,'2025_10_25_203015_add_commission_recipient_id_to_orders_items_table',42);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (119,'2025_09_28_202015_create_email_settings',43);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (120,'2025_09_28_202053_create_general_settings',43);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (121,'2025_10_27_152729_add_description_to_orders_items_table',44);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (122,'2025_10_27_154613_add_external_item_id_to_orders_items_table',45);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (125,'2025_11_01_195110_remove_parent_id_from_forums_categories_table',46);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (126,'2025_11_01_195116_add_parent_id_to_forums_table',46);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (127,'2025_11_03_182848_add_parent_id_to_products_categories_table',46);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (128,'2025_11_03_205054_add_featured_image_to_products_categories_table',46);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (129,'2025_09_28_202015_create_email_settings',47);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (130,'2025_09_28_202053_create_general_settings',47);

@@ -3,6 +3,7 @@ import { ucFirst } from '@/lib/utils';
 
 const statusMap: Record<App.Enums.OrderStatus, string> = {
     canceled: 'bg-red-500 text-white dark:bg-red-600',
+    expired: 'bg-red-500 text-white dark:bg-red-600',
     processing: 'bg-blue-500 text-white dark:bg-blue-600',
     requires_action: 'bg-yellow-500 text-white dark:bg-yellow-600',
     requires_capture: 'bg-orange-500 text-white dark:bg-orange-600',

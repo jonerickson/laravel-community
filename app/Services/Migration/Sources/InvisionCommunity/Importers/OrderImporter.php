@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Enums\OrderStatus;
+use App\Enums\Role;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationResult;
-use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunityLanguageResolver;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
@@ -30,17 +29,6 @@ class OrderImporter extends AbstractImporter
     protected const string CACHE_KEY_PREFIX = 'migration:ic:order_map:';
 
     protected const string CACHE_TAG = 'migration:ic:orders';
-
-    protected ?InvisionCommunityLanguageResolver $languageResolver = null;
-
-    public function __construct(MigrationSource $source)
-    {
-        parent::__construct($source);
-
-        $this->languageResolver = new InvisionCommunityLanguageResolver(
-            connection: $source->getConnection(),
-        );
-    }
 
     public static function getOrderMapping(int $sourceOrderId): ?int
     {
@@ -75,8 +63,9 @@ class OrderImporter extends AbstractImporter
     public function getDependencies(): array
     {
         return [
-            ImporterDependency::requiredPre('users', 'Orders require users to exist for customer assignment'),
-            ImporterDependency::requiredPre('products', 'Orders require products to exist for order items'),
+            // ImporterDependency::requiredPre('users', 'Orders require users to exist for customer assignment'),
+            // ImporterDependency::requiredPre('products', 'Orders require products to exist for order items'),
+            // ImporterDependency::optionalPre('subscriptions', 'Orders may be linked to a subscription plan'),
         ];
     }
 
@@ -93,12 +82,11 @@ class OrderImporter extends AbstractImporter
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
-            ->where('i_status', 'paid')
             ->orderBy('i_id')
             ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
             ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 
-        $totalOrders = $limit !== null && $limit !== 0 ? min($limit, $baseQuery->count()) : $baseQuery->count();
+        $totalOrders = $baseQuery->count();
 
         $output->writeln("Found {$totalOrders} paid orders to migrate...");
 
@@ -140,7 +128,10 @@ class OrderImporter extends AbstractImporter
         });
 
         $progressBar->finish();
-        $output->newLine(2);
+
+        $output->newLine();
+        $output->writeln("Migrated $processed orders...");
+        $output->newLine();
     }
 
     protected function importOrder(string $connection, object $sourceOrder, bool $isDryRun, MigrationResult $result): void
@@ -160,8 +151,12 @@ class OrderImporter extends AbstractImporter
         $order = new Order;
         $order->forceFill([
             'user_id' => $user->id,
-            'status' => OrderStatus::Succeeded,
-            'invoice_number' => $sourceOrder->i_po ?: null,
+            'status' => $this->getOrderStatus($sourceOrder),
+            'amount_due' => (float) $sourceOrder->i_total,
+            'amount_paid' => (float) $sourceOrder->i_total,
+            'amount_overpaid' => 0,
+            'amount_remaining' => 0,
+            'invoice_number' => $sourceOrder->i_id ?: null,
             'external_order_id' => 'ic_'.$sourceOrder->i_id,
             'external_invoice_id' => 'ic_'.$sourceOrder->i_id,
             'created_at' => $sourceOrder->i_date
@@ -189,7 +184,6 @@ class OrderImporter extends AbstractImporter
                 $result->incrementMigrated('order_items');
                 $result->recordMigrated('order_items', [
                     'order_id' => $order->id,
-                    'product_id' => $orderItem->price->product_id,
                     'price_id' => $orderItem->price_id,
                     'product_name' => $orderItem->name,
                     'amount' => $orderItem->amount,
@@ -211,69 +205,49 @@ class OrderImporter extends AbstractImporter
         ]);
     }
 
+    protected function getOrderStatus(object $sourceOrder): OrderStatus
+    {
+        return match ($sourceOrder->i_status) {
+            'paid' => OrderStatus::Succeeded,
+            'canc' => OrderStatus::Cancelled,
+            'expd' => OrderStatus::Expired,
+            default => OrderStatus::Pending,
+        };
+    }
+
     protected function createOrderItems(string $connection, object $sourceOrder, Order $order, bool $isDryRun, MigrationResult $result): array
     {
         $orderItems = [];
 
         try {
-            $purchases = DB::connection($connection)
-                ->table('nexus_purchases')
-                ->where('ps_original_invoice', $sourceOrder->i_id)
-                ->get();
+            $items = json_decode($sourceOrder->i_items ?? '', true);
 
-            if ($purchases->isEmpty()) {
-                $orderItem = new OrderItem;
-                $orderItem->forceFill([
-                    'order_id' => $order->id,
-                    'product_id' => null,
-                    'price_id' => null,
-                    'name' => $sourceOrder->i_title ?: 'Order #'.$sourceOrder->i_id,
-                    'amount' => (float) $sourceOrder->i_total,
-                    'quantity' => 1,
-                    'commission_amount' => 0,
-                ]);
-
-                $orderItems[] = $orderItem;
-
+            if (empty($items)) {
                 return $orderItems;
             }
 
-            foreach ($purchases as $purchase) {
-                $product = $this->findProduct($purchase);
+            foreach ($items as $item) {
+                $itemId = $item['itemID'] ?? null;
+                $itemType = $item['type'] ?? null;
 
-                if (! $product instanceof Product) {
-                    if (! $isDryRun) {
-                        $result->incrementFailed('order_items');
-                        $result->recordFailed('order_items', [
-                            'order_id' => $order->id ?? 'N/A',
-                            'source_purchase_id' => $purchase->ps_id,
-                            'error' => 'Could not find product',
-                        ]);
-                    }
+                if (! $itemId || ! $itemType) {
+                    $orderItems[] = $this->createOrderItem($order, $item, $sourceOrder, null, null);
 
                     continue;
                 }
 
-                $amount = (float) $purchase->ps_renewal_price;
+                $product = $this->findProductByItemType($itemType, $itemId);
 
-                if ($amount <= 0) {
-                    $amount = (float) $sourceOrder->i_total;
+                if (! $product instanceof Product) {
+                    $orderItems[] = $this->createOrderItem($order, $item, $sourceOrder, null, null);
+
+                    continue;
                 }
 
+                $amount = (float) ($item['cost'] ?? 0);
                 $price = $this->findPriceForProduct($product, $amount, $sourceOrder->i_currency);
 
-                $orderItem = new OrderItem;
-                $orderItem->forceFill([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'price_id' => $price?->id,
-                    'name' => $purchase->ps_name ?: $product->name,
-                    'amount' => $amount,
-                    'quantity' => 1,
-                    'commission_amount' => 0,
-                ]);
-
-                $orderItems[] = $orderItem;
+                $orderItems[] = $this->createOrderItem($order, $item, $sourceOrder, $price, $product);
             }
         } catch (Exception $e) {
             Log::error('Failed to create order items', [
@@ -295,6 +269,21 @@ class OrderImporter extends AbstractImporter
         return $orderItems;
     }
 
+    protected function createOrderItem(Order $order, array $item, object $sourceOrder, ?Price $price, ?Product $product): OrderItem
+    {
+        $orderItem = new OrderItem;
+        $orderItem->forceFill([
+            'order_id' => $order->id,
+            'price_id' => $price?->id,
+            'name' => $item['itemName'] ?? $product?->name ?? 'Order #'.$sourceOrder->i_id,
+            'amount' => (float) ($item['cost'] ?? 0),
+            'quantity' => $item['quantity'] ?? 1,
+            'commission_amount' => 0,
+        ]);
+
+        return $orderItem;
+    }
+
     protected function findUser(object $sourceOrder): ?User
     {
         $mappedUserId = UserImporter::getUserMapping((int) $sourceOrder->i_member);
@@ -303,15 +292,33 @@ class OrderImporter extends AbstractImporter
             return User::query()->find($mappedUserId);
         }
 
+        if ($adminUser = User::query()->role(Role::Administrator)->oldest()->first()) {
+            return $adminUser;
+        }
+
         return null;
     }
 
-    protected function findProduct(object $purchase): ?Product
+    protected function findProductByItemType(string $itemType, int $itemId): ?Product
     {
-        $mappedProductId = ProductImporter::getProductMapping((int) $purchase->ps_item_id);
+        if ($itemType === 'package') {
+            $mappedProductId = ProductImporter::getProductMapping($itemId);
 
-        if ($mappedProductId !== null && $mappedProductId !== 0) {
-            return Product::query()->find($mappedProductId);
+            if ($mappedProductId !== null && $mappedProductId !== 0) {
+                return Product::query()->find($mappedProductId);
+            }
+
+            return null;
+        }
+
+        if ($itemType === 'subscription') {
+            $mappedProductId = SubscriptionImporter::getSubscriptionMapping($itemId);
+
+            if ($mappedProductId !== null && $mappedProductId !== 0) {
+                return Product::query()->find($mappedProductId);
+            }
+
+            return null;
         }
 
         return null;

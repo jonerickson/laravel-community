@@ -10,6 +10,7 @@ use InvalidArgumentException;
 
 class MigrationService
 {
+    /** @var array<string, MigrationSource> */
     protected array $sources = [];
 
     protected array $migratedEntities = [];
@@ -100,9 +101,7 @@ class MigrationService
     public function cleanup(): void
     {
         foreach ($this->sources as $source) {
-            foreach ($source->getImporters() as $importer) {
-                $importer->cleanup();
-            }
+            $source->cleanup();
         }
     }
 
