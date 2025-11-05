@@ -816,6 +816,7 @@ CREATE TABLE `prices` (
   `product_id` bigint unsigned NOT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `amount` int NOT NULL,
   `currency` varchar(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'USD',
   `interval` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -1453,5 +1454,7 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (125,'2025_11_01_19
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (126,'2025_11_01_195116_add_parent_id_to_forums_table',46);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (127,'2025_11_03_182848_add_parent_id_to_products_categories_table',46);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (128,'2025_11_03_205054_add_featured_image_to_products_categories_table',46);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (129,'2025_09_28_202015_create_email_settings',47);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (130,'2025_09_28_202053_create_general_settings',47);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (131,'2025_09_28_202015_create_email_settings',47);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (132,'2025_09_28_202053_create_general_settings',47);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (133,'2025_11_05_005537_add_does_not_expire_to_subscriptions_table',47);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (134,'2025_11_05_200042_add_price_type_to_prices_table',47);

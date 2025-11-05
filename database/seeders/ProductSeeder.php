@@ -6,7 +6,6 @@ namespace Database\Seeders;
 
 use App\Enums\SubscriptionInterval;
 use App\Models\Group;
-use App\Models\Image;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\ProductCategory;
@@ -24,9 +23,8 @@ class ProductSeeder extends Seeder
         $productCategory = ProductCategory::factory()->visible()->active()->state([
             'name' => $name = 'Product Category 1',
             'slug' => Str::slug($name),
-        ])->has(Image::factory()->state([
-            'path' => 'boilerplate/product-category-1.jpg',
-        ]))->create();
+            'featured_image' => 'boilerplate/product-category-1.jpg',
+        ])->create();
 
         $products = Product::factory()
             ->approved()
