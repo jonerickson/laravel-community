@@ -202,6 +202,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         'banned_at',
         'ban_reason',
         'banned_by',
+        'stripe_id',
         'extra_billing_information',
         'billing_address',
         'billing_address_line_2',

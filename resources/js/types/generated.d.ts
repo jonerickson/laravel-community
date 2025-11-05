@@ -359,8 +359,9 @@ declare namespace App.Data {
         id: number;
         name: string;
         amount: number;
+        type: App.Enums.PriceType | null;
         currency: string;
-        interval: App.Enums.SubscriptionInterval;
+        interval: App.Enums.SubscriptionInterval | null;
         isDefault: boolean;
         isActive: boolean;
         externalPriceId: string | null;
@@ -445,6 +446,7 @@ declare namespace App.Data {
         externalSubscriptionId: string | null;
         externalProductId: string | null;
         externalPriceId: string | null;
+        doesNotExpire: boolean;
         quantity: number | null;
     };
     export type SupportTicketCategoryData = {
@@ -559,6 +561,7 @@ declare namespace App.Enums {
     export type PaymentBehavior = 'allow_incomplete' | 'default_incomplete' | 'error_if_incomplete' | 'pending_if_incomplete';
     export type PayoutStatus = 'pending' | 'completed' | 'failed' | 'cancelled';
     export type PostType = 'blog' | 'forum';
+    export type PriceType = 'one_time' | 'recurring';
     export type ProductApprovalStatus = 'pending' | 'approved' | 'rejected';
     export type ProductTaxCode =
         | 'general_tangible_goods'

@@ -23663,6 +23663,22 @@ namespace Illuminate\Support {
             return \Illuminate\Support\Stringable::ucwords();
         }
 
+        /**
+         * @see \App\Providers\AppServiceProvider::boot()
+         * @param string $table
+         * @param string $column
+         * @param string|null $connection
+         * @param mixed|null $fallback
+         * @param bool $throw
+         * @param int $maxAttempts
+         * @return \Illuminate\Support\Stringable
+         * @static
+         */
+        public static function unique($table, $column = 'id', $connection = null, $fallback = null, $throw = true, $maxAttempts = 5)
+        {
+            return \Illuminate\Support\Stringable::unique($table, $column, $connection, $fallback, $throw, $maxAttempts);
+        }
+
             }
     }
 

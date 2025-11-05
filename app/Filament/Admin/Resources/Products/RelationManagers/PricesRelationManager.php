@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Products\RelationManagers;
 
+use App\Enums\PriceType;
 use App\Enums\SubscriptionInterval;
 use App\Filament\Admin\Resources\Prices\Actions\CreateExternalPriceAction;
 use App\Filament\Admin\Resources\Prices\Actions\DeleteExternalPriceAction;
@@ -15,11 +16,13 @@ use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\RawJs;
 use Filament\Tables\Columns\IconColumn;
@@ -43,6 +46,14 @@ class PricesRelationManager extends RelationManager
                     ->required()
                     ->maxLength(255)
                     ->helperText('Display name for this price option.'),
+                Radio::make('type')
+                    ->disabled(fn ($operation, ?Price $record): bool => $operation === 'edit' && filled($record->external_price_id))
+                    ->live()
+                    ->columnSpanFull()
+                    ->label('Type')
+                    ->helperText('The type of price.')
+                    ->options(PriceType::class)
+                    ->required(),
                 TextInput::make('amount')
                     ->disabled(fn ($operation, ?Price $record): bool => $operation === 'edit' && filled($record->external_price_id))
                     ->required()
@@ -64,7 +75,7 @@ class PricesRelationManager extends RelationManager
                     ->disabled(fn ($operation, ?Price $record): bool => $operation === 'edit' && filled($record->external_price_id))
                     ->options(SubscriptionInterval::class)
                     ->nullable()
-                    ->visible(fn () => $this->getOwnerRecord()->isSubscription())
+                    ->visible(fn (Get $get): bool => $get('type') === PriceType::Recurring)
                     ->helperText('Subscription billing interval.'),
                 TextInput::make('interval_count')
                     ->disabled(fn ($operation, ?Price $record): bool => $operation === 'edit' && filled($record->external_price_id))
@@ -73,7 +84,7 @@ class PricesRelationManager extends RelationManager
                     ->default(1)
                     ->minValue(1)
                     ->maxValue(365)
-                    ->visible(fn () => $this->getOwnerRecord()->isSubscription())
+                    ->visible(fn (Get $get): bool => $get('type') === PriceType::Recurring)
                     ->helperText('Number of intervals (e.g., every 2 months).'),
                 Toggle::make('is_active')
                     ->label('Active')
@@ -105,9 +116,14 @@ class PricesRelationManager extends RelationManager
                 TextColumn::make('amount')
                     ->money()
                     ->sortable(),
+                TextColumn::make('type')
+                    ->sortable()
+                    ->placeholder('No Type')
+                    ->badge(),
                 TextColumn::make('interval')
+                    ->sortable()
                     ->badge()
-                    ->visible(fn () => $this->getOwnerRecord()->isSubscription())
+                    ->placeholder('No Interval')
                     ->color('info'),
                 IconColumn::make('is_active')
                     ->boolean()

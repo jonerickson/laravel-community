@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Laravel\Cashier\Cashier;
@@ -170,5 +171,7 @@ class AppServiceProvider extends ServiceProvider
 
             return $candidate;
         });
+
+        Stringable::macro('unique', fn (string $table, string $column = 'id', ?string $connection = null, mixed $fallback = null, bool $throw = true, int $maxAttempts = 5): Stringable => new Stringable(Str::unique($this->value, $table, $column, $connection, $fallback, $throw, $maxAttempts)));
     }
 }

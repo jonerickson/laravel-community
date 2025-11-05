@@ -42,17 +42,14 @@ use Laravel\Scout\Searchable;
 
 /**
  * @property int $id
- * @property int|null $seller_id
- * @property ProductApprovalStatus $approval_status
- * @property numeric $commission_rate
- * @property Carbon|null $approved_at
- * @property int|null $approved_by
- * @property string|null $rejection_reason
  * @property string $reference_id
  * @property string $name
  * @property string $slug
  * @property string $description
  * @property ProductType $type
+ * @property int|null $seller_id
+ * @property numeric $commission_rate
+ * @property string|null $rejection_reason
  * @property ProductTaxCode|null $tax_code
  * @property bool $is_featured
  * @property bool $is_visible
@@ -63,6 +60,9 @@ use Laravel\Scout\Searchable;
  * @property string|null $featured_image
  * @property int $order
  * @property string|null $external_product_id
+ * @property ProductApprovalStatus $approval_status
+ * @property int|null $approved_by
+ * @property Carbon|null $approved_at
  * @property array<array-key, mixed>|null $metadata
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at

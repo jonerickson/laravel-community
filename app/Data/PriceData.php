@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use App\Enums\PriceType;
 use App\Enums\SubscriptionInterval;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
@@ -20,9 +21,11 @@ class PriceData extends Data
 
     public float $amount;
 
+    public ?PriceType $type = null;
+
     public string $currency;
 
-    public SubscriptionInterval $interval;
+    public ?SubscriptionInterval $interval = null;
 
     public bool $isDefault;
 

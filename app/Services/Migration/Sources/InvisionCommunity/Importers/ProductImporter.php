@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
+use App\Enums\PriceType;
 use App\Enums\ProductApprovalStatus;
 use App\Enums\ProductTaxCode;
 use App\Enums\ProductType;
@@ -215,10 +216,15 @@ class ProductImporter extends AbstractImporter
         $name = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveProductGroupName($sourceCategory->pg_id, "Invision Product Group $sourceCategory->pg_id")
             : "Invision Product Group $sourceCategory->pg_id";
+
         $description = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveProductGroupDescription($sourceCategory->pg_id)
             : null;
-        $slug = Str::unique(Str::slug($sourceCategory->pg_seo_name ?? $name), 'products_categories', 'slug');
+
+        $slug = Str::of($sourceCategory->pg_seo_name ?? $name)
+            ->slug()
+            ->unique('products_categories', 'slug')
+            ->toString();
 
         $category = new ProductCategory;
         $category->forceFill([
@@ -302,7 +308,11 @@ class ProductImporter extends AbstractImporter
         $name = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveProductName($sourceProduct->p_id, "Invision Product $sourceProduct->p_id")
             : "Invision Product $sourceProduct->p_id";
-        $slug = Str::unique(Str::slug($sourceProduct->p_seo_name ?? $name), 'products', 'slug');
+
+        $slug = Str::of($sourceProduct->p_seo_name ?? $name)
+            ->slug()
+            ->unique('products', 'slug')
+            ->toString();
 
         $product = new Product;
         $product->forceFill([
@@ -356,16 +366,18 @@ class ProductImporter extends AbstractImporter
                 $result->recordMigrated('product_prices', [
                     'product_id' => $product->id,
                     'price_id' => $price->id,
+                    'type' => $price->type->value,
                     'amount' => $price->amount,
                     'currency' => $price->currency,
-                    'interval' => $price->interval?->value ?? 'one-time',
+                    'interval' => $price->interval?->value ?? 'N/A',
+                    'interval_count' => $price->interval_count ?? 'N/A',
                 ]);
             }
 
             $this->cacheProductMapping($sourceProduct->p_id, $product->id);
         }
 
-        $pricesSummary = collect($prices)->map(fn (Price $price): string => ($price->getOriginal('amount') / 100).' '.$price->currency.' ('.($price->interval?->value ?? 'one-time').')')->implode(', ');
+        $pricesSummary = collect($prices)->map(fn (Price $price): string => $price->amount.' '.$price->currency.' ('.($price->interval?->value ?? 'one-time').')')->implode(', ');
 
         $result->incrementMigrated(self::ENTITY_NAME);
         $result->recordMigrated(self::ENTITY_NAME, [
@@ -424,6 +436,7 @@ class ProductImporter extends AbstractImporter
                                 'description' => null,
                                 'amount' => $amount,
                                 'currency' => $currency,
+                                'type' => PriceType::Recurring,
                                 'interval' => $interval,
                                 'interval_count' => $intervalCount,
                                 'is_active' => true,
@@ -455,6 +468,7 @@ class ProductImporter extends AbstractImporter
                             'description' => null,
                             'amount' => $amount,
                             'currency' => $currency,
+                            'type' => PriceType::OneTime,
                             'interval' => null,
                             'interval_count' => 1,
                             'is_active' => true,

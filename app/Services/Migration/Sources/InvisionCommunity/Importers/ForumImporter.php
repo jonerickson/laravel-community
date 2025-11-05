@@ -214,10 +214,15 @@ class ForumImporter extends AbstractImporter
         $name = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveForumName($sourceCategory->id, "Invision Forum Category $sourceCategory->id")
             : "Invision Forum Category $sourceCategory->id";
+
         $description = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveForumDescription($sourceCategory->id)
             : null;
-        $slug = Str::unique(Str::slug($sourceCategory->name_seo ?? $name), 'forums_categories', 'slug');
+
+        $slug = Str::of($sourceCategory->name_seo ?? $name)
+            ->slug()
+            ->unique('forums_categories', 'slug')
+            ->toString();
 
         $category = new ForumCategory;
         $category->forceFill([
@@ -249,10 +254,15 @@ class ForumImporter extends AbstractImporter
         $name = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveForumName($sourceForum->id, "Invision Forum $sourceForum->id")
             : "Invision Forum $sourceForum->id";
+
         $description = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveForumDescription($sourceForum->id)
             : null;
-        $slug = Str::unique(Str::slug($sourceForum->name_seo ?? $name), 'forums', 'slug');
+
+        $slug = Str::of($sourceForum->name_seo ?? $name)
+            ->slug()
+            ->unique('forums', 'slug')
+            ->toString();
 
         $forum = new Forum;
         $forum->forceFill([

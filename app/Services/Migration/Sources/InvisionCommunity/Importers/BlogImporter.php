@@ -139,7 +139,11 @@ class BlogImporter extends AbstractImporter
     protected function importBlogEntry(object $sourceBlogEntry, bool $isDryRun, MigrationResult $result): void
     {
         $title = $sourceBlogEntry->entry_name;
-        $slug = Str::unique(Str::slug($sourceBlogEntry->entry_name_seo ?? $title), 'posts', 'slug');
+
+        $slug = Str::of($sourceBlogEntry->entry_name_seo ?? $title)
+            ->slug()
+            ->unique('posts', 'slug')
+            ->toString();
 
         $author = $this->findOrCreateAuthor($sourceBlogEntry);
 

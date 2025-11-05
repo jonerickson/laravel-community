@@ -63,9 +63,9 @@ class OrderImporter extends AbstractImporter
     public function getDependencies(): array
     {
         return [
-            // ImporterDependency::requiredPre('users', 'Orders require users to exist for customer assignment'),
-            // ImporterDependency::requiredPre('products', 'Orders require products to exist for order items'),
-            // ImporterDependency::optionalPre('subscriptions', 'Orders may be linked to a subscription plan'),
+            ImporterDependency::requiredPre('users', 'Orders require users to exist for customer assignment'),
+            ImporterDependency::requiredPre('products', 'Orders require products to exist for order items'),
+            ImporterDependency::optionalPre('subscriptions', 'Orders may be linked to a subscription plan'),
         ];
     }
 
@@ -83,6 +83,7 @@ class OrderImporter extends AbstractImporter
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->orderBy('i_id')
+            ->where('i_member', 1)
             ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
             ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
 

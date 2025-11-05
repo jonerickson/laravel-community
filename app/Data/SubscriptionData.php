@@ -39,5 +39,7 @@ class SubscriptionData extends Data
 
     public ?string $externalPriceId = null;
 
+    public bool $doesNotExpire;
+
     public ?int $quantity = null;
 }

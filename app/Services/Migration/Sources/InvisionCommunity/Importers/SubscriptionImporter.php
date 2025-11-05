@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
+use App\Enums\PriceType;
 use App\Enums\ProductApprovalStatus;
 use App\Enums\ProductTaxCode;
 use App\Enums\ProductType;
@@ -138,7 +139,11 @@ class SubscriptionImporter extends AbstractImporter
         $name = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveSubscriptionPackageName($sourceSubscription->sp_id, "Invision Subscription $sourceSubscription->sp_id")
             : "Invision Subscription $sourceSubscription->sp_id";
-        $slug = Str::unique(Str::slug($name), 'products', 'slug');
+
+        $slug = Str::of($name)
+            ->slug()
+            ->unique('products', 'slug')
+            ->toString();
 
         $product = new Product;
         $product->forceFill([
@@ -175,9 +180,11 @@ class SubscriptionImporter extends AbstractImporter
                 $result->recordMigrated('subscription_prices', [
                     'product_id' => $product->id,
                     'price_id' => $price->id,
+                    'type' => $price->type->value,
                     'amount' => $price->amount,
                     'currency' => $price->currency,
-                    'interval' => $price->interval?->value ?? 'one-time',
+                    'interval' => $price->interval?->value ?? 'N/A',
+                    'interval_count' => $price->interval_count ?? 'N/A',
                 ]);
             }
         }
@@ -232,6 +239,9 @@ class SubscriptionImporter extends AbstractImporter
                             'description' => null,
                             'amount' => $amount,
                             'currency' => $currency,
+                            'type' => $interval instanceof SubscriptionInterval
+                                ? PriceType::Recurring
+                                : PriceType::OneTime,
                             'interval' => $interval,
                             'interval_count' => $term,
                             'is_active' => true,
@@ -262,6 +272,7 @@ class SubscriptionImporter extends AbstractImporter
                             'description' => null,
                             'amount' => $amount,
                             'currency' => $currency,
+                            'type' => PriceType::Recurring,
                             'interval' => SubscriptionInterval::Monthly,
                             'interval_count' => 1,
                             'is_active' => true,

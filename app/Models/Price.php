@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\PriceType;
 use App\Enums\SubscriptionInterval;
 use App\Events\PriceCreated;
 use App\Events\PriceDeleted;
@@ -29,6 +30,7 @@ use Illuminate\Support\Stringable;
  * @property int $product_id
  * @property string $name
  * @property string|null $description
+ * @property PriceType|null $type
  * @property float $amount
  * @property string $currency
  * @property SubscriptionInterval|null $interval
@@ -65,6 +67,7 @@ use Illuminate\Support\Stringable;
  * @method static Builder<static>|Price whereName($value)
  * @method static Builder<static>|Price whereProductId($value)
  * @method static Builder<static>|Price whereReferenceId($value)
+ * @method static Builder<static>|Price whereType($value)
  * @method static Builder<static>|Price whereUpdatedAt($value)
  * @method static Builder<static>|Price withExternalPrice()
  * @method static Builder<static>|Price withoutExternalPrice()
@@ -80,6 +83,7 @@ class Price extends Model implements HasLabel
     protected $fillable = [
         'product_id',
         'name',
+        'type',
         'amount',
         'currency',
         'interval',
@@ -184,6 +188,7 @@ class Price extends Model implements HasLabel
     protected function casts(): array
     {
         return [
+            'type' => PriceType::class,
             'amount' => 'integer',
             'interval' => SubscriptionInterval::class,
             'is_default' => 'boolean',

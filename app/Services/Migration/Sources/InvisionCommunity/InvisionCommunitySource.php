@@ -16,6 +16,7 @@ use App\Services\Migration\Sources\InvisionCommunity\Importers\ProductImporter;
 use App\Services\Migration\Sources\InvisionCommunity\Importers\SubscriptionImporter;
 use App\Services\Migration\Sources\InvisionCommunity\Importers\TopicImporter;
 use App\Services\Migration\Sources\InvisionCommunity\Importers\UserImporter;
+use App\Services\Migration\Sources\InvisionCommunity\Importers\UserSubscriptionImporter;
 
 class InvisionCommunitySource implements MigrationSource
 {
@@ -38,6 +39,7 @@ class InvisionCommunitySource implements MigrationSource
             'blog_comments' => new BlogCommentImporter($this),
             'products' => new ProductImporter($this),
             'subscriptions' => new SubscriptionImporter($this),
+            'user_subscriptions' => new UserSubscriptionImporter($this),
             'forums' => new ForumImporter($this),
             'topics' => new TopicImporter($this),
             'posts' => new PostImporter($this),

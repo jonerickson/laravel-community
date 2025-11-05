@@ -17,6 +17,7 @@ use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
@@ -67,7 +68,7 @@ interface PaymentProcessor
 
     public function deleteCustomer(User $user): bool;
 
-    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ?string $successUrl = null): bool|string|SubscriptionData;
+    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, DateTimeInterface|int|null $anchorBillingCycle = null, ?string $successUrl = null): bool|string|SubscriptionData;
 
     public function swapSubscription(User $user, Price $price, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete): bool|SubscriptionData;
 

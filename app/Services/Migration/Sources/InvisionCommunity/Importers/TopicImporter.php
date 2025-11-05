@@ -135,7 +135,11 @@ class TopicImporter extends AbstractImporter
     protected function importTopic(object $sourceTopic, bool $isDryRun, MigrationResult $result): void
     {
         $title = $sourceTopic->title;
-        $slug = Str::unique(Str::slug($sourceTopic->title_seo ?? $title), 'topics', 'slug');
+
+        $slug = Str::of($sourceTopic->title_seo ?? $title)
+            ->slug()
+            ->unique('topics', 'slug')
+            ->toString();
 
         $author = $this->findOrCreateAuthor($sourceTopic);
 
