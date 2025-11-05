@@ -20,7 +20,7 @@ use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
-use DateTimeInterface;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Manager;
@@ -108,9 +108,9 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deletePaymentMethod($user, $paymentMethodId);
     }
 
-    public function createCustomer(User $user): bool
+    public function createCustomer(User $user, bool $force = false): bool
     {
-        return $this->driver()->createCustomer($user);
+        return $this->driver()->createCustomer($user, $force);
     }
 
     public function getCustomer(User $user): ?CustomerData
@@ -123,9 +123,9 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deleteCustomer($user);
     }
 
-    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, DateTimeInterface|int|null $anchorBillingCycle = null, ?string $successUrl = null): bool|string|SubscriptionData
+    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, CarbonInterface|int|null $backdateStartDate = null, CarbonInterface|int|null $billingCycleAnchor = null, ?string $successUrl = null): bool|string|SubscriptionData
     {
-        return $this->driver()->startSubscription($order, $chargeNow, $firstParty, $anchorBillingCycle, $successUrl);
+        return $this->driver()->startSubscription($order, $chargeNow, $firstParty, $prorationBehavior, $backdateStartDate, $billingCycleAnchor, $successUrl);
     }
 
     public function swapSubscription(User $user, Price $price, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete): bool|SubscriptionData

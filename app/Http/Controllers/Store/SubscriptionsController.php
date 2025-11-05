@@ -45,7 +45,7 @@ class SubscriptionsController extends Controller
         $subscriptions = Product::query()
             ->subscriptions()
             ->visible()
-            ->with(['prices' => fn (HasMany|Price $query) => $query->active()])
+            ->with(['prices' => fn (HasMany|Price $query) => $query->recurring()->active()])
             ->with('categories')
             ->with('policies.category')
             ->ordered()

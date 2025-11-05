@@ -24,7 +24,7 @@ use App\Models\Price;
 use App\Models\Product;
 use App\Models\Subscription as SubscriptionModel;
 use App\Models\User;
-use DateTimeInterface;
+use Carbon\CarbonInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -158,14 +158,11 @@ class StripeDriver implements PaymentProcessor
             ];
 
             if ($price->type === PriceType::Recurring && filled($price->interval)) {
-                $stripeParams['type'] = 'recurring';
                 $stripeParams['recurring'] = [
                     'interval' => $price->interval->value,
                     'interval_count' => $price->interval_count,
                     'usage_type' => 'licensed',
                 ];
-            } else {
-                $stripeParams['type'] = 'one_time';
             }
 
             $stripePrice = $this->stripe->prices->create($stripeParams, [
@@ -360,11 +357,17 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
-    public function createCustomer(User $user): bool
+    public function createCustomer(User $user, bool $force = false): bool
     {
-        return $this->executeWithErrorHandling('createCustomer', function () use ($user): bool {
-            if ($user->hasStripeId()) {
+        return $this->executeWithErrorHandling('createCustomer', function () use ($user, $force): bool {
+            if ($user->hasStripeId() && ! $force) {
                 return true;
+            }
+
+            if ($user->hasStripeId() && $force) {
+                $user->updateQuietly([
+                    'stripe_id' => null,
+                ]);
             }
 
             $user->createAsStripeCustomer();
@@ -412,9 +415,9 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
-    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, DateTimeInterface|int|null $anchorBillingCycle = null, ?string $successUrl = null): bool|string|SubscriptionData
+    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, CarbonInterface|int|null $backdateStartDate = null, CarbonInterface|int|null $billingCycleAnchor = null, ?string $successUrl = null): bool|string|SubscriptionData
     {
-        return $this->executeWithErrorHandling('startSubscription', function () use ($order, $chargeNow, $firstParty, $anchorBillingCycle, $successUrl): bool|string|SubscriptionData {
+        return $this->executeWithErrorHandling('startSubscription', function () use ($order, $chargeNow, $firstParty, $prorationBehavior, $backdateStartDate, $billingCycleAnchor, $successUrl): bool|string|SubscriptionData {
             $lineItems = [];
 
             foreach ($order->items as $orderItem) {
@@ -448,12 +451,17 @@ class StripeDriver implements PaymentProcessor
             /** @var Subscription|Session $result */
             $result = $order->user
                 ->newSubscription('default', $lineItems)
-                ->when(! $chargeNow, fn (SubscriptionBuilder $builder) => $builder->createAndSendInvoice())
                 ->when(filled($trialDays), fn (SubscriptionBuilder $builder) => $builder->trialDays($trialDays->product->trial_days))
                 ->when(filled($allowPromotionCodes), fn (SubscriptionBuilder $builder) => $builder->allowPromotionCodes())
-                ->when(filled($anchorBillingCycle), fn (SubscriptionBuilder $builder) => $builder->anchorBillingCycleOn($anchorBillingCycle))
+                ->when(filled($billingCycleAnchor), fn (SubscriptionBuilder $builder) => $builder->anchorBillingCycleOn($billingCycleAnchor))
+                ->when($prorationBehavior === ProrationBehavior::None, fn (SubscriptionBuilder $builder) => $builder->noProrate())
+                ->when($prorationBehavior === ProrationBehavior::AlwaysInvoice, fn (SubscriptionBuilder $builder) => $builder->alwaysInvoice())
+                ->when($prorationBehavior === ProrationBehavior::CreateProrations, fn (SubscriptionBuilder $builder) => $builder->prorate())
                 ->withMetadata($metadata)
-                ->when(! $firstParty, fn (SubscriptionBuilder $builder) => $builder->create())
+                ->when(! $chargeNow, fn (SubscriptionBuilder $builder) => $builder->createAndSendInvoice())
+                ->when(! $firstParty, fn (SubscriptionBuilder $builder) => $builder->create(subscriptionOptions: [
+                    'backdate_start_date' => $backdateStartDate instanceof CarbonInterface ? $backdateStartDate->getTimestamp() : null,
+                ]))
                 ->when($firstParty, fn (SubscriptionBuilder $builder) => $builder->checkout([
                     'client_reference_id' => $order->reference_id,
                     'origin_context' => 'web',

@@ -125,12 +125,12 @@ class Price extends Model implements HasLabel
 
     public function scopeRecurring(Builder $query): void
     {
-        $query->whereNotNull('interval');
+        $query->where('type', PriceType::Recurring);
     }
 
     public function scopeOneTime(Builder $query): void
     {
-        $query->whereNull('interval');
+        $query->where('type', PriceType::OneTime);
     }
 
     public function scopeWithExternalPrice(Builder $query): void

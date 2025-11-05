@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Link2, Plus, User } from 'lucide-react';
 import { useState } from 'react';
@@ -49,19 +49,7 @@ interface ConnectedAccountsProps {
 }
 
 export default function Integrations({ connectedAccounts }: ConnectedAccountsProps) {
-    const { delete: deleteForm } = useForm();
     const [showAddDialog, setShowAddDialog] = useState(false);
-
-    const handleRemoveAccount = (accountId: number, provider: string) => {
-        if (!window.confirm(`Are you sure you want to disconnect your ${provider} account?`)) {
-            return;
-        }
-
-        deleteForm(route('settings.integrations.destroy', accountId), {
-            preserveState: true,
-            preserveScroll: true,
-        });
-    };
 
     const handleConnectIntegration = (provider: string) => {
         window.location.href = route('oauth.redirect', {

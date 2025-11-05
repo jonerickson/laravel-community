@@ -63,8 +63,6 @@ class GroupImporter extends AbstractImporter
         OutputStyle $output,
         MigrationResult $result,
     ): void {
-        DB::connection($connection)->disableQueryLog();
-
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->orderBy('g_id')

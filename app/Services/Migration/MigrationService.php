@@ -6,6 +6,7 @@ namespace App\Services\Migration;
 
 use App\Services\Migration\Contracts\MigrationSource;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 class MigrationService
@@ -73,6 +74,8 @@ class MigrationService
         $migrationSource = $this->sources[$source];
         $result = new MigrationResult;
         $this->migratedEntities = [];
+
+        $this->prepareForMigration($migrationSource);
 
         if (! is_null($entity)) {
             $this->migrateEntityWithDependencies($migrationSource, $entity, $batchSize, $limit, $offset, $isDryRun, $output, $result);
@@ -189,5 +192,14 @@ class MigrationService
             output: $output,
             result: $result,
         );
+    }
+
+    protected function prepareForMigration(MigrationSource $source): void
+    {
+        DB::connection($source->getConnection())->disableQueryLog();
+
+        config()->set('mail.default', 'array');
+        config()->set('logging.default', 'single');
+        config()->set('logging.channels.single.path', storage_path('logs/migration.log'));
     }
 }

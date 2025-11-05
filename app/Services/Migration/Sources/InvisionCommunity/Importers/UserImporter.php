@@ -57,8 +57,6 @@ class UserImporter extends AbstractImporter
         OutputStyle $output,
         MigrationResult $result,
     ): void {
-        DB::connection($connection)->disableQueryLog();
-
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->orderBy('member_id')
@@ -123,6 +121,13 @@ class UserImporter extends AbstractImporter
         $output->newLine();
         $output->writeln("Migrated $processed users...");
         $output->newLine();
+
+        if (! $isDryRun) {
+            $output->writeln('Syncing billing addresses...');
+            $this->syncBillingAddresses($connection, $output);
+            $output->writeln('Billing addresses synced.');
+            $output->newLine();
+        }
     }
 
     public function isCompleted(): bool
@@ -238,5 +243,60 @@ class UserImporter extends AbstractImporter
     protected function cacheUserMapping(int $sourceUserId, int $targetUserId): void
     {
         Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.$sourceUserId, $targetUserId, 60 * 60 * 24 * 7);
+    }
+
+    protected function syncBillingAddresses(string $connection, OutputStyle $output): void
+    {
+        $addresses = DB::connection($connection)
+            ->table('nexus_customer_addresses')
+            ->whereNotNull('address')
+            ->get();
+
+        $progressBar = $output->createProgressBar($addresses->count());
+        $progressBar->start();
+
+        foreach ($addresses as $sourceAddress) {
+            try {
+                $targetUserId = self::getUserMapping((int) $sourceAddress->member);
+                if ($targetUserId === null) {
+                    continue;
+                }
+                if ($targetUserId === 0) {
+                    continue;
+                }
+
+                $user = User::query()->find($targetUserId);
+
+                if (! $user) {
+                    continue;
+                }
+
+                $addressData = json_decode((string) $sourceAddress->address, true);
+
+                if (! $addressData) {
+                    continue;
+                }
+
+                $user->update([
+                    'billing_address' => $addressData['addressLines'][0] ?? null,
+                    'billing_address_line_2' => $addressData['addressLines'][1] ?? null,
+                    'billing_city' => $addressData['city'] ?? null,
+                    'billing_state' => $addressData['region'] ?? null,
+                    'billing_postal_code' => $addressData['postalCode'] ?? null,
+                    'billing_country' => $addressData['country'] ?? null,
+                ]);
+            } catch (Exception $e) {
+                Log::error('Failed to sync billing address', [
+                    'source_member_id' => $sourceAddress->member ?? 'unknown',
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+            }
+
+            $progressBar->advance();
+        }
+
+        $progressBar->finish();
+        $output->newLine();
     }
 }

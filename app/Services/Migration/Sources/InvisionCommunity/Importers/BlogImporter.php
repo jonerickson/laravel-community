@@ -74,8 +74,6 @@ class BlogImporter extends AbstractImporter
         OutputStyle $output,
         MigrationResult $result,
     ): void {
-        DB::connection($connection)->disableQueryLog();
-
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->where('entry_status', 'published')

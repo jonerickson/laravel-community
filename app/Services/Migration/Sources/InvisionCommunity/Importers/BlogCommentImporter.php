@@ -73,8 +73,6 @@ class BlogCommentImporter extends AbstractImporter
         OutputStyle $output,
         MigrationResult $result,
     ): void {
-        DB::connection($connection)->disableQueryLog();
-
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->where('comment_approved', 1)

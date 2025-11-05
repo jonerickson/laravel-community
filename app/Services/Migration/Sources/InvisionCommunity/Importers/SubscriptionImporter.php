@@ -77,8 +77,6 @@ class SubscriptionImporter extends AbstractImporter
         OutputStyle $output,
         MigrationResult $result,
     ): void {
-        DB::connection($connection)->disableQueryLog();
-
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->where('sp_enabled', 1)

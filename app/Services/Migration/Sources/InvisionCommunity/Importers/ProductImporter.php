@@ -82,8 +82,6 @@ class ProductImporter extends AbstractImporter
         OutputStyle $output,
         MigrationResult $result,
     ): void {
-        DB::connection($connection)->disableQueryLog();
-
         $this->importCategories($connection, $batchSize, $limit, $offset, $isDryRun, $output, $result);
 
         $baseQuery = DB::connection($connection)
@@ -464,7 +462,7 @@ class ProductImporter extends AbstractImporter
                         $price = new Price;
                         $price->forceFill([
                             'product_id' => $product->id,
-                            'name' => "$currency One-Time",
+                            'name' => 'One-Time',
                             'description' => null,
                             'amount' => $amount,
                             'currency' => $currency,

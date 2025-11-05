@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Enums\ProrationBehavior;
 use App\Managers\PaymentManager;
 use App\Models\Order;
+use App\Pipes\Stripe\EnsureCustomerExists;
+use App\Pipes\Stripe\EnsurePricesExist;
+use App\Pipes\Stripe\EnsureProductsExist;
 use Carbon\CarbonInterface;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Pipeline;
 
 class ImportSubscription implements ShouldQueue
 {
@@ -18,21 +23,28 @@ class ImportSubscription implements ShouldQueue
 
     public function __construct(
         public Order $order,
-        public ?CarbonInterface $billingAnchorCycle,
+        public ?ProrationBehavior $prorationBehavior = ProrationBehavior::None,
+        public ?CarbonInterface $backdateStartDate = null,
+        public ?CarbonInterface $billingCycleAnchor = null,
     ) {}
 
     public function handle(PaymentManager $paymentManager): void
     {
         try {
-            if (! $paymentManager->getCustomer($this->order->user) instanceof \App\Data\CustomerData && ! $paymentManager->createCustomer($this->order->user)) {
-                throw new Exception('Failed to create Stripe customer.');
-            }
+            $order = Pipeline::send($this->order)
+                ->through([
+                    EnsureCustomerExists::class,
+                    EnsureProductsExist::class,
+                    EnsurePricesExist::class,
+                ])
+                ->thenReturn();
 
             $paymentManager->startSubscription(
-                order: $this->order,
-                chargeNow: false,
+                order: $order,
                 firstParty: false,
-                anchorBillingCycle: $this->billingAnchorCycle,
+                prorationBehavior: $this->prorationBehavior,
+                backdateStartDate: $this->backdateStartDate,
+                billingCycleAnchor: $this->billingCycleAnchor,
             );
         } catch (Exception $e) {
             Log::error('Failed to import subscription', [

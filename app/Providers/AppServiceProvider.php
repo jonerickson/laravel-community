@@ -172,6 +172,7 @@ class AppServiceProvider extends ServiceProvider
             return $candidate;
         });
 
+        /** @phpstan-ignore-next-line property.protected */
         Stringable::macro('unique', fn (string $table, string $column = 'id', ?string $connection = null, mixed $fallback = null, bool $throw = true, int $maxAttempts = 5): Stringable => new Stringable(Str::unique($this->value, $table, $column, $connection, $fallback, $throw, $maxAttempts)));
     }
 }

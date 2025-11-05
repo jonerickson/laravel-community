@@ -26,7 +26,7 @@ class HomeController
         return Product::query()
             ->visible()
             ->subscriptions()
-            ->with(['prices' => fn (HasMany|Price $query) => $query->active()])
+            ->with(['prices' => fn (HasMany|Price $query) => $query->recurring()->active()])
             ->ordered()
             ->get()
             ->filter(fn (Product $product) => Gate::check('view', $product));
