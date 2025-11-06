@@ -22,7 +22,7 @@ export function StoreProductRatingDialog({ product, reviews, scrollProp = 'revie
         if (onRatingAdded) {
             onRatingAdded();
         } else {
-            router.reload({ only: ['product'] });
+            router.reload({ only: ['product', 'reviews'] });
         }
     };
 
