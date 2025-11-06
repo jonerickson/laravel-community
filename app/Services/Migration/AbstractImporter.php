@@ -67,7 +67,7 @@ abstract class AbstractImporter implements EntityImporter
 
             $name = Str::random(40);
             $fullStoragePath = "$storagePath/$name.$extension";
-            $result = Storage::disk($disk)->put($fullStoragePath, $blob);
+            $result = Storage::disk($disk)->put($fullStoragePath, $blob, 'public');
 
             if ($result) {
                 return $fullStoragePath;
