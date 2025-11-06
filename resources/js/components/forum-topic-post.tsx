@@ -47,6 +47,8 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
         }
     };
 
+    const hasSignature = post.author && post.author.signature !== '' && stripCharacters(post.author.signature || '').length > 0;
+
     return (
         <Card data-post className={getCardClassName()} itemScope itemType="https://schema.org/Comment">
             <CardContent className="px-6 py-0 md:py-6">
@@ -102,20 +104,20 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
 
                         <RichEditorContent itemProp="text" content={post.content} />
 
-                        {(hasAnyPermission(['like_posts', 'reply_topics']) || post.author?.signature) && (
+                        {(hasAnyPermission(['like_posts', 'reply_topics']) || hasSignature) && (
                             <div
-                                className={cn('mt-4 border-t border-muted pt-2', {
-                                    'border-none': topic.isLocked && !stripCharacters(post.author?.signature || ''),
+                                className={cn('pt-2', {
+                                    'mt-4 border-t border-muted': hasSignature,
                                 })}
                             >
-                                {stripCharacters(post.author?.signature || '').length > 0 && (
+                                {hasSignature && (
                                     <div className="mt-2 text-xs text-muted-foreground">
                                         <RichEditorContent content={post.author.signature || ''} />
                                     </div>
                                 )}
 
                                 {hasAnyPermission(['like_posts', 'reply_topics']) && !topic.isLocked && (
-                                    <div className="mt-2 flex items-start justify-between">
+                                    <div className="mt-4 flex items-start justify-between rounded-sm bg-muted p-2">
                                         <div className="flex gap-2">
                                             {can('report_posts') && <ReportDialog reportableType="App\Models\Post" reportableId={post.id} />}
                                             {can('reply_topics') && (
