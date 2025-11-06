@@ -32,9 +32,9 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
     }
 
     const getCardClassName = () => {
-        if (post.isPinned) return 'border-2 border-info bg-info/10';
-        if (!post.isPublished || !post.isApproved) return 'border-2 border-warning bg-warning/10';
-        if (post.isReported) return 'border-2 border-destructive bg-destructive/10';
+        if (post.isPinned) return 'border-info/50 ring-[3px] ring-inset ring-info/20';
+        if (!post.isPublished || !post.isApproved) return 'border-warning/50 ring-[3px] ring-inset ring-warning/20';
+        if (post.isReported) return 'border-destructive/50 ring-[3px] ring-inset ring-destructive/20';
         return '';
     };
 
