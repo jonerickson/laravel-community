@@ -45,6 +45,11 @@ class DatabaseSeeder extends Seeder
             'email' => 'user@deschutesdesigngroup.com',
         ])->assignRole(Role::User);
 
+        User::factory()->create([
+            'name' => 'Test Support',
+            'email' => 'support@deschutesdesigngroup.com',
+        ])->assignRole(Role::SupportAgent);
+
         Announcement::factory()->state([
             'title' => 'Test Announcement',
             'slug' => 'test-announcement',

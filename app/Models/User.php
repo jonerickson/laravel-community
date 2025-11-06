@@ -250,7 +250,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {
-            return $this->hasRole(Role::Administrator);
+            return $this->hasAnyRole(Role::Administrator, Role::SupportAgent);
         }
 
         return $panel->getId() === 'marketplace';

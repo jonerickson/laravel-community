@@ -5,17 +5,24 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Enums\Role;
+use App\Models\Blacklist;
+use App\Models\Fingerprint;
+use App\Models\Order;
 use App\Models\Permission;
 use App\Models\Subscription;
+use App\Models\SupportTicket;
+use App\Models\SupportTicketCategory;
 use App\Models\User;
 use App\Providers\Social\DiscordProvider;
 use App\Providers\Social\RobloxProvider;
 use App\Services\PermissionService;
+use Filament\Facades\Filament;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
 use Filament\Tables\Table;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\DB;
@@ -58,9 +65,27 @@ class AppServiceProvider extends ServiceProvider
             'primary' => Color::Zinc,
         ]);
 
-        Gate::before(function (?User $user = null) {
+        Gate::before(function (?User $user, $abilitiy, $models) {
             if ($user?->hasRole(Role::Administrator) === true) {
                 return true;
+            }
+
+            if (Filament::getCurrentPanel() && $user?->hasRole(Role::SupportAgent)) {
+                if ($abilitiy === 'delete') {
+                    return false;
+                }
+
+                $approvedResources = [
+                    Blacklist::class,
+                    Fingerprint::class,
+                    Order::class,
+                    User::class,
+                    SupportTicket::class,
+                    SupportTicketCategory::class,
+                ];
+
+                return Collection::make($models)->some(fn ($modelClassOrInstance): bool => in_array($modelClassOrInstance, $approvedResources)
+                    || Collection::make($approvedResources)->some(fn ($approvedResource): bool => $modelClassOrInstance instanceof $approvedResource));
             }
         });
 

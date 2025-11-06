@@ -25,6 +25,7 @@ use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ExportBulkAction;
@@ -174,6 +175,7 @@ class UserResource extends Resource
                                                     ->dateTimeTooltip(),
                                             ]),
                                         Section::make('Permissions')
+                                            ->visible(fn () => Auth::user()->hasRole(\App\Enums\Role::Administrator))
                                             ->collapsible()
                                             ->persistCollapsed()
                                             ->components([
@@ -271,7 +273,7 @@ class UserResource extends Resource
                                                 return $roleIds->map(fn (string $roleId): string => $guildRoles->get($roleId, $roleId))->toArray();
                                             }),
                                     ]),
-                                Livewire::make(IntegrationsRelationManager::class, fn (User $record): array => [
+                                Livewire::make(IntegrationsRelationManager::class, fn (?User $record): array => [
                                     'ownerRecord' => $record,
                                     'pageClass' => EditUser::class,
                                 ]),
@@ -280,15 +282,16 @@ class UserResource extends Resource
                             ->icon(Heroicon::OutlinedShoppingCart)
                             ->visibleOn('edit')
                             ->schema([
-                                Livewire::make(OrdersRelationManager::class, fn (User $record): array => [
+                                Livewire::make(OrdersRelationManager::class, fn (?User $record): array => [
                                     'ownerRecord' => $record,
                                     'pageClass' => EditUser::class,
                                 ]),
                             ]),
                         Tabs\Tab::make('Payment Methods')
                             ->icon(Heroicon::OutlinedCreditCard)
+                            ->visibleOn('edit')
                             ->schema([
-                                Livewire::make(ListPaymentMethods::class, fn (User $record): array => [
+                                Livewire::make(ListPaymentMethods::class, fn (?User $record): array => [
                                     'record' => $record,
                                 ]),
                             ]),
@@ -296,7 +299,7 @@ class UserResource extends Resource
                             ->icon(Heroicon::OutlinedArrowPath)
                             ->visibleOn('edit')
                             ->schema([
-                                Livewire::make(ListSubscriptions::class, fn (User $record): array => [
+                                Livewire::make(ListSubscriptions::class, fn (?User $record): array => [
                                     'record' => $record,
                                 ]),
                             ]),
@@ -393,7 +396,6 @@ class UserResource extends Resource
             ])
             ->groups(['groups.name'])
             ->recordActions([
-                EditAction::make(),
                 Action::make('ban')
                     ->label('Ban User')
                     ->icon('heroicon-o-x-circle')
@@ -420,6 +422,8 @@ class UserResource extends Resource
                     ->modalHeading('Unban User')
                     ->modalDescription('Are you sure you want to unban this user?')
                     ->modalSubmitActionLabel('Unban User'),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 ExportBulkAction::make()

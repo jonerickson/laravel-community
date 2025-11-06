@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Pages;
 
+use App\Enums\Role;
 use App\Filament\Admin\Resources\Comments\Widgets\CommentModerationTable;
 use App\Filament\Admin\Resources\Orders\Widgets\OrdersAnalyticsChart;
 use App\Filament\Admin\Resources\Orders\Widgets\OrderStatsOverview;
@@ -29,6 +30,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Tabs;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Facades\Auth;
 use Override;
 
 class Dashboard extends BaseDashboard
@@ -106,6 +108,7 @@ class Dashboard extends BaseDashboard
                     ]),
                 Tabs\Tab::make('Comments')
                     ->icon(Heroicon::OutlinedMegaphone)
+                    ->visible(fn () => Auth::user()->hasAnyRole(Role::Administrator))
                     ->badge((string) Comment::query()->unapproved()->count())
                     ->badgeColor('warning')
                     ->schema([
@@ -114,6 +117,7 @@ class Dashboard extends BaseDashboard
                     ]),
                 Tabs\Tab::make('Forums')
                     ->icon(Heroicon::OutlinedChatBubbleLeftRight)
+                    ->visible(fn () => Auth::user()->hasAnyRole(Role::Administrator))
                     ->badge((string) Post::query()->needingModeration()->count())
                     ->badgeColor('warning')
                     ->schema([
@@ -122,18 +126,21 @@ class Dashboard extends BaseDashboard
                     ]),
                 Tabs\Tab::make('Store')
                     ->icon(Heroicon::OutlinedShoppingCart)
+                    ->visible(fn () => Auth::user()->hasAnyRole(Role::Administrator, Role::SupportAgent))
                     ->schema([
                         Grid::make($this->getColumns())
                             ->schema($this->getWidgetsSchemaComponents($this->getStoreWidgets())),
                     ]),
                 Tabs\Tab::make('Subscriptions')
                     ->icon(Heroicon::OutlinedArrowPath)
+                    ->visible(fn () => Auth::user()->hasAnyRole(Role::Administrator, Role::SupportAgent))
                     ->schema([
                         Grid::make($this->getColumns())
                             ->schema($this->getWidgetsSchemaComponents($this->getSubscriptionWidgets())),
                     ]),
                 Tabs\Tab::make('Support')
                     ->icon(Heroicon::OutlinedLifebuoy)
+                    ->visible(fn () => Auth::user()->hasAnyRole(Role::Administrator, Role::SupportAgent))
                     ->badge((string) SupportTicket::query()->unassigned()->active()->count())
                     ->badgeColor('warning')
                     ->schema([
