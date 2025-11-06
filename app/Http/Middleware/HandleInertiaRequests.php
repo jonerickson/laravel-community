@@ -39,7 +39,7 @@ class HandleInertiaRequests extends Middleware
         $sharedData = SharedData::from([
             'auth' => AuthData::from([
                 'user' => ($user = $request->user()) ? UserData::from($user) : null,
-                'isAdmin' => $user?->hasRole(Role::Administrator) ?? false,
+                'isAdmin' => $user?->hasAnyRole(Role::Administrator, Role::SupportAgent) ?? false,
                 'roles' => $user?->roles?->pluck('name')->toArray() ?? [],
                 'can' => Permission::all()->mapWithKeys(fn (Permission $permission): array => [$permission->name => Gate::forUser($user)->check($permission->name)])->toArray(),
                 'mustVerifyEmail' => $user && ! $user->hasVerifiedEmail(),
