@@ -481,8 +481,10 @@ class MigrateCommand extends Command
             $sshConfig['host']
         );
 
-        if ($sshConfig['key']) {
+        if (file_exists($sshConfig['key'])) {
             $sshCommand .= " -i {$sshConfig['key']}";
+        } else {
+            $sshCommand .= " -i /dev/stdin <<< '{$sshConfig['key']}'";
         }
 
         $result = Process::timeout(10)->run($sshCommand);
