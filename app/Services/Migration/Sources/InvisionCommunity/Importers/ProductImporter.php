@@ -13,6 +13,8 @@ use App\Models\Price;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
+use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunitySource;
 use Carbon\Carbon;
@@ -74,22 +76,21 @@ class ProductImporter extends AbstractImporter
     }
 
     public function import(
-        string $connection,
-        int $batchSize,
-        ?int $limit,
-        ?int $offset,
-        bool $isDryRun,
-        OutputStyle $output,
+        MigrationSource $source,
+        MigrationConfig $config,
         MigrationResult $result,
+        OutputStyle $output,
     ): void {
-        $this->importCategories($connection, $batchSize, $limit, $offset, $isDryRun, $output, $result);
+        $this->importCategories($source, $config, $result, $output);
+
+        $connection = $source->getConnection();
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->where('p_store', 1)
             ->orderBy('p_id')
-            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
-            ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
+            ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
+            ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
         $totalProducts = $baseQuery->count();
 
@@ -100,14 +101,14 @@ class ProductImporter extends AbstractImporter
 
         $processed = 0;
 
-        $baseQuery->chunk($batchSize, function ($products) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($products) use ($config, $result, $progressBar, $output, &$processed): bool {
             foreach ($products as $sourceProduct) {
-                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
                 }
 
                 try {
-                    $this->importProduct($sourceProduct, $isDryRun, $result);
+                    $this->importProduct($sourceProduct, $config->isDryRun, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -142,19 +143,18 @@ class ProductImporter extends AbstractImporter
     }
 
     protected function importCategories(
-        string $connection,
-        int $batchSize,
-        ?int $limit,
-        ?int $offset,
-        bool $isDryRun,
-        OutputStyle $output,
+        MigrationSource $source,
+        MigrationConfig $config,
         MigrationResult $result,
+        OutputStyle $output,
     ): void {
+        $connection = $source->getConnection();
+
         $baseQuery = DB::connection($connection)
             ->table('nexus_package_groups')
             ->orderBy('pg_id')
-            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
-            ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
+            ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
+            ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
         $totalCategories = $baseQuery->count();
 
@@ -166,16 +166,16 @@ class ProductImporter extends AbstractImporter
         $processed = 0;
         $sourceCategoriesData = [];
 
-        $baseQuery->chunk($batchSize, function ($categories) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed, &$sourceCategoriesData): bool {
+        $baseQuery->chunk($config->batchSize, function ($categories) use ($config, $result, $progressBar, $output, &$processed, &$sourceCategoriesData): bool {
             foreach ($categories as $sourceCategory) {
-                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
                 }
 
                 $sourceCategoriesData[] = $sourceCategory;
 
                 try {
-                    $this->importCategory($sourceCategory, $isDryRun, $result);
+                    $this->importCategory($sourceCategory, $config->isDryRun, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed('product_categories');
                     $result->recordFailed('product_categories', [
@@ -206,7 +206,7 @@ class ProductImporter extends AbstractImporter
         $output->writeln("Migrated $processed product categories...");
         $output->newLine();
 
-        $this->updateCategoryParentRelationships($sourceCategoriesData, $isDryRun, $output, $result);
+        $this->updateCategoryParentRelationships($sourceCategoriesData, $config->isDryRun, $output, $result);
     }
 
     protected function importCategory(object $sourceCategory, bool $isDryRun, MigrationResult $result): void

@@ -6,6 +6,8 @@ namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Models\Group;
 use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
+use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunitySource;
 use Exception;
@@ -55,19 +57,18 @@ class GroupImporter extends AbstractImporter
     }
 
     public function import(
-        string $connection,
-        int $batchSize,
-        ?int $limit,
-        ?int $offset,
-        bool $isDryRun,
-        OutputStyle $output,
+        MigrationSource $source,
+        MigrationConfig $config,
         MigrationResult $result,
+        OutputStyle $output,
     ): void {
+        $connection = $source->getConnection();
+
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->orderBy('g_id')
-            ->when($offset !== null && $offset !== 0, fn (Builder $builder) => $builder->offset($offset))
-            ->when($limit !== null && $limit !== 0, fn (Builder $builder) => $builder->limit($limit));
+            ->when($config->offset !== null && $config->offset !== 0, fn (Builder $builder) => $builder->offset($config->offset))
+            ->when($config->limit !== null && $config->limit !== 0, fn (Builder $builder) => $builder->limit($config->limit));
 
         $totalGroups = $baseQuery->count();
 
@@ -78,14 +79,14 @@ class GroupImporter extends AbstractImporter
 
         $processed = 0;
 
-        $baseQuery->chunk($batchSize, function ($groups) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($groups) use ($config, $result, $progressBar, $output, &$processed): bool {
             foreach ($groups as $sourceGroup) {
-                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
                 }
 
                 try {
-                    $this->importGroup($sourceGroup, $isDryRun, $result);
+                    $this->importGroup($sourceGroup, $config->isDryRun, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [

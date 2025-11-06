@@ -9,7 +9,9 @@ use App\Enums\Role;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
+use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
 use Carbon\Carbon;
 use Exception;
@@ -66,20 +68,20 @@ class BlogImporter extends AbstractImporter
     }
 
     public function import(
-        string $connection,
-        int $batchSize,
-        ?int $limit,
-        ?int $offset,
-        bool $isDryRun,
-        OutputStyle $output,
+        MigrationSource $source,
+        MigrationConfig $config,
         MigrationResult $result,
+        OutputStyle $output,
     ): void {
+        $connection = $source->getConnection();
+
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->where('entry_status', 'published')
             ->orderBy('entry_id')
-            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
-            ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
+            ->when($config->userId !== null && $config->userId !== 0, fn ($builder) => $builder->where('entry_author_id', $config->userId))
+            ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
+            ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
         $totalBlogs = $baseQuery->count();
 
@@ -90,14 +92,14 @@ class BlogImporter extends AbstractImporter
 
         $processed = 0;
 
-        $baseQuery->chunk($batchSize, function ($blogEntries) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($blogEntries) use ($config, $result, $progressBar, $output, &$processed): bool {
             foreach ($blogEntries as $sourceBlogEntry) {
-                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
                 }
 
                 try {
-                    $this->importBlogEntry($sourceBlogEntry, $isDryRun, $result);
+                    $this->importBlogEntry($sourceBlogEntry, $config->isDryRun, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
 
@@ -166,8 +168,8 @@ class BlogImporter extends AbstractImporter
             'excerpt' => $excerpt,
             'content' => $content,
             'slug' => $slug,
-            'is_published' => true,
-            'is_approved' => false,
+            'is_published' => ! $sourceBlogEntry->entry_hidden,
+            'is_approved' => true,
             'is_featured' => (bool) $sourceBlogEntry->entry_featured,
             'is_pinned' => (bool) $sourceBlogEntry->entry_pinned,
             'comments_enabled' => true,

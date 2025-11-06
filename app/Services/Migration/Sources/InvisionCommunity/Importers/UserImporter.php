@@ -6,7 +6,9 @@ namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
+use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
 use Carbon\Carbon;
 use Exception;
@@ -49,21 +51,21 @@ class UserImporter extends AbstractImporter
     }
 
     public function import(
-        string $connection,
-        int $batchSize,
-        ?int $limit,
-        ?int $offset,
-        bool $isDryRun,
-        OutputStyle $output,
+        MigrationSource $source,
+        MigrationConfig $config,
         MigrationResult $result,
+        OutputStyle $output,
     ): void {
+        $connection = $source->getConnection();
+
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->orderBy('member_id')
-            ->when($offset !== null && $offset !== 0, fn (Builder $builder) => $builder->offset($offset))
-            ->when($limit !== null && $limit !== 0, fn (Builder $builder) => $builder->limit($limit));
+            ->when($config->userId !== null && $config->userId !== 0, fn ($builder) => $builder->where('member_id', $config->userId))
+            ->when($config->offset !== null && $config->offset !== 0, fn (Builder $builder) => $builder->offset($config->offset))
+            ->when($config->limit !== null && $config->limit !== 0, fn (Builder $builder) => $builder->limit($config->limit));
 
-        if ($offset > 0) {
+        if ($config->offset > 0) {
             $totalUsers = DB::connection($connection)
                 ->table(DB::raw("({$baseQuery->toSql()}) as limited"))
                 ->mergeBindings($baseQuery)
@@ -79,14 +81,14 @@ class UserImporter extends AbstractImporter
 
         $processed = 0;
 
-        $baseQuery->chunk($batchSize, function ($users) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($users) use ($config, $result, $progressBar, $output, &$processed): bool {
             foreach ($users as $sourceUser) {
-                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
                 }
 
                 try {
-                    $this->importUser($sourceUser, $isDryRun, $result, $output);
+                    $this->importUser($sourceUser, $config->isDryRun, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
 
@@ -122,9 +124,9 @@ class UserImporter extends AbstractImporter
         $output->writeln("Migrated $processed users...");
         $output->newLine();
 
-        if (! $isDryRun) {
+        if (! $config->isDryRun) {
             $output->writeln('Syncing billing addresses...');
-            $this->syncBillingAddresses($connection, $output);
+            $this->syncBillingAddresses($source, $config, $output);
             $output->writeln('Billing addresses synced.');
             $output->newLine();
         }
@@ -245,11 +247,14 @@ class UserImporter extends AbstractImporter
         Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.$sourceUserId, $targetUserId, 60 * 60 * 24 * 7);
     }
 
-    protected function syncBillingAddresses(string $connection, OutputStyle $output): void
+    protected function syncBillingAddresses(MigrationSource $source, MigrationConfig $config, OutputStyle $output): void
     {
+        $connection = $source->getConnection();
+
         $addresses = DB::connection($connection)
             ->table('nexus_customer_addresses')
             ->whereNotNull('address')
+            ->when($config->userId !== null && $config->userId !== 0, fn ($builder) => $builder->where('member', $config->userId))
             ->get();
 
         $progressBar = $output->createProgressBar($addresses->count());

@@ -12,7 +12,9 @@ use App\Enums\SubscriptionInterval;
 use App\Models\Price;
 use App\Models\Product;
 use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
+use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunitySource;
 use Carbon\Carbon;
@@ -69,20 +71,19 @@ class SubscriptionImporter extends AbstractImporter
     }
 
     public function import(
-        string $connection,
-        int $batchSize,
-        ?int $limit,
-        ?int $offset,
-        bool $isDryRun,
-        OutputStyle $output,
+        MigrationSource $source,
+        MigrationConfig $config,
         MigrationResult $result,
+        OutputStyle $output,
     ): void {
+        $connection = $source->getConnection();
+
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->where('sp_enabled', 1)
             ->orderBy('sp_id')
-            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
-            ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
+            ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
+            ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
         $totalSubscriptions = $baseQuery->count();
 
@@ -93,14 +94,14 @@ class SubscriptionImporter extends AbstractImporter
 
         $processed = 0;
 
-        $baseQuery->chunk($batchSize, function ($subscriptions) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($subscriptions) use ($config, $result, $progressBar, $output, &$processed): bool {
             foreach ($subscriptions as $sourceSubscription) {
-                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
                 }
 
                 try {
-                    $this->importSubscription($sourceSubscription, $isDryRun, $result);
+                    $this->importSubscription($sourceSubscription, $config->isDryRun, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [

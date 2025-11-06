@@ -18,6 +18,8 @@ class MigrationService
 
     protected array $optionalDependencies = [];
 
+    protected ?MigrationConfig $config = null;
+
     public function registerSource(MigrationSource $source): void
     {
         $this->sources[$source->getName()] = $source;
@@ -31,6 +33,18 @@ class MigrationService
     public function getSource(string $name): ?MigrationSource
     {
         return $this->sources[$name] ?? null;
+    }
+
+    public function configure(MigrationConfig $config): self
+    {
+        $this->config = $config;
+
+        return $this;
+    }
+
+    public function getConfig(): ?MigrationConfig
+    {
+        return $this->config;
     }
 
     public function setOptionalDependencies(array $optionalDependencies): void
@@ -58,17 +72,14 @@ class MigrationService
         return $optional;
     }
 
-    public function migrate(
-        string $source,
-        ?string $entity,
-        int $batchSize,
-        ?int $limit,
-        ?int $offset,
-        bool $isDryRun,
-        OutputStyle $output,
-    ): MigrationResult {
+    public function migrate(string $source, OutputStyle $output): MigrationResult
+    {
         if (! isset($this->sources[$source])) {
             throw new InvalidArgumentException("Unknown migration source: $source");
+        }
+
+        if (! $this->config instanceof MigrationConfig) {
+            throw new InvalidArgumentException('Migration config not set. Call configure() first.');
         }
 
         $migrationSource = $this->sources[$source];
@@ -77,11 +88,11 @@ class MigrationService
 
         $this->prepareForMigration($migrationSource);
 
-        if (! is_null($entity)) {
-            $this->migrateEntityWithDependencies($migrationSource, $entity, $batchSize, $limit, $offset, $isDryRun, $output, $result);
+        if (! is_null($this->config->entity)) {
+            $this->migrateEntityWithDependencies($migrationSource, $this->config->entity, $output, $result);
         } else {
             foreach ($migrationSource->getImporters() as $importerEntity => $importer) {
-                $this->migrateEntityWithDependencies($migrationSource, $importerEntity, $batchSize, $limit, $offset, $isDryRun, $output, $result);
+                $this->migrateEntityWithDependencies($migrationSource, $importerEntity, $output, $result);
             }
         }
 
@@ -111,10 +122,6 @@ class MigrationService
     protected function migrateEntityWithDependencies(
         MigrationSource $source,
         string $entity,
-        int $batchSize,
-        ?int $limit,
-        ?int $offset,
-        bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
     ): void {
@@ -142,13 +149,13 @@ class MigrationService
             if ($dependency->isRequired() || in_array($dependency->entityName, $this->optionalDependencies)) {
                 $dependencyType = $dependency->isRequired() ? 'required' : 'optional';
                 $output->writeln("<comment>Migrating {$dependency->entityName} ({$dependencyType} dependency of {$entity})...</comment>");
-                $this->migrateEntityWithDependencies($source, $dependency->entityName, $batchSize, $limit, $offset, $isDryRun, $output, $result);
+                $this->migrateEntityWithDependencies($source, $dependency->entityName, $output, $result);
             }
         }
 
-        $this->migrateEntity($source, $entity, $batchSize, $limit, $offset, $isDryRun, $output, $result);
+        $this->migrateEntity($source, $entity, $output, $result);
 
-        if ($limit === null && $offset === null && ! $isDryRun) {
+        if ($this->config->limit === null && $this->config->offset === null && ! $this->config->isDryRun) {
             $importer->markCompleted();
         }
 
@@ -160,7 +167,7 @@ class MigrationService
             if ($dependency->isRequired() || in_array($dependency->entityName, $this->optionalDependencies)) {
                 $dependencyType = $dependency->isRequired() ? 'required' : 'optional';
                 $output->writeln("<comment>Migrating {$dependency->entityName} ({$dependencyType} dependency of {$entity})...</comment>");
-                $this->migrateEntityWithDependencies($source, $dependency->entityName, $batchSize, $limit, $offset, $isDryRun, $output, $result);
+                $this->migrateEntityWithDependencies($source, $dependency->entityName, $output, $result);
             }
         }
     }
@@ -168,10 +175,6 @@ class MigrationService
     protected function migrateEntity(
         MigrationSource $source,
         string $entity,
-        int $batchSize,
-        ?int $limit,
-        ?int $offset,
-        bool $isDryRun,
         OutputStyle $output,
         MigrationResult $result,
     ): void {
@@ -184,13 +187,10 @@ class MigrationService
         $output->writeln("<info>Migrating $entity...</info>");
 
         $importer->import(
-            connection: $source->getConnection(),
-            batchSize: $batchSize,
-            limit: $limit,
-            offset: $offset,
-            isDryRun: $isDryRun,
-            output: $output,
+            source: $source,
+            config: $this->config,
             result: $result,
+            output: $output,
         );
     }
 

@@ -6,6 +6,8 @@ namespace App\Services\Migration;
 
 use App\Services\Migration\Contracts\EntityImporter;
 use App\Services\Migration\Contracts\MigrationSource;
+use Closure;
+use DOMDocument;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -19,6 +21,40 @@ abstract class AbstractImporter implements EntityImporter
         protected MigrationSource $source,
     ) {
         //
+    }
+
+    protected function parseAndReplaceImagesInHtml(string $html, Closure $downloadCallback): string
+    {
+        if ($html === '' || $html === '0') {
+            return $html;
+        }
+
+        libxml_use_internal_errors(true);
+
+        $doc = new DOMDocument;
+        $doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+
+        $images = $doc->getElementsByTagName('img');
+
+        foreach ($images as $img) {
+            $originalSrc = $img->getAttribute('src');
+
+            $newUrl = value($downloadCallback, $originalSrc);
+
+            if ($newUrl) {
+                $img->setAttribute('src', $newUrl);
+            }
+        }
+
+        $body = $doc->getElementsByTagName('body')->item(0);
+        $newHtml = '';
+        foreach ($body->childNodes as $child) {
+            $newHtml .= $doc->saveHTML($child);
+        }
+
+        libxml_clear_errors();
+
+        return $newHtml;
     }
 
     protected function downloadAndStoreFile(string $baseUrl, string $sourcePath, string $storagePath, ?string $disk = 'public'): ?string

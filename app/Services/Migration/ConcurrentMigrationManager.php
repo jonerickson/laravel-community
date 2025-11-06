@@ -29,43 +29,33 @@ class ConcurrentMigrationManager
     ];
 
     public function __construct(
-        protected int $maxRecordsPerProcess,
-        protected int $maxConcurrentProcesses,
+        protected MigrationConfig $config,
         protected OutputStyle $output,
         protected ?int $workerMemoryLimit = null,
     ) {}
 
     public function migrate(
         MigrationSource $source,
-        string $entity,
         int $totalRecords,
-        int $batchSize,
-        bool $isDryRun = false,
-        bool $useSsh = false,
-        ?int $globalOffset = null,
     ): bool {
-        $startOffset = $globalOffset ?? 0;
+        $startOffset = $this->config->offset ?? 0;
         $nextOffset = $startOffset;
         $totalToProcess = $totalRecords - $startOffset;
 
-        $this->output->writeln("Starting concurrent migration of <info>$entity</info>");
+        $this->output->writeln("Starting concurrent migration of <info>{$this->config->entity}</info>");
         $this->output->writeln("Total records: <info>$totalToProcess</info>");
-        $this->output->writeln("Max records per process: <info>{$this->maxRecordsPerProcess}</info>");
-        $this->output->writeln("Concurrent processes: <info>{$this->maxConcurrentProcesses}</info>");
+        $this->output->writeln("Max records per process: <info>{$this->config->maxRecordsPerProcess}</info>");
+        $this->output->writeln("Concurrent processes: <info>{$this->config->maxProcesses}</info>");
         $this->output->newLine();
 
         while ($nextOffset < $totalRecords || $this->activeProcesses !== []) {
-            while (count($this->activeProcesses) < $this->maxConcurrentProcesses && $nextOffset < $totalRecords) {
-                $chunkLimit = min($this->maxRecordsPerProcess, $totalRecords - $nextOffset);
+            while (count($this->activeProcesses) < $this->config->maxProcesses && $nextOffset < $totalRecords) {
+                $chunkLimit = min($this->config->maxRecordsPerProcess, $totalRecords - $nextOffset);
 
                 $this->spawnWorkerProcess(
                     source: $source,
-                    entity: $entity,
                     offset: $nextOffset,
                     limit: $chunkLimit,
-                    batchSize: $batchSize,
-                    isDryRun: $isDryRun,
-                    useSsh: $useSsh,
                 );
 
                 $nextOffset += $chunkLimit;
@@ -107,22 +97,18 @@ class ConcurrentMigrationManager
 
     protected function spawnWorkerProcess(
         MigrationSource $source,
-        string $entity,
         int $offset,
         int $limit,
-        int $batchSize,
-        bool $isDryRun,
-        bool $useSsh,
     ): void {
         $command = [
             PHP_BINARY,
             'artisan',
             'mi:migrate',
             $source->getName(),
-            '--entity='.$entity,
+            '--entity='.$this->config->entity,
             '--offset='.$offset,
             '--limit='.$limit,
-            '--batch='.$batchSize,
+            '--batch='.$this->config->batchSize,
             '--worker',
             '--force',
         ];
@@ -131,12 +117,16 @@ class ConcurrentMigrationManager
             $command[] = '--memory-limit='.$this->workerMemoryLimit;
         }
 
-        if ($isDryRun) {
+        if ($this->config->isDryRun) {
             $command[] = '--dry-run';
         }
 
-        if ($useSsh) {
+        if ($this->config->useSsh) {
             $command[] = '--ssh';
+        }
+
+        if ($this->config->userId !== null && $this->config->userId !== 0) {
+            $command[] = '--id='.$this->config->userId;
         }
 
         $process = new Process($command, base_path());
@@ -149,13 +139,13 @@ class ConcurrentMigrationManager
             'process' => $process,
             'offset' => $offset,
             'limit' => $limit,
-            'entity' => $entity,
+            'entity' => $this->config->entity,
             'output_position' => 0,
             'error_position' => 0,
             'color' => $color,
         ];
 
-        $this->output->writeln("<comment>[Process Started]</comment> Entity: $entity, Offset: $offset, Limit: $limit, PID: {$process->getPid()}");
+        $this->output->writeln("<comment>[Process Started]</comment> Entity: {$this->config->entity}, Offset: $offset, Limit: $limit, PID: {$process->getPid()}");
     }
 
     protected function checkProcesses(): void

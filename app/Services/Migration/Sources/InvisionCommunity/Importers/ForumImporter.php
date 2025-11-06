@@ -7,6 +7,8 @@ namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 use App\Models\Forum;
 use App\Models\ForumCategory;
 use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
+use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunitySource;
 use Exception;
@@ -67,23 +69,22 @@ class ForumImporter extends AbstractImporter
     }
 
     public function import(
-        string $connection,
-        int $batchSize,
-        ?int $limit,
-        ?int $offset,
-        bool $isDryRun,
-        OutputStyle $output,
+        MigrationSource $source,
+        MigrationConfig $config,
         MigrationResult $result,
+        OutputStyle $output,
     ): void {
-        $this->importCategories($connection, $batchSize, $limit, $offset, $isDryRun, $output, $result);
+        $this->importCategories($source, $config, $result, $output);
+
+        $connection = $source->getConnection();
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->where('parent_id', '<>', -1)
             ->where('position', '<>', 0)
             ->orderBy('id')
-            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
-            ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
+            ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
+            ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
         $totalForums = $baseQuery->count();
 
@@ -95,16 +96,16 @@ class ForumImporter extends AbstractImporter
         $processed = 0;
         $sourceForumsData = [];
 
-        $baseQuery->chunk($batchSize, function ($forums) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed, &$sourceForumsData): bool {
+        $baseQuery->chunk($config->batchSize, function ($forums) use ($config, $result, $progressBar, $output, &$processed, &$sourceForumsData): bool {
             foreach ($forums as $sourceForum) {
-                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
                 }
 
                 $sourceForumsData[] = $sourceForum;
 
                 try {
-                    $this->importForum($sourceForum, $isDryRun, $result);
+                    $this->importForum($sourceForum, $config->isDryRun, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -137,25 +138,24 @@ class ForumImporter extends AbstractImporter
         $output->writeln("Migrated $processed forums...");
         $output->newLine();
 
-        $this->updateForumParentRelationships($sourceForumsData, $isDryRun, $output, $result);
+        $this->updateForumParentRelationships($sourceForumsData, $config->isDryRun, $output, $result);
     }
 
     protected function importCategories(
-        string $connection,
-        int $batchSize,
-        ?int $limit,
-        ?int $offset,
-        bool $isDryRun,
-        OutputStyle $output,
+        MigrationSource $source,
+        MigrationConfig $config,
         MigrationResult $result,
+        OutputStyle $output,
     ): void {
+        $connection = $source->getConnection();
+
         $baseQuery = DB::connection($connection)
             ->table('forums_forums')
             ->where('parent_id', -1)
             ->where('position', '<>', 0)
             ->orderBy('id')
-            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
-            ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
+            ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
+            ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
         $totalCategories = $baseQuery->count();
 
@@ -166,14 +166,14 @@ class ForumImporter extends AbstractImporter
 
         $processed = 0;
 
-        $baseQuery->chunk($batchSize, function ($categories) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($categories) use ($config, $result, $progressBar, $output, &$processed): bool {
             foreach ($categories as $sourceCategory) {
-                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
                 }
 
                 try {
-                    $this->importCategory($sourceCategory, $isDryRun, $result);
+                    $this->importCategory($sourceCategory, $config->isDryRun, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed('forum_categories');
                     $result->recordFailed('forum_categories', [

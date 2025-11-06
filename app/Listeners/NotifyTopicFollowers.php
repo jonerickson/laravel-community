@@ -6,16 +6,10 @@ namespace App\Listeners;
 
 use App\Events\PostCreated;
 use App\Notifications\Forums\NewContentNotification;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Notification;
 
-class NotifyTopicFollowers implements ShouldQueue
+class NotifyTopicFollowers
 {
-    use Dispatchable;
-    use InteractsWithQueue;
-
     public function handle(PostCreated $event): void
     {
         $post = $event->post;
@@ -32,7 +26,7 @@ class NotifyTopicFollowers implements ShouldQueue
             ->filter(fn ($follower): bool => $follower->id !== $post->created_by);
 
         if ($followers->isNotEmpty()) {
-            Notification::send($followers, new NewContentNotification($post, $topic));
+            Notification::sendNow($followers, new NewContentNotification($post, $topic));
         }
     }
 }

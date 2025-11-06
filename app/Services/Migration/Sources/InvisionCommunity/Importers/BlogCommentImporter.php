@@ -8,7 +8,9 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
+use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
 use Carbon\Carbon;
 use Exception;
@@ -65,20 +67,20 @@ class BlogCommentImporter extends AbstractImporter
     }
 
     public function import(
-        string $connection,
-        int $batchSize,
-        ?int $limit,
-        ?int $offset,
-        bool $isDryRun,
-        OutputStyle $output,
+        MigrationSource $source,
+        MigrationConfig $config,
         MigrationResult $result,
+        OutputStyle $output,
     ): void {
+        $connection = $source->getConnection();
+
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->where('comment_approved', 1)
             ->orderBy('comment_id')
-            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
-            ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
+            ->when($config->userId !== null && $config->userId !== 0, fn ($builder) => $builder->where('comment_member_id', $config->userId))
+            ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
+            ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
         $totalComments = $baseQuery->count();
 
@@ -89,14 +91,14 @@ class BlogCommentImporter extends AbstractImporter
 
         $processed = 0;
 
-        $baseQuery->chunk($batchSize, function ($comments) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($comments) use ($config, $result, $progressBar, $output, &$processed): bool {
             foreach ($comments as $sourceComment) {
-                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
                 }
 
                 try {
-                    $this->importComment($sourceComment, $isDryRun, $result);
+                    $this->importComment($sourceComment, $config->isDryRun, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [

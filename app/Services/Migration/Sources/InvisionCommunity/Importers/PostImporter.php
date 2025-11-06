@@ -10,7 +10,9 @@ use App\Models\Post;
 use App\Models\Topic;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
+use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
 use Carbon\Carbon;
 use Exception;
@@ -18,6 +20,7 @@ use Illuminate\Console\OutputStyle;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PostImporter extends AbstractImporter
@@ -67,22 +70,22 @@ class PostImporter extends AbstractImporter
     }
 
     public function import(
-        string $connection,
-        int $batchSize,
-        ?int $limit,
-        ?int $offset,
-        bool $isDryRun,
-        OutputStyle $output,
+        MigrationSource $source,
+        MigrationConfig $config,
         MigrationResult $result,
+        OutputStyle $output,
     ): void {
+        $connection = $source->getConnection();
+
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->where('queued', 0)
             ->orderBy('pid')
-            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
-            ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
+            ->when($config->userId !== null && $config->userId !== 0, fn ($builder) => $builder->where('author_id', $config->userId))
+            ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
+            ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
-        $totalPosts = $limit !== null && $limit !== 0 ? min($limit, $baseQuery->count()) : $baseQuery->count();
+        $totalPosts = $config->limit !== null && $config->limit !== 0 ? min($config->limit, $baseQuery->count()) : $baseQuery->count();
 
         $output->writeln("Found {$totalPosts} posts to migrate...");
 
@@ -91,14 +94,14 @@ class PostImporter extends AbstractImporter
 
         $processed = 0;
 
-        $baseQuery->chunk($batchSize, function ($posts) use ($limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($posts) use ($config, $result, $progressBar, $output, &$processed): bool {
             foreach ($posts as $sourcePost) {
-                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
                 }
 
                 try {
-                    $this->importPost($sourcePost, $isDryRun, $result);
+                    $this->importPost($sourcePost, $config->isDryRun, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -161,7 +164,7 @@ class PostImporter extends AbstractImporter
             'type' => PostType::Forum,
             'topic_id' => $topic->id,
             'title' => "Re: $topic->title",
-            'content' => $sourcePost->post,
+            'content' => $this->modifyContent($sourcePost->post ?? ''),
             'is_published' => true,
             'is_approved' => true,
             'comments_enabled' => false,
@@ -214,6 +217,31 @@ class PostImporter extends AbstractImporter
         }
 
         return null;
+    }
+
+    protected function modifyContent(string $content): string
+    {
+        $baseUrl = $this->source->getBaseUrl();
+
+        if (is_null($baseUrl)) {
+            return $content;
+        }
+
+        return $this->parseAndReplaceImagesInHtml($content, function (string $imgSrc) use ($baseUrl): string {
+            $cleanSrc = ltrim((string) preg_replace('/^<fileStore\.core_Attachment>\//', '', $imgSrc), '/');
+
+            $filePath = $this->downloadAndStoreFile(
+                baseUrl: $baseUrl.'/uploads',
+                sourcePath: $cleanSrc,
+                storagePath: 'post-images',
+            );
+
+            if (! is_null($filePath)) {
+                return Storage::disk('public')->url($filePath);
+            }
+
+            return $imgSrc;
+        });
     }
 
     protected function cachePostMapping(int $sourcePostId, int $targetPostId): void

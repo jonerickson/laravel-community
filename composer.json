@@ -7,7 +7,9 @@
     "license": "MIT",
     "require": {
         "php": "^8.4",
+        "ext-dom": "*",
         "ext-fileinfo": "*",
+        "ext-libxml": "*",
         "ext-pcntl": "*",
         "api-platform/laravel": "^4.1.25",
         "filament/filament": "^4.1.9",

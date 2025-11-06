@@ -12,7 +12,9 @@ use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
+use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
 use Carbon\Carbon;
 use Exception;
@@ -70,20 +72,19 @@ class OrderImporter extends AbstractImporter
     }
 
     public function import(
-        string $connection,
-        int $batchSize,
-        ?int $limit,
-        ?int $offset,
-        bool $isDryRun,
-        OutputStyle $output,
+        MigrationSource $source,
+        MigrationConfig $config,
         MigrationResult $result,
+        OutputStyle $output,
     ): void {
+        $connection = $source->getConnection();
+
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
             ->orderBy('i_id')
-            ->where('i_member', 1)
-            ->when($offset !== null && $offset !== 0, fn ($builder) => $builder->offset($offset))
-            ->when($limit !== null && $limit !== 0, fn ($builder) => $builder->limit($limit));
+            ->when($config->userId !== null && $config->userId !== 0, fn ($builder) => $builder->where('i_member', $config->userId))
+            ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
+            ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
         $totalOrders = $baseQuery->count();
 
@@ -94,14 +95,14 @@ class OrderImporter extends AbstractImporter
 
         $processed = 0;
 
-        $baseQuery->chunk($batchSize, function ($orders) use ($connection, $limit, $isDryRun, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($orders) use ($config, $result, $progressBar, $output, &$processed): bool {
             foreach ($orders as $sourceOrder) {
-                if ($limit !== null && $limit !== 0 && $processed >= $limit) {
+                if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
                 }
 
                 try {
-                    $this->importOrder($connection, $sourceOrder, $isDryRun, $result);
+                    $this->importOrder($sourceOrder, $config->isDryRun, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -133,7 +134,7 @@ class OrderImporter extends AbstractImporter
         $output->newLine();
     }
 
-    protected function importOrder(string $connection, object $sourceOrder, bool $isDryRun, MigrationResult $result): void
+    protected function importOrder(object $sourceOrder, bool $isDryRun, MigrationResult $result): void
     {
         $user = $this->findUser($sourceOrder);
 
@@ -173,7 +174,7 @@ class OrderImporter extends AbstractImporter
             $this->cacheOrderMapping($sourceOrder->i_id, $order->id);
         }
 
-        $orderItems = $this->createOrderItems($connection, $sourceOrder, $order, $isDryRun, $result);
+        $orderItems = $this->createOrderItems($sourceOrder, $order, $isDryRun, $result);
 
         if (! $isDryRun) {
             /** @var OrderItem $orderItem */
@@ -214,7 +215,7 @@ class OrderImporter extends AbstractImporter
         };
     }
 
-    protected function createOrderItems(string $connection, object $sourceOrder, Order $order, bool $isDryRun, MigrationResult $result): array
+    protected function createOrderItems(object $sourceOrder, Order $order, bool $isDryRun, MigrationResult $result): array
     {
         $orderItems = [];
 
