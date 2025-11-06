@@ -62,7 +62,7 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
                                     <Link
                                         key={`${forum.id}-${topic.id}`}
                                         href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
-                                        className="flex items-center gap-3 px-6 py-2 hover:bg-muted/30"
+                                        className="flex items-center gap-3 px-4 py-2 hover:bg-accent/20 sm:px-6"
                                     >
                                         <div className="flex-shrink-0">
                                             <div

@@ -24,7 +24,7 @@ export default function PolicyCategoryIndex({ categories }: PoliciesIndexProps) 
             <Head title="Policies" />
             <div className="flex h-full flex-1 flex-col overflow-x-auto">
                 <Heading title="Policies" description="Browse our policies, terms of service, and legal documents" />
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-2">
                     {categories.map((category) => (
                         <Card key={category.id} className="transition-shadow hover:shadow-md">
                             <CardHeader>

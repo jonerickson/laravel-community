@@ -59,19 +59,19 @@ HTML
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="flex flex-col gap-2 p-4 rounded-lg border border-border shadow-sm">
+    <div class="flex flex-col gap-2 p-4 rounded-lg border border-border shadow-sm bg-background relative">
       <div class="font-semibold text-lg text-primary">Phone</div>
       <p class="font-light text-foreground">+1 (555) 123-4567</p>
       <p class="text-sm text-muted-foreground">Mon-Fri 9am-5pm EST</p>
     </div>
 
-    <div class="flex flex-col gap-2 p-4 rounded-lg border border-border shadow-sm">
+    <div class="flex flex-col gap-2 p-4 rounded-lg border border-border shadow-sm bg-background relative">
       <div class="font-semibold text-lg">Email</div>
       <p class="font-light text-foreground">support@example.com</p>
       <p class="text-sm text-muted-foreground">We'll respond within 24 hours</p>
     </div>
 
-    <div class="flex flex-col gap-2 p-4 rounded-lg border border-border shadow-sm">
+    <div class="flex flex-col gap-2 p-4 rounded-lg border border-border shadow-sm bg-background relative">
       <div class="font-semibold text-lg">Address</div>
       <p class="font-light text-foreground">123 Business Street<br>Suite 100<br>City, State 12345</p>
     </div>

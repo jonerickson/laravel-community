@@ -96,19 +96,19 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                 </div>
 
                 {forums.length > 0 ? (
-                    <div className="rounded-md border">
+                    <div className="relative rounded-md border bg-background">
                         <Table className="table table-fixed">
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[60%]">Forums</TableHead>
+                                    <TableHead className="w-[60%] pl-4">Forums</TableHead>
                                     <TableHead className="hidden w-[10%] text-center md:table-cell">Topics</TableHead>
                                     <TableHead className="hidden w-[10%] text-center md:table-cell">Posts</TableHead>
-                                    <TableHead className="hidden w-[20%] text-right md:table-cell">Latest Activity</TableHead>
+                                    <TableHead className="hidden w-[20%] pr-4 text-right md:table-cell">Latest Activity</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {forums.map((forum) => (
-                                    <TableRow key={forum.id} className="hover:bg-muted/50">
+                                    <TableRow key={forum.id} className="hover:bg-accent/20">
                                         <TableCell className="p-4">
                                             <div className="flex items-start gap-3">
                                                 <div

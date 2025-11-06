@@ -438,7 +438,7 @@ export function RichTextEditor({ content, onChange, placeholder = 'Start typing.
 
     return (
         <>
-            <div className={`rounded-md border border-input ${className}`}>
+            <div className={`relative rounded-md border border-input bg-background ${className}`}>
                 <div className="flex items-center gap-1 border-b p-2">
                     {/* Essential formatting tools - always visible */}
                     <ToolbarButton action={() => editor.chain().focus().toggleBold().run()} icon={Bold} isActive={editor.isActive('bold')} />

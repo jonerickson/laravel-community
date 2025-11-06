@@ -77,8 +77,6 @@ class CategoryController extends Controller
     {
         $this->authorize('view', $category);
 
-        $category->load(['image']);
-
         $forums = $category
             ->forums()
             ->whereNull('parent_id')

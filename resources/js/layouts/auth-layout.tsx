@@ -11,7 +11,7 @@ export default function AuthLayout({ children, title, description, ...props }: {
     return (
         <div className="relative min-h-screen overflow-hidden">
             <div className="pointer-events-none absolute inset-0 z-10">
-                <AbstractBackgroundPattern corner="bottom-right" />
+                <AbstractBackgroundPattern />
             </div>
             <AuthLayoutTemplate title={title} description={description} {...props}>
                 {children}

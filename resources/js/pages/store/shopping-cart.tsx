@@ -202,7 +202,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
 
                             <ul role="list" className="divide-y divide-border border-t border-b border-border">
                                 {items.map((item) => (
-                                    <li key={item.productId} className="flex items-start py-6">
+                                    <li key={item.productId} className="relative flex items-start bg-background p-4 sm:p-6">
                                         <div className="shrink-0">
                                             {item.product?.featuredImageUrl ? (
                                                 <img
@@ -323,10 +323,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                             </ul>
                         </section>
 
-                        <section
-                            aria-labelledby="summary-heading"
-                            className="mt-16 rounded-lg bg-sidebar px-4 py-6 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8"
-                        >
+                        <section aria-labelledby="summary-heading" className="relative mt-16 rounded-lg bg-muted p-4 sm:p-6 lg:col-span-5 lg:mt-0">
                             <HeadingSmall title="Order summary" />
 
                             <dl className="divide-shadow-muted mt-6 divide-y">

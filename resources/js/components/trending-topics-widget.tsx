@@ -26,7 +26,7 @@ export default function TrendingTopicsWidget({ topics = [] }: TrendingTopicsWidg
     };
 
     return (
-        <div className="overflow-hidden rounded-lg border border-sidebar-border/50">
+        <div className="relative overflow-hidden rounded-lg border border-sidebar-border/50 bg-background">
             <div className="overflow-x-auto">
                 <table className="w-full">
                     <thead className="bg-muted/50">

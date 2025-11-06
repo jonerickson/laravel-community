@@ -215,19 +215,19 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                 )}
 
                 {forum.children && forum.children.length > 0 && (
-                    <div className="rounded-md border">
+                    <div className="relative rounded-md border bg-background">
                         <Table className="table table-fixed">
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[60%]">Subforums</TableHead>
+                                    <TableHead className="w-[60%] pl-4">Subforums</TableHead>
                                     <TableHead className="hidden w-[10%] text-center md:table-cell">Topics</TableHead>
                                     <TableHead className="hidden w-[10%] text-center md:table-cell">Posts</TableHead>
-                                    <TableHead className="hidden w-[20%] text-right md:table-cell">Latest Activity</TableHead>
+                                    <TableHead className="hidden w-[20%] pr-4 text-right md:table-cell">Latest Activity</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {forum.children.map((subforum) => (
-                                    <TableRow key={subforum.id} className="hover:bg-muted/50">
+                                    <TableRow key={subforum.id} className="hover:bg-accent/20">
                                         <TableCell className="p-4">
                                             <div className="flex items-start gap-3">
                                                 <div
@@ -310,22 +310,22 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                 )}
 
                 {topics.length > 0 ? (
-                    <div className="rounded-md border">
+                    <div className="relative rounded-md border bg-background">
                         <InfiniteScroll data="topics">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="w-[80%]">Forums</TableHead>
+                                        <TableHead className="w-[80%] pl-4">Forums</TableHead>
                                         <TableHead className="w-[5%] text-center">Replies</TableHead>
                                         <TableHead className="w-[5%] text-center">Views</TableHead>
-                                        <TableHead className="w-[10%] text-right">Last Activity</TableHead>
+                                        <TableHead className="w-[10%] pr-4 text-right">Last Activity</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {topics.map((topic) => (
                                         <TableRow
                                             key={topic.id}
-                                            className={`hover:bg-muted/50 ${selectedTopics.includes(topic.id) ? 'bg-info-foreground' : ''}`}
+                                            className={`hover:bg-accent/20 ${selectedTopics.includes(topic.id) ? 'bg-info-foreground' : ''}`}
                                         >
                                             <TableCell className="p-4">
                                                 <div className="flex items-start gap-3">

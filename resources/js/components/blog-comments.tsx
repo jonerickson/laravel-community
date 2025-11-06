@@ -2,6 +2,7 @@ import EmojiReactions from '@/components/emoji-reactions';
 import { EmptyState } from '@/components/empty-state';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
+import RichEditorContent from '@/components/rich-editor-content';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { UserInfo } from '@/components/user-info';
@@ -108,8 +109,8 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
     return (
         <div className="space-y-6 border-l-2 border-muted pl-4" itemScope itemType="https://schema.org/Comment">
             <div
-                className={cn('flex flex-col gap-3 rounded-lg p-4', {
-                    'bg-muted/50': comment.isApproved,
+                className={cn('relative flex flex-col gap-3 rounded-lg p-4', {
+                    'bg-muted': comment.isApproved,
                     'border-2 border-warning bg-warning/10': !comment.isApproved,
                 })}
             >
@@ -156,7 +157,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                 ) : (
                     <>
                         <div className="text-sm text-foreground" itemProp="text">
-                            {comment.content}
+                            <RichEditorContent content={comment.content} />
                         </div>
 
                         {hasAnyPermission(['create_comments', 'update_permissions', 'like_comments']) && (

@@ -415,7 +415,7 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
     };
 
     return (
-        <AppLayout background={true}>
+        <AppLayout>
             <Head title="Subscriptions" />
 
             <div className="text-center">

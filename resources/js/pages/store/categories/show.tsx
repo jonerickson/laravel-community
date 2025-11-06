@@ -87,7 +87,7 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                             {category.children.map((subcategory) => (
                                 <Link key={subcategory.id} href={route('store.categories.show', { category: subcategory.slug })}>
-                                    <Card className="transition-colors hover:bg-muted/50">
+                                    <Card>
                                         <CardContent className="p-4">
                                             <div className="flex items-start gap-3">
                                                 <div className="flex size-10 flex-shrink-0 items-center justify-center rounded-lg bg-muted">

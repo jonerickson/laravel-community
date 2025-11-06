@@ -7,7 +7,6 @@ namespace Database\Seeders;
 use App\Models\Forum;
 use App\Models\ForumCategory;
 use App\Models\Group;
-use App\Models\Image;
 use App\Models\Post;
 use App\Models\Topic;
 use App\Models\User;
@@ -24,6 +23,7 @@ class ForumSeeder extends Seeder
                 'description' => 'Talk about anything and everything',
                 'icon' => 'message-square',
                 'color' => '#3b82f6',
+                'featured_image' => 'boilerplate/forum-category-1.jpeg',
                 'forums' => [
                     [
                         'name' => 'General Discussion',
@@ -86,14 +86,11 @@ class ForumSeeder extends Seeder
         $guestGroup = Group::defaultGuestGroups()->first() ?? Group::factory()->asDefaultGuest()->create();
         $adminGroup = Group::query()->where('name', 'Administrators')->first() ?? Group::factory()->state(['name' => 'Administrators'])->create();
 
-        foreach (array_reverse($categories) as $category) {
+        foreach ($categories as $category) {
             $forumCategory = ForumCategory::factory()
                 ->state(Arr::except($category, ['forums']))
                 ->hasAttached($memberGroup)
                 ->hasAttached($guestGroup)
-                ->has(Image::factory()->state([
-                    'path' => 'boilerplate/forum-category-1.jpeg',
-                ]))
                 ->create();
 
             foreach ($category['forums'] ?? [] as $forum) {

@@ -47,7 +47,7 @@ export default function Reviews({ subscription, reviews }: ReviewsPageProps) {
         <AppLayout>
             <Head title={`${subscription.name} - Reviews`} />
 
-            <div className="mx-auto max-w-4xl space-y-6">
+            <div className="mx-auto w-full max-w-4xl space-y-6">
                 <Button variant="ghost" size="sm" onClick={() => router.visit(route('store.subscriptions'))} className="mb-4">
                     <ArrowLeft className="mr-2 size-4" />
                     Back to subscriptions
