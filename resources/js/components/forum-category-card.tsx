@@ -91,9 +91,9 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
                                                     {topic.title}
                                                 </span>
                                             </div>
-                                            <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
-                                                <span>by {topic.author.name}</span>
-                                                <span>"</span>
+                                            <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                                                <span>Started by {topic.author.name}</span>
+                                                <span>•</span>
                                                 <span>
                                                     {topic.lastReplyAt
                                                         ? formatDistanceToNow(new Date(topic.lastReplyAt), { addSuffix: true })
