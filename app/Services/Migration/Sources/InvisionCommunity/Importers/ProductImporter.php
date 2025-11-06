@@ -13,7 +13,6 @@ use App\Models\Price;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunitySource;
@@ -76,14 +75,13 @@ class ProductImporter extends AbstractImporter
     }
 
     public function import(
-        MigrationSource $source,
         MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $this->importCategories($source, $config, $result, $output);
+        $this->importCategories($config, $result, $output);
 
-        $connection = $source->getConnection();
+        $connection = $this->source->getConnection();
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
@@ -108,7 +106,7 @@ class ProductImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importProduct($sourceProduct, $config->isDryRun, $result);
+                    $this->importProduct($sourceProduct, $config, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -143,12 +141,11 @@ class ProductImporter extends AbstractImporter
     }
 
     protected function importCategories(
-        MigrationSource $source,
         MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $connection = $source->getConnection();
+        $connection = $this->source->getConnection();
 
         $baseQuery = DB::connection($connection)
             ->table('nexus_package_groups')
@@ -175,7 +172,7 @@ class ProductImporter extends AbstractImporter
                 $sourceCategoriesData[] = $sourceCategory;
 
                 try {
-                    $this->importCategory($sourceCategory, $config->isDryRun, $result);
+                    $this->importCategory($sourceCategory, $config, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed('product_categories');
                     $result->recordFailed('product_categories', [
@@ -206,10 +203,10 @@ class ProductImporter extends AbstractImporter
         $output->writeln("Migrated $processed product categories...");
         $output->newLine();
 
-        $this->updateCategoryParentRelationships($sourceCategoriesData, $config->isDryRun, $output, $result);
+        $this->updateCategoryParentRelationships($sourceCategoriesData, $config, $output);
     }
 
-    protected function importCategory(object $sourceCategory, bool $isDryRun, MigrationResult $result): void
+    protected function importCategory(object $sourceCategory, MigrationConfig $config, MigrationResult $result): void
     {
         $name = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveProductGroupName($sourceCategory->pg_id, "Invision Product Group $sourceCategory->pg_id")
@@ -233,11 +230,11 @@ class ProductImporter extends AbstractImporter
             'is_active' => true,
         ]);
 
-        if (! $isDryRun) {
+        if (! $config->isDryRun) {
             $category->save();
             $this->cacheCategoryMapping($sourceCategory->pg_id, $category->id);
 
-            if (($imagePath = $sourceCategory->pg_image) && ($baseUrl = $this->source->getBaseUrl())) {
+            if (($imagePath = $sourceCategory->pg_image) && ($baseUrl = $this->source->getBaseUrl()) && $config->downloadMedia) {
                 $filePath = $this->downloadAndStoreFile(
                     baseUrl: $baseUrl.'/uploads',
                     sourcePath: $imagePath,
@@ -260,7 +257,7 @@ class ProductImporter extends AbstractImporter
         ]);
     }
 
-    protected function updateCategoryParentRelationships(array $sourceCategoriesData, bool $isDryRun, OutputStyle $output, MigrationResult $result): void
+    protected function updateCategoryParentRelationships(array $sourceCategoriesData, MigrationConfig $config, OutputStyle $output): void
     {
         $output->writeln('Updating product category parent relationships...');
 
@@ -280,7 +277,7 @@ class ProductImporter extends AbstractImporter
                 if (isset($sourceCategory->pg_parent) && $sourceCategory->pg_parent !== null && $sourceCategory->pg_parent !== 0) {
                     $parentCategoryId = static::getCategoryMapping((int) $sourceCategory->pg_parent);
 
-                    if ($parentCategoryId !== null && $parentCategoryId !== 0 && ! $isDryRun) {
+                    if ($parentCategoryId !== null && $parentCategoryId !== 0 && ! $config->isDryRun) {
                         ProductCategory::query()
                             ->where('id', $mappedCategoryId)
                             ->update(['parent_id' => $parentCategoryId]);
@@ -301,7 +298,7 @@ class ProductImporter extends AbstractImporter
         $output->newLine(2);
     }
 
-    protected function importProduct(object $sourceProduct, bool $isDryRun, MigrationResult $result): void
+    protected function importProduct(object $sourceProduct, MigrationConfig $config, MigrationResult $result): void
     {
         $name = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveProductName($sourceProduct->p_id, "Invision Product $sourceProduct->p_id")
@@ -334,12 +331,12 @@ class ProductImporter extends AbstractImporter
                 : Carbon::now(),
         ]);
 
-        if (! $isDryRun) {
+        if (! $config->isDryRun) {
             $product->save();
             $this->assignCategory($product, $sourceProduct);
             $this->assignGroups($product, $sourceProduct);
 
-            if (($imagePath = $sourceProduct->p_image) && ($baseUrl = $this->source->getBaseUrl())) {
+            if (($imagePath = $sourceProduct->p_image) && ($baseUrl = $this->source->getBaseUrl()) && $config->downloadMedia) {
                 $filePath = $this->downloadAndStoreFile(
                     baseUrl: $baseUrl.'/uploads',
                     sourcePath: $imagePath,
@@ -353,9 +350,9 @@ class ProductImporter extends AbstractImporter
             }
         }
 
-        $prices = $this->createPrices($sourceProduct, $product, $isDryRun, $result);
+        $prices = $this->createPrices($sourceProduct, $product, $config, $result);
 
-        if (! $isDryRun) {
+        if (! $config->isDryRun) {
             /** @var Price $price */
             foreach ($prices as $price) {
                 $price->save();
@@ -390,7 +387,7 @@ class ProductImporter extends AbstractImporter
         ]);
     }
 
-    protected function createPrices(object $sourceProduct, Product $product, bool $isDryRun, MigrationResult $result): array
+    protected function createPrices(object $sourceProduct, Product $product, MigrationConfig $config, MigrationResult $result): array
     {
         $prices = [];
 
@@ -484,7 +481,7 @@ class ProductImporter extends AbstractImporter
                 'error' => $e->getMessage(),
             ]);
 
-            if (! $isDryRun) {
+            if (! $config->isDryRun) {
                 $result->incrementFailed('product_prices');
                 $result->recordFailed('product_prices', [
                     'product_id' => $product->id ?? 'N/A',

@@ -9,7 +9,6 @@ use App\Enums\Role;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
@@ -68,12 +67,11 @@ class BlogImporter extends AbstractImporter
     }
 
     public function import(
-        MigrationSource $source,
         MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $connection = $source->getConnection();
+        $connection = $this->source->getConnection();
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
@@ -99,7 +97,7 @@ class BlogImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importBlogEntry($sourceBlogEntry, $config->isDryRun, $result);
+                    $this->importBlogEntry($sourceBlogEntry, $config, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
 
@@ -136,7 +134,7 @@ class BlogImporter extends AbstractImporter
         $output->newLine();
     }
 
-    protected function importBlogEntry(object $sourceBlogEntry, bool $isDryRun, MigrationResult $result): void
+    protected function importBlogEntry(object $sourceBlogEntry, MigrationConfig $config, MigrationResult $result): void
     {
         $title = $sourceBlogEntry->entry_name;
 
@@ -183,11 +181,11 @@ class BlogImporter extends AbstractImporter
                 : Carbon::createFromTimestamp($sourceBlogEntry->entry_date),
         ]);
 
-        if (! $isDryRun) {
+        if (! $config->isDryRun) {
             $post->save();
             $this->cacheBlogMapping($sourceBlogEntry->entry_id, $post->id);
 
-            if (($imagePath = $sourceBlogEntry->entry_cover_photo) && ($baseUrl = $this->source->getBaseUrl())) {
+            if (($imagePath = $sourceBlogEntry->entry_cover_photo) && ($baseUrl = $this->source->getBaseUrl()) && $config->downloadMedia) {
                 $filePath = $this->downloadAndStoreFile(
                     baseUrl: $baseUrl.'/uploads',
                     sourcePath: $imagePath,

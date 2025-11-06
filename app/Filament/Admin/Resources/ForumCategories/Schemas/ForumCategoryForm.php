@@ -55,15 +55,14 @@ class ForumCategoryForm
                                 ->required()
                                 ->default('#3b82f6'),
                         ]),
-                        Section::make('Image')
+                        Section::make('Media')
                             ->columnSpanFull()
-                            ->relationship('image')
                             ->schema([
-                                FileUpload::make('path')
+                                FileUpload::make('featured_image')
+                                    ->label('Featured Image')
                                     ->helperText('Add a category image to be displayed on the forum index.')
-                                    ->hiddenLabel()
                                     ->disk('public')
-                                    ->directory('forum-category-images')
+                                    ->directory('product-category-images')
                                     ->visibility('public')
                                     ->downloadable()
                                     ->previewable()

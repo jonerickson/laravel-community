@@ -10,11 +10,16 @@ use App\Events\OrderPending;
 use App\Events\OrderProcessing;
 use App\Events\OrderSaved;
 use App\Events\OrderSucceeded;
+use Illuminate\Support\Facades\App;
 
 class HandleOrderSaved
 {
     public function handle(OrderSaved $event): void
     {
+        if (App::runningConsoleCommand('app:migrate')) {
+            return;
+        }
+
         if ($event->order->wasChanged('status')) {
             match ($event->order->status) {
                 OrderStatus::Cancelled => event(new OrderCancelled($event->order)),

@@ -10,7 +10,6 @@ use App\Models\Post;
 use App\Models\Topic;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
@@ -70,12 +69,11 @@ class PostImporter extends AbstractImporter
     }
 
     public function import(
-        MigrationSource $source,
         MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $connection = $source->getConnection();
+        $connection = $this->source->getConnection();
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
@@ -101,7 +99,7 @@ class PostImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importPost($sourcePost, $config->isDryRun, $result);
+                    $this->importPost($sourcePost, $config, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -133,7 +131,7 @@ class PostImporter extends AbstractImporter
         $output->newLine();
     }
 
-    protected function importPost(object $sourcePost, bool $isDryRun, MigrationResult $result): void
+    protected function importPost(object $sourcePost, MigrationConfig $config, MigrationResult $result): void
     {
         $author = $this->findOrCreateAuthor($sourcePost);
 
@@ -164,7 +162,7 @@ class PostImporter extends AbstractImporter
             'type' => PostType::Forum,
             'topic_id' => $topic->id,
             'title' => "Re: $topic->title",
-            'content' => $this->modifyContent($sourcePost->post ?? ''),
+            'content' => $this->modifyContent($sourcePost->post ?? '', $config),
             'is_published' => true,
             'is_approved' => true,
             'comments_enabled' => false,
@@ -179,7 +177,7 @@ class PostImporter extends AbstractImporter
                     : Carbon::now()),
         ]);
 
-        if (! $isDryRun) {
+        if (! $config->isDryRun) {
             $post->save();
             $this->cachePostMapping($sourcePost->pid, $post->id);
         }
@@ -219,8 +217,12 @@ class PostImporter extends AbstractImporter
         return null;
     }
 
-    protected function modifyContent(string $content): string
+    protected function modifyContent(string $content, MigrationConfig $config): string
     {
+        if (! $config->downloadMedia) {
+            return $content;
+        }
+
         $baseUrl = $this->source->getBaseUrl();
 
         if (is_null($baseUrl)) {

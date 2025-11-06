@@ -12,7 +12,6 @@ use App\Enums\SubscriptionInterval;
 use App\Models\Price;
 use App\Models\Product;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
@@ -71,12 +70,11 @@ class SubscriptionImporter extends AbstractImporter
     }
 
     public function import(
-        MigrationSource $source,
         MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $connection = $source->getConnection();
+        $connection = $this->source->getConnection();
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
@@ -101,7 +99,7 @@ class SubscriptionImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importSubscription($sourceSubscription, $config->isDryRun, $result);
+                    $this->importSubscription($sourceSubscription, $config, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -133,7 +131,7 @@ class SubscriptionImporter extends AbstractImporter
         $output->newLine();
     }
 
-    protected function importSubscription(object $sourceSubscription, bool $isDryRun, MigrationResult $result): void
+    protected function importSubscription(object $sourceSubscription, MigrationConfig $config, MigrationResult $result): void
     {
         $name = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveSubscriptionPackageName($sourceSubscription->sp_id, "Invision Subscription $sourceSubscription->sp_id")
@@ -161,16 +159,16 @@ class SubscriptionImporter extends AbstractImporter
             'tax_code' => ProductTaxCode::SoftwareSaasPersonalUse,
         ]);
 
-        if (! $isDryRun) {
+        if (! $config->isDryRun) {
             $product->save();
             $this->assignGroups($product, $sourceSubscription);
             $this->assignCategory($product);
             $this->cacheSubscriptionMapping($sourceSubscription->sp_id, $product->id);
         }
 
-        $prices = $this->createPrices($sourceSubscription, $product, $isDryRun, $result);
+        $prices = $this->createPrices($sourceSubscription, $product, $config, $result);
 
-        if (! $isDryRun) {
+        if (! $config->isDryRun) {
             /** @var Price $price */
             foreach ($prices as $price) {
                 $price->save();
@@ -202,7 +200,7 @@ class SubscriptionImporter extends AbstractImporter
         ]);
     }
 
-    protected function createPrices(object $sourceSubscription, Product $product, bool $isDryRun, MigrationResult $result): array
+    protected function createPrices(object $sourceSubscription, Product $product, MigrationConfig $config, MigrationResult $result): array
     {
         $prices = [];
 
@@ -289,7 +287,7 @@ class SubscriptionImporter extends AbstractImporter
                 'error' => $e->getMessage(),
             ]);
 
-            if (! $isDryRun) {
+            if (! $config->isDryRun) {
                 $result->incrementFailed('subscription_prices');
                 $result->recordFailed('subscription_prices', [
                     'product_id' => $product->id ?? 'N/A',

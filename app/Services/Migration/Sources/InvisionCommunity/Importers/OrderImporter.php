@@ -12,7 +12,6 @@ use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
@@ -72,12 +71,11 @@ class OrderImporter extends AbstractImporter
     }
 
     public function import(
-        MigrationSource $source,
         MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $connection = $source->getConnection();
+        $connection = $this->source->getConnection();
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
@@ -102,7 +100,7 @@ class OrderImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importOrder($sourceOrder, $config->isDryRun, $result);
+                    $this->importOrder($sourceOrder, $config, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -134,7 +132,7 @@ class OrderImporter extends AbstractImporter
         $output->newLine();
     }
 
-    protected function importOrder(object $sourceOrder, bool $isDryRun, MigrationResult $result): void
+    protected function importOrder(object $sourceOrder, MigrationConfig $config, MigrationResult $result): void
     {
         $user = $this->findUser($sourceOrder);
 
@@ -169,14 +167,14 @@ class OrderImporter extends AbstractImporter
                     : Carbon::now()),
         ]);
 
-        if (! $isDryRun) {
+        if (! $config->isDryRun) {
             $order->save();
             $this->cacheOrderMapping($sourceOrder->i_id, $order->id);
         }
 
-        $orderItems = $this->createOrderItems($sourceOrder, $order, $isDryRun, $result);
+        $orderItems = $this->createOrderItems($sourceOrder, $order, $config, $result);
 
-        if (! $isDryRun) {
+        if (! $config->isDryRun) {
             /** @var OrderItem $orderItem */
             foreach ($orderItems as $orderItem) {
                 $orderItem->save();
@@ -215,7 +213,7 @@ class OrderImporter extends AbstractImporter
         };
     }
 
-    protected function createOrderItems(object $sourceOrder, Order $order, bool $isDryRun, MigrationResult $result): array
+    protected function createOrderItems(object $sourceOrder, Order $order, MigrationConfig $config, MigrationResult $result): array
     {
         $orderItems = [];
 
@@ -256,7 +254,7 @@ class OrderImporter extends AbstractImporter
                 'error' => $e->getMessage(),
             ]);
 
-            if (! $isDryRun) {
+            if (! $config->isDryRun) {
                 $result->incrementFailed('order_items');
                 $result->recordFailed('order_items', [
                     'order_id' => $order->id ?? 'N/A',

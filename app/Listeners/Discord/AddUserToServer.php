@@ -11,6 +11,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\App;
 
 class AddUserToServer implements ShouldQueue
 {
@@ -29,6 +30,10 @@ class AddUserToServer implements ShouldQueue
      */
     public function handle(UserIntegrationCreated $event): void
     {
+        if (App::runningConsoleCommand('app:migrate')) {
+            return;
+        }
+
         if ($event->integration->provider !== 'discord') {
             return;
         }

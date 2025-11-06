@@ -7,11 +7,16 @@ namespace App\Listeners;
 use App\Events\CommentCreated;
 use App\Events\SupportTicketCommentAdded;
 use App\Models\SupportTicket;
+use Illuminate\Support\Facades\App;
 
 class HandleCommentCreated
 {
     public function handle(CommentCreated $event): void
     {
+        if (App::runningConsoleCommand('app:migrate')) {
+            return;
+        }
+
         if ($event->comment->commentable_type === SupportTicket::class) {
             /** @var SupportTicket $supportTicket */
             $supportTicket = $event->comment->commentable;

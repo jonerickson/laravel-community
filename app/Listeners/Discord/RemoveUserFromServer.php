@@ -11,6 +11,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\App;
 
 class RemoveUserFromServer implements ShouldQueue
 {
@@ -29,6 +30,10 @@ class RemoveUserFromServer implements ShouldQueue
      */
     public function handle(UserIntegrationDeleted $event): void
     {
+        if (App::runningConsoleCommand('app:migrate')) {
+            return;
+        }
+
         if ($event->integration->provider !== 'discord') {
             return;
         }

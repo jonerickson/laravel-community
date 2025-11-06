@@ -53,7 +53,7 @@ class ResetCommand extends Command
 {
     use ConfirmableTrait;
 
-    protected $signature = 'mi:reset
+    protected $signature = 'app:reset
         {--force : Force the operation to run when in production}
         {--all : Delete all data without prompting}
         {--announcements : Delete announcements}

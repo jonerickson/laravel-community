@@ -9,7 +9,6 @@ use App\Models\Forum;
 use App\Models\Topic;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
@@ -68,12 +67,11 @@ class TopicImporter extends AbstractImporter
     }
 
     public function import(
-        MigrationSource $source,
         MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $connection = $source->getConnection();
+        $connection = $this->source->getConnection();
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
@@ -98,7 +96,7 @@ class TopicImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importTopic($sourceTopic, $config->isDryRun, $result);
+                    $this->importTopic($sourceTopic, $config, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -132,7 +130,7 @@ class TopicImporter extends AbstractImporter
         $output->newLine();
     }
 
-    protected function importTopic(object $sourceTopic, bool $isDryRun, MigrationResult $result): void
+    protected function importTopic(object $sourceTopic, MigrationConfig $config, MigrationResult $result): void
     {
         $title = $sourceTopic->title;
 
@@ -183,7 +181,7 @@ class TopicImporter extends AbstractImporter
                 : Carbon::now(),
         ]);
 
-        if (! $isDryRun) {
+        if (! $config->isDryRun) {
             $topic->save();
             $this->cacheTopicMapping($sourceTopic->tid, $topic->id);
         }

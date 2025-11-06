@@ -21,7 +21,6 @@ interface EntityImporter
     public function getDependencies(): array;
 
     public function import(
-        MigrationSource $source,
         MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,

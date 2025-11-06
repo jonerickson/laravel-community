@@ -6,11 +6,16 @@ namespace App\Listeners;
 
 use App\Events\TopicCreated;
 use App\Models\User;
+use Illuminate\Support\Facades\App;
 
 class AutoFollowCreatedTopic
 {
     public function handle(TopicCreated $event): void
     {
+        if (App::runningConsoleCommand('app:migrate')) {
+            return;
+        }
+
         $topic = $event->topic;
         $user = User::find($topic->created_by);
 

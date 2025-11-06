@@ -103,7 +103,7 @@ class ConcurrentMigrationManager
         $command = [
             PHP_BINARY,
             'artisan',
-            'mi:migrate',
+            'app:migrate',
             $source->getName(),
             '--entity='.$this->config->entity,
             '--offset='.$offset,

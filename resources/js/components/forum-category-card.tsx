@@ -25,10 +25,10 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
                             <Link href={route('forums.categories.show', { category: category.slug })}>
                                 <Heading title={category.name} description={category.description || undefined} />
                                 <div className="-mt-4">
-                                    {category.image && (
+                                    {category.featuredImageUrl && (
                                         <div className="pb-4">
                                             <img
-                                                src={category.image.url}
+                                                src={category.featuredImageUrl}
                                                 alt={`${category.name} category image`}
                                                 className="h-48 w-full rounded-lg object-cover"
                                             />

@@ -11,6 +11,7 @@ use App\Managers\PaymentManager;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\App;
 
 class SyncProductWithPaymentProvider implements ShouldQueue
 {
@@ -25,6 +26,10 @@ class SyncProductWithPaymentProvider implements ShouldQueue
 
     public function handle(ProductCreated|ProductUpdated|ProductDeleted $event): void
     {
+        if (App::runningConsoleCommand('app:migrate')) {
+            return;
+        }
+
         match (true) {
             $event instanceof ProductCreated => $this->handleProductCreated($event),
             $event instanceof ProductUpdated => $this->handleProductUpdated($event),

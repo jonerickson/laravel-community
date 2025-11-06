@@ -7,11 +7,16 @@ namespace App\Listeners;
 use App\Events\FingerprintCreated;
 use App\Events\FingerprintUpdated;
 use App\Jobs\CheckFingerprintForFraud;
+use Illuminate\Support\Facades\App;
 
 class CheckFingerprintForFraudListener
 {
     public function handle(FingerprintCreated|FingerprintUpdated $event): void
     {
+        if (App::runningConsoleCommand('app:migrate')) {
+            return;
+        }
+
         $shouldDispatch = ! $event->fingerprint->is_banned
             && filled($event->fingerprint->request_id)
             && (blank($event->fingerprint->last_checked_at)

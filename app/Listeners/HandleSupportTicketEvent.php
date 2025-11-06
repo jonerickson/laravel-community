@@ -15,6 +15,7 @@ use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
 
 class HandleSupportTicketEvent implements ShouldQueue
@@ -24,6 +25,10 @@ class HandleSupportTicketEvent implements ShouldQueue
 
     public function handle(SupportTicketCreated|SupportTicketCommentAdded|SupportTicketStatusChanged|SupportTicketUpdated $event): void
     {
+        if (App::runningConsoleCommand('app:migrate')) {
+            return;
+        }
+
         match ($event::class) {
             SupportTicketCreated::class => $this->sendMail(
                 mailable: new SupportTicketCreatedMail($event->supportTicket),

@@ -27,7 +27,7 @@ class MigrateCommand extends Command
 {
     use ConfirmableTrait;
 
-    protected $signature = 'mi:migrate
+    protected $signature = 'app:migrate
                             {source? : The migration source (e.g., invision-community)}
                             {--force : Force the operation to run when in production}
                             {--entity= : Specific entity to migrate (e.g., users, posts)}
@@ -40,6 +40,7 @@ class MigrateCommand extends Command
                             {--status : Display migration status with record counts for each entity}
                             {--cleanup=1 : Cleanup the migration after it has finished}
                             {--ssh : Connect to the source database via SSH tunnel}
+                            {--media=1 : Download and store media files}
                             {--base-url= : Base URL of the source site for downloading files/images}
                             {--parallel : Enable concurrent processing with multiple processes}
                             {--max-records-per-process=1000 : Maximum records each process should handle before terminating}
@@ -719,6 +720,7 @@ class MigrateCommand extends Command
             userId: $this->option('id') ? (int) $this->option('id') : null,
             isDryRun: (bool) $this->option('dry-run'),
             useSsh: (bool) $this->option('ssh'),
+            downloadMedia: (bool) $this->option('media'),
             baseUrl: $this->option('base-url'),
             parallel: (bool) $this->option('parallel'),
             maxRecordsPerProcess: (int) $this->option('max-records-per-process'),

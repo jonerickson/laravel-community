@@ -187,7 +187,6 @@ class MigrationService
         $output->writeln("<info>Migrating $entity...</info>");
 
         $importer->import(
-            source: $source,
             config: $this->config,
             result: $result,
             output: $output,

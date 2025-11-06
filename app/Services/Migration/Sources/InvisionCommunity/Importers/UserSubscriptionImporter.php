@@ -15,7 +15,6 @@ use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
@@ -70,12 +69,11 @@ class UserSubscriptionImporter extends AbstractImporter
     }
 
     public function import(
-        MigrationSource $source,
         MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $connection = $source->getConnection();
+        $connection = $this->source->getConnection();
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
@@ -102,7 +100,7 @@ class UserSubscriptionImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importUserSubscription($sourceUserSubscription, $config->isDryRun, $result);
+                    $this->importUserSubscription($sourceUserSubscription, $config, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -134,7 +132,7 @@ class UserSubscriptionImporter extends AbstractImporter
         $output->newLine();
     }
 
-    protected function importUserSubscription(object $sourceUserSubscription, bool $isDryRun, MigrationResult $result): void
+    protected function importUserSubscription(object $sourceUserSubscription, MigrationConfig $config, MigrationResult $result): void
     {
         $user = $this->findUser($sourceUserSubscription);
 
@@ -148,7 +146,7 @@ class UserSubscriptionImporter extends AbstractImporter
             return;
         }
 
-        $this->setStripeCustomerId($user, $sourceUserSubscription->sub_member_id, $isDryRun);
+        $this->setStripeCustomerId($user, $sourceUserSubscription->sub_member_id, $config);
 
         $orderId = OrderImporter::getOrderMapping((int) $sourceUserSubscription->sub_invoice_id);
 
@@ -217,7 +215,7 @@ class UserSubscriptionImporter extends AbstractImporter
             return;
         }
 
-        if (! $isDryRun) {
+        if (! $config->isDryRun) {
             $backdateStartDate = isset($sourceUserSubscription->sub_start) ? Carbon::parse($sourceUserSubscription->sub_start) : null;
             $billingCycleAnchor = isset($sourceUserSubscription->sub_expires) ? Carbon::parse($sourceUserSubscription->sub_expires) : null;
 
@@ -259,7 +257,7 @@ class UserSubscriptionImporter extends AbstractImporter
         return null;
     }
 
-    protected function setStripeCustomerId(User $user, int $memberId, bool $isDryRun): void
+    protected function setStripeCustomerId(User $user, int $memberId, MigrationConfig $config): void
     {
         if ($user->hasStripeId()) {
             return;
@@ -270,7 +268,7 @@ class UserSubscriptionImporter extends AbstractImporter
             ->where('member_id', $memberId)
             ->value('stripe_id');
 
-        if ($stripeId && ! $isDryRun) {
+        if ($stripeId && ! $config->isDryRun) {
             $user->updateQuietly([
                 'stripe_id' => $stripeId,
             ]);

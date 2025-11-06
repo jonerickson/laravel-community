@@ -9,6 +9,7 @@ use App\Events\BlacklistMatch;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\App;
 use Throwable;
 
 class IssueBlacklistWarning implements ShouldQueue
@@ -21,6 +22,10 @@ class IssueBlacklistWarning implements ShouldQueue
      */
     public function handle(BlacklistMatch $event): void
     {
+        if (App::runningConsoleCommand('app:migrate')) {
+            return;
+        }
+
         if (blank($event->user) || blank($event->blacklist->warning)) {
             return;
         }

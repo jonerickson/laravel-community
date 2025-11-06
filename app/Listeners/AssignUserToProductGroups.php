@@ -9,6 +9,7 @@ use App\Events\SubscriptionCreated;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\App;
 
 class AssignUserToProductGroups implements ShouldQueue
 {
@@ -17,6 +18,10 @@ class AssignUserToProductGroups implements ShouldQueue
 
     public function handle(SubscriptionCreated|OrderSucceeded $event): void
     {
+        if (App::runningConsoleCommand('app:migrate')) {
+            return;
+        }
+
         $user = $event instanceof SubscriptionCreated ? $event->user : $event->order->user;
 
         if (! $user) {

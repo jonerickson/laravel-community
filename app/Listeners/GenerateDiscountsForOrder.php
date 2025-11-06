@@ -12,6 +12,7 @@ use App\Models\Discount;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
 
 class GenerateDiscountsForOrder implements ShouldQueue
@@ -21,6 +22,10 @@ class GenerateDiscountsForOrder implements ShouldQueue
 
     public function handle(OrderSucceeded $event): void
     {
+        if (App::runningConsoleCommand('app:migrate')) {
+            return;
+        }
+
         $order = $event->order;
 
         $orderItems = $order->items()

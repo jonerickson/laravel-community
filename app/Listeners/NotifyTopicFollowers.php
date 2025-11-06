@@ -6,12 +6,17 @@ namespace App\Listeners;
 
 use App\Events\PostCreated;
 use App\Notifications\Forums\NewContentNotification;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Notification;
 
 class NotifyTopicFollowers
 {
     public function handle(PostCreated $event): void
     {
+        if (App::runningConsoleCommand('app:migrate')) {
+            return;
+        }
+
         $post = $event->post;
         $topic = $post->topic;
 

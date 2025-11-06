@@ -138,8 +138,9 @@ declare namespace App.Data {
         color: string;
         order: number;
         isActive: boolean;
+        featuredImage: string | null;
+        featuredImageUrl: string | null;
         forums: Array<App.Data.ForumData> | null;
-        image: App.Data.ImageData | null;
         createdAt: string | null;
         updatedAt: string | null;
     };

@@ -10,11 +10,10 @@ use Laravel\Cashier\Subscription as BaseSubscription;
  * @property int $id
  * @property int $user_id
  * @property string $type
- * @property string|null $stripe_id
- * @property string|null $stripe_status
+ * @property string $stripe_id
+ * @property string $stripe_status
  * @property string|null $stripe_price
  * @property int|null $quantity
- * @property int $does_not_expire
  * @property \Illuminate\Support\Carbon|null $trial_ends_at
  * @property \Illuminate\Support\Carbon|null $ends_at
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -41,7 +40,6 @@ use Laravel\Cashier\Subscription as BaseSubscription;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription recurring()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereDoesNotExpire($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereEndsAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereQuantity($value)

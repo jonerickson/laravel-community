@@ -14,6 +14,7 @@ use App\Mail\Payments\RefundCreated as RefundCreatedMail;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
 
 class HandlePaymentProcessorEvent implements ShouldQueue
@@ -23,6 +24,10 @@ class HandlePaymentProcessorEvent implements ShouldQueue
 
     public function handle(PaymentSucceeded|PaymentActionRequired|RefundCreated $event): void
     {
+        if (App::runningConsoleCommand('app:migrate')) {
+            return;
+        }
+
         match ($event::class) {
             PaymentSucceeded::class => $this->handlePaymentSucceeded($event),
             PaymentActionRequired::class => $this->handlePaymentActionRequired($event),

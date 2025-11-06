@@ -31,7 +31,6 @@ class CategoryController extends Controller
         $categories = ForumCategory::query()
             ->active()
             ->ordered()
-            ->with('image')
             ->with(['forums' => function (HasMany|Forum $query): void {
                 $query
                     ->whereNull('parent_id')

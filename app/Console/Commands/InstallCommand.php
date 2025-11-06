@@ -21,7 +21,7 @@ class InstallCommand extends Command
 {
     use ConfirmableTrait;
 
-    protected $signature = 'mi:install
+    protected $signature = 'app:install
                             {--name= : The super admin\'s name}
                             {--email= : The super admin\'s email}
                             {--password= : The super admin\'s password}

@@ -6,11 +6,16 @@ namespace App\Listeners;
 
 use App\Events\SupportTicketStatusChanged;
 use App\Events\SupportTicketUpdated;
+use Illuminate\Support\Facades\App;
 
 class HandleSupportTicketUpdated
 {
     public function handle(SupportTicketUpdated $event): void
     {
+        if (App::runningConsoleCommand('app:migrate')) {
+            return;
+        }
+
         if ($event->supportTicket->wasChanged('status')) {
             event(new SupportTicketStatusChanged(
                 supportTicket: $event->supportTicket,

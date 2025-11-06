@@ -12,12 +12,17 @@ use App\Mail\Orders\OrderCancelled as OrderCancelledMail;
 use App\Mail\Orders\OrderProcessing as OrderProcessingMail;
 use App\Mail\Orders\OrderSucceeded as OrderSucceededMail;
 use Illuminate\Contracts\Mail\Mailable;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
 
 class HandleOrderEvent
 {
     public function handle(OrderCancelled|OrderPending|OrderProcessing|OrderSucceeded $event): void
     {
+        if (App::runningConsoleCommand('app:migrate')) {
+            return;
+        }
+
         match ($event::class) {
             OrderCancelled::class => $this->sendMail(
                 new OrderCancelledMail($event->order),

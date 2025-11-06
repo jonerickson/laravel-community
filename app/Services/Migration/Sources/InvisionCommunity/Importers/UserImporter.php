@@ -6,7 +6,6 @@ namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
@@ -51,12 +50,11 @@ class UserImporter extends AbstractImporter
     }
 
     public function import(
-        MigrationSource $source,
         MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $connection = $source->getConnection();
+        $connection = $this->source->getConnection();
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
@@ -88,7 +86,7 @@ class UserImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importUser($sourceUser, $config->isDryRun, $result, $output);
+                    $this->importUser($sourceUser, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
 
@@ -126,7 +124,7 @@ class UserImporter extends AbstractImporter
 
         if (! $config->isDryRun) {
             $output->writeln('Syncing billing addresses...');
-            $this->syncBillingAddresses($source, $config, $output);
+            $this->syncBillingAddresses($config, $output);
             $output->writeln('Billing addresses synced.');
             $output->newLine();
         }
@@ -147,7 +145,7 @@ class UserImporter extends AbstractImporter
         Cache::tags(self::CACHE_TAG)->flush();
     }
 
-    protected function importUser(object $sourceUser, bool $isDryRun, MigrationResult $result, OutputStyle $output): void
+    protected function importUser(object $sourceUser, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $email = $sourceUser->email;
 
@@ -180,7 +178,7 @@ class UserImporter extends AbstractImporter
             'created_at' => Carbon::createFromTimestamp($sourceUser->joined),
         ]);
 
-        if (! $isDryRun) {
+        if (! $config->isDryRun) {
             $user->save();
             $this->assignGroups($user, $sourceUser);
             $this->cacheUserMapping($sourceUser->member_id, $user->id);
@@ -247,9 +245,9 @@ class UserImporter extends AbstractImporter
         Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.$sourceUserId, $targetUserId, 60 * 60 * 24 * 7);
     }
 
-    protected function syncBillingAddresses(MigrationSource $source, MigrationConfig $config, OutputStyle $output): void
+    protected function syncBillingAddresses(MigrationConfig $config, OutputStyle $output): void
     {
-        $connection = $source->getConnection();
+        $connection = $this->source->getConnection();
 
         $addresses = DB::connection($connection)
             ->table('nexus_customer_addresses')

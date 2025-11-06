@@ -7,7 +7,6 @@ namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 use App\Models\Forum;
 use App\Models\ForumCategory;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunitySource;
@@ -69,14 +68,13 @@ class ForumImporter extends AbstractImporter
     }
 
     public function import(
-        MigrationSource $source,
         MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $this->importCategories($source, $config, $result, $output);
+        $this->importCategories($config, $result, $output);
 
-        $connection = $source->getConnection();
+        $connection = $this->source->getConnection();
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
@@ -105,7 +103,7 @@ class ForumImporter extends AbstractImporter
                 $sourceForumsData[] = $sourceForum;
 
                 try {
-                    $this->importForum($sourceForum, $config->isDryRun, $result);
+                    $this->importForum($sourceForum, $config, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -138,16 +136,15 @@ class ForumImporter extends AbstractImporter
         $output->writeln("Migrated $processed forums...");
         $output->newLine();
 
-        $this->updateForumParentRelationships($sourceForumsData, $config->isDryRun, $output, $result);
+        $this->updateForumParentRelationships($sourceForumsData, $config, $output);
     }
 
     protected function importCategories(
-        MigrationSource $source,
         MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $connection = $source->getConnection();
+        $connection = $this->source->getConnection();
 
         $baseQuery = DB::connection($connection)
             ->table('forums_forums')
@@ -173,7 +170,7 @@ class ForumImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importCategory($sourceCategory, $config->isDryRun, $result);
+                    $this->importCategory($sourceCategory, $config, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed('forum_categories');
                     $result->recordFailed('forum_categories', [
@@ -207,7 +204,7 @@ class ForumImporter extends AbstractImporter
         $output->newLine();
     }
 
-    protected function importCategory(object $sourceCategory, bool $isDryRun, MigrationResult $result): void
+    protected function importCategory(object $sourceCategory, MigrationConfig $config, MigrationResult $result): void
     {
         $name = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveForumName($sourceCategory->id, "Invision Forum Category $sourceCategory->id")
@@ -232,10 +229,23 @@ class ForumImporter extends AbstractImporter
             'is_active' => true,
         ]);
 
-        if (! $isDryRun) {
+        if (! $config->isDryRun) {
             $category->save();
             $category->groups()->sync([GroupImporter::getDefaultMemberGroup(), GroupImporter::getDefaultGuestGroup()]);
             $this->cacheCategoryMapping($sourceCategory->id, $category->id);
+
+            if (($imagePath = $sourceCategory->card_image) && ($baseUrl = $this->source->getBaseUrl()) && $config->downloadMedia) {
+                $filePath = $this->downloadAndStoreFile(
+                    baseUrl: $baseUrl.'/uploads',
+                    sourcePath: $imagePath,
+                    storagePath: 'forums/categories',
+                );
+
+                if (! is_null($filePath)) {
+                    $category->featured_image = $filePath;
+                    $category->save();
+                }
+            }
         }
 
         $result->incrementMigrated('forum_categories');
@@ -247,7 +257,7 @@ class ForumImporter extends AbstractImporter
         ]);
     }
 
-    protected function importForum(object $sourceForum, bool $isDryRun, MigrationResult $result): void
+    protected function importForum(object $sourceForum, MigrationConfig $config, MigrationResult $result): void
     {
         $name = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveForumName($sourceForum->id, "Invision Forum $sourceForum->id")
@@ -273,7 +283,7 @@ class ForumImporter extends AbstractImporter
             'is_active' => true,
         ]);
 
-        if (! $isDryRun) {
+        if (! $config->isDryRun) {
             $forum->save();
             $forum->groups()->sync([GroupImporter::getDefaultMemberGroup(), GroupImporter::getDefaultGuestGroup()]);
             $this->cacheForumMapping($sourceForum->id, $forum->id);
@@ -288,7 +298,7 @@ class ForumImporter extends AbstractImporter
         ]);
     }
 
-    protected function updateForumParentRelationships(array $sourceForumsData, bool $isDryRun, OutputStyle $output, MigrationResult $result): void
+    protected function updateForumParentRelationships(array $sourceForumsData, MigrationConfig $config, OutputStyle $output): void
     {
         $output->writeln('Updating forum parent relationships...');
 
@@ -308,7 +318,7 @@ class ForumImporter extends AbstractImporter
                 $parentCategoryId = static::getCategoryMapping((int) $sourceForum->parent_id);
 
                 if ($parentCategoryId !== null && $parentCategoryId !== 0) {
-                    if (! $isDryRun) {
+                    if (! $config->isDryRun) {
                         Forum::query()
                             ->where('id', $mappedForumId)
                             ->update(['category_id' => $parentCategoryId]);
@@ -316,7 +326,7 @@ class ForumImporter extends AbstractImporter
                 } else {
                     $parentForumId = static::getForumMapping((int) $sourceForum->parent_id);
 
-                    if ($parentForumId !== null && $parentForumId !== 0 && ! $isDryRun) {
+                    if ($parentForumId !== null && $parentForumId !== 0 && ! $config->isDryRun) {
                         Forum::query()
                             ->where('id', $mappedForumId)
                             ->update(['parent_id' => $parentForumId]);

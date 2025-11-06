@@ -10,6 +10,7 @@ use App\Models\OrderItem;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
 
 class CalculateOrderCommissions implements ShouldQueue
@@ -19,6 +20,10 @@ class CalculateOrderCommissions implements ShouldQueue
 
     public function handle(OrderSucceeded $event): void
     {
+        if (App::runningConsoleCommand('app:migrate')) {
+            return;
+        }
+
         $order = $event->order;
         $sellerItems = [];
 

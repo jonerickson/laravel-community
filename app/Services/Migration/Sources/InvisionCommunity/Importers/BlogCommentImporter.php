@@ -8,7 +8,6 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
@@ -67,12 +66,11 @@ class BlogCommentImporter extends AbstractImporter
     }
 
     public function import(
-        MigrationSource $source,
         MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $connection = $source->getConnection();
+        $connection = $this->source->getConnection();
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
@@ -98,7 +96,7 @@ class BlogCommentImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importComment($sourceComment, $config->isDryRun, $result);
+                    $this->importComment($sourceComment, $config, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -132,7 +130,7 @@ class BlogCommentImporter extends AbstractImporter
         $output->newLine();
     }
 
-    protected function importComment(object $sourceComment, bool $isDryRun, MigrationResult $result): void
+    protected function importComment(object $sourceComment, MigrationConfig $config, MigrationResult $result): void
     {
         $blogPostId = BlogImporter::getBlogMapping($sourceComment->comment_entry_id);
 
@@ -174,7 +172,7 @@ class BlogCommentImporter extends AbstractImporter
                 : Carbon::createFromTimestamp($sourceComment->comment_date),
         ]);
 
-        if (! $isDryRun) {
+        if (! $config->isDryRun) {
             $comment->save();
             $this->cacheCommentMapping($sourceComment->comment_id, $comment->id);
         }

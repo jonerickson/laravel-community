@@ -11,6 +11,7 @@ use App\Notifications\Reports\NewReportCreatedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Notification;
 
 class SendAdminNotification implements ShouldQueue
@@ -20,6 +21,10 @@ class SendAdminNotification implements ShouldQueue
 
     public function handle(ReportCreated $event): void
     {
+        if (App::runningConsoleCommand('app:migrate')) {
+            return;
+        }
+
         $admins = User::query()
             ->role(Role::Administrator)
             ->get();

@@ -6,7 +6,6 @@ namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Models\Group;
 use App\Services\Migration\AbstractImporter;
-use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunitySource;
@@ -57,12 +56,11 @@ class GroupImporter extends AbstractImporter
     }
 
     public function import(
-        MigrationSource $source,
         MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $connection = $source->getConnection();
+        $connection = $this->source->getConnection();
 
         $baseQuery = DB::connection($connection)
             ->table($this->getSourceTable())
@@ -86,7 +84,7 @@ class GroupImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importGroup($sourceGroup, $config->isDryRun, $result);
+                    $this->importGroup($sourceGroup, $config, $result);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -135,7 +133,7 @@ class GroupImporter extends AbstractImporter
         Cache::tags(self::CACHE_TAG)->flush();
     }
 
-    protected function importGroup(object $sourceGroup, bool $isDryRun, MigrationResult $result): void
+    protected function importGroup(object $sourceGroup, MigrationConfig $config, MigrationResult $result): void
     {
         $name = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveGroupName($sourceGroup->g_id, "Invision Group $sourceGroup->g_id")
@@ -165,7 +163,7 @@ class GroupImporter extends AbstractImporter
             'is_default_member' => false,
         ]);
 
-        if (! $isDryRun) {
+        if (! $config->isDryRun) {
             $group->save();
             $this->cacheGroupMapping($sourceGroup->g_id, $group->id);
         }

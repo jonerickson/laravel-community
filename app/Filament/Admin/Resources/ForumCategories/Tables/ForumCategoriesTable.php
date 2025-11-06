@@ -22,7 +22,7 @@ class ForumCategoriesTable
     {
         return $table
             ->columns([
-                ImageColumn::make('image.path')
+                ImageColumn::make('featured_image')
                     ->grow(false)
                     ->alignCenter()
                     ->label('')
