@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
+import { Link } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface RecentViewersProps {
@@ -17,7 +18,11 @@ export default function RecentViewers({ viewers }: RecentViewersProps) {
                 <CardTitle className="flex items-center gap-2 text-base">Recently viewed</CardTitle>
                 <div className="mt-4 flex flex-wrap gap-2">
                     {viewers.map((viewer) => (
-                        <div key={viewer.user.id} className="flex items-center gap-2 rounded-md bg-muted/50 p-2 text-sm">
+                        <Link
+                            href={route('users.show', viewer.user.id)}
+                            key={viewer.user.id}
+                            className="flex items-center gap-2 rounded-md bg-muted/50 p-2 text-sm"
+                        >
                             <Avatar className="h-6 w-6">
                                 {viewer.user.avatarUrl && <AvatarImage src={viewer.user.avatarUrl} alt={viewer.user.name} />}
                                 <AvatarFallback className="text-xs">{viewer.user.name.charAt(0).toUpperCase()}</AvatarFallback>
@@ -28,7 +33,7 @@ export default function RecentViewers({ viewers }: RecentViewersProps) {
                                     {formatDistanceToNow(new Date(viewer.viewedAt), { addSuffix: true })}
                                 </span>
                             </div>
-                        </div>
+                        </Link>
                     ))}
                 </div>
                 {viewers.length > 8 && (

@@ -1,8 +1,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Link } from '@inertiajs/react';
 
 export default function ForumUserInfo({ user, isAuthor = false }: { user: App.Data.UserData; isAuthor?: boolean }) {
     return (
-        <div className="flex flex-row items-center gap-4 md:flex-col md:gap-2 md:px-8">
+        <Link href={route('users.show', user.id)} className="flex flex-row items-center gap-4 md:flex-col md:gap-2 md:px-8">
             <Avatar className="size-12">
                 {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name} />}
                 <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
@@ -29,6 +30,6 @@ export default function ForumUserInfo({ user, isAuthor = false }: { user: App.Da
                     </ul>
                 )}
             </div>
-        </div>
+        </Link>
     );
 }
