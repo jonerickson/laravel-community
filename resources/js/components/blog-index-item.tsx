@@ -21,9 +21,9 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
     });
 
     return (
-        <div className="flex flex-col items-start">
+        <div className="flex flex-col items-start space-y-4">
             <Link href={route('blog.show', { post: post.slug })} className="group">
-                <article className="flex flex-col">
+                <article className="flex flex-col space-y-6">
                     <div className="relative w-full overflow-hidden rounded-2xl">
                         {post.featuredImageUrl ? (
                             <img
@@ -38,12 +38,12 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                         )}
                         <div className="absolute inset-0 rounded-2xl ring-1 ring-ring/20 ring-inset" />
                     </div>
-                    <div className="mt-4 flex max-w-xl grow flex-col justify-between">
+                    <div className="flex max-w-xl grow flex-col justify-between space-y-2">
                         <div className="flex flex-row gap-2">
                             {post.isFeatured && <Badge variant="secondary">Featured</Badge>}
                             {auth && auth.user && !post.isReadByUser && <Badge variant="default">New</Badge>}
                         </div>
-                        <div className="mt-2 flex items-center gap-x-4 text-xs">
+                        <div className="flex items-center gap-x-4 text-xs">
                             <time dateTime={post.publishedAt || post.createdAt || undefined} className="text-muted-foreground">
                                 {formattedDate}
                             </time>
@@ -71,15 +71,13 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                                 </div>
                             )}
                         </div>
-                        <div className="group relative mt-2 grow">
+                        <div className="group relative grow">
                             <HeadingSmall title={post.title} description={post.excerpt || truncate(stripCharacters(post.content))} />
                         </div>
                     </div>
                 </article>
             </Link>
-            <div className="flex items-center gap-2 py-1.5 pt-4 text-left text-sm">
-                {post.author && <UserInfo user={post.author} showEmail={false} />}
-            </div>
+            <div className="flex items-center text-left text-sm">{post.author && <UserInfo user={post.author} showEmail={false} />}</div>
         </div>
     );
 }
