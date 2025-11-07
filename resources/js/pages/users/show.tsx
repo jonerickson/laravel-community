@@ -88,14 +88,25 @@ export default function Show({ user }: UserProfilePageProps) {
                     </Card>
                 )}
 
-                <Card>
-                    <CardHeader>
-                        <Heading title="Profile information" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-sm text-muted-foreground">No content at this time.</div>
-                    </CardContent>
-                </Card>
+                {user.fields && user.fields.length > 0 && (
+                    <Card>
+                        <CardHeader>
+                            <Heading title="Profile information" />
+                        </CardHeader>
+                        <CardContent>
+                            <dl className="grid grid-cols-1 gap-4">
+                                {user.fields.map((field) => (
+                                    <div key={field.id}>
+                                        <dt className="text-sm font-medium text-muted-foreground">{field.label}</dt>
+                                        <dd className="mt-1 text-sm">
+                                            {field.value || <span className="text-muted-foreground italic">Not specified</span>}
+                                        </dd>
+                                    </div>
+                                ))}
+                            </dl>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
         </AppLayout>
     );

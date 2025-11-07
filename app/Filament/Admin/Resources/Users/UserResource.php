@@ -8,6 +8,7 @@ use App\Filament\Admin\Resources\Users\Actions\ChangePasswordAction;
 use App\Filament\Admin\Resources\Users\Pages\CreateUser;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Filament\Admin\Resources\Users\Pages\ListUsers;
+use App\Filament\Admin\Resources\Users\RelationManagers\FieldsRelationManager;
 use App\Filament\Admin\Resources\Users\RelationManagers\FingerprintsRelationManager;
 use App\Filament\Admin\Resources\Users\RelationManagers\IntegrationsRelationManager;
 use App\Filament\Admin\Resources\Users\RelationManagers\OrdersRelationManager;
@@ -460,6 +461,7 @@ class UserResource extends Resource
     {
         return [
             FingerprintsRelationManager::make(),
+            FieldsRelationManager::make(),
         ];
     }
 

@@ -1,4 +1,4 @@
-import { CustomField, CustomFieldStep } from '@/components/onboarding/steps/custom-field-step';
+import { CustomFieldStep } from '@/components/onboarding/steps/custom-field-step';
 import { EmailConfirmationStep } from '@/components/onboarding/steps/email-confirmation-step';
 import { DiscordIcon, IntegrationStep, RobloxIcon } from '@/components/onboarding/steps/integration-step';
 import { RegistrationStep } from '@/components/onboarding/steps/registration-step';
@@ -9,7 +9,7 @@ import { Head, router, useForm } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 type OnboardingProps = {
-    customFields?: CustomField[];
+    customFields?: App.Data.FieldData[];
     initialStep?: number;
     isAuthenticated: boolean;
     integrations: {

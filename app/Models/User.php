@@ -36,6 +36,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
@@ -92,6 +93,8 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read Collection<int, \Laravel\Passport\Client> $clients
  * @property-read int|null $clients_count
  * @property-read SubscriptionData|null $current_subscription
+ * @property-read Collection<int, Field> $fields
+ * @property-read int|null $fields_count
  * @property-read Collection<int, Fingerprint> $fingerprints
  * @property-read int|null $fingerprints_count
  * @property-read UserGroup|null $pivot
@@ -286,6 +289,14 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     public function integrations(): HasMany
     {
         return $this->hasMany(UserIntegration::class);
+    }
+
+    public function fields(): BelongsToMany
+    {
+        return $this->belongsToMany(Field::class, 'users_fields')
+            ->withPivot('value')
+            ->withTimestamps()
+            ->orderBy('order');
     }
 
     public function payouts(): HasMany

@@ -111,6 +111,18 @@ declare namespace App.Data {
         productName: string | null;
         createdAt: string;
     };
+    export type FieldData = {
+        id: number;
+        name: string;
+        label: string;
+        type: App.Enums.FieldType;
+        description: string | null;
+        options: Array<any> | null;
+        isRequired: boolean;
+        isPublic: boolean;
+        order: number;
+        value: string | null;
+    };
     export type FileData = {
         id: string;
         name: string;
@@ -525,6 +537,7 @@ declare namespace App.Data {
         signature: string | null;
         emailVerifiedAt: string | null;
         groups: Array<App.Data.GroupData>;
+        fields: Array<App.Data.FieldData>;
         warningPoints: number;
         activeConsequenceType: App.Enums.WarningConsequenceType | null;
         hasPassword: boolean;
@@ -547,6 +560,7 @@ declare namespace App.Enums {
     export type AnnouncementType = 'info' | 'success' | 'warning' | 'error';
     export type DiscountType = 'gift_card' | 'promo_code' | 'manual';
     export type DiscountValueType = 'fixed' | 'percentage';
+    export type FieldType = 'checkbox' | 'date' | 'datetime' | 'number' | 'radio' | 'rich_text' | 'select' | 'text' | 'textarea';
     export type OrderRefundReason = 'duplicate' | 'fraudulent' | 'requested_by_customer' | 'other';
     export type OrderStatus =
         | 'pending'

@@ -30,6 +30,9 @@ class UserData extends Data
     /** @var GroupData[] */
     public array $groups;
 
+    /** @var FieldData[] */
+    public array $fields = [];
+
     public int $warningPoints = 0;
 
     public ?WarningConsequenceType $activeConsequenceType = null;

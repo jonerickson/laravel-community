@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Onboarding;
 
 use App\Http\Requests\Onboarding\OnboardingProfileRequest;
+use App\Models\Field;
 use App\Models\User;
 use App\Services\OnboardingService;
 use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProfileController
@@ -20,20 +22,19 @@ class ProfileController
 
     public function __invoke(OnboardingProfileRequest $request): Response
     {
-        $request->except(['_token']);
-
         $this->user->forceFill([
             'onboarded_at' => now(),
         ]);
 
-        // TODO: Finish custom fields
-        //        foreach ($customData as $key => $value) {
-        //            if (in_array($key, ['bio', 'role'])) {
-        //                $this->user->forceFill([
-        //                    $key => $value,
-        //                ]);
-        //            }
-        //        }
+        $sync = Collection::make($request->validated())->mapWithKeys(function ($value, $key): array {
+            $field = Field::where('name', $key)->first();
+
+            return [$field->id => [
+                'value' => $value,
+            ]];
+        })->toArray();
+
+        $this->user->fields()->sync($sync);
 
         $this->onboardingService->advanceToStep(4);
 

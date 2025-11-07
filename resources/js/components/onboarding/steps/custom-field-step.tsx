@@ -7,18 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
-export type CustomField = {
-    name: string;
-    label: string;
-    type: 'text' | 'email' | 'number' | 'textarea' | 'select';
-    placeholder?: string;
-    required?: boolean;
-    options?: { value: string; label: string }[];
-    description?: string;
-};
-
 type CustomFieldStepProps = {
-    fields: CustomField[];
+    fields: App.Data.FieldData[];
     data: Record<string, string>;
     errors: Record<string, string>;
     processing: boolean;
@@ -30,10 +20,10 @@ type CustomFieldStepProps = {
 };
 
 export function CustomFieldStep({ fields, data, errors, processing, onChange, onNext, onPrevious, title, description }: CustomFieldStepProps) {
-    const renderField = (field: CustomField) => {
+    const renderField = (field: App.Data.FieldData) => {
         const commonProps = {
             id: field.name,
-            required: field.required,
+            required: field.isRequired,
             disabled: processing,
             value: data[field.name] || '',
         };
@@ -43,7 +33,7 @@ export function CustomFieldStep({ fields, data, errors, processing, onChange, on
                 return (
                     <Textarea
                         {...commonProps}
-                        placeholder={field.placeholder}
+                        placeholder={field.description || ''}
                         onChange={(e) => onChange(field.name, e.target.value)}
                         className="min-h-[120px] resize-none bg-background"
                         rows={5}
@@ -54,7 +44,7 @@ export function CustomFieldStep({ fields, data, errors, processing, onChange, on
                 return (
                     <Select value={data[field.name] || ''} onValueChange={(value) => onChange(field.name, value)} disabled={processing}>
                         <SelectTrigger className="bg-background">
-                            <SelectValue placeholder={field.placeholder || 'Select an option'} />
+                            <SelectValue placeholder={field.description || 'Select an option'} />
                         </SelectTrigger>
                         <SelectContent>
                             {field.options?.map((option) => (
@@ -71,7 +61,7 @@ export function CustomFieldStep({ fields, data, errors, processing, onChange, on
                     <Input
                         {...commonProps}
                         type={field.type}
-                        placeholder={field.placeholder}
+                        placeholder={field.description || ''}
                         onChange={(e) => onChange(field.name, e.target.value)}
                         className="bg-background"
                     />
@@ -93,9 +83,8 @@ export function CustomFieldStep({ fields, data, errors, processing, onChange, on
                     <div key={field.name} className="grid gap-2">
                         <Label htmlFor={field.name}>
                             {field.label}
-                            {field.required && <span className="text-destructive">*</span>}
+                            {field.isRequired && <span className="text-destructive">*</span>}
                         </Label>
-                        {field.description && <p className="text-xs text-muted-foreground">{field.description}</p>}
                         {renderField(field)}
                         <InputError message={errors[field.name]} />
                     </div>

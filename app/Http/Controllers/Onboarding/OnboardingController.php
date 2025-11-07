@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Onboarding;
 
+use App\Data\FieldData;
 use App\Data\ProductData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Onboarding\OnboardingUpdateRequest;
 use App\Managers\PaymentManager;
+use App\Models\Field;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
@@ -36,28 +38,7 @@ class OnboardingController extends Controller
                 ->with('message', 'Your account has already been successfully onboarded.');
         }
 
-        $customFields = [
-            [
-                'name' => 'bio',
-                'label' => 'Tell us about yourself',
-                'type' => 'textarea',
-                'placeholder' => 'Share a bit about yourself...',
-                'required' => false,
-                'description' => 'This will appear on your profile',
-            ],
-            [
-                'name' => 'role',
-                'label' => 'What brings you here?',
-                'type' => 'select',
-                'required' => true,
-                'options' => [
-                    ['value' => 'developer', 'label' => 'Developer'],
-                    ['value' => 'creator', 'label' => 'Content Creator'],
-                    ['value' => 'player', 'label' => 'Player'],
-                    ['value' => 'other', 'label' => 'Other'],
-                ],
-            ],
-        ];
+        $customFields = FieldData::collect(Field::query()->get());
 
         $initialStep = $this->onboardingService->determineInitialStep($this->user);
 

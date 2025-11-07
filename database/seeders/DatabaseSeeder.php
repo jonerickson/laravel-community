@@ -59,6 +59,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             BlogSeeder::class,
+            FieldSeeder::class,
             ProductSeeder::class,
             ForumSeeder::class,
             PolicySeeder::class,
