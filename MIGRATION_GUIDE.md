@@ -1,11 +1,20 @@
 # Migration System Guide
 
-This guide explains how to use the migration system to import data from external sources.
+This guide explains how to use the migration system to import data from external sources into Mountain Interactive.
 
 ## Overview
 
-The migration system supports importing data from multiple sources, with built-in support for:
-- Invision Community
+The migration system is a sophisticated, extensible data migration framework with built-in support for:
+- **Invision Community** - Complete suite migration including forums, blogs, commerce, and users
+
+Key features:
+- Parallel processing with concurrent workers
+- Automatic dependency resolution
+- SSH tunnel support for secure remote connections
+- Media file downloading and processing
+- Comprehensive error handling and progress tracking
+- Dry run mode for testing
+- Cache-based ID mapping for relationship preservation
 
 The system is designed to be extensible, allowing you to add new sources and entity importers as needed.
 
@@ -13,52 +22,170 @@ The system is designed to be extensible, allowing you to add new sources and ent
 
 ### Invision Community
 
-Add the following environment variables to your `.env` file:
+#### Database Connection
+
+Add a database connection in `config/database.php`:
+
+```php
+'invision_community' => [
+    'driver' => 'mysql',
+    'host' => env('IC_DB_HOST', '127.0.0.1'),
+    'port' => env('IC_DB_PORT', 3306),
+    'database' => env('IC_DB_DATABASE'),
+    'username' => env('IC_DB_USERNAME'),
+    'password' => env('IC_DB_PASSWORD'),
+    'charset' => 'utf8mb4',
+    'collation' => 'utf8mb4_unicode_ci',
+],
+```
+
+Add the corresponding environment variables to your `.env` file:
 
 ```env
-# Invision Community Migration Configuration
-MIGRATION_IC_DRIVER=mysql          # Database driver (mysql or pgsql)
-MIGRATION_IC_HOST=127.0.0.1       # Database host
-MIGRATION_IC_PORT=3306            # Database port
-MIGRATION_IC_DATABASE=invision    # Database name
-MIGRATION_IC_USERNAME=root        # Database username
-MIGRATION_IC_PASSWORD=            # Database password
-MIGRATION_IC_PREFIX=              # Table prefix (if any)
-MIGRATION_IC_CHARSET=utf8mb4      # Character set
+# Invision Community Database
+IC_DB_HOST=127.0.0.1
+IC_DB_PORT=3306
+IC_DB_DATABASE=invision
+IC_DB_USERNAME=root
+IC_DB_PASSWORD=
 ```
+
+#### SSH Tunnel (Optional)
+
+For secure remote database access, configure SSH tunneling in `config/migration.php`:
+
+```php
+'sources' => [
+    'invision_community' => [
+        'base_url' => env('IC_BASE_URL'),
+        'ssh' => [
+            'host' => env('IC_SSH_HOST'),      // SSH server address
+            'user' => env('IC_SSH_USER'),      // SSH username
+            'port' => env('IC_SSH_PORT', 22),  // SSH port
+            'key' => env('IC_SSH_KEY'),        // Path to private key
+        ],
+    ],
+],
+```
+
+Add these environment variables:
+
+```env
+# SSH Tunnel Configuration
+IC_SSH_HOST=your-server.com
+IC_SSH_USER=your-username
+IC_SSH_PORT=22
+IC_SSH_KEY=/path/to/private/key
+
+# Base URL for Media Downloads
+IC_BASE_URL=https://community.example.com
+```
+
+#### Media Downloads
+
+To download and migrate media files (images, attachments), set the base URL:
+
+```env
+IC_BASE_URL=https://community.example.com
+```
+
+This is required for:
+- Blog cover photos
+- Forum attachments
+- Product featured images
+- Product category images
+- Forum category icons
 
 ## Usage
 
-### Basic Migration
+### Basic Commands
+
+#### Basic Migration
 
 Migrate all entities from a source:
 
 ```bash
-php artisan mi:migrate invision-community
+php artisan app:migrate invision-community
 ```
 
-### Migrate Specific Entity
+#### Migrate Specific Entity
 
 Migrate only users:
 
 ```bash
-php artisan mi:migrate invision-community --entity=users
+php artisan app:migrate invision-community --entity=users
 ```
 
-### Dry Run
+#### Dry Run
 
 Preview what would be migrated without making changes:
 
 ```bash
-php artisan mi:migrate invision-community --dry-run
+php artisan app:migrate invision-community --dry-run
 ```
 
-### Custom Batch Size
+#### Custom Batch Size
 
-Process records in batches of 50:
+Process records in batches of 500:
 
 ```bash
-php artisan mi:migrate invision-community --batch-size=50
+php artisan app:migrate invision-community --batch=500
+```
+
+#### Limit and Offset
+
+Migrate a specific range of records:
+
+```bash
+php artisan app:migrate invision-community --entity=posts --limit=10000 --offset=5000
+```
+
+#### Filter by User ID
+
+Migrate data for a specific user:
+
+```bash
+php artisan app:migrate invision-community --entity=orders --id=12345
+```
+
+### Advanced Options
+
+#### Parallel Processing
+
+Enable concurrent worker processes for faster migrations:
+
+```bash
+php artisan app:migrate invision-community --entity=posts --parallel
+```
+
+Configure parallelization:
+
+```bash
+php artisan app:migrate invision-community \
+    --entity=posts \
+    --parallel \
+    --max-processes=8 \
+    --max-records-per-process=2000
+```
+
+Options:
+- `--max-processes`: Maximum concurrent workers (default: 4)
+- `--max-records-per-process`: Records per worker (default: 1000)
+
+#### SSH Tunnel
+
+Use SSH tunnel for remote database access:
+
+```bash
+php artisan app:migrate invision-community --ssh
+```
+
+#### Disable Media Downloads
+
+Skip downloading media files:
+
+```bash
+php artisan app:migrate invision-community --no-download-media
 ```
 
 ### Interactive Mode
@@ -66,41 +193,153 @@ php artisan mi:migrate invision-community --batch-size=50
 If you don't specify a source, you'll be prompted to select one:
 
 ```bash
-php artisan mi:migrate
+php artisan app:migrate
 ```
-
-## Supported Entities
-
-### Invision Community
-
-- **groups** - Migrates user groups, including:
-  - Group name
-  - Description
-  - Color (extracted from group prefix)
-  - Automatically maps source group IDs to target group IDs for user assignment
-
-- **users** - Migrates user accounts, including:
-  - Name
-  - Email
-  - Email verification status
-  - Signature
-  - Last seen timestamp
-  - Account creation date
-  - Password (replaced with random hash for security)
-  - Primary group (member_group_id)
-  - Secondary groups (mgroup_others)
 
 ## Architecture
 
-The migration system consists of several components:
+The migration system consists of several components working together to provide a robust, scalable migration framework:
 
 ### Core Components
 
-- `MigrationService` - Orchestrates the migration process and dependency resolution
-- `MigrationResult` - Tracks migration statistics
-- `MigrationSource` - Interface for migration sources
-- `EntityImporter` - Interface for entity importers
-- `ImporterDependency` - Defines dependencies between entities
+#### **MigrationService**
+Central orchestrator that manages migration sources and coordinates import operations.
+
+**Responsibilities:**
+- Register and manage migration sources
+- Configure migration parameters
+- Execute migrations with automatic dependency resolution
+- Handle optional dependency prompts
+- Prepare environment (disable query logs, configure logging)
+
+**Key Methods:**
+- `registerSource()` - Register a new migration source
+- `configure()` - Set migration configuration
+- `migrate()` - Execute migration with dependency resolution
+- `getOptionalDependencies()` - Retrieve optional dependencies for user selection
+
+---
+
+#### **ConcurrentMigrationManager**
+Advanced parallel processing manager for high-performance migrations.
+
+**Features:**
+- Spawn multiple worker processes simultaneously
+- Real-time output streaming from workers
+- Color-coded console output per worker
+- Automatic process monitoring and failure detection
+- Memory limit enforcement per worker
+- Graceful termination handling
+
+**Configuration:**
+- `maxProcesses` - Maximum concurrent workers (default: 4)
+- `maxRecordsPerProcess` - Records per worker (default: 1000)
+- `workerMemoryLimit` - Memory limit per worker (optional)
+
+**Worker Management:**
+- Spawns: `php artisan app:migrate [source] --entity=X --offset=Y --limit=Z --worker`
+- Monitors exit codes (137 = out of memory)
+- Tracks completed, failed, and active chunks
+- Streams stdout/stderr in real-time
+
+---
+
+#### **MigrationConfig**
+Configuration value object for migration operations.
+
+**Available Options:**
+- `entity` - Specific entity to migrate
+- `batchSize` - Records per batch (default: 1000)
+- `limit` - Total records limit
+- `offset` - Starting offset
+- `userId` - Filter by user ID
+- `isDryRun` - Preview mode (default: false)
+- `useSsh` - Use SSH tunnel (default: false)
+- `downloadMedia` - Download media files (default: true)
+- `baseUrl` - Source base URL for media
+- `parallel` - Enable parallel processing (default: false)
+- `maxRecordsPerProcess` - Records per worker (default: 1000)
+- `maxProcesses` - Concurrent workers (default: 4)
+- `memoryLimit` - Worker memory limit
+
+---
+
+#### **MigrationResult**
+Tracks migration statistics and stores detailed records using cache.
+
+**Features:**
+- Migrated, skipped, and failed counts per entity
+- Detailed records stored in cache with tags
+- 7-day TTL for cached records
+- Table-formatted output support
+
+**Methods:**
+- `addEntity()` - Add entity statistics
+- `recordMigrated/Skipped/Failed()` - Store detailed records in cache
+- `toTableRows()` - Generate summary table
+
+---
+
+#### **ImporterDependency**
+Defines relationships between importers with type safety.
+
+**Dependency Types:**
+- **Pre-dependencies**: Must run before the importer
+- **Post-dependencies**: Must run after the importer
+- **Required**: Mandatory for operation
+- **Optional**: User can choose to include
+
+**Factory Methods:**
+```php
+ImporterDependency::requiredPre('users', 'Description')
+ImporterDependency::optionalPre('groups', 'Description')
+ImporterDependency::requiredPost('orders', 'Description')
+ImporterDependency::optionalPost('subscriptions', 'Description')
+```
+
+---
+
+#### **AbstractImporter**
+Base class providing shared functionality for all importers.
+
+**Features:**
+- Media download and processing
+- HTML image parsing and URL replacement
+- File extension detection
+- Random filename generation
+- Error logging with stack traces
+- Cache management (7-day TTL)
+
+**Key Methods:**
+- `downloadAndStoreFile()` - Download and store remote files
+- `parseAndReplaceImagesInHtml()` - Parse HTML, download images, replace URLs
+
+---
+
+### Contracts (Interfaces)
+
+#### **MigrationSource Contract**
+```php
+public function getName(): string;
+public function getConnection(): string;
+public function getImporters(): array;
+public function getImporter(string $entity): ?EntityImporter;
+public function getSshConfig(): ?array;
+public function getBaseUrl(): ?string;
+public function setBaseUrl(?string $url): void;
+public function cleanup(): void;
+```
+
+#### **EntityImporter Contract**
+```php
+public function getEntityName(): string;
+public function getSourceTable(): string;
+public function getDependencies(): array;
+public function import(MigrationConfig $config, MigrationResult $result, OutputStyle $output): void;
+public function isCompleted(): bool;
+public function markCompleted(): void;
+public function cleanup(): void;
+```
 
 ### Dependency System
 
@@ -142,19 +381,97 @@ public function getDependencies(): array
 
 ## Migration Behavior
 
-- **Dependency Resolution** - Required dependencies are automatically migrated in the correct order
+### Dependency Management
+- **Automatic Dependency Resolution** - Required dependencies are automatically migrated in the correct order
 - **Optional Dependencies** - User is prompted to select which optional dependencies to include
-- **Duplicate Detection** - Records are checked to prevent duplicates (users by email, groups by name)
+- **Dependency Graph Execution** - Complex dependency chains are resolved automatically
+
+### Data Processing
+- **Batch Processing** - Records processed in configurable batches (default: 1000)
+- **Offset & Limit Support** - Resume migrations or migrate specific ranges
+- **User Filtering** - Filter migrations by specific user ID
+- **Duplicate Detection** - Records checked to prevent duplicates (users by email, groups by name, etc.)
 - **Skipped Records** - Existing records are skipped and counted
-- **Failed Records** - Errors are caught and counted without stopping the migration
-- **Progress Tracking** - A progress bar shows real-time migration progress
-- **Dry Run Mode** - Test migrations without modifying the database
-- **ID Mapping** - Source IDs are mapped to target IDs using cache for relationship preservation
+- **Failed Records** - Errors caught and counted without stopping the migration
 
-## Notes
+### Progress & Feedback
+- **Progress Tracking** - Real-time progress bar with percentage and ETA
+- **Verbose Logging** - Detailed logging with `-vvv` flag
+- **Statistics Summary** - Table-formatted summary showing migrated/skipped/failed counts
+- **Worker Output** - Color-coded output when using parallel processing
 
-- Passwords from external sources are replaced with random hashes for security
-- Users will need to use password reset to set a new password
-- HTML content is stripped from signatures
-- Email verification status is preserved when possible
-- All timestamps are converted to Carbon instances
+### Special Modes
+- **Dry Run Mode** - Preview what would be migrated without making changes
+  - Skips database writes
+  - Skips file downloads
+  - Shows detailed statistics
+  - Does not mark entities as completed
+- **Parallel Processing** - Spawns multiple workers for faster migrations
+  - Configurable worker count
+  - Automatic load distribution
+  - Memory limit enforcement
+  - Real-time output streaming
+
+### Cache Management
+- **ID Mapping** - Source IDs mapped to target IDs using cache for relationship preservation
+- **7-Day TTL** - All ID mappings cached for 7 days
+- **Cache Tags** - Organized by source and entity for easy cleanup
+- **Completion Tracking** - Entity completion status stored in cache
+
+### Media Processing
+- **Configurable Downloads** - Enable/disable media downloads per migration
+- **Base URL Validation** - Requires valid base URL for media downloads
+- **Random Filenames** - 40-character random names prevent collisions
+- **Extension Detection** - Automatic file extension detection from MIME type
+- **HTML Image Parsing** - Downloads embedded images and updates URLs
+- **Error Handling** - Continues on failed downloads with logging
+
+### Completion Behavior
+- **Completion Tracking** - Entities marked completed after full migration
+- **Partial Migrations** - Using limit/offset prevents completion marking (enables resumable migrations)
+- **Worker Mode** - Worker processes never mark entities completed
+
+## Important Notes
+
+### Security
+- **Password Migration** - Passwords replaced with random hashes for security
+- **Password Reset Required** - Users must use password reset to set new password
+- **SSH Tunnel Support** - Secure remote database access via SSH tunneling
+
+### Data Handling
+- **HTML Content** - HTML preserved in content fields, stripped from signatures
+- **Email Verification** - Email verification status preserved when possible (from bit flags)
+- **Timestamps** - All timestamps converted to Carbon instances
+- **Language Resolution** - Invision Community language keys resolved automatically (cached 1 hour)
+- **Hierarchical Data** - Two-phase imports handle parent relationships correctly
+- **Default Values** - Falls back to admin user when author not found
+
+### Performance
+- **Query Log Disabled** - Query logging disabled during migration for performance
+- **Batch Processing** - Prevents memory exhaustion on large datasets
+- **Parallel Workers** - Up to 8+ concurrent workers supported
+- **Memory Limits** - Worker memory limits prevent OOM crashes
+
+### Caching
+- **Cache Duration** - All migration caches last 7 days
+- **ID Mappings** - Essential for preserving relationships across migrations
+- **Language Cache** - Language translations cached for 1 hour
+- **Cleanup** - Use `cleanup()` methods to clear caches
+
+### Media Files
+- **Storage Location** - All files stored in `storage/app/public/`
+- **Public Visibility** - Downloaded files have public visibility
+- **Subdirectories** - Organized by entity type (post-images/, products/featured-images/, etc.)
+- **Fallback Handling** - Migration continues if media download fails
+
+### Error Handling
+- **Record-Level Errors** - Individual record failures don't stop batch
+- **Detailed Logging** - Full stack traces logged with file/line numbers
+- **Exit Codes** - Worker exit code 137 indicates out of memory
+- **Graceful Failures** - System recovers and continues processing
+
+### Limitations
+- **Completion Tracking** - Entities not marked completed when using limit/offset
+- **Worker Mode** - Must be spawned by ConcurrentMigrationManager
+- **SSH Requirements** - SSH key-based authentication only (no password auth)
+- **Database Support** - MySQL and PostgreSQL supported
