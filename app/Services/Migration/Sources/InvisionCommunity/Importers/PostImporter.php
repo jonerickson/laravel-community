@@ -235,7 +235,7 @@ class PostImporter extends AbstractImporter
             $filePath = $this->downloadAndStoreFile(
                 baseUrl: $baseUrl.'/uploads',
                 sourcePath: $cleanSrc,
-                storagePath: 'post-images',
+                storagePath: 'forums/posts',
             );
 
             if (! is_null($filePath)) {

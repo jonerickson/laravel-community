@@ -189,7 +189,7 @@ class BlogImporter extends AbstractImporter
                 $filePath = $this->downloadAndStoreFile(
                     baseUrl: $baseUrl.'/uploads',
                     sourcePath: $imagePath,
-                    storagePath: 'post-images',
+                    storagePath: 'blog',
                 );
 
                 if (! is_null($filePath)) {

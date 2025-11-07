@@ -109,7 +109,7 @@ class PostResource extends Resource
                             ->schema([
                                 FileUpload::make('featured_image')
                                     ->label('Featured Image')
-                                    ->directory('post-images')
+                                    ->directory('blog')
                                     ->visibility('public')
                                     ->downloadable()
                                     ->previewable()

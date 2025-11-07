@@ -238,7 +238,7 @@ class ProductImporter extends AbstractImporter
                 $filePath = $this->downloadAndStoreFile(
                     baseUrl: $baseUrl.'/uploads',
                     sourcePath: $imagePath,
-                    storagePath: 'product-categories/featured-images',
+                    storagePath: 'products/categories',
                 );
 
                 if (! is_null($filePath)) {
@@ -340,7 +340,7 @@ class ProductImporter extends AbstractImporter
                 $filePath = $this->downloadAndStoreFile(
                     baseUrl: $baseUrl.'/uploads',
                     sourcePath: $imagePath,
-                    storagePath: 'products/featured-images',
+                    storagePath: 'products',
                 );
 
                 if (! is_null($filePath)) {

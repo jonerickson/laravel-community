@@ -84,7 +84,7 @@ class ProductCategoryResource extends Resource
                                 FileUpload::make('featured_image')
                                     ->label('Featured Image')
                                     ->helperText('Add a category image to be displayed on the store index.')
-                                    ->directory('product-category-images')
+                                    ->directory('products/categories')
                                     ->visibility('public')
                                     ->downloadable()
                                     ->previewable()

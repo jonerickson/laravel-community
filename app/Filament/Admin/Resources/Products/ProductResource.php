@@ -113,7 +113,7 @@ class ProductResource extends Resource
                                 FileUpload::make('featured_image')
                                     ->label('Featured Image')
                                     ->helperText('The main product image.')
-                                    ->directory('products/featured-images')
+                                    ->directory('products')
                                     ->visibility('public')
                                     ->downloadable()
                                     ->previewable()
@@ -146,6 +146,8 @@ class ProductResource extends Resource
                                             ->maxLength(65535)
                                             ->nullable(),
                                         FileUpload::make('path')
+                                            ->directory('files')
+                                            ->downloadable()
                                             ->required()
                                             ->visibility('private')
                                             ->hiddenLabel(),

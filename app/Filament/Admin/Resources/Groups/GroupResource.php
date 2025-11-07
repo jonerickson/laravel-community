@@ -65,7 +65,7 @@ class GroupResource extends Resource
                                     ->required(),
                                 FileUpload::make('image')
                                     ->nullable()
-                                    ->directory('groups/images')
+                                    ->directory('groups')
                                     ->visibility('public')
                                     ->image()
                                     ->imageEditor()
