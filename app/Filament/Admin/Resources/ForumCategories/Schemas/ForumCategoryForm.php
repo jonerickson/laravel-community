@@ -61,7 +61,6 @@ class ForumCategoryForm
                                 FileUpload::make('featured_image')
                                     ->label('Featured Image')
                                     ->helperText('Add a category image to be displayed on the forum index.')
-                                    ->disk('public')
                                     ->directory('product-category-images')
                                     ->visibility('public')
                                     ->downloadable()

@@ -23,7 +23,7 @@ class AttachmentController extends Controller
 
         /** @var UploadedFile $file */
         $file = $request->validated('attachment');
-        $path = $file->store('support-attachments');
+        $path = $file->store('support');
 
         $ticket->files()->create([
             'name' => $file->getClientOriginalName(),

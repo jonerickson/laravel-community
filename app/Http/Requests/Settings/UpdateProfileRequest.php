@@ -30,6 +30,7 @@ class UpdateProfileRequest extends FormRequest
         ]);
     }
 
+    #[Override]
     public function attributes(): array
     {
         $fields = Field::query()->get()->mapWithKeys(fn (Field $field): array => ["fields.$field->id" => Str::lower($field->label)])->toArray();

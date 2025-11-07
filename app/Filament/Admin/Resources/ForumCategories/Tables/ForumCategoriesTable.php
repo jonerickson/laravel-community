@@ -26,7 +26,6 @@ class ForumCategoriesTable
                     ->grow(false)
                     ->alignCenter()
                     ->label('')
-                    ->disk('public')
                     ->imageSize(60)
                     ->square(),
                 TextColumn::make('name')

@@ -239,7 +239,7 @@ class PostImporter extends AbstractImporter
             );
 
             if (! is_null($filePath)) {
-                return Storage::disk('public')->url($filePath);
+                return Storage::url($filePath);
             }
 
             return $imgSrc;

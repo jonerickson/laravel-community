@@ -21,7 +21,7 @@ trait HasAvatar
     public function avatarUrl(): Attribute
     {
         return Attribute::make(
-            get: fn ($value, $attributes): ?string => isset($attributes['avatar']) ? Storage::disk('public')->url($attributes['avatar']) : null,
+            get: fn ($value, $attributes): ?string => isset($attributes['avatar']) ? Storage::url($attributes['avatar']) : null,
         )->shouldCache();
     }
 

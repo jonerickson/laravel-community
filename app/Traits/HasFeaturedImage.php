@@ -18,7 +18,7 @@ trait HasFeaturedImage
     {
         return Attribute::make(
             get: fn (): ?string => $this->hasFeaturedImage()
-                ? Storage::disk('public')->url($this->featured_image)
+                ? Storage::url($this->featured_image)
                 : null,
         )->shouldCache();
     }

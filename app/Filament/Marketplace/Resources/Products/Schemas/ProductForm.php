@@ -33,7 +33,6 @@ class ProductForm
                     ->required()
                     ->columnSpanFull(),
                 FileUpload::make('featured_image')
-                    ->disk('public')
                     ->directory('products/featured-images')
                     ->visibility('public')
                     ->helperText('The main product image.')

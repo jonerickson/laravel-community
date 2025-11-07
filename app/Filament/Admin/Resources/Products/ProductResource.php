@@ -113,7 +113,6 @@ class ProductResource extends Resource
                                 FileUpload::make('featured_image')
                                     ->label('Featured Image')
                                     ->helperText('The main product image.')
-                                    ->disk('public')
                                     ->directory('products/featured-images')
                                     ->visibility('public')
                                     ->downloadable()
@@ -247,7 +246,6 @@ class ProductResource extends Resource
                     ->grow(false)
                     ->alignCenter()
                     ->label('')
-                    ->disk('public')
                     ->imageSize(60)
                     ->square(),
                 TextColumn::make('name')

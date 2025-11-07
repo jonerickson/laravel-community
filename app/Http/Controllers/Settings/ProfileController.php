@@ -57,7 +57,7 @@ class ProfileController extends Controller
         ];
 
         if ($request->hasFile('avatar')) {
-            $path = $request->file('avatar')->store('avatars', 'public');
+            $path = $request->file('avatar')->storePublicly('avatars');
             $data['avatar'] = $path;
         }
 

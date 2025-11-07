@@ -57,7 +57,7 @@ abstract class AbstractImporter implements EntityImporter
         return $newHtml;
     }
 
-    protected function downloadAndStoreFile(string $baseUrl, string $sourcePath, string $storagePath, ?string $disk = 'public'): ?string
+    protected function downloadAndStoreFile(string $baseUrl, string $sourcePath, string $storagePath): ?string
     {
         try {
             $sourcePath = ltrim(rtrim($sourcePath, '/'), '/');
@@ -67,7 +67,7 @@ abstract class AbstractImporter implements EntityImporter
 
             $name = Str::random(40);
             $fullStoragePath = "$storagePath/$name.$extension";
-            $result = Storage::disk($disk)->put($fullStoragePath, $blob, 'public');
+            $result = Storage::put($fullStoragePath, $blob, 'public');
 
             if ($result) {
                 return $fullStoragePath;

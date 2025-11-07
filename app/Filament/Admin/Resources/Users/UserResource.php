@@ -120,7 +120,6 @@ class UserResource extends Resource
                                                                 ])
                                                                 ->imageCropAspectRatio('1:1')
                                                                 ->visibility('public')
-                                                                ->disk('public')
                                                                 ->directory('avatars')
                                                                 ->openable()
                                                                 ->downloadable(),

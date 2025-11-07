@@ -37,8 +37,7 @@ class ProductInfolist
                     ->columnSpan(2)
                     ->schema([
                         ImageEntry::make('featured_image')
-                            ->label('Featured Image')
-                            ->disk('public'),
+                            ->label('Featured Image'),
                     ]),
             ]);
     }

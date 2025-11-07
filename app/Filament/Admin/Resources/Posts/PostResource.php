@@ -109,7 +109,6 @@ class PostResource extends Resource
                             ->schema([
                                 FileUpload::make('featured_image')
                                     ->label('Featured Image')
-                                    ->disk('public')
                                     ->directory('post-images')
                                     ->visibility('public')
                                     ->downloadable()
@@ -186,7 +185,6 @@ class PostResource extends Resource
                     ->grow(false)
                     ->alignCenter()
                     ->label('')
-                    ->disk('public')
                     ->imageSize(60)
                     ->square(),
                 TextColumn::make('title')

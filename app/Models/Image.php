@@ -56,7 +56,7 @@ class Image extends Model
     public function url(): Attribute
     {
         return Attribute::get(fn (): ?string => $this->path
-            ? Storage::disk('public')->url($this->path)
+            ? Storage::url($this->path)
             : null
         )->shouldCache();
     }
