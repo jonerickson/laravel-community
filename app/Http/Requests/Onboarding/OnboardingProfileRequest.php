@@ -17,6 +17,6 @@ class OnboardingProfileRequest extends FormRequest
 
     public function rules(): array
     {
-        return Field::query()->get()->mapWithKeys(fn(Field $field): array => [$field->name => $field->type->getRules($field)])->toArray();
+        return Field::query()->get()->mapWithKeys(fn (Field $field): array => [$field->name => $field->type->getRules($field)])->toArray();
     }
 }

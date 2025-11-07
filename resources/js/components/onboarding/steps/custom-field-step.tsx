@@ -1,11 +1,7 @@
 import { LoaderCircle } from 'lucide-react';
 
-import InputError from '@/components/input-error';
+import { CustomFieldInput } from '@/components/custom-field-input';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 
 type CustomFieldStepProps = {
     fields: App.Data.FieldData[];
@@ -20,55 +16,6 @@ type CustomFieldStepProps = {
 };
 
 export function CustomFieldStep({ fields, data, errors, processing, onChange, onNext, onPrevious, title, description }: CustomFieldStepProps) {
-    const renderField = (field: App.Data.FieldData) => {
-        const commonProps = {
-            id: field.name,
-            required: field.isRequired,
-            disabled: processing,
-            value: data[field.name] || '',
-        };
-
-        switch (field.type) {
-            case 'textarea':
-                return (
-                    <Textarea
-                        {...commonProps}
-                        placeholder={field.description || ''}
-                        onChange={(e) => onChange(field.name, e.target.value)}
-                        className="min-h-[120px] resize-none bg-background"
-                        rows={5}
-                    />
-                );
-
-            case 'select':
-                return (
-                    <Select value={data[field.name] || ''} onValueChange={(value) => onChange(field.name, value)} disabled={processing}>
-                        <SelectTrigger className="bg-background">
-                            <SelectValue placeholder={field.description || 'Select an option'} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {field.options?.map((option) => (
-                                <SelectItem key={option.value} value={option.value}>
-                                    {option.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                );
-
-            default:
-                return (
-                    <Input
-                        {...commonProps}
-                        type={field.type}
-                        placeholder={field.description || ''}
-                        onChange={(e) => onChange(field.name, e.target.value)}
-                        className="bg-background"
-                    />
-                );
-        }
-    };
-
     return (
         <div className="flex flex-col gap-6">
             {(title || description) && (
@@ -80,14 +27,13 @@ export function CustomFieldStep({ fields, data, errors, processing, onChange, on
 
             <div className="grid gap-6">
                 {fields.map((field) => (
-                    <div key={field.name} className="grid gap-2">
-                        <Label htmlFor={field.name}>
-                            {field.label}
-                            {field.isRequired && <span className="text-destructive">*</span>}
-                        </Label>
-                        {renderField(field)}
-                        <InputError message={errors[field.name]} />
-                    </div>
+                    <CustomFieldInput
+                        key={field.id}
+                        field={field}
+                        value={data[field.name] || ''}
+                        onChange={(value) => onChange(field.name, value)}
+                        error={errors[field.name]}
+                    />
                 ))}
             </div>
 

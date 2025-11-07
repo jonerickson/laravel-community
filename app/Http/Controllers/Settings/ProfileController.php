@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Settings;
 
+use App\Data\FieldData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\UpdateProfileRequest;
+use App\Models\Field;
 use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\Request;
@@ -24,8 +26,25 @@ class ProfileController extends Controller
 
     public function edit(Request $request): Response
     {
+        $this->user->load(['fields' => function ($query): void {
+            $query->ordered();
+        }]);
+
+        $fields = Field::query()
+            ->ordered()
+            ->get()
+            ->map(function (Field $field): FieldData {
+                $userField = $this->user->fields->firstWhere('id', $field->id);
+                $fieldData = FieldData::from($field);
+                $fieldData->value = $userField?->pivot->value;
+
+                return $fieldData;
+            })
+            ->toArray();
+
         return Inertia::render('settings/profile', [
             'status' => $request->session()->get('status'),
+            'fields' => $fields,
         ]);
     }
 
@@ -42,6 +61,14 @@ class ProfileController extends Controller
         }
 
         $this->user->update($data);
+
+        if ($request->has('fields')) {
+            foreach ($request->input('fields', []) as $fieldId => $value) {
+                $this->user->fields()->syncWithoutDetaching([
+                    $fieldId => ['value' => $value],
+                ]);
+            }
+        }
 
         return to_route('settings.profile.edit');
     }

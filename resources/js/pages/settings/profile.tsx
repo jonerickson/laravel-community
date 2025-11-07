@@ -3,6 +3,7 @@ import { Transition } from '@headlessui/react';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler, useRef, useState } from 'react';
 
+import { CustomFieldInput } from '@/components/custom-field-input';
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
@@ -27,24 +28,35 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+interface ProfilePageProps {
+    fields: App.Data.FieldData[];
+}
+
 type ProfileForm = {
     name: string;
     email: string;
     signature: string;
     avatar: File | null;
+    fields: Record<number, string>;
 };
 
-export default function Profile() {
+export default function Profile({ fields }: ProfilePageProps) {
     const { auth } = usePage<App.Data.SharedData>().props;
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const getInitials = useInitials();
+
+    const initialFields: Record<number, string> = {};
+    fields.forEach((field) => {
+        initialFields[field.id] = field.value || '';
+    });
 
     const { data, setData, post, errors, processing, recentlySuccessful } = useForm<ProfileForm>({
         name: auth.user?.name || '',
         email: auth.user?.email || '',
         signature: auth.user?.signature || '',
         avatar: null,
+        fields: initialFields,
     });
 
     if (!auth.user) {
@@ -140,6 +152,29 @@ export default function Profile() {
                                 This signature will appear under your posts in forums. Keep it concise and professional.
                             </p>
                         </div>
+
+                        {fields.length > 0 && (
+                            <>
+                                <div className="border-t pt-6">
+                                    <HeadingSmall title="Custom fields" description="Additional profile information" />
+                                </div>
+
+                                {fields.map((field) => (
+                                    <CustomFieldInput
+                                        key={field.id}
+                                        field={field}
+                                        value={data.fields[field.id] || ''}
+                                        onChange={(value) =>
+                                            setData('fields', {
+                                                ...data.fields,
+                                                [field.id]: value,
+                                            })
+                                        }
+                                        error={errors[`fields.${field.id}` as keyof typeof errors]}
+                                    />
+                                ))}
+                            </>
+                        )}
 
                         <div className="flex items-center gap-4">
                             <Button disabled={processing}>{processing ? 'Saving...' : 'Save profile'}</Button>
