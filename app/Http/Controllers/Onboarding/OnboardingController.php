@@ -38,7 +38,17 @@ class OnboardingController extends Controller
                 ->with('message', 'Your account has already been successfully onboarded.');
         }
 
-        $customFields = FieldData::collect(Field::query()->get());
+        $customFields = Field::query()
+            ->ordered()
+            ->get()
+            ->map(function (Field $field): FieldData {
+                $userField = $this->user->fields->firstWhere('id', $field->id);
+                $fieldData = FieldData::from($field);
+                $fieldData->value = $userField?->pivot->value;
+
+                return $fieldData;
+            })
+            ->toArray();
 
         $initialStep = $this->onboardingService->determineInitialStep($this->user);
 

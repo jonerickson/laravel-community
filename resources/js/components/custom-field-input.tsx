@@ -69,9 +69,9 @@ export function CustomFieldInput({ field, value, onChange, error }: CustomFieldI
                         </SelectTrigger>
                         <SelectContent>
                             {field.options &&
-                                Object.entries(field.options).map(([key, label]) => (
-                                    <SelectItem key={key} value={key}>
-                                        {String(label)}
+                                field.options.map((option: { value: string; label: string }) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                        {option.label}
                                     </SelectItem>
                                 ))}
                         </SelectContent>

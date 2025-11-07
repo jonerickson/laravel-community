@@ -77,7 +77,7 @@ export default function Onboarding({
         processing: profileProcessing,
         errors: profileErrors,
     } = useForm({
-        ...Object.fromEntries(customFields.map((field) => [field.name, ''])),
+        fields: Object.fromEntries(customFields.map((field) => [field.id, field.value || ''])),
     });
 
     const {
@@ -94,8 +94,8 @@ export default function Onboarding({
         setRegisterData(field as keyof OnboardingFormData, value);
     };
 
-    const updateProfileField = (field: string, value: string) => {
-        setProfileData(field, value);
+    const updateProfileField = (fieldId: number, value: string) => {
+        setProfileData(`fields.${fieldId}`, value);
     };
 
     const handleRegistration = () => {
@@ -196,7 +196,7 @@ export default function Onboarding({
                     <WizardStep title="Complete your profile" description="Tell us a bit more about yourself.">
                         <CustomFieldStep
                             fields={customFields}
-                            data={profileData}
+                            data={profileData.fields}
                             errors={profileErrors}
                             processing={profileProcessing}
                             onChange={updateProfileField}

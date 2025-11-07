@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 
 type CustomFieldStepProps = {
     fields: App.Data.FieldData[];
-    data: Record<string, string>;
+    data: Record<number, string>;
     errors: Record<string, string>;
     processing: boolean;
-    onChange: (field: string, value: string) => void;
+    onChange: (fieldId: number, value: string) => void;
     onNext: () => void;
     onPrevious: () => void;
     title?: string;
@@ -30,9 +30,9 @@ export function CustomFieldStep({ fields, data, errors, processing, onChange, on
                     <CustomFieldInput
                         key={field.id}
                         field={field}
-                        value={data[field.name] || ''}
-                        onChange={(value) => onChange(field.name, value)}
-                        error={errors[field.name]}
+                        value={data[field.id] || field.value || ''}
+                        onChange={(value) => onChange(field.id, value)}
+                        error={errors[`fields.${field.id}`]}
                     />
                 ))}
             </div>

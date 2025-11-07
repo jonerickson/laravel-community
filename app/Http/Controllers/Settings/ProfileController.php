@@ -10,6 +10,7 @@ use App\Http\Requests\Settings\UpdateProfileRequest;
 use App\Models\Field;
 use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -26,7 +27,7 @@ class ProfileController extends Controller
 
     public function edit(Request $request): Response
     {
-        $this->user->load(['fields' => function ($query): void {
+        $this->user->load(['fields' => function (BelongsToMany|Field $query): void {
             $query->ordered();
         }]);
 
@@ -63,9 +64,9 @@ class ProfileController extends Controller
         $this->user->update($data);
 
         if ($request->has('fields')) {
-            foreach ($request->input('fields', []) as $fieldId => $value) {
+            foreach ($request->validated('fields', []) as $fieldId => $value) {
                 $this->user->fields()->syncWithoutDetaching([
-                    $fieldId => ['value' => $value],
+                    (int) $fieldId => ['value' => $value],
                 ]);
             }
         }

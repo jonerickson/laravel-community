@@ -48,9 +48,11 @@ class FieldForm
                         Grid::make()
                             ->schema([
                                 Forms\Components\Toggle::make('is_required')
+                                    ->label('Required')
                                     ->default(false)
                                     ->helperText('Is this field required for users?'),
                                 Forms\Components\Toggle::make('is_public')
+                                    ->label('Public')
                                     ->default(true)
                                     ->helperText('Show this field on public profiles?'),
                             ]),

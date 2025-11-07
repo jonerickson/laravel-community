@@ -9,6 +9,7 @@ use App\Rules\BlacklistRule;
 use App\Rules\NoProfanity;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Override;
 
 class UpdateProfileRequest extends FormRequest
@@ -20,12 +21,23 @@ class UpdateProfileRequest extends FormRequest
 
     public function rules(): array
     {
-        $fields = Field::query()->get()->mapWithKeys(fn (Field $field): array => [$field->name => $field->type->getRules($field)])->toArray();
+        $fields = Field::query()->get()->mapWithKeys(fn (Field $field): array => ["fields.$field->id" => $field->type->getRules($field)])->toArray();
 
         return array_merge($fields, [
             'name' => ['required', 'string', 'max:255'],
             'signature' => ['nullable', 'string', 'max:500', new NoProfanity, new BlacklistRule],
             'avatar' => ['nullable', 'image', 'max:2048'],
+        ]);
+    }
+
+    public function attributes(): array
+    {
+        $fields = Field::query()->get()->mapWithKeys(fn (Field $field): array => ["fields.$field->id" => Str::lower($field->label)])->toArray();
+
+        return array_merge($fields, [
+            'name' => 'name',
+            'signature' => 'signature',
+            'avatar' => 'avatar',
         ]);
     }
 

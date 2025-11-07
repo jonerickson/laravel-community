@@ -8,6 +8,7 @@ use App\Enums\FieldType;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
+use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 #[TypeScript]
@@ -24,6 +25,10 @@ class FieldData extends Data
 
     public ?string $description = null;
 
+    #[LiteralTypeScriptType('Array<{ value: string; label: string }> | null')]
+    /**
+     * @var array<int, array{value: string, label: string}>|null
+     */
     public ?array $options = null;
 
     public bool $isRequired;

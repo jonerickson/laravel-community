@@ -7,6 +7,7 @@ namespace App\Http\Requests\Onboarding;
 use App\Models\Field;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class OnboardingProfileRequest extends FormRequest
 {
@@ -17,6 +18,11 @@ class OnboardingProfileRequest extends FormRequest
 
     public function rules(): array
     {
-        return Field::query()->get()->mapWithKeys(fn (Field $field): array => [$field->name => $field->type->getRules($field)])->toArray();
+        return Field::query()->get()->mapWithKeys(fn (Field $field): array => ["fields.$field->id" => $field->type->getRules($field)])->toArray();
+    }
+
+    public function attributes(): array
+    {
+        return Field::query()->get()->mapWithKeys(fn (Field $field): array => ["fields.$field->id" => Str::lower($field->label)])->toArray();
     }
 }

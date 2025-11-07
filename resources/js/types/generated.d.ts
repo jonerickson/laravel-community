@@ -117,7 +117,7 @@ declare namespace App.Data {
         label: string;
         type: App.Enums.FieldType;
         description: string | null;
-        options: Array<any> | null;
+        options: Array<{ value: string; label: string }> | null;
         isRequired: boolean;
         isPublic: boolean;
         order: number;
@@ -271,7 +271,7 @@ declare namespace App.Data {
         createdAt: string | null;
         updatedAt: string | null;
     };
-    export type PaginatedData<T = unknown> = {
+    export type PaginatedData<t = unknown> = {
         data: Array<T>;
         currentPage: number;
         lastPage: number;

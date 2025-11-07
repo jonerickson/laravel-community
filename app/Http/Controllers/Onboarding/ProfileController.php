@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Onboarding;
 
 use App\Http\Requests\Onboarding\OnboardingProfileRequest;
-use App\Models\Field;
 use App\Models\User;
 use App\Services\OnboardingService;
 use Illuminate\Container\Attributes\CurrentUser;
-use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProfileController
@@ -26,15 +24,13 @@ class ProfileController
             'onboarded_at' => now(),
         ]);
 
-        $sync = Collection::make($request->validated())->mapWithKeys(function ($value, $key): array {
-            $field = Field::where('name', $key)->first();
-
-            return [$field->id => [
-                'value' => $value,
-            ]];
-        })->toArray();
-
-        $this->user->fields()->sync($sync);
+        if ($request->has('fields')) {
+            foreach ($request->validated('fields', []) as $fieldId => $value) {
+                $this->user->fields()->syncWithoutDetaching([
+                    (int) $fieldId => ['value' => $value],
+                ]);
+            }
+        }
 
         $this->onboardingService->advanceToStep(4);
 
