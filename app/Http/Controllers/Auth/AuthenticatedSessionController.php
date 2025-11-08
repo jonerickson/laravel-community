@@ -12,8 +12,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
+use Illuminate\Support\Uri;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -37,11 +40,17 @@ class AuthenticatedSessionController extends Controller
         ]);
     }
 
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request): SymfonyResponse
     {
+        $intended = Uri::of(Redirect::getIntendedUrl() ?? '');
+
         $request->authenticate();
 
         $request->session()->regenerate();
+
+        if (! $intended->isEmpty() && Str::of($intended->path())->match('/^(admin|marketplace)\//')) {
+            return inertia()->location($intended->value());
+        }
 
         return redirect()->intended(route('dashboard', absolute: false));
     }
