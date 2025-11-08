@@ -59,6 +59,8 @@ class PaymentMethodController extends Controller
             ]);
         }
 
+        $this->user->updateDefaultPaymentMethodFromStripe();
+
         return redirect()->route('settings.payment-methods')->with([
             'message' => 'Your payment method was successfully added.',
             'messageVariant' => 'success',
@@ -80,6 +82,8 @@ class PaymentMethodController extends Controller
             ]);
         }
 
+        $this->user->updateDefaultPaymentMethodFromStripe();
+
         return back()->with([
             'message' => 'The payment method was updated successfully.',
             'messageVariant' => 'success',
@@ -99,6 +103,8 @@ class PaymentMethodController extends Controller
                 'messageVariant' => 'error',
             ]);
         }
+
+        $this->user->updateDefaultPaymentMethodFromStripe();
 
         return back()->with([
             'message' => 'The payment method was successfully removed.',

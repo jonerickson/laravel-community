@@ -23,12 +23,19 @@ class EnsureCustomerExists
      */
     public function __invoke(Order $order, Closure $next)
     {
-        if (! $this->paymentManager->getCustomer($order->user) instanceof CustomerData) {
+        if (! $customer = $this->paymentManager->getCustomer($order->user) instanceof CustomerData && ! ($customer = $this->paymentManager->searchCustomer('email', $order->user->email)) instanceof CustomerData) {
             $result = $this->paymentManager->createCustomer($order->user, true);
-
             if (! $result) {
                 throw new Exception('Failed to create Stripe customer.');
             }
+
+            return $next($order);
+        }
+
+        if ($customer->id !== $order->user_id) {
+            $order->user->update([
+                'stripe_id' => $customer->id,
+            ]);
         }
 
         return $next($order);

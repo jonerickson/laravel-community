@@ -357,6 +357,30 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
+    public function searchCustomer(string $field, string $value): ?CustomerData
+    {
+        return $this->executeWithErrorHandling('searchCustomer', function () use ($field, $value): ?CustomerData {
+            $customers = $this->stripe->customers->search([
+                'query' => "$field:\"$value\"",
+            ]);
+
+            if ($customers->isEmpty()) {
+                return null;
+            }
+
+            $customer = $customers->first();
+
+            return CustomerData::from([
+                'id' => $customer->id,
+                'email' => $customer->email,
+                'name' => $customer->name,
+                'phone' => $customer->phone,
+                'currency' => $customer->currency,
+                'metadata' => $customer->metadata->toArray(),
+            ]);
+        });
+    }
+
     public function createCustomer(User $user, bool $force = false): bool
     {
         return $this->executeWithErrorHandling('createCustomer', function () use ($user, $force): bool {
@@ -415,9 +439,9 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
-    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, CarbonInterface|int|null $backdateStartDate = null, CarbonInterface|int|null $billingCycleAnchor = null, ?string $successUrl = null): bool|string|SubscriptionData
+    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete, CarbonInterface|int|null $backdateStartDate = null, CarbonInterface|int|null $billingCycleAnchor = null, ?string $successUrl = null): bool|string|SubscriptionData
     {
-        return $this->executeWithErrorHandling('startSubscription', function () use ($order, $chargeNow, $firstParty, $prorationBehavior, $backdateStartDate, $billingCycleAnchor, $successUrl): bool|string|SubscriptionData {
+        return $this->executeWithErrorHandling('startSubscription', function () use ($order, $chargeNow, $firstParty, $prorationBehavior, $paymentBehavior, $backdateStartDate, $billingCycleAnchor, $successUrl): bool|string|SubscriptionData {
             $lineItems = [];
 
             foreach ($order->items as $orderItem) {
@@ -457,6 +481,9 @@ class StripeDriver implements PaymentProcessor
                 ->when($prorationBehavior === ProrationBehavior::None, fn (SubscriptionBuilder $builder) => $builder->noProrate())
                 ->when($prorationBehavior === ProrationBehavior::AlwaysInvoice, fn (SubscriptionBuilder $builder) => $builder->alwaysInvoice())
                 ->when($prorationBehavior === ProrationBehavior::CreateProrations, fn (SubscriptionBuilder $builder) => $builder->prorate())
+                ->when($paymentBehavior === PaymentBehavior::DefaultIncomplete, fn (SubscriptionBuilder $builder) => $builder->defaultIncomplete())
+                ->when($paymentBehavior === PaymentBehavior::AllowIncomplete, fn (SubscriptionBuilder $builder) => $builder->allowPaymentFailures())
+                ->when($paymentBehavior === PaymentBehavior::PendingIfIncomplete, fn (SubscriptionBuilder $builder) => $builder->pendingIfPaymentFails())
                 ->withMetadata($metadata)
                 ->when(! $chargeNow, fn (SubscriptionBuilder $builder) => $builder->createAndSendInvoice())
                 ->when(! $firstParty, fn (SubscriptionBuilder $builder) => $builder->create(subscriptionOptions: [

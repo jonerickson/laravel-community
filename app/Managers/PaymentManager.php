@@ -108,6 +108,11 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deletePaymentMethod($user, $paymentMethodId);
     }
 
+    public function searchCustomer(string $field, string $value): ?CustomerData
+    {
+        return $this->driver()->searchCustomer($field, $value);
+    }
+
     public function createCustomer(User $user, bool $force = false): bool
     {
         return $this->driver()->createCustomer($user, $force);
@@ -123,7 +128,7 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deleteCustomer($user);
     }
 
-    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, CarbonInterface|int|null $backdateStartDate = null, CarbonInterface|int|null $billingCycleAnchor = null, ?string $successUrl = null): bool|string|SubscriptionData
+    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete, CarbonInterface|int|null $backdateStartDate = null, CarbonInterface|int|null $billingCycleAnchor = null, ?string $successUrl = null): bool|string|SubscriptionData
     {
         return $this->driver()->startSubscription($order, $chargeNow, $firstParty, $prorationBehavior, $backdateStartDate, $billingCycleAnchor, $successUrl);
     }

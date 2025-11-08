@@ -8,6 +8,7 @@ use App\Enums\ProrationBehavior;
 use App\Managers\PaymentManager;
 use App\Models\Order;
 use App\Pipes\Stripe\EnsureCustomerExists;
+use App\Pipes\Stripe\EnsureDefaultPaymentMethod;
 use App\Pipes\Stripe\EnsurePricesExist;
 use App\Pipes\Stripe\EnsureProductsExist;
 use Carbon\CarbonInterface;
@@ -34,6 +35,7 @@ class ImportSubscription implements ShouldQueue
             $order = Pipeline::send($this->order)
                 ->through([
                     EnsureCustomerExists::class,
+                    EnsureDefaultPaymentMethod::class,
                     EnsureProductsExist::class,
                     EnsurePricesExist::class,
                 ])

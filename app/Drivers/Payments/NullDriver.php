@@ -99,6 +99,11 @@ class NullDriver implements PaymentProcessor
         return false;
     }
 
+    public function searchCustomer(string $field, string $value): ?CustomerData
+    {
+        return null;
+    }
+
     public function createCustomer(User $user, bool $force = false): bool
     {
         return false;
@@ -114,7 +119,7 @@ class NullDriver implements PaymentProcessor
         return false;
     }
 
-    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, CarbonInterface|int|null $backdateStartDate = null, CarbonInterface|int|null $billingCycleAnchor = null, ?string $successUrl = null): bool|string|SubscriptionData
+    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete, CarbonInterface|int|null $backdateStartDate = null, CarbonInterface|int|null $billingCycleAnchor = null, ?string $successUrl = null): bool|string|SubscriptionData
     {
         return false;
     }
