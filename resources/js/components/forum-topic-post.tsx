@@ -54,7 +54,7 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
             <CardContent className="px-6 py-0 md:py-6">
                 <div className="flex flex-col gap-4 md:flex-row">
                     <div
-                        className="flex min-w-0 flex-row items-start justify-between gap-2 md:flex-col md:items-center md:justify-start"
+                        className="flex min-w-0 flex-row items-start justify-between gap-2 md:w-1/4 md:flex-col md:items-center md:justify-start lg:w-1/6"
                         itemProp="author"
                         itemScope
                         itemType="https://schema.org/Person"

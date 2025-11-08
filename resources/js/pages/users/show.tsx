@@ -32,7 +32,7 @@ export default function Show({ user }: UserProfilePageProps) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${user.name} - Profile`} />
 
-            <div className="mx-auto w-full max-w-4xl space-y-6 px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto w-full max-w-4xl space-y-6">
                 <Card>
                     <CardHeader>
                         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
