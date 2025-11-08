@@ -92,7 +92,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
                 <div className="mt-6 lg:col-span-7 lg:col-start-1 lg:row-span-3 lg:row-start-1 lg:mt-0 lg:flex lg:flex-col">
                     <h2 className="sr-only">Images</h2>
 
-                    <div className="grid grid-cols-1 lg:flex-1 lg:grid-cols-2 lg:gap-8">
+                    <div className="relative grid grid-cols-1 lg:flex-1 lg:grid-cols-2 lg:gap-8">
                         {productData?.featuredImageUrl ? (
                             <img
                                 alt={productData.name}
@@ -108,7 +108,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
 
                     <div className="mt-4">
                         <div className="flex gap-2 overflow-x-auto">
-                            <div className="aspect-square h-16 w-16 flex-shrink-0 rounded border border-border">
+                            <div className="relative aspect-square h-16 w-16 flex-shrink-0 rounded border border-border">
                                 {productData?.featuredImageUrl ? (
                                     <img
                                         alt={`${productData.name} thumbnail`}

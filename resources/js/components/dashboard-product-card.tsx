@@ -48,10 +48,10 @@ export default function DashboardProductCard({ product, type, className }: Dashb
     const IconComponent = config.icon;
 
     return (
-        <Card className={cn('group relative flex h-full flex-col overflow-hidden transition-all hover:shadow-lg', className, config.borderCss)}>
+        <Card className={cn('group flex h-full flex-col overflow-hidden transition-all hover:shadow-lg', className, config.borderCss)}>
             <div className={cn('absolute inset-0 bg-gradient-to-br opacity-50', config.gradient)} />
 
-            <CardHeader className="relative pb-1">
+            <CardHeader className="pb-1">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
                         <IconComponent className={`size-3.5 ${config.titleCss}`} />
@@ -63,7 +63,7 @@ export default function DashboardProductCard({ product, type, className }: Dashb
                 </div>
             </CardHeader>
 
-            <CardContent className="relative flex-1 space-y-6">
+            <CardContent className="flex-1 space-y-6">
                 <div className="aspect-[4/3] overflow-hidden rounded-md bg-muted">
                     {product.featuredImageUrl ? (
                         <img
@@ -97,7 +97,7 @@ export default function DashboardProductCard({ product, type, className }: Dashb
                 </div>
             </CardContent>
 
-            <CardFooter className="relative pt-1">
+            <CardFooter className="pt-1">
                 <Button asChild className="w-full">
                     <Link href={route('store.products.show', { product: product.slug })}>View product</Link>
                 </Button>

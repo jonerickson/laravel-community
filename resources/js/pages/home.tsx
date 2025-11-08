@@ -360,10 +360,7 @@ function SubscriptionCards({ subscriptions }: SubscriptionCardsProps) {
                     <Card
                         gradient
                         key={subscription.id}
-                        className={cn(
-                            'relative flex flex-col justify-between bg-background sm:h-full',
-                            subscription.isFeatured && 'ring-2 ring-info',
-                        )}
+                        className={cn('flex flex-col justify-between bg-background sm:h-full', subscription.isFeatured && 'ring-2 ring-info')}
                     >
                         {subscription.isFeatured && (
                             <div className="absolute -top-4 left-1/2 z-10 -translate-x-1/2">
