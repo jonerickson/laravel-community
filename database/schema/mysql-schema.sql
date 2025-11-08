@@ -172,6 +172,24 @@ CREATE TABLE `failed_jobs` (
   UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `fields`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `fields` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `label` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text',
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `options` json DEFAULT NULL,
+  `is_required` tinyint(1) NOT NULL DEFAULT '0',
+  `is_public` tinyint(1) NOT NULL DEFAULT '1',
+  `order` int NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `files`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -269,6 +287,7 @@ CREATE TABLE `forums_categories` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `featured_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `color` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -816,7 +835,7 @@ CREATE TABLE `prices` (
   `product_id` bigint unsigned NOT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `amount` int NOT NULL,
   `currency` varchar(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'USD',
   `interval` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -1232,6 +1251,23 @@ CREATE TABLE `users` (
   KEY `users_stripe_id_index` (`stripe_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `users_fields`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users_fields` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `field_id` bigint unsigned NOT NULL,
+  `value` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_fields_user_id_field_id_unique` (`user_id`,`field_id`),
+  KEY `users_fields_field_id_foreign` (`field_id`),
+  CONSTRAINT `users_fields_field_id_foreign` FOREIGN KEY (`field_id`) REFERENCES `fields` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `users_fields_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `users_groups`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -1454,7 +1490,10 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (125,'2025_11_01_19
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (126,'2025_11_01_195116_add_parent_id_to_forums_table',46);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (127,'2025_11_03_182848_add_parent_id_to_products_categories_table',46);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (128,'2025_11_03_205054_add_featured_image_to_products_categories_table',46);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (131,'2025_09_28_202015_create_email_settings',47);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (132,'2025_09_28_202053_create_general_settings',47);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (133,'2025_11_05_005537_add_does_not_expire_to_subscriptions_table',47);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (134,'2025_11_05_200042_add_price_type_to_prices_table',47);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (135,'2025_09_28_202015_create_email_settings',48);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (136,'2025_09_28_202053_create_general_settings',48);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (137,'2025_11_06_193510_add_featured_image_to_forums_categories_table',48);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (138,'2025_11_07_013939_create_fields_table',48);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (139,'2025_11_07_013955_create_user_fields_table',48);
