@@ -20,7 +20,7 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
         <Card className="overflow-hidden py-0 transition-shadow hover:shadow-sm">
             <CardContent className="p-0">
                 <div className="flex flex-col md:flex-row">
-                    <div className="w-full border-b bg-primary/5 px-6 py-4 md:w-64 md:border-r md:border-b-0">
+                    <div className="w-full border-b bg-primary/5 px-4 py-4 sm:px-6 md:w-64 md:border-r md:border-b-0">
                         <div className="space-y-3">
                             <Link href={route('forums.categories.show', { category: category.slug })}>
                                 <Heading title={category.name} description={category.description || undefined} />
@@ -66,7 +66,7 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
                                     >
                                         <div className="flex-shrink-0">
                                             <div
-                                                className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium text-white"
+                                                className="flex size-6 items-center justify-center rounded-full text-sm font-medium text-white sm:size-8"
                                                 style={{ backgroundColor: forum.color }}
                                             >
                                                 {topic.author.name?.charAt(0).toUpperCase() || 'U'}
@@ -84,7 +84,7 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
                                                 {can('publish_posts') && topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
                                                 {can('approve_posts') && topic.hasUnapprovedContent && <ThumbsDown className="size-4 text-warning" />}
                                                 <span
-                                                    className={`truncate font-medium ${
+                                                    className={`truncate text-sm font-medium sm:text-base ${
                                                         auth && auth.user && topic.isReadByUser ? 'text-muted-foreground' : 'text-foreground'
                                                     }`}
                                                 >

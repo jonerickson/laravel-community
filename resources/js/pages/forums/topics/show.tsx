@@ -5,6 +5,7 @@ import ForumTopicPost from '@/components/forum-topic-post';
 import ForumTopicReply from '@/components/forum-topic-reply';
 import Loading from '@/components/loading';
 import RecentViewers from '@/components/recent-viewers';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import usePermissions from '@/hooks/use-permissions';
@@ -13,7 +14,7 @@ import { pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { Deferred, Head, InfiniteScroll, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
-import { AlertTriangle, ArrowDown, ArrowLeft, Clock, Eye, EyeOff, Lock, MessageSquare, Pin, Reply, ThumbsDown, User } from 'lucide-react';
+import { AlertTriangle, ArrowDown, ArrowLeft, Clock, Eye, EyeOff, MessageSquare, Reply, ThumbsDown, User } from 'lucide-react';
 import { useState } from 'react';
 import { route } from 'ziggy-js';
 
@@ -172,14 +173,16 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
             </Head>
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex flex-col items-start justify-between gap-2 sm:flex-row">
-                    <div className="flex w-full items-start justify-between md:items-center">
-                        <div className="mb-2 flex items-center gap-2">
-                            {topic.isHot && <span className="text-sm">🔥</span>}
-                            {topic.isPinned && <Pin className="size-4 text-info" />}
-                            {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
-                            {can('report_posts') && topic.hasReportedContent && <AlertTriangle className="size-4 text-destructive" />}
-                            {can('publish_posts') && topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
-                            {can('approve_posts') && topic.hasUnapprovedContent && <ThumbsDown className="size-4 text-warning" />}
+                    <div className="flex w-full items-start justify-between lg:items-center">
+                        <div className="mb-2 flex flex-col gap-2 lg:flex-row lg:items-center">
+                            <div className="flex items-center gap-2">
+                                {topic.isHot && <span className="text-sm">🔥</span>}
+                                {can('report_posts') && topic.hasReportedContent && <AlertTriangle className="size-4 text-destructive" />}
+                                {can('publish_posts') && topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
+                                {can('approve_posts') && topic.hasUnapprovedContent && <ThumbsDown className="size-4 text-warning" />}
+                                {topic.isPinned && <Badge variant="info">Pinned</Badge>}
+                                {topic.isLocked && <Badge>Locked</Badge>}
+                            </div>
                             <h1 className="text-xl font-semibold tracking-tight">{topic.title}</h1>
                         </div>
 

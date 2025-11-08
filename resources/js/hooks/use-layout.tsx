@@ -4,7 +4,7 @@ import { useCookie } from './use-cookie';
 export type LayoutType = 'sidebar' | 'header';
 
 export function useLayout() {
-    const [layout, updateLayout] = useCookie<LayoutType>('layout', 'sidebar', {
+    const [layout, updateLayout] = useCookie<LayoutType>('layout', 'header', {
         useLocalStorage: true,
     });
 
