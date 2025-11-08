@@ -35,14 +35,6 @@ class FieldResource extends Resource
         return FieldsTable::configure($table);
     }
 
-    #[Override]
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [

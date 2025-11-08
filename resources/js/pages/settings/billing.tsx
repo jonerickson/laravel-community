@@ -86,7 +86,7 @@ export default function Billing({ user }: BillingProps) {
             <Head title="Billing information" />
 
             <SettingsLayout>
-                <div className="space-y-6 md:max-w-2xl">
+                <div className="space-y-6">
                     <HeadingSmall title="Billing information" description="Update your account billing information for invoices and tax purposes" />
 
                     <form onSubmit={submit} className="space-y-6">

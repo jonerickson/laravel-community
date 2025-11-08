@@ -1,6 +1,6 @@
 import { type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler, useRef, useState } from 'react';
 
 import { CustomFieldInput } from '@/components/custom-field-input';
@@ -89,8 +89,17 @@ export default function Profile({ fields }: ProfilePageProps) {
             <Head title="Profile settings" />
 
             <SettingsLayout>
-                <div className="space-y-6 md:max-w-2xl">
-                    <HeadingSmall title="Profile information" description="Update your name and email address" />
+                <div className="space-y-6">
+                    <div className="flex items-center justify-between gap-2">
+                        <HeadingSmall title="Profile information" description="Update your name and email address" />
+                        {auth && auth.user && (
+                            <Button variant="outline" asChild>
+                                <Link target="_blank" href={route('users.show', { user: auth.user.id })}>
+                                    View profile
+                                </Link>
+                            </Button>
+                        )}
+                    </div>
 
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">
@@ -102,7 +111,7 @@ export default function Profile({ fields }: ProfilePageProps) {
                                 </Avatar>
                                 <div className="flex flex-col gap-2">
                                     <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                                        Choose Photo
+                                        Choose photo
                                     </Button>
                                     <p className="text-sm text-muted-foreground">JPG, PNG up to 2MB</p>
                                 </div>

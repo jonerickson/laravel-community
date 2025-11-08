@@ -42,9 +42,18 @@ class FieldForm
                         Forms\Components\Textarea::make('description')
                             ->rows(3)
                             ->helperText('An optional description or help text.'),
-                        Forms\Components\KeyValue::make('options')
+                        Forms\Components\Repeater::make('options')
                             ->visible(fn (Get $get): bool => $get('type') === FieldType::Select)
-                            ->helperText('Options for select fields (key => label)'),
+                            ->columns()
+                            ->addActionLabel('Add option')
+                            ->schema([
+                                Forms\Components\TextInput::make('value')
+                                    ->helperText('The internal field value.')
+                                    ->required(),
+                                Forms\Components\TextInput::make('label')
+                                    ->required()
+                                    ->helperText('The public field label.'),
+                            ]),
                         Grid::make()
                             ->schema([
                                 Forms\Components\Toggle::make('is_required')

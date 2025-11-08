@@ -4,9 +4,11 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useInitials } from '@/hooks/use-initials';
 import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { Calendar, User as UserIcon } from 'lucide-react';
+import { route } from 'ziggy-js';
 
 interface UserProfilePageProps {
     user: App.Data.UserData;
@@ -15,8 +17,19 @@ interface UserProfilePageProps {
 export default function Show({ user }: UserProfilePageProps) {
     const getInitials = useInitials();
 
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Dashboard',
+            href: route('dashboard'),
+        },
+        {
+            title: user.name,
+            href: route('users.show', { user: user.id }),
+        },
+    ];
+
     return (
-        <AppLayout>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${user.name} - Profile`} />
 
             <div className="mx-auto w-full max-w-4xl space-y-6 px-4 sm:px-6 lg:px-8">

@@ -89,7 +89,7 @@ export default function Integrations({ connectedAccounts }: ConnectedAccountsPro
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Integrations" />
             <SettingsLayout>
-                <div className="space-y-8">
+                <div className="space-y-6">
                     <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                         <HeadingSmall title="Integrations" description="Connect your accounts for enhanced features and authentication" />
                         {availableToConnect.length > 0 && (
