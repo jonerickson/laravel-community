@@ -14,10 +14,13 @@ class EnsureAccountHasEmail
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (($user = $request->user()) && blank($user->email)) {
+        if (($user = $request->user()) && blank($user->email) && ! $request->routeIs('set-email.notice')) {
             return $request->expectsJson()
                 ? abort(403, 'Your account must have a vaild email address.')
-                : Redirect::guest(URL::route('set-email.notice'));
+                : ($request->inertia()
+                    ? inertia()->location(URL::route('set-email.notice'))
+                    : Redirect::guest(URL::route('set-email.notice'))
+                );
         }
 
         return $next($request);

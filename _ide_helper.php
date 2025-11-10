@@ -24050,6 +24050,10 @@ namespace App\Http\Requests\Auth {
             }
     /**
      */
+    class SetPasswordRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    /**
+     */
     class SetEmailRequest extends \Illuminate\Foundation\Http\FormRequest {
             }
     /**

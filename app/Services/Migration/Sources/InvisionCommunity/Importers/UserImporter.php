@@ -15,9 +15,7 @@ use Illuminate\Console\OutputStyle;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class UserImporter extends AbstractImporter
 {
@@ -165,8 +163,7 @@ class UserImporter extends AbstractImporter
         $user->forceFill([
             'name' => $sourceUser->name,
             'email' => $email,
-            'email_verified_at' => $this->isEmailValidated($sourceUser) ? Carbon::now() : null,
-            'password' => $this->migratePassword($sourceUser),
+            'email_verified_at' => Carbon::now(),
             'signature' => strip_tags($sourceUser->signature ?? ''),
             'last_seen_at' => $sourceUser->last_activity ? Carbon::createFromTimestamp($sourceUser->last_activity) : null,
             'created_at' => Carbon::createFromTimestamp($sourceUser->joined),
@@ -216,22 +213,6 @@ class UserImporter extends AbstractImporter
         if ($groupIds !== []) {
             $user->groups()->sync(array_unique(array_values($groupIds)));
         }
-    }
-
-    protected function migratePassword(object $sourceUser): ?string
-    {
-        if (empty($sourceUser->members_pass_hash)) {
-            return null;
-        }
-
-        return Hash::make(Str::random(32));
-    }
-
-    protected function isEmailValidated(object $sourceUser): bool
-    {
-        $validatedBit = 65536;
-
-        return (bool) ((int) ($sourceUser->members_bitoptions ?? 0) & $validatedBit);
     }
 
     protected function cacheUserMapping(int $sourceUserId, int $targetUserId): void

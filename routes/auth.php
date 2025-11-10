@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SetEmailPromptController;
+use App\Http\Controllers\Auth\SetPasswordPromptController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\OAuth\CallbackController;
 use App\Http\Controllers\OAuth\RedirectController;
@@ -78,6 +79,12 @@ Route::middleware('auth')->group(function (): void {
 
     Route::post('set-email', [SetEmailPromptController::class, 'store'])
         ->name('set-email.verify');
+
+    Route::get('set-password', [SetPasswordPromptController::class, 'create'])
+        ->name('set-password.notice');
+
+    Route::post('set-password', [SetPasswordPromptController::class, 'store'])
+        ->name('set-password.verify');
 
     Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
         ->name('password.confirm');

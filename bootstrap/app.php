@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Exceptions\BannedException;
 use App\Http\Middleware\CheckBannedUser;
 use App\Http\Middleware\EnsureAccountHasEmail;
+use App\Http\Middleware\EnsureAccountHasPassword;
 use App\Http\Middleware\ForceOnboarding;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -43,6 +44,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
+            'password' => EnsureAccountHasPassword::class,
             'email' => EnsureAccountHasEmail::class,
             'onboarded' => ForceOnboarding::class,
         ]);
