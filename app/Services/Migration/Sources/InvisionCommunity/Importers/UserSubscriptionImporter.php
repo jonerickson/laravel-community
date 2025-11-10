@@ -16,6 +16,7 @@ use App\Services\Migration\MigrationResult;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -63,22 +64,18 @@ class UserSubscriptionImporter extends AbstractImporter
         ];
     }
 
+    public function getTotalRecordsCount(): int
+    {
+        return $this->getBaseQuery()->count();
+    }
+
     public function import(
-        MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $connection = $this->source->getConnection();
+        $config = $this->getConfig();
 
-        $baseQuery = DB::connection($connection)
-            ->table($this->getSourceTable())
-            ->whereNotNull('sub_member_id')
-            ->whereNotNull('sub_package_id')
-            ->where('sub_renews', 1)
-            ->where('sub_active', 1)
-            ->where('sub_cancelled', 0)
-            ->orderBy('sub_id')
-            ->when($config->userId !== null && $config->userId !== 0, fn ($builder) => $builder->where('sub_member_id', $config->userId))
+        $baseQuery = $this->getBaseQuery()
             ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
             ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
@@ -226,8 +223,19 @@ class UserSubscriptionImporter extends AbstractImporter
         }
     }
 
-    protected function cacheOrderMapping(int $sourceOrderId, int $targetOrderId): void
+    protected function getBaseQuery(): Builder
     {
-        Cache::tags(OrderImporter::CACHE_TAG)->put(OrderImporter::CACHE_KEY_PREFIX.$sourceOrderId, $targetOrderId, OrderImporter::CACHE_TTL);
+        $connection = $this->source->getConnection();
+        $config = $this->getConfig();
+
+        return DB::connection($connection)
+            ->table($this->getSourceTable())
+            ->whereNotNull('sub_member_id')
+            ->whereNotNull('sub_package_id')
+            ->where('sub_renews', 1)
+            ->where('sub_active', 1)
+            ->where('sub_cancelled', 0)
+            ->orderBy('sub_id')
+            ->when($config->userId !== null && $config->userId !== 0, fn ($builder) => $builder->where('sub_member_id', $config->userId));
     }
 }

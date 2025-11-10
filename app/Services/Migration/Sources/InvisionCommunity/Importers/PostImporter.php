@@ -16,6 +16,7 @@ use App\Services\Migration\MigrationResult;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -68,18 +69,18 @@ class PostImporter extends AbstractImporter
         ];
     }
 
+    public function getTotalRecordsCount(): int
+    {
+        return $this->getBaseQuery()->count();
+    }
+
     public function import(
-        MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $connection = $this->source->getConnection();
+        $config = $this->getConfig();
 
-        $baseQuery = DB::connection($connection)
-            ->table($this->getSourceTable())
-            ->where('queued', 0)
-            ->orderBy('pid')
-            ->when($config->userId !== null && $config->userId !== 0, fn ($builder) => $builder->where('author_id', $config->userId))
+        $baseQuery = $this->getBaseQuery()
             ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
             ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
@@ -249,5 +250,17 @@ class PostImporter extends AbstractImporter
     protected function cachePostMapping(int $sourcePostId, int $targetPostId): void
     {
         Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.$sourcePostId, $targetPostId, self::CACHE_TTL);
+    }
+
+    protected function getBaseQuery(): Builder
+    {
+        $connection = $this->source->getConnection();
+        $config = $this->getConfig();
+
+        return DB::connection($connection)
+            ->table($this->getSourceTable())
+            ->where('queued', 0)
+            ->orderBy('pid')
+            ->when($config->userId !== null && $config->userId !== 0, fn ($builder) => $builder->where('author_id', $config->userId));
     }
 }

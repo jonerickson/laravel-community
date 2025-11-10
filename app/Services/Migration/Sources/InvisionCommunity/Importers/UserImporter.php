@@ -49,28 +49,22 @@ class UserImporter extends AbstractImporter
         ];
     }
 
+    public function getTotalRecordsCount(): int
+    {
+        return $this->getBaseQuery()->count();
+    }
+
     public function import(
-        MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $connection = $this->source->getConnection();
+        $config = $this->getConfig();
 
-        $baseQuery = DB::connection($connection)
-            ->table($this->getSourceTable())
-            ->orderBy('member_id')
-            ->when($config->userId !== null && $config->userId !== 0, fn ($builder) => $builder->where('member_id', $config->userId))
+        $baseQuery = $this->getBaseQuery()
             ->when($config->offset !== null && $config->offset !== 0, fn (Builder $builder) => $builder->offset($config->offset))
             ->when($config->limit !== null && $config->limit !== 0, fn (Builder $builder) => $builder->limit($config->limit));
 
-        if ($config->offset > 0) {
-            $totalUsers = DB::connection($connection)
-                ->table(DB::raw("({$baseQuery->toSql()}) as limited"))
-                ->mergeBindings($baseQuery)
-                ->count();
-        } else {
-            $totalUsers = $baseQuery->count();
-        }
+        $totalUsers = $baseQuery->count();
 
         $output->writeln("Found $totalUsers users to migrate...");
 
@@ -301,5 +295,16 @@ class UserImporter extends AbstractImporter
 
         $progressBar->finish();
         $output->newLine();
+    }
+
+    protected function getBaseQuery(): Builder
+    {
+        $connection = $this->source->getConnection();
+        $config = $this->getConfig();
+
+        return DB::connection($connection)
+            ->table($this->getSourceTable())
+            ->orderBy('member_id')
+            ->when($config->userId !== null && $config->userId !== 0, fn ($builder) => $builder->where('member_id', $config->userId));
     }
 }

@@ -15,13 +15,14 @@ interface EntityImporter
 
     public function getSourceTable(): string;
 
+    public function getTotalRecordsCount(): int;
+
     /**
      * @return array<ImporterDependency>
      */
     public function getDependencies(): array;
 
     public function import(
-        MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void;
@@ -31,4 +32,8 @@ interface EntityImporter
     public function markCompleted(): void;
 
     public function cleanup(): void;
+
+    public function setConfig(MigrationConfig $config): self;
+
+    public function getConfig(): ?MigrationConfig;
 }

@@ -55,16 +55,18 @@ class GroupImporter extends AbstractImporter
         return [];
     }
 
+    public function getTotalRecordsCount(): int
+    {
+        return $this->getBaseQuery()->count();
+    }
+
     public function import(
-        MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $connection = $this->source->getConnection();
+        $config = $this->getConfig();
 
-        $baseQuery = DB::connection($connection)
-            ->table($this->getSourceTable())
-            ->orderBy('g_id')
+        $baseQuery = $this->getBaseQuery()
             ->when($config->offset !== null && $config->offset !== 0, fn (Builder $builder) => $builder->offset($config->offset))
             ->when($config->limit !== null && $config->limit !== 0, fn (Builder $builder) => $builder->limit($config->limit));
 
@@ -196,5 +198,14 @@ class GroupImporter extends AbstractImporter
     protected function cacheGroupMapping(int $sourceGroupId, int $targetGroupId): void
     {
         Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.$sourceGroupId, $targetGroupId, 60 * 60 * 24 * 7);
+    }
+
+    protected function getBaseQuery(): Builder
+    {
+        $connection = $this->source->getConnection();
+
+        return DB::connection($connection)
+            ->table($this->getSourceTable())
+            ->orderBy('g_id');
     }
 }

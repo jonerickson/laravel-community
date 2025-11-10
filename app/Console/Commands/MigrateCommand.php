@@ -15,9 +15,13 @@ use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Sleep;
 use Random\RandomException;
+use ReflectionException;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\select;
@@ -66,12 +70,13 @@ class MigrateCommand extends Command
 
         $this->setupBaseUrlIfNeeded($sourceInstance);
 
-        $config = $this->buildMigrationConfig();
-        $service->configure($config);
+        $config = $this->buildMigrationConfig($sourceInstance);
+        $service->setConfig($config);
+        $service->setOutput($this->output);
 
         if ($this->option('worker')) {
-            if (in_array($source, [null, '', '0'], true) || in_array($config->entity, [null, '', '0'], true)) {
-                $this->error('Worker mode requires --source and --entity');
+            if (in_array($source, [null, '', '0'], true) || $config->entities === [] || count($config->entities) !== 1) {
+                $this->error('Worker mode requires --source and a single --entity');
 
                 return self::FAILURE;
             }
@@ -143,12 +148,13 @@ class MigrateCommand extends Command
                 return self::FAILURE;
             }
 
-            $this->info("Processing {$config->entity}: Batch Size {$config->batchSize}, Offset {$config->offset}, Limit {$config->limit}");
+            $entity = $config->entities[0] ?? 'unknown';
+            $offset = $config->offset ?? 0;
+            $this->info("Processing {$entity}: Batch Size {$config->batchSize}, Offset {$offset}, Limit {$config->limit}");
 
             declare(ticks=100) {
                 $result = $service->migrate(
-                    source: $source->getName(),
-                    output: $this->output,
+                    source: $source,
                 );
             }
 
@@ -157,7 +163,7 @@ class MigrateCommand extends Command
             DB::disconnect($source->getConnection());
             gc_collect_cycles();
 
-            $stats = $result->entities[$config->entity] ?? ['migrated' => 0, 'skipped' => 0, 'failed' => 0];
+            $stats = $result->entities[$entity] ?? ['migrated' => 0, 'skipped' => 0, 'failed' => 0];
             $endMemory = memory_get_usage(true);
             $peakMemory = memory_get_peak_usage(true);
 
@@ -168,6 +174,8 @@ class MigrateCommand extends Command
         } catch (Exception $e) {
             unregister_tick_function($checkMemory);
             $this->error("Migration failed: {$e->getMessage()}");
+
+            Log::error('Migration failed: '.$e->getMessage());
 
             return self::FAILURE;
         } finally {
@@ -211,7 +219,9 @@ class MigrateCommand extends Command
             }
 
             if ($this->option('status')) {
-                return $this->displayMigrationStatus($source, $config->entity);
+                $entity = count($config->entities) === 1 ? $config->entities[0] : null;
+
+                return $this->displayMigrationStatus($source, $entity);
             }
 
             if (! $this->confirmToProceed()) {
@@ -234,20 +244,20 @@ class MigrateCommand extends Command
                 $this->warn('Excluding entities: '.implode(', ', $config->excluded));
             }
 
-            $this->promptForOptionalDependencies($service, $source, $config->entity);
+            $entity = count($config->entities) === 1 ? $config->entities[0] : null;
+            $this->promptForOptionalDependencies($service, $source, $entity);
 
             $this->info("Starting migration from {$source->getConnection()}...");
 
-            if ($config->parallel && $config->entity) {
-                return $this->runConcurrentMigration(
+            if ($config->parallel) {
+                return $this->runConcurrentMigrationsForMultipleEntities(
                     source: $source,
                     service: $service,
                 );
             }
 
             $result = $service->migrate(
-                source: $source->getName(),
-                output: $this->output,
+                source: $source,
             );
 
             $this->newLine();
@@ -269,6 +279,11 @@ class MigrateCommand extends Command
         } catch (Exception $e) {
             $this->error("Migration failed: {$e->getMessage()}");
 
+            Log::error("Failed to migrate {$source->getName()}", [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
             return self::FAILURE;
         } finally {
             if ($sshTunnel !== null && $sshTunnel !== []) {
@@ -278,6 +293,7 @@ class MigrateCommand extends Command
     }
 
     protected function runConcurrentMigration(
+        string $entity,
         MigrationSource $source,
         MigrationService $service,
     ): int {
@@ -291,15 +307,17 @@ class MigrateCommand extends Command
 
         $this->info("Worker memory limit calculated: {$workerMemoryLimit}MB per process");
 
-        $totalRecords = DB::connection($source->getConnection())
-            ->table($service->getImporterForEntity($config->entity)?->getSourceTable() ?? '')
-            ->count();
+        $importer = $source->getImporter($entity);
+        $importer->setConfig($config);
+
+        $totalRecords = $importer->getTotalRecordsCount();
 
         if ($config->limit !== null && $config->limit !== 0) {
             $totalRecords = min($totalRecords, $config->limit + ($config->offset ?? 0));
         }
 
         $manager = new ConcurrentMigrationManager(
+            entity: $entity,
             config: $service->getConfig(),
             output: $this->output,
             workerMemoryLimit: $workerMemoryLimit,
@@ -328,10 +346,45 @@ class MigrateCommand extends Command
         }
 
         if ($result) {
-            $source->getImporter($config->entity)->markCompleted();
+            $source->getImporter($entity)->markCompleted();
         }
 
         return self::SUCCESS;
+    }
+
+    protected function runConcurrentMigrationsForMultipleEntities(
+        MigrationSource $source,
+        MigrationService $service,
+    ): int {
+        $config = $service->getConfig();
+        $allSuccessful = true;
+
+        $this->info('Running concurrent migrations for multiple entities...');
+        $this->newLine();
+
+        foreach ($config->entities as $entity) {
+            $this->info("Starting concurrent migration for entity: $entity");
+
+            $result = $this->runConcurrentMigration(
+                entity: $entity,
+                source: $source,
+                service: $service,
+            );
+
+            if ($result !== self::SUCCESS) {
+                $allSuccessful = false;
+                $this->error("Failed to migrate entity: $entity");
+            }
+
+            $this->newLine();
+        }
+
+        if ($this->option('cleanup')) {
+            $this->warn('Cleaning up...');
+            $service->cleanup();
+        }
+
+        return $allSuccessful ? self::SUCCESS : self::FAILURE;
     }
 
     protected function promptForOptionalDependencies(MigrationService $service, MigrationSource $source, ?string $entity): void
@@ -715,10 +768,9 @@ class MigrateCommand extends Command
         return null;
     }
 
-    protected function buildMigrationConfig(): MigrationConfig
+    protected function buildMigrationConfig(MigrationSource $source): MigrationConfig
     {
         $excluded = [];
-        $entities = [];
         $entity = $this->option('entity');
 
         if ($this->option('excluded')) {
@@ -727,17 +779,15 @@ class MigrateCommand extends Command
 
         if ($entity) {
             $entities = array_map('trim', explode(',', $entity));
+        } else {
+            $entities = array_keys($source->getImporters());
 
-            if (count($entities) === 1) {
-                $entity = $entities[0];
-                $entities = [];
-            } else {
-                $entity = null;
+            if ($excluded !== []) {
+                $entities = array_filter($entities, fn (string $entityName): bool => ! in_array($entityName, $excluded));
             }
         }
 
         return new MigrationConfig(
-            entity: $entity,
             entities: $entities,
             batchSize: (int) $this->option('batch'),
             limit: $this->option('limit') ? (int) $this->option('limit') : null,
@@ -753,5 +803,14 @@ class MigrateCommand extends Command
             memoryLimit: $this->option('memory-limit') ? (int) $this->option('memory-limit') : null,
             excluded: $excluded,
         );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    protected function setupMigration(): void
+    {
+        app()->bind(InputInterface::class, $this->input);
+        app()->bind(OutputInterface::class, $this->output);
     }
 }

@@ -17,10 +17,24 @@ abstract class AbstractImporter implements EntityImporter
 {
     protected const int CACHE_TTL = 60 * 60 * 24 * 7;
 
+    protected ?MigrationConfig $config = null;
+
     public function __construct(
         protected MigrationSource $source,
     ) {
         //
+    }
+
+    public function setConfig(MigrationConfig $config): self
+    {
+        $this->config = $config;
+
+        return $this;
+    }
+
+    public function getConfig(): ?MigrationConfig
+    {
+        return $this->config;
     }
 
     protected function parseAndReplaceImagesInHtml(string $html, Closure $downloadCallback): string

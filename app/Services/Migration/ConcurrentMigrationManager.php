@@ -29,6 +29,7 @@ class ConcurrentMigrationManager
     ];
 
     public function __construct(
+        protected string $entity,
         protected MigrationConfig $config,
         protected OutputStyle $output,
         protected ?int $workerMemoryLimit = null,
@@ -42,7 +43,7 @@ class ConcurrentMigrationManager
         $nextOffset = $startOffset;
         $totalToProcess = $totalRecords - $startOffset;
 
-        $this->output->writeln("Starting concurrent migration of <info>{$this->config->entity}</info>");
+        $this->output->writeln("Starting concurrent migration of <info>{$this->entity}</info>");
         $this->output->writeln("Total records: <info>$totalToProcess</info>");
         $this->output->writeln("Max records per process: <info>{$this->config->maxRecordsPerProcess}</info>");
         $this->output->writeln("Concurrent processes: <info>{$this->config->maxProcesses}</info>");
@@ -105,7 +106,7 @@ class ConcurrentMigrationManager
             'artisan',
             'app:migrate',
             $source->getName(),
-            '--entity='.$this->config->entity,
+            '--entity='.$this->entity,
             '--offset='.$offset,
             '--limit='.$limit,
             '--batch='.$this->config->batchSize,
@@ -143,13 +144,13 @@ class ConcurrentMigrationManager
             'process' => $process,
             'offset' => $offset,
             'limit' => $limit,
-            'entity' => $this->config->entity,
+            'entity' => $this->entity,
             'output_position' => 0,
             'error_position' => 0,
             'color' => $color,
         ];
 
-        $this->output->writeln("<comment>[Process Started]</comment> Entity: {$this->config->entity}, Offset: $offset, Limit: $limit, PID: {$process->getPid()}");
+        $this->output->writeln("<comment>[Process Started]</comment> Entity: {$this->entity}, Offset: $offset, Limit: $limit, PID: {$process->getPid()}");
     }
 
     protected function checkProcesses(): void
@@ -160,45 +161,49 @@ class ConcurrentMigrationManager
 
             $this->streamProcessOutput($process, $data);
 
-            if (! $process->isRunning()) {
-                $this->streamProcessOutput($process, $data);
-
-                if ($process->isSuccessful()) {
-                    $this->completedChunks[] = $data;
-                    $this->output->writeln("<info>[Process Completed]</info> Entity: {$data['entity']}, Offset: {$data['offset']}, Limit: {$data['limit']}");
-                } else {
-                    $exitCode = $process->getExitCode();
-                    $stdOutput = $process->getOutput();
-                    $errorOutput = $process->getErrorOutput() ?: 'Unknown error';
-
-                    $errorMessage = $errorOutput;
-
-                    if ($exitCode === 137) {
-                        $errorMessage = 'Process killed (likely out of memory - exit code 137). Try reducing --max-records-per-process or --max-processes.';
-                    }
-
-                    $this->failedChunks[] = [
-                        'offset' => $data['offset'],
-                        'limit' => $data['limit'],
-                        'entity' => $data['entity'],
-                        'error' => $errorMessage,
-                        'exit_code' => $exitCode,
-                    ];
-
-                    $this->output->writeln("<error>[Process Failed]</error> Entity: {$data['entity']}, Offset: {$data['offset']}, Exit Code: $exitCode");
-
-                    if ($errorOutput && ! $this->isProgressBarOutput($errorOutput)) {
-                        $this->output->writeln("<error>  → Error: $errorOutput</error>");
-                    }
-
-                    if ($stdOutput) {
-                        $this->output->writeln("<info>  → Output: $stdOutput</info>");
-                    }
-                }
-
-                $this->releaseWorkerColor($offset);
-                unset($this->activeProcesses[$offset]);
+            if ($process->isRunning()) {
+                continue;
             }
+
+            if ($process->isSuccessful()) {
+                $this->handleSuccessfulProcess($data);
+            } else {
+                $this->handleFailedProcess($data, $process);
+            }
+
+            $this->releaseWorkerColor($offset);
+            unset($this->activeProcesses[$offset]);
+        }
+    }
+
+    protected function handleSuccessfulProcess(array $data): void
+    {
+        $this->completedChunks[] = $data;
+        $this->output->writeln("<info>[Process Completed]</info> Entity: {$data['entity']}, Offset: {$data['offset']}, Limit: {$data['limit']}");
+    }
+
+    protected function handleFailedProcess(array $data, Process $process): void
+    {
+        $exitCode = $process->getExitCode();
+        $errorOutput = in_array($process->getErrorOutput(), ['', '0'], true) ? 'Unknown error' : $process->getErrorOutput();
+        $stdOutput = $process->getOutput();
+
+        $this->failedChunks[] = [
+            'offset' => $data['offset'],
+            'limit' => $data['limit'],
+            'entity' => $data['entity'],
+            'error' => $errorOutput,
+            'exit_code' => $exitCode,
+        ];
+
+        $this->output->writeln("<error>[Process Failed]</error> Entity: {$data['entity']}, Offset: {$data['offset']}, Exit Code: $exitCode");
+
+        if ($errorOutput && ! $this->isProgressBarOutput($errorOutput)) {
+            $this->output->writeln("<error>  → Error: $errorOutput</error>");
+        }
+
+        if ($stdOutput !== '' && $stdOutput !== '0') {
+            $this->output->writeln("<info>  → Output: $stdOutput</info>");
         }
     }
 

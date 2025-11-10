@@ -7,7 +7,6 @@ namespace App\Services\Migration;
 class MigrationConfig
 {
     public function __construct(
-        public ?string $entity = null,
         public array $entities = [],
         public int $batchSize = 1000,
         public ?int $limit = null,

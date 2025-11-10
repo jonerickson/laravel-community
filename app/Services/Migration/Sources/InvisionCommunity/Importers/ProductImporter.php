@@ -19,6 +19,7 @@ use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunitySource;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -74,19 +75,20 @@ class ProductImporter extends AbstractImporter
         return [];
     }
 
+    public function getTotalRecordsCount(): int
+    {
+        return $this->getBaseQuery()->count();
+    }
+
     public function import(
-        MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
-        $this->importCategories($config, $result, $output);
+        $this->importCategories($result, $output);
 
-        $connection = $this->source->getConnection();
+        $config = $this->getConfig();
 
-        $baseQuery = DB::connection($connection)
-            ->table($this->getSourceTable())
-            ->where('p_store', 1)
-            ->orderBy('p_id')
+        $baseQuery = $this->getBaseQuery()
             ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
             ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
@@ -141,11 +143,11 @@ class ProductImporter extends AbstractImporter
     }
 
     protected function importCategories(
-        MigrationConfig $config,
         MigrationResult $result,
         OutputStyle $output,
     ): void {
         $connection = $this->source->getConnection();
+        $config = $this->getConfig();
 
         $baseQuery = DB::connection($connection)
             ->table('nexus_package_groups')
@@ -575,5 +577,15 @@ class ProductImporter extends AbstractImporter
     protected function cacheCategoryMapping(int $sourceCategoryId, int $targetCategoryId): void
     {
         Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_CATEGORY_PREFIX.$sourceCategoryId, $targetCategoryId, self::CACHE_TTL);
+    }
+
+    protected function getBaseQuery(): Builder
+    {
+        $connection = $this->source->getConnection();
+
+        return DB::connection($connection)
+            ->table($this->getSourceTable())
+            ->where('p_store', 1)
+            ->orderBy('p_id');
     }
 }
