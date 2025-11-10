@@ -79,7 +79,7 @@ class UserSubscriptionImporter extends AbstractImporter
             ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
             ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
-        $totalUserSubscriptions = $baseQuery->count();
+        $totalUserSubscriptions = $baseQuery->clone()->countOffset();
 
         $output->writeln("Found {$totalUserSubscriptions} user subscriptions to migrate...");
 

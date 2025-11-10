@@ -85,7 +85,7 @@ class ForumImporter extends AbstractImporter
             ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
             ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
-        $totalForums = $baseQuery->count();
+        $totalForums = $baseQuery->clone()->countOffset();
 
         $output->writeln("Found $totalForums forums to migrate...");
 
@@ -155,7 +155,7 @@ class ForumImporter extends AbstractImporter
             ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
             ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
-        $totalCategories = $baseQuery->count();
+        $totalCategories = $baseQuery->clone()->countOffset();
 
         $output->writeln("Found {$totalCategories} forum categories to migrate...");
 

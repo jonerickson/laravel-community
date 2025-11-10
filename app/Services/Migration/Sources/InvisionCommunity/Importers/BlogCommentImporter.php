@@ -81,7 +81,7 @@ class BlogCommentImporter extends AbstractImporter
             ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
             ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
-        $totalComments = $baseQuery->count();
+        $totalComments = $baseQuery->clone()->countOffset();
 
         $output->writeln("Found {$totalComments} blog comments to migrate...");
 

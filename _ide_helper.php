@@ -23722,6 +23722,15 @@ namespace Illuminate\Database\Query {
             return \Illuminate\Database\Query\Builder::getSelect();
         }
 
+        /**
+         * @see \App\Providers\AppServiceProvider::boot()
+         * @static
+         */
+        public static function countOffset()
+        {
+            return \Illuminate\Database\Query\Builder::countOffset();
+        }
+
             }
     }
 
@@ -32203,6 +32212,15 @@ namespace  {
         {
             /** @var \Illuminate\Database\Query\Builder $instance */
             return $instance->macroCall($method, $parameters);
+        }
+
+        /**
+         * @see \App\Providers\AppServiceProvider::boot()
+         * @static
+         */
+        public static function countOffset()
+        {
+            return \Illuminate\Database\Query\Builder::countOffset();
         }
 
 }

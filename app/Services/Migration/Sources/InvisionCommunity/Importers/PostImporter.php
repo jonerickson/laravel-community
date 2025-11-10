@@ -84,7 +84,7 @@ class PostImporter extends AbstractImporter
             ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
             ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
-        $totalPosts = $config->limit !== null && $config->limit !== 0 ? min($config->limit, $baseQuery->count()) : $baseQuery->count();
+        $totalPosts = $baseQuery->clone()->countOffset();
 
         $output->writeln("Found {$totalPosts} posts to migrate...");
 

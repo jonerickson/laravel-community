@@ -82,7 +82,7 @@ class TopicImporter extends AbstractImporter
             ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
             ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
-        $totalTopics = $baseQuery->count();
+        $totalTopics = $baseQuery->clone()->countOffset();
 
         $output->writeln("Found {$totalTopics} topics to migrate...");
 

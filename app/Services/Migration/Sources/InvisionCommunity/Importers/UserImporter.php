@@ -64,7 +64,7 @@ class UserImporter extends AbstractImporter
             ->when($config->offset !== null && $config->offset !== 0, fn (Builder $builder) => $builder->offset($config->offset))
             ->when($config->limit !== null && $config->limit !== 0, fn (Builder $builder) => $builder->limit($config->limit));
 
-        $totalUsers = $baseQuery->count();
+        $totalUsers = $baseQuery->clone()->countOffset();
 
         $output->writeln("Found $totalUsers users to migrate...");
 

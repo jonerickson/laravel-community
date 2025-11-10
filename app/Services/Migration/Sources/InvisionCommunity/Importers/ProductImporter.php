@@ -92,7 +92,7 @@ class ProductImporter extends AbstractImporter
             ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
             ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
-        $totalProducts = $baseQuery->count();
+        $totalProducts = $baseQuery->clone()->countOffset();
 
         $output->writeln("Found {$totalProducts} products to migrate...");
 
@@ -155,7 +155,7 @@ class ProductImporter extends AbstractImporter
             ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
             ->when($config->limit !== null && $config->limit !== 0, fn ($builder) => $builder->limit($config->limit));
 
-        $totalCategories = $baseQuery->count();
+        $totalCategories = $baseQuery->clone()->countOffset();
 
         $output->writeln("Found {$totalCategories} product categories to migrate...");
 

@@ -70,7 +70,7 @@ class GroupImporter extends AbstractImporter
             ->when($config->offset !== null && $config->offset !== 0, fn (Builder $builder) => $builder->offset($config->offset))
             ->when($config->limit !== null && $config->limit !== 0, fn (Builder $builder) => $builder->limit($config->limit));
 
-        $totalGroups = $baseQuery->count();
+        $totalGroups = $baseQuery->clone()->countOffset();
 
         $output->writeln("Found {$totalGroups} groups to migrate...");
 
