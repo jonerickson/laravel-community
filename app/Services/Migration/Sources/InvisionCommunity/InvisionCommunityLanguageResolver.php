@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 class InvisionCommunityLanguageResolver
 {
-    protected const string CACHE_KEY_PREFIX = 'migration:ic:lang:';
+    public const string CACHE_KEY_PREFIX = 'migration:ic:lang:';
 
-    protected const string CACHE_TAG = 'migration:ic:lang';
+    public const string CACHE_TAG = 'migration:ic:lang';
 
     protected const int CACHE_TTL = 3600;
 

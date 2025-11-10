@@ -4,15 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
-use App\Enums\OrderStatus;
-use App\Enums\PriceType;
 use App\Enums\ProrationBehavior;
 use App\Enums\Role;
-use App\Enums\SubscriptionInterval;
 use App\Jobs\ImportSubscription;
 use App\Models\Order;
-use App\Models\Price;
-use App\Models\Product;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
 use App\Services\Migration\ImporterDependency;
@@ -28,11 +23,11 @@ use Illuminate\Support\Str;
 
 class UserSubscriptionImporter extends AbstractImporter
 {
-    protected const string ENTITY_NAME = 'user_subscriptions';
+    public const string ENTITY_NAME = 'user_subscriptions';
 
-    protected const string CACHE_KEY_PREFIX = 'migration:ic:user_subscription_map:';
+    public const string CACHE_KEY_PREFIX = 'migration:ic:user_subscription_map:';
 
-    protected const string CACHE_TAG = 'migration:ic:user_subscriptions';
+    public const string CACHE_TAG = 'migration:ic:user_subscriptions';
 
     public function isCompleted(): bool
     {
@@ -79,6 +74,9 @@ class UserSubscriptionImporter extends AbstractImporter
             ->table($this->getSourceTable())
             ->whereNotNull('sub_member_id')
             ->whereNotNull('sub_package_id')
+            ->where('sub_renews', 1)
+            ->where('sub_active', 1)
+            ->where('sub_cancelled', 0)
             ->orderBy('sub_id')
             ->when($config->userId !== null && $config->userId !== 0, fn ($builder) => $builder->where('sub_member_id', $config->userId))
             ->when($config->offset !== null && $config->offset !== 0, fn ($builder) => $builder->offset($config->offset))
@@ -100,7 +98,7 @@ class UserSubscriptionImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importUserSubscription($sourceUserSubscription, $config, $result);
+                    $this->importUserSubscription($sourceUserSubscription, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -132,7 +130,7 @@ class UserSubscriptionImporter extends AbstractImporter
         $output->newLine();
     }
 
-    protected function importUserSubscription(object $sourceUserSubscription, MigrationConfig $config, MigrationResult $result): void
+    protected function importUserSubscription(object $sourceUserSubscription, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $user = $this->findUser($sourceUserSubscription);
 
@@ -151,56 +149,15 @@ class UserSubscriptionImporter extends AbstractImporter
         $orderId = OrderImporter::getOrderMapping((int) $sourceUserSubscription->sub_invoice_id);
 
         if ($orderId === null || $orderId === 0) {
-            if ($sourceUserSubscription->sub_added_manually) {
-                $order = $user->orders()->create([
-                    'status' => OrderStatus::Succeeded,
-                    'amount_due' => 0,
-                    'amount_overpaid' => 0,
-                    'amount_paid' => 0,
-                    'amount_remaining' => 0,
-                ]);
+            $result->incrementSkipped(self::ENTITY_NAME);
+            $result->recordSkipped(self::ENTITY_NAME, [
+                'source_id' => $sourceUserSubscription->sub_id,
+                'purchase_id' => $sourceUserSubscription->sub_purchase_id,
+                'invoice_id' => $sourceUserSubscription->sub_invoice_id,
+                'reason' => 'Order not found from imported orders',
+            ]);
 
-                $product = $this->findProduct($sourceUserSubscription);
-
-                if (! $product instanceof Product) {
-                    $result->incrementSkipped(self::ENTITY_NAME);
-                    $result->recordSkipped(self::ENTITY_NAME, [
-                        'source_id' => $sourceUserSubscription->sub_id,
-                        'reason' => 'Product not found to generate order',
-                    ]);
-
-                    return;
-                }
-
-                $order->items()->create([
-                    'name' => $product ? $product->name : 'Unknown Product',
-                    'amount' => 0,
-                    'quantity' => 1,
-                    'price_id' => Price::firstOrCreate([
-                        'type' => PriceType::Recurring,
-                        'amount' => 0,
-                        'product_id' => $product->id,
-                    ], [
-                        'reference_id' => Str::uuid()->toString(),
-                        'name' => 'One-Time',
-                        'currency' => 'USD',
-                        'interval' => SubscriptionInterval::Yearly,
-                        'interval_count' => 1,
-                        'is_default' => false,
-                        'is_active' => true,
-                    ])->getKey(),
-                ]);
-
-                $orderId = $order->getKey();
-            } else {
-                $result->incrementSkipped(self::ENTITY_NAME);
-                $result->recordSkipped(self::ENTITY_NAME, [
-                    'source_id' => $sourceUserSubscription->sub_id,
-                    'reason' => 'Order not found from imported orders',
-                ]);
-
-                return;
-            }
+            return;
         }
 
         $order = Order::query()->find($orderId);
@@ -216,8 +173,13 @@ class UserSubscriptionImporter extends AbstractImporter
         }
 
         if (! $config->isDryRun) {
-            $backdateStartDate = isset($sourceUserSubscription->sub_start) ? Carbon::parse($sourceUserSubscription->sub_start) : null;
-            $billingCycleAnchor = isset($sourceUserSubscription->sub_expires) ? Carbon::parse($sourceUserSubscription->sub_expires) : null;
+            $backdateStartDate = isset($sourceUserSubscription->sub_start)
+                ? Carbon::parse($sourceUserSubscription->sub_start)
+                : now();
+
+            $billingCycleAnchor = isset($sourceUserSubscription->sub_expires)
+                ? Carbon::parse($sourceUserSubscription->sub_expires)
+                : now()->addYear();
 
             ImportSubscription::dispatch($order, ProrationBehavior::None, $backdateStartDate, $billingCycleAnchor);
         }
@@ -246,17 +208,6 @@ class UserSubscriptionImporter extends AbstractImporter
         return null;
     }
 
-    protected function findProduct(object $sourceUserSubscription): ?Product
-    {
-        $mappedProductId = SubscriptionImporter::getSubscriptionMapping($sourceUserSubscription->sub_package_id);
-
-        if ($mappedProductId !== null && $mappedProductId !== 0) {
-            return Product::query()->find($mappedProductId);
-        }
-
-        return null;
-    }
-
     protected function setStripeCustomerId(User $user, int $memberId, MigrationConfig $config): void
     {
         if ($user->hasStripeId()) {
@@ -273,5 +224,10 @@ class UserSubscriptionImporter extends AbstractImporter
                 'stripe_id' => $stripeId,
             ]);
         }
+    }
+
+    protected function cacheOrderMapping(int $sourceOrderId, int $targetOrderId): void
+    {
+        Cache::tags(OrderImporter::CACHE_TAG)->put(OrderImporter::CACHE_KEY_PREFIX.$sourceOrderId, $targetOrderId, OrderImporter::CACHE_TTL);
     }
 }

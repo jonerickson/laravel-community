@@ -26,13 +26,13 @@ use Illuminate\Support\Str;
 
 class ProductImporter extends AbstractImporter
 {
-    protected const string ENTITY_NAME = 'products';
+    public const string ENTITY_NAME = 'products';
 
-    protected const string CACHE_KEY_PREFIX = 'migration:ic:product_map:';
+    public const string CACHE_KEY_PREFIX = 'migration:ic:product_map:';
 
-    protected const string CACHE_KEY_CATEGORY_PREFIX = 'migration:ic:product_category_map:';
+    public const string CACHE_KEY_CATEGORY_PREFIX = 'migration:ic:product_category_map:';
 
-    protected const string CACHE_TAG = 'migration:ic:products';
+    public const string CACHE_TAG = 'migration:ic:products';
 
     public static function getProductMapping(int $sourceProductId): ?int
     {
@@ -106,7 +106,7 @@ class ProductImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importProduct($sourceProduct, $config, $result);
+                    $this->importProduct($sourceProduct, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -172,7 +172,7 @@ class ProductImporter extends AbstractImporter
                 $sourceCategoriesData[] = $sourceCategory;
 
                 try {
-                    $this->importCategory($sourceCategory, $config, $result);
+                    $this->importCategory($sourceCategory, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed('product_categories');
                     $result->recordFailed('product_categories', [
@@ -206,7 +206,7 @@ class ProductImporter extends AbstractImporter
         $this->updateCategoryParentRelationships($sourceCategoriesData, $config, $output);
     }
 
-    protected function importCategory(object $sourceCategory, MigrationConfig $config, MigrationResult $result): void
+    protected function importCategory(object $sourceCategory, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $name = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveProductGroupName($sourceCategory->pg_id, "Invision Product Group $sourceCategory->pg_id")
@@ -218,8 +218,25 @@ class ProductImporter extends AbstractImporter
 
         $slug = Str::of($sourceCategory->pg_seo_name ?? $name)
             ->slug()
-            ->unique('products_categories', 'slug')
             ->toString();
+
+        $existingCategory = ProductCategory::query()->where('slug', $slug)->first();
+
+        if ($existingCategory) {
+            $this->cacheCategoryMapping($sourceCategory->pg_id, $existingCategory->id);
+            $result->incrementSkipped(self::ENTITY_NAME);
+
+            if ($output->isVeryVerbose()) {
+                $result->recordSkipped(self::ENTITY_NAME, [
+                    'source_id' => $sourceCategory->pg_id,
+                    'name' => $name,
+                    'slug' => $slug,
+                    'reason' => 'Already exists',
+                ]);
+            }
+
+            return;
+        }
 
         $category = new ProductCategory;
         $category->forceFill([
@@ -298,7 +315,7 @@ class ProductImporter extends AbstractImporter
         $output->newLine(2);
     }
 
-    protected function importProduct(object $sourceProduct, MigrationConfig $config, MigrationResult $result): void
+    protected function importProduct(object $sourceProduct, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $name = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveProductName($sourceProduct->p_id, "Invision Product $sourceProduct->p_id")
@@ -306,8 +323,25 @@ class ProductImporter extends AbstractImporter
 
         $slug = Str::of($sourceProduct->p_seo_name ?? $name)
             ->slug()
-            ->unique('products', 'slug')
             ->toString();
+
+        $existingProduct = Product::query()->where('slug', $slug)->first();
+
+        if ($existingProduct) {
+            $this->cacheProductMapping($sourceProduct->p_id, $existingProduct->id);
+            $result->incrementSkipped(self::ENTITY_NAME);
+
+            if ($output->isVeryVerbose()) {
+                $result->recordSkipped(self::ENTITY_NAME, [
+                    'source_id' => $sourceProduct->p_id,
+                    'name' => $name,
+                    'slug' => $slug,
+                    'reason' => 'Already exists',
+                ]);
+            }
+
+            return;
+        }
 
         $product = new Product;
         $product->forceFill([

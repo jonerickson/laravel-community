@@ -22,11 +22,11 @@ use Illuminate\Support\Str;
 
 class TopicImporter extends AbstractImporter
 {
-    protected const string ENTITY_NAME = 'topics';
+    public const string ENTITY_NAME = 'topics';
 
-    protected const string CACHE_KEY_PREFIX = 'migration:ic:topic_map:';
+    public const string CACHE_KEY_PREFIX = 'migration:ic:topic_map:';
 
-    protected const string CACHE_TAG = 'migration:ic:topics';
+    public const string CACHE_TAG = 'migration:ic:topics';
 
     public static function getTopicMapping(int $sourceTopicId): ?int
     {
@@ -96,7 +96,7 @@ class TopicImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importTopic($sourceTopic, $config, $result);
+                    $this->importTopic($sourceTopic, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -130,14 +130,30 @@ class TopicImporter extends AbstractImporter
         $output->newLine();
     }
 
-    protected function importTopic(object $sourceTopic, MigrationConfig $config, MigrationResult $result): void
+    protected function importTopic(object $sourceTopic, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $title = $sourceTopic->title;
 
         $slug = Str::of($sourceTopic->title_seo ?? $title)
             ->slug()
-            ->unique('topics', 'slug')
             ->toString();
+
+        $existingTopic = Topic::query()->where('slug', $slug)->first();
+
+        if ($existingTopic) {
+            $this->cacheTopicMapping($sourceTopic->tid, $existingTopic->id);
+            $result->incrementSkipped(self::ENTITY_NAME);
+
+            if ($output->isVeryVerbose()) {
+                $result->recordSkipped(self::ENTITY_NAME, [
+                    'source_id' => $sourceTopic->tid,
+                    'title' => $title,
+                    'reason' => 'Already exists',
+                ]);
+            }
+
+            return;
+        }
 
         $author = $this->findOrCreateAuthor($sourceTopic);
 

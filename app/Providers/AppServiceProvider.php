@@ -32,14 +32,12 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use Illuminate\Support\Stringable;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Laravel\Cashier\Cashier;
 use Laravel\Passport\Passport;
 use Laravel\Socialite\Facades\Socialite;
 use Override;
-use RuntimeException;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -169,35 +167,5 @@ class AppServiceProvider extends ServiceProvider
             return $request->header('X-Fingerprint-ID')
                 ?? $request->cookie('fingerprint_id');
         });
-
-        Str::macro('unique', function (string $string, string $table, string $column = 'id', ?string $connection = null, mixed $fallback = null, bool $throw = true, int $maxAttempts = 5): string {
-            $connection = Model::resolveConnection($connection);
-
-            $candidate = $string;
-            $attempts = 0;
-
-            while ($connection->table($table)->where($column, $candidate)->exists()) {
-                $attempts++;
-
-                if (! is_null($fallback)) {
-                    $candidate = (string) value($fallback, Str::of($string));
-                } else {
-                    $candidate = $string.'-'.Str::random(6);
-                }
-
-                if ($throw && $attempts > 5) {
-                    throw new RuntimeException("Unable to generate unique value for [$string.$table.$column] after $maxAttempts attempts.");
-                }
-            }
-
-            if ($candidate === '' || $candidate === '0') {
-                return $string;
-            }
-
-            return $candidate;
-        });
-
-        /** @phpstan-ignore-next-line property.protected */
-        Stringable::macro('unique', fn (string $table, string $column = 'id', ?string $connection = null, mixed $fallback = null, bool $throw = true, int $maxAttempts = 5): Stringable => new Stringable(Str::unique($this->value, $table, $column, $connection, $fallback, $throw, $maxAttempts)));
     }
 }

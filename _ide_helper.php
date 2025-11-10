@@ -23494,23 +23494,6 @@ namespace Illuminate\Support {
             return \Illuminate\Support\Str::ucwords($value);
         }
 
-        /**
-         * @see \App\Providers\AppServiceProvider::boot()
-         * @param string $string
-         * @param string $table
-         * @param string $column
-         * @param string|null $connection
-         * @param mixed|null $fallback
-         * @param bool $throw
-         * @param int $maxAttempts
-         * @return string
-         * @static
-         */
-        public static function unique($string, $table, $column = 'id', $connection = null, $fallback = null, $throw = true, $maxAttempts = 5)
-        {
-            return \Illuminate\Support\Str::unique($string, $table, $column, $connection, $fallback, $throw, $maxAttempts);
-        }
-
             }
     /**
      */
@@ -23533,23 +23516,6 @@ namespace Illuminate\Support {
         public static function ucwords()
         {
             return \Illuminate\Support\Stringable::ucwords();
-        }
-
-        /**
-         * @phpstan-ignore-next-line property.protected
-         * @see \App\Providers\AppServiceProvider::boot()
-         * @param string $table
-         * @param string $column
-         * @param string|null $connection
-         * @param mixed|null $fallback
-         * @param bool $throw
-         * @param int $maxAttempts
-         * @return \Illuminate\Support\Stringable
-         * @static
-         */
-        public static function unique($table, $column = 'id', $connection = null, $fallback = null, $throw = true, $maxAttempts = 5)
-        {
-            return \Illuminate\Support\Stringable::unique($table, $column, $connection, $fallback, $throw, $maxAttempts);
         }
 
             }

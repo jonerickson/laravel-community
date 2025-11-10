@@ -370,6 +370,10 @@ class StripeDriver implements PaymentProcessor
 
             $customer = $customers->first();
 
+            if ($customer->isDeleted()) {
+                return null;
+            }
+
             return CustomerData::from([
                 'id' => $customer->id,
                 'email' => $customer->email,
@@ -408,6 +412,10 @@ class StripeDriver implements PaymentProcessor
             }
 
             $customer = $this->stripe->customers->retrieve($user->stripeId());
+
+            if ($customer->isDeleted()) {
+                return null;
+            }
 
             return CustomerData::from([
                 'id' => $customer->id,
@@ -477,7 +485,7 @@ class StripeDriver implements PaymentProcessor
                 ->newSubscription('default', $lineItems)
                 ->when(filled($trialDays), fn (SubscriptionBuilder $builder) => $builder->trialDays($trialDays->product->trial_days))
                 ->when(filled($allowPromotionCodes), fn (SubscriptionBuilder $builder) => $builder->allowPromotionCodes())
-                ->when(filled($billingCycleAnchor), fn (SubscriptionBuilder $builder) => $builder->anchorBillingCycleOn($billingCycleAnchor))
+                ->when(filled($billingCycleAnchor), fn (SubscriptionBuilder $builder) => $builder->trialUntil($billingCycleAnchor))
                 ->when($prorationBehavior === ProrationBehavior::None, fn (SubscriptionBuilder $builder) => $builder->noProrate())
                 ->when($prorationBehavior === ProrationBehavior::AlwaysInvoice, fn (SubscriptionBuilder $builder) => $builder->alwaysInvoice())
                 ->when($prorationBehavior === ProrationBehavior::CreateProrations, fn (SubscriptionBuilder $builder) => $builder->prorate())

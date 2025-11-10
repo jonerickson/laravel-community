@@ -21,11 +21,11 @@ use Illuminate\Support\Str;
 
 class UserImporter extends AbstractImporter
 {
-    protected const string ENTITY_NAME = 'users';
+    public const string ENTITY_NAME = 'users';
 
-    protected const string CACHE_KEY_PREFIX = 'migration:ic:user_map:';
+    public const string CACHE_KEY_PREFIX = 'migration:ic:user_map:';
 
-    protected const string CACHE_TAG = 'migration:ic:users';
+    public const string CACHE_TAG = 'migration:ic:users';
 
     public static function getUserMapping(int $sourceUserId): ?int
     {

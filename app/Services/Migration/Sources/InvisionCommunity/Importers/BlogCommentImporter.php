@@ -21,11 +21,11 @@ use Illuminate\Support\Str;
 
 class BlogCommentImporter extends AbstractImporter
 {
-    protected const string ENTITY_NAME = 'blog_comments';
+    public const string ENTITY_NAME = 'blog_comments';
 
-    protected const string CACHE_KEY_PREFIX = 'migration:ic:blog_comment_map:';
+    public const string CACHE_KEY_PREFIX = 'migration:ic:blog_comment_map:';
 
-    protected const string CACHE_TAG = 'migration:ic:blog_comments';
+    public const string CACHE_TAG = 'migration:ic:blog_comments';
 
     public static function getCommentMapping(int $sourceCommentId): ?int
     {

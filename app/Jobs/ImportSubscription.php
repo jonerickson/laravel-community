@@ -12,11 +12,11 @@ use App\Pipes\Stripe\EnsureDefaultPaymentMethod;
 use App\Pipes\Stripe\EnsurePricesExist;
 use App\Pipes\Stripe\EnsureProductsExist;
 use Carbon\CarbonInterface;
-use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Pipeline;
+use Throwable;
 
 class ImportSubscription implements ShouldQueue
 {
@@ -48,7 +48,7 @@ class ImportSubscription implements ShouldQueue
                 backdateStartDate: $this->backdateStartDate,
                 billingCycleAnchor: $this->billingCycleAnchor,
             );
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             Log::error('Failed to import subscription', [
                 'user_id' => $this->order->user_id,
                 'order_id' => $this->order->id,

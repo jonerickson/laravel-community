@@ -26,11 +26,11 @@ use Illuminate\Support\Str;
 
 class SubscriptionImporter extends AbstractImporter
 {
-    protected const string ENTITY_NAME = 'subscriptions';
+    public const string ENTITY_NAME = 'subscriptions';
 
-    protected const string CACHE_KEY_PREFIX = 'migration:ic:subscription_map:';
+    public const string CACHE_KEY_PREFIX = 'migration:ic:subscription_map:';
 
-    protected const string CACHE_TAG = 'migration:ic:subscriptions';
+    public const string CACHE_TAG = 'migration:ic:subscriptions';
 
     public static function getSubscriptionMapping(int $sourceSubscriptionId): ?int
     {
@@ -99,7 +99,7 @@ class SubscriptionImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importSubscription($sourceSubscription, $config, $result);
+                    $this->importSubscription($sourceSubscription, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -131,7 +131,7 @@ class SubscriptionImporter extends AbstractImporter
         $output->newLine();
     }
 
-    protected function importSubscription(object $sourceSubscription, MigrationConfig $config, MigrationResult $result): void
+    protected function importSubscription(object $sourceSubscription, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $name = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveSubscriptionPackageName($sourceSubscription->sp_id, "Invision Subscription $sourceSubscription->sp_id")
@@ -139,8 +139,25 @@ class SubscriptionImporter extends AbstractImporter
 
         $slug = Str::of($name)
             ->slug()
-            ->unique('products', 'slug')
             ->toString();
+
+        $existingProduct = Product::query()->where('slug', $slug)->first();
+
+        if ($existingProduct) {
+            $this->cacheSubscriptionMapping($sourceSubscription->sp_id, $existingProduct->id);
+            $result->incrementSkipped(self::ENTITY_NAME);
+
+            if ($output->isVeryVerbose()) {
+                $result->recordSkipped(self::ENTITY_NAME, [
+                    'source_id' => $sourceSubscription->sp_id,
+                    'name' => $name,
+                    'slug' => $slug,
+                    'reason' => 'Already exists',
+                ]);
+            }
+
+            return;
+        }
 
         $product = new Product;
         $product->forceFill([

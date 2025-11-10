@@ -9,9 +9,9 @@ use Illuminate\Support\Str;
 
 class MigrationResult
 {
-    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
+    public const string CACHE_TAG = 'migration:result';
 
-    protected const string CACHE_TAG = 'migration:result';
+    protected const int CACHE_TTL = 60 * 60 * 24 * 7;
 
     protected string $cachePrefix;
 

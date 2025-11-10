@@ -19,11 +19,11 @@ use Illuminate\Support\Str;
 
 class GroupImporter extends AbstractImporter
 {
-    protected const string ENTITY_NAME = 'groups';
+    public const string ENTITY_NAME = 'groups';
 
-    protected const string CACHE_KEY_PREFIX = 'migration:ic:group_map:';
+    public const string CACHE_KEY_PREFIX = 'migration:ic:group_map:';
 
-    protected const string CACHE_TAG = 'migration:ic:groups';
+    public const string CACHE_TAG = 'migration:ic:groups';
 
     public static function getGroupMapping(int $sourceGroupId): ?int
     {
@@ -84,7 +84,7 @@ class GroupImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importGroup($sourceGroup, $config, $result);
+                    $this->importGroup($sourceGroup, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -133,7 +133,7 @@ class GroupImporter extends AbstractImporter
         Cache::tags(self::CACHE_TAG)->flush();
     }
 
-    protected function importGroup(object $sourceGroup, MigrationConfig $config, MigrationResult $result): void
+    protected function importGroup(object $sourceGroup, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $name = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveGroupName($sourceGroup->g_id, "Invision Group $sourceGroup->g_id")
@@ -144,11 +144,14 @@ class GroupImporter extends AbstractImporter
         if ($existingGroup) {
             $this->cacheGroupMapping($sourceGroup->g_id, $existingGroup->id);
             $result->incrementSkipped(self::ENTITY_NAME);
-            $result->recordSkipped(self::ENTITY_NAME, [
-                'source_id' => $sourceGroup->g_id,
-                'name' => $name,
-                'reason' => 'Already exists',
-            ]);
+
+            if ($output->isVeryVerbose()) {
+                $result->recordSkipped(self::ENTITY_NAME, [
+                    'source_id' => $sourceGroup->g_id,
+                    'name' => $name,
+                    'reason' => 'Already exists',
+                ]);
+            }
 
             return;
         }

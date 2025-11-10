@@ -22,11 +22,11 @@ use Illuminate\Support\Str;
 
 class BlogImporter extends AbstractImporter
 {
-    protected const string ENTITY_NAME = 'blogs';
+    public const string ENTITY_NAME = 'blogs';
 
-    protected const string CACHE_KEY_PREFIX = 'migration:ic:blog_map:';
+    public const string CACHE_KEY_PREFIX = 'migration:ic:blog_map:';
 
-    protected const string CACHE_TAG = 'migration:ic:blog';
+    public const string CACHE_TAG = 'migration:ic:blog';
 
     public static function getBlogMapping(int $sourceBlogId): ?int
     {
@@ -97,7 +97,7 @@ class BlogImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importBlogEntry($sourceBlogEntry, $config, $result);
+                    $this->importBlogEntry($sourceBlogEntry, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
 
@@ -134,14 +134,31 @@ class BlogImporter extends AbstractImporter
         $output->newLine();
     }
 
-    protected function importBlogEntry(object $sourceBlogEntry, MigrationConfig $config, MigrationResult $result): void
+    protected function importBlogEntry(object $sourceBlogEntry, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $title = $sourceBlogEntry->entry_name;
 
         $slug = Str::of($sourceBlogEntry->entry_name_seo ?? $title)
             ->slug()
-            ->unique('posts', 'slug')
             ->toString();
+
+        $existingPost = Post::query()->where('slug', $slug)->first();
+
+        if ($existingPost) {
+            $this->cacheBlogMapping($sourceBlogEntry->entry_id, $existingPost->id);
+            $result->incrementSkipped(self::ENTITY_NAME);
+
+            if ($output->isVeryVerbose()) {
+                $result->recordSkipped(self::ENTITY_NAME, [
+                    'source_id' => $sourceBlogEntry->entry_id,
+                    'title' => $title,
+                    'slug' => $slug,
+                    'reason' => 'Already exists',
+                ]);
+            }
+
+            return;
+        }
 
         $author = $this->findOrCreateAuthor($sourceBlogEntry);
 
@@ -150,6 +167,7 @@ class BlogImporter extends AbstractImporter
             $result->recordFailed(self::ENTITY_NAME, [
                 'source_id' => $sourceBlogEntry->entry_id,
                 'title' => $title,
+                'slug' => $slug,
                 'error' => 'Could not find or create author',
             ]);
 

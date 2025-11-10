@@ -24,11 +24,11 @@ use Illuminate\Support\Str;
 
 class PostImporter extends AbstractImporter
 {
-    protected const string ENTITY_NAME = 'posts';
+    public const string ENTITY_NAME = 'posts';
 
-    protected const string CACHE_KEY_PREFIX = 'migration:ic:post_map:';
+    public const string CACHE_KEY_PREFIX = 'migration:ic:post_map:';
 
-    protected const string CACHE_TAG = 'migration:ic:posts';
+    public const string CACHE_TAG = 'migration:ic:posts';
 
     public static function getPostMapping(int $sourcePostId): ?int
     {

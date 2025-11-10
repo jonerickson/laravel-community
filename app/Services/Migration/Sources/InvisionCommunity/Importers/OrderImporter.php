@@ -25,11 +25,11 @@ use Illuminate\Support\Str;
 
 class OrderImporter extends AbstractImporter
 {
-    protected const string ENTITY_NAME = 'orders';
+    public const string ENTITY_NAME = 'orders';
 
-    protected const string CACHE_KEY_PREFIX = 'migration:ic:order_map:';
+    public const string CACHE_KEY_PREFIX = 'migration:ic:order_map:';
 
-    protected const string CACHE_TAG = 'migration:ic:orders';
+    public const string CACHE_TAG = 'migration:ic:orders';
 
     public static function getOrderMapping(int $sourceOrderId): ?int
     {
@@ -100,7 +100,7 @@ class OrderImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importOrder($sourceOrder, $config, $result);
+                    $this->importOrder($sourceOrder, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -132,7 +132,7 @@ class OrderImporter extends AbstractImporter
         $output->newLine();
     }
 
-    protected function importOrder(object $sourceOrder, MigrationConfig $config, MigrationResult $result): void
+    protected function importOrder(object $sourceOrder, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $user = $this->findUser($sourceOrder);
 
@@ -146,6 +146,28 @@ class OrderImporter extends AbstractImporter
             return;
         }
 
+        $invoiceNumber = $sourceOrder->i_id ?: null;
+
+        $existingOrder = Order::query()->where('invoice_number', $invoiceNumber)->first();
+
+        if ($existingOrder && $invoiceNumber) {
+            $this->cacheOrderMapping($sourceOrder->i_id, $existingOrder->id);
+            $result->incrementSkipped(self::ENTITY_NAME);
+
+            if ($output->isVeryVerbose()) {
+                $result->recordSkipped(self::ENTITY_NAME, [
+                    'source_id' => $sourceOrder->i_id,
+                    'user' => $user->name,
+                    'status' => $existingOrder->status->value,
+                    'total' => $sourceOrder->i_total,
+                    'currency' => $sourceOrder->i_currency,
+                    'reason' => 'Already exists',
+                ]);
+            }
+
+            return;
+        }
+
         $order = new Order;
         $order->forceFill([
             'user_id' => $user->id,
@@ -154,9 +176,9 @@ class OrderImporter extends AbstractImporter
             'amount_paid' => (float) $sourceOrder->i_total,
             'amount_overpaid' => 0,
             'amount_remaining' => 0,
-            'invoice_number' => $sourceOrder->i_id ?: null,
-            'external_order_id' => 'ic_'.$sourceOrder->i_id,
-            'external_invoice_id' => 'ic_'.$sourceOrder->i_id,
+            'invoice_number' => $invoiceNumber,
+            'external_order_id' => $sourceOrder->i_id,
+            'external_invoice_id' => $sourceOrder->i_id,
             'created_at' => $sourceOrder->i_date
                 ? Carbon::createFromTimestamp($sourceOrder->i_date)
                 : Carbon::now(),

@@ -19,13 +19,13 @@ use Illuminate\Support\Str;
 
 class ForumImporter extends AbstractImporter
 {
-    protected const string ENTITY_NAME = 'forums';
+    public const string ENTITY_NAME = 'forums';
 
-    protected const string CACHE_KEY_PREFIX = 'migration:ic:forum_map:';
+    public const string CACHE_KEY_PREFIX = 'migration:ic:forum_map:';
 
-    protected const string CACHE_KEY_CATEGORY_PREFIX = 'migration:ic:forum_category_map:';
+    public const string CACHE_KEY_CATEGORY_PREFIX = 'migration:ic:forum_category_map:';
 
-    protected const string CACHE_TAG = 'migration:ic:forums';
+    public const string CACHE_TAG = 'migration:ic:forums';
 
     public static function getForumMapping(int $sourceForumId): ?int
     {
@@ -103,7 +103,7 @@ class ForumImporter extends AbstractImporter
                 $sourceForumsData[] = $sourceForum;
 
                 try {
-                    $this->importForum($sourceForum, $config, $result);
+                    $this->importForum($sourceForum, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
                     $result->recordFailed(self::ENTITY_NAME, [
@@ -170,7 +170,7 @@ class ForumImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importCategory($sourceCategory, $config, $result);
+                    $this->importCategory($sourceCategory, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed('forum_categories');
                     $result->recordFailed('forum_categories', [
@@ -204,7 +204,7 @@ class ForumImporter extends AbstractImporter
         $output->newLine();
     }
 
-    protected function importCategory(object $sourceCategory, MigrationConfig $config, MigrationResult $result): void
+    protected function importCategory(object $sourceCategory, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $name = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveForumName($sourceCategory->id, "Invision Forum Category $sourceCategory->id")
@@ -216,8 +216,25 @@ class ForumImporter extends AbstractImporter
 
         $slug = Str::of($sourceCategory->name_seo ?? $name)
             ->slug()
-            ->unique('forums_categories', 'slug')
             ->toString();
+
+        $existingCategory = ForumCategory::query()->where('slug', $slug)->first();
+
+        if ($existingCategory) {
+            $this->cacheCategoryMapping($sourceCategory->id, $existingCategory->id);
+            $result->incrementSkipped(self::ENTITY_NAME);
+
+            if ($output->isVeryVerbose()) {
+                $result->recordSkipped(self::ENTITY_NAME, [
+                    'source_id' => $sourceCategory->id,
+                    'name' => $name,
+                    'slug' => $slug,
+                    'reason' => 'Already exists',
+                ]);
+            }
+
+            return;
+        }
 
         $category = new ForumCategory;
         $category->forceFill([
@@ -257,7 +274,7 @@ class ForumImporter extends AbstractImporter
         ]);
     }
 
-    protected function importForum(object $sourceForum, MigrationConfig $config, MigrationResult $result): void
+    protected function importForum(object $sourceForum, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $name = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveForumName($sourceForum->id, "Invision Forum $sourceForum->id")
@@ -269,8 +286,25 @@ class ForumImporter extends AbstractImporter
 
         $slug = Str::of($sourceForum->name_seo ?? $name)
             ->slug()
-            ->unique('forums', 'slug')
             ->toString();
+
+        $existingForum = Forum::query()->where('slug', $slug)->first();
+
+        if ($existingForum) {
+            $this->cacheForumMapping($sourceForum->id, $existingForum->id);
+            $result->incrementSkipped(self::ENTITY_NAME);
+
+            if ($output->isVeryVerbose()) {
+                $result->recordSkipped(self::ENTITY_NAME, [
+                    'source_id' => $sourceForum->id,
+                    'name' => $name,
+                    'slug' => $slug,
+                    'reason' => 'Already exists',
+                ]);
+            }
+
+            return;
+        }
 
         $forum = new Forum;
         $forum->forceFill([

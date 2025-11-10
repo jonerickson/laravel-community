@@ -23,11 +23,17 @@ class EnsureDefaultPaymentMethod
      */
     public function __invoke(Order $order, Closure $next)
     {
-        if (! $order->user->defaultPaymentMethod() && ($paymentMethods = $this->paymentManager->listPaymentMethods($order->user)) && $paymentMethods->isNotEmpty()) {
-            /** @var PaymentMethodData $paymentMethod */
-            $paymentMethod = $paymentMethods->first();
+        $defaultPaymentMethod = $order->user->defaultPaymentMethod();
 
-            $order->user->updateDefaultPaymentMethod($paymentMethod->id);
+        if (! $defaultPaymentMethod) {
+            $paymentMethods = $this->paymentManager->listPaymentMethods($order->user);
+
+            if ($paymentMethods->isNotEmpty()) {
+                /** @var PaymentMethodData $paymentMethod */
+                $paymentMethod = $paymentMethods->first();
+
+                $order->user->updateDefaultPaymentMethod($paymentMethod->id);
+            }
         }
 
         $order->user->updateDefaultPaymentMethodFromStripe();
