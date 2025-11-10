@@ -725,7 +725,7 @@ class MigrateCommand extends Command
         $osReservedMemoryMB = (int) ($totalMemoryMB * 0.25);
         $availableMemoryMB = $totalMemoryMB - $osReservedMemoryMB;
 
-        $workerMemoryLimitMB = (int) floor($availableMemoryMB / $maxProcesses);
+        $workerMemoryLimitMB = (int) min(1024, floor($availableMemoryMB / $maxProcesses));
 
         $memoryAfterAllocation = $totalMemoryMB - ($workerMemoryLimitMB * $maxProcesses);
         $memoryAfterAllocationPercent = ($memoryAfterAllocation / $totalMemoryMB) * 100;
