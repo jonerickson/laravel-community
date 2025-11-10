@@ -63,7 +63,7 @@ class MigrationService
             }
 
             foreach ($importer->getDependencies() as $dependency) {
-                if ($dependency->isOptional()) {
+                if ($dependency->isOptional() && ! in_array($dependency->entityName, $this->config->excluded)) {
                     $optional[$dependency->entityName] = $dependency;
                 }
             }
@@ -90,6 +90,10 @@ class MigrationService
 
         if (! is_null($this->config->entity)) {
             $this->migrateEntityWithDependencies($migrationSource, $this->config->entity, $output, $result);
+        } elseif ($this->config->entities !== []) {
+            foreach ($this->config->entities as $entity) {
+                $this->migrateEntityWithDependencies($migrationSource, $entity, $output, $result);
+            }
         } else {
             foreach ($migrationSource->getImporters() as $importerEntity => $importer) {
                 $this->migrateEntityWithDependencies($migrationSource, $importerEntity, $output, $result);
@@ -126,6 +130,13 @@ class MigrationService
         MigrationResult $result,
     ): void {
         if (in_array($entity, $this->migratedEntities)) {
+            return;
+        }
+
+        if (in_array($entity, $this->config->excluded)) {
+            $output->writeln("<comment>Skipping $entity - excluded</comment>");
+            $this->migratedEntities[] = $entity;
+
             return;
         }
 

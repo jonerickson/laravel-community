@@ -8,6 +8,7 @@ class MigrationConfig
 {
     public function __construct(
         public ?string $entity = null,
+        public array $entities = [],
         public int $batchSize = 1000,
         public ?int $limit = null,
         public ?int $offset = null,
@@ -20,6 +21,7 @@ class MigrationConfig
         public int $maxRecordsPerProcess = 1000,
         public int $maxProcesses = 4,
         public ?int $memoryLimit = null,
+        public array $excluded = [],
     ) {
         //
     }

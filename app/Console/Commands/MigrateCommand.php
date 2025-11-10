@@ -28,13 +28,13 @@ class MigrateCommand extends Command
     use ConfirmableTrait;
 
     protected $signature = 'app:migrate
-                            {source? : The migration source (e.g., invision-community)}
+                            {source? : The migration source}
                             {--force : Force the operation to run when in production}
-                            {--entity= : Specific entity to migrate (e.g., users, posts)}
+                            {--entity= : Specific entity or comma-delimited list of entities to migrate}
                             {--batch=1000 : Number of records to process per batch}
-                            {--limit= : Maximum number of records to migrate (useful for testing)}
+                            {--limit= : Maximum number of records to migrate}
                             {--id= : A specific user ID to only import}
-                            {--offset= : Number of records to skip before starting migration (useful for resuming)}
+                            {--offset= : Number of records to skip before starting migration}
                             {--dry-run : Preview migration without making changes}
                             {--check : Verify database connection and exit}
                             {--status : Display migration status with record counts for each entity}
@@ -42,6 +42,7 @@ class MigrateCommand extends Command
                             {--ssh : Connect to the source database via SSH tunnel}
                             {--media=1 : Download and store media files}
                             {--base-url= : Base URL of the source site for downloading files/images}
+                            {--excluded= : Comma-delimited list of entities to exclude from migration}
                             {--parallel : Enable concurrent processing with multiple processes}
                             {--max-records-per-process=1000 : Maximum records each process should handle before terminating}
                             {--max-processes=4 : Maximum number of concurrent processes to run}
@@ -227,6 +228,10 @@ class MigrateCommand extends Command
 
             if ($config->offset !== null && $config->offset !== 0) {
                 $this->warn("Starting migration from offset {$config->offset} (skipping first {$config->offset} records).");
+            }
+
+            if ($config->excluded !== []) {
+                $this->warn('Excluding entities: '.implode(', ', $config->excluded));
             }
 
             $this->promptForOptionalDependencies($service, $source, $config->entity);
@@ -712,8 +717,28 @@ class MigrateCommand extends Command
 
     protected function buildMigrationConfig(): MigrationConfig
     {
+        $excluded = [];
+        $entities = [];
+        $entity = $this->option('entity');
+
+        if ($this->option('excluded')) {
+            $excluded = array_map('trim', explode(',', $this->option('excluded')));
+        }
+
+        if ($entity) {
+            $entities = array_map('trim', explode(',', $entity));
+
+            if (count($entities) === 1) {
+                $entity = $entities[0];
+                $entities = [];
+            } else {
+                $entity = null;
+            }
+        }
+
         return new MigrationConfig(
-            entity: $this->option('entity'),
+            entity: $entity,
+            entities: $entities,
             batchSize: (int) $this->option('batch'),
             limit: $this->option('limit') ? (int) $this->option('limit') : null,
             offset: $this->option('offset') ? (int) $this->option('offset') : null,
@@ -726,6 +751,7 @@ class MigrateCommand extends Command
             maxRecordsPerProcess: (int) $this->option('max-records-per-process'),
             maxProcesses: (int) $this->option('max-processes'),
             memoryLimit: $this->option('memory-limit') ? (int) $this->option('memory-limit') : null,
+            excluded: $excluded,
         );
     }
 }

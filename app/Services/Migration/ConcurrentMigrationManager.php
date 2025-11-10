@@ -129,6 +129,10 @@ class ConcurrentMigrationManager
             $command[] = '--id='.$this->config->userId;
         }
 
+        if ($this->config->excluded !== []) {
+            $command[] = '--excluded='.implode(',', $this->config->excluded);
+        }
+
         $process = new Process($command, base_path());
         $process->setTimeout(null);
         $process->start();
