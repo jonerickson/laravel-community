@@ -725,7 +725,7 @@ class MigrateCommand extends Command
         $osReservedMemoryMB = (int) ($totalMemoryMB * 0.25);
         $availableMemoryMB = $totalMemoryMB - $osReservedMemoryMB;
 
-        $workerMemoryLimitMB = (int) min(1024, floor($availableMemoryMB / $maxProcesses));
+        $workerMemoryLimitMB = (int) min(512, floor($availableMemoryMB / $maxProcesses));
 
         $memoryAfterAllocation = $totalMemoryMB - ($workerMemoryLimitMB * $maxProcesses);
         $memoryAfterAllocationPercent = ($memoryAfterAllocation / $totalMemoryMB) * 100;
@@ -738,7 +738,7 @@ class MigrateCommand extends Command
             $this->error("Memory Left for OS: {$memoryAfterAllocation}MB ({$memoryAfterAllocationPercent}%)");
             $this->error('At least 25% of total memory must remain available for the OS.');
 
-            $maxSafeProcesses = (int) floor($availableMemoryMB / 256);
+            $maxSafeProcesses = (int) floor($availableMemoryMB / 512);
             $this->warn("Consider reducing --max-processes to {$maxSafeProcesses} or fewer.");
 
             return null;
