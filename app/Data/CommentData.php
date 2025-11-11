@@ -20,6 +20,8 @@ class CommentData extends Data
 
     public int $id;
 
+    public string $referenceId;
+
     public string $commentableType;
 
     public int $commentableId;

@@ -1,4 +1,5 @@
 import AppLogoIcon from '@/components/app-logo-icon';
+import { AbstractBackgroundPattern } from '@/components/ui/abstract-background-pattern';
 import { Link, usePage } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
@@ -19,16 +20,19 @@ export default function AuthSplitLayout({ children, title, description }: PropsW
                     {name}
                 </Link>
             </div>
-            <div className="flex w-full flex-col justify-center p-8 lg:col-span-2 lg:mx-auto lg:max-w-3xl lg:px-12">
-                <div className="flex w-full flex-col justify-center space-y-6">
-                    <Link href={route('home')} className="relative z-20 flex items-center justify-center lg:hidden">
-                        <AppLogoIcon className="h-10 fill-current text-black sm:h-12" />
-                    </Link>
-                    <div className="flex flex-col gap-2 text-center">
-                        <h1 className="text-xl font-medium">{title}</h1>
-                        <p className="text-sm text-balance text-muted-foreground">{description}</p>
+            <div className="relative flex flex-col justify-center lg:col-span-2">
+                <AbstractBackgroundPattern />
+                <div className="w-full p-8 lg:mx-auto lg:max-w-3xl lg:px-12">
+                    <div className="flex w-full flex-col justify-center space-y-6">
+                        <Link href={route('home')} className="relative z-20 flex items-center justify-center lg:hidden">
+                            <AppLogoIcon className="h-10 fill-current sm:h-12" />
+                        </Link>
+                        <div className="flex flex-col gap-2 text-center">
+                            <h1 className="text-xl font-medium">{title}</h1>
+                            <p className="text-sm text-balance text-muted-foreground">{description}</p>
+                        </div>
+                        {children}
                     </div>
-                    {children}
                 </div>
             </div>
         </div>

@@ -20,7 +20,7 @@ Your ticket has been re-opened and is now available for review. We'll address yo
 Your ticket is now being actively worked on. We'll keep you updated on the progress.
 @endif
 
-<x-mail::button :url="route('support.show', $supportTicket)">View ticket</x-mail::button>
+<x-mail::button :url="route('support.show', $supportTicket->reference_id)">View ticket</x-mail::button>
 
 Thanks,
 <br />

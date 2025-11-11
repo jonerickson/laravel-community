@@ -14,7 +14,9 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 #[MapInputName(SnakeCaseMapper::class)]
 class FileData extends Data
 {
-    public string $id;
+    public int $id;
+
+    public string $referenceId;
 
     public string $name;
 

@@ -115,7 +115,6 @@ export function CustomFieldInput({ field, value, onChange, error }: CustomFieldI
                 </Label>
             )}
             {renderInput()}
-            {field.description && field.type !== 'checkbox' && <p className="text-sm text-muted-foreground">{field.description}</p>}
             {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
     );

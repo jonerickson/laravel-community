@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Traits\HasReferenceId;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -15,6 +16,7 @@ use Override;
 
 /**
  * @property int $id
+ * @property string $reference_id
  * @property string|null $resource_type
  * @property int|null $resource_id
  * @property string $name
@@ -38,6 +40,7 @@ use Override;
  * @method static Builder<static>|File whereMime($value)
  * @method static Builder<static>|File whereName($value)
  * @method static Builder<static>|File wherePath($value)
+ * @method static Builder<static>|File whereReferenceId($value)
  * @method static Builder<static>|File whereResourceId($value)
  * @method static Builder<static>|File whereResourceType($value)
  * @method static Builder<static>|File whereSize($value)
@@ -47,6 +50,8 @@ use Override;
  */
 class File extends Model
 {
+    use HasReferenceId;
+
     protected $fillable = [
         'name',
         'description',

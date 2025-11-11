@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['domain' => config('app.url')], function (): void {
     Route::get('/', HomeController::class)->name('home');
 
-    Route::get('users/{user}', [UserController::class, 'show'])->name('users.show');
+    Route::get('users/{user:reference_id}', [UserController::class, 'show'])->name('users.show');
 
     Route::group(['middleware' => ['auth', 'email', 'password', 'verified', 'onboarded']], function (): void {
         Route::get('dashboard', DashboardController::class)->name('dashboard');

@@ -25,9 +25,9 @@ export function IntegrationStep({ integrations, onConnect, onNext, onPrevious, o
 
     return (
         <div className="flex flex-col gap-6">
-            <div className="rounded-lg border bg-muted/50 p-4">
+            <div className="rounded-lg border bg-card p-6 text-left">
                 <p className="text-sm text-muted-foreground">
-                    <strong className="font-medium text-foreground">More account providers coming soon!</strong>
+                    <strong className="font-medium text-foreground">More account providers coming soon</strong>
                     <br />
                     Connect your accounts to enhance your experience. You can skip this step and connect them later from your settings.
                 </p>
@@ -35,7 +35,7 @@ export function IntegrationStep({ integrations, onConnect, onNext, onPrevious, o
 
             <div className="grid gap-6 sm:grid-cols-2">
                 {integrations.map((integration) => (
-                    <Card key={integration.id} className={integration.connected ? 'border-primary bg-primary/5' : 'hover:border-primary/50'}>
+                    <Card key={integration.id} className={integration.connected ? 'border-border bg-primary/5' : 'hover:border-border/50'}>
                         <CardHeader>
                             <div className="flex items-start justify-between">
                                 <div className="flex items-center gap-3">

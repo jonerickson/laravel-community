@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Pipes\Stripe;
 
+use App\Data\ProductData;
 use App\Managers\PaymentManager;
 use App\Models\Order;
 use Closure;
@@ -32,7 +33,7 @@ class EnsureProductsExist
             if (! $product->external_product_id) {
                 $productData = $this->paymentManager->createProduct($product);
 
-                if (! $productData instanceof \App\Data\ProductData) {
+                if (! $productData instanceof ProductData) {
                     throw new Exception("Failed to create product in payment processor for product ID {$product->id}");
                 }
             }

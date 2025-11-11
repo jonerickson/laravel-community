@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Settings;
 
+use App\Data\CustomerData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\UpdateBillingRequest;
+use App\Managers\PaymentManager;
 use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
@@ -17,6 +19,7 @@ class BillingController extends Controller
     public function __construct(
         #[CurrentUser]
         private readonly User $user,
+        private readonly PaymentManager $paymentManager,
     ) {
         //
     }
@@ -34,12 +37,27 @@ class BillingController extends Controller
                 'vat_id',
                 'extra_billing_information',
             ]),
+            'portalUrl' => $this->paymentManager->getBillingPortalUrl($this->user),
         ]);
     }
 
     public function update(UpdateBillingRequest $request): RedirectResponse
     {
         $this->user->update($request->validated());
+
+        $result = true;
+        if (! $this->paymentManager->getCustomer($this->user) instanceof CustomerData) {
+            $result = $this->paymentManager->createCustomer($this->user);
+        }
+
+        if (! $result) {
+            return back()->with([
+                'message' => 'We were unable to sync your billing data. Please try again.',
+                'messageVariant' => 'error',
+            ]);
+        }
+
+        $this->paymentManager->syncCustomerInformation($this->user);
 
         return back()->with('message', 'Your billing information was updated successfully.');
     }

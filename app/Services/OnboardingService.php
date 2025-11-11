@@ -57,14 +57,18 @@ class OnboardingService
 
     public function determineInitialStep(?User $user): int
     {
-        if ($this->isInProgress()) {
-            return $this->getCurrentStep();
-        }
-
         if (! $user instanceof User) {
             $this->startOnboarding();
 
             return 0;
+        }
+
+        if ($this->isInProgress()) {
+            $currentStep = $this->getCurrentStep();
+
+            if ($currentStep >= 1) {
+                return $currentStep;
+            }
         }
 
         $step = 1;

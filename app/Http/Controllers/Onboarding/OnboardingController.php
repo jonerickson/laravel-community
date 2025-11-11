@@ -42,6 +42,10 @@ class OnboardingController extends Controller
             ->ordered()
             ->get()
             ->map(function (Field $field): FieldData {
+                if (is_null($this->user)) {
+                    return FieldData::from($field);
+                }
+
                 $userField = $this->user->fields->firstWhere('id', $field->id);
                 $fieldData = FieldData::from($field);
                 $fieldData->value = $userField?->pivot->value;

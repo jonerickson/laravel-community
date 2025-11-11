@@ -53,6 +53,7 @@ declare namespace App.Data {
     };
     export type CommentData = {
         id: number;
+        referenceId: string;
         commentableType: string;
         commentableId: number;
         content: string;
@@ -124,7 +125,8 @@ declare namespace App.Data {
         value: string | null;
     };
     export type FileData = {
-        id: string;
+        id: number;
+        referenceId: string;
         name: string;
         url: string;
         size: number | null;
@@ -392,6 +394,7 @@ declare namespace App.Data {
     };
     export type ProductData = {
         id: number;
+        referenceId: string;
         name: string;
         slug: string;
         description: string;
@@ -428,6 +431,7 @@ declare namespace App.Data {
     };
     export type RecentViewerUserData = {
         id: number;
+        referenceId: string;
         name: string;
         avatarUrl: string | null;
     };
@@ -475,6 +479,7 @@ declare namespace App.Data {
     };
     export type SupportTicketData = {
         id: number;
+        referenceId: string;
         subject: string;
         description: string;
         status: App.Enums.SupportTicketStatus;
@@ -531,6 +536,7 @@ declare namespace App.Data {
     };
     export type UserData = {
         id: number;
+        referenceId: string;
         name: string;
         email: string;
         avatarUrl: string | null;

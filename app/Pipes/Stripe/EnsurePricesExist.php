@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Pipes\Stripe;
 
+use App\Data\PriceData;
 use App\Managers\PaymentManager;
 use App\Models\Order;
 use Closure;
@@ -32,7 +33,7 @@ class EnsurePricesExist
             if (! $price->external_price_id) {
                 $priceData = $this->paymentManager->createPrice($price);
 
-                if (! $priceData instanceof \App\Data\PriceData) {
+                if (! $priceData instanceof PriceData) {
                     throw new Exception("Failed to create price in payment processor for price ID {$price->id}");
                 }
             }

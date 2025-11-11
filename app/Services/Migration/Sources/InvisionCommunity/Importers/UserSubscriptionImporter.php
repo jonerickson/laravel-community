@@ -4,16 +4,20 @@ declare(strict_types=1);
 
 namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
+use App\Data\SubscriptionData;
 use App\Enums\ProrationBehavior;
 use App\Enums\Role;
 use App\Jobs\ImportSubscription;
+use App\Managers\PaymentManager;
 use App\Models\Order;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
+use App\Services\Migration\Contracts\MigrationSource;
 use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Exception;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Database\Query\Builder;
@@ -29,6 +33,15 @@ class UserSubscriptionImporter extends AbstractImporter
     public const string CACHE_KEY_PREFIX = 'migration:ic:user_subscription_map:';
 
     public const string CACHE_TAG = 'migration:ic:user_subscriptions';
+
+    protected ?PaymentManager $paymentManager = null;
+
+    public function __construct(MigrationSource $source)
+    {
+        parent::__construct($source);
+
+        $this->paymentManager = app(PaymentManager::class);
+    }
 
     public function isCompleted(): bool
     {
@@ -176,7 +189,27 @@ class UserSubscriptionImporter extends AbstractImporter
 
             $billingCycleAnchor = isset($sourceUserSubscription->sub_expires)
                 ? Carbon::parse($sourceUserSubscription->sub_expires)
-                : now()->addYear();
+                : null;
+
+            if (is_null($billingCycleAnchor) || ($billingCycleAnchor instanceof CarbonInterface && $billingCycleAnchor->isPast())) {
+                $result->incrementSkipped(self::ENTITY_NAME);
+                $result->recordSkipped(self::ENTITY_NAME, [
+                    'source_id' => $sourceUserSubscription->sub_id,
+                    'reason' => 'Expiration date does not exist or is in the past',
+                ]);
+
+                return;
+            }
+
+            if ($this->paymentManager->currentSubscription($user) instanceof SubscriptionData) {
+                $result->incrementSkipped(self::ENTITY_NAME);
+                $result->recordSkipped(self::ENTITY_NAME, [
+                    'source_id' => $sourceUserSubscription->sub_id,
+                    'reason' => 'User already has current subscription',
+                ]);
+
+                return;
+            }
 
             ImportSubscription::dispatch($order, ProrationBehavior::None, $backdateStartDate, $billingCycleAnchor);
         }

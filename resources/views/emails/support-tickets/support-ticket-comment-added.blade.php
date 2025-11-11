@@ -13,7 +13,7 @@ Hello! A new comment has been added to support ticket **{{ $supportTicket->ticke
 {!! $comment->content !!}
 </x-mail::panel>
 
-<x-mail::button :url="route('support.show', $supportTicket)">
+<x-mail::button :url="route('support.show', $supportTicket->reference_id)">
 View ticket
 </x-mail::button>
 

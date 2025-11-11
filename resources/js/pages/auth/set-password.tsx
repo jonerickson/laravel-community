@@ -37,7 +37,6 @@ export default function SetPassword({ status }: { status?: string }) {
                     <div className="grid gap-2">
                         <Label htmlFor="password">New password</Label>
                         <Input
-                            className="bg-background"
                             id="password"
                             type="password"
                             name="password"
@@ -54,7 +53,6 @@ export default function SetPassword({ status }: { status?: string }) {
                     <div className="grid gap-2">
                         <Label htmlFor="password_confirmation">Confirm new password</Label>
                         <Input
-                            className="bg-background"
                             id="password_confirmation"
                             type="password"
                             name="password_confirmation"

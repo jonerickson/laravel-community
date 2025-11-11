@@ -50,7 +50,7 @@ Route::middleware('guest')->group(function (): void {
         ->middleware('throttle:login')
         ->name('magic-link.send');
 
-    Route::get('magic-link/login/{user}', [MagicLinkController::class, 'index'])
+    Route::get('magic-link/login/{user:reference_id}', [MagicLinkController::class, 'index'])
         ->middleware(['signed', 'throttle:login'])
         ->name('magic-link.login');
 });

@@ -114,7 +114,10 @@ function PricingCard({
                 </div>
                 <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
                 <CardDescription className="text-base">
-                    <Link href={route('store.subscriptions.reviews', plan.id)} className="my-4 flex w-full items-center justify-center text-center">
+                    <Link
+                        href={route('store.subscriptions.reviews', plan.referenceId)}
+                        className="my-4 flex w-full items-center justify-center text-center"
+                    >
                         <StarRating rating={plan.averageRating || 0} showValue={true} />
                     </Link>
                     <RichEditorContent content={plan.description} />

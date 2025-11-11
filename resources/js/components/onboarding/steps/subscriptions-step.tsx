@@ -63,7 +63,7 @@ export function SubscriptionsStep({
                             };
 
                         return (
-                            <Card key={subscription.id} className="border bg-muted/50">
+                            <Card key={subscription.id}>
                                 <CardHeader className="text-center">
                                     <CardTitle className="text-xl">{subscription.name}</CardTitle>
                                     {subscription.description && <CardDescription className="text-sm">{subscription.description}</CardDescription>}
@@ -96,8 +96,12 @@ export function SubscriptionsStep({
                     })}
                 </div>
             ) : (
-                <div className="rounded-lg border bg-muted/50 p-8 text-center">
-                    <p className="text-sm text-muted-foreground">No subscription plans available at this time.</p>
+                <div className="rounded-lg border bg-card p-6 text-left">
+                    <p className="text-sm text-muted-foreground">
+                        <strong className="font-medium text-foreground">No available subscriptions</strong>
+                        <br />
+                        Check back later for more options!
+                    </p>
                 </div>
             )}
 

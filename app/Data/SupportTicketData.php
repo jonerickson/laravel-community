@@ -20,6 +20,8 @@ class SupportTicketData extends Data
 {
     public int $id;
 
+    public string $referenceId;
+
     public string $subject;
 
     public string $description;

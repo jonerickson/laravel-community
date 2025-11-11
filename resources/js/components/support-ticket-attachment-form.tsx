@@ -28,7 +28,7 @@ export default function SupportTicketAttachmentForm({ ticket, onCancel, onSucces
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        post(route('support.attachments.store', ticket.id), {
+        post(route('support.attachments.store', ticket.referenceId), {
             preserveScroll: true,
             onSuccess: () => {
                 reset();

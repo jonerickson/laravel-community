@@ -193,6 +193,11 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->syncCustomerInformation($user);
     }
 
+    public function getBillingPortalUrl(User $user): ?string
+    {
+        return $this->driver()->getBillingPortalUrl($user);
+    }
+
     protected function createStripeDriver(): PaymentProcessor
     {
         $stripeSecret = $this->config->get('services.stripe.secret');

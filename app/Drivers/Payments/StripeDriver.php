@@ -519,11 +519,11 @@ class StripeDriver implements PaymentProcessor
                         'font_family' => 'inter',
                     ],
                     'success_url' => URL::signedRoute('store.checkout.success', [
-                        'order' => $order,
+                        'order' => $order->reference_id,
                         'redirect' => $successUrl ?? route('store.subscriptions', absolute: false),
                     ]),
                     'cancel_url' => URL::signedRoute('store.checkout.cancel', [
-                        'order' => $order,
+                        'order' => $order->reference_id,
                         'redirect' => route('store.subscriptions', absolute: false),
                     ]),
                 ])->asStripeCheckoutSession());
@@ -730,10 +730,10 @@ class StripeDriver implements PaymentProcessor
                 'client_reference_id' => $order->reference_id,
                 'customer' => $order->user->stripeId(),
                 'success_url' => URL::signedRoute('store.checkout.success', [
-                    'order' => $order,
+                    'order' => $order->reference_id,
                 ]),
                 'cancel_url' => URL::signedRoute('store.checkout.cancel', [
-                    'order' => $order,
+                    'order' => $order->reference_id,
                 ]),
                 'mode' => 'payment',
                 'line_items' => $lineItems,
@@ -910,6 +910,13 @@ class StripeDriver implements PaymentProcessor
 
             return true;
         }, false);
+    }
+
+    public function getBillingPortalUrl(User $user): ?string
+    {
+        return $this->executeWithErrorHandling('getBillingPortalUrl', fn (): ?string => $user->billingPortalUrl(
+            returnUrl: route('settings.billing'),
+        ));
     }
 
     private function executeWithErrorHandling(string $method, callable $callback, mixed $defaultValue = null): mixed

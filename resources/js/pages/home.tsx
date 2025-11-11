@@ -112,13 +112,13 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                                             My Dashboard
                                         </Link>
                                     ) : (
-                                        <Link href={route('login')} className="flex items-center gap-2">
+                                        <Link href={route('onboarding')} className="flex items-center gap-2">
                                             <UserPlus className="size-4" />
                                             Join The Community
                                         </Link>
                                     )}
                                 </Button>
-                                <Button variant="outline" size="lg" className="bg-background">
+                                <Button variant="outline" size="lg">
                                     <Link href={route('store.index')} className="flex items-center gap-2">
                                         <ShoppingCart className="size-4" />
                                         Browse Store

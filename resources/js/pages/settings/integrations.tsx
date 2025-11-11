@@ -93,7 +93,7 @@ export default function Integrations({ connectedAccounts }: ConnectedAccountsPro
                     <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                         <HeadingSmall title="Integrations" description="Connect your accounts for enhanced features and authentication" />
                         {availableToConnect.length > 0 && (
-                            <Button onClick={() => setShowAddDialog(true)}>
+                            <Button variant="outline" onClick={() => setShowAddDialog(true)}>
                                 <Plus className="mr-2 size-4" />
                                 Add Integration
                             </Button>

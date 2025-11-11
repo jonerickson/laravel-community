@@ -59,7 +59,7 @@ export default function SupportTicketsIndex({ tickets }: SupportTicketsIndexProp
                                                     <div className="flex items-center gap-2">
                                                         <CardTitle className="flex items-center gap-2">
                                                             <Ticket className="size-4" />
-                                                            <Link href={route('support.show', ticket.id)} className="hover:underline">
+                                                            <Link href={route('support.show', ticket.referenceId)} className="hover:underline">
                                                                 #{ticket.id} - {ticket.subject}
                                                             </Link>
                                                         </CardTitle>

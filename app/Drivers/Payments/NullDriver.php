@@ -186,4 +186,9 @@ class NullDriver implements PaymentProcessor
     {
         return false;
     }
+
+    public function getBillingPortalUrl(User $user): ?string
+    {
+        return null;
+    }
 }

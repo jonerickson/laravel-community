@@ -20,6 +20,8 @@ class ProductData extends Data
 {
     public int $id;
 
+    public string $referenceId;
+
     public string $name;
 
     public string $slug;

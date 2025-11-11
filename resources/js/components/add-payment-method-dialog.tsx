@@ -46,10 +46,13 @@ export default function AddPaymentMethodDialog({ open, onOpenChange }: AddPaymen
 
     return (
         <Dialog open={open} onOpenChange={handleClose}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-xl">
                 <DialogHeader>
                     <DialogTitle>Add a payment method</DialogTitle>
-                    <DialogDescription>Add a new credit or debit card to your account.</DialogDescription>
+                    <DialogDescription>
+                        Add a new credit or debit card to your account. In addition, mobile pay such as Apple Pay or Google Pay may be available
+                        during checkout.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-4">

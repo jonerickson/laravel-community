@@ -18,7 +18,7 @@ export default function SupportTicketCommentForm({ ticket, onCancel, onSuccess }
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        post(route('support.comments.store', ticket.id), {
+        post(route('support.comments.store', ticket.referenceId), {
             preserveScroll: true,
             onSuccess: () => {
                 reset();

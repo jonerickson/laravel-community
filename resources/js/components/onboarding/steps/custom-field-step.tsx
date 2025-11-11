@@ -25,17 +25,27 @@ export function CustomFieldStep({ fields, data, errors, processing, onChange, on
                 </div>
             )}
 
-            <div className="grid gap-6">
-                {fields.map((field) => (
-                    <CustomFieldInput
-                        key={field.id}
-                        field={field}
-                        value={data[field.id] || field.value || ''}
-                        onChange={(value) => onChange(field.id, value)}
-                        error={errors[`fields.${field.id}`]}
-                    />
-                ))}
-            </div>
+            {fields && fields.length > 0 ? (
+                <div className="grid gap-6">
+                    {fields.map((field) => (
+                        <CustomFieldInput
+                            key={field.id}
+                            field={field}
+                            value={data[field.id] || field.value || ''}
+                            onChange={(value) => onChange(field.id, value)}
+                            error={errors[`fields.${field.id}`]}
+                        />
+                    ))}
+                </div>
+            ) : (
+                <div className="rounded-lg border bg-card p-6 text-left">
+                    <p className="text-sm text-muted-foreground">
+                        <strong className="font-medium text-foreground">No profile fields</strong>
+                        <br />
+                        There are not custom profile fields that need attention at this time.
+                    </p>
+                </div>
+            )}
 
             <div className="flex flex-col gap-3 sm:flex-row">
                 <Button type="button" variant="outline" onClick={onPrevious} className="flex-1">

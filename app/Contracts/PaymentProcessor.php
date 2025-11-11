@@ -101,4 +101,6 @@ interface PaymentProcessor
     public function cancelOrder(Order $order): bool;
 
     public function syncCustomerInformation(User $user): bool;
+
+    public function getBillingPortalUrl(User $user): ?string;
 }

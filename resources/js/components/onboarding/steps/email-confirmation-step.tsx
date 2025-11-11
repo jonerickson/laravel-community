@@ -47,7 +47,7 @@ export function EmailConfirmationStep({ verified, processing, onResend, onNext, 
                         description="We've sent a verification link to your email address on file."
                     />
 
-                    <div className="rounded-lg border bg-muted/50 p-4">
+                    <div className="rounded-lg border bg-card p-6 text-left">
                         <p className="text-sm text-muted-foreground">
                             <strong className="font-medium text-foreground">Didn't receive the email?</strong>
                             <br />

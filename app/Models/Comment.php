@@ -8,6 +8,7 @@ use App\Enums\WarningConsequenceType;
 use App\Events\CommentCreated;
 use App\Traits\Approvable;
 use App\Traits\HasAuthor;
+use App\Traits\HasReferenceId;
 use App\Traits\Likeable;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,6 +23,7 @@ use Override;
 
 /**
  * @property int $id
+ * @property string $reference_id
  * @property string $commentable_type
  * @property int $commentable_id
  * @property string|null $content
@@ -63,6 +65,7 @@ use Override;
  * @method static Builder<static>|Comment whereIsApproved($value)
  * @method static Builder<static>|Comment whereParentId($value)
  * @method static Builder<static>|Comment whereRating($value)
+ * @method static Builder<static>|Comment whereReferenceId($value)
  * @method static Builder<static>|Comment whereUpdatedAt($value)
  *
  * @mixin Eloquent
@@ -72,6 +75,7 @@ class Comment extends Model
     use Approvable;
     use HasAuthor;
     use HasFactory;
+    use HasReferenceId;
     use Likeable;
 
     protected $dispatchesEvents = [

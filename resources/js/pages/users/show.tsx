@@ -24,7 +24,7 @@ export default function Show({ user }: UserProfilePageProps) {
         },
         {
             title: user.name,
-            href: route('users.show', { user: user.id }),
+            href: route('users.show', { user: user.referenceId }),
         },
     ];
 

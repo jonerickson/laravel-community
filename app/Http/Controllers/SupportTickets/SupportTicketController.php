@@ -79,7 +79,7 @@ class SupportTicketController extends Controller
 
         $ticket = $this->supportTicketManager->createTicket($validated);
 
-        return to_route('support.show', $ticket)
+        return to_route('support.show', $ticket->reference_id)
             ->with('message', 'Your support ticket was successfully created. Please check your email for updates.');
     }
 

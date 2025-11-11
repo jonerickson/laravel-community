@@ -31,7 +31,7 @@ class AttachmentController extends Controller
             'path' => $path,
         ]);
 
-        return to_route('support.show', $ticket)
+        return to_route('support.show', $ticket->reference_id)
             ->with('message', 'Your attachment was successfully added.');
     }
 
@@ -42,7 +42,7 @@ class AttachmentController extends Controller
 
         $file->delete();
 
-        return to_route('support.show', $ticket)
+        return to_route('support.show', $ticket->reference_id)
             ->with('message', 'The attachment was successfully deleted.');
     }
 }

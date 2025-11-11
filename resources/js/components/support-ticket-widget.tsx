@@ -15,7 +15,7 @@ export default function SupportTicketWidget({ tickets = [] }: SupportTicketsWidg
                 <div className="relative bg-background">
                     <Link
                         key={ticket.id}
-                        href={route('support.show', ticket.id)}
+                        href={route('support.show', ticket.referenceId)}
                         className="group block cursor-pointer rounded-lg border border-sidebar-border/50 bg-card/30 p-3 transition-all duration-200 hover:border-accent/30 hover:bg-accent/20 hover:shadow-sm"
                     >
                         <div className="space-y-1">

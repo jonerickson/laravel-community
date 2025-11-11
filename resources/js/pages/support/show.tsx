@@ -36,7 +36,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
         },
         {
             title: `Ticket #${ticket.id}`,
-            href: route('support.show', ticket.id),
+            href: route('support.show', ticket.referenceId),
         },
     ];
 
@@ -62,7 +62,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
             action: action,
         }));
 
-        updateForm.patch(route('support.update', ticket.id), {
+        updateForm.patch(route('support.update', ticket.referenceId), {
             preserveScroll: true,
             onSuccess: () => {
                 router.reload({ only: ['ticket'] });
@@ -70,12 +70,12 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
         });
     };
 
-    const handleDeleteAttachment = (fileId: string, fileName: string) => {
+    const handleDeleteAttachment = (fileReferenceId: string, fileName: string) => {
         if (!window.confirm(`Are you sure you want to delete "${fileName}"?`)) {
             return;
         }
 
-        deleteAttachmentForm.delete(route('support.attachments.destroy', [ticket.id, fileId]), {
+        deleteAttachmentForm.delete(route('support.attachments.destroy', [ticket.referenceId, fileReferenceId]), {
             preserveScroll: true,
             onSuccess: () => {
                 router.reload({ only: ['ticket'] });
@@ -256,7 +256,7 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        onClick={() => handleDeleteAttachment(file.id, file.name)}
+                                                        onClick={() => handleDeleteAttachment(file.referenceId, file.name)}
                                                         className="h-auto shrink-0 p-1 text-destructive hover:text-destructive"
                                                     >
                                                         <Trash2 className="size-4" />

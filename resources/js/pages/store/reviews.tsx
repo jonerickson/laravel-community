@@ -32,7 +32,7 @@ export default function Reviews({ subscription, reviews }: ReviewsPageProps) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        post(route('store.subscriptions.reviews.store', subscription.id), {
+        post(route('store.subscriptions.reviews.store', subscription.referenceId), {
             preserveScroll: true,
             onSuccess: () => {
                 reset();

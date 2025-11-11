@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { ExternalLink } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -35,6 +36,7 @@ interface BillingProps {
         vat_id?: string;
         extra_billing_information?: string;
     };
+    portalUrl: string | null;
 }
 
 type BillingForm = {
@@ -61,7 +63,7 @@ const countries = [
     { value: 'NL', label: 'Netherlands' },
 ];
 
-export default function Billing({ user }: BillingProps) {
+export default function Billing({ user, portalUrl }: BillingProps) {
     const { data, setData, post, errors, processing, recentlySuccessful } = useForm<BillingForm>({
         billing_address: user.billing_address || '',
         billing_address_line_2: user.billing_address_line_2 || '',
@@ -87,7 +89,20 @@ export default function Billing({ user }: BillingProps) {
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Billing information" description="Update your account billing information for invoices and tax purposes" />
+                    <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                        <HeadingSmall
+                            title="Billing information"
+                            description="Update your account billing information for invoices and tax purposes"
+                        />
+                        {portalUrl && (
+                            <Button variant="outline" asChild>
+                                <a href={portalUrl} target="_blank" rel="noopener noreferrer">
+                                    <ExternalLink className="mr-2 size-4" />
+                                    Billing Portal
+                                </a>
+                            </Button>
+                        )}
+                    </div>
 
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">

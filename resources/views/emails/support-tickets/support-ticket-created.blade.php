@@ -15,7 +15,7 @@ Hello! A new support ticket has been created and requires your attention.
 {!! $supportTicket->description !!}
 </x-mail::panel>
 
-<x-mail::button :url="route('support.show', $supportTicket)">
+<x-mail::button :url="route('support.show', $supportTicket->reference_id)">
 View ticket
 </x-mail::button>
 

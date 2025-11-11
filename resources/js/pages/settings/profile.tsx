@@ -1,6 +1,6 @@
 import { type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler, useRef, useState } from 'react';
 
 import { CustomFieldInput } from '@/components/custom-field-input';
@@ -16,6 +16,7 @@ import UpdatePassword from '@/components/update-password';
 import { useInitials } from '@/hooks/use-initials';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { User } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -94,9 +95,10 @@ export default function Profile({ fields }: ProfilePageProps) {
                         <HeadingSmall title="Profile information" description="Update your name and email address" />
                         {auth && auth.user && (
                             <Button variant="outline" asChild>
-                                <Link target="_blank" href={route('users.show', { user: auth.user.id })}>
-                                    View profile
-                                </Link>
+                                <a target="_blank" href={route('users.show', auth.user.referenceId)}>
+                                    <User className="mr-2 size-4" />
+                                    View Profile
+                                </a>
                             </Button>
                         )}
                     </div>
@@ -124,7 +126,6 @@ export default function Profile({ fields }: ProfilePageProps) {
                             <Label htmlFor="name">Name</Label>
                             <Input
                                 id="name"
-                                className="mt-1 block w-full"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
                                 required

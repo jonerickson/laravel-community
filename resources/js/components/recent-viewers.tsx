@@ -19,7 +19,7 @@ export default function RecentViewers({ viewers }: RecentViewersProps) {
                 <div className="mt-4 flex flex-wrap gap-2 hover:opacity-80">
                     {viewers.map((viewer) => (
                         <Link
-                            href={route('users.show', viewer.user.id)}
+                            href={route('users.show', viewer.user.referenceId)}
                             key={viewer.user.id}
                             className="flex items-center gap-2 rounded-md bg-muted/50 p-2 text-sm"
                         >

@@ -17,6 +17,8 @@ class UserData extends Data
 {
     public int $id;
 
+    public string $referenceId;
+
     public string $name;
 
     public string $email;

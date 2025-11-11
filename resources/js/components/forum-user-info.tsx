@@ -4,7 +4,7 @@ import { Link } from '@inertiajs/react';
 export default function ForumUserInfo({ user, isAuthor = false }: { user: App.Data.UserData; isAuthor?: boolean }) {
     return (
         <Link
-            href={route('users.show', user.id)}
+            href={route('users.show', user.referenceId)}
             className="flex flex-row items-center gap-4 hover:opacity-80 md:flex-col md:items-center md:gap-2 md:px-8"
         >
             <Avatar className="size-12">

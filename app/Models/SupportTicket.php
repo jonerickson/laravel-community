@@ -12,6 +12,7 @@ use App\Traits\Commentable;
 use App\Traits\HasAuthor;
 use App\Traits\HasFiles;
 use App\Traits\HasNotes;
+use App\Traits\HasReferenceId;
 use Filament\Support\Contracts\HasLabel;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
@@ -24,6 +25,7 @@ use Override;
 
 /**
  * @property int $id
+ * @property string $reference_id
  * @property string $ticket_number
  * @property string $subject
  * @property string $description
@@ -85,6 +87,7 @@ use Override;
  * @method static Builder<static>|SupportTicket whereLastSyncedAt($value)
  * @method static Builder<static>|SupportTicket whereOrderId($value)
  * @method static Builder<static>|SupportTicket wherePriority($value)
+ * @method static Builder<static>|SupportTicket whereReferenceId($value)
  * @method static Builder<static>|SupportTicket whereResolvedAt($value)
  * @method static Builder<static>|SupportTicket whereStatus($value)
  * @method static Builder<static>|SupportTicket whereSubject($value)
@@ -101,6 +104,7 @@ class SupportTicket extends Model implements HasLabel
     use HasFactory;
     use HasFiles;
     use HasNotes;
+    use HasReferenceId;
 
     protected $dispatchesEvents = [
         'created' => SupportTicketCreated::class,
