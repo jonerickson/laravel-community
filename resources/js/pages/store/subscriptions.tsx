@@ -120,7 +120,7 @@ function PricingCard({
                     >
                         <StarRating rating={plan.averageRating || 0} showValue={true} />
                     </Link>
-                    <RichEditorContent content={plan.description} />
+                    {plan.description && <RichEditorContent content={plan.description} />}
                 </CardDescription>
 
                 <div className="mt-6">
@@ -518,7 +518,7 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                     </div>
                 </div>
             ) : (
-                <div className='-mt-6'>
+                <div className="-mt-6">
                     <EmptyState
                         icon={<Package />}
                         title="No subscription plans available"

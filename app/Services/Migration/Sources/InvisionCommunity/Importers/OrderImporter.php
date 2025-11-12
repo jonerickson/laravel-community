@@ -251,6 +251,7 @@ class OrderImporter extends AbstractImporter
             foreach ($items as $item) {
                 $itemId = $item['itemID'] ?? null;
                 $itemType = $item['type'] ?? null;
+                $itemAction = $item['act'] ?? null;
 
                 if (! $itemId || ! $itemType) {
                     $orderItems[] = $this->createOrderItem($order, $item, $sourceOrder, null, null);
@@ -258,7 +259,7 @@ class OrderImporter extends AbstractImporter
                     continue;
                 }
 
-                $product = $this->findProductByItemType($itemType, $itemId);
+                $product = $this->findProductByItemType($sourceOrder, $itemType, $itemId, $itemAction);
 
                 if (! $product instanceof Product) {
                     $orderItems[] = $this->createOrderItem($order, $item, $sourceOrder, null, null);
@@ -297,10 +298,11 @@ class OrderImporter extends AbstractImporter
         $orderItem->forceFill([
             'order_id' => $order->id,
             'price_id' => $price?->id,
-            'name' => $item['itemName'] ?? $product?->name ?? 'Order #'.$sourceOrder->i_id,
+            'name' => Str::trim($item['itemName'] ?? $product?->name ?? 'Order #'.$sourceOrder->i_id),
             'amount' => (float) ($item['cost'] ?? 0),
             'quantity' => $item['quantity'] ?? 1,
             'commission_amount' => 0,
+            'external_item_id' => $item['itemID'] ?? null,
         ]);
 
         return $orderItem;
@@ -321,7 +323,7 @@ class OrderImporter extends AbstractImporter
         return null;
     }
 
-    protected function findProductByItemType(string $itemType, int $itemId): ?Product
+    protected function findProductByItemType(object $sourceOrder, string $itemType, int $itemId, string $itemAction): ?Product
     {
         if ($itemType === 'package') {
             $mappedProductId = ProductImporter::getProductMapping($itemId);
@@ -334,13 +336,41 @@ class OrderImporter extends AbstractImporter
         }
 
         if ($itemType === 'subscription') {
-            $mappedProductId = SubscriptionImporter::getSubscriptionMapping($itemId);
+            if ($itemAction === 'new') {
+                $mappedProductId = SubscriptionImporter::getSubscriptionMapping($itemId);
 
-            if ($mappedProductId !== null && $mappedProductId !== 0) {
-                return Product::query()->find($mappedProductId);
+                if ($mappedProductId !== null && $mappedProductId !== 0) {
+                    return Product::query()->find($mappedProductId);
+                }
+
+                return null;
             }
 
-            return null;
+            if ($itemAction === 'renewal') {
+                $renewalIds = array_filter(explode(',', (string) $sourceOrder->i_renewal_ids));
+
+                if ($renewalIds === []) {
+                    return null;
+                }
+
+                $renewalId = $renewalIds[0];
+
+                if (! $sourcePurchase = DB::connection($this->source->getConnection())->table('nexus_purchases')->where('ps_id', $renewalId)->first()) {
+                    return null;
+                }
+
+                if ($sourcePurchase->ps_item_id === null || $sourcePurchase->ps_item_id === 0) {
+                    return null;
+                }
+
+                $mappedProductId = SubscriptionImporter::getSubscriptionMapping($sourcePurchase->ps_item_id);
+
+                if ($mappedProductId !== null && $mappedProductId !== 0) {
+                    return Product::query()->find($mappedProductId);
+                }
+
+                return null;
+            }
         }
 
         return null;

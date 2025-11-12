@@ -58,7 +58,7 @@ class TopicResource extends Resource
                                     ->required()
                                     ->maxLength(255),
                                 Textarea::make('description')
-                                    ->maxLength(500)
+                                    ->maxLength(65535)
                                     ->rows(3),
                             ]),
                     ]),
@@ -115,7 +115,7 @@ class TopicResource extends Resource
                     ->sortable(),
                 TextColumn::make('posts_count')
                     ->label('Posts')
-                    ->numeric()
+                    ->counts('posts')
                     ->sortable(),
                 ToggleColumn::make('is_pinned')
                     ->sortable()

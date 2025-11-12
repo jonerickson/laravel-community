@@ -370,7 +370,7 @@ function SubscriptionCards({ subscriptions }: SubscriptionCardsProps) {
                         )}
                         <CardHeader>
                             <CardTitle>{subscription.name}</CardTitle>
-                            <CardDescription>{stripCharacters(subscription.description)}</CardDescription>
+                            {subscription.description && <CardDescription>{stripCharacters(subscription.description)}</CardDescription>}
                             {defaultPrice && (
                                 <div className="mt-4 text-3xl font-bold">
                                     {currency(defaultPrice.amount, false)}

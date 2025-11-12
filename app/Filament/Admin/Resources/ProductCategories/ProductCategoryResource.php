@@ -75,7 +75,7 @@ class ProductCategoryResource extends Resource
                                 Textarea::make('description')
                                     ->helperText('A helpful description on what the product category features.')
                                     ->columnSpanFull()
-                                    ->maxLength(500)
+                                    ->maxLength(65535)
                                     ->rows(3),
                             ]),
                         Section::make('Media')

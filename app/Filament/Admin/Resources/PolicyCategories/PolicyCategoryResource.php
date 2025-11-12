@@ -63,6 +63,7 @@ class PolicyCategoryResource extends Resource
                                     ->unique(ignoreRecord: true)
                                     ->rules(['alpha_dash']),
                                 Textarea::make('description')
+                                    ->maxLength(65535)
                                     ->columnSpanFull(),
                             ]),
                     ]),

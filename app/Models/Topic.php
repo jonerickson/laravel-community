@@ -114,7 +114,6 @@ class Topic extends Model implements Sluggable
     ];
 
     protected $appends = [
-        'posts_count',
         'is_hot',
         'has_reported_content',
         'has_unpublished_content',

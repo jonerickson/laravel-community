@@ -204,19 +204,15 @@ trait Trendable
         $score = 0.0;
 
         if (property_exists($this, 'views_count')) {
-            $score += ($this->views_count ?? 0) * ($weights['views'] ?? 1.0);
         }
 
         if (property_exists($this, 'unique_views_count')) {
-            $score += ($this->unique_views_count ?? 0) * ($weights['unique_views'] ?? 1.5);
         }
 
         if (property_exists($this, 'posts_count')) {
-            $score += ($this->posts_count ?? 0) * ($weights['posts'] ?? 3.0);
         }
 
         if (property_exists($this, 'reads_count')) {
-            $score += ($this->reads_count ?? 0) * ($weights['reads'] ?? 2.0);
         }
 
         $likesScore = $this->calculateLikesScore();

@@ -163,9 +163,9 @@ class SubscriptionImporter extends AbstractImporter
 
         $product = new Product;
         $product->forceFill([
-            'name' => $name,
+            'name' => Str::trim($name),
             'slug' => $slug,
-            'description' => "Subscription imported from Invision Community: $name",
+            'description' => null,
             'type' => ProductType::Subscription,
             'is_featured' => (bool) $sourceSubscription->sp_featured,
             'is_subscription_only' => true,
@@ -324,7 +324,7 @@ class SubscriptionImporter extends AbstractImporter
         $groupIds = [];
 
         if (! empty($sourceSubscription->sp_primary_group)) {
-            foreach (explode(',', (string) $sourceSubscription->sp_primary_group) as $groupId) {
+            foreach (array_filter(explode(',', (string) $sourceSubscription->sp_primary_group)) as $groupId) {
                 $mappedGroupId = GroupImporter::getGroupMapping((int) $groupId);
 
                 if ($mappedGroupId !== null && $mappedGroupId !== 0) {
@@ -334,7 +334,7 @@ class SubscriptionImporter extends AbstractImporter
         }
 
         if (! empty($sourceSubscription->sp_secondary_group)) {
-            foreach (explode(',', (string) $sourceSubscription->sp_secondary_group) as $groupId) {
+            foreach (array_filter(explode(',', (string) $sourceSubscription->sp_secondary_group)) as $groupId) {
                 $mappedGroupId = GroupImporter::getGroupMapping((int) $groupId);
 
                 if ($mappedGroupId && ! in_array($mappedGroupId, $groupIds)) {

@@ -242,9 +242,9 @@ class ProductImporter extends AbstractImporter
 
         $category = new ProductCategory;
         $category->forceFill([
-            'name' => $name,
+            'name' => Str::trim($name),
             'slug' => $slug,
-            'description' => strip_tags($description ?? ''),
+            'description' => in_array(strip_tags($description ?? ''), ['', '0'], true) ? null : strip_tags($description ?? ''),
             'order' => $sourceCategory->pg_position ?? 0,
             'is_active' => true,
         ]);
@@ -347,9 +347,9 @@ class ProductImporter extends AbstractImporter
 
         $product = new Product;
         $product->forceFill([
-            'name' => $name,
+            'name' => Str::trim($name),
             'slug' => $slug,
-            'description' => strip_tags($sourceProduct->p_page ?? ''),
+            'description' => in_array(strip_tags($sourceProduct->p_page ?? ''), ['', '0'], true) ? null : strip_tags($sourceProduct->p_page ?? ''),
             'type' => ProductType::Product,
             'is_featured' => (bool) $sourceProduct->p_featured,
             'approval_status' => ProductApprovalStatus::Approved,
@@ -535,7 +535,7 @@ class ProductImporter extends AbstractImporter
         $groupIds = [];
 
         if (! empty($sourceProduct->p_primary_group)) {
-            foreach (explode(',', (string) $sourceProduct->p_primary_group) as $groupId) {
+            foreach (array_filter(explode(',', (string) $sourceProduct->p_primary_group)) as $groupId) {
                 $mappedGroupId = GroupImporter::getGroupMapping((int) $groupId);
 
                 if ($mappedGroupId !== null && $mappedGroupId !== 0) {
@@ -545,7 +545,7 @@ class ProductImporter extends AbstractImporter
         }
 
         if (! empty($sourceProduct->p_secondary_group)) {
-            foreach (explode(',', (string) $sourceProduct->p_secondary_group) as $groupId) {
+            foreach (array_filter(explode(',', (string) $sourceProduct->p_secondary_group)) as $groupId) {
                 $mappedGroupId = GroupImporter::getGroupMapping((int) $groupId);
 
                 if ($mappedGroupId && ! in_array($mappedGroupId, $groupIds)) {

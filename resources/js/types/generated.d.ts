@@ -399,7 +399,7 @@ declare namespace App.Data {
         referenceId: string;
         name: string;
         slug: string;
-        description: string;
+        description: string | null;
         type: App.Enums.ProductType;
         taxCode: App.Enums.ProductTaxCode | null;
         isFeatured: boolean;

@@ -25,6 +25,7 @@ class WarningForm
                             ->maxLength(255)
                             ->columnSpanFull(),
                         Textarea::make('description')
+                            ->maxLength(65535)
                             ->rows(3)
                             ->columnSpanFull(),
                         TextInput::make('points')

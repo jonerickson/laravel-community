@@ -94,6 +94,7 @@ class PricesRelationManager extends RelationManager
                     ->label('Default')
                     ->helperText('Whether this is the default price option.'),
                 Textarea::make('description')
+                    ->maxLength(65535)
                     ->columnSpanFull()
                     ->helperText('Additional description for this price option.'),
             ]);

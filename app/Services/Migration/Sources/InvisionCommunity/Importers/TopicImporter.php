@@ -185,7 +185,7 @@ class TopicImporter extends AbstractImporter
 
         $topic = new Topic;
         $topic->forceFill([
-            'title' => $title,
+            'title' => Str::trim($title),
             'slug' => $slug,
             'forum_id' => $forum->id,
             'is_pinned' => $sourceTopic->pinned,

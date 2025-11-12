@@ -32,7 +32,7 @@ export default function StoreCategoriesProductItem({ product }: { product: App.D
             <div className="flex flex-1 flex-col pt-4">
                 <div className="flex-1">
                     <div className="mb-2 flex items-center gap-2">
-                        <HeadingSmall title={product.name} description={truncate(stripCharacters(product.description))} />
+                        <HeadingSmall title={product.name} description={truncate(stripCharacters(product.description || ''))} />
                     </div>
                     <div className="mt-3">
                         <StarRating rating={product.averageRating || 0} size="sm" className="mb-1" />

@@ -25,7 +25,7 @@ class ProductData extends Data
 
     public string $slug;
 
-    public string $description;
+    public ?string $description = null;
 
     public ProductType $type;
 

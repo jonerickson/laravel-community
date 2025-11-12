@@ -71,6 +71,7 @@ class ProductResource extends Resource
                                     ->options(ProductType::class)
                                     ->default(ProductType::Product->value),
                                 TextInput::make('name')
+                                    ->maxLength(255)
                                     ->helperText('The product name.')
                                     ->required()
                                     ->live(onBlur: true)
@@ -103,8 +104,8 @@ class ProductResource extends Resource
                                     ->searchable()
                                     ->helperText('Groups that a customer will be assigned when they purchase this product.'),
                                 RichEditor::make('description')
+                                    ->maxLength(65535)
                                     ->helperText('The main product overview.')
-                                    ->required()
                                     ->columnSpanFull(),
                             ]),
                         Section::make('Media')

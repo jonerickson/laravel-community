@@ -40,6 +40,7 @@ class FieldForm
                                     ->helperText('The field input type.'),
                             ]),
                         Forms\Components\Textarea::make('description')
+                            ->maxLength(65535)
                             ->rows(3)
                             ->helperText('An optional description or help text.'),
                         Forms\Components\Repeater::make('options')

@@ -59,6 +59,7 @@ class SupportTicketForm
                             ->required()
                             ->maxLength(255),
                         Forms\Components\RichEditor::make('description')
+                            ->maxLength(65535)
                             ->required()
                             ->columnSpanFull(),
                     ]),

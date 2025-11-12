@@ -85,7 +85,7 @@ class ForumResource extends Resource
                         Textarea::make('description')
                             ->helperText('A helpful description on what the forum is about.')
                             ->columnSpanFull()
-                            ->maxLength(500)
+                            ->maxLength(65535)
                             ->rows(3),
                         RichEditor::make('rules')
                             ->columnSpanFull()
@@ -152,7 +152,7 @@ class ForumResource extends Resource
                     ->sortable(),
                 TextColumn::make('posts_count')
                     ->label('Posts')
-                    ->getStateUsing(fn (Forum $record): int => $record->posts_count)
+                    ->counts('posts')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Created')

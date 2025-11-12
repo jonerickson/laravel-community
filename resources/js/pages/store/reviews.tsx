@@ -58,9 +58,11 @@ export default function Reviews({ subscription, reviews }: ReviewsPageProps) {
                         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                             <div className="flex-1">
                                 <CardTitle className="text-2xl">{subscription.name}</CardTitle>
-                                <CardDescription className="mt-2">
-                                    <RichEditorContent content={subscription.description} />
-                                </CardDescription>
+                                {subscription.description && (
+                                    <CardDescription className="mt-2">
+                                        <RichEditorContent content={subscription.description} />
+                                    </CardDescription>
+                                )}
                                 {defaultPrice && (
                                     <div className="mt-4 flex items-baseline gap-1">
                                         <span className="text-2xl font-bold">{currency(defaultPrice.amount)}</span>

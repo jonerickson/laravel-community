@@ -60,6 +60,7 @@ class GroupResource extends Resource
                                     ->required()
                                     ->maxLength(255),
                                 Textarea::make('description')
+                                    ->maxLength(65535)
                                     ->nullable(),
                                 ColorPicker::make('color')
                                     ->required(),
@@ -146,6 +147,7 @@ class GroupResource extends Resource
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('description')
+                    ->placeholder('No Description')
                     ->searchable()
                     ->limit(),
                 TextColumn::make('roles.name')

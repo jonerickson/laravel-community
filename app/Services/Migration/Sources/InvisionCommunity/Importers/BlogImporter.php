@@ -181,7 +181,7 @@ class BlogImporter extends AbstractImporter
         $post = new Post;
         $post->forceFill([
             'type' => PostType::Blog,
-            'title' => $title,
+            'title' => Str::trim($title),
             'excerpt' => $excerpt,
             'content' => $content,
             'slug' => $slug,

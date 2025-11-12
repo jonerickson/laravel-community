@@ -187,8 +187,8 @@ class UserSubscriptionImporter extends AbstractImporter
                 ? Carbon::parse($sourceUserSubscription->sub_start)
                 : now();
 
-            $billingCycleAnchor = isset($sourceUserSubscription->sub_expires)
-                ? Carbon::parse($sourceUserSubscription->sub_expires)
+            $billingCycleAnchor = isset($sourceUserSubscription->sub_expire)
+                ? Carbon::parse($sourceUserSubscription->sub_expire)
                 : null;
 
             if (is_null($billingCycleAnchor) || ($billingCycleAnchor instanceof CarbonInterface && $billingCycleAnchor->isPast())) {

@@ -26,6 +26,7 @@ class SupportTicketCategoryForm
                             ->disabled()
                             ->dehydrated(false),
                         Forms\Components\Textarea::make('description')
+                            ->maxLength(65535)
                             ->rows(3)
                             ->columnSpanFull(),
                         Forms\Components\ColorPicker::make('color')

@@ -50,7 +50,7 @@ class PageForm
                                     ->unique(ignoreRecord: true)
                                     ->rules(['alpha_dash']),
                                 Textarea::make('description')
-                                    ->maxLength(500)
+                                    ->maxLength(65535)
                                     ->rows(3)
                                     ->columnSpanFull(),
                             ]),

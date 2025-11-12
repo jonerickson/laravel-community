@@ -160,8 +160,8 @@ class GroupImporter extends AbstractImporter
 
         $group = new Group;
         $group->forceFill([
-            'name' => $name,
-            'description' => 'An Invision Community migrated group.',
+            'name' => Str::trim($name),
+            'description' => null,
             'color' => $this->convertColor($sourceGroup->prefix ?? ''),
             'is_active' => true,
             'is_default_guest' => false,

@@ -30,7 +30,6 @@ class ProductForm
                 RichEditor::make('description')
                     ->helperText('The main product overview.')
                     ->maxLength(65535)
-                    ->required()
                     ->columnSpanFull(),
                 FileUpload::make('featured_image')
                     ->directory('products')

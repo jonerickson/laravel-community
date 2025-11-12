@@ -46,7 +46,7 @@ class ForumCategoryForm
                             Textarea::make('description')
                                 ->helperText('A helpful description on what the forum is about.')
                                 ->columnSpanFull()
-                                ->maxLength(500)
+                                ->maxLength(65535)
                                 ->rows(3),
                             TextInput::make('icon')
                                 ->maxLength(255)

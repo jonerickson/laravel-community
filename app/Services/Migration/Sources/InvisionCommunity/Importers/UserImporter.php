@@ -16,6 +16,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class UserImporter extends AbstractImporter
 {
@@ -161,10 +162,10 @@ class UserImporter extends AbstractImporter
 
         $user = new User;
         $user->forceFill([
-            'name' => $sourceUser->name,
+            'name' => Str::trim($sourceUser->name),
             'email' => $email,
             'email_verified_at' => Carbon::now(),
-            'signature' => strip_tags($sourceUser->signature ?? ''),
+            'signature' => in_array(strip_tags($sourceUser->signature ?? ''), ['', '0'], true) ? null : strip_tags($sourceUser->signature ?? ''),
             'last_seen_at' => $sourceUser->last_activity ? Carbon::createFromTimestamp($sourceUser->last_activity) : null,
             'created_at' => Carbon::createFromTimestamp($sourceUser->joined),
         ]);
@@ -201,7 +202,7 @@ class UserImporter extends AbstractImporter
         }
 
         if (! empty($sourceUser->mgroup_others)) {
-            foreach (explode(',', (string) $sourceUser->mgroup_others) as $secondaryGroupId) {
+            foreach (array_filter(explode(',', (string) $sourceUser->mgroup_others)) as $secondaryGroupId) {
                 $mappedGroupId = GroupImporter::getGroupMapping((int) $secondaryGroupId);
 
                 if ($mappedGroupId && ! in_array($mappedGroupId, $groupIds)) {
