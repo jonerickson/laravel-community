@@ -102,6 +102,7 @@ DROP TABLE IF EXISTS `comments`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `comments` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `reference_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `commentable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `commentable_id` bigint unsigned NOT NULL,
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
@@ -177,10 +178,10 @@ DROP TABLE IF EXISTS `fields`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `fields` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `label` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text',
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `options` json DEFAULT NULL,
   `is_required` tinyint(1) NOT NULL DEFAULT '0',
   `is_public` tinyint(1) NOT NULL DEFAULT '1',
@@ -195,6 +196,7 @@ DROP TABLE IF EXISTS `files`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `files` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `reference_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `resource_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `resource_id` bigint unsigned DEFAULT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -287,7 +289,7 @@ CREATE TABLE `forums_categories` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `featured_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `featured_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `color` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -1087,6 +1089,7 @@ DROP TABLE IF EXISTS `support_tickets`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `support_tickets` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `reference_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `ticket_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -1258,7 +1261,7 @@ CREATE TABLE `users_fields` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
   `field_id` bigint unsigned NOT NULL,
-  `value` text COLLATE utf8mb4_unicode_ci,
+  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -1492,8 +1495,11 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (127,'2025_11_03_18
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (128,'2025_11_03_205054_add_featured_image_to_products_categories_table',46);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (133,'2025_11_05_005537_add_does_not_expire_to_subscriptions_table',47);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (134,'2025_11_05_200042_add_price_type_to_prices_table',47);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (135,'2025_09_28_202015_create_email_settings',48);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (136,'2025_09_28_202053_create_general_settings',48);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (137,'2025_11_06_193510_add_featured_image_to_forums_categories_table',48);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (138,'2025_11_07_013939_create_fields_table',48);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (139,'2025_11_07_013955_create_user_fields_table',48);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (140,'2025_09_28_202015_create_email_settings',49);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (141,'2025_09_28_202053_create_general_settings',49);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (142,'2025_11_11_181015_add_reference_id_to_support_tickets_table',49);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (143,'2025_11_11_181656_add_reference_id_to_comments_table',49);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (144,'2025_11_11_181835_add_reference_id_to_files_table',49);

@@ -518,11 +518,13 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                     </div>
                 </div>
             ) : (
-                <EmptyState
-                    icon={<Package />}
-                    title="No subscription plans available"
-                    description="We're currently working on our subscription offerings. Check back soon for exciting plans and features!"
-                />
+                <div className='-mt-6'>
+                    <EmptyState
+                        icon={<Package />}
+                        title="No subscription plans available"
+                        description="We're currently working on our subscription offerings. Check back soon for exciting plans and features!"
+                    />
+                </div>
             )}
 
             <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
