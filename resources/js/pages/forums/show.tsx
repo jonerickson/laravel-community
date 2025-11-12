@@ -264,34 +264,34 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                                             </div>
                                         </TableCell>
                                         <TableCell className="hidden p-4 text-right md:table-cell">
-                                            {subforum.latestTopics && subforum.latestTopics.length > 0 ? (
+                                            {subforum.latestTopic ? (
                                                 <div className="text-sm">
                                                     <div className="mb-1">
                                                         <Link
                                                             href={route('forums.topics.show', {
                                                                 forum: subforum.slug,
-                                                                topic: subforum.latestTopics[0].slug,
+                                                                topic: subforum.latestTopic.slug,
                                                             })}
                                                             className="font-medium text-wrap break-words hover:underline"
                                                         >
-                                                            {subforum.latestTopics[0].title}
+                                                            {subforum.latestTopic.title}
                                                         </Link>
                                                     </div>
                                                     <div className="flex items-center justify-end gap-2 text-xs text-muted-foreground">
                                                         <Avatar className="size-4">
                                                             <AvatarFallback className="text-xs">
-                                                                {subforum.latestTopics[0].author?.name?.charAt(0).toUpperCase() || 'U'}
+                                                                {subforum.latestTopic.author?.name?.charAt(0).toUpperCase() || 'U'}
                                                             </AvatarFallback>
                                                         </Avatar>
-                                                        <span>by {subforum.latestTopics[0].author?.name}</span>
+                                                        <span>by {subforum.latestTopic.author?.name}</span>
                                                         <span>•</span>
                                                         <span>
-                                                            {subforum.latestTopics[0].lastReplyAt
-                                                                ? formatDistanceToNow(new Date(subforum.latestTopics[0].lastReplyAt), {
+                                                            {subforum.latestTopic.lastReplyAt
+                                                                ? formatDistanceToNow(new Date(subforum.latestTopic.lastReplyAt), {
                                                                       addSuffix: true,
                                                                   })
-                                                                : subforum.latestTopics[0].createdAt
-                                                                  ? formatDistanceToNow(new Date(subforum.latestTopics[0].createdAt), {
+                                                                : subforum.latestTopic.createdAt
+                                                                  ? formatDistanceToNow(new Date(subforum.latestTopic.createdAt), {
                                                                         addSuffix: true,
                                                                     })
                                                                   : 'N/A'}

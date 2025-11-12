@@ -142,34 +142,34 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                                             </div>
                                         </TableCell>
                                         <TableCell className="hidden p-4 text-right md:table-cell">
-                                            {forum.latestTopics && forum.latestTopics.length > 0 ? (
+                                            {forum.latestTopic ? (
                                                 <div className="text-sm">
                                                     <div className="mb-1">
                                                         <Link
                                                             href={route('forums.topics.show', {
                                                                 forum: forum.slug,
-                                                                topic: forum.latestTopics[0].slug,
+                                                                topic: forum.latestTopic.slug,
                                                             })}
                                                             className="font-medium text-wrap break-words hover:underline"
                                                         >
-                                                            {forum.latestTopics[0].title}
+                                                            {forum.latestTopic.title}
                                                         </Link>
                                                     </div>
                                                     <div className="flex items-center justify-end gap-2 text-xs text-muted-foreground">
                                                         <Avatar className="size-4">
                                                             <AvatarFallback className="text-xs">
-                                                                {forum.latestTopics[0].author?.name?.charAt(0).toUpperCase() || 'U'}
+                                                                {forum.latestTopic.author?.name?.charAt(0).toUpperCase() || 'U'}
                                                             </AvatarFallback>
                                                         </Avatar>
-                                                        <span>by {forum.latestTopics[0].author?.name}</span>
+                                                        <span>by {forum.latestTopic.author?.name}</span>
                                                         <span>•</span>
                                                         <span>
-                                                            {forum.latestTopics[0].lastReplyAt
-                                                                ? formatDistanceToNow(new Date(forum.latestTopics[0].lastReplyAt), {
+                                                            {forum.latestTopic.lastReplyAt
+                                                                ? formatDistanceToNow(new Date(forum.latestTopic.lastReplyAt), {
                                                                       addSuffix: true,
                                                                   })
-                                                                : forum.latestTopics[0].createdAt
-                                                                  ? formatDistanceToNow(new Date(forum.latestTopics[0].createdAt), {
+                                                                : forum.latestTopic.createdAt
+                                                                  ? formatDistanceToNow(new Date(forum.latestTopic.createdAt), {
                                                                         addSuffix: true,
                                                                     })
                                                                   : 'N/A'}

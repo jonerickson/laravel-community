@@ -47,6 +47,8 @@ class ForumData extends Data
     /** @var TopicData[] */
     public ?array $latestTopics = null;
 
+    public ?TopicData $latestTopic = null;
+
     public ?ForumCategoryData $category = null;
 
     public ?ForumData $parent = null;

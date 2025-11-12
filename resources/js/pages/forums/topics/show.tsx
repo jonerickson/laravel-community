@@ -173,7 +173,7 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
             </Head>
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex flex-col items-start justify-between gap-2 sm:flex-row">
-                    <div className="flex w-full items-start justify-between lg:items-center">
+                    <div className="flex w-full items-center justify-between sm:items-start lg:items-center">
                         <div className="mb-2 flex flex-col gap-2 lg:flex-row lg:items-center">
                             <div className="flex items-center gap-2">
                                 {topic.isHot && <span className="text-sm">🔥</span>}

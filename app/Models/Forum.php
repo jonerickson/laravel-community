@@ -11,13 +11,13 @@ use App\Traits\HasGroups;
 use App\Traits\HasSlug;
 use App\Traits\Orderable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Override;
@@ -46,13 +46,14 @@ use Override;
  * @property-read Collection<int, Group> $groups
  * @property-read int|null $groups_count
  * @property-read bool $is_followed_by_user
+ * @property-read Topic|null $latestTopic
  * @property-read Collection<int, Topic> $latestTopics
  * @property-read int|null $latest_topics_count
  * @property-read Forum|null $parent
  * @property-read Collection<int, Post> $posts
- * @property-read int $posts_count
+ * @property-read int|null $posts_count
  * @property-read Collection<int, Topic> $topics
- * @property-read int $topics_count
+ * @property-read int|null $topics_count
  *
  * @method static Builder<static>|Forum active()
  * @method static \Database\Factories\ForumFactory factory($count = null, $state = [])
@@ -126,25 +127,14 @@ class Forum extends Model implements Sluggable
         return $this->topics()->latest();
     }
 
+    public function latestTopic(): HasOne
+    {
+        return $this->hasOne(Topic::class)->latestOfMany();
+    }
+
     public function posts(): HasManyThrough
     {
         return $this->hasManyThrough(Post::class, Topic::class);
-    }
-
-    public function topicsCount(): Attribute
-    {
-        return Attribute::make(
-            get: fn (): int => $this->topics->count()
-        );
-    }
-
-    public function postsCount(): Attribute
-    {
-        return Attribute::make(
-            get: fn (): int => $this->topics
-                ->flatMap->posts
-                ->count()
-        );
     }
 
     #[Override]

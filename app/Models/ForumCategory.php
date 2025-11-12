@@ -12,10 +12,11 @@ use App\Traits\HasGroups;
 use App\Traits\HasIcon;
 use App\Traits\HasSlug;
 use App\Traits\Orderable;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Str;
 
 /**
@@ -35,25 +36,27 @@ use Illuminate\Support\Str;
  * @property-read int|null $forums_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Group> $groups
  * @property-read int|null $groups_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Topic> $topics
+ * @property-read int|null $topics_count
  *
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory active()
+ * @method static Builder<static>|ForumCategory active()
  * @method static \Database\Factories\ForumCategoryFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory inactive()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory ordered()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereColor($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereFeaturedImage($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereIcon($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereOrder($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategory whereUpdatedAt($value)
+ * @method static Builder<static>|ForumCategory inactive()
+ * @method static Builder<static>|ForumCategory newModelQuery()
+ * @method static Builder<static>|ForumCategory newQuery()
+ * @method static Builder<static>|ForumCategory ordered()
+ * @method static Builder<static>|ForumCategory query()
+ * @method static Builder<static>|ForumCategory whereColor($value)
+ * @method static Builder<static>|ForumCategory whereCreatedAt($value)
+ * @method static Builder<static>|ForumCategory whereDescription($value)
+ * @method static Builder<static>|ForumCategory whereFeaturedImage($value)
+ * @method static Builder<static>|ForumCategory whereIcon($value)
+ * @method static Builder<static>|ForumCategory whereId($value)
+ * @method static Builder<static>|ForumCategory whereIsActive($value)
+ * @method static Builder<static>|ForumCategory whereName($value)
+ * @method static Builder<static>|ForumCategory whereOrder($value)
+ * @method static Builder<static>|ForumCategory whereSlug($value)
+ * @method static Builder<static>|ForumCategory whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */
@@ -78,27 +81,18 @@ class ForumCategory extends Model implements Sluggable
         'is_active',
     ];
 
-    protected $appends = [
-        'posts_count',
-    ];
-
     public function forums(): HasMany
     {
         return $this->hasMany(Forum::class, 'category_id');
     }
 
+    public function topics(): HasManyThrough
+    {
+        return $this->hasManyThrough(Topic::class, Forum::class);
+    }
+
     public function generateSlug(): ?string
     {
         return Str::slug($this->name);
-    }
-
-    public function postsCount(): Attribute
-    {
-        return Attribute::make(
-            get: fn (): int => $this->forums
-                ->flatMap->topics
-                ->flatMap->posts
-                ->count()
-        );
     }
 }

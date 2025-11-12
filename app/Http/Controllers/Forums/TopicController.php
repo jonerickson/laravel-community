@@ -38,6 +38,8 @@ class TopicController extends Controller
         $this->authorize('view', $forum);
         $this->authorize('create', Topic::class);
 
+        $forum->loadMissing(['category', 'parent']);
+
         return Inertia::render('forums/topics/create', [
             'forum' => ForumData::from($forum),
         ]);

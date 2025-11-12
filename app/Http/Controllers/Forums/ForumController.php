@@ -29,16 +29,16 @@ class ForumController extends Controller
         $this->authorize('view', $forum);
 
         $forum->setRelation('children', $forum
-            ->loadMissing(['children' => fn (HasMany|Forum $query) => $query->active()->ordered()])
-            ->loadMissing(['children.latestTopics.posts.reads', 'children.latestTopics.posts.views', 'children.latestTopics.posts.likes', 'children.latestTopics.posts.comments', 'children.latestTopics.author', 'children.latestTopics.lastPost.author', 'parent', 'category'])
+            ->loadMissing(['children' => fn (HasMany|Forum $query) => $query->withCount(['topics', 'posts'])->active()->ordered()])
+            ->loadMissing(['children.latestTopic.author', 'category', 'parent'])
             ->children
             ->filter(fn (Forum $child) => Gate::check('view', $child))
             ->values()
         );
 
         $topics = TopicData::collect($forum
-            ->loadMissing(['topics' => fn (HasMany|Topic $query) => $query->latestActivity()])
-            ->loadMissing(['topics.author', 'topics.lastPost.author', 'topics.posts.reads', 'topics.posts.views', 'topics.posts.likes', 'topics.posts.comments'])
+            ->loadMissing(['topics' => fn (HasMany|Topic $query) => $query->withCount(['posts', 'views'])->latestActivity()])
+            ->loadMissing(['topics.author', 'topics.lastPost.author'])
             ->topics
             ->filter(fn (Topic $topic) => Gate::check('view', $topic))
             ->values()

@@ -33,18 +33,23 @@ class CategoryController extends Controller
             ->ordered()
             ->with(['forums' => function (HasMany|Forum $query): void {
                 $query
-                    ->with(['topics.posts', 'posts', 'follows', 'followers'])
                     ->whereNull('parent_id')
                     ->active()
                     ->ordered()
                     ->with(['latestTopics' => function (HasMany|Topic $subQuery): void {
                         $subQuery
-                            ->with(['forum.category', 'author', 'lastPost.author', 'posts.comments.reports'])
+                            ->with(['author'])
                             ->limit(3);
                     }]);
             }])
             ->with(['groups'])
             ->get()
+            ->loadCount([
+                'forums as posts_count' => function ($query): void {
+                    $query->join('topics', 'topics.forum_id', '=', 'forums.id')
+                        ->join('posts', 'posts.topic_id', '=', 'topics.id');
+                },
+            ])
             ->filter(fn (ForumCategory $category) => Gate::check('view', $category))
             ->map(function (ForumCategory $category): ForumCategory {
                 $category->setRelation(
@@ -71,8 +76,8 @@ class CategoryController extends Controller
         $this->authorize('view', $category);
 
         $forums = $category
-            ->loadMissing(['forums' => fn (HasMany|Forum $query) => $query->whereNull('parent_id')->active()->ordered()])
-            ->loadMissing(['groups', 'forums.latestTopics.posts.reads', 'forums.latestTopics.posts.views', 'forums.latestTopics.posts.likes', 'forums.latestTopics.posts.comments', 'forums.latestTopics.author', 'forums.latestTopics.lastPost.author'])
+            ->loadMissing(['forums' => fn (HasMany|Forum $query) => $query->withCount(['topics', 'posts'])->whereNull('parent_id')->active()->ordered()])
+            ->loadMissing(['forums.latestTopic.author'])
             ->forums
             ->filter(fn (Forum $forum) => Gate::check('view', $forum))
             ->values();

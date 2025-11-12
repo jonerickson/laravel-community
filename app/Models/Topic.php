@@ -56,7 +56,6 @@ use Override;
  * @property-read bool $is_hot
  * @property-read bool $is_read_by_user
  * @property-read Post|null $lastPost
- * @property-read mixed $last_reply_at
  * @property-read Collection<int, Post> $posts
  * @property-read int|null $posts_count
  * @property-read Collection<int, Read> $reads
@@ -112,12 +111,10 @@ class Topic extends Model implements Sluggable
         'title',
         'description',
         'forum_id',
-        'last_reply_at',
     ];
 
     protected $appends = [
         'posts_count',
-        'last_reply_at',
         'is_hot',
         'has_reported_content',
         'has_unpublished_content',
@@ -150,18 +147,8 @@ class Topic extends Model implements Sluggable
     public function lastPost(): HasOne
     {
         return $this->hasOne(Post::class)
-            ->ofMany([
-                'id' => 'max',
-            ], function (Builder $query): void {
-                $query->where('type', 'forum');
-            });
-    }
-
-    public function lastReplyAt(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->lastPost?->created_at
-        )->shouldCache();
+            ->forum()
+            ->latestOfMany();
     }
 
     public function scopeLatestActivity(Builder $query): void
@@ -169,13 +156,6 @@ class Topic extends Model implements Sluggable
         $query->orderByDesc('is_pinned')
             ->orderByDesc('updated_at')
             ->orderByDesc('created_at');
-    }
-
-    public function postsCount(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->posts->count(),
-        )->shouldCache();
     }
 
     public function hasReportedContent(): Attribute

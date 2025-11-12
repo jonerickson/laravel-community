@@ -176,6 +176,7 @@ declare namespace App.Data {
         isFollowedByUser: boolean | null;
         followersCount: number | null;
         latestTopics: Array<App.Data.TopicData> | null;
+        latestTopic: App.Data.TopicData | null;
         category: App.Data.ForumCategoryData | null;
         parent: App.Data.ForumData | null;
         children: Array<App.Data.ForumData> | null;

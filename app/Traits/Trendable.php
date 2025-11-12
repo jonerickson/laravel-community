@@ -203,7 +203,6 @@ trait Trendable
         $weights = Config::get('trending.weights', []);
         $score = 0.0;
 
-        /** @ignore-rector */
         if (property_exists($this, 'views_count')) {
             $score += ($this->views_count ?? 0) * ($weights['views'] ?? 1.0);
         }
