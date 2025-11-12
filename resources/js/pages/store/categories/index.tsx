@@ -36,7 +36,7 @@ export default function StoreCategoriesIndex({ categories }: StoreCategoriesInde
                             ))}
                         </div>
                     ) : (
-                        <EmptyState icon={<FolderIcon />} title="No product categories" description="Check back later for new categories." />
+                        <EmptyState icon={<FolderIcon />} title="No product categories" description="Check back later for more product options." />
                     )}
                 </div>
             </div>

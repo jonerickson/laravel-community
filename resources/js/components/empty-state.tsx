@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
 import { cn } from '@/lib/utils';
-import { PlusIcon } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { cloneElement, ReactElement, SVGProps } from 'react';
 
 interface EmptyStateProps {
@@ -35,7 +35,7 @@ export function EmptyState({ icon, title, description, buttonText, onButtonClick
             {onButtonClick && buttonText && (
                 <EmptyContent>
                     <Button onClick={onButtonClick} variant="outline" size="sm">
-                        <PlusIcon />
+                        <ExternalLink />
                         {buttonText}
                     </Button>
                 </EmptyContent>

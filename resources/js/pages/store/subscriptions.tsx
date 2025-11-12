@@ -519,7 +519,6 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                 </div>
             ) : (
                 <EmptyState
-                    className="z-20 bg-background"
                     icon={<Package />}
                     title="No subscription plans available"
                     description="We're currently working on our subscription offerings. Check back soon for exciting plans and features!"

@@ -49,7 +49,7 @@ export default function Dashboard({
                                 <p className="text-sm text-muted-foreground">View the most recent, latest and trending products</p>
                             </div>
                             <Link href={route('store.index')} className="text-sm font-medium text-primary hover:underline">
-                                View store
+                                Browse store
                                 <span aria-hidden="true"> &rarr;</span>
                             </Link>
                         </div>
@@ -62,7 +62,12 @@ export default function Dashboard({
                                     featuredProduct={featuredProduct}
                                 />
                             ) : (
-                                <EmptyState title="No top rated products" description="Check back later for more product options." />
+                                <EmptyState
+                                    title="No top rated products"
+                                    description="Check back later for more product options."
+                                    buttonText="Browse Store"
+                                    onButtonClick={() => router.visit(route('store.index'))}
+                                />
                             )}
                         </Deferred>
                     </div>
@@ -77,7 +82,7 @@ export default function Dashboard({
                                 <p className="text-sm text-muted-foreground">Stay updated with our latest articles and insights</p>
                             </div>
                             <Link href={route('blog.index')} className="text-sm font-medium text-primary hover:underline">
-                                View all posts
+                                View blog
                                 <span aria-hidden="true"> &rarr;</span>
                             </Link>
                         </div>
@@ -86,7 +91,12 @@ export default function Dashboard({
                             {latestBlogPosts && latestBlogPosts.length > 0 ? (
                                 <DashboardBlogGrid posts={latestBlogPosts} />
                             ) : (
-                                <EmptyState title="No recent blog posts" description="Check back later for our latest articles." />
+                                <EmptyState
+                                    title="No recent blog posts"
+                                    description="Check back later for our latest articles."
+                                    buttonText="View Blog"
+                                    onButtonClick={() => router.visit(route('blog.index'))}
+                                />
                             )}
                         </Deferred>
                     </div>
@@ -101,7 +111,7 @@ export default function Dashboard({
                                 <p className="text-sm text-muted-foreground">The most engaging forum discussions right now</p>
                             </div>
                             <Link href={route('forums.index')} className="text-sm font-medium text-primary hover:underline">
-                                View all forums
+                                Explore forums
                                 <span aria-hidden="true"> &rarr;</span>
                             </Link>
                         </div>
@@ -110,7 +120,12 @@ export default function Dashboard({
                             {trendingTopics && trendingTopics.length > 0 ? (
                                 <TrendingTopicsWidget topics={trendingTopics} />
                             ) : (
-                                <EmptyState title="No trending topics" description="Check back later for updated content." />
+                                <EmptyState
+                                    title="No trending topics"
+                                    description="Check back later for updated content."
+                                    buttonText="Explore Forums"
+                                    onButtonClick={() => router.visit(route('forums.index'))}
+                                />
                             )}
                         </Deferred>
                     </div>
@@ -125,7 +140,7 @@ export default function Dashboard({
                                 <p className="text-sm text-muted-foreground">Your most recent active tickets</p>
                             </div>
                             <Link href={route('support.index')} className="text-sm font-medium text-primary hover:underline">
-                                View all tickets
+                                Open support tickets
                                 <span aria-hidden="true"> &rarr;</span>
                             </Link>
                         </div>
@@ -137,7 +152,7 @@ export default function Dashboard({
                                 <EmptyState
                                     title="No support tickets"
                                     description="Open a new support ticket to get started."
-                                    buttonText="New support ticket"
+                                    buttonText="New Support Ticket"
                                     onButtonClick={() => router.visit(route('support.index'))}
                                 />
                             )}

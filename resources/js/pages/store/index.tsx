@@ -6,7 +6,7 @@ import StoreIndexCategoriesItem from '@/components/store-index-categories-item';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Deferred, Head, Link } from '@inertiajs/react';
-import { ImageIcon } from 'lucide-react';
+import { Folder, ImageIcon, Star, UserPlus } from 'lucide-react';
 import { route } from 'ziggy-js';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -44,7 +44,7 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
                                 ))}
                             </div>
                         ) : (
-                            <EmptyState title="No product categories" description="Check back later for more product options." />
+                            <EmptyState icon={<Folder />} title="No product categories" description="Check back later for more product options." />
                         )}
                     </Deferred>
 
@@ -100,7 +100,7 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
                                 ))}
                             </div>
                         ) : (
-                            <EmptyState title="No featured products" description="Check back later for more product options." />
+                            <EmptyState icon={<Star />} title="No featured products" description="Check back later for more product options." />
                         )}
                     </Deferred>
                 </div>
@@ -122,7 +122,11 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
                                 ))}
                             </div>
                         ) : (
-                            <EmptyState title="No community submitted products" description="Check back later for more product options." />
+                            <EmptyState
+                                icon={<UserPlus />}
+                                title="No community submitted products"
+                                description="Check back later for more product options."
+                            />
                         )}
                     </Deferred>
 

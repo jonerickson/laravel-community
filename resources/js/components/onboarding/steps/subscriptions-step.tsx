@@ -100,7 +100,7 @@ export function SubscriptionsStep({
                     <p className="text-sm text-muted-foreground">
                         <strong className="font-medium text-foreground">No available subscriptions</strong>
                         <br />
-                        Check back later for more options!
+                        Check back later for more product options.
                     </p>
                 </div>
             )}
