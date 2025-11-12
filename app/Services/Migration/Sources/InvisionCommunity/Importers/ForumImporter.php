@@ -241,7 +241,7 @@ class ForumImporter extends AbstractImporter
         $category->forceFill([
             'name' => Str::trim($name),
             'slug' => $slug,
-            'description' => in_array(strip_tags($description ?? ''), ['', '0'], true) ? null : strip_tags($description ?? ''),
+            'description' => Str::of($description)->stripTags()->toString() ?: null,
             'icon' => 'message-square',
             'color' => $sourceCategory->feature_color ?? '#94a3b8',
             'is_active' => true,
@@ -311,7 +311,7 @@ class ForumImporter extends AbstractImporter
         $forum->forceFill([
             'name' => Str::trim($name),
             'slug' => $slug,
-            'description' => in_array(strip_tags($description ?? ''), ['', '0'], true) ? null : strip_tags($description ?? ''),
+            'description' => Str::of($description)->stripTags()->toString() ?: null,
             'icon' => 'message-square',
             'color' => $sourceForum->feature_color ?? '#94a3b8',
             'order' => $sourceForum->position ?? 0,

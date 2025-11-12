@@ -112,7 +112,7 @@ class Policy extends Model implements Sluggable
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'content' => strip_tags($this->content ?? ''),
+            'content' => Str::of($this->content)->stripTags()->toString(),
             'version' => $this->version,
             'effective_at' => $this->effective_at?->toDateTimeString(),
             'created_at' => $this->created_at?->toDateTimeString() ?? '',

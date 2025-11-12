@@ -11,6 +11,7 @@ use App\Models\Post;
 use App\Models\Product;
 use App\Models\Topic;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class SearchController extends Controller
 {
@@ -81,7 +82,7 @@ class SearchController extends Controller
                     'id' => $post->id,
                     'type' => 'post',
                     'title' => $post->title,
-                    'excerpt' => $post->excerpt ?: substr(strip_tags($post->content), 0, 150).'...',
+                    'excerpt' => $post->excerpt ?: Str::of($post->content)->stripTags()->limit()->toString(),
                     'url' => $post->url,
                     'post_type' => $post->type->value,
                     'author_name' => $post->author->name,

@@ -55,16 +55,23 @@ class StripeDriver implements PaymentProcessor
     public function createProduct(Product $product): ?ProductData
     {
         return $this->executeWithErrorHandling('createProduct', function () use ($product): ProductData {
-            $stripeProduct = $this->stripe->products->create([
+            $payload = [
                 'name' => $product->name,
-                'description' => Str::limit(strip_tags($product->description)),
                 'tax_code' => $product->tax_code?->getStripeCode(),
                 'metadata' => Arr::dot([
                     'product_id' => $product->reference_id,
                     ...$product->metadata ?? [],
                 ]),
                 'active' => true,
-            ], [
+            ];
+
+            $description = Str::of($product->description)->stripTags()->limit()->toString();
+
+            if (filled($description)) {
+                $payload['description'] = $description;
+            }
+
+            $stripeProduct = $this->stripe->products->create($payload, [
                 'idempotency_key' => $this->getIdempotencyKey(),
             ]);
 
@@ -88,15 +95,22 @@ class StripeDriver implements PaymentProcessor
     public function updateProduct(Product $product): ?ProductData
     {
         return $this->executeWithErrorHandling('updateProduct', function () use ($product): ProductData {
-            $this->stripe->products->update($product->external_product_id, [
+            $payload = [
                 'name' => $product->name,
-                'description' => Str::limit(strip_tags($product->description)),
                 'default_price' => $product->prices()->latest()->get()->firstWhere('is_default', true)->external_price_id,
                 'metadata' => Arr::dot([
                     'product_id' => $product->reference_id,
                     ...$product->metadata ?? [],
                 ]),
-            ], [
+            ];
+
+            $description = Str::of($product->description)->stripTags()->limit()->toString();
+
+            if (filled($description)) {
+                $payload['description'] = $description;
+            }
+
+            $this->stripe->products->update($product->external_product_id, $payload, [
                 'idempotency_key' => $this->getIdempotencyKey(),
             ]);
 
@@ -447,9 +461,19 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
-    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete, CarbonInterface|int|null $backdateStartDate = null, CarbonInterface|int|null $billingCycleAnchor = null, ?string $successUrl = null): bool|string|SubscriptionData
-    {
-        return $this->executeWithErrorHandling('startSubscription', function () use ($order, $chargeNow, $firstParty, $prorationBehavior, $paymentBehavior, $backdateStartDate, $billingCycleAnchor, $successUrl): bool|string|SubscriptionData {
+    public function startSubscription(
+        Order $order,
+        bool $chargeNow = true,
+        bool $firstParty = true,
+        ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations,
+        PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete,
+        CarbonInterface|int|null $backdateStartDate = null,
+        CarbonInterface|int|null $billingCycleAnchor = null,
+        ?string $successUrl = null,
+        array $customerOptions = [],
+        array $subscriptionOptions = [],
+    ): bool|string|SubscriptionData {
+        return $this->executeWithErrorHandling('startSubscription', function () use ($order, $chargeNow, $firstParty, $prorationBehavior, $paymentBehavior, $backdateStartDate, $billingCycleAnchor, $customerOptions, $subscriptionOptions, $successUrl): bool|string|SubscriptionData {
             $lineItems = [];
 
             foreach ($order->items as $orderItem) {
@@ -493,40 +517,46 @@ class StripeDriver implements PaymentProcessor
                 ->when($paymentBehavior === PaymentBehavior::AllowIncomplete, fn (SubscriptionBuilder $builder) => $builder->allowPaymentFailures())
                 ->when($paymentBehavior === PaymentBehavior::PendingIfIncomplete, fn (SubscriptionBuilder $builder) => $builder->pendingIfPaymentFails())
                 ->withMetadata($metadata)
-                ->when(! $chargeNow, fn (SubscriptionBuilder $builder) => $builder->createAndSendInvoice())
-                ->when(! $firstParty, fn (SubscriptionBuilder $builder) => $builder->create(subscriptionOptions: [
-                    'backdate_start_date' => $backdateStartDate instanceof CarbonInterface ? $backdateStartDate->getTimestamp() : null,
-                ]))
-                ->when($firstParty, fn (SubscriptionBuilder $builder) => $builder->checkout([
-                    'client_reference_id' => $order->reference_id,
-                    'origin_context' => 'web',
-                    'consent_collection' => [
-                        'terms_of_service' => 'required',
-                    ],
-                    'custom_text' => [
-                        'terms_of_service_acceptance' => [
-                            'message' => 'I accept the Terms of Service outlined by '.config('app.name'),
+                ->when(! $chargeNow, fn (SubscriptionBuilder $builder) => $builder->createAndSendInvoice($customerOptions, $subscriptionOptions))
+                ->when(! $firstParty, fn (SubscriptionBuilder $builder) => $builder->create(
+                    customerOptions: $customerOptions,
+                    subscriptionOptions: array_merge($subscriptionOptions, [
+                        'backdate_start_date' => $backdateStartDate instanceof CarbonInterface ? $backdateStartDate->getTimestamp() : null,
+                    ])
+                ))
+                ->when($firstParty, fn (SubscriptionBuilder $builder) => $builder->checkout(
+                    sessionOptions: [
+                        'client_reference_id' => $order->reference_id,
+                        'origin_context' => 'web',
+                        'consent_collection' => [
+                            'terms_of_service' => 'required',
                         ],
-                        'submit' => [
-                            'message' => "Order Number: $order->reference_id",
+                        'custom_text' => [
+                            'terms_of_service_acceptance' => [
+                                'message' => 'I accept the Terms of Service outlined by '.config('app.name'),
+                            ],
+                            'submit' => [
+                                'message' => "Order Number: $order->reference_id",
+                            ],
                         ],
+                        'branding_settings' => [
+                            'display_name' => config('app.name'),
+                            'border_style' => 'rounded',
+                            'background_color' => '#f9f9f9',
+                            'button_color' => '#171719',
+                            'font_family' => 'inter',
+                        ],
+                        'success_url' => URL::signedRoute('store.checkout.success', [
+                            'order' => $order->reference_id,
+                            'redirect' => $successUrl ?? route('store.subscriptions', absolute: false),
+                        ]),
+                        'cancel_url' => URL::signedRoute('store.checkout.cancel', [
+                            'order' => $order->reference_id,
+                            'redirect' => route('store.subscriptions', absolute: false),
+                        ]),
                     ],
-                    'branding_settings' => [
-                        'display_name' => config('app.name'),
-                        'border_style' => 'rounded',
-                        'background_color' => '#f9f9f9',
-                        'button_color' => '#171719',
-                        'font_family' => 'inter',
-                    ],
-                    'success_url' => URL::signedRoute('store.checkout.success', [
-                        'order' => $order->reference_id,
-                        'redirect' => $successUrl ?? route('store.subscriptions', absolute: false),
-                    ]),
-                    'cancel_url' => URL::signedRoute('store.checkout.cancel', [
-                        'order' => $order->reference_id,
-                        'redirect' => route('store.subscriptions', absolute: false),
-                    ]),
-                ])->asStripeCheckoutSession());
+                    customerOptions: $customerOptions
+                )->asStripeCheckoutSession());
 
             if ($result instanceof Session) {
                 $order->updateQuietly([

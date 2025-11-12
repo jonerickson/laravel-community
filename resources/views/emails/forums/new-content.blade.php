@@ -18,14 +18,14 @@ Hello {{ $recipient->name }},
 
 @if($content->posts->isNotEmpty())
 <x-mail::panel>
-{!! Str::limit(strip_tags($content->posts->first()->content), 200) !!}
+{!! Str::of($content->posts->first()->content)->stripTags()->limit()->toString() !!}
 </x-mail::panel>
 @endif
 @else
 **Topic:** {{ $content->topic->title }}
 
 <x-mail::panel>
-{!! Str::limit(strip_tags($content->content), 200) !!}
+{!! Str::of($content->content)->stripTags()->limit()->toString() !!}
 </x-mail::panel>
 @endif
 

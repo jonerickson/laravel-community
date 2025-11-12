@@ -244,7 +244,7 @@ class ProductImporter extends AbstractImporter
         $category->forceFill([
             'name' => Str::trim($name),
             'slug' => $slug,
-            'description' => in_array(strip_tags($description ?? ''), ['', '0'], true) ? null : strip_tags($description ?? ''),
+            'description' => Str::of($description)->stripTags()->toString() ?: null,
             'order' => $sourceCategory->pg_position ?? 0,
             'is_active' => true,
         ]);
@@ -349,7 +349,7 @@ class ProductImporter extends AbstractImporter
         $product->forceFill([
             'name' => Str::trim($name),
             'slug' => $slug,
-            'description' => in_array(strip_tags($sourceProduct->p_page ?? ''), ['', '0'], true) ? null : strip_tags($sourceProduct->p_page ?? ''),
+            'description' => Str::of($sourceProduct->p_page)->stripTags()->toString() ?: null,
             'type' => ProductType::Product,
             'is_featured' => (bool) $sourceProduct->p_featured,
             'approval_status' => ProductApprovalStatus::Approved,

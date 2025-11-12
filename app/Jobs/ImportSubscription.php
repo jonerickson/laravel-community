@@ -47,6 +47,13 @@ class ImportSubscription implements ShouldQueue
                 prorationBehavior: $this->prorationBehavior,
                 backdateStartDate: $this->backdateStartDate,
                 billingCycleAnchor: $this->billingCycleAnchor,
+                subscriptionOptions: [
+                    'trial_settings' => [
+                        'end_behavior' => [
+                            'missing_payment_method' => 'create_invoice',
+                        ],
+                    ],
+                ]
             );
         } catch (Throwable $e) {
             Log::error('Failed to import subscription', [

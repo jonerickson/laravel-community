@@ -231,7 +231,7 @@ class Post extends Model implements HasLabel, Sluggable
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'content' => strip_tags($this->content ?? ''),
+            'content' => Str::of($this->content)->stripTags()->toString(),
             'excerpt' => $this->excerpt,
             'type' => $this->type->value ?? '',
             'created_at' => $this->created_at?->toDateTimeString() ?? '',
@@ -277,7 +277,7 @@ class Post extends Model implements HasLabel, Sluggable
     {
         return Attribute::make(
             get: function (): int {
-                $wordCount = str_word_count(strip_tags($this->content));
+                $wordCount = Str::of($this->content)->stripTags()->wordCount();
 
                 return max(1, (int) ceil($wordCount / 200));
             }

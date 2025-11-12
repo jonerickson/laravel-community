@@ -42,7 +42,7 @@ export function SubscriptionsStep({
             )}
 
             {hasSubscription ? (
-                <div className="rounded-lg border bg-muted/50 p-8 text-center">
+                <div className="rounded-lg border bg-card p-8 text-center">
                     <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-primary/10">
                         <svg className="size-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

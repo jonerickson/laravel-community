@@ -187,9 +187,7 @@ class UserSubscriptionImporter extends AbstractImporter
                 ? Carbon::parse($sourceUserSubscription->sub_start)
                 : now();
 
-            $billingCycleAnchor = isset($sourceUserSubscription->sub_expire)
-                ? Carbon::parse($sourceUserSubscription->sub_expire)
-                : null;
+            $billingCycleAnchor = $this->getExpirationDate($sourceUserSubscription);
 
             if (is_null($billingCycleAnchor) || ($billingCycleAnchor instanceof CarbonInterface && $billingCycleAnchor->isPast())) {
                 $result->incrementSkipped(self::ENTITY_NAME);
@@ -236,6 +234,21 @@ class UserSubscriptionImporter extends AbstractImporter
         }
 
         return null;
+    }
+
+    protected function getExpirationDate(object $sourceUserSubscription): ?CarbonInterface
+    {
+        $expirationDate = $sourceUserSubscription->sub_expire;
+
+        if (isset($sourceUserSubscription->sub_purchase_id) && isset($expirationDate) && is_numeric($expirationDate)) {
+            $sourcePurchase = DB::connection($this->source->getConnection())->table('nexus_purchases')->where('ps_id', $sourceUserSubscription->sub_purchase_id)->first();
+
+            if ($sourcePurchase && isset($sourcePurchase->ps_expire) && is_numeric($sourcePurchase->ps_expire)) {
+                return Carbon::parse($sourcePurchase->ps_expire);
+            }
+        }
+
+        return isset($expirationDate) ? Carbon::parse($expirationDate) : null;
     }
 
     protected function setStripeCustomerId(User $user, int $memberId, MigrationConfig $config): void

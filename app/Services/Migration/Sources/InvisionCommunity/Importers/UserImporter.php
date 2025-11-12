@@ -165,7 +165,7 @@ class UserImporter extends AbstractImporter
             'name' => Str::trim($sourceUser->name),
             'email' => $email,
             'email_verified_at' => Carbon::now(),
-            'signature' => in_array(strip_tags($sourceUser->signature ?? ''), ['', '0'], true) ? null : strip_tags($sourceUser->signature ?? ''),
+            'description' => Str::of($sourceUser->signature)->stripTags()->toString() ?: null,
             'last_seen_at' => $sourceUser->last_activity ? Carbon::createFromTimestamp($sourceUser->last_activity) : null,
             'created_at' => Carbon::createFromTimestamp($sourceUser->joined),
         ]);

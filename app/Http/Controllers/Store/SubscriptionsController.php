@@ -71,6 +71,7 @@ class SubscriptionsController extends Controller
             'currentSubscription' => $this->user instanceof User
                 ? $this->paymentManager->currentSubscription($this->user)
                 : null,
+            'portalUrl' => $this->paymentManager->getBillingPortalUrl($this->user),
         ]);
     }
 

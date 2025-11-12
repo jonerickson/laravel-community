@@ -11,7 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { cn, currency } from '@/lib/utils';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Check, ChevronDown, Crown, Package, RefreshCw, Rocket, Shield, Star, Users, X, Zap } from 'lucide-react';
+import { AlertCircle, Check, ChevronDown, Crown, Package, RefreshCw, Rocket, Shield, Star, Users, X, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -19,6 +19,7 @@ interface SubscriptionsProps {
     subscriptionProducts: App.Data.ProductData[];
     subscriptionReviews: Record<number, App.Data.CommentData[]>;
     currentSubscription: App.Data.SubscriptionData | null;
+    portalUrl?: string | null;
 }
 
 const getIconForPlan = (plan: App.Data.ProductData): React.ElementType => {
@@ -53,6 +54,7 @@ interface PricingCardProps {
     currentSubscription: App.Data.SubscriptionData | null;
     isExpanded: boolean;
     onToggleExpanded: () => void;
+    portalUrl?: string | null;
 }
 
 function PricingCard({
@@ -70,6 +72,7 @@ function PricingCard({
     currentSubscription,
     isExpanded,
     onToggleExpanded,
+    portalUrl,
 }: PricingCardProps) {
     const Icon = getIconForPlan(plan);
     const color = getColorForPlan(plan);
@@ -90,7 +93,13 @@ function PricingCard({
         <Card
             className={cn(
                 'relative flex w-full flex-col',
-                isCurrentPlan && 'ring-2 ring-success',
+                isCurrentPlan &&
+                    currentSubscription?.status &&
+                    ['past_due', 'incomplete'].includes(currentSubscription.status) &&
+                    'ring-2 ring-destructive',
+                isCurrentPlan &&
+                    (!currentSubscription?.status || !['past_due', 'incomplete'].includes(currentSubscription.status)) &&
+                    'ring-2 ring-success',
                 plan.isFeatured && !isCurrentPlan && 'ring-2 ring-info',
             )}
         >
@@ -101,7 +110,14 @@ function PricingCard({
                     </Badge>
                 </div>
             )}
-            {isCurrentPlan && (
+            {isCurrentPlan && currentSubscription?.status && ['past_due', 'incomplete'].includes(currentSubscription.status) && (
+                <div className="absolute -top-4 left-1/2 z-10 -translate-x-1/2">
+                    <Badge variant="default" className="bg-destructive text-destructive-foreground">
+                        Payment required
+                    </Badge>
+                </div>
+            )}
+            {isCurrentPlan && (!currentSubscription?.status || !['past_due', 'incomplete'].includes(currentSubscription.status)) && (
                 <div className="absolute -top-4 left-1/2 z-10 -translate-x-1/2">
                     <Badge variant="default" className="bg-success text-success-foreground">
                         Current
@@ -221,6 +237,26 @@ function PricingCard({
                                 </div>
                             )}
 
+                            {currentSubscription?.status && ['past_due', 'incomplete'].includes(currentSubscription.status) && (
+                                <div className="rounded-md bg-destructive/10 p-3 text-center">
+                                    <p className="text-sm font-medium text-destructive">Payment Issue</p>
+                                    <p className="text-xs text-muted-foreground">
+                                        {currentSubscription.status === 'past_due'
+                                            ? 'Your payment is past due. Please update your payment method to continue your subscription.'
+                                            : 'Your payment is incomplete. Please complete your payment to activate your subscription.'}
+                                    </p>
+                                </div>
+                            )}
+
+                            {currentSubscription?.status && ['past_due', 'incomplete'].includes(currentSubscription.status) && portalUrl && (
+                                <Button className="w-full" variant="default" size="sm" asChild>
+                                    <a href={portalUrl} target="_blank" rel="noopener noreferrer">
+                                        <AlertCircle className="mr-2 size-4" />
+                                        Pay invoice
+                                    </a>
+                                </Button>
+                            )}
+
                             {priceId && (
                                 <>
                                     {currentSubscription?.endsAt && new Date(currentSubscription.endsAt) > new Date() ? (
@@ -293,7 +329,7 @@ function PricingCard({
     );
 }
 
-export default function Subscriptions({ subscriptionProducts, subscriptionReviews, currentSubscription }: SubscriptionsProps) {
+export default function Subscriptions({ subscriptionProducts, subscriptionReviews, currentSubscription, portalUrl }: SubscriptionsProps) {
     const [billingCycle, setBillingCycle] = useState<App.Enums.SubscriptionInterval>('month');
     const [policiesAgreed, setPoliciesAgreed] = useState<Record<number, boolean>>({});
     const [expandedCards, setExpandedCards] = useState<Record<number, boolean>>({});
@@ -479,6 +515,7 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                                         currentSubscription={currentSubscription}
                                         isExpanded={isExpanded}
                                         onToggleExpanded={() => toggleExpanded(plan.id)}
+                                        portalUrl={portalUrl}
                                     />
                                 </div>
                             );
