@@ -515,7 +515,6 @@ declare namespace App.Data {
         isPinned: boolean;
         isLocked: boolean;
         viewsCount: number;
-        uniqueViewsCount: number;
         order: number;
         postsCount: number;
         lastReplyAt: string | null;

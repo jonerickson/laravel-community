@@ -62,13 +62,6 @@ trait Viewable
         )->shouldCache();
     }
 
-    public function uniqueViewsCount(): Attribute
-    {
-        return Attribute::make(
-            get: fn (): int => $this->views->unique('fingerprint_id')->count(),
-        )->shouldCache();
-    }
-
     public function incrementViews(): void
     {
         $this->recordView();

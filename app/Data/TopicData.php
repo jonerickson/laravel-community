@@ -35,8 +35,6 @@ class TopicData extends Data
 
     public int $viewsCount;
 
-    public int $uniqueViewsCount;
-
     public int $order;
 
     public int $postsCount;

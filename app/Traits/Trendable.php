@@ -19,7 +19,7 @@ trait Trendable
         $cacheKey = $this->getTrendingCacheKey($referenceTime);
 
         if (Config::get('trending.cache.cache_scores', true)) {
-            return Cache::remember(
+            return (float) Cache::remember(
                 $cacheKey,
                 now()->addMinutes(Config::get('trending.cache.duration', 60)),
                 fn (): float => $this->calculateTrendingScore($referenceTime)
@@ -161,13 +161,11 @@ trait Trendable
     {
         return Attribute::make(
             get: function (): float {
-                // If the trending_score was calculated by a query scope, use that value
                 if (isset($this->attributes['trending_score'])) {
                     return (float) $this->attributes['trending_score'];
                 }
 
-                // Otherwise, calculate it using the model attributes
-                return $this->calculateTrendingScore(now());
+                return $this->getTrendingScore();
             }
         )->shouldCache();
     }
@@ -176,8 +174,7 @@ trait Trendable
     {
         $this->getKey();
         Config::get('trending.cache.prefix', 'trending');
-        // In production, you might want to use a more sophisticated cache clearing mechanism
-        // For now, we'll just clear the current cache keys
+
         $cacheKeys = [
             $this->getTrendingCacheKey(now()),
             $this->getTrendingCacheKey(now()->subHour()),
@@ -203,16 +200,17 @@ trait Trendable
         $weights = Config::get('trending.weights', []);
         $score = 0.0;
 
-        if (property_exists($this, 'views_count')) {
+        if (isset($this->views)) {
+            $score += $this->views->count() * ($weights['views'] ?? 1.0);
+            $score += $this->views->unique('fingerprint_id')->count() * ($weights['unique_views'] ?? 1.5);
         }
 
-        if (property_exists($this, 'unique_views_count')) {
+        if (isset($this->posts)) {
+            $score += $this->posts->count() * ($weights['posts'] ?? 3.0);
         }
 
-        if (property_exists($this, 'posts_count')) {
-        }
-
-        if (property_exists($this, 'reads_count')) {
+        if (isset($this->reads)) {
+            $score += $this->reads->count() * ($weights['reads'] ?? 2.0);
         }
 
         $likesScore = $this->calculateLikesScore();
