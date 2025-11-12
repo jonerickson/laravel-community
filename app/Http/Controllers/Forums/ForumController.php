@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Forum;
 use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -27,43 +28,19 @@ class ForumController extends Controller
     {
         $this->authorize('view', $forum);
 
-        $forum->load([
-            'category',
-            'parent',
-            'children' => function ($query): void {
-                $query
-                    ->active()
-                    ->ordered()
-                    ->withCount(['topics', 'posts'])
-                    ->with(['latestTopics' => function ($subQuery): void {
-                        $subQuery
-                            ->with(['author', 'lastPost.author'])
-                            ->limit(3);
-                    }]);
-            },
-        ]);
-
-        $forum->setRelation(
-            'children',
-            $forum->children
-                ->filter(fn (Forum $child) => Gate::check('view', $child))
-                ->map(function (Forum $child): Forum {
-                    $child->setRelation(
-                        'latestTopics',
-                        $child->latestTopics->filter(fn (Topic $topic) => Gate::check('view', $topic))->values()
-                    );
-
-                    return $child;
-                })
-                ->values()
+        $forum->setRelation('children', $forum
+            ->loadMissing(['children' => fn (HasMany|Forum $query) => $query->active()->ordered()])
+            ->loadMissing(['children.latestTopics.posts.reads', 'children.latestTopics.posts.views', 'children.latestTopics.posts.likes', 'children.latestTopics.posts.comments', 'children.latestTopics.author', 'children.latestTopics.lastPost.author', 'parent', 'category'])
+            ->children
+            ->filter(fn (Forum $child) => Gate::check('view', $child))
+            ->values()
         );
 
         $topics = TopicData::collect($forum
-            ->topics()
-            ->with(['author', 'lastPost.author'])
-            ->latestActivity()
-            ->get()
-            ->filter(fn (Topic $topic) => Gate::check('view', [$topic, $forum]))
+            ->loadMissing(['topics' => fn (HasMany|Topic $query) => $query->latestActivity()])
+            ->loadMissing(['topics.author', 'topics.lastPost.author', 'topics.posts.reads', 'topics.posts.views', 'topics.posts.likes', 'topics.posts.comments'])
+            ->topics
+            ->filter(fn (Topic $topic) => Gate::check('view', $topic))
             ->values()
             ->all(), PaginatedDataCollection::class);
 

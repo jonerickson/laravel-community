@@ -35,8 +35,7 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
                                         </div>
                                     )}
                                     <div className="text-sm text-muted-foreground">
-                                        {category.forums?.reduce((total, forum) => total + (forum.topicsCount || 0), 0) || 0}{' '}
-                                        {pluralize('post', category.forums?.reduce((total, forum) => total + (forum.topicsCount || 0), 0) || 0)}
+                                        {category.postsCount} {pluralize('post', category.postsCount)}
                                     </div>
                                 </div>
                             </Link>

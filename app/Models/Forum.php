@@ -134,14 +134,16 @@ class Forum extends Model implements Sluggable
     public function topicsCount(): Attribute
     {
         return Attribute::make(
-            get: fn (): int => $this->topics()->count()
+            get: fn (): int => $this->topics->count()
         );
     }
 
     public function postsCount(): Attribute
     {
         return Attribute::make(
-            get: fn (): int => Post::whereHas('topic', fn ($query) => $query->where('forum_id', $this->id))->count()
+            get: fn (): int => $this->topics
+                ->flatMap->posts
+                ->count()
         );
     }
 

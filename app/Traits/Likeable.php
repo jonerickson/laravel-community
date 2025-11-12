@@ -89,7 +89,7 @@ trait Likeable
     public function likesCount(): Attribute
     {
         return Attribute::make(
-            get: fn (): int => $this->likes()->count(),
+            get: fn (): int => $this->likes->count(),
         )->shouldCache();
     }
 
@@ -97,7 +97,7 @@ trait Likeable
     {
         return Attribute::make(
             get: function (): array {
-                $likes = $this->likes()->get()->groupBy('emoji');
+                $likes = $this->likes->groupBy('emoji');
                 $summary = [];
 
                 foreach ($likes as $unicode => $emojiLikes) {
@@ -123,7 +123,8 @@ trait Likeable
                     return null;
                 }
 
-                $unicode = $this->likes()->where('created_by', $userId)->value('emoji');
+                /** @var ?string $unicode */
+                $unicode = $this->likes->where('created_by', $userId)->value('emoji');
 
                 return $unicode ? self::unicodeToEmoji($unicode) : null;
             }
@@ -140,7 +141,7 @@ trait Likeable
                     return [];
                 }
 
-                $unicodes = $this->likes()->where('created_by', $userId)->pluck('emoji')->toArray();
+                $unicodes = $this->likes->where('created_by', $userId)->pluck('emoji')->toArray();
 
                 return array_map(self::unicodeToEmoji(...), $unicodes);
             }

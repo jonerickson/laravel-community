@@ -56,7 +56,7 @@ trait Readable
             return null;
         }
 
-        return $this->reads()->whereCreatedBy($user)->first();
+        return $this->reads->firstWhere('created_by', $user->id);
     }
 
     public function isReadBy(?User $user = null): bool
@@ -135,7 +135,7 @@ trait Readable
     public function readsCount(): Attribute
     {
         return Attribute::make(
-            get: fn (): int => $this->reads()->count(),
+            get: fn (): int => $this->reads->count(),
         )->shouldCache();
     }
 
@@ -153,6 +153,7 @@ trait Readable
         return $recentViewers->map(fn (Read $read): array => [
             'user' => [
                 'id' => $read->author->id,
+                'referenceId' => $read->author->reference_id,
                 'name' => $read->author->name,
                 'avatarUrl' => $read->author->avatar_url,
             ],

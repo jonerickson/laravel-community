@@ -28,6 +28,8 @@ class ForumCategoryData extends Data
 
     public int $order;
 
+    public int $postsCount;
+
     public bool $isActive;
 
     public ?string $featuredImage = null;

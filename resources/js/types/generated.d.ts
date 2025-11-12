@@ -151,6 +151,7 @@ declare namespace App.Data {
         icon: string | null;
         color: string;
         order: number;
+        postsCount: number;
         isActive: boolean;
         featuredImage: string | null;
         featuredImageUrl: string | null;

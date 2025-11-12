@@ -56,8 +56,10 @@ class OnboardingController extends Controller
 
         $initialStep = $this->onboardingService->determineInitialStep($this->user);
 
-        $hasDiscordIntegration = $this->user && $this->user->integrations()->where('provider', 'discord')->exists();
-        $hasRobloxIntegration = $this->user && $this->user->integrations()->where('provider', 'roblox')->exists();
+        $integrations = $this->user->integrations()->get();
+
+        $hasDiscordIntegration = $this->user && $integrations->firstWhere('provider', 'discord');
+        $hasRobloxIntegration = $this->user && $integrations->firstWhere('provider', 'roblox');
         $hasSubscription = $this->user && $this->paymentManager->currentSubscription($this->user);
 
         $subscriptions = Product::query()

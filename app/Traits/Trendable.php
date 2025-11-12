@@ -203,27 +203,23 @@ trait Trendable
         $weights = Config::get('trending.weights', []);
         $score = 0.0;
 
-        // Views contribution
-        if (method_exists($this, 'views_count')) {
+        /** @ignore-rector */
+        if (property_exists($this, 'views_count')) {
             $score += ($this->views_count ?? 0) * ($weights['views'] ?? 1.0);
         }
 
-        // Unique views contribution
-        if (method_exists($this, 'unique_views_count')) {
+        if (property_exists($this, 'unique_views_count')) {
             $score += ($this->unique_views_count ?? 0) * ($weights['unique_views'] ?? 1.5);
         }
 
-        // Posts/replies contribution
-        if (method_exists($this, 'posts_count')) {
+        if (property_exists($this, 'posts_count')) {
             $score += ($this->posts_count ?? 0) * ($weights['posts'] ?? 3.0);
         }
 
-        // Reads contribution
-        if (method_exists($this, 'reads_count')) {
+        if (property_exists($this, 'reads_count')) {
             $score += ($this->reads_count ?? 0) * ($weights['reads'] ?? 2.0);
         }
 
-        // Likes from related posts
         $likesScore = $this->calculateLikesScore();
 
         return $score + $likesScore * ($weights['likes'] ?? 2.5);
@@ -231,13 +227,12 @@ trait Trendable
 
     protected function calculateLikesScore(): float
     {
-        if (! method_exists($this, 'posts')) {
+        if (! property_exists($this, 'posts')) {
             return 0.0;
         }
 
-        return (float) $this->posts()
-            ->withCount('likes')
-            ->get()
+        return (float) $this->posts
+            ->loadCount('likes')
             ->sum('likes_count');
     }
 
@@ -246,19 +241,16 @@ trait Trendable
         $ageInHours = $this->created_at->diffInHours($referenceTime);
         $decayConfig = Config::get('trending.decay', []);
 
-        // Recency boost for new content
         $recencyConfig = $decayConfig['recency_boost'] ?? [];
         if ($ageInHours <= ($recencyConfig['threshold_hours'] ?? 24)) {
             return $recencyConfig['multiplier'] ?? 2.0;
         }
 
-        // Sharp drop-off for old content
         $oldContentConfig = $decayConfig['old_content'] ?? [];
         if ($ageInHours >= ($oldContentConfig['threshold_hours'] ?? 720)) {
             return $oldContentConfig['multiplier'] ?? 0.1;
         }
 
-        // Exponential decay for content in between
         $halfLifeHours = $decayConfig['half_life'] ?? 168; // 7 days default
 
         return 0.5 ** ($ageInHours / $halfLifeHours);

@@ -7,7 +7,6 @@ namespace App\Data;
 use App\Enums\ProductTaxCode;
 use App\Enums\ProductType;
 use Carbon\CarbonImmutable;
-use Spatie\LaravelData\Attributes\LoadRelation;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
@@ -56,7 +55,6 @@ class ProductData extends Data
     /** @var PriceData[] */
     public array $prices;
 
-    #[LoadRelation]
     public ?PriceData $defaultPrice = null;
 
     public float $averageRating;

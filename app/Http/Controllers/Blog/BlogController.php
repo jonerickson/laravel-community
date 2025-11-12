@@ -12,7 +12,6 @@ use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -25,7 +24,7 @@ class BlogController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function index(Request $request): Response
+    public function index(): Response
     {
         $this->authorize('viewAny', Post::class);
 
@@ -49,17 +48,17 @@ class BlogController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function show(Request $request, Post $post): Response
+    public function show(Post $post): Response
     {
         $this->authorize('view', $post);
 
         $post->incrementViews();
 
         $comments = CommentData::collect($post->comments()
-            ->with(['author', 'replies', 'replies.author', 'parent'])
+            ->with(['author.groups', 'replies.author.groups', 'parent', 'likes.author'])
             ->latest()
             ->get()
-            ->filter(fn (Comment $comment) => Gate::check('view', [$comment, $post]))
+            ->filter(fn (Comment $comment) => Gate::check('view', $comment))
             ->values()
             ->all(), PaginatedDataCollection::class);
 

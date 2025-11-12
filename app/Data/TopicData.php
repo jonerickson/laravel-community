@@ -6,7 +6,6 @@ namespace App\Data;
 
 use App\Data\Traits\HasDataPermissions;
 use Carbon\CarbonImmutable;
-use Spatie\LaravelData\Attributes\LoadRelation;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
@@ -62,13 +61,10 @@ class TopicData extends Data
 
     public bool $hasUnapprovedContent = false;
 
-    #[LoadRelation]
     public ?ForumData $forum = null;
 
-    #[LoadRelation]
     public UserData $author;
 
-    #[LoadRelation]
     public ?PostData $lastPost = null;
 
     /** @var PostData[] */

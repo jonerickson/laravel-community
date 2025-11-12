@@ -21,7 +21,7 @@ trait Reportable
 
     public function hasReports(): bool
     {
-        return $this->pendingReports()->exists();
+        return $this->pendingReports->isNotEmpty();
     }
 
     public function isReported(): Attribute
@@ -47,7 +47,7 @@ trait Reportable
 
     public function reportCount(): Attribute
     {
-        return Attribute::get(fn (): int => $this->pendingReports()->count())
+        return Attribute::get(fn (): int => $this->pendingReports->count())
             ->shouldCache();
     }
 

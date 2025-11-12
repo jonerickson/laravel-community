@@ -58,14 +58,14 @@ trait Viewable
     public function viewsCount(): Attribute
     {
         return Attribute::make(
-            get: fn (): int|string => $this->views()->sum('count'),
+            get: fn (): int|string => $this->views->count(),
         )->shouldCache();
     }
 
     public function uniqueViewsCount(): Attribute
     {
         return Attribute::make(
-            get: fn (): int => $this->views()->distinct(['fingerprint_id'])->count('fingerprint_id'),
+            get: fn (): int => $this->views->unique('fingerprint_id')->count(),
         )->shouldCache();
     }
 

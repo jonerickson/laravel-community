@@ -15,7 +15,7 @@ class UserController extends Controller
 {
     public function show(User $user): Response
     {
-        $user->load(['groups', 'fields' => function (BelongsToMany|Field $query): void {
+        $user->loadMissing(['groups', 'fields' => function (BelongsToMany|Field $query): void {
             $query->where('is_public', true)->ordered();
         }]);
 

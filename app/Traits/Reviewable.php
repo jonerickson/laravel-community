@@ -15,6 +15,11 @@ trait Reviewable
         return $this->morphMany(Comment::class, 'commentable')->ratings();
     }
 
+    public function approvedReviews(): MorphMany
+    {
+        return $this->reviews()->approved();
+    }
+
     public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable')->comments();
@@ -23,14 +28,14 @@ trait Reviewable
     public function averageRating(): Attribute
     {
         return Attribute::make(
-            get: fn (): float|int => (float) $this->reviews()->approved()->avg('rating') ?: 0
+            get: fn (): float|int => (float) $this->approvedReviews->avg('rating') ?: 0
         )->shouldCache();
     }
 
     public function reviewsCount(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->reviews()->approved()->count()
+            get: fn () => $this->approvedReviews->count()
         )->shouldCache();
     }
 

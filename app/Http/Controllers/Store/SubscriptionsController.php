@@ -12,12 +12,14 @@ use App\Http\Requests\Store\SubscriptionCancelRequest;
 use App\Http\Requests\Store\SubscriptionCheckoutRequest;
 use App\Http\Requests\Store\SubscriptionUpdateRequest;
 use App\Managers\PaymentManager;
+use App\Models\Comment;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
@@ -45,6 +47,7 @@ class SubscriptionsController extends Controller
         $subscriptions = Product::query()
             ->subscriptions()
             ->visible()
+            ->with(['approvedReviews' => fn (MorphMany|Comment $query) => $query->latest()])
             ->with(['prices' => fn (HasMany|Price $query) => $query->recurring()->active()])
             ->with('categories')
             ->with('policies.category')
@@ -55,10 +58,8 @@ class SubscriptionsController extends Controller
 
         $subscriptionReviews = $subscriptions->mapWithKeys(function (Product $product): array {
             $reviews = CommentData::collect($product
-                ->reviews()
-                ->approved()
-                ->latest()
-                ->get()
+                ->approvedReviews
+                ->values()
                 ->all(), PaginatedDataCollection::class);
 
             return [$product->id => $reviews->items()];

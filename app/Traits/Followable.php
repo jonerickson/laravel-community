@@ -36,7 +36,7 @@ trait Followable
             return null;
         }
 
-        return $this->follows()->where('created_by', $user->getKey())->first();
+        return $this->follows->firstWhere('created_by', $user->getKey());
     }
 
     public function isFollowedBy(?User $user = null): bool
@@ -73,7 +73,7 @@ trait Followable
     public function followersCount(): Attribute
     {
         return Attribute::make(
-            get: fn (): int => $this->follows()->count(),
+            get: fn (): int => $this->follows->count(),
         )->shouldCache();
     }
 

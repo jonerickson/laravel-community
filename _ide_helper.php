@@ -19642,7 +19642,7 @@ namespace Illuminate\Support\Facades {
          * Get a filesystem instance.
          *
          * @param string|null $name
-         * @return \Illuminate\Filesystem\AwsS3V3Adapter
+         * @return \Illuminate\Filesystem\LocalFilesystemAdapter
          * @static
          */
         public static function drive($name = null)
@@ -19655,7 +19655,7 @@ namespace Illuminate\Support\Facades {
          * Get a filesystem instance.
          *
          * @param \UnitEnum|string|null $name
-         * @return \Illuminate\Filesystem\AwsS3V3Adapter
+         * @return \Illuminate\Filesystem\LocalFilesystemAdapter
          * @static
          */
         public static function disk($name = null)
@@ -19680,7 +19680,7 @@ namespace Illuminate\Support\Facades {
          * Build an on-demand disk.
          *
          * @param string|array $config
-         * @return \Illuminate\Filesystem\AwsS3V3Adapter
+         * @return \Illuminate\Filesystem\LocalFilesystemAdapter
          * @static
          */
         public static function build($config)
@@ -19694,7 +19694,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param array $config
          * @param string $name
-         * @return \Illuminate\Filesystem\AwsS3V3Adapter
+         * @return \Illuminate\Filesystem\LocalFilesystemAdapter
          * @static
          */
         public static function createLocalDriver($config, $name = 'local')
@@ -19707,7 +19707,7 @@ namespace Illuminate\Support\Facades {
          * Create an instance of the ftp driver.
          *
          * @param array $config
-         * @return \Illuminate\Filesystem\AwsS3V3Adapter
+         * @return \Illuminate\Filesystem\LocalFilesystemAdapter
          * @static
          */
         public static function createFtpDriver($config)
@@ -19720,7 +19720,7 @@ namespace Illuminate\Support\Facades {
          * Create an instance of the sftp driver.
          *
          * @param array $config
-         * @return \Illuminate\Filesystem\AwsS3V3Adapter
+         * @return \Illuminate\Filesystem\LocalFilesystemAdapter
          * @static
          */
         public static function createSftpDriver($config)
@@ -19746,7 +19746,7 @@ namespace Illuminate\Support\Facades {
          * Create a scoped driver.
          *
          * @param array $config
-         * @return \Illuminate\Filesystem\AwsS3V3Adapter
+         * @return \Illuminate\Filesystem\LocalFilesystemAdapter
          * @static
          */
         public static function createScopedDriver($config)
@@ -19847,20 +19847,6 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
-         * Get the URL for the file at the given path.
-         *
-         * @param string $path
-         * @return string
-         * @throws \RuntimeException
-         * @static
-         */
-        public static function url($path)
-        {
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
-            return $instance->url($path);
-        }
-
-        /**
          * Determine if temporary URLs can be generated.
          *
          * @return bool
@@ -19868,7 +19854,7 @@ namespace Illuminate\Support\Facades {
          */
         public static function providesTemporaryUrls()
         {
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->providesTemporaryUrls();
         }
 
@@ -19883,35 +19869,35 @@ namespace Illuminate\Support\Facades {
          */
         public static function temporaryUrl($path, $expiration, $options = [])
         {
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->temporaryUrl($path, $expiration, $options);
         }
 
         /**
-         * Get a temporary upload URL for the file at the given path.
+         * Specify the name of the disk the adapter is managing.
          *
-         * @param string $path
-         * @param \DateTimeInterface $expiration
-         * @param array $options
-         * @return array
+         * @param string $disk
+         * @return \Illuminate\Filesystem\LocalFilesystemAdapter
          * @static
          */
-        public static function temporaryUploadUrl($path, $expiration, $options = [])
+        public static function diskName($disk)
         {
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
-            return $instance->temporaryUploadUrl($path, $expiration, $options);
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
+            return $instance->diskName($disk);
         }
 
         /**
-         * Get the underlying S3 client.
+         * Indicate that signed URLs should serve the corresponding files.
          *
-         * @return \Aws\S3\S3Client
+         * @param bool $serve
+         * @param \Closure|null $urlGeneratorResolver
+         * @return \Illuminate\Filesystem\LocalFilesystemAdapter
          * @static
          */
-        public static function getClient()
+        public static function shouldServeSignedUrls($serve = true, $urlGeneratorResolver = null)
         {
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
-            return $instance->getClient();
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
+            return $instance->shouldServeSignedUrls($serve, $urlGeneratorResolver);
         }
 
         /**
@@ -19919,13 +19905,13 @@ namespace Illuminate\Support\Facades {
          *
          * @param string|array $path
          * @param string|null $content
-         * @return \Illuminate\Filesystem\AwsS3V3Adapter
+         * @return \Illuminate\Filesystem\LocalFilesystemAdapter
          * @static
          */
         public static function assertExists($path, $content = null)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->assertExists($path, $content);
         }
 
@@ -19935,13 +19921,13 @@ namespace Illuminate\Support\Facades {
          * @param string $path
          * @param int $count
          * @param bool $recursive
-         * @return \Illuminate\Filesystem\AwsS3V3Adapter
+         * @return \Illuminate\Filesystem\LocalFilesystemAdapter
          * @static
          */
         public static function assertCount($path, $count, $recursive = false)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->assertCount($path, $count, $recursive);
         }
 
@@ -19949,13 +19935,13 @@ namespace Illuminate\Support\Facades {
          * Assert that the given file or directory does not exist.
          *
          * @param string|array $path
-         * @return \Illuminate\Filesystem\AwsS3V3Adapter
+         * @return \Illuminate\Filesystem\LocalFilesystemAdapter
          * @static
          */
         public static function assertMissing($path)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->assertMissing($path);
         }
 
@@ -19963,13 +19949,13 @@ namespace Illuminate\Support\Facades {
          * Assert that the given directory is empty.
          *
          * @param string $path
-         * @return \Illuminate\Filesystem\AwsS3V3Adapter
+         * @return \Illuminate\Filesystem\LocalFilesystemAdapter
          * @static
          */
         public static function assertDirectoryEmpty($path)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->assertDirectoryEmpty($path);
         }
 
@@ -19983,7 +19969,7 @@ namespace Illuminate\Support\Facades {
         public static function exists($path)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->exists($path);
         }
 
@@ -19997,7 +19983,7 @@ namespace Illuminate\Support\Facades {
         public static function missing($path)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->missing($path);
         }
 
@@ -20011,7 +19997,7 @@ namespace Illuminate\Support\Facades {
         public static function fileExists($path)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->fileExists($path);
         }
 
@@ -20025,7 +20011,7 @@ namespace Illuminate\Support\Facades {
         public static function fileMissing($path)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->fileMissing($path);
         }
 
@@ -20039,7 +20025,7 @@ namespace Illuminate\Support\Facades {
         public static function directoryExists($path)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->directoryExists($path);
         }
 
@@ -20053,7 +20039,7 @@ namespace Illuminate\Support\Facades {
         public static function directoryMissing($path)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->directoryMissing($path);
         }
 
@@ -20067,7 +20053,7 @@ namespace Illuminate\Support\Facades {
         public static function path($path)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->path($path);
         }
 
@@ -20081,7 +20067,7 @@ namespace Illuminate\Support\Facades {
         public static function get($path)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->get($path);
         }
 
@@ -20096,7 +20082,7 @@ namespace Illuminate\Support\Facades {
         public static function json($path, $flags = 0)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->json($path, $flags);
         }
 
@@ -20113,7 +20099,7 @@ namespace Illuminate\Support\Facades {
         public static function response($path, $name = null, $headers = [], $disposition = 'inline')
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->response($path, $name, $headers, $disposition);
         }
 
@@ -20130,7 +20116,7 @@ namespace Illuminate\Support\Facades {
         public static function serve($request, $path, $name = null, $headers = [])
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->serve($request, $path, $name, $headers);
         }
 
@@ -20146,7 +20132,7 @@ namespace Illuminate\Support\Facades {
         public static function download($path, $name = null, $headers = [])
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->download($path, $name, $headers);
         }
 
@@ -20162,7 +20148,7 @@ namespace Illuminate\Support\Facades {
         public static function put($path, $contents, $options = [])
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->put($path, $contents, $options);
         }
 
@@ -20178,7 +20164,7 @@ namespace Illuminate\Support\Facades {
         public static function putFile($path, $file = null, $options = [])
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->putFile($path, $file, $options);
         }
 
@@ -20195,7 +20181,7 @@ namespace Illuminate\Support\Facades {
         public static function putFileAs($path, $file, $name = null, $options = [])
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->putFileAs($path, $file, $name, $options);
         }
 
@@ -20209,7 +20195,7 @@ namespace Illuminate\Support\Facades {
         public static function getVisibility($path)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->getVisibility($path);
         }
 
@@ -20224,7 +20210,7 @@ namespace Illuminate\Support\Facades {
         public static function setVisibility($path, $visibility)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->setVisibility($path, $visibility);
         }
 
@@ -20241,7 +20227,7 @@ namespace Illuminate\Support\Facades {
 ')
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->prepend($path, $data, $separator);
         }
 
@@ -20258,7 +20244,7 @@ namespace Illuminate\Support\Facades {
 ')
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->append($path, $data, $separator);
         }
 
@@ -20272,7 +20258,7 @@ namespace Illuminate\Support\Facades {
         public static function delete($paths)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->delete($paths);
         }
 
@@ -20287,7 +20273,7 @@ namespace Illuminate\Support\Facades {
         public static function copy($from, $to)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->copy($from, $to);
         }
 
@@ -20302,7 +20288,7 @@ namespace Illuminate\Support\Facades {
         public static function move($from, $to)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->move($from, $to);
         }
 
@@ -20316,7 +20302,7 @@ namespace Illuminate\Support\Facades {
         public static function size($path)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->size($path);
         }
 
@@ -20330,7 +20316,7 @@ namespace Illuminate\Support\Facades {
         public static function checksum($path, $options = [])
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->checksum($path, $options);
         }
 
@@ -20344,7 +20330,7 @@ namespace Illuminate\Support\Facades {
         public static function mimeType($path)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->mimeType($path);
         }
 
@@ -20358,7 +20344,7 @@ namespace Illuminate\Support\Facades {
         public static function lastModified($path)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->lastModified($path);
         }
 
@@ -20372,7 +20358,7 @@ namespace Illuminate\Support\Facades {
         public static function readStream($path)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->readStream($path);
         }
 
@@ -20388,8 +20374,40 @@ namespace Illuminate\Support\Facades {
         public static function writeStream($path, $resource, $options = [])
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->writeStream($path, $resource, $options);
+        }
+
+        /**
+         * Get the URL for the file at the given path.
+         *
+         * @param string $path
+         * @return string
+         * @throws \RuntimeException
+         * @static
+         */
+        public static function url($path)
+        {
+            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
+            return $instance->url($path);
+        }
+
+        /**
+         * Get a temporary upload URL for the file at the given path.
+         *
+         * @param string $path
+         * @param \DateTimeInterface $expiration
+         * @param array $options
+         * @return array
+         * @throws \RuntimeException
+         * @static
+         */
+        public static function temporaryUploadUrl($path, $expiration, $options = [])
+        {
+            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
+            return $instance->temporaryUploadUrl($path, $expiration, $options);
         }
 
         /**
@@ -20403,7 +20421,7 @@ namespace Illuminate\Support\Facades {
         public static function files($directory = null, $recursive = false)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->files($directory, $recursive);
         }
 
@@ -20417,7 +20435,7 @@ namespace Illuminate\Support\Facades {
         public static function allFiles($directory = null)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->allFiles($directory);
         }
 
@@ -20432,7 +20450,7 @@ namespace Illuminate\Support\Facades {
         public static function directories($directory = null, $recursive = false)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->directories($directory, $recursive);
         }
 
@@ -20446,7 +20464,7 @@ namespace Illuminate\Support\Facades {
         public static function allDirectories($directory = null)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->allDirectories($directory);
         }
 
@@ -20460,7 +20478,7 @@ namespace Illuminate\Support\Facades {
         public static function makeDirectory($path)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->makeDirectory($path);
         }
 
@@ -20474,7 +20492,7 @@ namespace Illuminate\Support\Facades {
         public static function deleteDirectory($directory)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->deleteDirectory($directory);
         }
 
@@ -20487,7 +20505,7 @@ namespace Illuminate\Support\Facades {
         public static function getDriver()
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->getDriver();
         }
 
@@ -20500,7 +20518,7 @@ namespace Illuminate\Support\Facades {
         public static function getAdapter()
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->getAdapter();
         }
 
@@ -20513,7 +20531,7 @@ namespace Illuminate\Support\Facades {
         public static function getConfig()
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->getConfig();
         }
 
@@ -20527,7 +20545,7 @@ namespace Illuminate\Support\Facades {
         public static function serveUsing($callback)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             $instance->serveUsing($callback);
         }
 
@@ -20541,7 +20559,7 @@ namespace Illuminate\Support\Facades {
         public static function buildTemporaryUrlsUsing($callback)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             $instance->buildTemporaryUrlsUsing($callback);
         }
 
@@ -20558,7 +20576,7 @@ namespace Illuminate\Support\Facades {
          */
         public static function when($value = null, $callback = null, $default = null)
         {
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->when($value, $callback, $default);
         }
 
@@ -20575,7 +20593,7 @@ namespace Illuminate\Support\Facades {
          */
         public static function unless($value = null, $callback = null, $default = null)
         {
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->unless($value, $callback, $default);
         }
 
@@ -20591,7 +20609,7 @@ namespace Illuminate\Support\Facades {
         public static function macro($name, $macro)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            \Illuminate\Filesystem\AwsS3V3Adapter::macro($name, $macro);
+            \Illuminate\Filesystem\LocalFilesystemAdapter::macro($name, $macro);
         }
 
         /**
@@ -20606,7 +20624,7 @@ namespace Illuminate\Support\Facades {
         public static function mixin($mixin, $replace = true)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            \Illuminate\Filesystem\AwsS3V3Adapter::mixin($mixin, $replace);
+            \Illuminate\Filesystem\LocalFilesystemAdapter::mixin($mixin, $replace);
         }
 
         /**
@@ -20619,7 +20637,7 @@ namespace Illuminate\Support\Facades {
         public static function hasMacro($name)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            return \Illuminate\Filesystem\AwsS3V3Adapter::hasMacro($name);
+            return \Illuminate\Filesystem\LocalFilesystemAdapter::hasMacro($name);
         }
 
         /**
@@ -20631,7 +20649,7 @@ namespace Illuminate\Support\Facades {
         public static function flushMacros()
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            \Illuminate\Filesystem\AwsS3V3Adapter::flushMacros();
+            \Illuminate\Filesystem\LocalFilesystemAdapter::flushMacros();
         }
 
         /**
@@ -20646,7 +20664,7 @@ namespace Illuminate\Support\Facades {
         public static function macroCall($method, $parameters)
         {
             //Method inherited from \Illuminate\Filesystem\FilesystemAdapter 
-            /** @var \Illuminate\Filesystem\AwsS3V3Adapter $instance */
+            /** @var \Illuminate\Filesystem\LocalFilesystemAdapter $instance */
             return $instance->macroCall($method, $parameters);
         }
 
@@ -22936,6 +22954,598 @@ namespace AnourValar\EloquentSerialize\Facades {
             }
     }
 
+namespace Barryvdh\Debugbar\Facades {
+    /**
+     * @method static void alert(mixed $message)
+     * @method static void critical(mixed $message)
+     * @method static void debug(mixed $message)
+     * @method static void emergency(mixed $message)
+     * @method static void error(mixed $message)
+     * @method static void info(mixed $message)
+     * @method static void log(mixed $message)
+     * @method static void notice(mixed $message)
+     * @method static void warning(mixed $message)
+     * @see \Barryvdh\Debugbar\LaravelDebugbar
+     */
+    class Debugbar extends \DebugBar\DebugBar {
+        /**
+         * Returns the HTTP driver
+         * 
+         * If no http driver where defined, a PhpHttpDriver is automatically created
+         *
+         * @return \DebugBar\HttpDriverInterface
+         * @static
+         */
+        public static function getHttpDriver()
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->getHttpDriver();
+        }
+
+        /**
+         * Enable the Debugbar and boot, if not already booted.
+         *
+         * @static
+         */
+        public static function enable()
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->enable();
+        }
+
+        /**
+         * Boot the debugbar (add collectors, renderer and listener)
+         *
+         * @static
+         */
+        public static function boot()
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->boot();
+        }
+
+        /**
+         * @static
+         */
+        public static function shouldCollect($name, $default = false)
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->shouldCollect($name, $default);
+        }
+
+        /**
+         * Adds a data collector
+         *
+         * @param \DebugBar\DataCollector\DataCollectorInterface $collector
+         * @throws DebugBarException
+         * @return \Barryvdh\Debugbar\LaravelDebugbar
+         * @static
+         */
+        public static function addCollector($collector)
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->addCollector($collector);
+        }
+
+        /**
+         * Handle silenced errors
+         *
+         * @param $level
+         * @param $message
+         * @param string $file
+         * @param int $line
+         * @param array $context
+         * @throws \ErrorException
+         * @static
+         */
+        public static function handleError($level, $message, $file = '', $line = 0, $context = [])
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->handleError($level, $message, $file, $line, $context);
+        }
+
+        /**
+         * Starts a measure
+         *
+         * @param string $name Internal name, used to stop the measure
+         * @param string $label Public name
+         * @param string|null $collector
+         * @param string|null $group
+         * @static
+         */
+        public static function startMeasure($name, $label = null, $collector = null, $group = null)
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->startMeasure($name, $label, $collector, $group);
+        }
+
+        /**
+         * Stops a measure
+         *
+         * @param string $name
+         * @static
+         */
+        public static function stopMeasure($name)
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->stopMeasure($name);
+        }
+
+        /**
+         * Adds an exception to be profiled in the debug bar
+         *
+         * @param \Exception $e
+         * @deprecated in favor of addThrowable
+         * @static
+         */
+        public static function addException($e)
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->addException($e);
+        }
+
+        /**
+         * Adds an exception to be profiled in the debug bar
+         *
+         * @param \Throwable $e
+         * @static
+         */
+        public static function addThrowable($e)
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->addThrowable($e);
+        }
+
+        /**
+         * Returns a JavascriptRenderer for this instance
+         *
+         * @param string $baseUrl
+         * @param string $basePath
+         * @return \Barryvdh\Debugbar\JavascriptRenderer
+         * @static
+         */
+        public static function getJavascriptRenderer($baseUrl = null, $basePath = null)
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->getJavascriptRenderer($baseUrl, $basePath);
+        }
+
+        /**
+         * Modify the response and inject the debugbar (or data in headers)
+         *
+         * @param \Symfony\Component\HttpFoundation\Request $request
+         * @param \Symfony\Component\HttpFoundation\Response $response
+         * @return \Symfony\Component\HttpFoundation\Response
+         * @static
+         */
+        public static function modifyResponse($request, $response)
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->modifyResponse($request, $response);
+        }
+
+        /**
+         * Check if the Debugbar is enabled
+         *
+         * @return boolean
+         * @static
+         */
+        public static function isEnabled()
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->isEnabled();
+        }
+
+        /**
+         * Collects the data from the collectors
+         *
+         * @return array
+         * @static
+         */
+        public static function collect()
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->collect();
+        }
+
+        /**
+         * Injects the web debug toolbar into the given Response.
+         *
+         * @param \Symfony\Component\HttpFoundation\Response $response A Response instance
+         * Based on https://github.com/symfony/WebProfilerBundle/blob/master/EventListener/WebDebugToolbarListener.php
+         * @static
+         */
+        public static function injectDebugbar($response)
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->injectDebugbar($response);
+        }
+
+        /**
+         * Checks if there is stacked data in the session
+         *
+         * @return boolean
+         * @static
+         */
+        public static function hasStackedData()
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->hasStackedData();
+        }
+
+        /**
+         * Returns the data stacked in the session
+         *
+         * @param boolean $delete Whether to delete the data in the session
+         * @return array
+         * @static
+         */
+        public static function getStackedData($delete = true)
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->getStackedData($delete);
+        }
+
+        /**
+         * Disable the Debugbar
+         *
+         * @static
+         */
+        public static function disable()
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->disable();
+        }
+
+        /**
+         * Adds a measure
+         *
+         * @param string $label
+         * @param float $start
+         * @param float $end
+         * @param array|null $params
+         * @param string|null $collector
+         * @param string|null $group
+         * @static
+         */
+        public static function addMeasure($label, $start, $end, $params = [], $collector = null, $group = null)
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->addMeasure($label, $start, $end, $params, $collector, $group);
+        }
+
+        /**
+         * Utility function to measure the execution of a Closure
+         *
+         * @param string $label
+         * @param \Closure $closure
+         * @param string|null $collector
+         * @param string|null $group
+         * @return mixed
+         * @static
+         */
+        public static function measure($label, $closure, $collector = null, $group = null)
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->measure($label, $closure, $collector, $group);
+        }
+
+        /**
+         * Collect data in a CLI request
+         *
+         * @return array
+         * @static
+         */
+        public static function collectConsole()
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->collectConsole();
+        }
+
+        /**
+         * Adds a message to the MessagesCollector
+         * 
+         * A message can be anything from an object to a string
+         *
+         * @param mixed $message
+         * @param string $label
+         * @static
+         */
+        public static function addMessage($message, $label = 'info')
+        {
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->addMessage($message, $label);
+        }
+
+        /**
+         * Checks if a data collector has been added
+         *
+         * @param string $name
+         * @return boolean
+         * @static
+         */
+        public static function hasCollector($name)
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->hasCollector($name);
+        }
+
+        /**
+         * Returns a data collector
+         *
+         * @param string $name
+         * @return \DebugBar\DataCollector\DataCollectorInterface
+         * @throws DebugBarException
+         * @static
+         */
+        public static function getCollector($name)
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->getCollector($name);
+        }
+
+        /**
+         * Returns an array of all data collectors
+         *
+         * @return array[DataCollectorInterface]
+         * @static
+         */
+        public static function getCollectors()
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->getCollectors();
+        }
+
+        /**
+         * Sets the request id generator
+         *
+         * @param \DebugBar\RequestIdGeneratorInterface $generator
+         * @return \Barryvdh\Debugbar\LaravelDebugbar
+         * @static
+         */
+        public static function setRequestIdGenerator($generator)
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->setRequestIdGenerator($generator);
+        }
+
+        /**
+         * @return \DebugBar\RequestIdGeneratorInterface
+         * @static
+         */
+        public static function getRequestIdGenerator()
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->getRequestIdGenerator();
+        }
+
+        /**
+         * Returns the id of the current request
+         *
+         * @return string
+         * @static
+         */
+        public static function getCurrentRequestId()
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->getCurrentRequestId();
+        }
+
+        /**
+         * Sets the storage backend to use to store the collected data
+         *
+         * @param \DebugBar\StorageInterface $storage
+         * @return \Barryvdh\Debugbar\LaravelDebugbar
+         * @static
+         */
+        public static function setStorage($storage = null)
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->setStorage($storage);
+        }
+
+        /**
+         * @return \DebugBar\StorageInterface
+         * @static
+         */
+        public static function getStorage()
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->getStorage();
+        }
+
+        /**
+         * Checks if the data will be persisted
+         *
+         * @return boolean
+         * @static
+         */
+        public static function isDataPersisted()
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->isDataPersisted();
+        }
+
+        /**
+         * Sets the HTTP driver
+         *
+         * @param \DebugBar\HttpDriverInterface $driver
+         * @return \Barryvdh\Debugbar\LaravelDebugbar
+         * @static
+         */
+        public static function setHttpDriver($driver)
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->setHttpDriver($driver);
+        }
+
+        /**
+         * Returns collected data
+         * 
+         * Will collect the data if none have been collected yet
+         *
+         * @return array
+         * @static
+         */
+        public static function getData()
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->getData();
+        }
+
+        /**
+         * Returns an array of HTTP headers containing the data
+         *
+         * @param string $headerName
+         * @param integer $maxHeaderLength
+         * @return array
+         * @static
+         */
+        public static function getDataAsHeaders($headerName = 'phpdebugbar', $maxHeaderLength = 4096, $maxTotalHeaderLength = 250000)
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->getDataAsHeaders($headerName, $maxHeaderLength, $maxTotalHeaderLength);
+        }
+
+        /**
+         * Sends the data through the HTTP headers
+         *
+         * @param bool $useOpenHandler
+         * @param string $headerName
+         * @param integer $maxHeaderLength
+         * @return \Barryvdh\Debugbar\LaravelDebugbar
+         * @static
+         */
+        public static function sendDataInHeaders($useOpenHandler = null, $headerName = 'phpdebugbar', $maxHeaderLength = 4096)
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->sendDataInHeaders($useOpenHandler, $headerName, $maxHeaderLength);
+        }
+
+        /**
+         * Stacks the data in the session for later rendering
+         *
+         * @static
+         */
+        public static function stackData()
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->stackData();
+        }
+
+        /**
+         * Sets the key to use in the $_SESSION array
+         *
+         * @param string $ns
+         * @return \Barryvdh\Debugbar\LaravelDebugbar
+         * @static
+         */
+        public static function setStackDataSessionNamespace($ns)
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->setStackDataSessionNamespace($ns);
+        }
+
+        /**
+         * Returns the key used in the $_SESSION array
+         *
+         * @return string
+         * @static
+         */
+        public static function getStackDataSessionNamespace()
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->getStackDataSessionNamespace();
+        }
+
+        /**
+         * Sets whether to only use the session to store stacked data even
+         * if a storage is enabled
+         *
+         * @param boolean $enabled
+         * @return \Barryvdh\Debugbar\LaravelDebugbar
+         * @static
+         */
+        public static function setStackAlwaysUseSessionStorage($enabled = true)
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->setStackAlwaysUseSessionStorage($enabled);
+        }
+
+        /**
+         * Checks if the session is always used to store stacked data
+         * even if a storage is enabled
+         *
+         * @return boolean
+         * @static
+         */
+        public static function isStackAlwaysUseSessionStorage()
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->isStackAlwaysUseSessionStorage();
+        }
+
+        /**
+         * @static
+         */
+        public static function offsetSet($key, $value)
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->offsetSet($key, $value);
+        }
+
+        /**
+         * @static
+         */
+        public static function offsetGet($key)
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->offsetGet($key);
+        }
+
+        /**
+         * @static
+         */
+        public static function offsetExists($key)
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->offsetExists($key);
+        }
+
+        /**
+         * @static
+         */
+        public static function offsetUnset($key)
+        {
+            //Method inherited from \DebugBar\DebugBar 
+            /** @var \Barryvdh\Debugbar\LaravelDebugbar $instance */
+            return $instance->offsetUnset($key);
+        }
+
+            }
+    }
+
 namespace Laravel\Socialite\Facades {
     /**
      * @method array getScopes()
@@ -23469,6 +24079,23 @@ namespace Livewire {
     }
 
 namespace Illuminate\Support {
+    /**
+     * @template TKey of array-key
+     * @template-covariant TValue
+     * @implements \ArrayAccess<TKey, TValue>
+     * @implements \Illuminate\Support\Enumerable<TKey, TValue>
+     */
+    class Collection {
+        /**
+         * @see \Barryvdh\Debugbar\ServiceProvider::register()
+         * @static
+         */
+        public static function debug()
+        {
+            return \Illuminate\Support\Collection::debug();
+        }
+
+            }
     /**
      */
     class Str {
@@ -26948,6 +27575,16 @@ namespace Illuminate\View {
             return \Illuminate\View\View::response($callback);
         }
 
+            }
+    }
+
+namespace Illuminate\Database\Eloquent {
+    /**
+     * @template TKey of array-key
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     * @extends \Illuminate\Support\Collection<TKey, TModel>
+     */
+    class Collection extends \Illuminate\Support\Collection {
             }
     }
 
@@ -32258,6 +32895,7 @@ namespace  {
     class View extends \Illuminate\Support\Facades\View {}
     class Vite extends \Illuminate\Support\Facades\Vite {}
     class EloquentSerialize extends \AnourValar\EloquentSerialize\Facades\EloquentSerializeFacade {}
+    class Debugbar extends \Barryvdh\Debugbar\Facades\Debugbar {}
     class Horizon extends \Laravel\Horizon\Horizon {}
     class Socialite extends \Laravel\Socialite\Facades\Socialite {}
     class Livewire extends \Livewire\Livewire {}

@@ -237,10 +237,6 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         'active_consequence_type',
     ];
 
-    protected $with = [
-        'groups',
-    ];
-
     protected $dispatchesEvents = [
         'created' => UserCreated::class,
         'updated' => UserUpdated::class,
@@ -317,19 +313,20 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     public function warningPoints(): Attribute
     {
         return Attribute::make(
-            get: fn (): int => $this->activeWarnings()->get()->sum(fn (UserWarning $warning) => $warning->warning->points)
+            get: fn (): int => $this->activeWarnings->sum(fn (UserWarning $warning) => $warning->warning->points)
         )->shouldCache();
     }
 
     public function activeConsequence(): Attribute
     {
         return Attribute::make(
-            get: fn (): ?WarningConsequence => $this->userWarnings()
-                ->activeConsequence()
-                ->with('warningConsequence')
-                ->orderByDesc('consequence_expires_at')
-                ->first()
-                ?->warningConsequence
+            get: fn (): ?WarningConsequence => null
+            //            $this->userWarnings()
+            //                    ->activeConsequence()
+            //                    ->with('warningConsequence')
+            //                    ->orderByDesc('consequence_expires_at')
+            //                    ->first()
+            //                    ?->warningConsequence
         )->shouldCache();
     }
 

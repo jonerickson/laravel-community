@@ -33,16 +33,17 @@ class CategoryController extends Controller
             ->ordered()
             ->with(['forums' => function (HasMany|Forum $query): void {
                 $query
+                    ->with(['topics.posts', 'posts', 'follows', 'followers'])
                     ->whereNull('parent_id')
                     ->active()
                     ->ordered()
-                    ->withCount(['topics', 'posts'])
                     ->with(['latestTopics' => function (HasMany|Topic $subQuery): void {
                         $subQuery
-                            ->with(['forum.category', 'author', 'lastPost.author'])
+                            ->with(['forum.category', 'author', 'lastPost.author', 'posts.comments.reports'])
                             ->limit(3);
                     }]);
             }])
+            ->with(['groups'])
             ->get()
             ->filter(fn (ForumCategory $category) => Gate::check('view', $category))
             ->map(function (ForumCategory $category): ForumCategory {
@@ -50,14 +51,6 @@ class CategoryController extends Controller
                     'forums',
                     $category->forums
                         ->filter(fn (Forum $forum) => Gate::check('view', $forum))
-                        ->map(function (Forum $forum): Forum {
-                            $forum->setRelation(
-                                'latestTopics',
-                                $forum->latestTopics->filter(fn (Topic $topic) => Gate::check('view', $topic))->values()
-                            );
-
-                            return $forum;
-                        })
                         ->values()
                 );
 
@@ -78,25 +71,10 @@ class CategoryController extends Controller
         $this->authorize('view', $category);
 
         $forums = $category
-            ->forums()
-            ->whereNull('parent_id')
-            ->active()
-            ->ordered()
-            ->withCount(['topics', 'posts'])
-            ->with(['latestTopics' => function ($query): void {
-                $query->with(['author', 'lastPost.author'])
-                    ->limit(3);
-            }])
-            ->get()
+            ->loadMissing(['forums' => fn (HasMany|Forum $query) => $query->whereNull('parent_id')->active()->ordered()])
+            ->loadMissing(['groups', 'forums.latestTopics.posts.reads', 'forums.latestTopics.posts.views', 'forums.latestTopics.posts.likes', 'forums.latestTopics.posts.comments', 'forums.latestTopics.author', 'forums.latestTopics.lastPost.author'])
+            ->forums
             ->filter(fn (Forum $forum) => Gate::check('view', $forum))
-            ->map(function (Forum $forum): Forum {
-                $forum->setRelation(
-                    'latestTopics',
-                    $forum->latestTopics->filter(fn (Topic $topic) => Gate::check('view', $topic))->values()
-                );
-
-                return $forum;
-            })
             ->values();
 
         return Inertia::render('forums/categories/show', [

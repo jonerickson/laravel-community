@@ -9,9 +9,11 @@ use App\Models\User;
 
 class PermissionService
 {
+    protected static ?Group $defaultGuestGroup = null;
+
     public static function hasPermissionTo(string $permission, ?User $user = null): bool
     {
-        if (blank($user) && ($guestGroup = Group::query()->defaultGuestGroups()->first())) {
+        if (blank($user) && ($guestGroup = static::getDefaultGuestGroup())) {
             return $guestGroup->hasPermissionTo($permission);
         }
 
@@ -30,5 +32,10 @@ class PermissionService
         }
 
         return false;
+    }
+
+    protected static function getDefaultGuestGroup(): ?Group
+    {
+        return static::$defaultGuestGroup ?? static::$defaultGuestGroup = Group::query()->defaultGuestGroups()->first();
     }
 }

@@ -16,6 +16,7 @@ use App\Models\Forum;
 use App\Models\Post;
 use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
@@ -82,14 +83,15 @@ class TopicController extends Controller
         $this->authorize('view', $forum);
         $this->authorize('view', $topic);
 
+        $forum->loadMissing(['parent', 'category']);
+
         $topic->incrementViews();
 
         $posts = PostData::collect($topic
-            ->posts()
-            ->with(['author', 'comments.author', 'comments.replies.author', 'reports'])
-            ->latestActivity()
-            ->get()
-            ->filter(fn (Post $post) => Gate::check('view', [$post, $forum, $topic]))
+            ->loadMissing(['posts' => fn (HasMany|Post $query) => $query->latestActivity()])
+            ->loadMissing(['author', 'posts.author.groups', 'posts.reports', 'posts.comments', 'posts.views', 'posts.reads', 'posts.likes'])
+            ->posts
+            ->filter(fn (Post $post) => Gate::check('view', $post))
             ->values()
             ->all(), PaginatedDataCollection::class);
 

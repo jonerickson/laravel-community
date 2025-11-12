@@ -174,34 +174,30 @@ class Topic extends Model implements Sluggable
     public function postsCount(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->posts()->count(),
+            get: fn () => $this->posts->count(),
         )->shouldCache();
     }
 
     public function hasReportedContent(): Attribute
     {
         return Attribute::make(
-            get: fn (): bool => $this->posts()
-                ->whereHas('pendingReports')
-                ->exists()
+            get: fn (): bool => $this->posts
+                ->filter(fn (Post $post) => $post->pendingReports->isNotEmpty())
+                ->isNotEmpty()
         )->shouldCache();
     }
 
     public function hasUnpublishedContent(): Attribute
     {
         return Attribute::make(
-            get: fn (): bool => $this->posts()
-                ->unpublished()
-                ->exists()
+            get: fn (): bool => $this->posts->where('is_published', false)->isNotEmpty()
         )->shouldCache();
     }
 
     public function hasUnapprovedContent(): Attribute
     {
         return Attribute::make(
-            get: fn (): bool => $this->posts()
-                ->unapproved()
-                ->exists()
+            get: fn (): bool => $this->posts->where('is_approved', false)->isNotEmpty()
         )->shouldCache();
     }
 
@@ -215,15 +211,14 @@ class Topic extends Model implements Sluggable
                 }
 
                 $dayAgo = now()->subDay();
-                $recentPosts = $this->posts()
+                $recentPosts = $this->posts
                     ->where('created_at', '>=', $dayAgo)
-                    ->with('likes')
-                    ->get();
+                    ->values();
 
                 $postsInLast24h = $recentPosts->count();
                 $postingScore = $postsInLast24h * 2;
 
-                $likesInLast24h = $recentPosts->sum(fn ($post) => $post->likes()->count());
+                $likesInLast24h = $recentPosts->sum(fn ($post) => $post->likes->count());
                 $engagementScore = $likesInLast24h * 1;
 
                 $totalScore = $postingScore + $engagementScore;

@@ -41,7 +41,7 @@ trait Commentable
     public function commentsCount(): Attribute
     {
         return Attribute::make(
-            get: fn (): int => $this->approvedComments()->count() ?? 0,
+            get: fn (): int => $this->approvedComments->count() ?? 0,
         )->shouldCache();
     }
 

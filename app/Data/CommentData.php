@@ -6,7 +6,6 @@ namespace App\Data;
 
 use App\Data\Traits\HasDataPermissions;
 use Carbon\CarbonImmutable;
-use Spatie\LaravelData\Attributes\LoadRelation;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
@@ -46,13 +45,10 @@ class CommentData extends Data
     /** @var string[] */
     public array $userReactions;
 
-    #[LoadRelation]
     public ?UserData $user = null;
 
-    #[LoadRelation]
     public ?UserData $author = null;
 
-    #[LoadRelation]
     public ?CommentData $parent = null;
 
     /** @var CommentData[] */
