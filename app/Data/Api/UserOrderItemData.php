@@ -27,9 +27,12 @@ class UserOrderItemData extends Data
     #[ApiProperty(property: 'name', serialize: new Groups(['user']))]
     public ?string $name = null;
 
+    #[ApiProperty(property: 'description', serialize: new Groups(['user']))]
+    public ?string $description = null;
+
+    #[ApiProperty(property: 'amount', serialize: new Groups(['user']))]
+    public ?float $amount = null;
+
     #[ApiProperty(property: 'quantity', serialize: new Groups(['user']))]
     public ?int $quantity = null;
-
-    #[ApiProperty(property: 'product', serialize: new Groups(['user']))]
-    public ?UserOrderItemProductData $product = null;
 }

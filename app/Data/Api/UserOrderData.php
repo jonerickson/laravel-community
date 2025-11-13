@@ -35,6 +35,9 @@ class UserOrderData extends Data
     #[ApiProperty(property: 'status', serialize: new Groups(['user']))]
     public OrderStatus $status;
 
+    #[ApiProperty(property: 'amount', serialize: new Groups(['user']))]
+    public ?float $amount = null;
+
     #[ApiProperty(property: 'createdAt', serialize: new Groups(['user']))]
     public ?CarbonImmutable $created_at = null;
 

@@ -29,7 +29,9 @@ class UserProvider implements ProviderInterface
         return value(match ($operation::class) {
             GetCollection::class => UserData::collect($query->get()),
             Get::class => function (Builder $query, array $uriVariables): ?UserData {
-                if (! $user = $query->whereKey(data_get($uriVariables, 'id'))->first()) {
+                $id = data_get($uriVariables, 'id');
+
+                if (! $user = $query->whereKey($id)->orWhereRelation('integrations', 'provider_id', $id)->first()) {
                     return null;
                 }
 
