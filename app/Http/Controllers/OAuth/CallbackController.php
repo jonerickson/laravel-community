@@ -11,6 +11,7 @@ use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Throwable;
 
 class CallbackController extends Controller
 {
@@ -23,7 +24,11 @@ class CallbackController extends Controller
 
     public function __invoke(string $provider): RedirectResponse
     {
-        $socialUser = Socialite::driver($provider)->user();
+        try {
+            $socialUser = Socialite::driver($provider)->user();
+        } catch (Throwable) {
+            return redirect()->intended(route('login'));
+        }
 
         if ($this->user && $socialUser->getEmail() && $this->user->email !== $socialUser->getEmail()) {
             return to_route('settings.integrations.index')
