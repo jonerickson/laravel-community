@@ -862,7 +862,7 @@ CREATE TABLE `products` (
   `reference_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'storeProduct',
   `seller_id` bigint unsigned DEFAULT NULL,
   `commission_rate` decimal(5,2) NOT NULL DEFAULT '0.00',
@@ -1501,6 +1501,6 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (139,'2025_11_07_01
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (142,'2025_11_11_181015_add_reference_id_to_support_tickets_table',49);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (143,'2025_11_11_181656_add_reference_id_to_comments_table',49);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (144,'2025_11_11_181835_add_reference_id_to_files_table',49);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (145,'2025_09_28_202015_create_email_settings',50);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (146,'2025_09_28_202053_create_general_settings',50);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (147,'2025_11_12_174357_change_product_description_to_null',50);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (148,'2025_09_28_202015_create_email_settings',51);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (149,'2025_09_28_202053_create_general_settings',51);
