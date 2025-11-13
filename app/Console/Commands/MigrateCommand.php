@@ -772,7 +772,7 @@ class MigrateCommand extends Command
             $result = Process::run('grep MemTotal /proc/meminfo | awk \'{print $2}\'');
 
             if ($result->successful()) {
-                return (int) round((int) trim($result->output()));
+                return (int) round((int) trim($result->output()) * 1024);
             }
         }
 
