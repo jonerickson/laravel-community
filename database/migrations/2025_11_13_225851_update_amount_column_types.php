@@ -14,16 +14,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->unsignedBigInteger('amount_due')->nullable()->change();
-            $table->unsignedBigInteger('amount_overpaid')->nullable()->change();
-            $table->unsignedBigInteger('amount_paid')->nullable()->change();
-            $table->unsignedBigInteger('amount_remaining')->nullable()->change();
+            $table->bigInteger('amount_due')->nullable()->change();
+            $table->bigInteger('amount_overpaid')->nullable()->change();
+            $table->bigInteger('amount_paid')->nullable()->change();
+            $table->bigInteger('amount_remaining')->nullable()->change();
         });
 
         Schema::table('orders_items', function (Blueprint $table) {
-            $table->unsignedBigInteger('amount')->nullable()->change();
-            $table->unsignedBigInteger('commission_amount')->nullable()->change();
-            $table->unsignedBigInteger('quantity')->nullable()->change();
+            $table->bigInteger('amount')->nullable()->change();
+            $table->bigInteger('commission_amount')->nullable()->change();
+            $table->bigInteger('quantity')->nullable()->change();
         });
     }
 
