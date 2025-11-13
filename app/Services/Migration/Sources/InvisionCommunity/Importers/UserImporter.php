@@ -262,12 +262,12 @@ class UserImporter extends AbstractImporter
 
                 if (! $config->isDryRun) {
                     $user->update([
-                        'billing_address' => $addressData['addressLines'][0] ?? null,
-                        'billing_address_line_2' => $addressData['addressLines'][1] ?? null,
-                        'billing_city' => $addressData['city'] ?? null,
-                        'billing_state' => $addressData['region'] ?? null,
-                        'billing_postal_code' => $addressData['postalCode'] ?? null,
-                        'billing_country' => $addressData['country'] ?? null,
+                        'billing_address' => Str::of($addressData['addressLines'][0])->limit(255)->toString() ?: null,
+                        'billing_address_line_2' => Str::of($addressData['addressLines'][1])->limit(255)->toString() ?: null,
+                        'billing_city' => Str::of($addressData['city'])->limit(255)->toString() ?: null,
+                        'billing_state' => Str::of($addressData['region'])->limit(255)->toString() ?: null,
+                        'billing_postal_code' => Str::of($addressData['postalCode'])->limit(25)->toString() ?: null,
+                        'billing_country' => Str::of($addressData['country'])->limit(2)->toString() ?: null,
                     ]);
                 }
             } catch (Exception $e) {

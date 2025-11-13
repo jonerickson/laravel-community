@@ -20,12 +20,12 @@ class UpdateBillingRequest extends FormRequest
         return [
             'billing_address' => ['required', 'string', 'max:255'],
             'billing_address_line_2' => ['nullable', 'string', 'max:255'],
-            'billing_city' => ['required', 'string', 'max:100'],
-            'billing_state' => ['required', 'string', 'max:100'],
-            'billing_postal_code' => ['required', 'string', 'max:20'],
+            'billing_city' => ['required', 'string', 'max:255'],
+            'billing_state' => ['required', 'string', 'max:255'],
+            'billing_postal_code' => ['required', 'string', 'max:25'],
             'billing_country' => ['required', 'string', 'size:2'],
             'vat_id' => ['nullable', 'string', 'max:50'],
-            'extra_billing_information' => ['nullable', 'string', 'max:1000'],
+            'extra_billing_information' => ['nullable', 'string', 'max:65535'],
         ];
     }
 

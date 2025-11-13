@@ -208,25 +208,44 @@ class UserResource extends Resource
                                     ->columns()
                                     ->schema([
                                         TextInput::make('billing_address')
+                                            ->maxLength(255)
                                             ->label('Address')
                                             ->nullable(),
                                         TextInput::make('billing_address_line_2')
+                                            ->maxLength(255)
                                             ->label('Address Line 2')
                                             ->nullable(),
                                         Grid::make()
-                                            ->columns(3)
+                                            ->columns(4)
                                             ->columnSpanFull()
                                             ->schema([
                                                 TextInput::make('billing_city')
+                                                    ->maxLength(255)
                                                     ->label('City')
                                                     ->nullable(),
                                                 TextInput::make('billing_state')
+                                                    ->maxLength(255)
                                                     ->label('State')
                                                     ->nullable(),
                                                 TextInput::make('billing_postal_code')
+                                                    ->maxLength(25)
                                                     ->label('Postal Code')
                                                     ->nullable(),
+                                                TextInput::make('billing_country')
+                                                    ->maxLength(2)
+                                                    ->label('Country')
+                                                    ->nullable(),
                                             ]),
+                                        Textarea::make('extra_billing_information')
+                                            ->columnSpanFull()
+                                            ->maxLength(65535)
+                                            ->label('Extra Billing information')
+                                            ->nullable(),
+                                        TextInput::make('vat_id')
+                                            ->columnSpanFull()
+                                            ->maxLength(50)
+                                            ->label('VAT ID')
+                                            ->nullable(),
                                     ]),
                             ]),
                         Tabs\Tab::make('Integrations')

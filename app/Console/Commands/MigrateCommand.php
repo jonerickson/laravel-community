@@ -739,9 +739,20 @@ class MigrateCommand extends Command
             "Total System Memory: $totalMemoryString",
             "Available System Memory: $availableMemoryString",
             "Max Processes: $maxProcesses",
-            "Memory Allocation Per Process: $workerMemoryLimitString",
+            "Memory Allocation Per Worker Process: $workerMemoryLimitString",
             "Reserved for OS: $memoryAfterAllocationString ($memoryAfterAllocationPercentString)",
         ];
+
+        if (($workerMemoryLimit / 1024 / 1024) < 512) {
+            $this->components->error('Insufficient memory available for worker processes');
+            $this->components->error('At least 512MB should be allocatable for each worker process.');
+            $this->components->bulletList($memoryString);
+
+            $maxSafeProcesses = (int) floor($availableMemory / 1024 / 1024 / 1024);
+            $this->components->warn("Consider setting your --max-processes to $maxSafeProcesses or fewer.");
+
+            return null;
+        }
 
         if ($memoryAfterAllocationPercent < 25) {
             $this->components->error('Insufficient memory available for the requested number of processes.');
@@ -749,7 +760,7 @@ class MigrateCommand extends Command
             $this->components->bulletList($memoryString);
 
             $maxSafeProcesses = (int) floor($availableMemory / 1024 / 1024 / 1024);
-            $this->components->warn("Consider reducing --max-processes to $maxSafeProcesses or fewer.");
+            $this->components->warn("Consider setting your --max-processes to $maxSafeProcesses or fewer.");
 
             return null;
         }

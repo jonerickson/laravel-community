@@ -176,7 +176,7 @@ class PostImporter extends AbstractImporter
         $post->forceFill([
             'type' => PostType::Forum,
             'topic_id' => $topic->id,
-            'title' => "Re: $topic->title",
+            'title' => Str::of("Re: $topic->title")->trim()->limit(255)->toString(),
             'content' => $this->modifyContent($sourcePost->post ?? '', $config),
             'is_published' => true,
             'is_approved' => true,
