@@ -13,6 +13,7 @@ use App\Enums\OrderStatus;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\LaravelData\PaginatedDataCollection;
 
 class UserProvider implements ProviderInterface
 {
@@ -26,8 +27,13 @@ class UserProvider implements ProviderInterface
                     ->where('status', OrderStatus::Succeeded);
             }]);
 
+        $request = $context['request'] ?? request();
+
         return value(match ($operation::class) {
-            GetCollection::class => UserData::collect($query->get()),
+            GetCollection::class => UserData::collect($query->paginate(
+                perPage: $request->query(config('api-platform.pagination.items_per_page_parameter_name'), config('api-platform.defaults.pagination_items_per_page')),
+                pageName: config('api-platform.pagination.page_parameter_name'),
+            ), PaginatedDataCollection::class),
             Get::class => function (Builder $query, array $uriVariables): ?UserData {
                 $id = data_get($uriVariables, 'id');
 
