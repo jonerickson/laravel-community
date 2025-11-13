@@ -6,6 +6,7 @@ namespace App\Services\Migration;
 
 use App\Services\Migration\Contracts\MigrationSource;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -21,6 +22,8 @@ class MigrationService
     protected ?MigrationConfig $config = null;
 
     protected ?OutputStyle $output = null;
+
+    protected ?Factory $components = null;
 
     public function registerSource(MigrationSource $source): void
     {
@@ -47,6 +50,18 @@ class MigrationService
     public function getOutput(): ?OutputStyle
     {
         return $this->output;
+    }
+
+    public function setComponents(Factory $components): self
+    {
+        $this->components = $components;
+
+        return $this;
+    }
+
+    public function getComponents(): ?Factory
+    {
+        return $this->components;
     }
 
     public function setConfig(MigrationConfig $config): self
@@ -93,7 +108,11 @@ class MigrationService
         }
 
         if (! $this->output instanceof OutputStyle) {
-            throw new InvalidArgumentException('Migration output not set. Call setOutput() first.');
+            throw new InvalidArgumentException('Migration components not set. Call setOutput() first.');
+        }
+
+        if (! $this->components instanceof Factory) {
+            throw new InvalidArgumentException('Migration components not set. Call setComponents() first.');
         }
 
         $result = new MigrationResult;
@@ -125,7 +144,7 @@ class MigrationService
         }
 
         if (in_array($entity, $this->config->excluded)) {
-            $this->output->writeln("<comment>Skipping $entity - excluded</comment>");
+            $this->components->info("Skipping $entity - excluded");
             $this->migratedEntities[] = $entity;
 
             return;
@@ -138,7 +157,7 @@ class MigrationService
         }
 
         if ($importer->isCompleted()) {
-            $this->output->writeln("<info>Skipping $entity - already completed</info>");
+            $this->components->info("Skipping $entity - already completed</info>");
             $this->migratedEntities[] = $entity;
 
             return;
@@ -149,8 +168,14 @@ class MigrationService
 
         foreach ($preDependencies as $dependency) {
             if ($dependency->isRequired() || in_array($dependency->entityName, $this->optionalDependencies)) {
+                $dependencyImporter = $source->getImporter($dependency->entityName);
+
+                if ($dependencyImporter && $dependencyImporter->isCompleted()) {
+                    continue;
+                }
+
                 $dependencyType = $dependency->isRequired() ? 'required' : 'optional';
-                $this->output->writeln("<comment>Migrating {$dependency->entityName} ({$dependencyType} dependency of {$entity})...</comment>");
+                $this->components->info("Migrating {$dependency->entityName} ({$dependencyType} dependency of {$entity})...</comment>");
                 $this->migrateEntityWithDependencies($dependency->entityName, $source, $result);
             }
         }
@@ -167,8 +192,14 @@ class MigrationService
 
         foreach ($postDependencies as $dependency) {
             if ($dependency->isRequired() || in_array($dependency->entityName, $this->optionalDependencies)) {
+                $dependencyImporter = $source->getImporter($dependency->entityName);
+
+                if ($dependencyImporter && $dependencyImporter->isCompleted()) {
+                    continue;
+                }
+
                 $dependencyType = $dependency->isRequired() ? 'required' : 'optional';
-                $this->output->writeln("<comment>Migrating {$dependency->entityName} ({$dependencyType} dependency of {$entity})...</comment>");
+                $this->components->info("Migrating {$dependency->entityName} ({$dependencyType} dependency of {$entity})...</comment>");
                 $this->migrateEntityWithDependencies($dependency->entityName, $source, $result);
             }
         }
@@ -186,12 +217,15 @@ class MigrationService
             throw new InvalidArgumentException("Unknown entity: $entity");
         }
 
-        $this->output->writeln("<info>Migrating $entity...</info>");
+        $this->components->info("Migrating $entity...");
 
-        $importer->import(
+        $processed = $importer->import(
             result: $result,
-            output: $this->output,
+            output: $this->getOutput(),
+            components: $this->components,
         );
+
+        $this->components->success("Migrated $processed $entity.");
     }
 
     protected function prepareForMigration(MigrationSource $source): void

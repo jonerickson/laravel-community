@@ -15,6 +15,7 @@ use App\Services\Migration\MigrationResult;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -75,7 +76,8 @@ class TopicImporter extends AbstractImporter
     public function import(
         MigrationResult $result,
         OutputStyle $output,
-    ): void {
+        Factory $components,
+    ): int {
         $config = $this->getConfig();
 
         $baseQuery = $this->getBaseQuery()
@@ -84,14 +86,16 @@ class TopicImporter extends AbstractImporter
 
         $totalTopics = $baseQuery->clone()->countOffset();
 
-        $output->writeln("Found {$totalTopics} topics to migrate...");
+        if ($output->isVerbose()) {
+            $components->info("Found {$totalTopics} topics to migrate...");
+        }
 
         $progressBar = $output->createProgressBar($totalTopics);
         $progressBar->start();
 
         $processed = 0;
 
-        $baseQuery->chunk($config->batchSize, function ($topics) use ($config, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($topics) use ($config, $result, $progressBar, $output, $components, &$processed): bool {
             foreach ($topics as $sourceTopic) {
                 if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
@@ -101,11 +105,14 @@ class TopicImporter extends AbstractImporter
                     $this->importTopic($sourceTopic, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
-                    $result->recordFailed(self::ENTITY_NAME, [
-                        'source_id' => $sourceTopic->tid ?? 'unknown',
-                        'title' => $sourceTopic->title ?? 'unknown',
-                        'error' => $e->getMessage(),
-                    ]);
+
+                    if ($output->isVerbose()) {
+                        $result->recordFailed(self::ENTITY_NAME, [
+                            'source_id' => $sourceTopic->tid ?? 'unknown',
+                            'title' => $sourceTopic->title ?? 'unknown',
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
 
                     Log::error('Failed to import topic', [
                         'source_id' => $sourceTopic->tid ?? 'unknown',
@@ -114,8 +121,9 @@ class TopicImporter extends AbstractImporter
                         'trace' => $e->getTraceAsString(),
                     ]);
 
+                    $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $output->writeln("<error>Failed to import topic: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                    $components->error("Failed to import topic: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
                 }
 
                 $processed++;
@@ -127,9 +135,9 @@ class TopicImporter extends AbstractImporter
 
         $progressBar->finish();
 
-        $output->newLine();
-        $output->writeln("Migrated $processed topics...");
-        $output->newLine();
+        $output->newLine(2);
+
+        return $processed;
     }
 
     protected function importTopic(object $sourceTopic, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
@@ -146,7 +154,7 @@ class TopicImporter extends AbstractImporter
             $this->cacheTopicMapping($sourceTopic->tid, $existingTopic->id);
             $result->incrementSkipped(self::ENTITY_NAME);
 
-            if ($output->isVeryVerbose()) {
+            if ($output->isVerbose()) {
                 $result->recordSkipped(self::ENTITY_NAME, [
                     'source_id' => $sourceTopic->tid,
                     'title' => $title,
@@ -161,11 +169,14 @@ class TopicImporter extends AbstractImporter
 
         if (! $author instanceof User) {
             $result->incrementFailed(self::ENTITY_NAME);
-            $result->recordFailed(self::ENTITY_NAME, [
-                'source_id' => $sourceTopic->tid,
-                'title' => $title,
-                'error' => 'Could not find or create author',
-            ]);
+
+            if ($output->isVerbose()) {
+                $result->recordFailed(self::ENTITY_NAME, [
+                    'source_id' => $sourceTopic->tid,
+                    'title' => $title,
+                    'error' => 'Could not find or create author',
+                ]);
+            }
 
             return;
         }
@@ -174,11 +185,14 @@ class TopicImporter extends AbstractImporter
 
         if (! $forum instanceof Forum) {
             $result->incrementFailed(self::ENTITY_NAME);
-            $result->recordFailed(self::ENTITY_NAME, [
-                'source_id' => $sourceTopic->tid,
-                'title' => $title,
-                'error' => 'Could not find or create forum',
-            ]);
+
+            if ($output->isVerbose()) {
+                $result->recordFailed(self::ENTITY_NAME, [
+                    'source_id' => $sourceTopic->tid,
+                    'title' => $title,
+                    'error' => 'Could not find or create forum',
+                ]);
+            }
 
             return;
         }
@@ -205,13 +219,16 @@ class TopicImporter extends AbstractImporter
         }
 
         $result->incrementMigrated(self::ENTITY_NAME);
-        $result->recordMigrated(self::ENTITY_NAME, [
-            'source_id' => $sourceTopic->tid,
-            'target_id' => $topic->id ?? 'N/A (dry run)',
-            'title' => $topic->title,
-            'slug' => $topic->slug,
-            'author' => $author->name,
-        ]);
+
+        if ($output->isVeryVerbose()) {
+            $result->recordMigrated(self::ENTITY_NAME, [
+                'source_id' => $sourceTopic->tid,
+                'target_id' => $topic->id ?? 'N/A (dry run)',
+                'title' => $topic->title,
+                'slug' => $topic->slug,
+                'author' => $author->name,
+            ]);
+        }
     }
 
     protected function findOrCreateAuthor(object $sourceTopic): ?User

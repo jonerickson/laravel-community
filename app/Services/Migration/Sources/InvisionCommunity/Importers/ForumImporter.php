@@ -12,6 +12,7 @@ use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunitySource;
 use Exception;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -76,8 +77,9 @@ class ForumImporter extends AbstractImporter
     public function import(
         MigrationResult $result,
         OutputStyle $output,
-    ): void {
-        $this->importCategories($result, $output);
+        Factory $components,
+    ): int {
+        $this->importCategories($result, $output, $components);
 
         $config = $this->getConfig();
 
@@ -87,7 +89,9 @@ class ForumImporter extends AbstractImporter
 
         $totalForums = $baseQuery->clone()->countOffset();
 
-        $output->writeln("Found $totalForums forums to migrate...");
+        if ($output->isVerbose()) {
+            $components->info("Found $totalForums forums to migrate...");
+        }
 
         $progressBar = $output->createProgressBar($totalForums);
         $progressBar->start();
@@ -95,7 +99,7 @@ class ForumImporter extends AbstractImporter
         $processed = 0;
         $sourceForumsData = [];
 
-        $baseQuery->chunk($config->batchSize, function ($forums) use ($config, $result, $progressBar, $output, &$processed, &$sourceForumsData): bool {
+        $baseQuery->chunk($config->batchSize, function ($forums) use ($config, $result, $progressBar, $output, $components, &$processed, &$sourceForumsData): bool {
             foreach ($forums as $sourceForum) {
                 if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
@@ -107,11 +111,14 @@ class ForumImporter extends AbstractImporter
                     $this->importForum($sourceForum, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
-                    $result->recordFailed(self::ENTITY_NAME, [
-                        'source_id' => $sourceForum->id ?? 'unknown',
-                        'name' => $sourceForum->name ?? 'unknown',
-                        'error' => $e->getMessage(),
-                    ]);
+
+                    if ($output->isVerbose()) {
+                        $result->recordFailed(self::ENTITY_NAME, [
+                            'source_id' => $sourceForum->id ?? 'unknown',
+                            'name' => $sourceForum->name ?? 'unknown',
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
 
                     Log::error('Failed to import forum', [
                         'source_id' => $sourceForum->id ?? 'unknown',
@@ -120,8 +127,9 @@ class ForumImporter extends AbstractImporter
                         'trace' => $e->getTraceAsString(),
                     ]);
 
+                    $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $output->writeln("<error>Failed to import forum: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                    $components->error("Failed to import forum: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
                 }
 
                 $processed++;
@@ -133,16 +141,17 @@ class ForumImporter extends AbstractImporter
 
         $progressBar->finish();
 
-        $output->newLine();
-        $output->writeln("Migrated $processed forums...");
-        $output->newLine();
+        $output->newLine(2);
 
-        $this->updateForumParentRelationships($sourceForumsData, $config, $output);
+        $this->updateForumParentRelationships($sourceForumsData, $config, $output, $components);
+
+        return $processed;
     }
 
     protected function importCategories(
         MigrationResult $result,
         OutputStyle $output,
+        Factory $components,
     ): void {
         $connection = $this->source->getConnection();
         $config = $this->getConfig();
@@ -157,14 +166,16 @@ class ForumImporter extends AbstractImporter
 
         $totalCategories = $baseQuery->clone()->countOffset();
 
-        $output->writeln("Found {$totalCategories} forum categories to migrate...");
+        if ($output->isVerbose()) {
+            $components->info("Found {$totalCategories} forum categories to migrate...");
+        }
 
         $progressBar = $output->createProgressBar($totalCategories);
         $progressBar->start();
 
         $processed = 0;
 
-        $baseQuery->chunk($config->batchSize, function ($categories) use ($config, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($categories) use ($config, $result, $progressBar, $output, $components, &$processed): bool {
             foreach ($categories as $sourceCategory) {
                 if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
@@ -174,11 +185,14 @@ class ForumImporter extends AbstractImporter
                     $this->importCategory($sourceCategory, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed('forum_categories');
-                    $result->recordFailed('forum_categories', [
-                        'source_id' => $sourceCategory->id ?? 'unknown',
-                        'name' => $sourceCategory->name ?? 'unknown',
-                        'error' => $e->getMessage(),
-                    ]);
+
+                    if ($output->isVerbose()) {
+                        $result->recordFailed('forum_categories', [
+                            'source_id' => $sourceCategory->id ?? 'unknown',
+                            'name' => $sourceCategory->name ?? 'unknown',
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
 
                     Log::error('Failed to import forum category', [
                         'source_id' => $sourceCategory->id ?? 'unknown',
@@ -187,8 +201,9 @@ class ForumImporter extends AbstractImporter
                         'trace' => $e->getTraceAsString(),
                     ]);
 
+                    $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $output->writeln("<error>Failed to import forum category: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                    $components->error("Failed to import forum category: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
                 }
 
                 $processed++;
@@ -200,9 +215,11 @@ class ForumImporter extends AbstractImporter
 
         $progressBar->finish();
 
-        $output->newLine();
-        $output->writeln("Migrated $processed forum categories...");
-        $output->newLine();
+        $output->newLine(2);
+
+        if ($output->isVerbose()) {
+            $components->info("Migrated $processed forum categories...");
+        }
     }
 
     protected function importCategory(object $sourceCategory, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
@@ -225,7 +242,7 @@ class ForumImporter extends AbstractImporter
             $this->cacheCategoryMapping($sourceCategory->id, $existingCategory->id);
             $result->incrementSkipped(self::ENTITY_NAME);
 
-            if ($output->isVeryVerbose()) {
+            if ($output->isVerbose()) {
                 $result->recordSkipped(self::ENTITY_NAME, [
                     'source_id' => $sourceCategory->id,
                     'name' => $name,
@@ -267,12 +284,15 @@ class ForumImporter extends AbstractImporter
         }
 
         $result->incrementMigrated('forum_categories');
-        $result->recordMigrated('forum_categories', [
-            'source_id' => $sourceCategory->id,
-            'target_id' => $category->id ?? 'N/A (dry run)',
-            'name' => $category->name,
-            'slug' => $category->slug,
-        ]);
+
+        if ($output->isVeryVerbose()) {
+            $result->recordMigrated('forum_categories', [
+                'source_id' => $sourceCategory->id,
+                'target_id' => $category->id ?? 'N/A (dry run)',
+                'name' => $category->name,
+                'slug' => $category->slug,
+            ]);
+        }
     }
 
     protected function importForum(object $sourceForum, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
@@ -295,7 +315,7 @@ class ForumImporter extends AbstractImporter
             $this->cacheForumMapping($sourceForum->id, $existingForum->id);
             $result->incrementSkipped(self::ENTITY_NAME);
 
-            if ($output->isVeryVerbose()) {
+            if ($output->isVerbose()) {
                 $result->recordSkipped(self::ENTITY_NAME, [
                     'source_id' => $sourceForum->id,
                     'name' => $name,
@@ -325,17 +345,20 @@ class ForumImporter extends AbstractImporter
         }
 
         $result->incrementMigrated(self::ENTITY_NAME);
-        $result->recordMigrated(self::ENTITY_NAME, [
-            'source_id' => $sourceForum->id,
-            'target_id' => $forum->id ?? 'N/A (dry run)',
-            'name' => $forum->name,
-            'slug' => $forum->slug,
-        ]);
+
+        if ($output->isVeryVerbose()) {
+            $result->recordMigrated(self::ENTITY_NAME, [
+                'source_id' => $sourceForum->id,
+                'target_id' => $forum->id ?? 'N/A (dry run)',
+                'name' => $forum->name,
+                'slug' => $forum->slug,
+            ]);
+        }
     }
 
-    protected function updateForumParentRelationships(array $sourceForumsData, MigrationConfig $config, OutputStyle $output): void
+    protected function updateForumParentRelationships(array $sourceForumsData, MigrationConfig $config, OutputStyle $output, Factory $components): void
     {
-        $output->writeln('Updating forum parent relationships...');
+        $components->info('Updating forum parent relationships...');
 
         $progressBar = $output->createProgressBar(count($sourceForumsData));
         $progressBar->start();
@@ -373,6 +396,10 @@ class ForumImporter extends AbstractImporter
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString(),
                 ]);
+
+                $output->newLine(2);
+                $fileName = Str::of($e->getFile())->classBasename();
+                $components->error("Failed to update forum parent relationship: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
             }
 
             $progressBar->advance();
@@ -380,6 +407,7 @@ class ForumImporter extends AbstractImporter
 
         $progressBar->finish();
         $output->newLine(2);
+        $components->info('Updating forum parent relationships completed.');
     }
 
     protected function cacheForumMapping(int $sourceForumId, int $targetForumId): void

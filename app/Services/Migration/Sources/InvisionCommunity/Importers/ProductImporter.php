@@ -19,6 +19,7 @@ use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunitySource;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -83,8 +84,9 @@ class ProductImporter extends AbstractImporter
     public function import(
         MigrationResult $result,
         OutputStyle $output,
-    ): void {
-        $this->importCategories($result, $output);
+        Factory $components,
+    ): int {
+        $this->importCategories($result, $output, $components);
 
         $config = $this->getConfig();
 
@@ -94,14 +96,14 @@ class ProductImporter extends AbstractImporter
 
         $totalProducts = $baseQuery->clone()->countOffset();
 
-        $output->writeln("Found {$totalProducts} products to migrate...");
+        $components->info("Found {$totalProducts} products to migrate...");
 
         $progressBar = $output->createProgressBar($totalProducts);
         $progressBar->start();
 
         $processed = 0;
 
-        $baseQuery->chunk($config->batchSize, function ($products) use ($config, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($products) use ($config, $result, $progressBar, $output, $components, &$processed): bool {
             foreach ($products as $sourceProduct) {
                 if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
@@ -111,11 +113,14 @@ class ProductImporter extends AbstractImporter
                     $this->importProduct($sourceProduct, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
-                    $result->recordFailed(self::ENTITY_NAME, [
-                        'source_id' => $sourceProduct->p_id ?? 'unknown',
-                        'name' => $sourceProduct->p_name ?? 'unknown',
-                        'error' => $e->getMessage(),
-                    ]);
+
+                    if ($output->isVerbose()) {
+                        $result->recordFailed(self::ENTITY_NAME, [
+                            'source_id' => $sourceProduct->p_id ?? 'unknown',
+                            'name' => $sourceProduct->p_name ?? 'unknown',
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
 
                     Log::error('Failed to import product', [
                         'source_id' => $sourceProduct->p_id ?? 'unknown',
@@ -124,8 +129,9 @@ class ProductImporter extends AbstractImporter
                         'trace' => $e->getTraceAsString(),
                     ]);
 
+                    $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $output->writeln("<error>Failed to import product: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                    $components->error("Failed to import product: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
                 }
 
                 $processed++;
@@ -137,14 +143,15 @@ class ProductImporter extends AbstractImporter
 
         $progressBar->finish();
 
-        $output->newLine();
-        $output->writeln("Migrated $processed products...");
-        $output->newLine();
+        $output->newLine(2);
+
+        return $processed;
     }
 
     protected function importCategories(
         MigrationResult $result,
         OutputStyle $output,
+        Factory $components,
     ): void {
         $connection = $this->source->getConnection();
         $config = $this->getConfig();
@@ -157,7 +164,9 @@ class ProductImporter extends AbstractImporter
 
         $totalCategories = $baseQuery->clone()->countOffset();
 
-        $output->writeln("Found {$totalCategories} product categories to migrate...");
+        if ($output->isVerbose()) {
+            $components->info("Found {$totalCategories} product categories to migrate...");
+        }
 
         $progressBar = $output->createProgressBar($totalCategories);
         $progressBar->start();
@@ -165,7 +174,7 @@ class ProductImporter extends AbstractImporter
         $processed = 0;
         $sourceCategoriesData = [];
 
-        $baseQuery->chunk($config->batchSize, function ($categories) use ($config, $result, $progressBar, $output, &$processed, &$sourceCategoriesData): bool {
+        $baseQuery->chunk($config->batchSize, function ($categories) use ($config, $result, $progressBar, $output, $components, &$processed, &$sourceCategoriesData): bool {
             foreach ($categories as $sourceCategory) {
                 if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
@@ -177,11 +186,14 @@ class ProductImporter extends AbstractImporter
                     $this->importCategory($sourceCategory, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed('product_categories');
-                    $result->recordFailed('product_categories', [
-                        'source_id' => $sourceCategory->pg_id ?? 'unknown',
-                        'name' => $sourceCategory->pg_name ?? 'unknown',
-                        'error' => $e->getMessage(),
-                    ]);
+
+                    if ($output->isVerbose()) {
+                        $result->recordFailed('product_categories', [
+                            'source_id' => $sourceCategory->pg_id ?? 'unknown',
+                            'name' => $sourceCategory->pg_name ?? 'unknown',
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
 
                     Log::error('Failed to import product category', [
                         'source_id' => $sourceCategory->pg_id ?? 'unknown',
@@ -190,8 +202,9 @@ class ProductImporter extends AbstractImporter
                         'trace' => $e->getTraceAsString(),
                     ]);
 
+                    $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $output->writeln("<error>Failed to import product category: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                    $components->error("Failed to import product category: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
                 }
 
                 $processed++;
@@ -201,11 +214,13 @@ class ProductImporter extends AbstractImporter
             return true;
         });
 
-        $output->newLine();
-        $output->writeln("Migrated $processed product categories...");
-        $output->newLine();
+        $output->newLine(2);
 
-        $this->updateCategoryParentRelationships($sourceCategoriesData, $config, $output);
+        if ($output->isVerbose()) {
+            $components->info("Migrated $processed product categories...");
+        }
+
+        $this->updateCategoryParentRelationships($sourceCategoriesData, $config, $output, $components);
     }
 
     protected function importCategory(object $sourceCategory, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
@@ -228,7 +243,7 @@ class ProductImporter extends AbstractImporter
             $this->cacheCategoryMapping($sourceCategory->pg_id, $existingCategory->id);
             $result->incrementSkipped(self::ENTITY_NAME);
 
-            if ($output->isVeryVerbose()) {
+            if ($output->isVerbose()) {
                 $result->recordSkipped(self::ENTITY_NAME, [
                     'source_id' => $sourceCategory->pg_id,
                     'name' => $name,
@@ -268,17 +283,20 @@ class ProductImporter extends AbstractImporter
         }
 
         $result->incrementMigrated('product_categories');
-        $result->recordMigrated('product_categories', [
-            'source_id' => $sourceCategory->pg_id,
-            'target_id' => $category->id ?? 'N/A (dry run)',
-            'name' => $category->name,
-            'slug' => $category->slug,
-        ]);
+
+        if ($output->isVeryVerbose()) {
+            $result->recordMigrated('product_categories', [
+                'source_id' => $sourceCategory->pg_id,
+                'target_id' => $category->id ?? 'N/A (dry run)',
+                'name' => $category->name,
+                'slug' => $category->slug,
+            ]);
+        }
     }
 
-    protected function updateCategoryParentRelationships(array $sourceCategoriesData, MigrationConfig $config, OutputStyle $output): void
+    protected function updateCategoryParentRelationships(array $sourceCategoriesData, MigrationConfig $config, OutputStyle $output, Factory $components): void
     {
-        $output->writeln('Updating product category parent relationships...');
+        $components->info('Updating product category parent relationships...');
 
         $progressBar = $output->createProgressBar(count($sourceCategoriesData));
         $progressBar->start();
@@ -308,6 +326,10 @@ class ProductImporter extends AbstractImporter
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString(),
                 ]);
+
+                $output->newLine(2);
+                $fileName = Str::of($e->getFile())->classBasename();
+                $components->error("Failed to update product parent category relationship: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
             }
 
             $progressBar->advance();
@@ -315,6 +337,7 @@ class ProductImporter extends AbstractImporter
 
         $progressBar->finish();
         $output->newLine(2);
+        $components->info('Updating product category parent relationships complete.');
     }
 
     protected function importProduct(object $sourceProduct, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
@@ -333,7 +356,7 @@ class ProductImporter extends AbstractImporter
             $this->cacheProductMapping($sourceProduct->p_id, $existingProduct->id);
             $result->incrementSkipped(self::ENTITY_NAME);
 
-            if ($output->isVeryVerbose()) {
+            if ($output->isVerbose()) {
                 $result->recordSkipped(self::ENTITY_NAME, [
                     'source_id' => $sourceProduct->p_id,
                     'name' => $name,
@@ -386,7 +409,7 @@ class ProductImporter extends AbstractImporter
             }
         }
 
-        $prices = $this->createPrices($sourceProduct, $product, $config, $result);
+        $prices = $this->createPrices($sourceProduct, $product, $config, $result, $output);
 
         if (! $config->isDryRun) {
             /** @var Price $price */
@@ -394,15 +417,18 @@ class ProductImporter extends AbstractImporter
                 $price->save();
 
                 $result->incrementMigrated('product_prices');
-                $result->recordMigrated('product_prices', [
-                    'product_id' => $product->id,
-                    'price_id' => $price->id,
-                    'type' => $price->type->value,
-                    'amount' => $price->amount,
-                    'currency' => $price->currency,
-                    'interval' => $price->interval?->value ?? 'N/A',
-                    'interval_count' => $price->interval_count ?? 'N/A',
-                ]);
+
+                if ($output->isVeryVerbose()) {
+                    $result->recordMigrated('product_prices', [
+                        'product_id' => $product->id,
+                        'price_id' => $price->id,
+                        'type' => $price->type->value,
+                        'amount' => $price->amount,
+                        'currency' => $price->currency,
+                        'interval' => $price->interval?->value ?? 'N/A',
+                        'interval_count' => $price->interval_count ?? 'N/A',
+                    ]);
+                }
             }
 
             $this->cacheProductMapping($sourceProduct->p_id, $product->id);
@@ -411,19 +437,22 @@ class ProductImporter extends AbstractImporter
         $pricesSummary = collect($prices)->map(fn (Price $price): string => $price->amount.' '.$price->currency.' ('.($price->interval?->value ?? 'one-time').')')->implode(', ');
 
         $result->incrementMigrated(self::ENTITY_NAME);
-        $result->recordMigrated(self::ENTITY_NAME, [
-            'source_id' => $sourceProduct->p_id,
-            'target_id' => $product->id ?? 'N/A (dry run)',
-            'name' => $product->name,
-            'slug' => $product->slug,
-            'type' => $product->type->value,
-            'is_featured' => $product->is_featured,
-            'category_id' => $sourceProduct->p_group ?? 'N/A',
-            'prices' => $pricesSummary ?: 'N/A',
-        ]);
+
+        if ($output->isVeryVerbose()) {
+            $result->recordMigrated(self::ENTITY_NAME, [
+                'source_id' => $sourceProduct->p_id,
+                'target_id' => $product->id ?? 'N/A (dry run)',
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'type' => $product->type->value,
+                'is_featured' => $product->is_featured,
+                'category_id' => $sourceProduct->p_group ?? 'N/A',
+                'prices' => $pricesSummary ?: 'N/A',
+            ]);
+        }
     }
 
-    protected function createPrices(object $sourceProduct, Product $product, MigrationConfig $config, MigrationResult $result): array
+    protected function createPrices(object $sourceProduct, Product $product, MigrationConfig $config, MigrationResult $result, OutputStyle $output): array
     {
         $prices = [];
 
@@ -519,11 +548,14 @@ class ProductImporter extends AbstractImporter
 
             if (! $config->isDryRun) {
                 $result->incrementFailed('product_prices');
-                $result->recordFailed('product_prices', [
-                    'product_id' => $product->id ?? 'N/A',
-                    'source_product_id' => $sourceProduct->p_id,
-                    'error' => $e->getMessage(),
-                ]);
+
+                if ($output->isVerbose()) {
+                    $result->recordFailed('product_prices', [
+                        'product_id' => $product->id ?? 'N/A',
+                        'source_product_id' => $sourceProduct->p_id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
             }
         }
 

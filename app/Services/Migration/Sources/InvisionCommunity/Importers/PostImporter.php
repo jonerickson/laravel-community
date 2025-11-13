@@ -16,6 +16,7 @@ use App\Services\Migration\MigrationResult;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -77,7 +78,8 @@ class PostImporter extends AbstractImporter
     public function import(
         MigrationResult $result,
         OutputStyle $output,
-    ): void {
+        Factory $components,
+    ): int {
         $config = $this->getConfig();
 
         $baseQuery = $this->getBaseQuery()
@@ -86,27 +88,32 @@ class PostImporter extends AbstractImporter
 
         $totalPosts = $baseQuery->clone()->countOffset();
 
-        $output->writeln("Found {$totalPosts} posts to migrate...");
+        if ($output->isVerbose()) {
+            $components->info("Found {$totalPosts} posts to migrate...");
+        }
 
         $progressBar = $output->createProgressBar($totalPosts);
         $progressBar->start();
 
         $processed = 0;
 
-        $baseQuery->chunk($config->batchSize, function ($posts) use ($config, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($posts) use ($config, $result, $progressBar, $output, $components, &$processed): bool {
             foreach ($posts as $sourcePost) {
                 if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
                 }
 
                 try {
-                    $this->importPost($sourcePost, $config, $result);
+                    $this->importPost($sourcePost, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
-                    $result->recordFailed(self::ENTITY_NAME, [
-                        'source_id' => $sourcePost->pid ?? 'unknown',
-                        'error' => $e->getMessage(),
-                    ]);
+
+                    if ($output->isVerbose()) {
+                        $result->recordFailed(self::ENTITY_NAME, [
+                            'source_id' => $sourcePost->pid ?? 'unknown',
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
 
                     Log::error('Failed to import post', [
                         'source_id' => $sourcePost->pid ?? 'unknown',
@@ -114,8 +121,9 @@ class PostImporter extends AbstractImporter
                         'trace' => $e->getTraceAsString(),
                     ]);
 
+                    $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $output->writeln("<error>Failed to import post: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                    $components->error("Failed to import post: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
                 }
 
                 $processed++;
@@ -127,21 +135,24 @@ class PostImporter extends AbstractImporter
 
         $progressBar->finish();
 
-        $output->newLine();
-        $output->writeln("Migrated $processed posts...");
-        $output->newLine();
+        $output->newLine(2);
+
+        return $processed;
     }
 
-    protected function importPost(object $sourcePost, MigrationConfig $config, MigrationResult $result): void
+    protected function importPost(object $sourcePost, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $author = $this->findOrCreateAuthor($sourcePost);
 
         if (! $author instanceof User) {
             $result->incrementFailed(self::ENTITY_NAME);
-            $result->recordFailed(self::ENTITY_NAME, [
-                'source_id' => $sourcePost->pid,
-                'error' => 'Could not find or create author',
-            ]);
+
+            if ($output->isVerbose()) {
+                $result->recordFailed(self::ENTITY_NAME, [
+                    'source_id' => $sourcePost->pid,
+                    'error' => 'Could not find or create author',
+                ]);
+            }
 
             return;
         }
@@ -150,10 +161,13 @@ class PostImporter extends AbstractImporter
 
         if (! $topic instanceof Topic) {
             $result->incrementFailed(self::ENTITY_NAME);
-            $result->recordFailed(self::ENTITY_NAME, [
-                'source_id' => $sourcePost->pid,
-                'error' => 'Could not find topic',
-            ]);
+
+            if ($output->isVerbose()) {
+                $result->recordFailed(self::ENTITY_NAME, [
+                    'source_id' => $sourcePost->pid,
+                    'error' => 'Could not find topic',
+                ]);
+            }
 
             return;
         }
@@ -184,12 +198,15 @@ class PostImporter extends AbstractImporter
         }
 
         $result->incrementMigrated(self::ENTITY_NAME);
-        $result->recordMigrated(self::ENTITY_NAME, [
-            'source_id' => $sourcePost->pid,
-            'target_id' => $post->id ?? 'N/A (dry run)',
-            'topic' => $topic->title,
-            'author' => $author->name,
-        ]);
+
+        if ($output->isVeryVerbose()) {
+            $result->recordMigrated(self::ENTITY_NAME, [
+                'source_id' => $sourcePost->pid,
+                'target_id' => $post->id ?? 'N/A (dry run)',
+                'topic' => $topic->title,
+                'author' => $author->name,
+            ]);
+        }
     }
 
     protected function findOrCreateAuthor(object $sourcePost): ?User

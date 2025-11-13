@@ -14,6 +14,7 @@ use App\Services\Migration\MigrationResult;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -74,7 +75,8 @@ class BlogCommentImporter extends AbstractImporter
     public function import(
         MigrationResult $result,
         OutputStyle $output,
-    ): void {
+        Factory $components,
+    ): int {
         $config = $this->getConfig();
 
         $baseQuery = $this->getBaseQuery()
@@ -83,28 +85,33 @@ class BlogCommentImporter extends AbstractImporter
 
         $totalComments = $baseQuery->clone()->countOffset();
 
-        $output->writeln("Found {$totalComments} blog comments to migrate...");
+        if ($output->isVerbose()) {
+            $components->info("Found {$totalComments} blog comments to migrate...");
+        }
 
         $progressBar = $output->createProgressBar($totalComments);
         $progressBar->start();
 
         $processed = 0;
 
-        $baseQuery->chunk($config->batchSize, function ($comments) use ($config, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($comments) use ($config, $result, $progressBar, $output, $components, &$processed): bool {
             foreach ($comments as $sourceComment) {
                 if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
                 }
 
                 try {
-                    $this->importComment($sourceComment, $config, $result);
+                    $this->importComment($sourceComment, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
-                    $result->recordFailed(self::ENTITY_NAME, [
-                        'source_id' => $sourceComment->comment_id ?? 'unknown',
-                        'entry_id' => $sourceComment->comment_entry_id ?? 'unknown',
-                        'error' => $e->getMessage(),
-                    ]);
+
+                    if ($output->isVerbose()) {
+                        $result->recordFailed(self::ENTITY_NAME, [
+                            'source_id' => $sourceComment->comment_id ?? 'unknown',
+                            'entry_id' => $sourceComment->comment_entry_id ?? 'unknown',
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
 
                     Log::error('Failed to import blog comment', [
                         'source_id' => $sourceComment->comment_id ?? 'unknown',
@@ -113,8 +120,9 @@ class BlogCommentImporter extends AbstractImporter
                         'trace' => $e->getTraceAsString(),
                     ]);
 
+                    $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $output->writeln("<error>Failed to import blog comment: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                    $components->error("Failed to import blog comment: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
                 }
 
                 $processed++;
@@ -126,22 +134,25 @@ class BlogCommentImporter extends AbstractImporter
 
         $progressBar->finish();
 
-        $output->newLine();
-        $output->writeln("Migrated $processed blog comments...");
-        $output->newLine();
+        $output->newLine(2);
+
+        return $processed;
     }
 
-    protected function importComment(object $sourceComment, MigrationConfig $config, MigrationResult $result): void
+    protected function importComment(object $sourceComment, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $blogPostId = BlogImporter::getBlogMapping($sourceComment->comment_entry_id);
 
         if ($blogPostId === null || $blogPostId === 0) {
             $result->incrementFailed(self::ENTITY_NAME);
-            $result->recordFailed(self::ENTITY_NAME, [
-                'source_id' => $sourceComment->comment_id,
-                'entry_id' => $sourceComment->comment_entry_id,
-                'error' => 'Blog post not found in mapping',
-            ]);
+
+            if ($output->isVerbose()) {
+                $result->recordFailed(self::ENTITY_NAME, [
+                    'source_id' => $sourceComment->comment_id,
+                    'entry_id' => $sourceComment->comment_entry_id,
+                    'error' => 'Blog post not found in mapping',
+                ]);
+            }
 
             return;
         }
@@ -150,11 +161,14 @@ class BlogCommentImporter extends AbstractImporter
 
         if (! $author instanceof User) {
             $result->incrementFailed(self::ENTITY_NAME);
-            $result->recordFailed(self::ENTITY_NAME, [
-                'source_id' => $sourceComment->comment_id,
-                'entry_id' => $sourceComment->comment_entry_id,
-                'error' => 'Could not find author',
-            ]);
+
+            if ($output->isVerbose()) {
+                $result->recordFailed(self::ENTITY_NAME, [
+                    'source_id' => $sourceComment->comment_id,
+                    'entry_id' => $sourceComment->comment_entry_id,
+                    'error' => 'Could not find author',
+                ]);
+            }
 
             return;
         }
@@ -179,14 +193,17 @@ class BlogCommentImporter extends AbstractImporter
         }
 
         $result->incrementMigrated(self::ENTITY_NAME);
-        $result->recordMigrated(self::ENTITY_NAME, [
-            'source_id' => $sourceComment->comment_id,
-            'target_id' => $comment->id ?? 'N/A (dry run)',
-            'entry_id' => $sourceComment->comment_entry_id,
-            'blog_post_id' => $blogPostId,
-            'author' => $author->name,
-            'created_at' => $comment->created_at?->toDateTimeString() ?? 'N/A',
-        ]);
+
+        if ($output->isVeryVerbose()) {
+            $result->recordMigrated(self::ENTITY_NAME, [
+                'source_id' => $sourceComment->comment_id,
+                'target_id' => $comment->id ?? 'N/A (dry run)',
+                'entry_id' => $sourceComment->comment_entry_id,
+                'blog_post_id' => $blogPostId,
+                'author' => $author->name,
+                'created_at' => $comment->created_at?->toDateTimeString() ?? 'N/A',
+            ]);
+        }
     }
 
     protected function findAuthor(object $sourceComment): ?User

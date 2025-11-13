@@ -12,6 +12,7 @@ use App\Services\Migration\MigrationResult;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -56,7 +57,8 @@ class UserImporter extends AbstractImporter
     public function import(
         MigrationResult $result,
         OutputStyle $output,
-    ): void {
+        Factory $components,
+    ): int {
         $config = $this->getConfig();
 
         $baseQuery = $this->getBaseQuery()
@@ -65,14 +67,16 @@ class UserImporter extends AbstractImporter
 
         $totalUsers = $baseQuery->clone()->countOffset();
 
-        $output->writeln("Found $totalUsers users to migrate...");
+        if ($output->isVerbose()) {
+            $components->info("Found $totalUsers users to migrate...");
+        }
 
         $progressBar = $output->createProgressBar($totalUsers);
         $progressBar->start();
 
         $processed = 0;
 
-        $baseQuery->chunk($config->batchSize, function ($users) use ($config, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($users) use ($config, $result, $progressBar, $output, $components, &$processed): bool {
             foreach ($users as $sourceUser) {
                 if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
@@ -83,7 +87,7 @@ class UserImporter extends AbstractImporter
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
 
-                    if ($output->isVeryVerbose()) {
+                    if ($output->isVerbose()) {
                         $result->recordFailed(self::ENTITY_NAME, [
                             'source_id' => $sourceUser->member_id ?? 'unknown',
                             'email' => $sourceUser->email ?? 'unknown',
@@ -99,7 +103,10 @@ class UserImporter extends AbstractImporter
                         'error' => $e->getMessage(),
                         'trace' => $e->getTraceAsString(),
                     ]);
-                    $output->writeln("<error>Failed to import user {$sourceUser->email}: {$e->getMessage()}</error>");
+
+                    $output->newLine(2);
+                    $fileName = Str::of($e->getFile())->classBasename();
+                    $components->error("Failed to import user: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
                 }
 
                 $processed++;
@@ -111,16 +118,11 @@ class UserImporter extends AbstractImporter
 
         $progressBar->finish();
 
-        $output->newLine();
-        $output->writeln("Migrated $processed users...");
-        $output->newLine();
+        $output->newLine(2);
 
-        if (! $config->isDryRun) {
-            $output->writeln('Syncing billing addresses...');
-            $this->syncBillingAddresses($config, $output);
-            $output->writeln('Billing addresses synced.');
-            $output->newLine();
-        }
+        $this->syncBillingAddresses($config, $output, $components);
+
+        return $processed;
     }
 
     public function isCompleted(): bool
@@ -148,7 +150,7 @@ class UserImporter extends AbstractImporter
             $this->cacheUserMapping($sourceUser->member_id, $existingUser->id);
             $result->incrementSkipped(self::ENTITY_NAME);
 
-            if ($output->isVeryVerbose()) {
+            if ($output->isVerbose()) {
                 $result->recordSkipped(self::ENTITY_NAME, [
                     'source_id' => $sourceUser->member_id,
                     'email' => $email,
@@ -165,7 +167,7 @@ class UserImporter extends AbstractImporter
             'name' => Str::trim($sourceUser->name),
             'email' => $email,
             'email_verified_at' => Carbon::now(),
-            'description' => Str::of($sourceUser->signature)->stripTags()->toString() ?: null,
+            'signature' => Str::of($sourceUser->signature)->stripTags()->toString() ?: null,
             'last_seen_at' => $sourceUser->last_activity ? Carbon::createFromTimestamp($sourceUser->last_activity) : null,
             'created_at' => Carbon::createFromTimestamp($sourceUser->joined),
         ]);
@@ -221,8 +223,10 @@ class UserImporter extends AbstractImporter
         Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.$sourceUserId, $targetUserId, 60 * 60 * 24 * 7);
     }
 
-    protected function syncBillingAddresses(MigrationConfig $config, OutputStyle $output): void
+    protected function syncBillingAddresses(MigrationConfig $config, OutputStyle $output, Factory $components): void
     {
+        $components->info('Syncing billing addresses...');
+
         $connection = $this->source->getConnection();
 
         $addresses = DB::connection($connection)
@@ -256,27 +260,34 @@ class UserImporter extends AbstractImporter
                     continue;
                 }
 
-                $user->update([
-                    'billing_address' => $addressData['addressLines'][0] ?? null,
-                    'billing_address_line_2' => $addressData['addressLines'][1] ?? null,
-                    'billing_city' => $addressData['city'] ?? null,
-                    'billing_state' => $addressData['region'] ?? null,
-                    'billing_postal_code' => $addressData['postalCode'] ?? null,
-                    'billing_country' => $addressData['country'] ?? null,
-                ]);
+                if (! $config->isDryRun) {
+                    $user->update([
+                        'billing_address' => $addressData['addressLines'][0] ?? null,
+                        'billing_address_line_2' => $addressData['addressLines'][1] ?? null,
+                        'billing_city' => $addressData['city'] ?? null,
+                        'billing_state' => $addressData['region'] ?? null,
+                        'billing_postal_code' => $addressData['postalCode'] ?? null,
+                        'billing_country' => $addressData['country'] ?? null,
+                    ]);
+                }
             } catch (Exception $e) {
                 Log::error('Failed to sync billing address', [
                     'source_member_id' => $sourceAddress->member ?? 'unknown',
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString(),
                 ]);
+
+                $output->newLine(2);
+                $fileName = Str::of($e->getFile())->classBasename();
+                $components->error("Failed to sync billing address: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
             }
 
             $progressBar->advance();
         }
 
         $progressBar->finish();
-        $output->newLine();
+        $output->newLine(2);
+        $components->info('Syncing billing addresses complete.');
     }
 
     protected function getBaseQuery(): Builder

@@ -20,6 +20,7 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Exception;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -85,7 +86,8 @@ class UserSubscriptionImporter extends AbstractImporter
     public function import(
         MigrationResult $result,
         OutputStyle $output,
-    ): void {
+        Factory $components,
+    ): int {
         $config = $this->getConfig();
 
         $baseQuery = $this->getBaseQuery()
@@ -94,14 +96,16 @@ class UserSubscriptionImporter extends AbstractImporter
 
         $totalUserSubscriptions = $baseQuery->clone()->countOffset();
 
-        $output->writeln("Found {$totalUserSubscriptions} user subscriptions to migrate...");
+        if ($output->isVerbose()) {
+            $components->info("Found {$totalUserSubscriptions} user subscriptions to migrate...");
+        }
 
         $progressBar = $output->createProgressBar($totalUserSubscriptions);
         $progressBar->start();
 
         $processed = 0;
 
-        $baseQuery->chunk($config->batchSize, function ($userSubscriptions) use ($config, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($userSubscriptions) use ($config, $result, $progressBar, $output, $components, &$processed): bool {
             foreach ($userSubscriptions as $sourceUserSubscription) {
                 if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
@@ -111,10 +115,13 @@ class UserSubscriptionImporter extends AbstractImporter
                     $this->importUserSubscription($sourceUserSubscription, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
-                    $result->recordFailed(self::ENTITY_NAME, [
-                        'source_id' => $sourceUserSubscription->sub_id ?? 'unknown',
-                        'error' => $e->getMessage(),
-                    ]);
+
+                    if ($output->isVerbose()) {
+                        $result->recordFailed(self::ENTITY_NAME, [
+                            'source_id' => $sourceUserSubscription->sub_id ?? 'unknown',
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
 
                     Log::error('Failed to import user subscription', [
                         'source_id' => $sourceUserSubscription->sub_id ?? 'unknown',
@@ -122,8 +129,9 @@ class UserSubscriptionImporter extends AbstractImporter
                         'trace' => $e->getTraceAsString(),
                     ]);
 
+                    $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $output->writeln("<error>Failed to import user subscription: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                    $components->error("Failed to import user subscription: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
                 }
 
                 $processed++;
@@ -135,9 +143,9 @@ class UserSubscriptionImporter extends AbstractImporter
 
         $progressBar->finish();
 
-        $output->newLine();
-        $output->writeln("Migrated $processed user subscriptions...");
-        $output->newLine();
+        $output->newLine(2);
+
+        return $processed;
     }
 
     protected function importUserSubscription(object $sourceUserSubscription, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
@@ -146,10 +154,13 @@ class UserSubscriptionImporter extends AbstractImporter
 
         if (! $user instanceof User) {
             $result->incrementSkipped(self::ENTITY_NAME);
-            $result->recordSkipped(self::ENTITY_NAME, [
-                'source_id' => $sourceUserSubscription->sub_id,
-                'reason' => 'User not found',
-            ]);
+
+            if ($output->isVerbose()) {
+                $result->recordSkipped(self::ENTITY_NAME, [
+                    'source_id' => $sourceUserSubscription->sub_id,
+                    'reason' => 'User not found',
+                ]);
+            }
 
             return;
         }
@@ -160,12 +171,15 @@ class UserSubscriptionImporter extends AbstractImporter
 
         if ($orderId === null || $orderId === 0) {
             $result->incrementSkipped(self::ENTITY_NAME);
-            $result->recordSkipped(self::ENTITY_NAME, [
-                'source_id' => $sourceUserSubscription->sub_id,
-                'purchase_id' => $sourceUserSubscription->sub_purchase_id,
-                'invoice_id' => $sourceUserSubscription->sub_invoice_id,
-                'reason' => 'Order not found from imported orders',
-            ]);
+
+            if ($output->isVerbose()) {
+                $result->recordSkipped(self::ENTITY_NAME, [
+                    'source_id' => $sourceUserSubscription->sub_id,
+                    'purchase_id' => $sourceUserSubscription->sub_purchase_id,
+                    'invoice_id' => $sourceUserSubscription->sub_invoice_id,
+                    'reason' => 'Order not found from imported orders',
+                ]);
+            }
 
             return;
         }
@@ -174,10 +188,13 @@ class UserSubscriptionImporter extends AbstractImporter
 
         if (! $order instanceof Order) {
             $result->incrementSkipped(self::ENTITY_NAME);
-            $result->recordSkipped(self::ENTITY_NAME, [
-                'source_id' => $sourceUserSubscription->sub_id,
-                'reason' => 'Order not found',
-            ]);
+
+            if ($output->isVerbose()) {
+                $result->recordSkipped(self::ENTITY_NAME, [
+                    'source_id' => $sourceUserSubscription->sub_id,
+                    'reason' => 'Order not found',
+                ]);
+            }
 
             return;
         }
@@ -191,20 +208,26 @@ class UserSubscriptionImporter extends AbstractImporter
 
             if (is_null($billingCycleAnchor) || ($billingCycleAnchor instanceof CarbonInterface && $billingCycleAnchor->isPast())) {
                 $result->incrementSkipped(self::ENTITY_NAME);
-                $result->recordSkipped(self::ENTITY_NAME, [
-                    'source_id' => $sourceUserSubscription->sub_id,
-                    'reason' => 'Expiration date does not exist or is in the past',
-                ]);
+
+                if ($output->isVerbose()) {
+                    $result->recordSkipped(self::ENTITY_NAME, [
+                        'source_id' => $sourceUserSubscription->sub_id,
+                        'reason' => 'Expiration date does not exist or is in the past',
+                    ]);
+                }
 
                 return;
             }
 
             if ($this->paymentManager->currentSubscription($user) instanceof SubscriptionData) {
                 $result->incrementSkipped(self::ENTITY_NAME);
-                $result->recordSkipped(self::ENTITY_NAME, [
-                    'source_id' => $sourceUserSubscription->sub_id,
-                    'reason' => 'User already has current subscription',
-                ]);
+
+                if ($output->isVerbose()) {
+                    $result->recordSkipped(self::ENTITY_NAME, [
+                        'source_id' => $sourceUserSubscription->sub_id,
+                        'reason' => 'User already has current subscription',
+                    ]);
+                }
 
                 return;
             }
@@ -213,12 +236,15 @@ class UserSubscriptionImporter extends AbstractImporter
         }
 
         $result->incrementMigrated(self::ENTITY_NAME);
-        $result->recordMigrated(self::ENTITY_NAME, [
-            'source_id' => $sourceUserSubscription->sub_id,
-            'user_id' => $user->id,
-            'user_name' => $user->name,
-            'order_id' => $order->id,
-        ]);
+
+        if ($output->isVeryVerbose()) {
+            $result->recordMigrated(self::ENTITY_NAME, [
+                'source_id' => $sourceUserSubscription->sub_id,
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'order_id' => $order->id,
+            ]);
+        }
     }
 
     protected function findUser(object $sourceUserSubscription): ?User

@@ -8,6 +8,7 @@ use App\Services\Migration\ImporterDependency;
 use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
 
 interface EntityImporter
 {
@@ -25,7 +26,8 @@ interface EntityImporter
     public function import(
         MigrationResult $result,
         OutputStyle $output,
-    ): void;
+        Factory $components,
+    ): int;
 
     public function isCompleted(): bool;
 

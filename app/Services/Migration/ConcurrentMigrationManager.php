@@ -6,6 +6,8 @@ namespace App\Services\Migration;
 
 use App\Services\Migration\Contracts\MigrationSource;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
+use Illuminate\Support\Number;
 use Illuminate\Support\Sleep;
 use Symfony\Component\Process\Process;
 
@@ -32,6 +34,7 @@ class ConcurrentMigrationManager
         protected string $entity,
         protected MigrationConfig $config,
         protected OutputStyle $output,
+        protected Factory $components,
         protected ?int $workerMemoryLimit = null,
     ) {}
 
@@ -42,11 +45,16 @@ class ConcurrentMigrationManager
         $startOffset = $this->config->offset ?? 0;
         $nextOffset = $startOffset;
         $totalToProcess = $totalRecords - $startOffset;
+        $workerMemoryLimit = Number::fileSize(($this->workerMemoryLimit ?? 0) * 1024 * 1024);
 
-        $this->output->writeln("Starting concurrent migration of <info>{$this->entity}</info>");
-        $this->output->writeln("Total records: <info>$totalToProcess</info>");
-        $this->output->writeln("Max records per process: <info>{$this->config->maxRecordsPerProcess}</info>");
-        $this->output->writeln("Concurrent processes: <info>{$this->config->maxProcesses}</info>");
+        $this->components->info('Concurrency Information:');
+        $this->components->bulletList([
+            "Entity: $this->entity",
+            "Total Records: $totalToProcess",
+            "Worker Memory Limit: $workerMemoryLimit",
+            "Max Records Per Process: {$this->config->maxRecordsPerProcess}",
+            "Max Number of Processes: {$this->config->maxProcesses}",
+        ]);
         $this->output->newLine();
 
         while ($nextOffset < $totalRecords || $this->activeProcesses !== []) {
@@ -68,14 +76,14 @@ class ConcurrentMigrationManager
         }
 
         $this->output->newLine();
-        $this->output->writeln('<info>All processes completed!</info>');
-        $this->output->writeln('Completed chunks: <info>'.count($this->completedChunks).'</info>');
+        $this->components->success("All processes for $this->entity completed!");
+        $this->components->info('Completed chunks: '.count($this->completedChunks));
 
         if ($this->failedChunks !== []) {
-            $this->output->writeln('<error>Failed chunks: '.count($this->failedChunks).'</error>');
+            $this->components->error('Failed chunks: '.count($this->failedChunks));
 
             foreach ($this->failedChunks as $chunk) {
-                $this->output->writeln("<error>  - Offset {$chunk['offset']}, Limit {$chunk['limit']}: {$chunk['error']}</error>");
+                $this->components->error("Offset {$chunk['offset']}, Limit {$chunk['limit']}: {$chunk['error']}");
             }
         }
 
@@ -179,7 +187,7 @@ class ConcurrentMigrationManager
     protected function handleSuccessfulProcess(array $data): void
     {
         $this->completedChunks[] = $data;
-        $this->output->writeln("<info>[Process Completed]</info> Entity: {$data['entity']}, Offset: {$data['offset']}, Limit: {$data['limit']}");
+        $this->output->writeln("<comment>[Process Completed]</comment> Entity: {$data['entity']}, Offset: {$data['offset']}, Limit: {$data['limit']}");
     }
 
     protected function handleFailedProcess(array $data, Process $process): void
@@ -199,11 +207,11 @@ class ConcurrentMigrationManager
         $this->output->writeln("<error>[Process Failed]</error> Entity: {$data['entity']}, Offset: {$data['offset']}, Exit Code: $exitCode");
 
         if ($errorOutput && ! $this->isProgressBarOutput($errorOutput)) {
-            $this->output->writeln("<error>  → Error: $errorOutput</error>");
+            $this->components->error("Error: $errorOutput");
         }
 
         if ($stdOutput !== '' && $stdOutput !== '0') {
-            $this->output->writeln("<info>  → Output: $stdOutput</info>");
+            $this->output->writeln("  → Output: $stdOutput");
         }
     }
 

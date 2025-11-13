@@ -15,6 +15,7 @@ use App\Services\Migration\MigrationResult;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -75,7 +76,8 @@ class BlogImporter extends AbstractImporter
     public function import(
         MigrationResult $result,
         OutputStyle $output,
-    ): void {
+        Factory $components,
+    ): int {
         $config = $this->getConfig();
 
         $baseQuery = $this->getBaseQuery()
@@ -84,14 +86,16 @@ class BlogImporter extends AbstractImporter
 
         $totalBlogs = $baseQuery->clone()->countOffset();
 
-        $output->writeln("Found {$totalBlogs} blog entries to migrate...");
+        if ($output->isVerbose()) {
+            $components->info("Found {$totalBlogs} blog entries to migrate...");
+        }
 
         $progressBar = $output->createProgressBar($totalBlogs);
         $progressBar->start();
 
         $processed = 0;
 
-        $baseQuery->chunk($config->batchSize, function ($blogEntries) use ($config, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($blogEntries) use ($config, $result, $progressBar, $output, $components, &$processed): bool {
             foreach ($blogEntries as $sourceBlogEntry) {
                 if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
@@ -102,7 +106,7 @@ class BlogImporter extends AbstractImporter
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
 
-                    if ($output->isVeryVerbose()) {
+                    if ($output->isVerbose()) {
                         $result->recordFailed(self::ENTITY_NAME, [
                             'source_id' => $sourceBlogEntry->entry_id ?? 'unknown',
                             'title' => $sourceBlogEntry->entry_name ?? 'unknown',
@@ -117,8 +121,9 @@ class BlogImporter extends AbstractImporter
                         'trace' => $e->getTraceAsString(),
                     ]);
 
+                    $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $output->writeln("<error>Failed to import blog entry: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                    $components->error("Failed to import blog entry: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
                 }
 
                 $processed++;
@@ -130,9 +135,9 @@ class BlogImporter extends AbstractImporter
 
         $progressBar->finish();
 
-        $output->newLine();
-        $output->writeln("Migrated $processed blog entries...");
-        $output->newLine();
+        $output->newLine(2);
+
+        return $processed;
     }
 
     protected function importBlogEntry(object $sourceBlogEntry, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
@@ -149,7 +154,7 @@ class BlogImporter extends AbstractImporter
             $this->cacheBlogMapping($sourceBlogEntry->entry_id, $existingPost->id);
             $result->incrementSkipped(self::ENTITY_NAME);
 
-            if ($output->isVeryVerbose()) {
+            if ($output->isVerbose()) {
                 $result->recordSkipped(self::ENTITY_NAME, [
                     'source_id' => $sourceBlogEntry->entry_id,
                     'title' => $title,
@@ -165,12 +170,15 @@ class BlogImporter extends AbstractImporter
 
         if (! $author instanceof User) {
             $result->incrementFailed(self::ENTITY_NAME);
-            $result->recordFailed(self::ENTITY_NAME, [
-                'source_id' => $sourceBlogEntry->entry_id,
-                'title' => $title,
-                'slug' => $slug,
-                'error' => 'Could not find or create author',
-            ]);
+
+            if ($output->isVerbose()) {
+                $result->recordFailed(self::ENTITY_NAME, [
+                    'source_id' => $sourceBlogEntry->entry_id,
+                    'title' => $title,
+                    'slug' => $slug,
+                    'error' => 'Could not find or create author',
+                ]);
+            }
 
             return;
         }
@@ -219,14 +227,17 @@ class BlogImporter extends AbstractImporter
         }
 
         $result->incrementMigrated(self::ENTITY_NAME);
-        $result->recordMigrated(self::ENTITY_NAME, [
-            'source_id' => $sourceBlogEntry->entry_id,
-            'target_id' => $post->id ?? 'N/A (dry run)',
-            'title' => $post->title,
-            'slug' => $post->slug,
-            'author' => $author->name,
-            'published_at' => $post->published_at?->toDateTimeString() ?? 'N/A',
-        ]);
+
+        if ($output->isVeryVerbose()) {
+            $result->recordMigrated(self::ENTITY_NAME, [
+                'source_id' => $sourceBlogEntry->entry_id,
+                'target_id' => $post->id ?? 'N/A (dry run)',
+                'title' => $post->title,
+                'slug' => $post->slug,
+                'author' => $author->name,
+                'published_at' => $post->published_at?->toDateTimeString() ?? 'N/A',
+            ]);
+        }
     }
 
     protected function findOrCreateAuthor(object $sourceBlogEntry): ?User

@@ -11,6 +11,7 @@ use App\Services\Migration\MigrationResult;
 use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunitySource;
 use Exception;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -63,7 +64,8 @@ class GroupImporter extends AbstractImporter
     public function import(
         MigrationResult $result,
         OutputStyle $output,
-    ): void {
+        Factory $components,
+    ): int {
         $config = $this->getConfig();
 
         $baseQuery = $this->getBaseQuery()
@@ -72,14 +74,16 @@ class GroupImporter extends AbstractImporter
 
         $totalGroups = $baseQuery->clone()->countOffset();
 
-        $output->writeln("Found {$totalGroups} groups to migrate...");
+        if ($output->isVerbose()) {
+            $components->info("Found {$totalGroups} groups to migrate...");
+        }
 
         $progressBar = $output->createProgressBar($totalGroups);
         $progressBar->start();
 
         $processed = 0;
 
-        $baseQuery->chunk($config->batchSize, function ($groups) use ($config, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($groups) use ($config, $result, $progressBar, $output, $components, &$processed): bool {
             foreach ($groups as $sourceGroup) {
                 if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
@@ -89,11 +93,14 @@ class GroupImporter extends AbstractImporter
                     $this->importGroup($sourceGroup, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
-                    $result->recordFailed(self::ENTITY_NAME, [
-                        'source_id' => $sourceGroup->g_id ?? 'unknown',
-                        'name' => $sourceGroup->g_name ?? 'unknown',
-                        'error' => $e->getMessage(),
-                    ]);
+
+                    if ($output->isVerbose()) {
+                        $result->recordFailed(self::ENTITY_NAME, [
+                            'source_id' => $sourceGroup->g_id ?? 'unknown',
+                            'name' => $sourceGroup->g_name ?? 'unknown',
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
 
                     Log::error('Failed to import group', [
                         'source_id' => $sourceGroup->g_id ?? 'unknown',
@@ -102,8 +109,9 @@ class GroupImporter extends AbstractImporter
                         'trace' => $e->getTraceAsString(),
                     ]);
 
+                    $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $output->writeln("<error>Failed to import group: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                    $components->error("Failed to import group: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
                 }
 
                 $processed++;
@@ -115,9 +123,9 @@ class GroupImporter extends AbstractImporter
 
         $progressBar->finish();
 
-        $output->newLine();
-        $output->writeln("Migrated $processed groups...");
-        $output->newLine();
+        $output->newLine(2);
+
+        return $processed;
     }
 
     public function isCompleted(): bool
@@ -147,7 +155,7 @@ class GroupImporter extends AbstractImporter
             $this->cacheGroupMapping($sourceGroup->g_id, $existingGroup->id);
             $result->incrementSkipped(self::ENTITY_NAME);
 
-            if ($output->isVeryVerbose()) {
+            if ($output->isVerbose()) {
                 $result->recordSkipped(self::ENTITY_NAME, [
                     'source_id' => $sourceGroup->g_id,
                     'name' => $name,
@@ -174,12 +182,15 @@ class GroupImporter extends AbstractImporter
         }
 
         $result->incrementMigrated(self::ENTITY_NAME);
-        $result->recordMigrated(self::ENTITY_NAME, [
-            'source_id' => $sourceGroup->g_id,
-            'target_id' => $group->id ?? 'N/A (dry run)',
-            'name' => $group->name,
-            'color' => $group->color,
-        ]);
+
+        if ($output->isVeryVerbose()) {
+            $result->recordMigrated(self::ENTITY_NAME, [
+                'source_id' => $sourceGroup->g_id,
+                'target_id' => $group->id ?? 'N/A (dry run)',
+                'name' => $group->name,
+                'color' => $group->color,
+            ]);
+        }
     }
 
     protected function convertColor(?string $prefix): string

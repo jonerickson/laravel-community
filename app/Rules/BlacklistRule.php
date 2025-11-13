@@ -62,7 +62,7 @@ class BlacklistRule implements ValidationRule
 
     protected function matchesExactContent(string $value, string $content): bool
     {
-        $items = array_map('trim', explode(',', $content));
+        $items = array_map(trim(...), explode(',', $content));
         $lowerValue = strtolower($value);
 
         return array_any($items, fn ($item): bool => str_contains($lowerValue, strtolower($item)));

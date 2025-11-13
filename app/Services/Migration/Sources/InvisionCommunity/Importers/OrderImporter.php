@@ -18,6 +18,7 @@ use App\Services\Migration\MigrationResult;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -79,7 +80,8 @@ class OrderImporter extends AbstractImporter
     public function import(
         MigrationResult $result,
         OutputStyle $output,
-    ): void {
+        Factory $components,
+    ): int {
         $config = $this->getConfig();
 
         $baseQuery = $this->getBaseQuery()
@@ -88,14 +90,16 @@ class OrderImporter extends AbstractImporter
 
         $totalOrders = $baseQuery->clone()->countOffset();
 
-        $output->writeln("Found {$totalOrders} paid orders to migrate...");
+        if ($output->isVerbose()) {
+            $components->info("Found {$totalOrders} paid orders to migrate...");
+        }
 
         $progressBar = $output->createProgressBar($totalOrders);
         $progressBar->start();
 
         $processed = 0;
 
-        $baseQuery->chunk($config->batchSize, function ($orders) use ($config, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($orders) use ($config, $result, $progressBar, $output, $components, &$processed): bool {
             foreach ($orders as $sourceOrder) {
                 if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
@@ -105,10 +109,13 @@ class OrderImporter extends AbstractImporter
                     $this->importOrder($sourceOrder, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
-                    $result->recordFailed(self::ENTITY_NAME, [
-                        'source_id' => $sourceOrder->i_id ?? 'unknown',
-                        'error' => $e->getMessage(),
-                    ]);
+
+                    if ($output->isVerbose()) {
+                        $result->recordFailed(self::ENTITY_NAME, [
+                            'source_id' => $sourceOrder->i_id ?? 'unknown',
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
 
                     Log::error('Failed to import order', [
                         'source_id' => $sourceOrder->i_id ?? 'unknown',
@@ -116,8 +123,9 @@ class OrderImporter extends AbstractImporter
                         'trace' => $e->getTraceAsString(),
                     ]);
 
+                    $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $output->writeln("<error>Failed to import order: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                    $components->error("Failed to import order: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
                 }
 
                 $processed++;
@@ -129,9 +137,9 @@ class OrderImporter extends AbstractImporter
 
         $progressBar->finish();
 
-        $output->newLine();
-        $output->writeln("Migrated $processed orders...");
-        $output->newLine();
+        $output->newLine(2);
+
+        return $processed;
     }
 
     protected function importOrder(object $sourceOrder, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
@@ -140,10 +148,13 @@ class OrderImporter extends AbstractImporter
 
         if (! $user instanceof User) {
             $result->incrementFailed(self::ENTITY_NAME);
-            $result->recordFailed(self::ENTITY_NAME, [
-                'source_id' => $sourceOrder->i_id,
-                'error' => 'Could not find user',
-            ]);
+
+            if ($output->isVerbose()) {
+                $result->recordFailed(self::ENTITY_NAME, [
+                    'source_id' => $sourceOrder->i_id,
+                    'error' => 'Could not find user',
+                ]);
+            }
 
             return;
         }
@@ -156,7 +167,7 @@ class OrderImporter extends AbstractImporter
             $this->cacheOrderMapping($sourceOrder->i_id, $existingOrder->id);
             $result->incrementSkipped(self::ENTITY_NAME);
 
-            if ($output->isVeryVerbose()) {
+            if ($output->isVerbose()) {
                 $result->recordSkipped(self::ENTITY_NAME, [
                     'source_id' => $sourceOrder->i_id,
                     'user' => $user->name,
@@ -196,7 +207,7 @@ class OrderImporter extends AbstractImporter
             $this->cacheOrderMapping($sourceOrder->i_id, $order->id);
         }
 
-        $orderItems = $this->createOrderItems($sourceOrder, $order, $config, $result);
+        $orderItems = $this->createOrderItems($sourceOrder, $order, $config, $result, $output);
 
         if (! $config->isDryRun) {
             /** @var OrderItem $orderItem */
@@ -204,27 +215,33 @@ class OrderImporter extends AbstractImporter
                 $orderItem->save();
 
                 $result->incrementMigrated('order_items');
-                $result->recordMigrated('order_items', [
-                    'order_id' => $order->id,
-                    'price_id' => $orderItem->price_id,
-                    'product_name' => $orderItem->name,
-                    'amount' => $orderItem->amount,
-                ]);
+
+                if ($output->isVeryVerbose()) {
+                    $result->recordMigrated('order_items', [
+                        'order_id' => $order->id,
+                        'price_id' => $orderItem->price_id,
+                        'product_name' => $orderItem->name,
+                        'amount' => $orderItem->amount,
+                    ]);
+                }
             }
         }
 
         $orderItemsSummary = collect($orderItems)->map(fn (OrderItem $item): string => ($item->name ?? 'Unknown').' - '.$item->amount)->implode(', ');
 
         $result->incrementMigrated(self::ENTITY_NAME);
-        $result->recordMigrated(self::ENTITY_NAME, [
-            'source_id' => $sourceOrder->i_id,
-            'target_id' => $order->id ?? 'N/A (dry run)',
-            'user' => $user->name,
-            'status' => $order->status->value,
-            'total' => $sourceOrder->i_total,
-            'currency' => $sourceOrder->i_currency,
-            'items' => $orderItemsSummary ?: 'N/A',
-        ]);
+
+        if ($output->isVeryVerbose()) {
+            $result->recordMigrated(self::ENTITY_NAME, [
+                'source_id' => $sourceOrder->i_id,
+                'target_id' => $order->id ?? 'N/A (dry run)',
+                'user' => $user->name,
+                'status' => $order->status->value,
+                'total' => $sourceOrder->i_total,
+                'currency' => $sourceOrder->i_currency,
+                'items' => $orderItemsSummary ?: 'N/A',
+            ]);
+        }
     }
 
     protected function getOrderStatus(object $sourceOrder): OrderStatus
@@ -237,7 +254,7 @@ class OrderImporter extends AbstractImporter
         };
     }
 
-    protected function createOrderItems(object $sourceOrder, Order $order, MigrationConfig $config, MigrationResult $result): array
+    protected function createOrderItems(object $sourceOrder, Order $order, MigrationConfig $config, MigrationResult $result, OutputStyle $output): array
     {
         $orderItems = [];
 
@@ -281,11 +298,14 @@ class OrderImporter extends AbstractImporter
 
             if (! $config->isDryRun) {
                 $result->incrementFailed('order_items');
-                $result->recordFailed('order_items', [
-                    'order_id' => $order->id ?? 'N/A',
-                    'source_order_id' => $sourceOrder->i_id,
-                    'error' => $e->getMessage(),
-                ]);
+
+                if ($output->isVerbose()) {
+                    $result->recordFailed('order_items', [
+                        'order_id' => $order->id ?? 'N/A',
+                        'source_order_id' => $sourceOrder->i_id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
             }
         }
 

@@ -10,6 +10,7 @@ use App\Models\Policy;
 use App\Models\Post;
 use App\Models\Product;
 use App\Models\Topic;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -58,7 +59,7 @@ class SearchController extends Controller
             ->when(in_array('topic', $types), fn () => Topic::search($query)
                 ->take($limit * 3)
                 ->get()
-                ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn ($collection) => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
+                ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection) => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
                 ->take($limit)
                 ->map(fn (Topic $topic): array => [
                     'id' => $topic->id,
@@ -76,7 +77,7 @@ class SearchController extends Controller
             ->when(in_array('post', $types), fn () => Post::search($query)
                 ->take($limit * 3)
                 ->get()
-                ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn ($collection) => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
+                ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection) => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
                 ->take($limit)
                 ->map(fn (Post $post): array => [
                     'id' => $post->id,
@@ -94,7 +95,7 @@ class SearchController extends Controller
             ->when(in_array('policy', $types), fn () => Policy::search($query)
                 ->take($limit * 3)
                 ->get()
-                ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn ($collection) => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
+                ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection) => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
                 ->take($limit)
                 ->map(fn (Policy $policy): array => [
                     'id' => $policy->id,
@@ -113,7 +114,7 @@ class SearchController extends Controller
             ->when(in_array('product', $types), fn () => Product::search($query)
                 ->take($limit * 3)
                 ->get()
-                ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn ($collection) => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
+                ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection) => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
                 ->take($limit)
                 ->map(fn (Product $product): array => [
                     'id' => $product->id,
@@ -148,7 +149,7 @@ class SearchController extends Controller
             ]);
     }
 
-    private function applyDateFiltersToCollection(\Illuminate\Database\Eloquent\Collection $collection, ?string $createdAfter, ?string $createdBefore, ?string $updatedAfter, ?string $updatedBefore)
+    private function applyDateFiltersToCollection(Collection $collection, ?string $createdAfter, ?string $createdBefore, ?string $updatedAfter, ?string $updatedBefore)
     {
         return $collection
             ->when($createdAfter, fn ($col) => $col->filter(fn ($item): bool => $item->created_at >= $createdAfter))

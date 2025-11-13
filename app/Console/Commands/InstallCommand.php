@@ -17,6 +17,10 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\password;
+use function Laravel\Prompts\text;
+
 class InstallCommand extends Command
 {
     use ConfirmableTrait;
@@ -35,38 +39,40 @@ class InstallCommand extends Command
             return self::SUCCESS;
         }
 
-        if ($this->confirm('Would you like to install all the required permissions?', true)) {
+        $this->components->info('Installing application...');
+
+        if (confirm('Would you like to install all the required permissions? (Recommended)')) {
             Schema::disableForeignKeyConstraints();
             Permission::truncate();
             Role::truncate();
             Schema::enableForeignKeyConstraints();
 
-            $this->comment('Installing permissions...');
+            $this->components->info('Installing permissions...');
             $this->call('db:seed', ['--class' => PermissionSeeder::class]);
         }
 
-        if ($this->confirm('Would you like to install all the default member groups?', true)) {
+        if (confirm('Would you like to install all the default member groups? (Recommended)', true)) {
             Schema::disableForeignKeyConstraints();
             Group::truncate();
             Schema::enableForeignKeyConstraints();
 
-            $this->comment('Installing groups...');
+            $this->components->info('Installing groups...');
             $this->call('db:seed', ['--class' => GroupSeeder::class]);
         }
 
-        if ($this->confirm('Would you like to create a new super admin account?', true)) {
-            $name = $this->option('name') ?? $this->ask('Name');
-            $email = $this->option('email') ?? $this->ask('Email');
-            $password = $this->option('password') ?? $this->secret('Password');
+        if (confirm('Would you like to create a new super admin account?', true)) {
+            $name = $this->option('name') ?? text('Name', 'What is the name?');
+            $email = $this->option('email') ?? text('Email', 'What is the email?');
+            $password = $this->option('password') ?? password('Password', 'What is the password?');
 
             if (blank($name) || blank($email) || blank($password)) {
-                $this->error('Please provide a name, email and password when creating a new account.');
+                $this->components->error('Please provide a name, email and password when creating a new account.');
 
                 return self::FAILURE;
             }
 
             if (Role::count() === 0 || Permission::count() === 0) {
-                $this->comment('Installing permissions...');
+                $this->components->info('Installing permissions...');
                 $this->call('db:seed', ['--class' => PermissionSeeder::class]);
             }
 
@@ -80,7 +86,7 @@ class InstallCommand extends Command
             $user->markEmailAsVerified();
             $user->assignRole(RoleEnum::Administrator);
 
-            $this->comment('User created successfully.');
+            $this->components->success('User created successfully.');
         }
 
         if ($this->option('seed')) {
@@ -89,7 +95,7 @@ class InstallCommand extends Command
             ]);
         }
 
-        $this->comment('Application installed successfully.');
+        $this->components->success('Application installed successfully.');
 
         return self::SUCCESS;
     }

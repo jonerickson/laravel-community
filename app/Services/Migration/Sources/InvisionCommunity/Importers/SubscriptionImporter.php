@@ -19,6 +19,7 @@ use App\Services\Migration\Sources\InvisionCommunity\InvisionCommunitySource;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Console\View\Components\Factory;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -78,7 +79,8 @@ class SubscriptionImporter extends AbstractImporter
     public function import(
         MigrationResult $result,
         OutputStyle $output,
-    ): void {
+        Factory $components,
+    ): int {
         $config = $this->getConfig();
 
         $baseQuery = $this->getBaseQuery()
@@ -87,14 +89,16 @@ class SubscriptionImporter extends AbstractImporter
 
         $totalSubscriptions = $baseQuery->clone()->countOffset();
 
-        $output->writeln("Found {$totalSubscriptions} subscription packages to migrate...");
+        if ($output->isVerbose()) {
+            $components->info("Found {$totalSubscriptions} subscription packages to migrate...");
+        }
 
         $progressBar = $output->createProgressBar($totalSubscriptions);
         $progressBar->start();
 
         $processed = 0;
 
-        $baseQuery->chunk($config->batchSize, function ($subscriptions) use ($config, $result, $progressBar, $output, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($subscriptions) use ($config, $result, $progressBar, $output, $components, &$processed): bool {
             foreach ($subscriptions as $sourceSubscription) {
                 if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
@@ -104,10 +108,13 @@ class SubscriptionImporter extends AbstractImporter
                     $this->importSubscription($sourceSubscription, $config, $result, $output);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
-                    $result->recordFailed(self::ENTITY_NAME, [
-                        'source_id' => $sourceSubscription->sp_id ?? 'unknown',
-                        'error' => $e->getMessage(),
-                    ]);
+
+                    if ($output->isVerbose()) {
+                        $result->recordFailed(self::ENTITY_NAME, [
+                            'source_id' => $sourceSubscription->sp_id ?? 'unknown',
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
 
                     Log::error('Failed to import subscription', [
                         'source_id' => $sourceSubscription->sp_id ?? 'unknown',
@@ -115,8 +122,9 @@ class SubscriptionImporter extends AbstractImporter
                         'trace' => $e->getTraceAsString(),
                     ]);
 
+                    $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $output->writeln("<error>Failed to import subscription: {$e->getMessage()} in $fileName on Line {$e->getLine()}.</error>");
+                    $components->error("Failed to import subscription: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
                 }
 
                 $processed++;
@@ -128,9 +136,9 @@ class SubscriptionImporter extends AbstractImporter
 
         $progressBar->finish();
 
-        $output->newLine();
-        $output->writeln("Migrated $processed subscriptions...");
-        $output->newLine();
+        $output->newLine(2);
+
+        return $processed;
     }
 
     protected function importSubscription(object $sourceSubscription, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
@@ -149,7 +157,7 @@ class SubscriptionImporter extends AbstractImporter
             $this->cacheSubscriptionMapping($sourceSubscription->sp_id, $existingProduct->id);
             $result->incrementSkipped(self::ENTITY_NAME);
 
-            if ($output->isVeryVerbose()) {
+            if ($output->isVerbose()) {
                 $result->recordSkipped(self::ENTITY_NAME, [
                     'source_id' => $sourceSubscription->sp_id,
                     'name' => $name,
@@ -185,7 +193,7 @@ class SubscriptionImporter extends AbstractImporter
             $this->cacheSubscriptionMapping($sourceSubscription->sp_id, $product->id);
         }
 
-        $prices = $this->createPrices($sourceSubscription, $product, $config, $result);
+        $prices = $this->createPrices($sourceSubscription, $product, $config, $result, $output);
 
         if (! $config->isDryRun) {
             /** @var Price $price */
@@ -193,33 +201,39 @@ class SubscriptionImporter extends AbstractImporter
                 $price->save();
 
                 $result->incrementMigrated('subscription_prices');
-                $result->recordMigrated('subscription_prices', [
-                    'product_id' => $product->id,
-                    'price_id' => $price->id,
-                    'type' => $price->type->value,
-                    'amount' => $price->amount,
-                    'currency' => $price->currency,
-                    'interval' => $price->interval?->value ?? 'N/A',
-                    'interval_count' => $price->interval_count ?? 'N/A',
-                ]);
+
+                if ($output->isVeryVerbose()) {
+                    $result->recordMigrated('subscription_prices', [
+                        'product_id' => $product->id,
+                        'price_id' => $price->id,
+                        'type' => $price->type->value,
+                        'amount' => $price->amount,
+                        'currency' => $price->currency,
+                        'interval' => $price->interval?->value ?? 'N/A',
+                        'interval_count' => $price->interval_count ?? 'N/A',
+                    ]);
+                }
             }
         }
 
         $pricesSummary = collect($prices)->map(fn (Price $price): string => $price->amount.' '.$price->currency.' ('.($price->interval?->value ?? 'one-time').')')->implode(', ');
 
         $result->incrementMigrated(self::ENTITY_NAME);
-        $result->recordMigrated(self::ENTITY_NAME, [
-            'source_id' => $sourceSubscription->sp_id,
-            'target_id' => $product->id ?? 'N/A (dry run)',
-            'name' => $product->name,
-            'slug' => $product->slug,
-            'type' => $product->type->value,
-            'is_featured' => $product->is_featured,
-            'prices' => $pricesSummary ?: 'N/A',
-        ]);
+
+        if ($output->isVeryVerbose()) {
+            $result->recordMigrated(self::ENTITY_NAME, [
+                'source_id' => $sourceSubscription->sp_id,
+                'target_id' => $product->id ?? 'N/A (dry run)',
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'type' => $product->type->value,
+                'is_featured' => $product->is_featured,
+                'prices' => $pricesSummary ?: 'N/A',
+            ]);
+        }
     }
 
-    protected function createPrices(object $sourceSubscription, Product $product, MigrationConfig $config, MigrationResult $result): array
+    protected function createPrices(object $sourceSubscription, Product $product, MigrationConfig $config, MigrationResult $result, OutputStyle $output): array
     {
         $prices = [];
 
@@ -308,11 +322,14 @@ class SubscriptionImporter extends AbstractImporter
 
             if (! $config->isDryRun) {
                 $result->incrementFailed('subscription_prices');
-                $result->recordFailed('subscription_prices', [
-                    'product_id' => $product->id ?? 'N/A',
-                    'source_subscription_id' => $sourceSubscription->sp_id,
-                    'error' => $e->getMessage(),
-                ]);
+
+                if ($output->isVerbose()) {
+                    $result->recordFailed('subscription_prices', [
+                        'product_id' => $product->id ?? 'N/A',
+                        'source_subscription_id' => $sourceSubscription->sp_id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
             }
         }
 
