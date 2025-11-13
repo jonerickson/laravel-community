@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\ApiTokens;
 
+use App\Enums\Role;
 use App\Filament\Admin\Resources\ApiTokens\Pages\CreateApiToken;
 use App\Filament\Admin\Resources\ApiTokens\Pages\ListApiTokens;
 use App\Models\User;
@@ -53,7 +54,7 @@ class ApiTokenResource extends Resource
                             ->maxLength(255),
                         Select::make('tokenable_id')
                             ->disabledOn('edit')
-                            ->options(User::query()->orderBy('name')->pluck('name', 'id'))
+                            ->options(User::query()->role(Role::Administrator)->orderBy('name')->pluck('name', 'id'))
                             ->preload()
                             ->label('User')
                             ->searchable()
