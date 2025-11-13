@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Kbd } from '@/components/ui/kbd';
 import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 import { usePage } from '@inertiajs/react';
 import { Editor, OnMount } from '@monaco-editor/react';
 import { Code2, Copy, Download, Eye, EyeOff, FileCode, Maximize2, Minimize2, Moon, Sun } from 'lucide-react';
@@ -408,11 +409,10 @@ export function CodeEditor({ html, css, js, onSave, defaultHtml, defaultCss, def
                     <button
                         key={file.id}
                         onClick={() => setActiveFileId(file.id)}
-                        className={`group flex items-center gap-2 rounded-t-md px-3 py-2 text-sm transition-colors ${
-                            file.id === activeFileId
-                                ? 'bg-background text-foreground'
-                                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
-                        }`}
+                        className={cn('group flex items-center gap-2 rounded-t-md px-3 py-2 text-sm transition-colors', {
+                            'bg-background text-foreground': file.id === activeFileId,
+                            'text-muted-foreground hover:bg-muted/50 hover:text-foreground': file.id !== activeFileId,
+                        })}
                     >
                         <FileCode className="h-3.5 w-3.5" />
                         <span className="font-mono">{file.name}</span>
@@ -421,7 +421,12 @@ export function CodeEditor({ html, css, js, onSave, defaultHtml, defaultCss, def
             </div>
 
             <div className="flex flex-1 overflow-hidden">
-                <div className={`flex flex-col ${showPreview ? 'w-1/2' : 'w-full'} transition-all`}>
+                <div
+                    className={cn('flex flex-col transition-all', {
+                        'w-1/2': showPreview,
+                        'w-full': !showPreview,
+                    })}
+                >
                     <Editor
                         height="100%"
                         language={activeFile.language}

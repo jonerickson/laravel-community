@@ -62,7 +62,6 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
             </div>
 
             <div className="flex w-full items-center justify-center gap-1 overflow-x-auto md:w-auto">
-                {/* Previous Button */}
                 {currentPage > 1 ? (
                     <Link href={`${baseUrl}?page=${currentPage - 1}`} className="inline-flex">
                         <Button variant="outline" size="sm">

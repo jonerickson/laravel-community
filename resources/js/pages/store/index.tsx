@@ -4,6 +4,7 @@ import Loading from '@/components/loading';
 import StoreCategoriesProductItem from '@/components/store-categories-product-item';
 import StoreIndexCategoriesItem from '@/components/store-index-categories-item';
 import AppLayout from '@/layouts/app-layout';
+import { cn } from '@/lib/utils';
 import { type BreadcrumbItem } from '@/types';
 import { Deferred, Head, Link } from '@inertiajs/react';
 import { Folder, ImageIcon, Star, UserPlus } from 'lucide-react';
@@ -67,9 +68,10 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
                                 {featuredProducts.slice(0, 3).map((product, index) => (
                                     <div
                                         key={product.id}
-                                        className={`group relative aspect-[2/1] overflow-hidden rounded-lg ${
-                                            index === 0 ? 'sm:row-span-2 sm:aspect-square' : 'sm:aspect-auto'
-                                        }`}
+                                        className={cn('group relative aspect-[2/1] overflow-hidden rounded-lg', {
+                                            'sm:row-span-2 sm:aspect-square': index === 0,
+                                            'sm:aspect-auto': index !== 0,
+                                        })}
                                     >
                                         {product.featuredImageUrl ? (
                                             <img

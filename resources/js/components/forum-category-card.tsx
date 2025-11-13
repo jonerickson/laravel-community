@@ -2,7 +2,7 @@ import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
 import { Card, CardContent } from '@/components/ui/card';
 import usePermissions from '@/hooks/use-permissions';
-import { pluralize } from '@/lib/utils';
+import { cn, pluralize } from '@/lib/utils';
 import { Link, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, Circle, EyeOff, Lock, MessageSquare, Pin, ThumbsDown } from 'lucide-react';
@@ -83,9 +83,10 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
                                                 {can('publish_posts') && topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
                                                 {can('approve_posts') && topic.hasUnapprovedContent && <ThumbsDown className="size-4 text-warning" />}
                                                 <span
-                                                    className={`truncate text-sm font-medium sm:text-base ${
-                                                        auth && auth.user && topic.isReadByUser ? 'text-muted-foreground' : 'text-foreground'
-                                                    }`}
+                                                    className={cn('truncate text-sm sm:text-base', {
+                                                        'font-normal text-muted-foreground': auth && auth.user && topic.isReadByUser,
+                                                        'font-medium text-foreground': !topic.isReadByUser,
+                                                    })}
                                                 >
                                                     {topic.title}
                                                 </span>

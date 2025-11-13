@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useApiRequest } from '@/hooks/use-api-request';
 import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
+import { cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { stripCharacters } from '@/utils/truncate';
 import { Head, InfiniteScroll, Link, router, usePage } from '@inertiajs/react';
@@ -378,11 +379,10 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                                                             )}
                                                             <Link
                                                                 href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
-                                                                className={`hover:underline ${
-                                                                    auth && auth.user && topic.isReadByUser
-                                                                        ? 'font-normal text-muted-foreground'
-                                                                        : 'font-medium'
-                                                                }`}
+                                                                className={cn('hover:underline', {
+                                                                    'font-normal text-muted-foreground': auth && auth.user && topic.isReadByUser,
+                                                                    'font-medium text-foreground': !topic.isReadByUser,
+                                                                })}
                                                             >
                                                                 {topic.title}
                                                             </Link>
