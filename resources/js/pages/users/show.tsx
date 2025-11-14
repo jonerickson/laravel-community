@@ -9,6 +9,7 @@ import { Head } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { Calendar, User as UserIcon } from 'lucide-react';
 import { route } from 'ziggy-js';
+import RichEditorContent from '@/components/rich-editor-content';
 
 interface UserProfilePageProps {
     user: App.Data.UserData;
@@ -93,10 +94,12 @@ export default function Show({ user }: UserProfilePageProps) {
                 {user.signature && (
                     <Card>
                         <CardHeader>
-                            <Heading title="Signature" />
+                            <div className='-mb-6'>
+                                <Heading title="Signature" />
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: user.signature }} />
+                            <RichEditorContent content={user.signature} />
                         </CardContent>
                     </Card>
                 )}
@@ -104,7 +107,9 @@ export default function Show({ user }: UserProfilePageProps) {
                 {user.fields && user.fields.length > 0 && (
                     <Card>
                         <CardHeader>
-                            <Heading title="Profile information" />
+                            <div className='-mb-6'>
+                                <Heading title="Profile information" />
+                            </div>
                         </CardHeader>
                         <CardContent>
                             <dl className="grid grid-cols-1 gap-4">
