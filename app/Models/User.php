@@ -119,7 +119,6 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read int|null $permissions_count
  * @property-read Collection<int, Report> $rejectedReports
  * @property-read int|null $rejected_reports_count
- * @property-read int $report_count
  * @property-read Collection<int, Report> $reports
  * @property-read int|null $reports_count
  * @property-read Collection<int, \App\Models\Role> $roles
@@ -131,7 +130,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read Collection<int, UserWarning> $userWarnings
  * @property-read int|null $user_warnings_count
  * @property-read int $warning_points
- * @property-read Collection|Product[] $products
+ * @property-read Collection<int, Product> $products
  * @property-read int|null $products_count
  *
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])

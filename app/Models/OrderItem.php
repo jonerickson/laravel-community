@@ -21,7 +21,7 @@ use Override;
  * @property int|float $amount
  * @property float $commission_amount
  * @property int|null $commission_recipient_id
- * @property int $quantity
+ * @property int|null $quantity
  * @property string|null $external_item_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at

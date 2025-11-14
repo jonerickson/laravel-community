@@ -45,7 +45,7 @@ use Override;
  * @property-read mixed $author_name
  * @property-read User $creator
  * @property-read Collection<int, Follow> $followers
- * @property-read int $followers_count
+ * @property-read int|null $followers_count
  * @property-read Collection<int, Follow> $follows
  * @property-read int|null $follows_count
  * @property-read Forum $forum
@@ -59,11 +59,10 @@ use Override;
  * @property-read Collection<int, Post> $posts
  * @property-read int|null $posts_count
  * @property-read Collection<int, Read> $reads
- * @property-read int $reads_count
+ * @property-read int|null $reads_count
  * @property-read float $trending_score
- * @property-read int $unique_views_count
  * @property-read Collection<int, View> $views
- * @property-read string|int $views_count
+ * @property-read int|null $views_count
  *
  * @method static \Database\Factories\TopicFactory factory($count = null, $state = [])
  * @method static Builder<static>|Topic hotTopics(?int $limit = null)

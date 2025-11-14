@@ -43,11 +43,6 @@ class DiscountResource extends Resource
         ];
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        return (string) static::getModel()::count();
-    }
-
     public static function getNavigationBadgeColor(): string|array|null
     {
         $count = static::getNavigationBadge();

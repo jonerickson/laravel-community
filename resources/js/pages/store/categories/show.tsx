@@ -2,6 +2,7 @@ import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
 import StoreCategoriesProductItem from '@/components/store-categories-product-item';
 import { Card, CardContent } from '@/components/ui/card';
+import { Pagination } from '@/components/ui/pagination';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
@@ -9,7 +10,7 @@ import { Folder, ShoppingBag } from 'lucide-react';
 
 interface StoreCategoryShowProps {
     category: App.Data.ProductCategoryData;
-    products: App.Data.ProductData[];
+    products: App.Data.PaginatedData<App.Data.ProductData>;
 }
 
 export default function StoreCategoryShow({ category, products }: StoreCategoryShowProps) {
@@ -51,7 +52,7 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
                 item: breadcrumb.href,
             })),
         },
-        hasPart: products.map((product) => ({
+        hasPart: products.data.map((product) => ({
             '@type': 'Product',
             name: product.name,
             description: product.description,
@@ -64,7 +65,7 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
                 priceCurrency: 'USD',
             },
         })),
-        numberOfItems: products.length,
+        numberOfItems: products.data.length,
     };
 
     return (
@@ -116,9 +117,11 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
                     </div>
                 )}
 
-                {products.length > 0 ? (
+                <Pagination pagination={products} baseUrl={route('store.categories.show', category)} entityLabel="product" />
+
+                {products.data.length > 0 ? (
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        {products.map((product) => (
+                        {products.data.map((product) => (
                             <StoreCategoriesProductItem key={product.id} product={product} />
                         ))}
                     </div>

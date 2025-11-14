@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Store;
 
+use App\Data\PaginatedData;
 use App\Data\ProductCategoryData;
 use App\Data\ProductData;
 use App\Http\Controllers\Controller;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
+use Spatie\LaravelData\PaginatedDataCollection;
 
 class CategoryController extends Controller
 {
@@ -54,13 +56,16 @@ class CategoryController extends Controller
             }])
             ->where('is_subscription_only', false)
             ->ordered()
-            ->get()
+            ->paginate(perPage: 12);
+
+        $filteredProducts = $products
+            ->collect()
             ->filter(fn (Product $product) => Gate::check('view', $product))
             ->values();
 
         return Inertia::render('store/categories/show', [
             'category' => ProductCategoryData::from($category),
-            'products' => ProductData::collect($products),
+            'products' => PaginatedData::from(ProductData::collect($products->setCollection($filteredProducts), PaginatedDataCollection::class)->items()),
         ]);
     }
 }

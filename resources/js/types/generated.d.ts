@@ -517,7 +517,6 @@ declare namespace App.Data {
         viewsCount: number;
         order: number;
         postsCount: number;
-        lastReplyAt: string | null;
         isReadByUser: boolean;
         readsCount: number;
         isHot: boolean;

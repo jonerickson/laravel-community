@@ -40,7 +40,7 @@ use Override;
  * @property-read Collection<int, Forum> $children
  * @property-read int|null $children_count
  * @property-read Collection<int, Follow> $followers
- * @property-read int $followers_count
+ * @property-read int|null $followers_count
  * @property-read Collection<int, Follow> $follows
  * @property-read int|null $follows_count
  * @property-read Collection<int, Group> $groups

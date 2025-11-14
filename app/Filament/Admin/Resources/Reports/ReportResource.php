@@ -24,6 +24,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Number;
 use Override;
 
 class ReportResource extends Resource
@@ -38,7 +39,7 @@ class ReportResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::getModel()::where('status', ReportStatus::Pending)->count() !== '' && (string) static::getModel()::where('status', ReportStatus::Pending)->count() !== '0' ? (string) static::getModel()::where('status', ReportStatus::Pending)->count() : null;
+        return Number::format(static::getModel()::where('status', ReportStatus::Pending)->count());
     }
 
     public static function getNavigationBadgeColor(): string|array|null

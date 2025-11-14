@@ -38,7 +38,7 @@ use Override;
  * @property-read Model|Eloquent $commentable
  * @property-read User $creator
  * @property-read Collection<int, Like> $likes
- * @property-read int $likes_count
+ * @property-read int|null $likes_count
  * @property-read array $likes_summary
  * @property-read Comment|null $parent
  * @property-read Collection<int, Comment> $replies

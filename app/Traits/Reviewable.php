@@ -32,18 +32,10 @@ trait Reviewable
         )->shouldCache();
     }
 
-    public function reviewsCount(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->approvedReviews->count()
-        )->shouldCache();
-    }
-
     protected function initializeReviewable(): void
     {
         $this->mergeAppends([
             'average_rating',
-            'reviews_count',
         ]);
     }
 }

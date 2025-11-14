@@ -95,11 +95,9 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
                                                 <span>Started by {topic.author.name}</span>
                                                 <span>•</span>
                                                 <span>
-                                                    {topic.lastReplyAt
-                                                        ? formatDistanceToNow(new Date(topic.lastReplyAt), { addSuffix: true })
-                                                        : topic.createdAt
-                                                          ? formatDistanceToNow(new Date(topic.createdAt), { addSuffix: true })
-                                                          : 'N/A'}
+                                                    {topic.lastPost?.createdAt
+                                                        ? formatDistanceToNow(new Date(topic.lastPost.createdAt), { addSuffix: true })
+                                                        : 'N/A'}
                                                 </span>
                                             </div>
                                         </div>

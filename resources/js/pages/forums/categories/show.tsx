@@ -164,15 +164,11 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                                                         <span>by {forum.latestTopic.author?.name}</span>
                                                         <span>•</span>
                                                         <span>
-                                                            {forum.latestTopic.lastReplyAt
-                                                                ? formatDistanceToNow(new Date(forum.latestTopic.lastReplyAt), {
+                                                            {forum.latestTopic.lastPost?.createdAt
+                                                                ? formatDistanceToNow(new Date(forum.latestTopic.lastPost.createdAt), {
                                                                       addSuffix: true,
                                                                   })
-                                                                : forum.latestTopic.createdAt
-                                                                  ? formatDistanceToNow(new Date(forum.latestTopic.createdAt), {
-                                                                        addSuffix: true,
-                                                                    })
-                                                                  : 'N/A'}
+                                                                : 'N/A'}
                                                         </span>
                                                     </div>
                                                 </div>

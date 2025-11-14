@@ -6,6 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Pagination } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useApiRequest } from '@/hooks/use-api-request';
 import usePermissions from '@/hooks/use-permissions';
@@ -13,7 +14,7 @@ import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { stripCharacters } from '@/utils/truncate';
-import { Head, InfiniteScroll, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, Circle, Eye, EyeOff, LibraryBig, Lock, MessageSquare, Pin, Plus, ThumbsDown, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -287,15 +288,11 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                                                         <span>by {subforum.latestTopic.author?.name}</span>
                                                         <span>•</span>
                                                         <span>
-                                                            {subforum.latestTopic.lastReplyAt
-                                                                ? formatDistanceToNow(new Date(subforum.latestTopic.lastReplyAt), {
+                                                            {subforum.latestTopic.lastPost?.createdAt
+                                                                ? formatDistanceToNow(new Date(subforum.latestTopic.lastPost.createdAt), {
                                                                       addSuffix: true,
                                                                   })
-                                                                : subforum.latestTopic.createdAt
-                                                                  ? formatDistanceToNow(new Date(subforum.latestTopic.createdAt), {
-                                                                        addSuffix: true,
-                                                                    })
-                                                                  : 'N/A'}
+                                                                : 'N/A'}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -310,127 +307,126 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                     </div>
                 )}
 
+                <Pagination pagination={initialTopics} baseUrl={route('forums.show', forum)} entityLabel="topic" />
+
                 {topics.length > 0 ? (
                     <div className="relative rounded-md border bg-background">
-                        <InfiniteScroll data="topics">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="w-[80%] pl-4">Forums</TableHead>
-                                        <TableHead className="w-[5%] text-center">Replies</TableHead>
-                                        <TableHead className="w-[5%] text-center">Views</TableHead>
-                                        <TableHead className="w-[10%] pr-4 text-right">Last Activity</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {topics.map((topic) => (
-                                        <TableRow
-                                            key={topic.id}
-                                            className={`hover:bg-accent/20 ${selectedTopics.includes(topic.id) ? 'bg-info-foreground' : ''}`}
-                                        >
-                                            <TableCell className="p-4">
-                                                <div className="flex items-start gap-3">
-                                                    {can('delete_topics') ? (
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                handleSelectTopic(topic.id, !selectedTopics.includes(topic.id));
-                                                            }}
-                                                            className="relative"
-                                                        >
-                                                            {selectedTopics.includes(topic.id) ? (
-                                                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600">
-                                                                    <Checkbox
-                                                                        checked={true}
-                                                                        className="pointer-events-none border-white text-white"
-                                                                    />
-                                                                </div>
-                                                            ) : (
-                                                                <Avatar className="h-8 w-8 transition-opacity hover:opacity-75">
-                                                                    <AvatarFallback className="text-xs">
-                                                                        {topic.author.name.charAt(0).toUpperCase()}
-                                                                    </AvatarFallback>
-                                                                </Avatar>
-                                                            )}
-                                                        </button>
-                                                    ) : (
-                                                        <Avatar className="h-8 w-8">
-                                                            <AvatarFallback className="text-xs">
-                                                                {topic.author.name.charAt(0).toUpperCase()}
-                                                            </AvatarFallback>
-                                                        </Avatar>
-                                                    )}
-                                                    <div className="min-w-0 flex-1">
-                                                        <div className="mb-1 flex items-center gap-2">
-                                                            {auth && auth.user && !topic.isReadByUser && (
-                                                                <Circle className="size-3 fill-info text-info" />
-                                                            )}
-                                                            {topic.isHot && <span className="text-sm">🔥</span>}
-                                                            {topic.isPinned && <Pin className="size-4 text-info" />}
-                                                            {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
-                                                            {can('report_posts') && topic.hasReportedContent && (
-                                                                <AlertTriangle className="size-4 text-destructive" />
-                                                            )}
-                                                            {can('publish_posts') && topic.hasUnpublishedContent && (
-                                                                <EyeOff className="size-4 text-warning" />
-                                                            )}
-                                                            {can('approve_posts') && topic.hasUnapprovedContent && (
-                                                                <ThumbsDown className="size-4 text-warning" />
-                                                            )}
-                                                            <Link
-                                                                href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
-                                                                className={cn('hover:underline', {
-                                                                    'font-normal text-muted-foreground': auth && auth.user && topic.isReadByUser,
-                                                                    'font-medium text-foreground': !topic.isReadByUser,
-                                                                })}
-                                                            >
-                                                                {topic.title}
-                                                            </Link>
-                                                        </div>
-                                                        <div className="text-xs text-muted-foreground">
-                                                            Started by {topic.author.name} •{' '}
-                                                            {topic.createdAt
-                                                                ? formatDistanceToNow(new Date(topic.createdAt), { addSuffix: true })
-                                                                : 'Unknown time'}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="p-4 text-center">
-                                                <div className="flex items-center justify-center gap-1">
-                                                    <MessageSquare className="size-4" />
-                                                    <span>{topic.postsCount}</span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="p-4 text-center">
-                                                <div className="flex items-center justify-center gap-1">
-                                                    <Eye className="size-4" />
-                                                    <span>{topic.viewsCount}</span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="p-4 text-right">
-                                                {topic.lastPost ? (
-                                                    <div className="text-sm">
-                                                        <div className="font-medium">{topic.lastPost.author?.name}</div>
-                                                        {topic.lastReplyAt && (
-                                                            <div className="text-xs text-muted-foreground">
-                                                                {formatDistanceToNow(new Date(topic.lastReplyAt), { addSuffix: true })}
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="w-[80%] pl-4">Topics</TableHead>
+                                    <TableHead className="w-[5%] text-center">Replies</TableHead>
+                                    <TableHead className="w-[5%] text-center">Views</TableHead>
+                                    <TableHead className="w-[10%] pr-4 text-right">Last Activity</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {topics.map((topic) => (
+                                    <TableRow
+                                        key={topic.id}
+                                        className={`hover:bg-accent/20 ${selectedTopics.includes(topic.id) ? 'bg-info-foreground' : ''}`}
+                                    >
+                                        <TableCell className="p-4">
+                                            <div className="flex items-start gap-3">
+                                                {can('delete_topics') ? (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            handleSelectTopic(topic.id, !selectedTopics.includes(topic.id));
+                                                        }}
+                                                        className="relative"
+                                                    >
+                                                        {selectedTopics.includes(topic.id) ? (
+                                                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600">
+                                                                <Checkbox checked={true} className="pointer-events-none border-white text-white" />
                                                             </div>
+                                                        ) : (
+                                                            <Avatar className="h-8 w-8 transition-opacity hover:opacity-75">
+                                                                <AvatarFallback className="text-xs">
+                                                                    {topic.author.name.charAt(0).toUpperCase()}
+                                                                </AvatarFallback>
+                                                            </Avatar>
                                                         )}
-                                                    </div>
+                                                    </button>
                                                 ) : (
-                                                    <div className="text-sm text-muted-foreground">No replies</div>
+                                                    <Avatar className="h-8 w-8">
+                                                        <AvatarFallback className="text-xs">
+                                                            {topic.author.name.charAt(0).toUpperCase()}
+                                                        </AvatarFallback>
+                                                    </Avatar>
                                                 )}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </InfiniteScroll>
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="mb-1 flex items-center gap-2">
+                                                        {auth && auth.user && !topic.isReadByUser && (
+                                                            <Circle className="size-3 fill-info text-info" />
+                                                        )}
+                                                        {topic.isHot && <span className="text-sm">🔥</span>}
+                                                        {topic.isPinned && <Pin className="size-4 text-info" />}
+                                                        {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
+                                                        {can('report_posts') && topic.hasReportedContent && (
+                                                            <AlertTriangle className="size-4 text-destructive" />
+                                                        )}
+                                                        {can('publish_posts') && topic.hasUnpublishedContent && (
+                                                            <EyeOff className="size-4 text-warning" />
+                                                        )}
+                                                        {can('approve_posts') && topic.hasUnapprovedContent && (
+                                                            <ThumbsDown className="size-4 text-warning" />
+                                                        )}
+                                                        <Link
+                                                            href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
+                                                            className={cn('hover:underline', {
+                                                                'font-normal text-muted-foreground': auth && auth.user && topic.isReadByUser,
+                                                                'font-medium text-foreground': !topic.isReadByUser,
+                                                            })}
+                                                        >
+                                                            {topic.title}
+                                                        </Link>
+                                                    </div>
+                                                    <div className="text-xs text-muted-foreground">
+                                                        Started by {topic.author.name} •{' '}
+                                                        {topic.createdAt
+                                                            ? formatDistanceToNow(new Date(topic.createdAt), { addSuffix: true })
+                                                            : 'Unknown time'}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="p-4 text-center">
+                                            <div className="flex items-center justify-center gap-1">
+                                                <MessageSquare className="size-4" />
+                                                <span>{topic.postsCount}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="p-4 text-center">
+                                            <div className="flex items-center justify-center gap-1">
+                                                <Eye className="size-4" />
+                                                <span>{topic.viewsCount}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="p-4 text-right">
+                                            {topic.lastPost ? (
+                                                <div className="text-sm">
+                                                    <div className="font-medium">{topic.lastPost.author?.name}</div>
+                                                    {topic.lastPost.createdAt && (
+                                                        <div className="text-xs text-muted-foreground">
+                                                            {formatDistanceToNow(new Date(topic.lastPost.createdAt), { addSuffix: true })}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <div className="text-sm text-muted-foreground">No replies</div>
+                                            )}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
                     </div>
                 ) : (
                     <EmptyState icon={<LibraryBig />} title="No topics yet" description="Be the first to start a discussion in this forum." />
                 )}
+
+                <Pagination pagination={initialTopics} baseUrl={route('forums.show', forum)} entityLabel="topic" />
             </div>
         </AppLayout>
     );

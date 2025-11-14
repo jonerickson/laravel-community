@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Forums;
 
 use App\Actions\Forums\DeleteTopicAction;
 use App\Data\ForumData;
+use App\Data\PaginatedData;
 use App\Data\PostData;
 use App\Data\RecentViewerData;
 use App\Data\TopicData;
@@ -16,7 +17,6 @@ use App\Models\Forum;
 use App\Models\Post;
 use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
@@ -88,19 +88,24 @@ class TopicController extends Controller
         $forum->loadMissing(['parent', 'category']);
 
         $topic->incrementViews();
+        $topic->loadMissing(['author']);
+        $topic->loadCount(['posts', 'views']);
 
-        $posts = PostData::collect($topic
-            ->loadMissing(['posts' => fn (HasMany|Post $query) => $query->latestActivity()])
-            ->loadMissing(['author', 'posts.author.groups', 'posts.reports', 'posts.comments', 'posts.views', 'posts.reads', 'posts.likes'])
-            ->posts
+        $posts = $topic
+            ->posts()
+            ->latestActivity()
+            ->with(['author.groups', 'reads', 'views', 'likes.author', 'comments'])
+            ->paginate();
+
+        $filteredPosts = $posts
+            ->collect()
             ->filter(fn (Post $post) => Gate::check('view', $post))
-            ->values()
-            ->all(), PaginatedDataCollection::class);
+            ->values();
 
         return Inertia::render('forums/topics/show', [
             'forum' => ForumData::from($forum),
             'topic' => TopicData::from($topic),
-            'posts' => Inertia::scroll(fn () => $posts->items()),
+            'posts' => PaginatedData::from(PostData::collect($posts->setCollection($filteredPosts), PaginatedDataCollection::class)->items()),
             'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($topic->getRecentViewers())),
         ]);
     }

@@ -51,7 +51,7 @@ use Override;
  * @property-read mixed $author_name
  * @property-read SupportTicketCategory $category
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Comment> $comments
- * @property-read int $comments_count
+ * @property-read int|null $comments_count
  * @property-read User $creator
  * @property-read File|null $file
  * @property-read \Illuminate\Database\Eloquent\Collection<int, File> $files

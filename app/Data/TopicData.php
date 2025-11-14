@@ -39,8 +39,6 @@ class TopicData extends Data
 
     public int $postsCount;
 
-    public ?CarbonImmutable $lastReplyAt = null;
-
     public bool $isReadByUser;
 
     public int $readsCount;

@@ -34,6 +34,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Override;
 
@@ -211,7 +212,7 @@ class AnnouncementResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::getModel()::current()->count();
+        return Number::format(static::getModel()::current()->count());
     }
 
     public static function getNavigationBadgeColor(): string|array|null

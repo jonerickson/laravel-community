@@ -70,13 +70,6 @@ trait Followable
             ->delete() > 0;
     }
 
-    public function followersCount(): Attribute
-    {
-        return Attribute::make(
-            get: fn (): int => $this->follows->count(),
-        )->shouldCache();
-    }
-
     public function isFollowedByUser(): Attribute
     {
         return Attribute::make(

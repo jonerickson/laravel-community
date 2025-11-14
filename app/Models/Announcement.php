@@ -34,7 +34,7 @@ use Illuminate\Support\Str;
  * @property-read User $creator
  * @property-read bool $is_read_by_user
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Read> $reads
- * @property-read int $reads_count
+ * @property-read int|null $reads_count
  *
  * @method static Builder<static>|Announcement active()
  * @method static Builder<static>|Announcement current()

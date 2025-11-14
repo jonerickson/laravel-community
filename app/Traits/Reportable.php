@@ -45,17 +45,10 @@ trait Reportable
         return $this->reports()->where('status', 'rejected');
     }
 
-    public function reportCount(): Attribute
-    {
-        return Attribute::get(fn (): int => $this->pendingReports->count())
-            ->shouldCache();
-    }
-
     protected function initializeReportable(): void
     {
         $this->mergeAppends([
             'is_reported',
-            'report_count',
         ]);
     }
 }

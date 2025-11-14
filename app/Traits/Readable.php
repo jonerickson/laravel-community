@@ -132,13 +132,6 @@ trait Readable
         )->shouldCache();
     }
 
-    public function readsCount(): Attribute
-    {
-        return Attribute::make(
-            get: fn (): int => $this->reads->count(),
-        )->shouldCache();
-    }
-
     public function getRecentViewers(int $hours = 24, int $limit = 10): array
     {
         $recentViewers = $this->reads()
@@ -165,7 +158,6 @@ trait Readable
     {
         $this->mergeAppends([
             'is_read_by_user',
-            'reads_count',
         ]);
     }
 }

@@ -7,12 +7,13 @@ import Loading from '@/components/loading';
 import RecentViewers from '@/components/recent-viewers';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Pagination } from '@/components/ui/pagination';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
-import { Deferred, Head, InfiniteScroll, Link, router, usePage } from '@inertiajs/react';
+import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, ArrowDown, ArrowLeft, Clock, Eye, EyeOff, MessageSquare, Reply, ThumbsDown, User } from 'lucide-react';
 import { useState } from 'react';
@@ -234,19 +235,21 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
                     </div>
                 </div>
 
+                <Pagination pagination={posts} baseUrl={route('forums.topics.show', { forum, topic })} entityLabel="post" />
+
                 <div className="mt-0">
                     {posts.data.length > 0 ? (
-                        <InfiniteScroll data="posts">
-                            <div className="grid gap-6">
-                                {posts.data.map((post, index) => (
-                                    <ForumTopicPost key={post.id} post={post} index={index} forum={forum} topic={topic} onQuote={handleQuotePost} />
-                                ))}
-                            </div>
-                        </InfiniteScroll>
+                        <div className="grid gap-6">
+                            {posts.data.map((post, index) => (
+                                <ForumTopicPost key={post.id} post={post} index={index} forum={forum} topic={topic} onQuote={handleQuotePost} />
+                            ))}
+                        </div>
                     ) : (
                         <EmptyState icon={<MessageSquare />} title="No posts yet" description="This topic doesn't have any posts yet." />
                     )}
                 </div>
+
+                <Pagination pagination={posts} baseUrl={route('forums.topics.show', { forum, topic })} entityLabel="post" />
 
                 <Deferred fallback={<Loading />} data="recentViewers">
                     <RecentViewers viewers={recentViewers} />

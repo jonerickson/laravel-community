@@ -46,6 +46,10 @@ class ForumCategoriesTable
                     ->label('Active')
                     ->boolean()
                     ->sortable(),
+                TextColumn::make('forums_count')
+                    ->label('Forums')
+                    ->counts('forums')
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime()

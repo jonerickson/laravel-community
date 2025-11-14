@@ -45,7 +45,7 @@ use Laravel\Scout\Searchable;
  * @property string $reference_id
  * @property string $name
  * @property string $slug
- * @property string $description
+ * @property string|null $description
  * @property ProductType $type
  * @property int|null $seller_id
  * @property numeric $commission_rate

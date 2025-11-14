@@ -76,9 +76,13 @@ class CategoryController extends Controller
         $this->authorize('view', $category);
 
         $forums = $category
-            ->loadMissing(['forums' => fn (HasMany|Forum $query) => $query->withCount(['topics', 'posts'])->whereNull('parent_id')->active()->ordered()])
-            ->loadMissing(['forums.latestTopic.author'])
-            ->forums
+            ->forums()
+            ->whereNull('parent_id')
+            ->active()
+            ->ordered()
+            ->with('latestTopic.lastPost.author')
+            ->withCount(['topics', 'posts'])
+            ->get()
             ->filter(fn (Forum $forum) => Gate::check('view', $forum))
             ->values();
 

@@ -30,9 +30,8 @@ class BlogController extends Controller
 
         $posts = PostData::collect(Post::query()
             ->blog()
-            ->with('comments')
-            ->with('author')
-            ->with('reads')
+            ->with(['comments', 'author', 'reads'])
+            ->withCount(['views', 'comments'])
             ->published()
             ->latest()
             ->get()
@@ -53,8 +52,10 @@ class BlogController extends Controller
         $this->authorize('view', $post);
 
         $post->incrementViews();
+        $post->loadCount(['views', 'comments']);
 
-        $comments = CommentData::collect($post->comments()
+        $comments = CommentData::collect($post
+            ->comments()
             ->with(['author.groups', 'replies.author.groups', 'parent', 'likes.author'])
             ->latest()
             ->get()

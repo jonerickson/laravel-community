@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\SupportTickets;
 
 use App\Data\OrderData;
+use App\Data\PaginatedData;
 use App\Data\SupportTicketCategoryData;
 use App\Data\SupportTicketData;
 use App\Http\Controllers\Controller;
@@ -39,18 +40,19 @@ class SupportTicketController extends Controller
     {
         $this->authorize('viewAny', SupportTicket::class);
 
-        $tickets = SupportTicketData::collect(SupportTicket::query()
-            ->with('category')
-            ->with('author')
-            ->with('order')
+        $tickets = SupportTicket::query()
+            ->with(['category', 'author', 'latestComment.author'])
             ->whereBelongsTo($this->user, 'author')
             ->latest()
-            ->get()
+            ->paginate();
+
+        $filteredTickets = $tickets
+            ->collect()
             ->filter(fn (SupportTicket $ticket) => Gate::check('view', $ticket))
-            ->all(), PaginatedDataCollection::class);
+            ->values();
 
         return Inertia::render('support/index', [
-            'tickets' => Inertia::scroll(fn () => $tickets->items()),
+            'tickets' => PaginatedData::from(SupportTicketData::collect($tickets->setCollection($filteredTickets), PaginatedDataCollection::class)->items()),
         ]);
     }
 
@@ -86,6 +88,8 @@ class SupportTicketController extends Controller
     public function show(SupportTicket $ticket): Response
     {
         $this->authorize('view', $ticket);
+
+        $ticket->loadMissing(['comments', 'files']);
 
         return Inertia::render('support/show', [
             'ticket' => SupportTicketData::from($ticket),

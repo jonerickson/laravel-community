@@ -86,13 +86,6 @@ trait Likeable
         ]);
     }
 
-    public function likesCount(): Attribute
-    {
-        return Attribute::make(
-            get: fn (): int => $this->likes->count(),
-        )->shouldCache();
-    }
-
     public function likesSummary(): Attribute
     {
         return Attribute::make(
@@ -191,7 +184,6 @@ trait Likeable
     protected function initializeLikeable(): void
     {
         $this->mergeAppends([
-            'likes_count',
             'likes_summary',
             'user_reaction',
             'user_reactions',

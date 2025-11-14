@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Traits;
 
 use App\Models\View;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Request;
@@ -55,13 +54,6 @@ trait Viewable
         ]);
     }
 
-    public function viewsCount(): Attribute
-    {
-        return Attribute::make(
-            get: fn (): int|string => $this->views->count(),
-        )->shouldCache();
-    }
-
     public function incrementViews(): void
     {
         $this->recordView();
@@ -73,13 +65,5 @@ trait Viewable
             /** @var static $model */
             $model->views()->delete();
         });
-    }
-
-    protected function initializeViewable(): void
-    {
-        $this->mergeAppends([
-            'views_count',
-            'unique_views_count',
-        ]);
     }
 }

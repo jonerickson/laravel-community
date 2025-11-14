@@ -65,34 +65,32 @@ use Override;
  * @property-read User $author
  * @property-read mixed $author_name
  * @property-read Collection<int, Comment> $comments
- * @property-read int $comments_count
+ * @property-read int|null $comments_count
  * @property-read User $creator
  * @property-read string|null $featured_image_url
  * @property-read bool $is_read_by_user
  * @property-read bool $is_reported
  * @property-read Comment|null $latestComment
  * @property-read Collection<int, Like> $likes
- * @property-read int $likes_count
+ * @property-read int|null $likes_count
  * @property-read array $likes_summary
  * @property-read Collection<int, Report> $pendingReports
  * @property-read int|null $pending_reports_count
  * @property-read int $reading_time
  * @property-read Collection<int, Read> $reads
- * @property-read int $reads_count
+ * @property-read int|null $reads_count
  * @property-read Collection<int, Report> $rejectedReports
  * @property-read int|null $rejected_reports_count
- * @property-read int $report_count
  * @property-read Collection<int, Report> $reports
  * @property-read int|null $reports_count
  * @property-read Collection<int, Comment> $topLevelComments
  * @property-read int|null $top_level_comments_count
  * @property-read Topic|null $topic
- * @property-read int $unique_views_count
  * @property-read string|null $url
  * @property-read string|null $user_reaction
  * @property-read array $user_reactions
  * @property-read Collection<int, View> $views
- * @property-read string|int $views_count
+ * @property-read int|null $views_count
  *
  * @method static Builder<static>|Post approved()
  * @method static Builder<static>|Post blog()

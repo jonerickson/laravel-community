@@ -17,6 +17,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Number;
 use Override;
 
 class ProductResource extends Resource
@@ -61,7 +62,7 @@ class ProductResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::getEloquentQuery()->count();
+        return Number::format(static::getEloquentQuery()::count());
     }
 
     public static function getNavigationBadgeColor(): string|array|null

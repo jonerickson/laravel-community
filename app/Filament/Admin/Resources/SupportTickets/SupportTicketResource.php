@@ -16,6 +16,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Support\Number;
 use Override;
 use UnitEnum;
 
@@ -35,9 +36,7 @@ class SupportTicketResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = static::getModel()::active()->count();
-
-        return $count > 0 ? (string) $count : null;
+        return Number::format(static::getModel()::active()->count());
     }
 
     public static function getNavigationBadgeColor(): string|array|null

@@ -13,6 +13,8 @@ interface PaginationProps {
 export function Pagination({ pagination, baseUrl, entityLabel, className }: PaginationProps) {
     const { currentPage, lastPage, perPage, total } = pagination;
 
+    console.log(baseUrl);
+
     if (lastPage <= 1) {
         return null;
     }

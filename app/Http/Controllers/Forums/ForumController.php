@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Forums;
 
 use App\Data\ForumData;
+use App\Data\PaginatedData;
 use App\Data\TopicData;
 use App\Http\Controllers\Controller;
 use App\Models\Forum;
 use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -28,25 +28,31 @@ class ForumController extends Controller
     {
         $this->authorize('view', $forum);
 
-        $forum->setRelation('children', $forum
-            ->loadMissing(['children' => fn (HasMany|Forum $query) => $query->withCount(['topics', 'posts'])->active()->ordered()])
-            ->loadMissing(['children.latestTopic.author', 'category', 'parent'])
-            ->children
-            ->filter(fn (Forum $child) => Gate::check('view', $child))
-            ->values()
-        );
+        $forum
+            ->loadMissing(['category', 'parent'])
+            ->setRelation('children', $forum
+                ->children()
+                ->with(['latestTopic.author'])
+                ->withCount(['topics', 'posts'])
+                ->get()
+                ->filter(fn (Forum $child) => Gate::check('view', $child))
+                ->values()
+            );
 
-        $topics = TopicData::collect($forum
-            ->loadMissing(['topics' => fn (HasMany|Topic $query) => $query->withCount(['posts', 'views'])->latestActivity()])
-            ->loadMissing(['topics.author', 'topics.lastPost.author'])
-            ->topics
+        $topics = $forum
+            ->topics()
+            ->with(['author', 'lastPost.author', 'posts.reads'])
+            ->withCount(['posts', 'views'])
+            ->paginate();
+
+        $filteredTopics = $topics
+            ->collect()
             ->filter(fn (Topic $topic) => Gate::check('view', $topic))
-            ->values()
-            ->all(), PaginatedDataCollection::class);
+            ->values();
 
         return Inertia::render('forums/show', [
             'forum' => ForumData::from($forum),
-            'topics' => Inertia::scroll(fn () => $topics->items()),
+            'topics' => PaginatedData::from(TopicData::collect($topics->setCollection($filteredTopics), PaginatedDataCollection::class)->items()),
         ]);
     }
 }
