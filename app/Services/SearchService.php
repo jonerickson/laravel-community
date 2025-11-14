@@ -99,7 +99,14 @@ class SearchService
         }
 
         if (in_array('user', $types)) {
-            $users = $this->searchUsers($query, $limit);
+            $users = $this->searchUsers(
+                $query,
+                $createdAfter,
+                $createdBefore,
+                $updatedAfter,
+                $updatedBefore,
+                $limit
+            );
 
             $counts['users'] = $users->count();
             $results = $results->concat($users);
@@ -216,10 +223,17 @@ class SearchService
             ]);
     }
 
-    public function searchUsers(string $query, ?int $limit = null): SupportCollection
-    {
+    public function searchUsers(
+        string $query,
+        ?string $createdAfter = null,
+        ?string $createdBefore = null,
+        ?string $updatedAfter = null,
+        ?string $updatedBefore = null,
+        ?int $limit = null
+    ): SupportCollection {
         return User::search($query)
             ->get()
+            ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection): Collection => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
             ->when($limit, fn ($collection) => $collection->take($limit))
             ->map(fn (User $user): array => [
                 'id' => $user->id,
