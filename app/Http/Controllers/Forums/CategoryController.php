@@ -38,6 +38,7 @@ class CategoryController extends Controller
                     ->ordered()
                     ->with(['latestTopics' => function (HasMany|Topic $subQuery): void {
                         $subQuery
+                            ->withCount('posts')
                             ->with(['author'])
                             ->limit(3);
                     }]);
