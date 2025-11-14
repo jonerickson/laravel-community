@@ -235,5 +235,7 @@ class MigrationService
         config()->set('mail.default', 'array');
         config()->set('logging.default', 'single');
         config()->set('logging.channels.single.path', storage_path('logs/migration.log'));
+        config()->set('telescope.enabled', false);
+        config()->set('queue.default', 'sync');
     }
 }

@@ -588,10 +588,10 @@ CREATE TABLE `orders` (
   `reference_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint unsigned NOT NULL,
   `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `amount_due` int DEFAULT NULL,
-  `amount_overpaid` int DEFAULT NULL,
-  `amount_paid` int DEFAULT NULL,
-  `amount_remaining` int DEFAULT NULL,
+  `amount_due` bigint DEFAULT NULL,
+  `amount_overpaid` bigint DEFAULT NULL,
+  `amount_paid` bigint DEFAULT NULL,
+  `amount_remaining` bigint DEFAULT NULL,
   `refund_notes` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `refund_reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `invoice_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -637,10 +637,10 @@ CREATE TABLE `orders_items` (
   `name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `description` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `price_id` bigint unsigned DEFAULT NULL,
-  `amount` int DEFAULT NULL,
-  `commission_amount` int NOT NULL DEFAULT '0',
+  `amount` bigint DEFAULT NULL,
+  `commission_amount` bigint DEFAULT NULL,
   `commission_recipient_id` bigint unsigned DEFAULT NULL,
-  `quantity` int NOT NULL DEFAULT '1',
+  `quantity` bigint DEFAULT NULL,
   `external_item_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1502,5 +1502,6 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (142,'2025_11_11_18
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (143,'2025_11_11_181656_add_reference_id_to_comments_table',49);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (144,'2025_11_11_181835_add_reference_id_to_files_table',49);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (147,'2025_11_12_174357_change_product_description_to_null',50);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (148,'2025_09_28_202015_create_email_settings',51);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (149,'2025_09_28_202053_create_general_settings',51);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (150,'2025_09_28_202015_create_email_settings',51);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (151,'2025_09_28_202053_create_general_settings',51);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (152,'2025_11_13_225851_update_amount_column_types',51);
