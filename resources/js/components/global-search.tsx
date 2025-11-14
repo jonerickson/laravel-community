@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Toggle } from '@/components/ui/toggle';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { currency } from '@/lib/utils';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import axios from 'axios';
 import { ArrowRight, Calendar, ChevronDown, FileText, MessageSquare, Search, Shield, ShoppingBag, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -95,6 +95,9 @@ export function GlobalSearch() {
         updated_after: '',
         updated_before: '',
     });
+
+    const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
+    const [isLongPress, setIsLongPress] = useState(false);
 
     useEffect(() => {
         if (query.length < 2) {
@@ -188,15 +191,50 @@ export function GlobalSearch() {
         {} as Record<string, SearchResult[]>,
     );
 
+    const handlePressStart = () => {
+        setIsLongPress(false);
+        const timer = setTimeout(() => {
+            setIsLongPress(true);
+            router.get(route('search'));
+        }, 500);
+        setPressTimer(timer);
+    };
+
+    const handlePressEnd = () => {
+        if (pressTimer) {
+            clearTimeout(pressTimer);
+            setPressTimer(null);
+        }
+    };
+
+    const handleClick = () => {
+        if (isLongPress) {
+            return;
+        }
+        handlePressEnd();
+        setOpen(true);
+    };
+
     return (
         <>
-            <Button variant="ghost" size="icon" className="group h-9 w-9" onClick={() => setOpen(true)}>
+            <Button
+                variant="ghost"
+                size="icon"
+                className="group h-9 w-9"
+                onClick={handleClick}
+                onMouseDown={handlePressStart}
+                onMouseUp={handlePressEnd}
+                onMouseLeave={handlePressEnd}
+                onTouchStart={handlePressStart}
+                onTouchEnd={handlePressEnd}
+                onTouchCancel={handlePressEnd}
+            >
                 <Search className="size-5 opacity-80 group-hover:opacity-100" />
                 <span className="sr-only">Search</span>
             </Button>
 
             <CommandDialog open={open} onOpenChange={setOpen} className="w-full lg:!max-w-5xl" shouldFilter={false}>
-                <CommandInput placeholder="Search topics, posts, policies, and products..." value={query} onValueChange={setQuery} />
+                <CommandInput placeholder="Search policies, posts, products, topics and members..." value={query} onValueChange={setQuery} />
 
                 <Collapsible open={dateFiltersOpen} onOpenChange={setDateFiltersOpen}>
                     <div className="flex items-center gap-2 border-b px-3 py-2">

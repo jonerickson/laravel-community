@@ -109,6 +109,7 @@ class SearchService
             );
 
             $counts['users'] = $users->count();
+
             $results = $results->concat($users);
         }
 

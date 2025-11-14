@@ -296,7 +296,7 @@ export default function Search({ results, query: initialQuery, filters: initialF
                         <form onSubmit={handleSearch}>
                             <Input
                                 type="search"
-                                placeholder="Search topics, posts, policies, products, and members..."
+                                placeholder="Search policies, posts, products, topics and members..."
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                             />
