@@ -23,6 +23,7 @@ use App\Traits\HasReferenceId;
 use App\Traits\Integrations\DiscordUser;
 use App\Traits\LogsAuthActivity;
 use App\Traits\Reportable;
+use App\Traits\Searchable;
 use Exception;
 use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthentication;
 use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthenticationRecovery;
@@ -193,6 +194,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     use LogsAuthActivity;
     use Notifiable;
     use Reportable;
+    use Searchable;
 
     protected $fillable = [
         'name',
@@ -397,6 +399,15 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     public function getActivityLogName(): string
     {
         return 'user';
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+        ];
     }
 
     #[Override]

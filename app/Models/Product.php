@@ -22,6 +22,7 @@ use App\Traits\HasSlug;
 use App\Traits\LogsMarketplaceActivity;
 use App\Traits\Orderable;
 use App\Traits\Reviewable;
+use App\Traits\Searchable;
 use App\Traits\Trendable;
 use App\Traits\Visible;
 use Filament\Support\Contracts\HasLabel;
@@ -38,7 +39,6 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Laravel\Scout\Searchable;
 
 /**
  * @property int $id
@@ -331,6 +331,7 @@ class Product extends Model implements HasLabel, Sluggable
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
+            'categories' => $this->categories->pluck('name')->implode(', '),
             'type' => $this->type->value ?? '',
         ];
     }

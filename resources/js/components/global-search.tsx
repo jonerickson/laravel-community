@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 
 interface SearchResult {
     id: number;
-    type: 'topic' | 'post' | 'policy' | 'product';
+    type: 'policy' | 'product' | 'post' | 'topic' | 'user';
     title: string;
     description?: string;
     excerpt?: string;
@@ -61,6 +61,7 @@ const typeIcons = {
     post: FileText,
     policy: Shield,
     product: ShoppingBag,
+    user: User,
 };
 
 const typeLabels = {
@@ -68,6 +69,7 @@ const typeLabels = {
     post: 'Post',
     policy: 'Policy',
     product: 'Product',
+    user: 'Member',
 };
 
 const typeBadgeVariants = {
@@ -75,6 +77,7 @@ const typeBadgeVariants = {
     post: 'outline' as const,
     policy: 'default' as const,
     product: 'destructive' as const,
+    user: 'default' as const,
 };
 
 export function GlobalSearch() {
@@ -83,7 +86,7 @@ export function GlobalSearch() {
     const [results, setResults] = useState<SearchResult[]>([]);
     const [loading, setLoading] = useState(false);
     const [meta, setMeta] = useState<SearchResponse['meta'] | null>(null);
-    const [selectedTypes, setSelectedTypes] = useState<string[]>(['topic', 'post', 'policy', 'product']);
+    const [selectedTypes, setSelectedTypes] = useState<string[]>(['policy', 'post', 'product', 'topic', 'user']);
     const [dateFiltersOpen, setDateFiltersOpen] = useState(false);
     const [dateFilters, setDateFilters] = useState({
         created_after: '',
@@ -191,24 +194,24 @@ export function GlobalSearch() {
                 <span className="sr-only">Search</span>
             </Button>
 
-            <CommandDialog open={open} onOpenChange={setOpen} className="w-full lg:!max-w-5xl">
+            <CommandDialog open={open} onOpenChange={setOpen} className="w-full lg:!max-w-5xl" shouldFilter={false}>
                 <CommandInput placeholder="Search topics, posts, policies, and products..." value={query} onValueChange={setQuery} />
 
                 <Collapsible open={dateFiltersOpen} onOpenChange={setDateFiltersOpen}>
                     <div className="flex items-center gap-2 border-b px-3 py-2">
                         <span className="mr-2 text-sm text-nowrap text-muted-foreground">Filter by:</span>
                         <Toggle
-                            pressed={selectedTypes.includes('topic')}
-                            onPressedChange={() => toggleType('topic')}
+                            pressed={selectedTypes.includes('policy')}
+                            onPressedChange={() => toggleType('policy')}
                             size="sm"
                             className="h-7 px-2 text-xs"
                         >
                             <Tooltip>
-                                <TooltipContent>Topics</TooltipContent>
+                                <TooltipContent>Policies</TooltipContent>
                                 <TooltipTrigger asChild>
                                     <div className="flex items-center gap-1">
-                                        <MessageSquare className="mr-1 size-3" />
-                                        <span className="hidden sm:block">Topics</span>
+                                        <Shield className="mr-1 size-3" />
+                                        <span className="hidden sm:block">Policies</span>
                                     </div>
                                 </TooltipTrigger>
                             </Tooltip>
@@ -230,22 +233,6 @@ export function GlobalSearch() {
                             </Tooltip>
                         </Toggle>
                         <Toggle
-                            pressed={selectedTypes.includes('policy')}
-                            onPressedChange={() => toggleType('policy')}
-                            size="sm"
-                            className="h-7 px-2 text-xs"
-                        >
-                            <Tooltip>
-                                <TooltipContent>Policies</TooltipContent>
-                                <TooltipTrigger asChild>
-                                    <div className="flex items-center gap-1">
-                                        <Shield className="mr-1 size-3" />
-                                        <span className="hidden sm:block">Policies</span>
-                                    </div>
-                                </TooltipTrigger>
-                            </Tooltip>
-                        </Toggle>
-                        <Toggle
                             pressed={selectedTypes.includes('product')}
                             onPressedChange={() => toggleType('product')}
                             size="sm"
@@ -257,6 +244,38 @@ export function GlobalSearch() {
                                     <div className="flex items-center gap-1">
                                         <ShoppingBag className="mr-1 size-3" />
                                         <span className="hidden sm:block">Products</span>
+                                    </div>
+                                </TooltipTrigger>
+                            </Tooltip>
+                        </Toggle>
+                        <Toggle
+                            pressed={selectedTypes.includes('topic')}
+                            onPressedChange={() => toggleType('topic')}
+                            size="sm"
+                            className="h-7 px-2 text-xs"
+                        >
+                            <Tooltip>
+                                <TooltipContent>Topics</TooltipContent>
+                                <TooltipTrigger asChild>
+                                    <div className="flex items-center gap-1">
+                                        <MessageSquare className="mr-1 size-3" />
+                                        <span className="hidden sm:block">Topics</span>
+                                    </div>
+                                </TooltipTrigger>
+                            </Tooltip>
+                        </Toggle>
+                        <Toggle
+                            pressed={selectedTypes.includes('user')}
+                            onPressedChange={() => toggleType('user')}
+                            size="sm"
+                            className="h-7 px-2 text-xs"
+                        >
+                            <Tooltip>
+                                <TooltipContent>Members</TooltipContent>
+                                <TooltipTrigger asChild>
+                                    <div className="flex items-center gap-1">
+                                        <User className="mr-1 size-3" />
+                                        <span className="hidden sm:block">Members</span>
                                     </div>
                                 </TooltipTrigger>
                             </Tooltip>
@@ -369,28 +388,30 @@ export function GlobalSearch() {
 
                                             {result.price && <div className="text-sm font-medium text-primary">{currency(result.price)}</div>}
 
-                                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                {result.author_name && (
-                                                    <div className="flex items-center gap-1">
-                                                        <User className="!size-3" />
-                                                        {result.author_name}
-                                                    </div>
-                                                )}
-
-                                                {result.forum_name && <div>in {result.forum_name}</div>}
-
-                                                {result.category_name && <div>in {result.category_name}</div>}
-
-                                                {result.version && <div>v{result.version}</div>}
-
-                                                {result.effective_at ||
-                                                    (result.created_at && (
+                                            {['policy', 'post', 'topic'].includes(result.type) && (
+                                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                    {result.author_name && (
                                                         <div className="flex items-center gap-1">
-                                                            <Calendar className="!size-3" />
-                                                            {formatDate(result.effective_at || result.created_at)}
+                                                            <User className="!size-3" />
+                                                            {result.author_name}
                                                         </div>
-                                                    ))}
-                                            </div>
+                                                    )}
+
+                                                    {result.forum_name && <div>in {result.forum_name}</div>}
+
+                                                    {result.category_name && <div>in {result.category_name}</div>}
+
+                                                    {result.version && <div>v{result.version}</div>}
+
+                                                    {result.effective_at ||
+                                                        (result.created_at && (
+                                                            <div className="flex items-center gap-1">
+                                                                <Calendar className="!size-3" />
+                                                                {formatDate(result.effective_at || result.created_at)}
+                                                            </div>
+                                                        ))}
+                                                </div>
+                                            )}
                                         </div>
                                     </CommandItem>
                                 );

@@ -10,6 +10,7 @@ use App\Traits\HasAuthor;
 use App\Traits\HasSlug;
 use App\Traits\HasUrl;
 use App\Traits\Orderable;
+use App\Traits\Searchable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +18,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Laravel\Scout\Searchable;
 
 /**
  * @property int $id
@@ -114,6 +114,7 @@ class Policy extends Model implements Sluggable
             'title' => $this->title,
             'content' => Str::of($this->content)->stripTags()->toString(),
             'version' => $this->version,
+            'category' => $this->category?->name,
             'effective_at' => $this->effective_at?->toDateTimeString(),
             'created_at' => $this->created_at?->toDateTimeString() ?? '',
         ];

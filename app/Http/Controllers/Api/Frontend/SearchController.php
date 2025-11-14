@@ -10,6 +10,7 @@ use App\Models\Policy;
 use App\Models\Post;
 use App\Models\Product;
 use App\Models\Topic;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -19,7 +20,7 @@ class SearchController extends Controller
     public function __invoke(Request $request): ApiResource
     {
         $query = $request->get('q', '');
-        $types = $request->get('types', ['topic', 'post', 'policy', 'product']);
+        $types = $request->get('types', ['policy', 'post', 'product', 'topic', 'user']);
         $createdAfter = $request->get('created_after');
         $createdBefore = $request->get('created_before');
         $updatedAfter = $request->get('updated_after');
@@ -29,10 +30,10 @@ class SearchController extends Controller
             $types = explode(',', $types);
         }
 
-        $types = array_filter($types, fn ($type): bool => in_array($type, ['topic', 'post', 'policy', 'product']));
+        $types = array_filter($types, fn ($type): bool => in_array($type, ['policy', 'post', 'product', 'topic', 'user']));
 
         if (blank($types)) {
-            $types = ['topic', 'post', 'policy', 'product'];
+            $types = ['policy', 'post', 'product', 'topic', 'user'];
         }
 
         if (blank($query) || strlen((string) $query) < 2) {
@@ -54,24 +55,6 @@ class SearchController extends Controller
         }
 
         $limit = min((int) $request->get('limit', 10), 50);
-
-        $topics = collect()
-            ->when(in_array('topic', $types), fn () => Topic::search($query)
-                ->take($limit * 3)
-                ->get()
-                ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection) => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
-                ->take($limit)
-                ->map(fn (Topic $topic): array => [
-                    'id' => $topic->id,
-                    'type' => 'topic',
-                    'title' => $topic->title,
-                    'description' => $topic->description,
-                    'url' => route('forums.topics.show', [$topic->forum->slug, $topic->slug]),
-                    'forum_name' => $topic->forum->name,
-                    'author_name' => $topic->author->name,
-                    'created_at' => $topic->created_at->toISOString(),
-                    'updated_at' => $topic->updated_at->toISOString(),
-                ]));
 
         $posts = collect()
             ->when(in_array('post', $types), fn () => Post::search($query)
@@ -126,12 +109,66 @@ class SearchController extends Controller
                     'category_name' => $product->categories->first()?->name,
                 ]));
 
-        $results = $topics->concat($posts)->concat($policies)->concat($products)->take($limit);
+        $topics = collect()
+            ->when(in_array('topic', $types), fn () => Topic::search($query)
+                ->take($limit * 3)
+                ->get()
+                ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection) => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
+                ->take($limit)
+                ->map(fn (Topic $topic): array => [
+                    'id' => $topic->id,
+                    'type' => 'topic',
+                    'title' => $topic->title,
+                    'description' => $topic->description,
+                    'url' => route('forums.topics.show', [$topic->forum->slug, $topic->slug]),
+                    'forum_name' => $topic->forum->name,
+                    'author_name' => $topic->author->name,
+                    'created_at' => $topic->created_at->toISOString(),
+                    'updated_at' => $topic->updated_at->toISOString(),
+                ]));
+
+        $users = collect()
+            ->when(in_array('user', $types), fn () => User::search($query)
+                ->get()
+                ->take($limit)
+                ->map(fn (User $user): array => [
+                    'id' => $user->id,
+                    'type' => 'user',
+                    'title' => $user->name,
+                    'description' => $user->groups->pluck('name')->implode(', '),
+                    'url' => route('users.show', $user->reference_id),
+                ]));
+
+        $allCollections = collect([
+            'posts' => $posts,
+            'policies' => $policies,
+            'products' => $products,
+            'topics' => $topics,
+            'users' => $users,
+        ])->filter(fn ($collection) => $collection->isNotEmpty());
+
+        $totalResults = $allCollections->sum(fn ($collection) => $collection->count());
+
+        if ($totalResults <= $limit) {
+            $results = $posts->concat($policies)->concat($products)->concat($topics)->concat($users);
+        } else {
+            $resultsPerType = max(1, intval($limit / $allCollections->count()));
+            $remaining = $limit - ($resultsPerType * $allCollections->count());
+
+            $results = collect();
+            foreach ($allCollections as $collection) {
+                $takeAmount = $resultsPerType + ($remaining > 0 ? 1 : 0);
+                if ($remaining > 0) {
+                    $remaining--;
+                }
+                $results = $results->concat($collection->take($takeAmount));
+            }
+        }
 
         return ApiResource::success(
             resource: $results->values(),
             meta: [
-                'total' => $results->count(),
+                'total' => $totalResults,
                 'query' => $query,
                 'types' => $types,
                 'date_filters' => [
@@ -145,6 +182,7 @@ class SearchController extends Controller
                     'posts' => $posts->count(),
                     'policies' => $policies->count(),
                     'products' => $products->count(),
+                    'users' => $users->count(),
                 ],
             ]);
     }

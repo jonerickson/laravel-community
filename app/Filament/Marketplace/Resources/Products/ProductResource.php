@@ -62,7 +62,7 @@ class ProductResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return Number::format(static::getEloquentQuery()::count());
+        return Number::format(static::getEloquentQuery()->count());
     }
 
     public static function getNavigationBadgeColor(): string|array|null

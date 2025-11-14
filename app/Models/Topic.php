@@ -13,6 +13,7 @@ use App\Traits\HasSlug;
 use App\Traits\Lockable;
 use App\Traits\Pinnable;
 use App\Traits\Readable;
+use App\Traits\Searchable;
 use App\Traits\Trendable;
 use App\Traits\Viewable;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,7 +26,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Laravel\Scout\Searchable;
 use Override;
 
 /**
@@ -212,6 +212,9 @@ class Topic extends Model implements Sluggable
             'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
+            'forum' => $this->forum?->name,
+            'category' => $this->forum?->category?->name,
+            'author' => $this->author?->name,
             'created_at' => $this->created_at?->toDateTimeString() ?? '',
         ];
     }

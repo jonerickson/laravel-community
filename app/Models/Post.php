@@ -22,6 +22,7 @@ use App\Traits\Pinnable;
 use App\Traits\Publishable;
 use App\Traits\Readable;
 use App\Traits\Reportable;
+use App\Traits\Searchable;
 use App\Traits\Viewable;
 use Filament\Support\Contracts\HasLabel;
 use Illuminate\Contracts\Support\Htmlable;
@@ -33,7 +34,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Laravel\Scout\Searchable;
 use Override;
 
 /**
@@ -232,6 +232,10 @@ class Post extends Model implements HasLabel, Sluggable
             'content' => Str::of($this->content)->stripTags()->toString(),
             'excerpt' => $this->excerpt,
             'type' => $this->type->value ?? '',
+            'topic' => $this->topic?->title,
+            'forum' => $this->topic?->forum?->name,
+            'category' => $this->topic?->forum?->category?->name,
+            'author' => $this->author?->name,
             'created_at' => $this->created_at?->toDateTimeString() ?? '',
         ];
     }

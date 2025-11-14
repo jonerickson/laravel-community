@@ -142,9 +142,26 @@ return [
         'host' => env('MEILISEARCH_HOST', 'http://localhost:7700'),
         'key' => env('MEILISEARCH_KEY'),
         'index-settings' => [
-            // 'users' => [
-            //     'filterableAttributes'=> ['id', 'name', 'email'],
-            // ],
+            App\Models\Policy::class => [
+                'filterableAttributes' => ['id', 'title', 'version', 'category', 'effective_at', 'created_at'],
+                'sortableAttributes' => ['id', 'title', 'version', 'category', 'effective_at', 'created_at'],
+            ],
+            App\Models\Post::class => [
+                'filterableAttributes' => ['id', 'title', 'type', 'topic', 'forum', 'category', 'author', 'created_at'],
+                'sortableAttributes' => ['id', 'title', 'type', 'topic', 'forum', 'category', 'author', 'created_at'],
+            ],
+            App\Models\Product::class => [
+                'filterableAttributes' => ['id', 'name', 'type'],
+                'sortableAttributes' => ['id', 'name', 'type'],
+            ],
+            App\Models\Topic::class => [
+                'filterableAttributes' => ['id', 'title', 'forum', 'category', 'author', 'created_at'],
+                'sortableAttributes' => ['id', 'title', 'forum', 'category', 'author', 'created_at'],
+            ],
+            App\Models\User::class => [
+                'filterableAttributes' => ['id', 'name', 'email'],
+                'sortableAttributes' => ['id', 'name', 'email'],
+            ],
         ],
     ],
 
