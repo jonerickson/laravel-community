@@ -9,6 +9,7 @@ use App\Data\ProductData;
 use App\Data\SupportTicketData;
 use App\Data\TopicData;
 use App\Models\Post;
+use App\Models\Price;
 use App\Models\Product;
 use App\Models\SupportTicket;
 use App\Models\Topic;
@@ -32,20 +33,19 @@ class DashboardController
     public function __invoke(): Response
     {
         return Inertia::render('dashboard', [
-            'newestProduct' => Inertia::defer(fn (): ?ProductData => $this->getNewestProduct()),
-            'popularProduct' => Inertia::defer(fn (): ?ProductData => $this->getPopularProduct()),
-            'featuredProduct' => Inertia::defer(fn (): ?ProductData => $this->getFeaturedProduct()),
-            'supportTickets' => Inertia::defer(fn (): Collection => $this->getSupportTickets()),
-            'trendingTopics' => Inertia::defer(fn (): Collection => $this->getTrendingTopics()),
-            'latestBlogPosts' => Inertia::defer(fn (): Collection => $this->getLatestBlogPosts()),
+            'newestProduct' => Inertia::defer(fn (): ?ProductData => $this->getNewestProduct(), 'products'),
+            'popularProduct' => Inertia::defer(fn (): ?ProductData => $this->getPopularProduct(), 'products'),
+            'featuredProduct' => Inertia::defer(fn (): ?ProductData => $this->getFeaturedProduct(), 'products'),
+            'supportTickets' => Inertia::defer(fn (): Collection => $this->getSupportTickets(), 'tickets'),
+            'trendingTopics' => Inertia::defer(fn (): Collection => $this->getTrendingTopics(), 'topics'),
+            'latestBlogPosts' => Inertia::defer(fn (): Collection => $this->getLatestBlogPosts(), 'posts'),
         ]);
     }
 
     private function getSupportTickets(): Collection
     {
         return SupportTicketData::collect(SupportTicket::query()
-            ->with('category')
-            ->with('author')
+            ->with(['category', 'author'])
             ->whereBelongsTo($this->user, 'author')
             ->active()
             ->latest()
@@ -57,9 +57,7 @@ class DashboardController
     private function getTrendingTopics(): Collection
     {
         return TopicData::collect(Topic::trending(5)
-            ->with('forum')
-            ->with('author')
-            ->with('lastPost.author')
+            ->with(['forum', 'author', 'lastPost.author'])
             ->get()
             ->filter(fn (Topic $topic) => Gate::check('view', [$topic, $topic->forum])));
     }
@@ -82,9 +80,8 @@ class DashboardController
             ->products()
             ->approved()
             ->visible()
-            ->with('defaultPrice')
-            ->with('categories')
-            ->with(['prices' => function (HasMany $query): void {
+            ->with(['defaultPrice', 'categories'])
+            ->with(['prices' => function (Price|HasMany $query): void {
                 $query->active();
             }])
             ->latest()
@@ -105,9 +102,8 @@ class DashboardController
             ->products()
             ->approved()
             ->visible()
-            ->with('defaultPrice')
-            ->with('categories')
-            ->with(['prices' => function (HasMany $query): void {
+            ->with(['defaultPrice', 'categories'])
+            ->with(['prices' => function (Price|HasMany $query): void {
                 $query->active();
             }])
             ->trending()
@@ -129,9 +125,8 @@ class DashboardController
             ->approved()
             ->visible()
             ->featured()
-            ->with('defaultPrice')
-            ->with('categories')
-            ->with(['prices' => function (HasMany $query): void {
+            ->with(['defaultPrice', 'categories'])
+            ->with(['prices' => function (Price|HasMany $query): void {
                 $query->active();
             }])
             ->inRandomOrder()

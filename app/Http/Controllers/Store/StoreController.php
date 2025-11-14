@@ -7,8 +7,10 @@ namespace App\Http\Controllers\Store;
 use App\Data\ProductCategoryData;
 use App\Data\ProductData;
 use App\Http\Controllers\Controller;
+use App\Models\Price;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -19,7 +21,7 @@ class StoreController extends Controller
     public function __invoke(): Response
     {
         return Inertia::render('store/index', [
-            'categories' => Inertia::defer(fn (): \Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection|\Spatie\LaravelData\CursorPaginatedDataCollection|\Illuminate\Support\Enumerable|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Contracts\Pagination\CursorPaginator|array => ProductCategoryData::collect(ProductCategory::query()
+            'categories' => Inertia::defer(fn (): Paginator => ProductCategoryData::collect(ProductCategory::query()
                 ->whereNull('parent_id')
                 ->active()
                 ->visible()
@@ -28,35 +30,35 @@ class StoreController extends Controller
                 ->take(3)
                 ->get()
                 ->filter(fn (ProductCategory $category) => Gate::check('view', $category))
-                ->values())),
-            'featuredProducts' => Inertia::defer(fn (): \Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection|\Spatie\LaravelData\CursorPaginatedDataCollection|\Illuminate\Support\Enumerable|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Contracts\Pagination\CursorPaginator|array => ProductData::collect(Product::query()
+                ->values()), 'categories'),
+            'featuredProducts' => Inertia::defer(fn (): Paginator => ProductData::collect(Product::query()
                 ->products()
                 ->approved()
                 ->visible()
                 ->featured()
                 ->with('categories')
-                ->with(['prices' => function (HasMany $query): void {
+                ->with(['prices' => function (Price|HasMany $query): void {
                     $query->active();
                 }])
                 ->latest()
                 ->take(6)
                 ->get()
                 ->filter(fn (Product $product) => Gate::check('view', $product))
-                ->values())),
-            'userProvidedProducts' => Inertia::defer(fn (): \Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection|\Spatie\LaravelData\CursorPaginatedDataCollection|\Illuminate\Support\Enumerable|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Contracts\Pagination\CursorPaginator|array => ProductData::collect(Product::query()
+                ->values()), 'featured'),
+            'userProvidedProducts' => Inertia::defer(fn (): Paginator => ProductData::collect(Product::query()
                 ->products()
                 ->marketplace()
                 ->visible()
                 ->approved()
                 ->with('categories')
-                ->with(['prices' => function (HasMany $query): void {
+                ->with(['prices' => function (Price|HasMany $query): void {
                     $query->active();
                 }])
                 ->latest()
                 ->take(5)
                 ->get()
                 ->filter(fn (Product $product) => Gate::check('view', $product))
-                ->values())),
+                ->values()), 'community'),
         ]);
     }
 }
