@@ -6,35 +6,25 @@ namespace App\Http\Controllers\Api\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ApiResource;
-use App\Models\Policy;
-use App\Models\Post;
-use App\Models\Product;
-use App\Models\Topic;
-use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
+use App\Services\SearchService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class SearchController extends Controller
 {
+    public function __construct(
+        private readonly SearchService $searchService
+    ) {
+        //
+    }
+
     public function __invoke(Request $request): ApiResource
     {
         $query = $request->get('q', '');
-        $types = $request->get('types', ['policy', 'post', 'product', 'topic', 'user']);
+        $types = $this->searchService->validateAndNormalizeTypes($request->get('types', ['policy', 'post', 'product', 'topic', 'user']));
         $createdAfter = $request->get('created_after');
         $createdBefore = $request->get('created_before');
         $updatedAfter = $request->get('updated_after');
         $updatedBefore = $request->get('updated_before');
-
-        if (is_string($types)) {
-            $types = explode(',', $types);
-        }
-
-        $types = array_filter($types, fn ($type): bool => in_array($type, ['policy', 'post', 'product', 'topic', 'user']));
-
-        if (blank($types)) {
-            $types = ['policy', 'post', 'product', 'topic', 'user'];
-        }
 
         if (blank($query) || strlen((string) $query) < 2) {
             return ApiResource::success(
@@ -54,103 +44,30 @@ class SearchController extends Controller
             );
         }
 
-        $limit = min((int) $request->get('limit', 10), 50);
+        $limit = min($request->integer('limit', 10), 50);
 
-        $posts = collect()
-            ->when(in_array('post', $types), fn () => Post::search($query)
-                ->take($limit * 3)
-                ->get()
-                ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection) => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
-                ->take($limit)
-                ->map(fn (Post $post): array => [
-                    'id' => $post->id,
-                    'type' => 'post',
-                    'title' => $post->title,
-                    'excerpt' => $post->excerpt ?: Str::of($post->content)->stripTags()->limit()->toString(),
-                    'url' => $post->url,
-                    'post_type' => $post->type->value,
-                    'author_name' => $post->author->name,
-                    'created_at' => $post->created_at->toISOString(),
-                    'updated_at' => $post->updated_at->toISOString(),
-                ]));
-
-        $policies = collect()
-            ->when(in_array('policy', $types), fn () => Policy::search($query)
-                ->take($limit * 3)
-                ->get()
-                ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection) => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
-                ->take($limit)
-                ->map(fn (Policy $policy): array => [
-                    'id' => $policy->id,
-                    'type' => 'policy',
-                    'title' => $policy->title,
-                    'version' => $policy->version,
-                    'url' => $policy->url,
-                    'category_name' => $policy->category->name,
-                    'author_name' => $policy->author->name,
-                    'effective_at' => $policy->effective_at?->toISOString(),
-                    'created_at' => $policy->created_at->toISOString(),
-                    'updated_at' => $policy->updated_at->toISOString(),
-                ]));
-
-        $products = collect()
-            ->when(in_array('product', $types), fn () => Product::search($query)
-                ->take($limit * 3)
-                ->get()
-                ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection) => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
-                ->take($limit)
-                ->map(fn (Product $product): array => [
-                    'id' => $product->id,
-                    'type' => 'product',
-                    'title' => $product->name,
-                    'description' => $product->description,
-                    'url' => route('store.products.show', $product->slug),
-                    'price' => $product->defaultPrice?->amount,
-                    'category_name' => $product->categories->first()?->name,
-                ]));
-
-        $topics = collect()
-            ->when(in_array('topic', $types), fn () => Topic::search($query)
-                ->take($limit * 3)
-                ->get()
-                ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection) => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
-                ->take($limit)
-                ->map(fn (Topic $topic): array => [
-                    'id' => $topic->id,
-                    'type' => 'topic',
-                    'title' => $topic->title,
-                    'description' => $topic->description,
-                    'url' => route('forums.topics.show', [$topic->forum->slug, $topic->slug]),
-                    'forum_name' => $topic->forum->name,
-                    'author_name' => $topic->author->name,
-                    'created_at' => $topic->created_at->toISOString(),
-                    'updated_at' => $topic->updated_at->toISOString(),
-                ]));
-
-        $users = collect()
-            ->when(in_array('user', $types), fn () => User::search($query)
-                ->get()
-                ->take($limit)
-                ->map(fn (User $user): array => [
-                    'id' => $user->id,
-                    'type' => 'user',
-                    'title' => $user->name,
-                    'description' => $user->groups->pluck('name')->implode(', '),
-                    'url' => route('users.show', $user->reference_id),
-                ]));
+        $searchResults = $this->searchService->search(
+            query: $query,
+            types: $types,
+            createdAfter: $createdAfter,
+            createdBefore: $createdBefore,
+            updatedAfter: $updatedAfter,
+            updatedBefore: $updatedBefore,
+            limit: $limit
+        );
 
         $allCollections = collect([
-            'posts' => $posts,
-            'policies' => $policies,
-            'products' => $products,
-            'topics' => $topics,
-            'users' => $users,
+            'posts' => $searchResults['results']->where('type', 'post'),
+            'policies' => $searchResults['results']->where('type', 'policy'),
+            'products' => $searchResults['results']->where('type', 'product'),
+            'topics' => $searchResults['results']->where('type', 'topic'),
+            'users' => $searchResults['results']->where('type', 'user'),
         ])->filter(fn ($collection) => $collection->isNotEmpty());
 
-        $totalResults = $allCollections->sum(fn ($collection) => $collection->count());
+        $totalResults = $searchResults['results']->count();
 
         if ($totalResults <= $limit) {
-            $results = $posts->concat($policies)->concat($products)->concat($topics)->concat($users);
+            $results = $searchResults['results'];
         } else {
             $resultsPerType = max(1, intval($limit / $allCollections->count()));
             $remaining = $limit - ($resultsPerType * $allCollections->count());
@@ -177,22 +94,7 @@ class SearchController extends Controller
                     'updated_after' => $updatedAfter,
                     'updated_before' => $updatedBefore,
                 ],
-                'counts' => [
-                    'topics' => $topics->count(),
-                    'posts' => $posts->count(),
-                    'policies' => $policies->count(),
-                    'products' => $products->count(),
-                    'users' => $users->count(),
-                ],
+                'counts' => $searchResults['counts'],
             ]);
-    }
-
-    private function applyDateFiltersToCollection(Collection $collection, ?string $createdAfter, ?string $createdBefore, ?string $updatedAfter, ?string $updatedBefore)
-    {
-        return $collection
-            ->when($createdAfter, fn ($col) => $col->filter(fn ($item): bool => $item->created_at >= $createdAfter))
-            ->when($createdBefore, fn ($col) => $col->filter(fn ($item): bool => $item->created_at <= $createdBefore))
-            ->when($updatedAfter, fn ($col) => $col->filter(fn ($item): bool => $item->updated_at >= $updatedAfter))
-            ->when($updatedBefore, fn ($col) => $col->filter(fn ($item): bool => $item->updated_at <= $updatedBefore));
     }
 }

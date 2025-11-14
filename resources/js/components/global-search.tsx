@@ -8,8 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Toggle } from '@/components/ui/toggle';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { currency } from '@/lib/utils';
+import { Link } from '@inertiajs/react';
 import axios from 'axios';
-import { Calendar, ChevronDown, FileText, MessageSquare, Search, Shield, ShoppingBag, User } from 'lucide-react';
+import { ArrowRight, Calendar, ChevronDown, FileText, MessageSquare, Search, Shield, ShoppingBag, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface SearchResult {
@@ -422,6 +423,26 @@ export function GlobalSearch() {
                     {meta && meta.total > results.length && (
                         <div className="border-t p-2 text-center text-xs text-muted-foreground">
                             Showing {results.length} of {meta.total} results
+                        </div>
+                    )}
+
+                    {query.length >= 2 && (
+                        <div className="border-t p-3">
+                            <Link
+                                href={route('search', {
+                                    q: query,
+                                    types: selectedTypes,
+                                    created_after: dateFilters.created_after || undefined,
+                                    created_before: dateFilters.created_before || undefined,
+                                    updated_after: dateFilters.updated_after || undefined,
+                                    updated_before: dateFilters.updated_before || undefined,
+                                })}
+                                className="group flex items-center justify-center gap-2 text-sm font-medium text-primary hover:underline"
+                                onClick={() => setOpen(false)}
+                            >
+                                View all results
+                                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                            </Link>
                         </div>
                     )}
                 </CommandList>

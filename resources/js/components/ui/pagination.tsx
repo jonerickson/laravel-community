@@ -13,8 +13,6 @@ interface PaginationProps {
 export function Pagination({ pagination, baseUrl, entityLabel, className }: PaginationProps) {
     const { currentPage, lastPage, perPage, total } = pagination;
 
-    console.log(baseUrl);
-
     if (lastPage <= 1) {
         return null;
     }
@@ -57,6 +55,11 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
 
     const pageNumbers = getPageNumbers();
 
+    const buildPageUrl = (page: number) => {
+        const separator = baseUrl.includes('?') ? '&' : '?';
+        return `${baseUrl}${separator}page=${page}`;
+    };
+
     return (
         <div className={`flex flex-col items-center justify-between gap-4 md:flex-row ${className || ''}`}>
             <div className="hidden text-sm text-muted-foreground md:block">
@@ -65,7 +68,7 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
 
             <div className="flex w-full items-center justify-center gap-1 overflow-x-auto md:w-auto">
                 {currentPage > 1 ? (
-                    <Link href={`${baseUrl}?page=${currentPage - 1}`} className="inline-flex">
+                    <Link href={buildPageUrl(currentPage - 1)} className="inline-flex">
                         <Button variant="outline" size="sm">
                             <ChevronLeft className="mr-1 size-4" />
                             Previous
@@ -84,7 +87,7 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
                             ...
                         </span>
                     ) : (
-                        <Link key={page} href={`${baseUrl}?page=${page}`} className="inline-flex">
+                        <Link key={page} href={buildPageUrl(page as number)} className="inline-flex">
                             <Button variant={currentPage === page ? 'default' : 'outline'} size="sm" className="min-w-[40px]">
                                 {page}
                             </Button>
@@ -93,7 +96,7 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
                 )}
 
                 {currentPage < lastPage ? (
-                    <Link href={`${baseUrl}?page=${currentPage + 1}`} className="inline-flex">
+                    <Link href={buildPageUrl(currentPage + 1)} className="inline-flex">
                         <Button variant="outline" size="sm">
                             Next
                             <ChevronRight className="ml-1 size-4" />
