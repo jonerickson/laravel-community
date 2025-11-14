@@ -7,6 +7,7 @@ namespace App\Services\Migration;
 use App\Services\Migration\Contracts\MigrationSource;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -24,6 +25,12 @@ class MigrationService
     protected ?OutputStyle $output = null;
 
     protected ?Factory $components = null;
+
+    public function __construct(
+        private readonly Repository $configRepository,
+    ) {
+        //
+    }
 
     public function registerSource(MigrationSource $source): void
     {
@@ -232,10 +239,11 @@ class MigrationService
     {
         DB::connection($source->getConnection())->disableQueryLog();
 
-        config()->set('mail.default', 'array');
-        config()->set('logging.default', 'single');
-        config()->set('logging.channels.single.path', storage_path('logs/migration.log'));
-        config()->set('telescope.enabled', false);
-        config()->set('queue.default', 'sync');
+        $this->configRepository->set('activitylog.enabled', false);
+        $this->configRepository->set('mail.default', 'array');
+        $this->configRepository->set('logging.default', 'single');
+        $this->configRepository->set('logging.channels.single.path', storage_path('logs/migration.log'));
+        $this->configRepository->set('telescope.enabled', false);
+        $this->configRepository->set('queue.default', 'sync');
     }
 }

@@ -246,11 +246,4 @@ class Topic extends Model implements Sluggable
             $topic->posts()->delete();
         });
     }
-
-    protected function casts(): array
-    {
-        return [
-            'last_reply_at' => 'datetime',
-        ];
-    }
 }
