@@ -132,6 +132,8 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
                         description={`No products are currently available in the ${category.name} category.`}
                     />
                 )}
+
+                <Pagination pagination={products} baseUrl={route('store.categories.show', category)} entityLabel="product" />
             </div>
         </AppLayout>
     );
