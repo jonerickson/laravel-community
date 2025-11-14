@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Discount;
 use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
-use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -25,7 +25,7 @@ class DiscountController extends Controller
     public function __invoke(): Response
     {
         return Inertia::render('settings/discounts', [
-            'discounts' => Inertia::defer(fn (): Paginator => DiscountData::collect(Discount::query()
+            'discounts' => Inertia::defer(fn (): Collection => DiscountData::collect(Discount::query()
                 ->whereBelongsTo($this->user, 'customer')
                 ->latest()
                 ->get())),

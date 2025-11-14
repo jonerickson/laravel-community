@@ -10,8 +10,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\ProductCategory;
-use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -21,7 +21,7 @@ class StoreController extends Controller
     public function __invoke(): Response
     {
         return Inertia::render('store/index', [
-            'categories' => Inertia::defer(fn (): Paginator => ProductCategoryData::collect(ProductCategory::query()
+            'categories' => Inertia::defer(fn (): Collection => ProductCategoryData::collect(ProductCategory::query()
                 ->whereNull('parent_id')
                 ->active()
                 ->visible()
@@ -31,7 +31,7 @@ class StoreController extends Controller
                 ->get()
                 ->filter(fn (ProductCategory $category) => Gate::check('view', $category))
                 ->values()), 'categories'),
-            'featuredProducts' => Inertia::defer(fn (): Paginator => ProductData::collect(Product::query()
+            'featuredProducts' => Inertia::defer(fn (): Collection => ProductData::collect(Product::query()
                 ->products()
                 ->approved()
                 ->visible()
@@ -45,7 +45,7 @@ class StoreController extends Controller
                 ->get()
                 ->filter(fn (Product $product) => Gate::check('view', $product))
                 ->values()), 'featured'),
-            'userProvidedProducts' => Inertia::defer(fn (): Paginator => ProductData::collect(Product::query()
+            'userProvidedProducts' => Inertia::defer(fn (): Collection => ProductData::collect(Product::query()
                 ->products()
                 ->marketplace()
                 ->visible()
