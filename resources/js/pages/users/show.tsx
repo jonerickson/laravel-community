@@ -1,4 +1,5 @@
 import Heading from '@/components/heading';
+import RichEditorContent from '@/components/rich-editor-content';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -9,7 +10,6 @@ import { Head } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { Calendar, User as UserIcon } from 'lucide-react';
 import { route } from 'ziggy-js';
-import RichEditorContent from '@/components/rich-editor-content';
 
 interface UserProfilePageProps {
     user: App.Data.UserData;
@@ -94,7 +94,7 @@ export default function Show({ user }: UserProfilePageProps) {
                 {user.signature && (
                     <Card>
                         <CardHeader>
-                            <div className='-mb-6'>
+                            <div className="-mb-6">
                                 <Heading title="Signature" />
                             </div>
                         </CardHeader>
@@ -107,7 +107,7 @@ export default function Show({ user }: UserProfilePageProps) {
                 {user.fields && user.fields.length > 0 && (
                     <Card>
                         <CardHeader>
-                            <div className='-mb-6'>
+                            <div className="-mb-6">
                                 <Heading title="Profile information" />
                             </div>
                         </CardHeader>
