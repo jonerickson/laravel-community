@@ -60,7 +60,7 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                         itemType="https://schema.org/Person"
                     >
                         <div>
-                            <ForumUserInfo user={post.author} isAuthor={index === 0} />
+                            <ForumUserInfo user={post.author} isAuthor={index === 0} dateTime={post.createdAt || undefined} />
                             <meta itemProp="name" content={post.author?.name || undefined} />
                         </div>
                         <div className="md:hidden">

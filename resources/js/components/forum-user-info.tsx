@@ -1,7 +1,16 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Link } from '@inertiajs/react';
+import { formatDistanceToNow } from 'date-fns';
 
-export default function ForumUserInfo({ user, isAuthor = false }: { user: App.Data.UserData; isAuthor?: boolean }) {
+export default function ForumUserInfo({
+    user,
+    isAuthor = false,
+    dateTime = null,
+}: {
+    user: App.Data.UserData;
+    isAuthor?: boolean;
+    dateTime?: string | null;
+}) {
     return (
         <Link
             href={route('users.show', user.referenceId)}
@@ -12,14 +21,14 @@ export default function ForumUserInfo({ user, isAuthor = false }: { user: App.Da
                 <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
 
-            <div className="flex flex-col items-start md:items-center">
+            <div className="flex flex-col items-start md:items-center md:gap-2">
                 <div className="text-left md:text-center">
-                    <div className="text-sm font-medium">{user.name}</div>
-                    <div className="text-xs text-muted-foreground">{isAuthor ? 'Author' : ''}</div>
+                    <div className="text-sm font-bold tracking-tight">{user.name}</div>
+                    <div className="hidden text-xs text-muted-foreground md:block">{isAuthor ? 'Author' : ''}</div>
                 </div>
 
                 {user.groups.length > 0 && (
-                    <ul className="mt-1 flex flex-wrap gap-1 text-xs leading-snug font-medium md:flex-col md:flex-nowrap md:items-center md:justify-center">
+                    <ul className="flex flex-wrap text-xs leading-snug font-light md:flex-col md:flex-nowrap md:items-center md:justify-center">
                         {user.groups.map((group) => (
                             <li
                                 key={group.id}
@@ -30,6 +39,12 @@ export default function ForumUserInfo({ user, isAuthor = false }: { user: App.Da
                             </li>
                         ))}
                     </ul>
+                )}
+
+                {dateTime && (
+                    <time className="text-xs font-normal text-muted-foreground md:hidden" itemProp="dateCreated" dateTime={dateTime || undefined}>
+                        Posted {dateTime ? formatDistanceToNow(new Date(dateTime), { addSuffix: true }) : 'N/A'}
+                    </time>
                 )}
             </div>
         </Link>
