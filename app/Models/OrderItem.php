@@ -19,7 +19,7 @@ use Override;
  * @property string|null $description
  * @property int|null $price_id
  * @property int|float $amount
- * @property float $commission_amount
+ * @property float|null $commission_amount
  * @property int|null $commission_recipient_id
  * @property int|null $quantity
  * @property string|null $external_item_id

@@ -1,5 +1,6 @@
 import BlogComments from '@/components/blog-comments';
 import EmojiReactions from '@/components/emoji-reactions';
+import HeadingLarge from '@/components/heading-large';
 import Loading from '@/components/loading';
 import RecentViewers from '@/components/recent-viewers';
 import RichEditorContent from '@/components/rich-editor-content';
@@ -120,17 +121,15 @@ export default function BlogShow({ post, comments, recentViewers }: BlogShowProp
                             </div>
                         )}
 
-                        <h1 className="mb-4 text-4xl font-bold tracking-tight text-foreground lg:text-5xl" itemProp="headline">
-                            {post.title}
-                        </h1>
+                        <HeadingLarge title={post.title} />
 
                         {post.excerpt && (
-                            <p className="mb-6 max-w-3xl text-lg text-muted-foreground" itemProp="description">
+                            <p className="-mt-6 mb-6 max-w-3xl text-lg text-muted-foreground" itemProp="description">
                                 {post.excerpt}
                             </p>
                         )}
 
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                        <div className="-mt-4 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                             {post.author && (
                                 <div itemProp="author" itemScope itemType="https://schema.org/Person">
                                     <UserInfo user={post.author} showEmail={false} />

@@ -29,15 +29,19 @@ class SupportTicketController extends Controller
     use AuthorizesRequests;
 
     public function __construct(
+        private readonly SupportTicketManager $supportTicketManager,
         #[CurrentUser]
-        private readonly User $user,
-        private readonly SupportTicketManager $supportTicketManager
+        private readonly ?User $user = null,
     ) {
         //
     }
 
-    public function index(): Response
+    public function index(): Response|RedirectResponse
     {
+        if (! $this->user instanceof User) {
+            return redirect()->route('knowledge-base.index');
+        }
+
         $this->authorize('viewAny', SupportTicket::class);
 
         $tickets = SupportTicket::query()

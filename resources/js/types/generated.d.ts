@@ -204,6 +204,43 @@ declare namespace App.Data {
         invoicePdfUrl: string | null;
         externalPaymentId: string | null;
     };
+    export type KnowledgeBaseArticleData = {
+        id: number;
+        type: App.Enums.KnowledgeBaseArticleType;
+        title: string;
+        slug: string;
+        excerpt: string | null;
+        content: string;
+        isPublished: boolean;
+        categoryId: number | null;
+        category: App.Data.KnowledgeBaseCategoryData | null;
+        featuredImage: string | null;
+        featuredImageUrl: string | null;
+        readingTime: number | null;
+        publishedAt: string | null;
+        createdBy: number | null;
+        author: App.Data.UserData | null;
+        metadata: Array<string, unknown> | null;
+        createdAt: string | null;
+        updatedAt: string | null;
+        permissions: App.Data.PermissionData;
+    };
+    export type KnowledgeBaseCategoryData = {
+        id: number;
+        name: string;
+        slug: string;
+        description: string | null;
+        icon: string | null;
+        color: string | null;
+        order: number;
+        articlesCount: number;
+        isActive: boolean;
+        featuredImage: string | null;
+        featuredImageUrl: string | null;
+        articles: Array<App.Data.KnowledgeBaseArticleData> | null;
+        createdAt: string | null;
+        updatedAt: string | null;
+    };
     export type LikeData = {
         emoji: string;
         count: number;
@@ -275,7 +312,7 @@ declare namespace App.Data {
         createdAt: string | null;
         updatedAt: string | null;
     };
-    export type PaginatedData<T = unknown> = {
+    export type PaginatedData<t = unknown> = {
         data: Array<T>;
         currentPage: number;
         lastPage: number;
@@ -568,6 +605,7 @@ declare namespace App.Enums {
     export type DiscountType = 'gift_card' | 'promo_code' | 'manual';
     export type DiscountValueType = 'fixed' | 'percentage';
     export type FieldType = 'checkbox' | 'date' | 'datetime' | 'number' | 'radio' | 'rich_text' | 'select' | 'text' | 'textarea';
+    export type KnowledgeBaseArticleType = 'guide' | 'faq' | 'changelog' | 'troubleshooting' | 'announcement' | 'other';
     export type OrderRefundReason = 'duplicate' | 'fraudulent' | 'requested_by_customer' | 'other';
     export type OrderStatus =
         | 'pending'

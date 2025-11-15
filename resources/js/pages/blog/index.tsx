@@ -82,9 +82,7 @@ export default function BlogIndex({ posts }: BlogIndexProps) {
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
             <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto">
-                <div className="sm:flex sm:items-baseline sm:justify-between">
-                    <Heading title="Blog" description="Browse our latest blog posts and articles" />
-                </div>
+                <Heading title="Blog" description="Browse our latest blog posts and articles" />
 
                 <div className="-mt-8">
                     {posts.data.length > 0 ? (

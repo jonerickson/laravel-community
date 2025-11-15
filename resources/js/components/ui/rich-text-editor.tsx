@@ -440,7 +440,6 @@ export function RichTextEditor({ content, onChange, placeholder = 'Start typing.
         <>
             <div className={`relative rounded-md border border-input bg-background ${className}`}>
                 <div className="flex items-center gap-1 border-b p-2">
-                    {/* Essential formatting tools - always visible */}
                     <ToolbarButton action={() => editor.chain().focus().toggleBold().run()} icon={Bold} isActive={editor.isActive('bold')} />
                     <ToolbarButton action={() => editor.chain().focus().toggleItalic().run()} icon={Italic} isActive={editor.isActive('italic')} />
                     <ToolbarButton
@@ -505,7 +504,6 @@ export function RichTextEditor({ content, onChange, placeholder = 'Start typing.
                         </DropdownMenuContent>
                     </DropdownMenu>
 
-                    {/* Desktop-only tools - hidden on mobile */}
                     <div className="hidden items-center gap-1 md:flex">
                         <ToolbarSeparator />
                         <ToolbarButton
@@ -575,7 +573,6 @@ export function RichTextEditor({ content, onChange, placeholder = 'Start typing.
                         </DropdownMenu>
                     </div>
 
-                    {/* Mobile-only "More" dropdown with all additional tools */}
                     <div className="ml-auto md:hidden">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

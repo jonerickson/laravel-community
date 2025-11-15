@@ -133,15 +133,6 @@ export default function Integrations({ connectedAccounts }: ConnectedAccountsPro
                                                 </div>
                                             </div>
                                         </div>
-                                        {/*<Button*/}
-                                        {/*    variant="ghost"*/}
-                                        {/*    size="sm"*/}
-                                        {/*    onClick={() => handleRemoveAccount(account.id, getProviderDisplayName(account.provider))}*/}
-                                        {/*    className="text-destructive hover:text-destructive"*/}
-                                        {/*>*/}
-                                        {/*    <Trash2 className="h-4 w-4" />*/}
-                                        {/*    Remove*/}
-                                        {/*</Button>*/}
                                     </div>
                                 ))}
                             </div>

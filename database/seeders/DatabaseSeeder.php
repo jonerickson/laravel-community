@@ -64,6 +64,7 @@ class DatabaseSeeder extends Seeder
             ForumSeeder::class,
             PolicySeeder::class,
             SupportTicketCategorySeeder::class,
+            KnowledgeBaseSeeder::class,
             PageSeeder::class,
             WarningSeeder::class,
         ]);

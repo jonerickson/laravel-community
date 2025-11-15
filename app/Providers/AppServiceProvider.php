@@ -7,6 +7,8 @@ namespace App\Providers;
 use App\Enums\Role;
 use App\Models\Blacklist;
 use App\Models\Fingerprint;
+use App\Models\KnowledgeBaseArticle;
+use App\Models\KnowledgeBaseCategory;
 use App\Models\Order;
 use App\Models\Permission;
 use App\Models\Subscription;
@@ -77,10 +79,12 @@ class AppServiceProvider extends ServiceProvider
                 $approvedResources = [
                     Blacklist::class,
                     Fingerprint::class,
+                    KnowledgeBaseArticle::class,
+                    KnowledgeBaseCategory::class,
                     Order::class,
-                    User::class,
                     SupportTicket::class,
                     SupportTicketCategory::class,
+                    User::class,
                 ];
 
                 return Collection::make($models)->some(fn ($modelClassOrInstance): bool => in_array($modelClassOrInstance, $approvedResources)

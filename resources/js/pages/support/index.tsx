@@ -39,6 +39,12 @@ export default function SupportTicketsIndex({ tickets }: SupportTicketsIndexProp
                     </div>
 
                     <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row sm:items-center">
+                        <Button variant="outline" asChild>
+                            <a href={route('knowledge-base.index')} target="_blank">
+                                <HelpCircle className="size-4" />
+                                Knowledge Base
+                            </a>
+                        </Button>
                         <Button asChild>
                             <Link href={route('support.create')}>
                                 <Plus className="size-4" />

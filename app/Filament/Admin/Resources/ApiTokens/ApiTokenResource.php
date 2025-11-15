@@ -37,7 +37,7 @@ class ApiTokenResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Integrations';
 
-    protected static ?int $navigationSort = -3;
+    protected static ?int $navigationSort = -4;
 
     protected static ?string $label = 'API Key';
 
