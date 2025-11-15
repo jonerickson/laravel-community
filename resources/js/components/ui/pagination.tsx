@@ -19,7 +19,7 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
 
     const getPageNumbers = () => {
         const pages: (number | string)[] = [];
-        const showPages = 5;
+        const showPages = 4;
         const halfShow = Math.floor(showPages / 2);
 
         let start = Math.max(1, currentPage - halfShow);
@@ -68,16 +68,16 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
 
             <div className="flex w-full items-center justify-center gap-1 overflow-x-auto md:w-auto">
                 {currentPage > 1 ? (
-                    <Link href={buildPageUrl(currentPage - 1)} className="inline-flex">
-                        <Button variant="outline" size="sm">
-                            <ChevronLeft className="mr-1 size-4" />
-                            Previous
+                    <Link href={buildPageUrl(currentPage - 1)} className="flex-1 md:flex-none">
+                        <Button variant="outline" size="sm" className="w-full">
+                            <ChevronLeft className="size-4" />
+                            <span className="hidden sm:block">Previous</span>
                         </Button>
                     </Link>
                 ) : (
-                    <Button variant="outline" size="sm" disabled>
-                        <ChevronLeft className="mr-1 size-4" />
-                        Previous
+                    <Button variant="outline" size="sm" disabled className="w-full flex-1 md:flex-none">
+                        <ChevronLeft className="size-4" />
+                        <span className="hidden sm:block">Previous</span>
                     </Button>
                 )}
 
@@ -96,16 +96,16 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
                 )}
 
                 {currentPage < lastPage ? (
-                    <Link href={buildPageUrl(currentPage + 1)} className="inline-flex">
-                        <Button variant="outline" size="sm">
-                            Next
-                            <ChevronRight className="ml-1 size-4" />
+                    <Link href={buildPageUrl(currentPage + 1)} className="flex-1 md:flex-none">
+                        <Button variant="outline" size="sm" className="w-full">
+                            <span className="hidden sm:block">Next</span>
+                            <ChevronRight className="size-4" />
                         </Button>
                     </Link>
                 ) : (
-                    <Button variant="outline" size="sm" disabled>
-                        Next
-                        <ChevronRight className="ml-1 size-4" />
+                    <Button variant="outline" size="sm" disabled className="w-full flex-1 md:flex-none">
+                        <span className="hidden sm:block">Next</span>
+                        <ChevronRight className="size-4" />
                     </Button>
                 )}
             </div>
