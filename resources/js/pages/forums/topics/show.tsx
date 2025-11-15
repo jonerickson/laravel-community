@@ -11,12 +11,12 @@ import { Pagination } from '@/components/ui/pagination';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
-import { pluralize } from '@/lib/utils';
+import { cn, pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, ArrowDown, ArrowLeft, Clock, Eye, EyeOff, MessageSquare, Reply, ThumbsDown, User } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { route } from 'ziggy-js';
 
 interface TopicShowProps {
@@ -97,6 +97,17 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
 
     const currentUrl = route('forums.topics.show', { forum: forum.slug, topic: topic.slug });
 
+    const shouldShowBadges = useMemo((): boolean => {
+        return (
+            topic.isHot ||
+            topic.isPinned ||
+            topic.isLocked ||
+            (can('report_posts') && topic.hasReportedContent) ||
+            (can('publish_posts') && topic.hasUnpublishedContent) ||
+            (can('approve_posts') && topic.hasUnapprovedContent)
+        );
+    }, [topic, can]);
+
     const structuredData = {
         '@context': 'https://schema.org',
         '@type': 'DiscussionForumPosting',
@@ -175,7 +186,11 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex flex-col items-start justify-between gap-2 sm:flex-row">
                     <div className="flex w-full items-center justify-between sm:items-start lg:items-center">
-                        <div className="mb-2 flex flex-col gap-2 lg:flex-row lg:items-center">
+                        <div
+                            className={cn('mb-2 flex flex-col lg:flex-row lg:items-center', {
+                                'gap-2': shouldShowBadges,
+                            })}
+                        >
                             <div className="flex items-center gap-2">
                                 {topic.isHot && <span className="text-sm">🔥</span>}
                                 {can('report_posts') && topic.hasReportedContent && <AlertTriangle className="size-4 text-destructive" />}

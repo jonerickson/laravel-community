@@ -135,8 +135,8 @@ export function Pagination({ pagination, baseUrl, entityLabel, className }: Pagi
                             ...
                         </span>
                     ) : (
-                        <Link key={page} href={buildPageUrl(page as number)} className="inline-flex">
-                            <Button variant={currentPage === page ? 'default' : 'outline'} size="sm" className="min-w-[40px]">
+                        <Link key={page} href={buildPageUrl(page as number)} className="flex-1 md:inline-flex">
+                            <Button variant={currentPage === page ? 'default' : 'outline'} size="sm" className="w-full md:min-w-[40px]">
                                 {page}
                             </Button>
                         </Link>
