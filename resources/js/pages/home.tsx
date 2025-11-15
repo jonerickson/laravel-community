@@ -36,8 +36,8 @@ interface HomeProps {
 const features = [
     {
         icon: Users,
-        title: 'Player Management',
-        description: 'Comprehensive player management with detailed profiles, statistics tracking, and powerful community moderation tools.',
+        title: 'Member Management',
+        description: 'Comprehensive member management with detailed profiles, statistics tracking, and powerful community moderation tools.',
         color: 'text-gaming-blue',
     },
     {
@@ -50,7 +50,7 @@ const features = [
         icon: BarChart3,
         title: 'Analytics Dashboard',
         description:
-            'Advanced analytics providing deep insights into player engagement and community growth to enhance our high-fidelity gaming experiences.',
+            'Advanced analytics providing deep insights into member engagement and community growth to enhance our high-fidelity gaming experiences.',
         color: 'text-gaming-green',
     },
     {
@@ -69,14 +69,14 @@ const features = [
         icon: Globe,
         title: 'Global Infrastructure',
         description:
-            'Worldwide server network delivering high-fidelity gaming experiences with low latency and high availability for players globally.',
+            'Worldwide server network delivering high-fidelity gaming experiences with low latency and high availability for members globally.',
         color: 'text-gaming-green',
     },
 ];
 
 export default function Home({ subscriptions = [] }: HomeProps) {
     const page = usePage<App.Data.SharedData>();
-    const { name, auth, memberCount } = page.props;
+    const { name, auth, memberCount, postCount } = page.props;
 
     return (
         <div className="min-h-screen bg-background text-foreground">
@@ -133,12 +133,12 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                     <div className="container mx-auto px-6 sm:px-4">
                         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
                             <div className="text-center">
-                                <div className="text-gaming-blue mb-2 text-3xl font-bold md:text-4xl">10K+</div>
-                                <div className="text-sm text-muted-foreground">Active Communities</div>
+                                <div className="text-gaming-blue mb-2 text-3xl font-bold md:text-4xl">{postCount}+</div>
+                                <div className="text-sm text-muted-foreground">Active Discussions</div>
                             </div>
                             <div className="text-center">
-                                <div className="text-gaming-purple mb-2 text-3xl font-bold md:text-4xl">2M+</div>
-                                <div className="text-sm text-muted-foreground">Connected Players</div>
+                                <div className="text-gaming-purple mb-2 text-3xl font-bold md:text-4xl">{memberCount}+</div>
+                                <div className="text-sm text-muted-foreground">Connected Members</div>
                             </div>
                             <div className="text-center">
                                 <div className="text-gaming-green mb-2 text-3xl font-bold md:text-4xl">99.9%</div>
@@ -154,9 +154,9 @@ export default function Home({ subscriptions = [] }: HomeProps) {
 
                 <section id="features" className="py-20">
                     <div className="container mx-auto px-6 sm:px-4">
-                        <div className="mb-16 text-center">
+                        <div className="mx-auto mb-16 max-w-3xl text-center">
                             <HeadingLarge
-                                title="Everything you need for gaming communities"
+                                title="Everything you need for thriving communities"
                                 description="Our gaming platform provides all the essential tools needed to build thriving communities and deliver exceptional high-fidelity gaming experiences through advanced development capabilities."
                             />
                         </div>
@@ -180,10 +180,10 @@ export default function Home({ subscriptions = [] }: HomeProps) {
 
                 <section className="py-20">
                     <div className="container mx-auto px-6 sm:px-4">
-                        <div className="mb-16 text-center">
+                        <div className="mx-auto mb-16 max-w-3xl text-center">
                             <HeadingLarge
-                                title="Trusted by developers and players worldwide"
-                                description="Players choose us for our commitment to open gaming environments and exceptional development capabilities"
+                                title="Trusted by developers and members worldwide"
+                                description="Members choose us for our commitment to open environments and exceptional development capabilities."
                             ></HeadingLarge>
                         </div>
 
@@ -265,9 +265,9 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                         <AbstractBackgroundPattern />
                     </div>
                     <div className="relative z-20 container mx-auto px-6 sm:px-4">
-                        <div className="mb-16 text-center">
+                        <div className="mx-auto mb-16 max-w-3xl text-center">
                             <h2 className="mb-4 text-3xl font-bold md:text-4xl">Simple, transparent pricing</h2>
-                            <p className="text-lg text-muted-foreground">Choose the plan that fits you best</p>
+                            <p className="text-lg text-muted-foreground">Choose the plan that fits you best. No long term contracts.</p>
                         </div>
 
                         <Deferred data="subscriptions" fallback={<Loading variant="grid" cols={3} />}>

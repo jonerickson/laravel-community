@@ -447,7 +447,8 @@ declare namespace App.Data {
         address: string | null;
         slogan: string | null;
         cartCount: number | null;
-        memberCount: number | null;
+        memberCount: string | boolean | null;
+        postCount: string | boolean | null;
         flash: App.Data.FlashData | null;
         sidebarOpen: boolean;
         ziggy: Config & { location: string };

@@ -14,6 +14,7 @@ use App\Enums\Role;
 use App\Models\Announcement;
 use App\Models\Page;
 use App\Models\Permission;
+use App\Models\Post;
 use App\Models\User;
 use App\Services\ShoppingCartService;
 use Illuminate\Http\Request;
@@ -65,7 +66,8 @@ class HandleInertiaRequests extends Middleware
                 ]))
                 ->toArray()),
             'cartCount' => $this->shoppingCartService->getCartCount(),
-            'memberCount' => (int) Cache::remember('member_count', now()->addHour(), fn () => Number::format(User::count())),
+            'memberCount' => Cache::remember('member_count', now()->addHour(), fn () => Number::abbreviate(User::count())),
+            'postCount' => Cache::remember('post_count', now()->addHour(), fn () => Number::abbreviate(Post::count())),
             'flash' => null,
             'name' => config('app.name'),
             'email' => config('app.email'),
