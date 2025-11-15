@@ -132,7 +132,6 @@ class KnowledgeBaseArticle extends Model implements HasLabel, Sluggable
             'id' => $this->id,
             'title' => $this->title,
             'content' => Str::of($this->content)->stripTags()->toString(),
-            'excerpt' => $this->excerpt,
             'type' => $this->type->value,
             'category' => $this->category?->name,
             'author' => $this->author?->name,

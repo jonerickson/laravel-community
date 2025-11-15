@@ -45,8 +45,8 @@ class KnowledgeBaseController extends Controller
 
         $categories = KnowledgeBaseCategoryData::collect(
             KnowledgeBaseCategory::query()
-                ->where('is_active', true)
-                ->orderBy('order')
+                ->active()
+                ->ordered()
                 ->withCount(['publishedArticles as articles_count'])
                 ->get()
         );

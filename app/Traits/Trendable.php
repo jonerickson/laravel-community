@@ -38,7 +38,6 @@ trait Trendable
         $tableName = $this->getTable();
         $modelClass = addslashes(static::class);
 
-        // Use CTE for optimized trending calculation without redundant score computation
         $query->fromRaw("(
             WITH topic_stats AS (
                 SELECT

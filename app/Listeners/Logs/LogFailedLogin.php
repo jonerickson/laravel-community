@@ -14,7 +14,6 @@ class LogFailedLogin
         $credentials = $event->credentials;
         $email = $credentials['email'] ?? 'unknown';
 
-        // Use a static method or create a temporary user instance for logging
         $user = new User;
         if (method_exists($user, 'logFailedLogin')) {
             $user->logFailedLogin($email);

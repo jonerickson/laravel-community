@@ -142,6 +142,10 @@ return [
         'host' => env('MEILISEARCH_HOST', 'http://localhost:7700'),
         'key' => env('MEILISEARCH_KEY'),
         'index-settings' => [
+            App\Models\KnowledgeBaseArticle::class => [
+                'filterableAttributes' => ['id', 'title', 'content', 'type', 'category', 'author', 'created_at'],
+                'sortableAttributes' => ['id', 'title', 'content', 'type', 'category', 'author', 'created_at'],
+            ],
             App\Models\Policy::class => [
                 'filterableAttributes' => ['id', 'title', 'version', 'category', 'effective_at', 'created_at'],
                 'sortableAttributes' => ['id', 'title', 'version', 'category', 'effective_at', 'created_at'],

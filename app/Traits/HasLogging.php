@@ -17,14 +17,12 @@ trait HasLogging
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
 
-        // Allow models to specify which attributes to log
         if (method_exists($this, 'getLoggedAttributes')) {
             $options->logOnly($this->getLoggedAttributes());
         } else {
             $options->logFillable();
         }
 
-        // Allow models to customize the description
         if (method_exists($this, 'getActivityDescription')) {
             $options->setDescriptionForEvent(fn (string $eventName) => $this->getActivityDescription($eventName));
         } else {
