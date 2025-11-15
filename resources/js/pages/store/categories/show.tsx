@@ -83,7 +83,7 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
                 </div>
 
                 {category.children && category.children.length > 0 && (
-                    <div>
+                    <div className="-mt-2">
                         <h3 className="mb-4 text-lg font-semibold">Subcategories</h3>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                             {category.children.map((subcategory) => (

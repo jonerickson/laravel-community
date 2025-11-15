@@ -23,7 +23,7 @@ export default function StoreProductShow({ product, reviews }: ProductPageProps)
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={product.name} />
-            <div className="py-2">
+            <div className="lg:py-2">
                 <Product product={product} reviews={reviews} />
             </div>
         </AppLayout>

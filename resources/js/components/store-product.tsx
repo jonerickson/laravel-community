@@ -137,7 +137,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
                         <div className="mt-8 space-y-4">
                             {productData.prices && productData.prices.length > 0 && (
                                 <div className="space-y-2">
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
                                         <label htmlFor="price" className="text-sm font-medium">
                                             Price:
                                         </label>
@@ -160,12 +160,12 @@ export default function Product({ product: productData, reviews }: ProductProps)
                             )}
 
                             <div className="space-y-2">
-                                <div className="flex items-center gap-4">
+                                <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
                                     <label htmlFor="quantity" className="text-sm font-medium">
                                         Quantity:
                                     </label>
                                     <Select value={data.quantity.toString()} onValueChange={handleQuantityChange}>
-                                        <SelectTrigger className="w-[180px]">
+                                        <SelectTrigger className="lg:w-[180px]">
                                             <SelectValue placeholder="Quantity" />
                                         </SelectTrigger>
                                         <SelectContent>
