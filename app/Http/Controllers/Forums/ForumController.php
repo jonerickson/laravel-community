@@ -41,6 +41,7 @@ class ForumController extends Controller
 
         $topics = $forum
             ->topics()
+            ->latestActivity()
             ->with(['author', 'lastPost.author', 'posts.reads'])
             ->withCount(['posts', 'views'])
             ->paginate();
