@@ -100,7 +100,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
                                 className="col-span-2 row-span-2 h-full w-full rounded-lg object-cover"
                             />
                         ) : (
-                            <div className="col-span-2 row-span-2 flex h-full w-full items-center justify-center rounded-lg bg-muted">
+                            <div className="col-span-2 row-span-2 flex h-full w-full items-center justify-center rounded-lg bg-muted py-12">
                                 <ImageIcon className="h-24 w-24 text-muted-foreground" />
                             </div>
                         )}
