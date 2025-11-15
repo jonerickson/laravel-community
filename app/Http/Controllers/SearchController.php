@@ -19,7 +19,7 @@ class SearchController extends Controller
 
     public function __invoke(Request $request): Response
     {
-        $query = $request->get('q', '');
+        $query = $request->get('q') ?? '';
         $types = $this->searchService->validateAndNormalizeTypes($request->get('types', ['policy', 'post', 'product', 'topic', 'user']));
         $sortBy = $request->get('sort_by', 'relevance');
         $sortOrder = $request->get('sort_order', 'desc');
