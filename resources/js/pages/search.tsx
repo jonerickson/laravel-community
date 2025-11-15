@@ -10,10 +10,10 @@ import { Pagination } from '@/components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
-import { currency } from '@/lib/utils';
-import { Head, router } from '@inertiajs/react';
-import { Calendar, FileText, MessageSquare, Search as SearchIcon, Shield, ShoppingBag, User } from 'lucide-react';
-import { FormEvent, useEffect, useState } from 'react';
+import { cn, currency } from '@/lib/utils';
+import { Head, useForm } from '@inertiajs/react';
+import { Calendar, FileText, Loader2, MessageSquare, Search as SearchIcon, Shield, ShoppingBag, User } from 'lucide-react';
+import { FormEvent, useEffect } from 'react';
 
 interface SearchResult {
     id: number;
@@ -76,53 +76,47 @@ const typeLabels = {
 };
 
 export default function Search({ results, query: initialQuery, filters: initialFilters, counts }: Props) {
-    const [query, setQuery] = useState(initialQuery);
-    const [types, setTypes] = useState<string[]>(initialFilters.types);
-    const [sortBy, setSortBy] = useState(initialFilters.sort_by);
-    const [sortOrder, setSortOrder] = useState(initialFilters.sort_order);
-    const [perPage, setPerPage] = useState(initialFilters.per_page);
-    const [createdAfter, setCreatedAfter] = useState(initialFilters.created_after || '');
-    const [createdBefore, setCreatedBefore] = useState(initialFilters.created_before || '');
-    const [updatedAfter, setUpdatedAfter] = useState(initialFilters.updated_after || '');
-    const [updatedBefore, setUpdatedBefore] = useState(initialFilters.updated_before || '');
+    const { data, setData, get, processing } = useForm({
+        q: initialQuery,
+        types: initialFilters.types,
+        sort_by: initialFilters.sort_by,
+        sort_order: initialFilters.sort_order,
+        per_page: initialFilters.per_page,
+        created_after: initialFilters.created_after || '',
+        created_before: initialFilters.created_before || '',
+        updated_after: initialFilters.updated_after || '',
+        updated_before: initialFilters.updated_before || '',
+    });
 
     const handleSearch = (e?: FormEvent) => {
         if (e) {
             e.preventDefault();
         }
 
-        router.get(
-            route('search'),
-            {
-                q: query,
-                types,
-                sort_by: sortBy,
-                sort_order: sortOrder,
-                per_page: perPage,
-                created_after: createdAfter || undefined,
-                created_before: createdBefore || undefined,
-                updated_after: updatedAfter || undefined,
-                updated_before: updatedBefore || undefined,
-            },
-            {
-                preserveState: true,
-                preserveScroll: true,
-            },
-        );
+        get(route('search'), {
+            preserveState: true,
+            preserveScroll: true,
+        });
     };
 
     const toggleType = (type: string) => {
-        setTypes((prev) => {
-            const newTypes = prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type];
-            return newTypes.length === 0 ? [type] : newTypes;
+        setData((prev) => {
+            const newTypes = prev.types.includes(type) ? prev.types.filter((t) => t !== type) : [...prev.types, type];
+            return {
+                ...prev,
+                types: newTypes.length === 0 ? [type] : newTypes,
+            };
         });
     };
 
     const clearFilters = () => {
-        setCreatedAfter('');
-        setCreatedBefore('');
-        setUpdatedAfter('');
-        setUpdatedBefore('');
+        setData({
+            ...data,
+            created_after: '',
+            created_before: '',
+            updated_after: '',
+            updated_before: '',
+        });
     };
 
     const formatDate = (dateString: string) => {
@@ -131,13 +125,13 @@ export default function Search({ results, query: initialQuery, filters: initialF
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
-            if (query !== initialQuery || types.toString() !== initialFilters.types.toString()) {
+            if (data.q !== initialQuery || data.types.toString() !== initialFilters.types.toString()) {
                 handleSearch();
             }
         }, 500);
 
         return () => clearTimeout(timeoutId);
-    }, [query, types]);
+    }, [data.q, data.types]);
 
     return (
         <AppLayout>
@@ -163,12 +157,12 @@ export default function Search({ results, query: initialQuery, filters: initialF
                                             <div key={type} className="flex items-center gap-2">
                                                 <Checkbox
                                                     id={`type-${type}`}
-                                                    checked={types.includes(type)}
+                                                    checked={data.types.includes(type)}
                                                     onCheckedChange={() => toggleType(type)}
                                                 />
                                                 <Label htmlFor={`type-${type}`} className="flex items-center gap-2 text-sm font-normal">
                                                     {typeLabels[type as keyof typeof typeLabels]}
-                                                    <span className="text-xs text-muted-foreground">({counts[`${type}s` as keyof Counts]})</span>
+                                                    <span className="text-xs text-muted-foreground">({counts[`${type}s` as keyof Counts] || 0})</span>
                                                 </Label>
                                             </div>
                                         ))}
@@ -181,7 +175,7 @@ export default function Search({ results, query: initialQuery, filters: initialF
                                     <div className="flex items-center justify-between">
                                         <Label className="text-sm font-medium">Sorting:</Label>
                                     </div>
-                                    <Select value={sortBy} onValueChange={setSortBy}>
+                                    <Select value={data.sort_by} onValueChange={(value) => setData('sort_by', value)}>
                                         <SelectTrigger>
                                             <SelectValue />
                                         </SelectTrigger>
@@ -192,7 +186,7 @@ export default function Search({ results, query: initialQuery, filters: initialF
                                             <SelectItem value="title">Title</SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <Select value={sortOrder} onValueChange={setSortOrder}>
+                                    <Select value={data.sort_order} onValueChange={(value) => setData('sort_order', value)}>
                                         <SelectTrigger>
                                             <SelectValue />
                                         </SelectTrigger>
@@ -208,7 +202,7 @@ export default function Search({ results, query: initialQuery, filters: initialF
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between">
                                         <Label className="text-sm font-medium">Dates:</Label>
-                                        {(createdAfter || createdBefore || updatedAfter || updatedBefore) && (
+                                        {(data.created_after || data.created_before || data.updated_after || data.updated_before) && (
                                             <Button variant="ghost" size="sm" onClick={clearFilters} className="h-auto p-0 text-xs">
                                                 Clear
                                             </Button>
@@ -222,8 +216,8 @@ export default function Search({ results, query: initialQuery, filters: initialF
                                             <Input
                                                 id="created-after"
                                                 type="date"
-                                                value={createdAfter}
-                                                onChange={(e) => setCreatedAfter(e.target.value)}
+                                                value={data.created_after}
+                                                onChange={(e) => setData('created_after', e.target.value)}
                                                 className="h-8 text-xs"
                                             />
                                         </div>
@@ -234,8 +228,8 @@ export default function Search({ results, query: initialQuery, filters: initialF
                                             <Input
                                                 id="created-before"
                                                 type="date"
-                                                value={createdBefore}
-                                                onChange={(e) => setCreatedBefore(e.target.value)}
+                                                value={data.created_before}
+                                                onChange={(e) => setData('created_before', e.target.value)}
                                                 className="h-8 text-xs"
                                             />
                                         </div>
@@ -246,8 +240,8 @@ export default function Search({ results, query: initialQuery, filters: initialF
                                             <Input
                                                 id="updated-after"
                                                 type="date"
-                                                value={updatedAfter}
-                                                onChange={(e) => setUpdatedAfter(e.target.value)}
+                                                value={data.updated_after}
+                                                onChange={(e) => setData('updated_after', e.target.value)}
                                                 className="h-8 text-xs"
                                             />
                                         </div>
@@ -258,8 +252,8 @@ export default function Search({ results, query: initialQuery, filters: initialF
                                             <Input
                                                 id="updated-before"
                                                 type="date"
-                                                value={updatedBefore}
-                                                onChange={(e) => setUpdatedBefore(e.target.value)}
+                                                value={data.updated_before}
+                                                onChange={(e) => setData('updated_before', e.target.value)}
                                                 className="h-8 text-xs"
                                             />
                                         </div>
@@ -272,7 +266,7 @@ export default function Search({ results, query: initialQuery, filters: initialF
                                     <div className="flex items-center justify-between">
                                         <Label className="text-sm font-medium">Results:</Label>
                                     </div>
-                                    <Select value={perPage.toString()} onValueChange={(v) => setPerPage(parseInt(v))}>
+                                    <Select value={data.per_page.toString()} onValueChange={(v) => setData('per_page', parseInt(v))}>
                                         <SelectTrigger>
                                             <SelectValue />
                                         </SelectTrigger>
@@ -293,28 +287,36 @@ export default function Search({ results, query: initialQuery, filters: initialF
                     </aside>
 
                     <div className="space-y-6">
-                        <form onSubmit={handleSearch}>
+                        <form onSubmit={handleSearch} className="relative">
                             <Input
                                 type="search"
                                 placeholder="Search policies, posts, products, topics and members..."
-                                value={query}
-                                onChange={(e) => setQuery(e.target.value)}
+                                value={data.q}
+                                onChange={(e) => setData('q', e.target.value)}
+                                className={cn({
+                                    'pr-10': processing,
+                                })}
                             />
+                            {processing && data.q.length > 0 && (
+                                <div className="absolute top-1/2 right-3 -translate-y-1/2">
+                                    <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                                </div>
+                            )}
                         </form>
 
                         {results.lastPage > 1 && (
                             <Pagination
                                 pagination={results}
                                 baseUrl={route('search', {
-                                    q: query,
-                                    types,
-                                    sort_by: sortBy,
-                                    sort_order: sortOrder,
-                                    per_page: perPage,
-                                    created_after: createdAfter || undefined,
-                                    created_before: createdBefore || undefined,
-                                    updated_after: updatedAfter || undefined,
-                                    updated_before: updatedBefore || undefined,
+                                    q: data.q,
+                                    types: data.types,
+                                    sort_by: data.sort_by,
+                                    sort_order: data.sort_order,
+                                    per_page: data.per_page,
+                                    created_after: data.created_after || undefined,
+                                    created_before: data.created_before || undefined,
+                                    updated_after: data.updated_after || undefined,
+                                    updated_before: data.updated_before || undefined,
                                 })}
                                 entityLabel="result"
                             />
@@ -398,15 +400,15 @@ export default function Search({ results, query: initialQuery, filters: initialF
                             <Pagination
                                 pagination={results}
                                 baseUrl={route('search', {
-                                    q: query,
-                                    types,
-                                    sort_by: sortBy,
-                                    sort_order: sortOrder,
-                                    per_page: perPage,
-                                    created_after: createdAfter || undefined,
-                                    created_before: createdBefore || undefined,
-                                    updated_after: updatedAfter || undefined,
-                                    updated_before: updatedBefore || undefined,
+                                    q: data.q,
+                                    types: data.types,
+                                    sort_by: data.sort_by,
+                                    sort_order: data.sort_order,
+                                    per_page: data.per_page,
+                                    created_after: data.created_after || undefined,
+                                    created_before: data.created_before || undefined,
+                                    updated_after: data.updated_after || undefined,
+                                    updated_before: data.updated_before || undefined,
                                 })}
                                 entityLabel="result"
                             />

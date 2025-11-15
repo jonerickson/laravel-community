@@ -85,6 +85,11 @@
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
     }
+
+    input[type='search']::-webkit-search-cancel-button {
+        -webkit-appearance: none;
+        appearance: none;
+    }
 }
 
 :root {
