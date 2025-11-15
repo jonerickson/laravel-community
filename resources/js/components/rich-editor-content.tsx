@@ -10,13 +10,13 @@ export default function RichEditorContent({ content, className, ...props }: Rich
         <div
             // prettier-ignore
             className={cn(
-                "prose prose-sm max-w-none",
-                "[&_p]:text-sm [&_p]:mt-2",
-                "[&_a]:font-medium [&_a]:text-primary [&_a]:underline [&_a]:decoration-primary [&_a]:underline-offset-2",
+                "prose prose-sm max-w-none wrap-anywhere text-wrap",
+                "[&_p]:text-sm [&_p]:mt-2 [&_p]:wrap-anywhere [&_p]:text-wrap",
+                "[&_a]:font-medium [&_a]:text-primary [&_a]:underline [&_a]:decoration-primary [&_a]:underline-offset-2 [&_a]:wrap-anywhere [&_a]:text-wrap",
                 "dark:[&_a]:text-blue-400 dark:[&_a]:decoration-blue-400",
 
                 "[&_pre]:relative [&_pre]:my-4 [&_pre]:overflow-x-auto [&_pre]:rounded-md [&_pre]:border [&_pre]:border-border [&_pre]:bg-muted [&_pre]:p-4 [&_pre]:font-mono [&_pre]:text-sm [&_pre]:text-muted-foreground",
-                "[&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:font-mono [&_pre_code]:text-foreground",
+                "[&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:font-mono [&_pre_code]:text-foreground [&_pre_code]:wrap-anywhere [&_pre_code]:text-wrap",
 
                 "[&_blockquote]:border-l-4 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:bg-muted [&_blockquote]:py-4 [&_blockquote]:text-muted-foreground [&_blockquote]:border-border [&_blockquote]:my-4",
 

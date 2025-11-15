@@ -98,6 +98,12 @@
         -webkit-appearance: none;
         appearance: none;
     }
+
+    .prose img {
+        height: auto !important;
+        width: auto !important;
+        max-width: 100% !important;
+    }
 }
 
 :root {
