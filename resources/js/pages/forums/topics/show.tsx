@@ -11,7 +11,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
-import { cn, pluralize } from '@/lib/utils';
+import { pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
@@ -99,7 +99,6 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
 
     const shouldShowBadges = useMemo((): boolean => {
         return (
-            topic.isHot ||
             topic.isPinned ||
             topic.isLocked ||
             (can('report_posts') && topic.hasReportedContent) ||
@@ -186,20 +185,20 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex flex-col items-start justify-between gap-2 sm:flex-row">
                     <div className="flex w-full items-center justify-between sm:items-start lg:items-center">
-                        <div
-                            className={cn('mb-2 flex flex-col lg:flex-row lg:items-center', {
-                                'gap-2': shouldShowBadges,
-                            })}
-                        >
+                        <div className="mb-2 flex flex-col gap-2 lg:flex-row lg:items-center">
+                            {shouldShowBadges && (
+                                <div className="flex items-center gap-2">
+                                    {can('report_posts') && topic.hasReportedContent && <AlertTriangle className="size-4 text-destructive" />}
+                                    {can('publish_posts') && topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
+                                    {can('approve_posts') && topic.hasUnapprovedContent && <ThumbsDown className="size-4 text-warning" />}
+                                    {topic.isPinned && <Badge variant="info">Pinned</Badge>}
+                                    {topic.isLocked && <Badge>Locked</Badge>}
+                                </div>
+                            )}
                             <div className="flex items-center gap-2">
                                 {topic.isHot && <span className="text-sm">🔥</span>}
-                                {can('report_posts') && topic.hasReportedContent && <AlertTriangle className="size-4 text-destructive" />}
-                                {can('publish_posts') && topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
-                                {can('approve_posts') && topic.hasUnapprovedContent && <ThumbsDown className="size-4 text-warning" />}
-                                {topic.isPinned && <Badge variant="info">Pinned</Badge>}
-                                {topic.isLocked && <Badge>Locked</Badge>}
+                                <h1 className="text-xl font-semibold tracking-tight">{topic.title}</h1>
                             </div>
-                            <h1 className="text-xl font-semibold tracking-tight">{topic.title}</h1>
                         </div>
 
                         <ForumTopicModerationMenu topic={topic} forum={forum} />

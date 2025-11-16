@@ -25,10 +25,10 @@ class SearchController extends Controller
         $sortOrder = $request->get('sort_order', 'desc');
         $perPage = min($request->integer('per_page', 20), 50);
 
-        $createdAfter = $request->get('created_after');
-        $createdBefore = $request->get('created_before');
-        $updatedAfter = $request->get('updated_after');
-        $updatedBefore = $request->get('updated_before');
+        $createdAfter = $request->date('created_after');
+        $createdBefore = $request->date('created_before');
+        $updatedAfter = $request->date('updated_after');
+        $updatedBefore = $request->date('updated_before');
 
         $searchResults = $this->searchService->search(
             query: $query,

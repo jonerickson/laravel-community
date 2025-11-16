@@ -21,10 +21,10 @@ class SearchController extends Controller
     {
         $query = $request->get('q', '');
         $types = $this->searchService->validateAndNormalizeTypes($request->get('types', ['policy', 'post', 'product', 'topic', 'user']));
-        $createdAfter = $request->get('created_after');
-        $createdBefore = $request->get('created_before');
-        $updatedAfter = $request->get('updated_after');
-        $updatedBefore = $request->get('updated_before');
+        $createdAfter = $request->date('created_after');
+        $createdBefore = $request->date('created_before');
+        $updatedAfter = $request->date('updated_after');
+        $updatedBefore = $request->date('updated_before');
 
         if (blank($query) || strlen((string) $query) < 2) {
             return ApiResource::success(
@@ -56,34 +56,11 @@ class SearchController extends Controller
             limit: $limit
         );
 
-        $allCollections = collect([
-            'posts' => $searchResults['results']->where('type', 'post'),
-            'policies' => $searchResults['results']->where('type', 'policy'),
-            'products' => $searchResults['results']->where('type', 'product'),
-            'topics' => $searchResults['results']->where('type', 'topic'),
-            'users' => $searchResults['results']->where('type', 'user'),
-        ])->filter(fn ($collection) => $collection->isNotEmpty());
-
         $totalResults = $searchResults['results']->count();
-
-        if ($totalResults <= $limit) {
-            $results = $searchResults['results'];
-        } else {
-            $resultsPerType = max(1, intval($limit / $allCollections->count()));
-            $remaining = $limit - ($resultsPerType * $allCollections->count());
-
-            $results = collect();
-            foreach ($allCollections as $collection) {
-                $takeAmount = $resultsPerType + ($remaining > 0 ? 1 : 0);
-                if ($remaining > 0) {
-                    $remaining--;
-                }
-                $results = $results->concat($collection->take($takeAmount));
-            }
-        }
+        $results = $this->searchService->distributeResults($searchResults['results'], $limit);
 
         return ApiResource::success(
-            resource: $results->values(),
+            resource: $results,
             meta: [
                 'total' => $totalResults,
                 'query' => $query,

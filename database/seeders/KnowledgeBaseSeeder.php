@@ -14,13 +14,13 @@ class KnowledgeBaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::where('email', 'admin@example.com')->first() ?? User::factory()->create();
+        $author = User::first() ?? User::factory();
 
         $categories = [
-            ['name' => 'Getting Started', 'icon' => 'rocket', 'color' => '#3b82f6', 'order' => 1],
-            ['name' => 'Features', 'icon' => 'star', 'color' => '#8b5cf6', 'order' => 2],
-            ['name' => 'Troubleshooting', 'icon' => 'wrench', 'color' => '#ef4444', 'order' => 3],
-            ['name' => 'API Reference', 'icon' => 'code', 'color' => '#10b981', 'order' => 4],
+            ['name' => 'Getting Started', 'icon' => 'rocket', 'color' => '#3b82f6'],
+            ['name' => 'Features', 'icon' => 'star', 'color' => '#8b5cf6'],
+            ['name' => 'Troubleshooting', 'icon' => 'wrench', 'color' => '#ef4444'],
+            ['name' => 'API Reference', 'icon' => 'code', 'color' => '#10b981'],
         ];
 
         foreach ($categories as $categoryData) {
@@ -33,9 +33,9 @@ class KnowledgeBaseSeeder extends Seeder
             KnowledgeBaseArticle::factory()
                 ->count(5)
                 ->published()
+                ->for($author, 'author')
+                ->for($category, 'category')
                 ->create([
-                    'category_id' => $category->id,
-                    'created_by' => $admin->id,
                     'type' => match ($category->name) {
                         'Getting Started' => KnowledgeBaseArticleType::Guide,
                         'Features' => KnowledgeBaseArticleType::Guide,
@@ -45,22 +45,5 @@ class KnowledgeBaseSeeder extends Seeder
                     },
                 ]);
         }
-
-        KnowledgeBaseArticle::factory()
-            ->count(3)
-            ->published()
-            ->create([
-                'created_by' => $admin->id,
-                'type' => KnowledgeBaseArticleType::Changelog,
-                'category_id' => null,
-            ]);
-
-        KnowledgeBaseArticle::factory()
-            ->count(3)
-            ->published()
-            ->create([
-                'created_by' => $admin->id,
-                'type' => KnowledgeBaseArticleType::Faq,
-            ]);
     }
 }

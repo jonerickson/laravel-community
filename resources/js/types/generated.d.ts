@@ -312,7 +312,7 @@ declare namespace App.Data {
         createdAt: string | null;
         updatedAt: string | null;
     };
-    export type PaginatedData<t = unknown> = {
+    export type PaginatedData<T = unknown> = {
         data: Array<T>;
         currentPage: number;
         lastPage: number;
@@ -473,6 +473,23 @@ declare namespace App.Data {
         referenceId: string;
         name: string;
         avatarUrl: string | null;
+    };
+    export type SearchResultData = {
+        id: number;
+        type: string;
+        title: string;
+        url: string;
+        description: string | null;
+        excerpt: string | null;
+        version: string | null;
+        price: string | null;
+        forumName: string | null;
+        categoryName: string | null;
+        authorName: string | null;
+        postType: string | null;
+        effectiveAt: string | null;
+        createdAt: string | null;
+        updatedAt: string | null;
     };
     export type SharedData = {
         auth: App.Data.AuthData;

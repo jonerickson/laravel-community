@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Data\PaginatedData;
+use App\Data\SearchResultData;
 use App\Models\Policy;
 use App\Models\Post;
 use App\Models\Product;
 use App\Models\Topic;
 use App\Models\User;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection as SupportCollection;
@@ -20,10 +22,10 @@ class SearchService
     public function search(
         string $query,
         array $types = ['policy', 'post', 'product', 'topic', 'user'],
-        ?string $createdAfter = null,
-        ?string $createdBefore = null,
-        ?string $updatedAfter = null,
-        ?string $updatedBefore = null,
+        ?CarbonInterface $createdAfter = null,
+        ?CarbonInterface $createdBefore = null,
+        ?CarbonInterface $updatedAfter = null,
+        ?CarbonInterface $updatedBefore = null,
         ?int $limit = null
     ): array {
         $results = collect();
@@ -121,10 +123,10 @@ class SearchService
 
     public function searchPosts(
         string $query,
-        ?string $createdAfter = null,
-        ?string $createdBefore = null,
-        ?string $updatedAfter = null,
-        ?string $updatedBefore = null,
+        ?CarbonInterface $createdAfter = null,
+        ?CarbonInterface $createdBefore = null,
+        ?CarbonInterface $updatedAfter = null,
+        ?CarbonInterface $updatedBefore = null,
         ?int $limit = null
     ): SupportCollection {
         return Post::search($query)
@@ -132,7 +134,7 @@ class SearchService
             ->get()
             ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection): Collection => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
             ->when($limit, fn ($collection) => $collection->take($limit))
-            ->map(fn (Post $post): array => [
+            ->map(fn (Post $post): SearchResultData => SearchResultData::from([
                 'id' => $post->id,
                 'type' => 'post',
                 'title' => $post->title,
@@ -140,17 +142,17 @@ class SearchService
                 'url' => $post->url,
                 'post_type' => $post->type->value,
                 'author_name' => $post->author->name,
-                'created_at' => $post->created_at->toISOString(),
-                'updated_at' => $post->updated_at->toISOString(),
-            ]);
+                'created_at' => $post->created_at,
+                'updated_at' => $post->updated_at,
+            ]));
     }
 
     public function searchPolicies(
         string $query,
-        ?string $createdAfter = null,
-        ?string $createdBefore = null,
-        ?string $updatedAfter = null,
-        ?string $updatedBefore = null,
+        ?CarbonInterface $createdAfter = null,
+        ?CarbonInterface $createdBefore = null,
+        ?CarbonInterface $updatedAfter = null,
+        ?CarbonInterface $updatedBefore = null,
         ?int $limit = null
     ): SupportCollection {
         return Policy::search($query)
@@ -158,7 +160,7 @@ class SearchService
             ->get()
             ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection): Collection => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
             ->when($limit, fn ($collection) => $collection->take($limit))
-            ->map(fn (Policy $policy): array => [
+            ->map(fn (Policy $policy): SearchResultData => SearchResultData::from([
                 'id' => $policy->id,
                 'type' => 'policy',
                 'title' => $policy->title,
@@ -166,18 +168,18 @@ class SearchService
                 'url' => $policy->url,
                 'category_name' => $policy->category->name,
                 'author_name' => $policy->author->name,
-                'effective_at' => $policy->effective_at?->toISOString(),
-                'created_at' => $policy->created_at->toISOString(),
-                'updated_at' => $policy->updated_at->toISOString(),
-            ]);
+                'effective_at' => $policy->effective_at,
+                'created_at' => $policy->created_at,
+                'updated_at' => $policy->updated_at,
+            ]));
     }
 
     public function searchProducts(
         string $query,
-        ?string $createdAfter = null,
-        ?string $createdBefore = null,
-        ?string $updatedAfter = null,
-        ?string $updatedBefore = null,
+        ?CarbonInterface $createdAfter = null,
+        ?CarbonInterface $createdBefore = null,
+        ?CarbonInterface $updatedAfter = null,
+        ?CarbonInterface $updatedBefore = null,
         ?int $limit = null
     ): SupportCollection {
         return Product::search($query)
@@ -185,7 +187,7 @@ class SearchService
             ->get()
             ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection): Collection => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
             ->when($limit, fn ($collection) => $collection->take($limit))
-            ->map(fn (Product $product): array => [
+            ->map(fn (Product $product): SearchResultData => SearchResultData::from([
                 'id' => $product->id,
                 'type' => 'product',
                 'title' => $product->name,
@@ -193,17 +195,17 @@ class SearchService
                 'url' => route('store.products.show', $product->slug),
                 'price' => $product->defaultPrice?->amount,
                 'category_name' => $product->categories->first()?->name,
-                'created_at' => $product->created_at->toISOString(),
-                'updated_at' => $product->updated_at->toISOString(),
-            ]);
+                'created_at' => $product->created_at,
+                'updated_at' => $product->updated_at,
+            ]));
     }
 
     public function searchTopics(
         string $query,
-        ?string $createdAfter = null,
-        ?string $createdBefore = null,
-        ?string $updatedAfter = null,
-        ?string $updatedBefore = null,
+        ?CarbonInterface $createdAfter = null,
+        ?CarbonInterface $createdBefore = null,
+        ?CarbonInterface $updatedAfter = null,
+        ?CarbonInterface $updatedBefore = null,
         ?int $limit = null
     ): SupportCollection {
         return Topic::search($query)
@@ -211,7 +213,7 @@ class SearchService
             ->get()
             ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection): Collection => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
             ->when($limit, fn ($collection) => $collection->take($limit))
-            ->map(fn (Topic $topic): array => [
+            ->map(fn (Topic $topic): SearchResultData => SearchResultData::from([
                 'id' => $topic->id,
                 'type' => 'topic',
                 'title' => $topic->title,
@@ -219,40 +221,40 @@ class SearchService
                 'url' => route('forums.topics.show', [$topic->forum->slug, $topic->slug]),
                 'forum_name' => $topic->forum->name,
                 'author_name' => $topic->author->name,
-                'created_at' => $topic->created_at->toISOString(),
-                'updated_at' => $topic->updated_at->toISOString(),
-            ]);
+                'created_at' => $topic->created_at,
+                'updated_at' => $topic->updated_at,
+            ]));
     }
 
     public function searchUsers(
         string $query,
-        ?string $createdAfter = null,
-        ?string $createdBefore = null,
-        ?string $updatedAfter = null,
-        ?string $updatedBefore = null,
+        ?CarbonInterface $createdAfter = null,
+        ?CarbonInterface $createdBefore = null,
+        ?CarbonInterface $updatedAfter = null,
+        ?CarbonInterface $updatedBefore = null,
         ?int $limit = null
     ): SupportCollection {
         return User::search($query)
             ->get()
             ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection): Collection => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
             ->when($limit, fn ($collection) => $collection->take($limit))
-            ->map(fn (User $user): array => [
+            ->map(fn (User $user): SearchResultData => SearchResultData::from([
                 'id' => $user->id,
                 'type' => 'user',
                 'title' => $user->name,
                 'description' => $user->groups->pluck('name')->implode(', '),
                 'url' => route('users.show', $user->reference_id),
-                'created_at' => $user->created_at->toISOString(),
-                'updated_at' => $user->updated_at->toISOString(),
-            ]);
+                'created_at' => $user->created_at,
+                'updated_at' => $user->updated_at,
+            ]));
     }
 
     public function applyDateFiltersToCollection(
         Collection $collection,
-        ?string $createdAfter,
-        ?string $createdBefore,
-        ?string $updatedAfter,
-        ?string $updatedBefore
+        ?CarbonInterface $createdAfter,
+        ?CarbonInterface $createdBefore,
+        ?CarbonInterface $updatedAfter,
+        ?CarbonInterface $updatedBefore
     ): Collection {
         return $collection
             ->when($createdAfter, fn ($col) => $col->filter(fn ($item): bool => $item->created_at >= $createdAfter))
@@ -263,18 +265,18 @@ class SearchService
 
     public function sortResults(SupportCollection $results, string $sortBy, string $sortOrder = 'desc'): SupportCollection
     {
-        return $results->sort(function (array $a, array $b) use ($sortBy, $sortOrder): int {
+        return $results->sort(function (SearchResultData $a, SearchResultData $b) use ($sortBy, $sortOrder): int {
             $aValue = match ($sortBy) {
-                'created_at' => $a['created_at'] ?? '',
-                'updated_at' => $a['updated_at'] ?? '',
-                'title' => $a['title'] ?? '',
+                'created_at' => $a->createdAt?->timestamp ?? 0,
+                'updated_at' => $a->updatedAt?->timestamp ?? 0,
+                'title' => $a->title,
                 default => 0,
             };
 
             $bValue = match ($sortBy) {
-                'created_at' => $b['created_at'] ?? '',
-                'updated_at' => $b['updated_at'] ?? '',
-                'title' => $b['title'] ?? '',
+                'created_at' => $b->createdAt?->timestamp ?? 0,
+                'updated_at' => $b->updatedAt?->timestamp ?? 0,
+                'title' => $b->title,
                 default => 0,
             };
 
@@ -298,6 +300,63 @@ class SearchService
         ]);
 
         return PaginatedData::from($paginator)->toArray();
+    }
+
+    public function distributeResults(SupportCollection $results, int $limit): SupportCollection
+    {
+        $allCollections = collect([
+            'posts' => $results->where('type', 'post'),
+            'policies' => $results->where('type', 'policy'),
+            'products' => $results->where('type', 'product'),
+            'topics' => $results->where('type', 'topic'),
+            'users' => $results->where('type', 'user'),
+        ])->filter(fn ($collection) => $collection->isNotEmpty());
+
+        $totalResults = $results->count();
+
+        if ($totalResults <= $limit) {
+            return $results;
+        }
+
+        // Proportional Allocation
+        // Step 1: Compute proportional share (A_i = L × R_i / ∑R_j)
+        $allocations = $allCollections->map(function ($collection) use ($limit, $totalResults): array {
+            $count = $collection->count();
+            $proportionalShare = ($limit * $count) / $totalResults;
+
+            return [
+                'collection' => $collection,
+                'count' => $count,
+                'proportional_share' => $proportionalShare,
+                'floor' => (int) floor($proportionalShare),
+                'remainder' => $proportionalShare - floor($proportionalShare),
+            ];
+        });
+
+        // Step 2: Floor the allocations (a_i = ⌊A_i⌋)
+        $allocatedSlots = $allocations->sum('floor');
+
+        // Step 3: Distribute remaining slots using largest remainders
+        $remainingSlots = $limit - $allocatedSlots;
+
+        $allocations = $allocations->sortByDesc('remainder')->values();
+
+        // Assign remaining slots to groups with largest remainders
+        $finalAllocations = $allocations->map(function (array $allocation, $index) use ($remainingSlots): array {
+            $extraSlot = $index < $remainingSlots ? 1 : 0;
+            $allocation['final_allocation'] = $allocation['floor'] + $extraSlot;
+
+            return $allocation;
+        });
+
+        // Build the distributed results collection
+        $distributedResults = collect();
+        foreach ($finalAllocations as $allocation) {
+            $takeAmount = min($allocation['final_allocation'], $allocation['count']);
+            $distributedResults = $distributedResults->concat($allocation['collection']->take($takeAmount));
+        }
+
+        return $distributedResults->values();
     }
 
     public function validateAndNormalizeTypes(mixed $types): array

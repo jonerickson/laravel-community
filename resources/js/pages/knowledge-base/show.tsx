@@ -4,6 +4,7 @@ import KnowledgeBaseArticleCard from '@/components/knowledge-base-article-card';
 import RichEditorContent from '@/components/rich-editor-content';
 import { Badge } from '@/components/ui/badge';
 import AppLayout from '@/layouts/app-layout';
+import { ucFirst } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { Calendar, Clock } from 'lucide-react';
@@ -81,7 +82,7 @@ export default function KnowledgeBaseShow({ article, relatedArticles }: Knowledg
                 <article className="mx-auto max-w-4xl" itemScope itemType="https://schema.org/Article">
                     <header className="mb-8">
                         <div className="mb-4 flex flex-wrap items-center gap-2">
-                            <Badge variant="secondary">{article.type}</Badge>
+                            <Badge variant="secondary">{ucFirst(article.type)}</Badge>
                             {article.category && <Badge variant="outline">{article.category.name}</Badge>}
                         </div>
 

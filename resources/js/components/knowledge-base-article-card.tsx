@@ -1,5 +1,6 @@
 import HeadingSmall from '@/components/heading-small';
 import { Badge } from '@/components/ui/badge';
+import { ucFirst } from '@/lib/utils';
 import { stripCharacters, truncate } from '@/utils/truncate';
 import { Link } from '@inertiajs/react';
 import { Clock, ImageIcon } from 'lucide-react';
@@ -18,7 +19,7 @@ export default function KnowledgeBaseArticleCard({ article }: KnowledgeBaseArtic
 
     return (
         <div className="flex flex-col items-start space-y-4">
-            <Link href={route('knowledge-base.show', { article: article.slug })} className="group">
+            <Link href={route('knowledge-base.show', { article: article.slug })} className="group w-full">
                 <article className="flex flex-col space-y-6">
                     <div className="relative w-full overflow-hidden rounded-2xl">
                         {article.featuredImageUrl ? (
@@ -37,7 +38,7 @@ export default function KnowledgeBaseArticleCard({ article }: KnowledgeBaseArtic
 
                     <div className="flex max-w-xl grow flex-col justify-between space-y-2">
                         <div className="flex flex-row flex-wrap gap-2">
-                            <Badge variant="secondary">{article.type}</Badge>
+                            <Badge variant="secondary">{ucFirst(article.type)}</Badge>
                             {article.category && <Badge variant="outline">{article.category.name}</Badge>}
                         </div>
 

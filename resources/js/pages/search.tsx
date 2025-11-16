@@ -59,7 +59,7 @@ interface Props {
     counts: Counts;
 }
 
-const typeIcons = {
+const typeIcons: Record<SearchResult['type'], typeof MessageSquare> = {
     topic: MessageSquare,
     post: FileText,
     policy: Shield,
@@ -67,7 +67,7 @@ const typeIcons = {
     user: User,
 };
 
-const typeLabels = {
+const typeLabels: Record<SearchResult['type'], string> = {
     topic: 'Topic',
     post: 'Post',
     policy: 'Policy',
@@ -339,7 +339,7 @@ export default function Search({ results, query: initialQuery, filters: initialF
                                 />
                             )}
 
-                            {results.data.map((result) => {
+                            {results.data.map((result: SearchResult) => {
                                 const Icon = typeIcons[result.type];
                                 return (
                                     <Card key={`${result.type}-${result.id}`} className="transition-shadow hover:shadow-md">

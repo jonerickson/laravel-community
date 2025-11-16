@@ -87,7 +87,7 @@ export default function BlogIndex({ posts }: BlogIndexProps) {
                 <div className="-mt-8">
                     {posts.data.length > 0 ? (
                         <InfiniteScroll data="posts" loading={() => 'Loading more users...'}>
-                            <div className="mx-auto grid max-w-2xl grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+                            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                                 {posts.data.map((post) => (
                                     <BlogIndexItem key={post.id} post={post} />
                                 ))}

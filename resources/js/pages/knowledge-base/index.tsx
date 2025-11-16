@@ -79,7 +79,7 @@ export default function KnowledgeBaseIndex({ articles, categories, filters }: Kn
 
                 <div className="-mt-8 flex flex-col gap-6">
                     <div className="flex flex-col gap-4">
-                        <form onSubmit={handleSearch} className="flex gap-2">
+                        <form onSubmit={handleSearch} className="flex flex-col gap-4 sm:flex-row sm:gap-2">
                             <div className="relative flex-1">
                                 <Input
                                     type="search"
@@ -91,9 +91,9 @@ export default function KnowledgeBaseIndex({ articles, categories, filters }: Kn
                             <Button type="submit">Search</Button>
                         </form>
 
-                        <div className="flex flex-wrap gap-4">
+                        <div className="flex flex-col gap-4 sm:flex-row">
                             <Select value={filters.category || 'all'} onValueChange={(value) => handleFilterChange('category', value)}>
-                                <SelectTrigger className="w-[200px]">
+                                <SelectTrigger className="sm:w-[200px]">
                                     <SelectValue placeholder="All categories" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -107,7 +107,7 @@ export default function KnowledgeBaseIndex({ articles, categories, filters }: Kn
                             </Select>
 
                             <Select value={filters.type || 'all'} onValueChange={(value) => handleFilterChange('type', value)}>
-                                <SelectTrigger className="w-[200px]">
+                                <SelectTrigger className="sm:w-[200px]">
                                     <SelectValue placeholder="All types" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -125,7 +125,7 @@ export default function KnowledgeBaseIndex({ articles, categories, filters }: Kn
 
                     {articles.data.length > 0 ? (
                         <InfiniteScroll data="articles" loading={() => 'Loading more articles...'}>
-                            <div className="mx-auto -mt-6 grid max-w-2xl grid-cols-1 gap-6 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+                            <div className="-mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                                 {articles.data.map((article) => (
                                     <KnowledgeBaseArticleCard key={article.id} article={article} />
                                 ))}

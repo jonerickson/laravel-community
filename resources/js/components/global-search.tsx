@@ -13,28 +13,10 @@ import axios from 'axios';
 import { ArrowRight, Calendar, ChevronDown, FileText, MessageSquare, Search, Shield, ShoppingBag, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-interface SearchResult {
-    id: number;
-    type: 'policy' | 'product' | 'post' | 'topic' | 'user';
-    title: string;
-    description?: string;
-    excerpt?: string;
-    version?: string;
-    price?: string;
-    url: string;
-    forum_name?: string;
-    category_name?: string;
-    author_name: string;
-    post_type?: string;
-    effective_at?: string;
-    created_at?: string;
-    updated_at?: string;
-}
-
 interface SearchResponse {
     success: boolean;
     message: string;
-    data: SearchResult[];
+    data: App.Data.SearchResultData[];
     meta: {
         timestamp: string;
         version: string;
@@ -57,7 +39,9 @@ interface SearchResponse {
     errors: Record<string, string[]>;
 }
 
-const typeIcons = {
+type SearchResultType = 'policy' | 'product' | 'post' | 'topic' | 'user';
+
+const typeIcons: Record<SearchResultType, typeof MessageSquare> = {
     topic: MessageSquare,
     post: FileText,
     policy: Shield,
@@ -65,7 +49,7 @@ const typeIcons = {
     user: User,
 };
 
-const typeLabels = {
+const typeLabels: Record<SearchResultType, string> = {
     topic: 'Topic',
     post: 'Post',
     policy: 'Policy',
@@ -73,18 +57,18 @@ const typeLabels = {
     user: 'Member',
 };
 
-const typeBadgeVariants = {
-    topic: 'secondary' as const,
-    post: 'outline' as const,
-    policy: 'default' as const,
-    product: 'destructive' as const,
-    user: 'default' as const,
+const typeBadgeVariants: Record<SearchResultType, 'secondary' | 'outline' | 'default' | 'destructive'> = {
+    topic: 'secondary',
+    post: 'outline',
+    policy: 'default',
+    product: 'destructive',
+    user: 'default',
 };
 
 export function GlobalSearch() {
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState('');
-    const [results, setResults] = useState<SearchResult[]>([]);
+    const [results, setResults] = useState<App.Data.SearchResultData[]>([]);
     const [loading, setLoading] = useState(false);
     const [meta, setMeta] = useState<SearchResponse['meta'] | null>(null);
     const [selectedTypes, setSelectedTypes] = useState<string[]>(['policy', 'post', 'product', 'topic', 'user']);
@@ -188,7 +172,7 @@ export function GlobalSearch() {
             acc[result.type].push(result);
             return acc;
         },
-        {} as Record<string, SearchResult[]>,
+        {} as Record<string, App.Data.SearchResultData[]>,
     );
 
     const handlePressStart = () => {
@@ -399,10 +383,10 @@ export function GlobalSearch() {
                         </div>
                     )}
 
-                    {Object.entries(groupedResults).map(([type, typeResults]) => (
-                        <CommandGroup key={type} heading={`${typeLabels[type as keyof typeof typeLabels]} (${typeResults.length})`}>
+                    {(Object.entries(groupedResults) as [SearchResultType, App.Data.SearchResultData[]][]).map(([type, typeResults]) => (
+                        <CommandGroup key={type} heading={`${typeLabels[type]} (${typeResults.length})`}>
                             {typeResults.map((result) => {
-                                const Icon = typeIcons[result.type];
+                                const Icon = typeIcons[type];
                                 return (
                                     <CommandItem
                                         key={`${result.type}-${result.id}`}
@@ -414,8 +398,8 @@ export function GlobalSearch() {
                                         <div className="flex-1 space-y-1">
                                             <div className="flex items-center gap-2">
                                                 <div className="leading-none font-medium">{result.title}</div>
-                                                <Badge variant={typeBadgeVariants[result.type]} className="text-xs">
-                                                    {typeLabels[result.type]}
+                                                <Badge variant={typeBadgeVariants[type]} className="text-xs">
+                                                    {typeLabels[type]}
                                                 </Badge>
                                             </div>
 
@@ -429,24 +413,24 @@ export function GlobalSearch() {
 
                                             {['policy', 'post', 'topic'].includes(result.type) && (
                                                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                    {result.author_name && (
+                                                    {result.authorName && (
                                                         <div className="flex items-center gap-1">
                                                             <User className="!size-3" />
-                                                            {result.author_name}
+                                                            {result.authorName}
                                                         </div>
                                                     )}
 
-                                                    {result.forum_name && <div>in {result.forum_name}</div>}
+                                                    {result.forumName && <div>in {result.forumName}</div>}
 
-                                                    {result.category_name && <div>in {result.category_name}</div>}
+                                                    {result.categoryName && <div>in {result.categoryName}</div>}
 
                                                     {result.version && <div>v{result.version}</div>}
 
-                                                    {result.effective_at ||
-                                                        (result.created_at && (
+                                                    {result.effectiveAt ||
+                                                        (result.createdAt && (
                                                             <div className="flex items-center gap-1">
                                                                 <Calendar className="!size-3" />
-                                                                {formatDate(result.effective_at || result.created_at)}
+                                                                {formatDate(result.effectiveAt || result.createdAt)}
                                                             </div>
                                                         ))}
                                                 </div>

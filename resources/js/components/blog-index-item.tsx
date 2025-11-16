@@ -5,6 +5,7 @@ import { pluralize } from '@/lib/utils';
 import { stripCharacters, truncate } from '@/utils/truncate';
 import { Link, usePage } from '@inertiajs/react';
 import { Clock, Eye, ImageIcon, MessageCircle } from 'lucide-react';
+import { useMemo } from 'react';
 import SharedData = App.Data.SharedData;
 
 interface BlogIndexItemProps {
@@ -19,6 +20,10 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
         month: 'short',
         day: 'numeric',
     });
+
+    const shouldShowBadges = useMemo((): boolean | null => {
+        return post.isFeatured || (auth && auth.user && !post.isReadByUser);
+    }, [post, auth]);
 
     return (
         <div className="flex flex-col items-start space-y-4">
@@ -39,10 +44,12 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                         <div className="absolute inset-0 rounded-2xl ring-1 ring-ring/20 ring-inset" />
                     </div>
                     <div className="flex max-w-xl grow flex-col justify-between space-y-2">
-                        <div className="flex flex-row gap-2">
-                            {post.isFeatured && <Badge variant="secondary">Featured</Badge>}
-                            {auth && auth.user && !post.isReadByUser && <Badge variant="default">New</Badge>}
-                        </div>
+                        {shouldShowBadges && (
+                            <div className="flex flex-row gap-2">
+                                {post.isFeatured && <Badge variant="secondary">Featured</Badge>}
+                                {auth && auth.user && !post.isReadByUser && <Badge variant="default">New</Badge>}
+                            </div>
+                        )}
                         <div className="flex items-center gap-x-4 text-xs">
                             <time dateTime={post.publishedAt || post.createdAt || undefined} className="text-muted-foreground">
                                 {formattedDate}
