@@ -262,12 +262,12 @@ class UserImporter extends AbstractImporter
 
                 if (! $config->isDryRun) {
                     $user->update([
-                        'billing_address' => Str::of($addressData['addressLines'][0])->limit(255)->toString() ?: null,
-                        'billing_address_line_2' => Str::of($addressData['addressLines'][1])->limit(255)->toString() ?: null,
-                        'billing_city' => Str::of($addressData['city'])->limit(255)->toString() ?: null,
-                        'billing_state' => Str::of($addressData['region'])->limit(255)->toString() ?: null,
-                        'billing_postal_code' => Str::of($addressData['postalCode'])->limit(25)->toString() ?: null,
-                        'billing_country' => Str::of($addressData['country'])->limit(2)->toString() ?: null,
+                        'billing_address' => Str::of($addressData['addressLines'][0] ?? null)->limit(255)->toString() ?: null,
+                        'billing_address_line_2' => Str::of($addressData['addressLines'][1] ?? null)->limit(255)->toString() ?: null,
+                        'billing_city' => Str::of($addressData['city'] ?? null)->limit(255)->toString() ?: null,
+                        'billing_state' => Str::of($addressData['region'] ?? null)->limit(255)->toString() ?: null,
+                        'billing_postal_code' => Str::of($addressData['postalCode'] ?? null)->limit(25)->toString() ?: null,
+                        'billing_country' => Str::of($addressData['country'] ?? null)->limit(2)->toString() ?: null,
                     ]);
                 }
             } catch (Exception $e) {
