@@ -26,10 +26,11 @@ class MigrationService
 
     protected ?Factory $components = null;
 
-    public function __construct(
-        private readonly Repository $configRepository,
-    ) {
-        //
+    private readonly ?Repository $configRepository;
+
+    public function __construct()
+    {
+        $this->configRepository = app(Repository::class);
     }
 
     public function registerSource(MigrationSource $source): void

@@ -413,6 +413,56 @@ CREATE TABLE `jobs` (
   KEY `jobs_queue_index` (`queue`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `knowledge_base_articles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `knowledge_base_articles` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `excerpt` text COLLATE utf8mb4_unicode_ci,
+  `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `category_id` bigint unsigned DEFAULT NULL,
+  `featured_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `metadata` json DEFAULT NULL,
+  `is_published` tinyint(1) NOT NULL DEFAULT '0',
+  `published_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `knowledge_base_articles_slug_unique` (`slug`),
+  KEY `knowledge_base_articles_category_id_foreign` (`category_id`),
+  KEY `knowledge_base_articles_type_index` (`type`),
+  KEY `knowledge_base_articles_is_published_index` (`is_published`),
+  KEY `knowledge_base_articles_published_at_index` (`published_at`),
+  KEY `knowledge_base_articles_created_by_index` (`created_by`),
+  CONSTRAINT `knowledge_base_articles_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `knowledge_base_categories` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `knowledge_base_articles_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `knowledge_base_categories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `knowledge_base_categories` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `icon` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `color` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `featured_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `order` int NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `knowledge_base_categories_slug_unique` (`slug`),
+  KEY `knowledge_base_categories_is_active_index` (`is_active`),
+  KEY `knowledge_base_categories_order_index` (`order`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `likes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -1502,6 +1552,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (142,'2025_11_11_18
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (143,'2025_11_11_181656_add_reference_id_to_comments_table',49);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (144,'2025_11_11_181835_add_reference_id_to_files_table',49);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (147,'2025_11_12_174357_change_product_description_to_null',50);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (150,'2025_09_28_202015_create_email_settings',51);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (151,'2025_09_28_202053_create_general_settings',51);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (152,'2025_11_13_225851_update_amount_column_types',51);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (153,'2025_09_28_202015_create_email_settings',52);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (154,'2025_09_28_202053_create_general_settings',52);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (155,'2025_11_15_214902_create_knowledge_base_categories_table',52);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (156,'2025_11_15_214944_create_knowledge_base_articles_table',52);
