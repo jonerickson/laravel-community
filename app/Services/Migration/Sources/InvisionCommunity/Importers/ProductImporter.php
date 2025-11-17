@@ -175,18 +175,17 @@ class ProductImporter extends AbstractImporter
         $progressBar->start();
 
         $processed = 0;
-        $sourceCategoriesData = [];
+        $processedSourceCategories = [];
 
-        $baseQuery->chunk($config->batchSize, function ($categories) use ($config, $result, $progressBar, $output, $components, &$processed, &$sourceCategoriesData): bool {
+        $baseQuery->chunk($config->batchSize, function ($categories) use ($config, $result, $progressBar, $output, $components, &$processed, &$processedSourceCategories): bool {
             foreach ($categories as $sourceCategory) {
                 if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
                 }
 
-                $sourceCategoriesData[] = $sourceCategory;
-
                 try {
                     $this->importCategory($sourceCategory, $config, $result, $output);
+                    $processedSourceCategories[] = $sourceCategory;
                 } catch (Exception $e) {
                     $result->incrementFailed('product_categories');
 
@@ -223,7 +222,7 @@ class ProductImporter extends AbstractImporter
             $components->info(sprintf('Migrated %d product categories...', $processed));
         }
 
-        $this->updateCategoryParentRelationships($sourceCategoriesData, $config, $output, $components);
+        $this->updateCategoryParentRelationships($processedSourceCategories, $config, $output, $components);
     }
 
     protected function importCategory(object $sourceCategory, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
@@ -298,16 +297,20 @@ class ProductImporter extends AbstractImporter
     }
 
     /**
-     * @param  object[]  $sourceCategoriesData
+     * @param  object[]  $sourceCategories
      */
-    protected function updateCategoryParentRelationships(array $sourceCategoriesData, MigrationConfig $config, OutputStyle $output, Factory $components): void
+    protected function updateCategoryParentRelationships(array $sourceCategories, MigrationConfig $config, OutputStyle $output, Factory $components): void
     {
+        if ($sourceCategories === []) {
+            return;
+        }
+
         $components->info('Updating product category parent relationships...');
 
-        $progressBar = $output->createProgressBar(count($sourceCategoriesData));
+        $progressBar = $output->createProgressBar(count($sourceCategories));
         $progressBar->start();
 
-        foreach ($sourceCategoriesData as $sourceCategory) {
+        foreach ($sourceCategories as $sourceCategory) {
             try {
                 $mappedCategoryId = static::getCategoryMapping((int) $sourceCategory->pg_id);
 

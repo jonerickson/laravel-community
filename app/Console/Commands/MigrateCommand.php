@@ -51,7 +51,7 @@ class MigrateCommand extends Command
                             {--excluded= : Comma-delimited list of entities to exclude from migration}
                             {--parallel : Enable concurrent processing with multiple processes}
                             {--max-records-per-process=1000 : Maximum records each process should handle before terminating}
-                            {--max-processes=4 : Maximum number of concurrent processes to run}
+                            {--max-processes=8 : Maximum number of concurrent processes to run}
                             {--memory-limit= : Memory limit in MB for worker processes (automatically calculated if not provided)}
                             {--worker : Internal flag indicating this is a worker process (do not use manually)}';
 
@@ -730,7 +730,7 @@ class MigrateCommand extends Command
         $osReservedMemory = (int) ($totalMemory * 0.25);
         $availableMemory = $totalMemory - $osReservedMemory;
 
-        $workerMemoryLimit = (int) min(1024 * 1024 * 1024, floor($availableMemory / $maxProcesses));
+        $workerMemoryLimit = (int) min((1024 * 1024 * 1024) / 2, floor($availableMemory / $maxProcesses));
 
         $memoryAfterAllocation = $totalMemory - ($workerMemoryLimit * $maxProcesses);
         $memoryAfterAllocationPercent = ($memoryAfterAllocation / $totalMemory) * 100;

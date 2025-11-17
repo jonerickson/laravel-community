@@ -21,6 +21,10 @@ class ConcurrentMigrationManager
 
     protected array $workerColors = [];
 
+    protected array $retryCount = [];
+
+    protected int $maxRetries = 3;
+
     /**
      * @var string[]
      */
@@ -82,11 +86,17 @@ class ConcurrentMigrationManager
         $this->components->success(sprintf('All processes for %s completed!', $this->entity));
         $this->components->info('Completed chunks: '.count($this->completedChunks));
 
+        $totalRetries = array_sum($this->retryCount);
+        if ($totalRetries > 0) {
+            $this->components->info(sprintf('Total retries performed: %d', $totalRetries));
+        }
+
         if ($this->failedChunks !== []) {
             $this->components->error('Failed chunks: '.count($this->failedChunks));
 
             foreach ($this->failedChunks as $chunk) {
-                $this->components->error(sprintf('Offset %s, Limit %s: %s', $chunk['offset'], $chunk['limit'], $chunk['error']));
+                $retryInfo = isset($chunk['retry_attempts']) ? sprintf(' (Failed after %d retries)', $chunk['retry_attempts']) : '';
+                $this->components->error(sprintf('Offset %s, Limit %s%s: %s', $chunk['offset'], $chunk['limit'], $retryInfo, $chunk['error']));
             }
         }
 
@@ -111,6 +121,7 @@ class ConcurrentMigrationManager
         MigrationSource $source,
         int $offset,
         int $limit,
+        int $retryAttempt = 0,
     ): void {
         $command = [
             PHP_BINARY,
@@ -159,9 +170,12 @@ class ConcurrentMigrationManager
             'output_position' => 0,
             'error_position' => 0,
             'color' => $color,
+            'retry_attempt' => $retryAttempt,
+            'source' => $source,
         ];
 
-        $this->output->writeln(sprintf('<comment>[Process Started]</comment> Entity: %s, Offset: %d, Limit: %d, PID: %s', $this->entity, $offset, $limit, $process->getPid()));
+        $retryMessage = $retryAttempt > 0 ? sprintf(' (Retry %d/%d)', $retryAttempt, $this->maxRetries) : '';
+        $this->output->writeln(sprintf('<comment>[Process Started]</comment> Entity: %s, Offset: %d, Limit: %d, PID: %s%s', $this->entity, $offset, $limit, $process->getPid(), $retryMessage));
     }
 
     protected function checkProcesses(): void
@@ -204,23 +218,46 @@ class ConcurrentMigrationManager
         $exitCode = $process->getExitCode();
         $errorOutput = in_array($process->getErrorOutput(), ['', '0'], true) ? 'Unknown error' : $process->getErrorOutput();
         $stdOutput = $process->getOutput();
-
-        $this->failedChunks[] = [
-            'offset' => $data['offset'],
-            'limit' => $data['limit'],
-            'entity' => $data['entity'],
-            'error' => $errorOutput,
-            'exit_code' => $exitCode,
-        ];
+        $retryAttempt = $data['retry_attempt'] ?? 0;
 
         $this->output->writeln(sprintf('<error>[Process Failed]</error> Entity: %s, Offset: %s, Exit Code: %s', $data['entity'], $data['offset'], $exitCode));
 
-        if ($errorOutput && ! $this->isProgressBarOutput($errorOutput)) {
-            $this->components->error('Error: '.$errorOutput);
+        if ($stdOutput !== '' && $stdOutput !== '0') {
+            $this->components->info('Output:');
+            $lines = array_filter(explode("\n", $stdOutput), fn (string $line): bool => trim($line) !== '');
+            $this->output->writeln(implode("\n", $lines));
+            $this->output->newLine();
         }
 
-        if ($stdOutput !== '' && $stdOutput !== '0') {
-            $this->output->writeln('  → Output: '.$stdOutput);
+        if ($retryAttempt < $this->maxRetries) {
+            $nextRetry = $retryAttempt + 1;
+            $chunkKey = sprintf('%d-%d', $data['offset'], $data['limit']);
+
+            if (! isset($this->retryCount[$chunkKey])) {
+                $this->retryCount[$chunkKey] = 0;
+            }
+
+            $this->retryCount[$chunkKey]++;
+
+            $this->output->writeln(sprintf('<info>[Scheduling Retry]</info> Entity: %s, Offset: %s, Attempt: %d/%d', $data['entity'], $data['offset'], $nextRetry, $this->maxRetries));
+
+            $this->spawnWorkerProcess(
+                source: $data['source'],
+                offset: $data['offset'],
+                limit: $data['limit'],
+                retryAttempt: $nextRetry,
+            );
+        } else {
+            $this->failedChunks[] = [
+                'offset' => $data['offset'],
+                'limit' => $data['limit'],
+                'entity' => $data['entity'],
+                'error' => $errorOutput,
+                'exit_code' => $exitCode,
+                'retry_attempts' => $retryAttempt,
+            ];
+
+            $this->output->writeln(sprintf('<error>[Max Retries Reached]</error> Entity: %s, Offset: %s, Retry Attempts: %d', $data['entity'], $data['offset'], $retryAttempt));
         }
     }
 

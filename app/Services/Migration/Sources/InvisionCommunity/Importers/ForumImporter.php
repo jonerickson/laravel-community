@@ -100,18 +100,17 @@ class ForumImporter extends AbstractImporter
         $progressBar->start();
 
         $processed = 0;
-        $sourceForumsData = [];
+        $processedSourceForums = [];
 
-        $baseQuery->chunk($config->batchSize, function ($forums) use ($config, $result, $progressBar, $output, $components, &$processed, &$sourceForumsData): bool {
+        $baseQuery->chunk($config->batchSize, function ($forums) use ($config, $result, $progressBar, $output, $components, &$processed, &$processedSourceForums): bool {
             foreach ($forums as $sourceForum) {
                 if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
                 }
 
-                $sourceForumsData[] = $sourceForum;
-
                 try {
                     $this->importForum($sourceForum, $config, $result, $output);
+                    $processedSourceForums[] = $sourceForum;
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
 
@@ -146,7 +145,7 @@ class ForumImporter extends AbstractImporter
 
         $output->newLine(2);
 
-        $this->updateForumParentRelationships($sourceForumsData, $config, $output, $components);
+        $this->updateForumParentRelationships($processedSourceForums, $config, $output, $components);
 
         return $processed;
     }
@@ -360,16 +359,20 @@ class ForumImporter extends AbstractImporter
     }
 
     /**
-     * @param  object[]  $sourceForumsData
+     * @param  object[]  $sourceForums
      */
-    protected function updateForumParentRelationships(array $sourceForumsData, MigrationConfig $config, OutputStyle $output, Factory $components): void
+    protected function updateForumParentRelationships(array $sourceForums, MigrationConfig $config, OutputStyle $output, Factory $components): void
     {
+        if ($sourceForums === []) {
+            return;
+        }
+
         $components->info('Updating forum parent relationships...');
 
-        $progressBar = $output->createProgressBar(count($sourceForumsData));
+        $progressBar = $output->createProgressBar(count($sourceForums));
         $progressBar->start();
 
-        foreach ($sourceForumsData as $sourceForum) {
+        foreach ($sourceForums as $sourceForum) {
             try {
                 $mappedForumId = static::getForumMapping((int) $sourceForum->id);
 
