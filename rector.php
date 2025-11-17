@@ -27,5 +27,6 @@ return RectorConfig::configure()
         typeDeclarations: true,
         privatization: true,
         earlyReturn: true,
+        carbon: true,
     )
     ->withPhpSets();
