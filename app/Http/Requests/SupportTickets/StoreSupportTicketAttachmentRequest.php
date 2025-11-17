@@ -15,6 +15,9 @@ class StoreSupportTicketAttachmentRequest extends FormRequest
         return Auth::check() && Auth::user()->can('create', File::class);
     }
 
+    /**
+     * @return array<string, array<int, string>>
+     */
     public function rules(): array
     {
         return [

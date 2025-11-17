@@ -224,6 +224,9 @@ class Post extends Model implements HasLabel, Sluggable
         };
     }
 
+    /**
+     * @return array<string, int|string|null>
+     */
     public function toSearchableArray(): array
     {
         return [
@@ -245,6 +248,9 @@ class Post extends Model implements HasLabel, Sluggable
         return $this->is_published;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getLoggedAttributes(): array
     {
         return [

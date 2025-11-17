@@ -52,6 +52,9 @@ class Warning extends Model
         return $this->hasMany(UserWarning::class);
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [

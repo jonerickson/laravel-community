@@ -124,6 +124,9 @@ class OrderItem extends Model implements HasLabel
         });
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [

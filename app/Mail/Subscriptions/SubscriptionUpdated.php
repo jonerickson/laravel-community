@@ -46,6 +46,9 @@ class SubscriptionUpdated extends Mailable implements ShouldQueue
         );
     }
 
+    /**
+     * @return array{}
+     */
     public function attachments(): array
     {
         return [];

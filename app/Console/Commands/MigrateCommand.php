@@ -512,6 +512,8 @@ class MigrateCommand extends Command
     }
 
     /**
+     * @param  array<string, mixed>  $sshConfig
+     *
      * @throws RandomException
      */
     protected function createSshTunnel(array $sshConfig, string $connectionName): ?array
@@ -576,6 +578,9 @@ class MigrateCommand extends Command
         ];
     }
 
+    /**
+     * @param  array<string, mixed>  $sshTunnel
+     */
     protected function closeSshTunnel(array $sshTunnel): void
     {
         $localPort = $sshTunnel['local_port'];

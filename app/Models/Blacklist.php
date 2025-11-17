@@ -54,6 +54,9 @@ class Blacklist extends Model
         return $this->belongsTo(Warning::class);
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [

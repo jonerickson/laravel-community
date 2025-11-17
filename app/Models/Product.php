@@ -325,6 +325,9 @@ class Product extends Model implements HasLabel, Sluggable
         return $this->approval_status === ProductApprovalStatus::Rejected;
     }
 
+    /**
+     * @return array<string, int|string|null>
+     */
     public function toSearchableArray(): array
     {
         return [
@@ -336,6 +339,9 @@ class Product extends Model implements HasLabel, Sluggable
         ];
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getLoggedAttributes(): array
     {
         return [

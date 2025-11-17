@@ -15,6 +15,9 @@ class UpdateSupportTicketRequest extends FormRequest
         return Auth::check() && Auth::user()->can('update', $this->route('ticket'));
     }
 
+    /**
+     * @return array<string, array<int, string>>
+     */
     public function rules(): array
     {
         return [
@@ -22,6 +25,9 @@ class UpdateSupportTicketRequest extends FormRequest
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     #[Override]
     public function messages(): array
     {

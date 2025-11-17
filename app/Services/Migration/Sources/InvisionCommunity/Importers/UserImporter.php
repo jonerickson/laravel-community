@@ -42,6 +42,9 @@ class UserImporter extends AbstractImporter
         return 'core_members';
     }
 
+    /**
+     * @return ImporterDependency[]
+     */
     public function getDependencies(): array
     {
         return [

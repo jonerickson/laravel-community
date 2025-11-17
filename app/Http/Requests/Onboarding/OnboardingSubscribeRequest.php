@@ -15,6 +15,9 @@ class OnboardingSubscribeRequest extends FormRequest
         return Auth::check();
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function rules(): array
     {
         return [
@@ -24,6 +27,9 @@ class OnboardingSubscribeRequest extends FormRequest
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     #[Override]
     public function messages(): array
     {

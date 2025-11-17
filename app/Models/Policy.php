@@ -107,6 +107,9 @@ class Policy extends Model implements Sluggable
         });
     }
 
+    /**
+     * @return array<string, int|string|null>
+     */
     public function toSearchableArray(): array
     {
         return [
@@ -130,6 +133,9 @@ class Policy extends Model implements Sluggable
         return route('policies.show', [$this->category->slug, $this->slug]);
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [

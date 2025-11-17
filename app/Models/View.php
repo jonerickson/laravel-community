@@ -61,6 +61,9 @@ class View extends Model
         return $this->belongsTo(Fingerprint::class, 'fingerprint_id', 'session_id');
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [

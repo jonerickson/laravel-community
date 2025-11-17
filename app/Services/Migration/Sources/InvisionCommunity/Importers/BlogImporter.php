@@ -60,6 +60,9 @@ class BlogImporter extends AbstractImporter
         return 'blog_entries';
     }
 
+    /**
+     * @return ImporterDependency[]
+     */
     public function getDependencies(): array
     {
         return [

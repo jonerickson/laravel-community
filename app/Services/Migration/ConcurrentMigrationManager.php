@@ -21,6 +21,9 @@ class ConcurrentMigrationManager
 
     protected array $workerColors = [];
 
+    /**
+     * @var string[]
+     */
     protected array $availableColors = [
         'cyan',
         'magenta',
@@ -184,12 +187,18 @@ class ConcurrentMigrationManager
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     protected function handleSuccessfulProcess(array $data): void
     {
         $this->completedChunks[] = $data;
         $this->output->writeln(sprintf('<comment>[Process Completed]</comment> Entity: %s, Offset: %s, Limit: %s', $data['entity'], $data['offset'], $data['limit']));
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     protected function handleFailedProcess(array $data, Process $process): void
     {
         $exitCode = $process->getExitCode();
@@ -215,6 +224,9 @@ class ConcurrentMigrationManager
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     protected function streamProcessOutput(Process $process, array &$data): void
     {
         $newOutput = substr($process->getOutput(), $data['output_position']);

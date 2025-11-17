@@ -103,6 +103,9 @@ class Page extends Model implements Sluggable
         return route('pages.show', $this->slug);
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [

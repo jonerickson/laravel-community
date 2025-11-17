@@ -60,6 +60,9 @@ class TopicImporter extends AbstractImporter
         return 'forums_topics';
     }
 
+    /**
+     * @return ImporterDependency[]
+     */
     public function getDependencies(): array
     {
         return [

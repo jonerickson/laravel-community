@@ -29,6 +29,9 @@ class UpdatePasswordRequest extends FormRequest
         return $rules;
     }
 
+    /**
+     * @return array<string, string>
+     */
     #[Override]
     public function messages(): array
     {

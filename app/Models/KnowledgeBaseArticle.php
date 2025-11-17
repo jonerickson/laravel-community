@@ -126,6 +126,9 @@ class KnowledgeBaseArticle extends Model implements HasLabel, Sluggable
         return route('knowledge-base.show', $this);
     }
 
+    /**
+     * @return array<string, int|string|null>
+     */
     public function toSearchableArray(): array
     {
         return [
@@ -144,6 +147,9 @@ class KnowledgeBaseArticle extends Model implements HasLabel, Sluggable
         return $this->is_published;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getLoggedAttributes(): array
     {
         return [

@@ -14,6 +14,9 @@ class ApplyDiscountRequest extends FormRequest
         return true;
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function rules(): array
     {
         return [
@@ -22,6 +25,9 @@ class ApplyDiscountRequest extends FormRequest
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     #[Override]
     public function messages(): array
     {

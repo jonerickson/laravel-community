@@ -104,6 +104,9 @@ class UserWarning extends Model
         return $query->where('consequence_expires_at', '>', Carbon::now());
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [

@@ -380,6 +380,9 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         ];
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getLoggedAttributes(): array
     {
         return [
@@ -401,6 +404,9 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         return 'user';
     }
 
+    /**
+     * @return array<string, int|string|null>
+     */
     public function toSearchableArray(): array
     {
         return [
@@ -435,6 +441,9 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         return 'web';
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [

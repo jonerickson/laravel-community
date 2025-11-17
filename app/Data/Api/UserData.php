@@ -75,6 +75,9 @@ class UserData extends Data
         return $object;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function with(): array
     {
         return [

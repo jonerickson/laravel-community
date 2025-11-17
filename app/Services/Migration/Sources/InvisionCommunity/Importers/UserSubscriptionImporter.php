@@ -69,6 +69,9 @@ class UserSubscriptionImporter extends AbstractImporter
         return 'nexus_member_subscriptions';
     }
 
+    /**
+     * @return ImporterDependency[]
+     */
     public function getDependencies(): array
     {
         return [

@@ -51,6 +51,9 @@ class GroupImporter extends AbstractImporter
         return 'core_groups';
     }
 
+    /**
+     * @return array{}
+     */
     public function getDependencies(): array
     {
         return [];

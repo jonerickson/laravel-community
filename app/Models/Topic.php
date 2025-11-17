@@ -206,6 +206,9 @@ class Topic extends Model implements Sluggable
         )->shouldCache();
     }
 
+    /**
+     * @return array<string, int|string|null>
+     */
     public function toSearchableArray(): array
     {
         return [
@@ -219,6 +222,9 @@ class Topic extends Model implements Sluggable
         ];
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getLoggedAttributes(): array
     {
         return [

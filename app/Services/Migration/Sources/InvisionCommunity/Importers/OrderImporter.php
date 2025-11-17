@@ -63,6 +63,9 @@ class OrderImporter extends AbstractImporter
         return 'nexus_invoices';
     }
 
+    /**
+     * @return ImporterDependency[]
+     */
     public function getDependencies(): array
     {
         return [
@@ -312,6 +315,9 @@ class OrderImporter extends AbstractImporter
         return $orderItems;
     }
 
+    /**
+     * @param  array<string, mixed>  $item
+     */
     protected function createOrderItem(Order $order, array $item, object $sourceOrder, ?Price $price, ?Product $product): OrderItem
     {
         $orderItem = new OrderItem;

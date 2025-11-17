@@ -64,6 +64,9 @@ class ForumImporter extends AbstractImporter
         return 'forums_forums';
     }
 
+    /**
+     * @return array{}
+     */
     public function getDependencies(): array
     {
         return [];
@@ -356,6 +359,9 @@ class ForumImporter extends AbstractImporter
         }
     }
 
+    /**
+     * @param  object[]  $sourceForumsData
+     */
     protected function updateForumParentRelationships(array $sourceForumsData, MigrationConfig $config, OutputStyle $output, Factory $components): void
     {
         $components->info('Updating forum parent relationships...');

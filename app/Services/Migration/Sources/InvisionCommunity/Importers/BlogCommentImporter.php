@@ -59,6 +59,9 @@ class BlogCommentImporter extends AbstractImporter
         return 'blog_comments';
     }
 
+    /**
+     * @return ImporterDependency[]
+     */
     public function getDependencies(): array
     {
         return [

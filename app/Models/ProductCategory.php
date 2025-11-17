@@ -104,6 +104,9 @@ class ProductCategory extends Model implements Sluggable
         return Str::slug($this->name);
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getLoggedAttributes(): array
     {
         return [

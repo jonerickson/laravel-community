@@ -155,6 +155,8 @@ class DiscordApiService
     /**
      * Make a request to the Discord API with rate limit and error handling.
      *
+     * @param  array<string, string>|array<string, non-empty-array>  $options
+     *
      * @throws RequestException
      * @throws ConnectionException
      */

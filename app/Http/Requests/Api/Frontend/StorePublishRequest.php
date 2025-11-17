@@ -15,6 +15,9 @@ class StorePublishRequest extends FormRequest
         return Auth::check() && Auth::user()->can('publish', $this->resolvePublishable());
     }
 
+    /**
+     * @return array<string, array<int, string>>
+     */
     public function rules(): array
     {
         return [

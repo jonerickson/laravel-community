@@ -71,6 +71,9 @@ class ResetCommand extends Command
 
     protected $description = 'Resets the platform data by deleting selected records.';
 
+    /**
+     * @var array<string, array<string, string>>
+     */
     private array $dataTypes = [
         'announcements' => ['model' => Announcement::class, 'label' => 'Announcements'],
         'forums' => ['model' => Forum::class, 'label' => 'Forums and Topics'],
@@ -126,6 +129,9 @@ class ResetCommand extends Command
         return self::SUCCESS;
     }
 
+    /**
+     * @return int[]|string[]
+     */
     private function getSelectedFromFlags(): array
     {
         $selected = [];
@@ -142,6 +148,8 @@ class ResetCommand extends Command
     }
 
     /**
+     * @param  int[]|string[]  $selected
+     *
      * @throws Throwable
      */
     private function resetSelected(array $selected): int
@@ -181,6 +189,9 @@ class ResetCommand extends Command
         return $this->resetSelected($selected);
     }
 
+    /**
+     * @param  array<string, mixed>  $config
+     */
     private function deleteData(string $key, array $config): void
     {
         $model = $config['model'];

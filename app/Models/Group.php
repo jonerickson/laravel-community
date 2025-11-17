@@ -145,6 +145,9 @@ class Group extends Model
         return 'web';
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [

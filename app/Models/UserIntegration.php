@@ -89,6 +89,9 @@ class UserIntegration extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getLoggedAttributes(): array
     {
         return [
@@ -120,6 +123,9 @@ class UserIntegration extends Model
         });
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [

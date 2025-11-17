@@ -19,6 +19,9 @@ class WarningIssuedNotification extends Notification implements ShouldQueue
         public UserWarning $userWarning
     ) {}
 
+    /**
+     * @return array<int, string>
+     */
     public function via(object $notifiable): array
     {
         return ['mail', 'database'];

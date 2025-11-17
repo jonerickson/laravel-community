@@ -71,6 +71,9 @@ class ProductImporter extends AbstractImporter
         return 'nexus_packages';
     }
 
+    /**
+     * @return array{}
+     */
     public function getDependencies(): array
     {
         return [];
@@ -294,6 +297,9 @@ class ProductImporter extends AbstractImporter
         }
     }
 
+    /**
+     * @param  object[]  $sourceCategoriesData
+     */
     protected function updateCategoryParentRelationships(array $sourceCategoriesData, MigrationConfig $config, OutputStyle $output, Factory $components): void
     {
         $components->info('Updating product category parent relationships...');

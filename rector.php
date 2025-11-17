@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Arr;
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
+use Rector\Config\Level\TypeDeclarationDocblocksLevel;
 use Rector\Config\RectorConfig;
 
 return RectorConfig::configure()
@@ -25,8 +27,10 @@ return RectorConfig::configure()
         codeQuality: true,
         codingStyle: true,
         typeDeclarations: true,
+        typeDeclarationDocblocks: true,
         privatization: true,
         earlyReturn: true,
         carbon: true,
     )
+    ->withSkip(Arr::mapWithKeys(TypeDeclarationDocblocksLevel::RULES, fn (string $rule) => [$rule => [__DIR__.'/app/Filament/**/*']]))
     ->withPhpSets();

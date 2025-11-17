@@ -18,6 +18,9 @@ class StoreReadRequest extends FormRequest
         return Auth::check();
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function rules(): array
     {
         return [

@@ -21,6 +21,9 @@ class NewContentNotification extends Notification implements ShouldQueue
         public Model $followable
     ) {}
 
+    /**
+     * @return array<int, string>
+     */
     public function via(object $notifiable): array
     {
         return ['mail', 'database'];
@@ -31,6 +34,9 @@ class NewContentNotification extends Notification implements ShouldQueue
         return new NewContentMail($this->content, $this->followable, $notifiable)->to($notifiable->email);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(object $notifiable): array
     {
         $contentType = $this->content instanceof Topic ? 'topic' : 'post';

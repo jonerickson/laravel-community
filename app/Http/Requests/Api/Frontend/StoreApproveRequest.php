@@ -16,6 +16,9 @@ class StoreApproveRequest extends FormRequest
         return Auth::check() && Auth::user()->can('approve', $this->resolveApprovable());
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     public function rules(): array
     {
         return [
