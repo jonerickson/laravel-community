@@ -52,7 +52,7 @@ use Override;
  * @property string|null $featured_image
  * @property array<array-key, mixed>|null $metadata
  * @property Carbon|null $published_at
- * @property int $created_by
+ * @property int|null $created_by
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property \App\Enums\PublishableStatus $status
@@ -62,11 +62,11 @@ use Override;
  * @property-read int|null $approved_comments_count
  * @property-read Collection<int, Report> $approvedReports
  * @property-read int|null $approved_reports_count
- * @property-read User $author
+ * @property-read User|null $author
  * @property-read mixed $author_name
  * @property-read Collection<int, Comment> $comments
  * @property-read int|null $comments_count
- * @property-read User $creator
+ * @property-read User|null $creator
  * @property-read string|null $featured_image_url
  * @property-read bool $is_read_by_user
  * @property-read bool $is_reported

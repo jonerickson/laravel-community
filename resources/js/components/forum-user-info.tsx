@@ -11,11 +11,8 @@ export default function ForumUserInfo({
     isAuthor?: boolean;
     dateTime?: string | null;
 }) {
-    return (
-        <Link
-            href={route('users.show', user.referenceId)}
-            className="flex flex-row items-center gap-4 hover:opacity-80 md:flex-col md:items-center md:gap-2 md:px-8"
-        >
+    const content = (
+        <>
             <Avatar className="size-12">
                 {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name} />}
                 <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
@@ -47,6 +44,16 @@ export default function ForumUserInfo({
                     </time>
                 )}
             </div>
+        </>
+    );
+
+    if (!user.referenceId) {
+        return <div className="flex flex-row items-center gap-4 md:flex-col md:items-center md:gap-2 md:px-8">{content}</div>;
+    }
+
+    return (
+        <Link href={user.referenceId} className="flex flex-row items-center gap-4 hover:opacity-80 md:flex-col md:items-center md:gap-2 md:px-8">
+            {content}
         </Link>
     );
 }

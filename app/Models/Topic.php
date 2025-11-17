@@ -36,14 +36,14 @@ use Override;
  * @property int $forum_id
  * @property bool $is_pinned
  * @property bool $is_locked
- * @property int $created_by
+ * @property int|null $created_by
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
- * @property-read User $author
+ * @property-read User|null $author
  * @property-read mixed $author_name
- * @property-read User $creator
+ * @property-read User|null $creator
  * @property-read Collection<int, Follow> $followers
  * @property-read int|null $followers_count
  * @property-read Collection<int, Follow> $follows

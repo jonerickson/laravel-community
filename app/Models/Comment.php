@@ -30,13 +30,13 @@ use Override;
  * @property int|null $rating
  * @property bool $is_approved
  * @property int|null $parent_id
- * @property int $created_by
+ * @property int|null $created_by
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read User $author
+ * @property-read User|null $author
  * @property-read mixed $author_name
  * @property-read Model|Eloquent $commentable
- * @property-read User $creator
+ * @property-read User|null $creator
  * @property-read Collection<int, Like> $likes
  * @property-read int|null $likes_count
  * @property-read array $likes_summary

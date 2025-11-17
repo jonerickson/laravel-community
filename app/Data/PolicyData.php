@@ -28,7 +28,7 @@ class PolicyData extends Data
 
     public bool $isActive;
 
-    public ?UserData $author = null;
+    public UserData $author;
 
     public ?PolicyCategoryData $category = null;
 

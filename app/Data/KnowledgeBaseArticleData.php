@@ -47,7 +47,7 @@ class KnowledgeBaseArticleData extends Data
 
     public ?int $createdBy = null;
 
-    public ?UserData $author = null;
+    public UserData $author;
 
     #[LiteralTypeScriptType('Array<string, unknown> | null')]
     public ?array $metadata = null;

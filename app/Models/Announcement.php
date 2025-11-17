@@ -26,12 +26,12 @@ use Illuminate\Support\Str;
  * @property bool $is_dismissible
  * @property Carbon|null $starts_at
  * @property Carbon|null $ends_at
- * @property int $created_by
+ * @property int|null $created_by
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read User $author
+ * @property-read User|null $author
  * @property-read mixed $author_name
- * @property-read User $creator
+ * @property-read User|null $creator
  * @property-read bool $is_read_by_user
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Read> $reads
  * @property-read int|null $reads_count

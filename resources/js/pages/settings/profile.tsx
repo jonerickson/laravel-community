@@ -93,7 +93,7 @@ export default function Profile({ fields }: ProfilePageProps) {
                 <div className="space-y-6">
                     <div className="flex items-center justify-between gap-2">
                         <HeadingSmall title="Profile information" description="Update your name and email address" />
-                        {auth && auth.user && (
+                        {auth && auth.user && auth.user.referenceId && (
                             <Button variant="outline" asChild>
                                 <a target="_blank" href={route('users.show', auth.user.referenceId)}>
                                     <User className="mr-2 size-4" />

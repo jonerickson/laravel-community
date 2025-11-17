@@ -29,13 +29,13 @@ use Illuminate\Support\Str;
  * @property bool $show_in_navigation
  * @property string|null $navigation_label
  * @property int $navigation_order
- * @property int $created_by
+ * @property int|null $created_by
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property \App\Enums\PublishableStatus $status
- * @property-read User $author
+ * @property-read User|null $author
  * @property-read mixed $author_name
- * @property-read User $creator
+ * @property-read User|null $creator
  * @property-read string|null $url
  *
  * @method static \Database\Factories\PageFactory factory($count = null, $state = [])

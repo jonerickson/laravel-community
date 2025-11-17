@@ -17,7 +17,7 @@ class UserData extends Data
 {
     public int $id;
 
-    public string $referenceId;
+    public ?string $referenceId = null;
 
     public string $name;
 
@@ -30,7 +30,7 @@ class UserData extends Data
     public ?CarbonImmutable $emailVerifiedAt = null;
 
     /** @var GroupData[] */
-    public array $groups;
+    public array $groups = [];
 
     /** @var FieldData[] */
     public array $fields = [];

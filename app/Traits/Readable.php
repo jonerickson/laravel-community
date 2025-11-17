@@ -134,9 +134,10 @@ trait Readable
 
     public function getRecentViewers(int $hours = 24, int $limit = 10): array
     {
-        $recentViewers = $this->reads()
+        $recentViewers = $this
+            ->reads()
             ->where('updated_at', '>=', now()->subHours($hours))
-            ->with(['author'])
+            ->with('author')
             ->orderBy('updated_at', 'desc')
             ->get()
             ->unique('created_by')

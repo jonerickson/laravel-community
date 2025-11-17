@@ -7,8 +7,8 @@ declare namespace App.Data {
         type: App.Enums.AnnouncementType;
         isActive: boolean;
         isDismissible: boolean;
-        createdBy: number;
-        author: App.Data.UserData | null;
+        createdBy: number | null;
+        author: App.Data.UserData;
         startsAt: string | null;
         endsAt: string | null;
         createdAt: string | null;
@@ -58,15 +58,15 @@ declare namespace App.Data {
         commentableId: number;
         content: string;
         isApproved: boolean;
-        createdBy: number;
+        createdBy: number | null;
         parentId: number | null;
         rating: number | null;
         likesCount: number;
         likesSummary: Array<App.Data.LikeData>;
         userReaction: string | null;
         userReactions: Array<string>;
-        user: App.Data.UserData | null;
-        author: App.Data.UserData | null;
+        user: App.Data.UserData;
+        author: App.Data.UserData;
         parent: App.Data.CommentData | null;
         replies: Array<App.Data.CommentData> | null;
         createdAt: string | null;
@@ -219,7 +219,7 @@ declare namespace App.Data {
         readingTime: number | null;
         publishedAt: string | null;
         createdBy: number | null;
-        author: App.Data.UserData | null;
+        author: App.Data.UserData;
         metadata: Array<string, unknown> | null;
         createdAt: string | null;
         updatedAt: string | null;
@@ -308,7 +308,7 @@ declare namespace App.Data {
         showInNavigation: boolean;
         navigationLabel: string | null;
         navigationOrder: number;
-        author: App.Data.UserData | null;
+        author: App.Data.UserData;
         createdAt: string | null;
         updatedAt: string | null;
     };
@@ -368,7 +368,7 @@ declare namespace App.Data {
         description: string | null;
         content: string;
         isActive: boolean;
-        author: App.Data.UserData | null;
+        author: App.Data.UserData;
         category: App.Data.PolicyCategoryData | null;
         effectiveAt: string | null;
         createdAt: string | null;
@@ -547,7 +547,7 @@ declare namespace App.Data {
         assignedTo: number | null;
         assignedToUser: App.Data.UserData | null;
         createdBy: number;
-        author: App.Data.UserData | null;
+        author: App.Data.UserData;
         externalId: string | null;
         externalUrl: string | null;
         lastSyncedAt: string | null;
@@ -566,7 +566,7 @@ declare namespace App.Data {
         slug: string;
         description: string | null;
         forumId: number;
-        createdBy: number;
+        createdBy: number | null;
         isPinned: boolean;
         isLocked: boolean;
         viewsCount: number;
@@ -591,7 +591,7 @@ declare namespace App.Data {
     };
     export type UserData = {
         id: number;
-        referenceId: string;
+        referenceId: string | null;
         name: string;
         email: string;
         avatarUrl: string | null;

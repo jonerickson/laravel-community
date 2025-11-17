@@ -59,8 +59,11 @@ class ProductController extends Controller
     {
         $this->authorize('view', $product);
 
+        $product->loadCount(['reviews']);
+
         $reviews = CommentData::collect($product
             ->reviews()
+            ->with('author')
             ->approved()
             ->latest()
             ->get()

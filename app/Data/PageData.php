@@ -38,7 +38,7 @@ class PageData extends Data
 
     public int $navigationOrder;
 
-    public ?UserData $author = null;
+    public UserData $author;
 
     public ?CarbonImmutable $createdAt = null;
 

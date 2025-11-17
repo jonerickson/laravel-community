@@ -14,7 +14,12 @@ trait HasAuthor
 {
     public function author(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(User::class, 'created_by')
+            ->withDefault([
+                'id' => 0,
+                'name' => 'Guest',
+                'email' => config('app.email'),
+            ]);
     }
 
     public function creator(): BelongsTo
@@ -30,7 +35,7 @@ trait HasAuthor
     public function authorName(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->author?->name ?? 'Unknown'
+            get: fn () => $this->author?->name ?? 'Guest'
         );
     }
 

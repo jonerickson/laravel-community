@@ -29,7 +29,7 @@ class CommentData extends Data
 
     public bool $isApproved;
 
-    public int $createdBy;
+    public ?int $createdBy = null;
 
     public ?int $parentId = null;
 
@@ -45,9 +45,9 @@ class CommentData extends Data
     /** @var string[] */
     public array $userReactions;
 
-    public ?UserData $user = null;
+    public UserData $user;
 
-    public ?UserData $author = null;
+    public UserData $author;
 
     public ?CommentData $parent = null;
 

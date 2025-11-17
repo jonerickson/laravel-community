@@ -25,7 +25,10 @@ class ReviewController extends Controller
     {
         $this->authorize('viewAny', Comment::class);
 
-        $reviews = CommentData::collect($subscription->reviews()
+        $subscription->loadCount(['reviews']);
+
+        $reviews = CommentData::collect($subscription
+            ->reviews()
             ->with('author')
             ->approved()
             ->latest()

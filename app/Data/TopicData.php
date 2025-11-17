@@ -27,7 +27,7 @@ class TopicData extends Data
 
     public int $forumId;
 
-    public int $createdBy;
+    public ?int $createdBy = null;
 
     public bool $isPinned;
 

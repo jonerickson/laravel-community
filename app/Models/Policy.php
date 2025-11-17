@@ -30,13 +30,13 @@ use Illuminate\Support\Str;
  * @property int $order
  * @property bool $is_active
  * @property Carbon|null $effective_at
- * @property int $created_by
+ * @property int|null $created_by
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read User $author
+ * @property-read User|null $author
  * @property-read mixed $author_name
  * @property-read PolicyCategory $category
- * @property-read User $creator
+ * @property-read User|null $creator
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
  * @property-read int|null $products_count
  * @property-read string|null $url

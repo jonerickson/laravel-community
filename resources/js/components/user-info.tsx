@@ -9,8 +9,8 @@ export function UserInfo({ user, showEmail = false, showGroups = false }: { user
         return null;
     }
 
-    return (
-        <Link href={route('users.show', user.referenceId)} className="flex flex-row items-center gap-2 transition-opacity hover:opacity-80">
+    const content = (
+        <>
             <Avatar className="h-8 w-8 overflow-hidden rounded-full">
                 {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name} />}
                 <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
@@ -38,6 +38,16 @@ export function UserInfo({ user, showEmail = false, showGroups = false }: { user
                     </ul>
                 )}
             </div>
+        </>
+    );
+
+    if (!user.referenceId) {
+        return <div className="flex flex-row items-center gap-2 transition-opacity hover:opacity-80">{content}</div>;
+    }
+
+    return (
+        <Link href={route('users.show', user.referenceId)} className="flex flex-row items-center gap-2 transition-opacity hover:opacity-80">
+            {content}
         </Link>
     );
 }

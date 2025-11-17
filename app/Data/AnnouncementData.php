@@ -29,9 +29,9 @@ class AnnouncementData extends Data
 
     public bool $isDismissible;
 
-    public int $createdBy;
+    public ?int $createdBy = null;
 
-    public ?UserData $author = null;
+    public UserData $author;
 
     public ?CarbonImmutable $startsAt = null;
 

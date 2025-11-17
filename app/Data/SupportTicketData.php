@@ -41,7 +41,7 @@ class SupportTicketData extends Data
 
     public int $createdBy;
 
-    public ?UserData $author = null;
+    public UserData $author;
 
     public ?string $externalId = null;
 
