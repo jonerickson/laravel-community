@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Enums\Role;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
@@ -20,24 +21,11 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 
         $isLocal = $this->app->environment('local', 'staging');
 
-        Telescope::filter(function (IncomingEntry $entry) use ($isLocal): bool {
-            if ($isLocal) {
-                return true;
-            }
-            if ($entry->isReportableException()) {
-                return true;
-            }
-            if ($entry->isFailedRequest()) {
-                return true;
-            }
-            if ($entry->isFailedJob()) {
-                return true;
-            }
-            if ($entry->isScheduledTask()) {
-                return true;
-            }
-
-            return $entry->hasMonitoredTag();
+        Telescope::filter(fn (IncomingEntry $entry): bool => match (true) {
+            App::runningConsoleCommand('app:migrate') => false,
+            $isLocal => true,
+            $entry->isReportableException(), $entry->isFailedRequest(), $entry->isFailedJob(), $entry->isScheduledTask() => true,
+            default => $entry->hasMonitoredTag()
         });
     }
 
