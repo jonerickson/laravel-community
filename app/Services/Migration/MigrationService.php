@@ -246,5 +246,6 @@ class MigrationService
         $this->configRepository->set('logging.channels.single.path', storage_path('logs/migration.log'));
         $this->configRepository->set('telescope.enabled', false);
         $this->configRepository->set('queue.default', 'sync');
+        $this->configRepository->set('scout.driver', 'database');
     }
 }
