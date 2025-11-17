@@ -146,11 +146,16 @@ class SubscriptionImporter extends AbstractImporter
 
     protected function importSubscription(object $sourceSubscription, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
-        $name = $this->source instanceof InvisionCommunitySource
-            ? $this->source->getLanguageResolver()->resolveSubscriptionPackageName($sourceSubscription->sp_id, 'Invision Subscription '.$sourceSubscription->sp_id)
-            : 'Invision Subscription '.$sourceSubscription->sp_id;
+        $name = Str::of($this->source instanceof InvisionCommunitySource
+                ? $this->source->getLanguageResolver()->resolveSubscriptionPackageName($sourceSubscription->sp_id, 'Invision Subscription '.$sourceSubscription->sp_id)
+                : 'Invision Subscription '.$sourceSubscription->sp_id)
+            ->trim()
+            ->limit(255, '')
+            ->toString();
 
         $slug = Str::of($name)
+            ->trim()
+            ->limit(25, '')
             ->slug()
             ->toString();
 
@@ -174,7 +179,7 @@ class SubscriptionImporter extends AbstractImporter
 
         $product = new Product;
         $product->forceFill([
-            'name' => Str::trim($name),
+            'name' => $name,
             'slug' => $slug,
             'description' => null,
             'type' => ProductType::Subscription,

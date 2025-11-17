@@ -227,15 +227,20 @@ class ProductImporter extends AbstractImporter
 
     protected function importCategory(object $sourceCategory, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
-        $name = $this->source instanceof InvisionCommunitySource
-            ? $this->source->getLanguageResolver()->resolveProductGroupName($sourceCategory->pg_id, 'Invision Product Group '.$sourceCategory->pg_id)
-            : 'Invision Product Group '.$sourceCategory->pg_id;
+        $name = Str::of($this->source instanceof InvisionCommunitySource
+                ? $this->source->getLanguageResolver()->resolveProductGroupName($sourceCategory->pg_id, 'Invision Product Group '.$sourceCategory->pg_id)
+                : 'Invision Product Group '.$sourceCategory->pg_id)
+            ->trim()
+            ->limit(255, '')
+            ->toString();
 
         $description = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveProductGroupDescription($sourceCategory->pg_id)
             : null;
 
         $slug = Str::of($sourceCategory->pg_seo_name ?? $name)
+            ->trim()
+            ->limit(25, '')
             ->slug()
             ->toString();
 
@@ -259,7 +264,7 @@ class ProductImporter extends AbstractImporter
 
         $category = new ProductCategory;
         $category->forceFill([
-            'name' => Str::trim($name),
+            'name' => $name,
             'slug' => $slug,
             'description' => Str::of($description)->stripTags()->toString() ?: null,
             'order' => $sourceCategory->pg_position ?? 0,
@@ -351,11 +356,16 @@ class ProductImporter extends AbstractImporter
 
     protected function importProduct(object $sourceProduct, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
-        $name = $this->source instanceof InvisionCommunitySource
-            ? $this->source->getLanguageResolver()->resolveProductName($sourceProduct->p_id, 'Invision Product '.$sourceProduct->p_id)
-            : 'Invision Product '.$sourceProduct->p_id;
+        $name = Str::of($this->source instanceof InvisionCommunitySource
+                ? $this->source->getLanguageResolver()->resolveProductName($sourceProduct->p_id, 'Invision Product '.$sourceProduct->p_id)
+                : 'Invision Product '.$sourceProduct->p_id)
+            ->trim()
+            ->limit(255, '')
+            ->toString();
 
         $slug = Str::of($sourceProduct->p_seo_name ?? $name)
+            ->trim()
+            ->limit(25, '')
             ->slug()
             ->toString();
 
@@ -379,7 +389,7 @@ class ProductImporter extends AbstractImporter
 
         $product = new Product;
         $product->forceFill([
-            'name' => Str::trim($name),
+            'name' => $name,
             'slug' => $slug,
             'description' => Str::of($sourceProduct->p_page)->stripTags()->toString() ?: null,
             'type' => ProductType::Product,

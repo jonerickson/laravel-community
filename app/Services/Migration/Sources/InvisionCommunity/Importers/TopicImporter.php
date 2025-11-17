@@ -144,9 +144,14 @@ class TopicImporter extends AbstractImporter
 
     protected function importTopic(object $sourceTopic, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
-        $title = $sourceTopic->title;
+        $title = Str::of($sourceTopic->title)
+            ->trim()
+            ->limit(255, '')
+            ->toString();
 
         $slug = Str::of($sourceTopic->title_seo ?? $title)
+            ->trim()
+            ->limit(25, '')
             ->slug()
             ->toString();
 
@@ -170,7 +175,11 @@ class TopicImporter extends AbstractImporter
                 return;
             }
 
-            $slug = Str::of($slug)->unique('topics', 'slug')->toString();
+            $slug = Str::of($slug)
+                ->trim()
+                ->limit(25, '')
+                ->unique('topics', 'slug')
+                ->toString();
         }
 
         $forum = $this->findForum($sourceTopic);
@@ -193,7 +202,7 @@ class TopicImporter extends AbstractImporter
 
         $topic = new Topic;
         $topic->forceFill([
-            'title' => Str::of($title)->trim()->limit(255, '')->toString(),
+            'title' => $title,
             'slug' => $slug,
             'forum_id' => $forum->id,
             'is_pinned' => $sourceTopic->pinned,

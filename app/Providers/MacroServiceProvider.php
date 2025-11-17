@@ -54,7 +54,7 @@ class MacroServiceProvider extends ServiceProvider
                 if (! is_null($fallback)) {
                     $candidate = (string) value($fallback, Str::of($string));
                 } else {
-                    $candidate = $string.'-'.Str::random();
+                    $candidate = $string.'-'.Str::random(6);
                 }
             }
 

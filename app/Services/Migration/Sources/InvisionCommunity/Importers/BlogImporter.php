@@ -144,9 +144,14 @@ class BlogImporter extends AbstractImporter
 
     protected function importBlogEntry(object $sourceBlogEntry, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
-        $title = $sourceBlogEntry->entry_name;
+        $title = Str::of($sourceBlogEntry->entry_name)
+            ->trim()
+            ->limit(255, '')
+            ->toString();
 
         $slug = Str::of($sourceBlogEntry->entry_name_seo ?? $title)
+            ->trim()
+            ->limit(25, '')
             ->slug()
             ->toString();
 
@@ -175,7 +180,7 @@ class BlogImporter extends AbstractImporter
         $post = new Post;
         $post->forceFill([
             'type' => PostType::Blog,
-            'title' => Str::trim($title),
+            'title' => $title,
             'excerpt' => $excerpt,
             'content' => $content,
             'slug' => $slug,

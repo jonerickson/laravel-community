@@ -148,9 +148,12 @@ class GroupImporter extends AbstractImporter
 
     protected function importGroup(object $sourceGroup, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
-        $name = $this->source instanceof InvisionCommunitySource
-            ? $this->source->getLanguageResolver()->resolveGroupName($sourceGroup->g_id, 'Invision Group '.$sourceGroup->g_id)
-            : 'Invision Group '.$sourceGroup->g_id;
+        $name = Str::of($this->source instanceof InvisionCommunitySource
+                ? $this->source->getLanguageResolver()->resolveGroupName($sourceGroup->g_id, 'Invision Group '.$sourceGroup->g_id)
+                : 'Invision Group '.$sourceGroup->g_id)
+            ->trim()
+            ->limit(255, '')
+            ->toString();
 
         $existingGroup = Group::query()->where('name', $name)->first();
 
@@ -171,7 +174,7 @@ class GroupImporter extends AbstractImporter
 
         $group = new Group;
         $group->forceFill([
-            'name' => Str::trim($name),
+            'name' => $name,
             'description' => null,
             'color' => $this->convertColor($sourceGroup->prefix ?? ''),
             'is_active' => true,

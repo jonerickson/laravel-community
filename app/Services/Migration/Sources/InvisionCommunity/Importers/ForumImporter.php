@@ -226,15 +226,20 @@ class ForumImporter extends AbstractImporter
 
     protected function importCategory(object $sourceCategory, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
-        $name = $this->source instanceof InvisionCommunitySource
-            ? $this->source->getLanguageResolver()->resolveForumName($sourceCategory->id, 'Invision Forum Category '.$sourceCategory->id)
-            : 'Invision Forum Category '.$sourceCategory->id;
+        $name = Str::of($this->source instanceof InvisionCommunitySource
+                ? $this->source->getLanguageResolver()->resolveForumName($sourceCategory->id, 'Invision Forum Category '.$sourceCategory->id)
+                : 'Invision Forum Category '.$sourceCategory->id)
+            ->trim()
+            ->limit(255, '')
+            ->toString();
 
         $description = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveForumDescription($sourceCategory->id)
             : null;
 
         $slug = Str::of($sourceCategory->name_seo ?? $name)
+            ->trim()
+            ->limit(25, '')
             ->slug()
             ->toString();
 
@@ -258,7 +263,7 @@ class ForumImporter extends AbstractImporter
 
         $category = new ForumCategory;
         $category->forceFill([
-            'name' => Str::trim($name),
+            'name' => $name,
             'slug' => $slug,
             'description' => Str::of($description)->stripTags()->toString() ?: null,
             'icon' => 'message-square',
@@ -299,15 +304,20 @@ class ForumImporter extends AbstractImporter
 
     protected function importForum(object $sourceForum, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
-        $name = $this->source instanceof InvisionCommunitySource
-            ? $this->source->getLanguageResolver()->resolveForumName($sourceForum->id, 'Invision Forum '.$sourceForum->id)
-            : 'Invision Forum '.$sourceForum->id;
+        $name = Str::of($this->source instanceof InvisionCommunitySource
+                ? $this->source->getLanguageResolver()->resolveForumName($sourceForum->id, 'Invision Forum '.$sourceForum->id)
+                : 'Invision Forum '.$sourceForum->id)
+            ->trim()
+            ->limit(255, '')
+            ->toString();
 
         $description = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveForumDescription($sourceForum->id)
             : null;
 
         $slug = Str::of($sourceForum->name_seo ?? $name)
+            ->trim()
+            ->limit(25, '')
             ->slug()
             ->toString();
 
@@ -337,12 +347,16 @@ class ForumImporter extends AbstractImporter
                 return;
             }
 
-            $slug = Str::of($slug)->unique('forums', 'slug')->toString();
+            $slug = Str::of($slug)
+                ->trim()
+                ->limit(25, '')
+                ->unique('forums', 'slug')
+                ->toString();
         }
 
         $forum = new Forum;
         $forum->forceFill([
-            'name' => Str::trim($name),
+            'name' => $name,
             'slug' => $slug,
             'description' => Str::of($description)->stripTags()->toString() ?: null,
             'icon' => 'message-square',
