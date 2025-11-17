@@ -150,21 +150,27 @@ class TopicImporter extends AbstractImporter
             ->slug()
             ->toString();
 
-        $existingTopic = Topic::query()->where('slug', $slug)->first();
+        $existingTopic = Topic::query()
+            ->where('slug', $slug)
+            ->first();
 
         if ($existingTopic) {
-            $this->cacheTopicMapping($sourceTopic->tid, $existingTopic->id);
-            $result->incrementSkipped(self::ENTITY_NAME);
+            if ($existingTopic->created_at->getTimestamp() === $sourceTopic->start_date) {
+                $this->cacheTopicMapping($sourceTopic->tid, $existingTopic->id);
+                $result->incrementSkipped(self::ENTITY_NAME);
 
-            if ($output->isVerbose()) {
-                $result->recordSkipped(self::ENTITY_NAME, [
-                    'source_id' => $sourceTopic->tid,
-                    'title' => $title,
-                    'reason' => 'Already exists',
-                ]);
+                if ($output->isVerbose()) {
+                    $result->recordSkipped(self::ENTITY_NAME, [
+                        'source_id' => $sourceTopic->tid,
+                        'title' => $title,
+                        'reason' => 'Already exists',
+                    ]);
+                }
+
+                return;
             }
 
-            return;
+            $slug = Str::slug($slug.'-'.Str::random(6));
         }
 
         $forum = $this->findForum($sourceTopic);
