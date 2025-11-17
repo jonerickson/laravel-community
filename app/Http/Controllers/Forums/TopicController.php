@@ -105,8 +105,8 @@ class TopicController extends Controller
         return Inertia::render('forums/topics/show', [
             'forum' => ForumData::from($forum),
             'topic' => TopicData::from($topic),
-            'posts' => PaginatedData::from(PostData::collect($posts->setCollection($filteredPosts), PaginatedDataCollection::class)->items()),
-            'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($topic->getRecentViewers())),
+            'posts' => Inertia::defer(fn () => PaginatedData::from(PostData::collect($posts->setCollection($filteredPosts), PaginatedDataCollection::class)->items()), 'posts'),
+            'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($topic->getRecentViewers()), 'viewers'),
         ]);
     }
 

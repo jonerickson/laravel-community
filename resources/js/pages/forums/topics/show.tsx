@@ -155,7 +155,7 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
             },
         ],
         commentCount: topic.postsCount || 0,
-        comment: posts.data
+        comment: posts?.data
             .filter((post) => post.author)
             .map((post) => ({
                 '@type': 'Comment',
@@ -249,27 +249,33 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
                     </div>
                 </div>
 
-                <Pagination pagination={posts} baseUrl={route('forums.topics.show', { forum, topic })} entityLabel="post" />
+                {posts && posts.data.length > 0 && (
+                    <Pagination pagination={posts} baseUrl={route('forums.topics.show', { forum, topic })} entityLabel="post" />
+                )}
 
-                <div className="mt-0">
-                    {posts.data.length > 0 ? (
-                        <div className="grid gap-6">
-                            {posts.data.map((post, index) => (
-                                <ForumTopicPost key={post.id} post={post} index={index} forum={forum} topic={topic} onQuote={handleQuotePost} />
-                            ))}
-                        </div>
-                    ) : (
-                        <EmptyState icon={<MessageSquare />} title="No posts yet" description="This topic doesn't have any posts yet." />
-                    )}
-                </div>
+                <Deferred fallback={<Loading variant="forum-post" />} data="posts">
+                    <div className="mt-0">
+                        {posts && posts.data.length > 0 ? (
+                            <div className="grid gap-6">
+                                {posts.data.map((post, index) => (
+                                    <ForumTopicPost key={post.id} post={post} index={index} forum={forum} topic={topic} onQuote={handleQuotePost} />
+                                ))}
+                            </div>
+                        ) : (
+                            <EmptyState icon={<MessageSquare />} title="No posts yet" description="This topic doesn't have any posts yet." />
+                        )}
+                    </div>
+                </Deferred>
 
-                <Pagination pagination={posts} baseUrl={route('forums.topics.show', { forum, topic })} entityLabel="post" />
+                {posts && posts.data.length > 0 && (
+                    <Pagination pagination={posts} baseUrl={route('forums.topics.show', { forum, topic })} entityLabel="post" />
+                )}
 
                 <Deferred fallback={<Loading />} data="recentViewers">
                     <RecentViewers viewers={recentViewers} />
                 </Deferred>
 
-                {can('reply_topics') && !topic.isLocked && posts.data.length > 0 && (
+                {can('reply_topics') && !topic.isLocked && posts && posts.data.length > 0 && (
                     <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} quotedContent={quotedContent} quotedAuthor={quotedAuthor} />
                 )}
 

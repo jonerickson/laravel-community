@@ -116,7 +116,7 @@ export default function Dashboard({
                             </Link>
                         </div>
 
-                        <Deferred fallback={<Loading />} data={'trendingTopics'}>
+                        <Deferred fallback={<Loading variant="table" rows={5} cols={3} />} data={'trendingTopics'}>
                             {trendingTopics && trendingTopics.length > 0 ? (
                                 <TrendingTopicsWidget topics={trendingTopics} />
                             ) : (
