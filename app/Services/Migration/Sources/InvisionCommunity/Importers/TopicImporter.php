@@ -170,7 +170,7 @@ class TopicImporter extends AbstractImporter
                 return;
             }
 
-            $slug = Str::slug($slug.'-'.Str::random(6));
+            $slug = Str::of($slug)->unique('topics', 'slug')->toString();
         }
 
         $forum = $this->findForum($sourceTopic);

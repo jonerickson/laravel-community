@@ -24,14 +24,12 @@ use Filament\Support\Facades\FilamentColor;
 use Filament\Tables\Table;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -164,27 +162,5 @@ class AppServiceProvider extends ServiceProvider
                 'scopes' => $parameters['scopes'],
             ])
         );
-
-        Builder::macro('countOffset', function () {
-            $offset = $this->getOffset();
-            $limit = $this->getLimit();
-
-            if (is_null($limit)) {
-                return $this->count();
-            }
-
-            $this->offset = null;
-            $this->limit = null;
-
-            return (int) $this->selectRaw('LEAST(?, GREATEST(0, COUNT(*) - ?)) as offset_count', [$limit, $offset ?? 0])->value('offset_count');
-        });
-
-        Request::macro('fingerprintId', function (): ?string {
-            /** @var \Illuminate\Http\Request $request */
-            $request = app('request');
-
-            return $request->header('X-Fingerprint-ID')
-                ?? $request->cookie('fingerprint_id');
-        });
     }
 }

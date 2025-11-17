@@ -16542,7 +16542,7 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
-         * @see \App\Providers\AppServiceProvider::boot()
+         * @see \App\Providers\MacroServiceProvider::boot()
          * @return string|null
          * @static
          */
@@ -24259,6 +24259,23 @@ namespace Illuminate\Support {
             return \Illuminate\Support\Str::sanitizeHtml($html);
         }
 
+        /**
+         * @see \App\Providers\MacroServiceProvider::boot()
+         * @param string $string
+         * @param string $table
+         * @param string $column
+         * @param mixed|null $fallback
+         * @param string|null $connection
+         * @param bool $throw
+         * @param int $maxAttempts
+         * @return string
+         * @static
+         */
+        public static function unique($string, $table, $column = 'id', $fallback = null, $connection = null, $throw = true, $maxAttempts = 5)
+        {
+            return \Illuminate\Support\Str::unique($string, $table, $column, $fallback, $connection, $throw, $maxAttempts);
+        }
+
             }
     /**
      */
@@ -24271,6 +24288,22 @@ namespace Illuminate\Support {
         public static function sanitizeHtml()
         {
             return \Illuminate\Support\Stringable::sanitizeHtml();
+        }
+
+        /**
+         * @see \App\Providers\MacroServiceProvider::boot()
+         * @param string $table
+         * @param string $column
+         * @param mixed|null $fallback
+         * @param string|null $connection
+         * @param bool $throw
+         * @param int $maxAttempts
+         * @return static
+         * @static
+         */
+        public static function unique($table, $column = 'id', $fallback = null, $connection = null, $throw = true, $maxAttempts = 5)
+        {
+            return \Illuminate\Support\Stringable::unique($table, $column, $fallback, $connection, $throw, $maxAttempts);
         }
 
             }
@@ -24353,7 +24386,7 @@ namespace Illuminate\Http {
         }
 
         /**
-         * @see \App\Providers\AppServiceProvider::boot()
+         * @see \App\Providers\MacroServiceProvider::boot()
          * @return string|null
          * @static
          */
@@ -24478,7 +24511,7 @@ namespace Illuminate\Database\Query {
         }
 
         /**
-         * @see \App\Providers\AppServiceProvider::boot()
+         * @see \App\Providers\MacroServiceProvider::boot()
          * @static
          */
         public static function countOffset()
@@ -32984,7 +33017,7 @@ namespace  {
         }
 
         /**
-         * @see \App\Providers\AppServiceProvider::boot()
+         * @see \App\Providers\MacroServiceProvider::boot()
          * @static
          */
         public static function countOffset()

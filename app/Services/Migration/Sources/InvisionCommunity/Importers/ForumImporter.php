@@ -311,22 +311,33 @@ class ForumImporter extends AbstractImporter
             ->slug()
             ->toString();
 
+        $mappedParentCategoryId = static::getCategoryMapping((int) $sourceForum->parent_id);
+        $mappedParentForumId = static::getForumMapping((int) $sourceForum->parent_id);
+
         $existingForum = Forum::query()->where('slug', $slug)->first();
 
         if ($existingForum) {
-            $this->cacheForumMapping($sourceForum->id, $existingForum->id);
-            $result->incrementSkipped(self::ENTITY_NAME);
+            $parentMatches = ($mappedParentCategoryId && $existingForum->category_id === $mappedParentCategoryId)
+                || ($mappedParentForumId && $existingForum->parent_id === $mappedParentForumId)
+                || (! $mappedParentCategoryId && ! $mappedParentForumId && ! $existingForum->category_id && ! $existingForum->parent_id);
 
-            if ($output->isVerbose()) {
-                $result->recordSkipped(self::ENTITY_NAME, [
-                    'source_id' => $sourceForum->id,
-                    'name' => $name,
-                    'slug' => $slug,
-                    'reason' => 'Already exists',
-                ]);
+            if ($parentMatches) {
+                $this->cacheForumMapping($sourceForum->id, $existingForum->id);
+                $result->incrementSkipped(self::ENTITY_NAME);
+
+                if ($output->isVerbose()) {
+                    $result->recordSkipped(self::ENTITY_NAME, [
+                        'source_id' => $sourceForum->id,
+                        'name' => $name,
+                        'slug' => $slug,
+                        'reason' => 'Already exists with matching parent',
+                    ]);
+                }
+
+                return;
             }
 
-            return;
+            $slug = Str::of($slug)->unique('forums', 'slug')->toString();
         }
 
         $forum = new Forum;
