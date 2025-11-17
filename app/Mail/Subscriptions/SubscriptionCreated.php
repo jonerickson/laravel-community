@@ -26,7 +26,7 @@ class SubscriptionCreated extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Subscription Started - {$this->product->name}",
+            subject: 'Subscription Started - '.$this->product->name,
         );
     }
 

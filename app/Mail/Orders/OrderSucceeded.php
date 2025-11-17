@@ -54,7 +54,7 @@ class OrderSucceeded extends Mailable implements ShouldQueue
             return [];
         }
 
-        $filename = "invoices/{$this->order->reference_id}.pdf";
+        $filename = sprintf('invoices/%s.pdf', $this->order->reference_id);
 
         try {
             $pdfContents = file_get_contents($url);
@@ -74,7 +74,7 @@ class OrderSucceeded extends Mailable implements ShouldQueue
 
         return [
             Attachment::fromStorage($filename)
-                ->as("{$this->order->reference_id}.pdf")
+                ->as($this->order->reference_id.'.pdf')
                 ->withMime('application/pdf'),
         ];
     }

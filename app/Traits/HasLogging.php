@@ -27,7 +27,7 @@ trait HasLogging
             $options->setDescriptionForEvent(fn (string $eventName) => $this->getActivityDescription($eventName));
         } else {
             $modelName = class_basename($this);
-            $options->setDescriptionForEvent(fn (string $eventName): string => "$modelName $eventName");
+            $options->setDescriptionForEvent(fn (string $eventName): string => sprintf('%s %s', $modelName, $eventName));
         }
 
         if (method_exists($this, 'getActivityLogName')) {

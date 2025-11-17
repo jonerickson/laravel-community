@@ -91,7 +91,7 @@ class OrderImporter extends AbstractImporter
         $totalOrders = $baseQuery->clone()->countOffset();
 
         if ($output->isVerbose()) {
-            $components->info("Found {$totalOrders} paid orders to migrate...");
+            $components->info(sprintf('Found %s paid orders to migrate...', $totalOrders));
         }
 
         $progressBar = $output->createProgressBar($totalOrders);
@@ -125,7 +125,7 @@ class OrderImporter extends AbstractImporter
 
                     $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $components->error("Failed to import order: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
+                    $components->error(sprintf('Failed to import order: %s in %s on Line %d.', $e->getMessage(), $fileName, $e->getLine()));
                 }
 
                 $processed++;
@@ -289,11 +289,11 @@ class OrderImporter extends AbstractImporter
 
                 $orderItems[] = $this->createOrderItem($order, $item, $sourceOrder, $price, $product);
             }
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             Log::error('Failed to create order items', [
                 'order_id' => $order->id ?? 'N/A',
                 'source_order_id' => $sourceOrder->i_id,
-                'error' => $e->getMessage(),
+                'error' => $exception->getMessage(),
             ]);
 
             if (! $config->isDryRun) {
@@ -303,7 +303,7 @@ class OrderImporter extends AbstractImporter
                     $result->recordFailed('order_items', [
                         'order_id' => $order->id ?? 'N/A',
                         'source_order_id' => $sourceOrder->i_id,
-                        'error' => $e->getMessage(),
+                        'error' => $exception->getMessage(),
                     ]);
                 }
             }

@@ -23,7 +23,7 @@ class PinController extends Controller
     {
         $pinnable = $request->resolvePinnable();
 
-        if (! $pinnable) {
+        if ($pinnable === null) {
             return ApiResource::error(
                 message: 'Please select either a topic or post to pin.'
             );
@@ -37,7 +37,7 @@ class PinController extends Controller
 
         return ApiResource::success(
             resource: $pinnable,
-            message: "The $class has been successfully pinned."
+            message: sprintf('The %s has been successfully pinned.', $class)
         );
     }
 
@@ -48,7 +48,7 @@ class PinController extends Controller
     {
         $pinnable = $request->resolvePinnable();
 
-        if (! $pinnable) {
+        if ($pinnable === null) {
             return ApiResource::error(
                 message: 'Please select either a topic or post to unpin.'
             );
@@ -62,7 +62,7 @@ class PinController extends Controller
 
         return ApiResource::success(
             resource: $pinnable,
-            message: "The $class has been successfully unpinned."
+            message: sprintf('The %s has been successfully unpinned.', $class)
         );
     }
 }

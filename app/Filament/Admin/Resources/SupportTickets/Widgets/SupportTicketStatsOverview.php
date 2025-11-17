@@ -35,7 +35,7 @@ class SupportTicketStatsOverview extends StatsOverviewWidget
                 ->color($openTickets > 10 ? 'warning' : 'success'),
 
             Stat::make('Assigned to Me', Number::format($assignedToMe))
-                ->description('Tickets I\'m handling')
+                ->description("Tickets I'm handling")
                 ->icon(Heroicon::OutlinedUser)
                 ->color('info'),
 

@@ -75,7 +75,7 @@ class GroupImporter extends AbstractImporter
         $totalGroups = $baseQuery->clone()->countOffset();
 
         if ($output->isVerbose()) {
-            $components->info("Found {$totalGroups} groups to migrate...");
+            $components->info(sprintf('Found %s groups to migrate...', $totalGroups));
         }
 
         $progressBar = $output->createProgressBar($totalGroups);
@@ -111,7 +111,7 @@ class GroupImporter extends AbstractImporter
 
                     $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $components->error("Failed to import group: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
+                    $components->error(sprintf('Failed to import group: %s in %s on Line %d.', $e->getMessage(), $fileName, $e->getLine()));
                 }
 
                 $processed++;
@@ -146,8 +146,8 @@ class GroupImporter extends AbstractImporter
     protected function importGroup(object $sourceGroup, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $name = $this->source instanceof InvisionCommunitySource
-            ? $this->source->getLanguageResolver()->resolveGroupName($sourceGroup->g_id, "Invision Group $sourceGroup->g_id")
-            : "Invision Group $sourceGroup->g_id";
+            ? $this->source->getLanguageResolver()->resolveGroupName($sourceGroup->g_id, 'Invision Group '.$sourceGroup->g_id)
+            : 'Invision Group '.$sourceGroup->g_id;
 
         $existingGroup = Group::query()->where('name', $name)->first();
 

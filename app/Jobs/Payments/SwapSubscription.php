@@ -16,7 +16,8 @@ use Throwable;
 
 class SwapSubscription implements ShouldQueue
 {
-    use Batchable, Queueable;
+    use Batchable;
+    use Queueable;
 
     public function __construct(
         protected User $user,

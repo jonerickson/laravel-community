@@ -102,6 +102,7 @@ class TopicResource extends Resource
                         if ($record->is_pinned) {
                             $icons[] = Heroicon::OutlinedPaperClip;
                         }
+
                         if ($record->is_locked) {
                             $icons[] = Heroicon::OutlinedLockClosed;
                         }

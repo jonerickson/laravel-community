@@ -158,7 +158,7 @@ class KnowledgeBaseArticle extends Model implements HasLabel, Sluggable
 
     public function getActivityDescription(string $eventName): string
     {
-        return "Knowledge base article \"{$this->title}\" $eventName";
+        return sprintf('Knowledge base article "%s" %s', $this->title, $eventName);
     }
 
     public function getActivityLogName(): string

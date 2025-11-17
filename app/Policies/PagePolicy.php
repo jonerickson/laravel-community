@@ -20,6 +20,7 @@ class PagePolicy
         if ($page->is_published) {
             return true;
         }
+
         if (Gate::forUser($user)->check('view_pages')) {
             return true;
         }
@@ -41,6 +42,7 @@ class PagePolicy
         if (! $user instanceof User) {
             return false;
         }
+
         if (Gate::forUser($user)->check('update_pages')) {
             return true;
         }

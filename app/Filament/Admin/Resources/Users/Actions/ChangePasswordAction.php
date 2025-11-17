@@ -22,10 +22,10 @@ class ChangePasswordAction extends Action
 
         $this->color('gray');
         $this->modalHeading('Change Password');
-        $this->modalDescription('Update this user\'s password.');
+        $this->modalDescription("Update this user's password.");
         $this->modalSubmitActionLabel('Save');
-        $this->successNotificationTitle('The user\'s password has been successfully changed.');
-        $this->failureNotificationTitle('The user\'s password could not been changed. Please try again later.');
+        $this->successNotificationTitle("The user's password has been successfully changed.");
+        $this->failureNotificationTitle("The user's password could not been changed. Please try again later.");
 
         $this->schema([
             TextInput::make('password')

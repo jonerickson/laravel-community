@@ -36,10 +36,10 @@ class NoProfanity implements ValidationRule
                     $fail('The :attribute contains inappropriate language.');
                 }
             }
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             Log::warning('Profanity check failed', [
                 'attribute' => $attribute,
-                'error' => $e->getMessage(),
+                'error' => $exception->getMessage(),
             ]);
         }
     }

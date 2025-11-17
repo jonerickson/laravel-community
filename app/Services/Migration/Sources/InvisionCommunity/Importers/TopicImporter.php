@@ -87,7 +87,7 @@ class TopicImporter extends AbstractImporter
         $totalTopics = $baseQuery->clone()->countOffset();
 
         if ($output->isVerbose()) {
-            $components->info("Found {$totalTopics} topics to migrate...");
+            $components->info(sprintf('Found %s topics to migrate...', $totalTopics));
         }
 
         $progressBar = $output->createProgressBar($totalTopics);
@@ -123,7 +123,7 @@ class TopicImporter extends AbstractImporter
 
                     $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $components->error("Failed to import topic: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
+                    $components->error(sprintf('Failed to import topic: %s in %s on Line %d.', $e->getMessage(), $fileName, $e->getLine()));
                 }
 
                 $processed++;
@@ -199,7 +199,7 @@ class TopicImporter extends AbstractImporter
 
         $topic = new Topic;
         $topic->forceFill([
-            'title' => Str::of($title)->trim()->limit(255)->toString(),
+            'title' => Str::of($title)->trim()->limit(255, '')->toString(),
             'slug' => $slug,
             'forum_id' => $forum->id,
             'is_pinned' => $sourceTopic->pinned,

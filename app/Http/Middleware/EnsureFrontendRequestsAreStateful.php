@@ -36,7 +36,7 @@ class EnsureFrontendRequestsAreStateful
 
         $domain = Str::replaceFirst('https://', '', $domain);
         $domain = Str::replaceFirst('http://', '', $domain);
-        $domain = Str::endsWith($domain, '/') ? $domain : "$domain/";
+        $domain = Str::endsWith($domain, '/') ? $domain : $domain.'/';
 
         $appUrl = config('app.url');
 

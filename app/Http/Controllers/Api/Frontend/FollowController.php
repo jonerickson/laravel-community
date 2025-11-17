@@ -14,7 +14,7 @@ class FollowController extends Controller
     {
         $followable = $request->resolveFollowable();
 
-        if (! $followable) {
+        if ($followable === null) {
             return ApiResource::error(
                 message: 'The specified item could not be found.'
             );
@@ -23,7 +23,7 @@ class FollowController extends Controller
         $followable->follow();
 
         return ApiResource::success(
-            message: "You have successfully followed the {$request->validated('type')}."
+            message: sprintf('You have successfully followed the %s.', $request->validated('type'))
         );
     }
 
@@ -31,7 +31,7 @@ class FollowController extends Controller
     {
         $followable = $request->resolveFollowable();
 
-        if (! $followable) {
+        if ($followable === null) {
             return ApiResource::error(
                 message: 'The specified item could not be found.'
             );
@@ -40,7 +40,7 @@ class FollowController extends Controller
         $followable->unfollow();
 
         return ApiResource::success(
-            message: "You have successfully unfollowed the {$request->validated('type')}."
+            message: sprintf('You have successfully unfollowed the %s.', $request->validated('type'))
         );
     }
 }

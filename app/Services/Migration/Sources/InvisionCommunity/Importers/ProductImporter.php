@@ -96,7 +96,7 @@ class ProductImporter extends AbstractImporter
 
         $totalProducts = $baseQuery->clone()->countOffset();
 
-        $components->info("Found {$totalProducts} products to migrate...");
+        $components->info(sprintf('Found %s products to migrate...', $totalProducts));
 
         $progressBar = $output->createProgressBar($totalProducts);
         $progressBar->start();
@@ -131,7 +131,7 @@ class ProductImporter extends AbstractImporter
 
                     $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $components->error("Failed to import product: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
+                    $components->error(sprintf('Failed to import product: %s in %s on Line %d.', $e->getMessage(), $fileName, $e->getLine()));
                 }
 
                 $processed++;
@@ -165,7 +165,7 @@ class ProductImporter extends AbstractImporter
         $totalCategories = $baseQuery->clone()->countOffset();
 
         if ($output->isVerbose()) {
-            $components->info("Found {$totalCategories} product categories to migrate...");
+            $components->info(sprintf('Found %s product categories to migrate...', $totalCategories));
         }
 
         $progressBar = $output->createProgressBar($totalCategories);
@@ -204,7 +204,7 @@ class ProductImporter extends AbstractImporter
 
                     $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $components->error("Failed to import product category: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
+                    $components->error(sprintf('Failed to import product category: %s in %s on Line %d.', $e->getMessage(), $fileName, $e->getLine()));
                 }
 
                 $processed++;
@@ -217,7 +217,7 @@ class ProductImporter extends AbstractImporter
         $output->newLine(2);
 
         if ($output->isVerbose()) {
-            $components->info("Migrated $processed product categories...");
+            $components->info(sprintf('Migrated %d product categories...', $processed));
         }
 
         $this->updateCategoryParentRelationships($sourceCategoriesData, $config, $output, $components);
@@ -226,8 +226,8 @@ class ProductImporter extends AbstractImporter
     protected function importCategory(object $sourceCategory, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $name = $this->source instanceof InvisionCommunitySource
-            ? $this->source->getLanguageResolver()->resolveProductGroupName($sourceCategory->pg_id, "Invision Product Group $sourceCategory->pg_id")
-            : "Invision Product Group $sourceCategory->pg_id";
+            ? $this->source->getLanguageResolver()->resolveProductGroupName($sourceCategory->pg_id, 'Invision Product Group '.$sourceCategory->pg_id)
+            : 'Invision Product Group '.$sourceCategory->pg_id;
 
         $description = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveProductGroupDescription($sourceCategory->pg_id)
@@ -329,7 +329,7 @@ class ProductImporter extends AbstractImporter
 
                 $output->newLine(2);
                 $fileName = Str::of($e->getFile())->classBasename();
-                $components->error("Failed to update product parent category relationship: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
+                $components->error(sprintf('Failed to update product parent category relationship: %s in %s on Line %d.', $e->getMessage(), $fileName, $e->getLine()));
             }
 
             $progressBar->advance();
@@ -343,8 +343,8 @@ class ProductImporter extends AbstractImporter
     protected function importProduct(object $sourceProduct, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $name = $this->source instanceof InvisionCommunitySource
-            ? $this->source->getLanguageResolver()->resolveProductName($sourceProduct->p_id, "Invision Product $sourceProduct->p_id")
-            : "Invision Product $sourceProduct->p_id";
+            ? $this->source->getLanguageResolver()->resolveProductName($sourceProduct->p_id, 'Invision Product '.$sourceProduct->p_id)
+            : 'Invision Product '.$sourceProduct->p_id;
 
         $slug = Str::of($sourceProduct->p_seo_name ?? $name)
             ->slug()
@@ -465,9 +465,11 @@ class ProductImporter extends AbstractImporter
                         if (! isset($renewOption['cost'])) {
                             continue;
                         }
+
                         if (! is_array($renewOption['cost'])) {
                             continue;
                         }
+
                         foreach ($renewOption['cost'] as $currencyCode => $priceData) {
                             if (! isset($priceData['amount'])) {
                                 continue;
@@ -491,7 +493,7 @@ class ProductImporter extends AbstractImporter
                             $price->forceFill([
                                 'product_id' => $product->id,
                                 'name' => $interval instanceof SubscriptionInterval
-                                    ? "$intervalCount {$interval->value}"
+                                    ? sprintf('%d %s', $intervalCount, $interval->value)
                                     : 'One-Time',
                                 'description' => null,
                                 'amount' => $amount,
@@ -539,11 +541,11 @@ class ProductImporter extends AbstractImporter
                     }
                 }
             }
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             Log::error('Failed to create product prices', [
                 'product_id' => $product->id ?? 'N/A',
                 'source_product_id' => $sourceProduct->p_id,
-                'error' => $e->getMessage(),
+                'error' => $exception->getMessage(),
             ]);
 
             if (! $config->isDryRun) {
@@ -553,7 +555,7 @@ class ProductImporter extends AbstractImporter
                     $result->recordFailed('product_prices', [
                         'product_id' => $product->id ?? 'N/A',
                         'source_product_id' => $sourceProduct->p_id,
-                        'error' => $e->getMessage(),
+                        'error' => $exception->getMessage(),
                     ]);
                 }
             }

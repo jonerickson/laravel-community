@@ -232,9 +232,9 @@ class Topic extends Model implements Sluggable
 
     public function getActivityDescription(string $eventName): string
     {
-        $title = $this->title ? " \"{$this->title}\"" : '';
+        $title = $this->title ? sprintf(' "%s"', $this->title) : '';
 
-        return "Forum topic{$title} $eventName";
+        return sprintf('Forum topic%s %s', $title, $eventName);
     }
 
     public function getActivityLogName(): string

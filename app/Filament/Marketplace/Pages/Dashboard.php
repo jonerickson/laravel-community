@@ -28,6 +28,6 @@ class Dashboard extends BaseDashboard
     {
         $name = config('app.name');
 
-        return "Welcome to the $name marketplace. From here you can manage your products, payouts and customers.";
+        return sprintf('Welcome to the %s marketplace. From here you can manage your products, payouts and customers.', $name);
     }
 }

@@ -20,7 +20,7 @@ $appName = env('APP_NAME');
 
 return [
     'title' => env('API_NAME', env('APP_NAME', 'Laravel')),
-    'description' => "The official API of $appName.",
+    'description' => sprintf('The official API of %s.', $appName),
     'version' => '1.0.0',
     'show_webby' => true,
 

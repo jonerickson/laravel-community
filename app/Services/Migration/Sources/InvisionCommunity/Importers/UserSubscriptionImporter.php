@@ -97,7 +97,7 @@ class UserSubscriptionImporter extends AbstractImporter
         $totalUserSubscriptions = $baseQuery->clone()->countOffset();
 
         if ($output->isVerbose()) {
-            $components->info("Found {$totalUserSubscriptions} user subscriptions to migrate...");
+            $components->info(sprintf('Found %s user subscriptions to migrate...', $totalUserSubscriptions));
         }
 
         $progressBar = $output->createProgressBar($totalUserSubscriptions);
@@ -131,7 +131,7 @@ class UserSubscriptionImporter extends AbstractImporter
 
                     $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $components->error("Failed to import user subscription: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
+                    $components->error(sprintf('Failed to import user subscription: %s in %s on Line %d.', $e->getMessage(), $fileName, $e->getLine()));
                 }
 
                 $processed++;

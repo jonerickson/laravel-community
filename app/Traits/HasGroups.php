@@ -21,7 +21,7 @@ trait HasGroups
         $table = $this->getTable();
         $groupsForeignPivotKey = $this->groupsForeignPivotKey ?? null;
 
-        $relation = $this->belongsToMany(Group::class, "{$table}_groups", $groupsForeignPivotKey);
+        $relation = $this->belongsToMany(Group::class, $table.'_groups', $groupsForeignPivotKey);
 
         if (static::class === User::class) {
             return $relation->using(UserGroup::class);

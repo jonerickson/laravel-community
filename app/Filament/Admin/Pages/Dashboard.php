@@ -155,6 +155,6 @@ class Dashboard extends BaseDashboard
     {
         $name = config('app.name');
 
-        return "Welcome to the $name Admin Control Panel. From here you can manage your entire application and perform essential administrative functions.";
+        return sprintf('Welcome to the %s Admin Control Panel. From here you can manage your entire application and perform essential administrative functions.', $name);
     }
 }

@@ -17,6 +17,7 @@ it('can lock a topic', function (): void {
     ]);
 
     $response->assertSuccessful();
+
     expect($topic->fresh()->is_locked)->toBeTrue();
 });
 
@@ -31,6 +32,7 @@ it('can unlock a topic', function (): void {
     ]);
 
     $response->assertSuccessful();
+
     expect($topic->fresh()->is_locked)->toBeFalse();
 });
 

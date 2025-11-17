@@ -47,7 +47,7 @@ class ListSubscriptions extends Component implements HasActions, HasSchemas, Has
     {
         return $table
             ->heading('Subscriptions')
-            ->description('The user\'s subscription history.')
+            ->description("The user's subscription history.")
             ->emptyStateHeading('No subscriptions')
             ->emptyStateDescription('This user has no subscription history.')
             ->emptyStateIcon('heroicon-o-arrow-path')

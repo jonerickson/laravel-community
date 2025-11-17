@@ -41,7 +41,7 @@ class ListPaymentMethods extends Component implements HasActions, HasSchemas, Ha
     {
         return $table
             ->heading('Payment Methods')
-            ->description('The user\'s saved payment methods.')
+            ->description("The user's saved payment methods.")
             ->emptyStateHeading('No payment methods')
             ->emptyStateDescription('This user has no payment methods on file.')
             ->emptyStateIcon('heroicon-o-credit-card')

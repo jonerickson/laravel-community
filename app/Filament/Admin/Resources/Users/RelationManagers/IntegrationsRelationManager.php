@@ -34,17 +34,17 @@ class IntegrationsRelationManager extends RelationManager
                 TextInput::make('provider_id')
                     ->label('Provider ID')
                     ->required()
-                    ->helperText('The user\'s account ID for the provider.'),
+                    ->helperText("The user's account ID for the provider."),
                 TextInput::make('provider_name')
                     ->label('Provider Name')
                     ->required()
-                    ->helperText('The user\'s account name for the provider.'),
+                    ->helperText("The user's account name for the provider."),
                 TextInput::make('provider_email')
                     ->label('Provider Email')
                     ->default(fn () => $this->getOwnerRecord()?->email)
                     ->readOnly()
                     ->required()
-                    ->helperText('The user\'s account email for the provider. This cannot be edited because it is required to be the same email as the user account that is currently being updated.'),
+                    ->helperText("The user's account email for the provider. This cannot be edited because it is required to be the same email as the user account that is currently being updated."),
             ]);
     }
 
@@ -52,7 +52,7 @@ class IntegrationsRelationManager extends RelationManager
     {
         return $table
             ->heading('Integrations')
-            ->description('The user\'s connected accounts.')
+            ->description("The user's connected accounts.")
             ->emptyStateHeading('No integrations')
             ->emptyStateDescription('This user has no connected accounts.')
             ->emptyStateIcon('heroicon-o-link')

@@ -187,7 +187,7 @@ class Discount extends Model
             DiscountType::Manual => 'MANUAL',
         };
 
-        return Str::upper("$prefix-".Str::random(4).'-'.Str::random(4).'-'.Str::random(4).'-'.Str::random(4));
+        return Str::upper($prefix.'-'.Str::random(4).'-'.Str::random(4).'-'.Str::random(4).'-'.Str::random(4));
     }
 
     public function scopeActive(Builder $query): void

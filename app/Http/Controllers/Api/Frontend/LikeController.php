@@ -33,7 +33,7 @@ class LikeController extends Controller
     {
         $likeable = $request->resolveLikeable();
 
-        if (! $likeable) {
+        if ($likeable === null) {
             return ApiResource::error(
                 message: 'Unable to find an item to like/unlike.'
             );

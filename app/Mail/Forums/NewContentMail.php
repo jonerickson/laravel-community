@@ -34,7 +34,7 @@ class NewContentMail extends Mailable implements ShouldQueue
         $contentType = $this->content instanceof Topic ? 'New Topic' : 'New Reply';
 
         return new Envelope(
-            subject: "{$contentType} in {$followableName}",
+            subject: sprintf('%s in %s', $contentType, $followableName),
         );
     }
 

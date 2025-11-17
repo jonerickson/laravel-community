@@ -68,15 +68,16 @@ class UserImporter extends AbstractImporter
         $totalUsers = $baseQuery->clone()->countOffset();
 
         if ($output->isVerbose()) {
-            $components->info("Found $totalUsers users to migrate...");
+            $components->info(sprintf('Found %s users to migrate...', $totalUsers));
         }
 
         $progressBar = $output->createProgressBar($totalUsers);
         $progressBar->start();
 
         $processed = 0;
+        $processedSourceIds = [];
 
-        $baseQuery->chunk($config->batchSize, function ($users) use ($config, $result, $progressBar, $output, $components, &$processed): bool {
+        $baseQuery->chunk($config->batchSize, function ($users) use ($config, $result, $progressBar, $output, $components, &$processed, &$processedSourceIds): bool {
             foreach ($users as $sourceUser) {
                 if ($config->limit !== null && $config->limit !== 0 && $processed >= $config->limit) {
                     return false;
@@ -84,6 +85,7 @@ class UserImporter extends AbstractImporter
 
                 try {
                     $this->importUser($sourceUser, $config, $result, $output);
+                    $processedSourceIds[] = $sourceUser->member_id;
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
 
@@ -106,7 +108,7 @@ class UserImporter extends AbstractImporter
 
                     $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $components->error("Failed to import user: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
+                    $components->error(sprintf('Failed to import user: %s in %s on Line %d.', $e->getMessage(), $fileName, $e->getLine()));
                 }
 
                 $processed++;
@@ -120,7 +122,7 @@ class UserImporter extends AbstractImporter
 
         $output->newLine(2);
 
-        $this->syncBillingAddresses($config, $output, $components);
+        $this->syncBillingAddresses($processedSourceIds, $config, $output, $components);
 
         return $processed;
     }
@@ -223,8 +225,12 @@ class UserImporter extends AbstractImporter
         Cache::tags(self::CACHE_TAG)->put(self::CACHE_KEY_PREFIX.$sourceUserId, $targetUserId, 60 * 60 * 24 * 7);
     }
 
-    protected function syncBillingAddresses(MigrationConfig $config, OutputStyle $output, Factory $components): void
+    protected function syncBillingAddresses(array $sourceIds, MigrationConfig $config, OutputStyle $output, Factory $components): void
     {
+        if ($sourceIds === []) {
+            return;
+        }
+
         $components->info('Syncing billing addresses...');
 
         $connection = $this->source->getConnection();
@@ -232,7 +238,7 @@ class UserImporter extends AbstractImporter
         $addresses = DB::connection($connection)
             ->table('nexus_customer_addresses')
             ->whereNotNull('address')
-            ->when($config->userId !== null && $config->userId !== 0, fn ($builder) => $builder->where('member', $config->userId))
+            ->whereIn('member', $sourceIds)
             ->get();
 
         $progressBar = $output->createProgressBar($addresses->count());
@@ -244,6 +250,7 @@ class UserImporter extends AbstractImporter
                 if ($targetUserId === null) {
                     continue;
                 }
+
                 if ($targetUserId === 0) {
                     continue;
                 }
@@ -262,12 +269,12 @@ class UserImporter extends AbstractImporter
 
                 if (! $config->isDryRun) {
                     $user->update([
-                        'billing_address' => Str::of($addressData['addressLines'][0] ?? null)->limit(255)->toString() ?: null,
-                        'billing_address_line_2' => Str::of($addressData['addressLines'][1] ?? null)->limit(255)->toString() ?: null,
-                        'billing_city' => Str::of($addressData['city'] ?? null)->limit(255)->toString() ?: null,
-                        'billing_state' => Str::of($addressData['region'] ?? null)->limit(255)->toString() ?: null,
-                        'billing_postal_code' => Str::of($addressData['postalCode'] ?? null)->limit(25)->toString() ?: null,
-                        'billing_country' => Str::of($addressData['country'] ?? null)->limit(2)->toString() ?: null,
+                        'billing_address' => Str::of($addressData['addressLines'][0] ?? null)->limit(255, '')->toString() ?: null,
+                        'billing_address_line_2' => Str::of($addressData['addressLines'][1] ?? null)->limit(255, '')->toString() ?: null,
+                        'billing_city' => Str::of($addressData['city'] ?? null)->limit(255, '')->toString() ?: null,
+                        'billing_state' => Str::of($addressData['region'] ?? null)->limit(255, '')->toString() ?: null,
+                        'billing_postal_code' => Str::of($addressData['postalCode'] ?? null)->limit(25, '')->toString() ?: null,
+                        'billing_country' => Str::of($addressData['country'] ?? null)->limit(2, '')->toString() ?: null,
                     ]);
                 }
             } catch (Exception $e) {
@@ -279,7 +286,7 @@ class UserImporter extends AbstractImporter
 
                 $output->newLine(2);
                 $fileName = Str::of($e->getFile())->classBasename();
-                $components->error("Failed to sync billing address: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
+                $components->error(sprintf('Failed to sync billing address: %s in %s on Line %d.', $e->getMessage(), $fileName, $e->getLine()));
             }
 
             $progressBar->advance();

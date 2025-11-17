@@ -39,37 +39,37 @@ class InvisionCommunityLanguageResolver
 
     public function resolveGroupName(int|string $groupId, ?string $fallback = null): ?string
     {
-        return $this->resolve("core_group_$groupId", $fallback);
+        return $this->resolve('core_group_'.$groupId, $fallback);
     }
 
     public function resolveProductGroupName(int|string $groupId, ?string $fallback = null): ?string
     {
-        return $this->resolve("nexus_pgroup_$groupId", $fallback);
+        return $this->resolve('nexus_pgroup_'.$groupId, $fallback);
     }
 
     public function resolveProductGroupDescription(int|string $groupId, ?string $fallback = null): ?string
     {
-        return $this->resolve("nexus_pgroup_{$groupId}_desc", $fallback);
+        return $this->resolve(sprintf('nexus_pgroup_%s_desc', $groupId), $fallback);
     }
 
     public function resolveProductName(int|string $productId, ?string $fallback = null): ?string
     {
-        return $this->resolve("nexus_package_$productId", $fallback);
+        return $this->resolve('nexus_package_'.$productId, $fallback);
     }
 
     public function resolveSubscriptionPackageName(int|string $packageId, ?string $fallback = null): ?string
     {
-        return $this->resolve("nexus_subs_$packageId", $fallback);
+        return $this->resolve('nexus_subs_'.$packageId, $fallback);
     }
 
     public function resolveForumName(int|string $forumId, ?string $fallback = null): ?string
     {
-        return $this->resolve("forums_forum_$forumId", $fallback);
+        return $this->resolve('forums_forum_'.$forumId, $fallback);
     }
 
     public function resolveForumDescription(int|string $forumId, ?string $fallback = null): ?string
     {
-        return $this->resolve("forums_forum_{$forumId}_desc", $fallback);
+        return $this->resolve(sprintf('forums_forum_%s_desc', $forumId), $fallback);
     }
 
     public function batchResolve(array $keys): array

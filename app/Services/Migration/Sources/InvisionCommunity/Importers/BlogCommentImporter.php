@@ -86,7 +86,7 @@ class BlogCommentImporter extends AbstractImporter
         $totalComments = $baseQuery->clone()->countOffset();
 
         if ($output->isVerbose()) {
-            $components->info("Found {$totalComments} blog comments to migrate...");
+            $components->info(sprintf('Found %s blog comments to migrate...', $totalComments));
         }
 
         $progressBar = $output->createProgressBar($totalComments);
@@ -122,7 +122,7 @@ class BlogCommentImporter extends AbstractImporter
 
                     $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $components->error("Failed to import blog comment: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
+                    $components->error(sprintf('Failed to import blog comment: %s in %s on Line %d.', $e->getMessage(), $fileName, $e->getLine()));
                 }
 
                 $processed++;

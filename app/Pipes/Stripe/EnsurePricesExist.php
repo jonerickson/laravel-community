@@ -34,7 +34,7 @@ class EnsurePricesExist
                 $priceData = $this->paymentManager->createPrice($price);
 
                 if (! $priceData instanceof PriceData) {
-                    throw new Exception("Failed to create price in payment processor for price ID {$price->id}");
+                    throw new Exception('Failed to create price in payment processor for price ID '.$price->id);
                 }
             }
         }

@@ -33,6 +33,7 @@ class CalculateOrderCommissions implements ShouldQueue
             if (! $product) {
                 continue;
             }
+
             if (! $product->seller_id) {
                 continue;
             }
@@ -51,6 +52,7 @@ class CalculateOrderCommissions implements ShouldQueue
                 if (! isset($sellerItems[$sellerId])) {
                     $sellerItems[$sellerId] = [];
                 }
+
                 $sellerItems[$sellerId][] = $item;
             }
         }

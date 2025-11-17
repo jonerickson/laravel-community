@@ -129,7 +129,7 @@ class MigrateCommand extends Command
 
             if ($currentMemory >= $memoryThresholdBytes) {
                 $usedMB = round($currentMemory / 1024 / 1024, 2);
-                $this->components->warn("Memory threshold reached: {$usedMB}MB / {$memoryLimit}MB. Exiting gracefully to prevent out-of-memory error.");
+                $this->components->warn(sprintf('Memory threshold reached: %sMB / %sMB. Exiting gracefully to prevent out-of-memory error.', $usedMB, $memoryLimit));
 
                 DB::disconnect();
                 gc_collect_cycles();
@@ -153,7 +153,7 @@ class MigrateCommand extends Command
 
             $entity = $config->entities[0] ?? 'unknown';
             $offset = $config->offset ?? 0;
-            $this->components->info("Processing {$entity}: Batch Size {$config->batchSize}, Offset {$offset}, Limit {$config->limit}");
+            $this->components->info(sprintf('Processing %s: Batch Size %d, Offset %d, Limit %s', $entity, $config->batchSize, $offset, $config->limit));
 
             declare(ticks=100) {
                 $result = $service->migrate(
@@ -170,15 +170,15 @@ class MigrateCommand extends Command
             $endMemory = memory_get_usage(true);
             $peakMemory = memory_get_peak_usage(true);
 
-            $this->components->success("Completed: Migrated {$stats['migrated']}, Skipped {$stats['skipped']}, Failed {$stats['failed']}");
+            $this->components->success(sprintf('Completed: Migrated %s, Skipped %s, Failed %s', $stats['migrated'], $stats['skipped'], $stats['failed']));
             $this->components->info('Memory - Current: '.round($endMemory / 1024 / 1024, 2).'MB, Peak: '.round($peakMemory / 1024 / 1024, 2).'MB');
 
             return self::SUCCESS;
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             unregister_tick_function($checkMemory);
-            $this->components->error("Migration failed: {$e->getMessage()}");
+            $this->components->error('Migration failed: '.$exception->getMessage());
 
-            Log::error('Migration failed: '.$e->getMessage());
+            Log::error('Migration failed: '.$exception->getMessage());
 
             return self::FAILURE;
         } finally {
@@ -217,6 +217,7 @@ class MigrateCommand extends Command
             if ($config->useSsh && $sshTunnel === null) {
                 return self::FAILURE;
             }
+
             if ($this->option('check')) {
                 return $this->checkDatabaseConnection($source);
             }
@@ -240,11 +241,11 @@ class MigrateCommand extends Command
             }
 
             if ($config->limit !== null && $config->limit !== 0) {
-                $this->components->warn("Limiting migration to {$config->limit} records.");
+                $this->components->warn(sprintf('Limiting migration to %s records.', $config->limit));
             }
 
             if ($config->offset !== null && $config->offset !== 0) {
-                $this->components->warn("Starting migration from offset {$config->offset} (skipping first {$config->offset} records).");
+                $this->components->warn(sprintf('Starting migration from offset %s (skipping first %s records).', $config->offset, $config->offset));
             }
 
             if ($config->excluded !== []) {
@@ -254,7 +255,7 @@ class MigrateCommand extends Command
             $entity = count($config->entities) === 1 ? $config->entities[0] : null;
             $this->promptForOptionalDependencies($service, $source, $entity);
 
-            $this->components->info("Starting migration from {$source->getConnection()}...");
+            $this->components->info(sprintf('Starting migration from %s...', $source->getConnection()));
 
             if ($config->parallel) {
                 return $this->runConcurrentMigrationsForMultipleEntities(
@@ -288,12 +289,12 @@ class MigrateCommand extends Command
             }
 
             return self::SUCCESS;
-        } catch (Exception $e) {
-            $this->components->error("Migration failed: {$e->getMessage()}");
+        } catch (Exception $exception) {
+            $this->components->error('Migration failed: '.$exception->getMessage());
 
-            Log::error("Failed to migrate {$source->getName()}", [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+            Log::error('Failed to migrate '.$source->getName(), [
+                'error' => $exception->getMessage(),
+                'trace' => $exception->getTraceAsString(),
             ]);
 
             return self::FAILURE;
@@ -374,7 +375,7 @@ class MigrateCommand extends Command
         $this->components->info('Running concurrent migrations for multiple entities...');
 
         foreach ($config->entities as $entity) {
-            $this->components->info("Starting concurrent migration for $entity...");
+            $this->components->info(sprintf('Starting concurrent migration for %s...', $entity));
 
             $result = $this->runConcurrentMigration(
                 entity: $entity,
@@ -384,7 +385,7 @@ class MigrateCommand extends Command
 
             if ($result !== self::SUCCESS) {
                 $allSuccessful = false;
-                $this->components->error("Failed to migrate entity: $entity");
+                $this->components->error('Failed to migrate entity: '.$entity);
             }
         }
 
@@ -412,7 +413,7 @@ class MigrateCommand extends Command
             $label = $dependency->entityName;
 
             if ($dependency->description) {
-                $label .= " - {$dependency->description}";
+                $label .= ' - '.$dependency->description;
             }
 
             $options[$dependency->entityName] = $label;
@@ -434,7 +435,7 @@ class MigrateCommand extends Command
 
         foreach ($result->entities as $entity => $stats) {
             if ($stats['skipped'] > 0) {
-                $this->components->warn("Skipped $entity:");
+                $this->components->warn(sprintf('Skipped %s:', $entity));
                 $skippedRecords = $result->getSkippedRecords($entity);
 
                 if ($skippedRecords !== []) {
@@ -446,7 +447,7 @@ class MigrateCommand extends Command
             }
 
             if ($stats['failed'] > 0) {
-                $this->components->error("Failed $entity:");
+                $this->components->error(sprintf('Failed %s:', $entity));
                 $failedRecords = $result->getFailedRecords($entity);
 
                 if ($failedRecords !== []) {
@@ -458,7 +459,7 @@ class MigrateCommand extends Command
             }
 
             if ($this->output->isVeryVerbose() && $stats['migrated'] > 0) {
-                $this->components->info("Migrated $entity:");
+                $this->components->info(sprintf('Migrated %s:', $entity));
                 $migratedRecords = $result->getMigratedRecords($entity);
 
                 if ($migratedRecords !== []) {
@@ -482,11 +483,11 @@ class MigrateCommand extends Command
             $databaseName = DB::connection($connection)->getDatabaseName();
             $driver = DB::connection($connection)->getDriverName();
 
-            $this->components->success("Successfully connected to database: $databaseName (Driver: $driver)");
+            $this->components->success(sprintf('Successfully connected to database: %s (Driver: %s)', $databaseName, $driver));
 
             return self::SUCCESS;
-        } catch (Exception $e) {
-            $this->components->error("Failed to connect to database. Error: {$e->getMessage()}");
+        } catch (Exception $exception) {
+            $this->components->error('Failed to connect to database. Error: '.$exception->getMessage());
 
             return self::FAILURE;
         }
@@ -500,7 +501,7 @@ class MigrateCommand extends Command
         for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
             $port = random_int($minPort, $maxPort);
 
-            $result = Process::run("lsof -ti:$port");
+            $result = Process::run('lsof -ti:'.$port);
 
             if ($result->failed() || trim($result->output()) === '') {
                 return $port;
@@ -515,7 +516,7 @@ class MigrateCommand extends Command
      */
     protected function createSshTunnel(array $sshConfig, string $connectionName): ?array
     {
-        $dbConfig = config("database.connections.$connectionName");
+        $dbConfig = config('database.connections.'.$connectionName);
 
         if (! $dbConfig) {
             return null;
@@ -543,9 +544,9 @@ class MigrateCommand extends Command
         );
 
         if (file_exists($sshConfig['key'])) {
-            $sshCommand .= " -i {$sshConfig['key']}";
+            $sshCommand .= ' -i '.$sshConfig['key'];
         } else {
-            $sshCommand .= " -i /dev/stdin <<< '{$sshConfig['key']}'";
+            $sshCommand .= sprintf(" -i /dev/stdin <<< '%s'", $sshConfig['key']);
         }
 
         $result = Process::timeout(10)->run($sshCommand);
@@ -562,8 +563,8 @@ class MigrateCommand extends Command
 
         Sleep::for(1)->second();
 
-        config(["database.connections.$connectionName.host" => '127.0.0.1']);
-        config(["database.connections.$connectionName.port" => $localPort]);
+        config([sprintf('database.connections.%s.host', $connectionName) => '127.0.0.1']);
+        config([sprintf('database.connections.%s.port', $connectionName) => $localPort]);
 
         DB::purge($connectionName);
 
@@ -580,7 +581,7 @@ class MigrateCommand extends Command
         $localPort = $sshTunnel['local_port'];
 
         Process::pipe([
-            "lsof -ti:$localPort",
+            'lsof -ti:'.$localPort,
             'xargs kill -9',
         ]);
 
@@ -589,7 +590,7 @@ class MigrateCommand extends Command
 
     protected function displayMigrationStatus(MigrationSource $source, ?string $entity = null): int
     {
-        $this->components->info("Fetching migration status from {$source->getName()}...");
+        $this->components->info(sprintf('Fetching migration status from %s...', $source->getName()));
 
         $connection = $source->getConnection();
         $importers = array_filter($source->getImporters(), fn (EntityImporter $importer): bool => is_null($entity) || $importer->getEntityName() === $entity);
@@ -612,7 +613,7 @@ class MigrateCommand extends Command
                 $statusData[] = [
                     'entity' => $entityName,
                     'source_table' => $importer->getSourceTable(),
-                    'record_count' => "Error: {$e->getMessage()}",
+                    'record_count' => 'Error: '.$e->getMessage(),
                 ];
             }
         }
@@ -639,7 +640,7 @@ class MigrateCommand extends Command
         }
 
         if (! in_array($source, $service->getAvailableSources())) {
-            $this->components->error("Unknown migration source: $source");
+            $this->components->error('Unknown migration source: '.$source);
 
             return null;
         }
@@ -707,7 +708,7 @@ class MigrateCommand extends Command
 
         if ($baseUrl !== '') {
             $source->setBaseUrl($baseUrl);
-            $this->components->info("Base URL configured: $baseUrl");
+            $this->components->info('Base URL configured: '.$baseUrl);
         }
     }
 
@@ -736,11 +737,11 @@ class MigrateCommand extends Command
         $memoryAfterAllocationPercentString = Number::percentage($memoryAfterAllocationPercent);
 
         $memoryString = [
-            "Total System Memory: $totalMemoryString",
-            "Available System Memory: $availableMemoryString",
-            "Max Processes: $maxProcesses",
-            "Memory Allocation Per Worker Process: $workerMemoryLimitString",
-            "Reserved for OS: $memoryAfterAllocationString ($memoryAfterAllocationPercentString)",
+            'Total System Memory: '.$totalMemoryString,
+            'Available System Memory: '.$availableMemoryString,
+            'Max Processes: '.$maxProcesses,
+            'Memory Allocation Per Worker Process: '.$workerMemoryLimitString,
+            sprintf('Reserved for OS: %s (%s)', $memoryAfterAllocationString, $memoryAfterAllocationPercentString),
         ];
 
         if (($workerMemoryLimit / 1024 / 1024) < 512) {
@@ -749,7 +750,7 @@ class MigrateCommand extends Command
             $this->components->bulletList($memoryString);
 
             $maxSafeProcesses = (int) floor($availableMemory / 1024 / 1024 / 1024);
-            $this->components->warn("Consider setting your --max-processes to $maxSafeProcesses or fewer.");
+            $this->components->warn(sprintf('Consider setting your --max-processes to %d or fewer.', $maxSafeProcesses));
 
             return null;
         }
@@ -760,7 +761,7 @@ class MigrateCommand extends Command
             $this->components->bulletList($memoryString);
 
             $maxSafeProcesses = (int) floor($availableMemory / 1024 / 1024 / 1024);
-            $this->components->warn("Consider setting your --max-processes to $maxSafeProcesses or fewer.");
+            $this->components->warn(sprintf('Consider setting your --max-processes to %d or fewer.', $maxSafeProcesses));
 
             return null;
         }

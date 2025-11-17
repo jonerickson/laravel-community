@@ -21,7 +21,7 @@ class FingerprintsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->description('The user\'s fingerprints.')
+            ->description("The user's fingerprints.")
             ->searchable(false)
             ->toolbarActions([])
             ->filters([]);

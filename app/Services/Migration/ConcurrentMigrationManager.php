@@ -49,11 +49,11 @@ class ConcurrentMigrationManager
 
         $this->components->info('Concurrency Information:');
         $this->components->bulletList([
-            "Entity: $this->entity",
-            "Total Records: $totalToProcess",
-            "Worker Memory Limit: $workerMemoryLimit",
-            "Max Records Per Process: {$this->config->maxRecordsPerProcess}",
-            "Max Number of Processes: {$this->config->maxProcesses}",
+            'Entity: '.$this->entity,
+            'Total Records: '.$totalToProcess,
+            'Worker Memory Limit: '.$workerMemoryLimit,
+            'Max Records Per Process: '.$this->config->maxRecordsPerProcess,
+            'Max Number of Processes: '.$this->config->maxProcesses,
         ]);
         $this->output->newLine();
 
@@ -76,14 +76,14 @@ class ConcurrentMigrationManager
         }
 
         $this->output->newLine();
-        $this->components->success("All processes for $this->entity completed!");
+        $this->components->success(sprintf('All processes for %s completed!', $this->entity));
         $this->components->info('Completed chunks: '.count($this->completedChunks));
 
         if ($this->failedChunks !== []) {
             $this->components->error('Failed chunks: '.count($this->failedChunks));
 
             foreach ($this->failedChunks as $chunk) {
-                $this->components->error("Offset {$chunk['offset']}, Limit {$chunk['limit']}: {$chunk['error']}");
+                $this->components->error(sprintf('Offset %s, Limit %s: %s', $chunk['offset'], $chunk['limit'], $chunk['error']));
             }
         }
 
@@ -158,7 +158,7 @@ class ConcurrentMigrationManager
             'color' => $color,
         ];
 
-        $this->output->writeln("<comment>[Process Started]</comment> Entity: {$this->entity}, Offset: $offset, Limit: $limit, PID: {$process->getPid()}");
+        $this->output->writeln(sprintf('<comment>[Process Started]</comment> Entity: %s, Offset: %d, Limit: %d, PID: %s', $this->entity, $offset, $limit, $process->getPid()));
     }
 
     protected function checkProcesses(): void
@@ -187,7 +187,7 @@ class ConcurrentMigrationManager
     protected function handleSuccessfulProcess(array $data): void
     {
         $this->completedChunks[] = $data;
-        $this->output->writeln("<comment>[Process Completed]</comment> Entity: {$data['entity']}, Offset: {$data['offset']}, Limit: {$data['limit']}");
+        $this->output->writeln(sprintf('<comment>[Process Completed]</comment> Entity: %s, Offset: %s, Limit: %s', $data['entity'], $data['offset'], $data['limit']));
     }
 
     protected function handleFailedProcess(array $data, Process $process): void
@@ -204,14 +204,14 @@ class ConcurrentMigrationManager
             'exit_code' => $exitCode,
         ];
 
-        $this->output->writeln("<error>[Process Failed]</error> Entity: {$data['entity']}, Offset: {$data['offset']}, Exit Code: $exitCode");
+        $this->output->writeln(sprintf('<error>[Process Failed]</error> Entity: %s, Offset: %s, Exit Code: %s', $data['entity'], $data['offset'], $exitCode));
 
         if ($errorOutput && ! $this->isProgressBarOutput($errorOutput)) {
-            $this->components->error("Error: $errorOutput");
+            $this->components->error('Error: '.$errorOutput);
         }
 
         if ($stdOutput !== '' && $stdOutput !== '0') {
-            $this->output->writeln("  → Output: $stdOutput");
+            $this->output->writeln('  → Output: '.$stdOutput);
         }
     }
 
@@ -225,9 +225,10 @@ class ConcurrentMigrationManager
             $lines = explode("\n", rtrim($newOutput, "\n"));
             foreach ($lines as $line) {
                 if ($line !== '' && $line !== '0' && ! $this->isProgressBarOutput($line)) {
-                    $this->output->writeln("<fg=$color>[Worker {$data['offset']}]</> $line");
+                    $this->output->writeln(sprintf('<fg=%s>[Worker %s]</> %s', $color, $data['offset'], $line));
                 }
             }
+
             $data['output_position'] += strlen($newOutput);
         }
 
@@ -235,9 +236,10 @@ class ConcurrentMigrationManager
             $lines = explode("\n", rtrim($newError, "\n"));
             foreach ($lines as $line) {
                 if ($line !== '' && $line !== '0' && ! $this->isProgressBarOutput($line)) {
-                    $this->output->writeln("<fg=$color>[Worker {$data['offset']} ERROR]</> $line");
+                    $this->output->writeln(sprintf('<fg=%s>[Worker %s ERROR]</> %s', $color, $data['offset'], $line));
                 }
             }
+
             $data['error_position'] += strlen($newError);
         }
     }

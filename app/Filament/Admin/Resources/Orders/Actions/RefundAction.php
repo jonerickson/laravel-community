@@ -25,7 +25,7 @@ class RefundAction extends Action
         $this->icon(Heroicon::OutlinedReceiptRefund);
         $this->requiresConfirmation();
         $this->modalHeading('Refund');
-        $this->modalDescription('Are you sure you want to refund this order? Refunds can take up to 5-7 business days to appear on a customer\'s statement.');
+        $this->modalDescription("Are you sure you want to refund this order? Refunds can take up to 5-7 business days to appear on a customer's statement.");
         $this->modalSubmitActionLabel('Refund');
         $this->schema([
             Select::make('reason')

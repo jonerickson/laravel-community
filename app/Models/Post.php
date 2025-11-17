@@ -262,9 +262,9 @@ class Post extends Model implements HasLabel, Sluggable
     public function getActivityDescription(string $eventName): string
     {
         $type = $this->type?->value ?? 'post';
-        $title = $this->title ? " \"{$this->title}\"" : '';
+        $title = $this->title ? sprintf(' "%s"', $this->title) : '';
 
-        return ucfirst($type).$title." $eventName";
+        return ucfirst($type).$title.(' '.$eventName);
     }
 
     public function getActivityLogName(): string

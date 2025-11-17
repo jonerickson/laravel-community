@@ -353,7 +353,7 @@ class Product extends Model implements HasLabel, Sluggable
     {
         $type = $this->type?->value ?? 'product';
 
-        return ucfirst($type)." $this->name $eventName";
+        return ucfirst($type).sprintf(' %s %s', $this->name, $eventName);
     }
 
     public function getActivityLogName(): string

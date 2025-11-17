@@ -34,7 +34,7 @@ class EnsureProductsExist
                 $productData = $this->paymentManager->createProduct($product);
 
                 if (! $productData instanceof ProductData) {
-                    throw new Exception("Failed to create product in payment processor for product ID {$product->id}");
+                    throw new Exception('Failed to create product in payment processor for product ID '.$product->id);
                 }
             }
         }

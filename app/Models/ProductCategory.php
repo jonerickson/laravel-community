@@ -114,7 +114,7 @@ class ProductCategory extends Model implements Sluggable
 
     public function getActivityDescription(string $eventName): string
     {
-        return "Product category $this->name $eventName";
+        return sprintf('Product category %s %s', $this->name, $eventName);
     }
 
     public function getActivityLogName(): string

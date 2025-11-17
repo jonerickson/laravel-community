@@ -375,7 +375,7 @@ class StripeDriver implements PaymentProcessor
     {
         return $this->executeWithErrorHandling('searchCustomer', function () use ($field, $value): ?CustomerData {
             $customers = $this->stripe->customers->search([
-                'query' => "$field:\"$value\"",
+                'query' => sprintf('%s:"%s"', $field, $value),
             ]);
 
             if ($customers->isEmpty()) {
@@ -536,7 +536,7 @@ class StripeDriver implements PaymentProcessor
                                 'message' => 'I accept the Terms of Service outlined by '.config('app.name'),
                             ],
                             'submit' => [
-                                'message' => "Order Number: $order->reference_id",
+                                'message' => 'Order Number: '.$order->reference_id,
                             ],
                         ],
                         'branding_settings' => [
@@ -776,7 +776,7 @@ class StripeDriver implements PaymentProcessor
                         'message' => 'I accept the Terms of Service outlined by '.config('app.name'),
                     ],
                     'submit' => [
-                        'message' => "Order Number: {$order->reference_id}",
+                        'message' => 'Order Number: '.$order->reference_id,
                     ],
                 ],
                 'invoice_creation' => [
@@ -958,11 +958,11 @@ class StripeDriver implements PaymentProcessor
         try {
             return $callback();
         } catch (ApiErrorException $exception) {
-            Log::error("Stripe payment processor API error in {$method}", ['method' => $method, 'exception' => $exception]);
+            Log::error('Stripe payment processor API error in '.$method, ['method' => $method, 'exception' => $exception]);
 
             return $defaultValue;
         } catch (Exception $exception) {
-            Log::error("Stripe payment processor exception in {$method}", ['method' => $method, 'exception' => $exception]);
+            Log::error('Stripe payment processor exception in '.$method, ['method' => $method, 'exception' => $exception]);
 
             return $defaultValue;
         }
@@ -973,6 +973,6 @@ class StripeDriver implements PaymentProcessor
         $callingMethod = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'] ?? 'unknown';
         $requestId = Context::get('request_id');
 
-        return $requestId ? "$requestId-$callingMethod" : $callingMethod;
+        return $requestId ? sprintf('%s-%s', $requestId, $callingMethod) : $callingMethod;
     }
 }

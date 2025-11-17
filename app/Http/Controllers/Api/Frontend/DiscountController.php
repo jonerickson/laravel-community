@@ -50,7 +50,7 @@ class DiscountController
         if ($product = $order->items()->with('price.product')->get()->firstWhere('price.product.allow_discount_codes', false)) {
             return ApiResource::error(
                 message: 'Invalid or expired discount code.',
-                errors: ['code' => ["$product->name does not allow the use of a discount code."]],
+                errors: ['code' => [$product->name.' does not allow the use of a discount code.']],
                 status: 422
             );
         }
@@ -76,10 +76,10 @@ class DiscountController
 
         try {
             $this->cartService->applyDiscount($order, $discount);
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException $runtimeException) {
             return ApiResource::error(
-                message: $e->getMessage(),
-                errors: ['code' => [$e->getMessage()]],
+                message: $runtimeException->getMessage(),
+                errors: ['code' => [$runtimeException->getMessage()]],
                 status: 422
             );
         }

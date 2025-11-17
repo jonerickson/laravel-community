@@ -152,7 +152,7 @@ class MigrationService
         }
 
         if (in_array($entity, $this->config->excluded)) {
-            $this->components->info("Skipping $entity - excluded");
+            $this->components->info(sprintf('Skipping %s - excluded', $entity));
             $this->migratedEntities[] = $entity;
 
             return;
@@ -161,11 +161,11 @@ class MigrationService
         $importer = $source->getImporter($entity);
 
         if (! $importer instanceof Contracts\EntityImporter) {
-            throw new InvalidArgumentException("Unknown entity: $entity");
+            throw new InvalidArgumentException('Unknown entity: '.$entity);
         }
 
         if ($importer->isCompleted()) {
-            $this->components->info("Skipping $entity - already completed</info>");
+            $this->components->info(sprintf('Skipping %s - already completed</info>', $entity));
             $this->migratedEntities[] = $entity;
 
             return;
@@ -183,7 +183,7 @@ class MigrationService
                 }
 
                 $dependencyType = $dependency->isRequired() ? 'required' : 'optional';
-                $this->components->info("Migrating {$dependency->entityName} ({$dependencyType} dependency of {$entity})...</comment>");
+                $this->components->info(sprintf('Migrating %s (%s dependency of %s)...</comment>', $dependency->entityName, $dependencyType, $entity));
                 $this->migrateEntityWithDependencies($dependency->entityName, $source, $result);
             }
         }
@@ -207,7 +207,7 @@ class MigrationService
                 }
 
                 $dependencyType = $dependency->isRequired() ? 'required' : 'optional';
-                $this->components->info("Migrating {$dependency->entityName} ({$dependencyType} dependency of {$entity})...</comment>");
+                $this->components->info(sprintf('Migrating %s (%s dependency of %s)...</comment>', $dependency->entityName, $dependencyType, $entity));
                 $this->migrateEntityWithDependencies($dependency->entityName, $source, $result);
             }
         }
@@ -222,10 +222,10 @@ class MigrationService
         $importer->setConfig($this->config);
 
         if (! $importer instanceof Contracts\EntityImporter) {
-            throw new InvalidArgumentException("Unknown entity: $entity");
+            throw new InvalidArgumentException('Unknown entity: '.$entity);
         }
 
-        $this->components->info("Migrating $entity...");
+        $this->components->info(sprintf('Migrating %s...', $entity));
 
         $processed = $importer->import(
             result: $result,
@@ -233,7 +233,7 @@ class MigrationService
             components: $this->components,
         );
 
-        $this->components->success("Migrated $processed $entity.");
+        $this->components->success(sprintf('Migrated %d %s.', $processed, $entity));
     }
 
     protected function prepareForMigration(MigrationSource $source): void

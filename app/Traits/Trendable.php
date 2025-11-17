@@ -41,7 +41,7 @@ trait Trendable
         $query->fromRaw("(
             WITH topic_stats AS (
                 SELECT
-                    `$tableName`.*,
+                    `{$tableName}`.*,
                     (
                         LOG(1 + COALESCE(view_stats.total_views, 0)) * ? +
                         LOG(1 + COALESCE(view_stats.unique_views, 0)) * ? +
@@ -49,17 +49,17 @@ trait Trendable
                         LOG(1 + COALESCE(read_stats.read_count, 0)) * ? +
                         LOG(1 + COALESCE(like_stats.like_count, 0)) * ?
                     ) AS raw_score,
-                    TIMESTAMPDIFF(HOUR, `$tableName`.created_at, ?) AS hours_since
-                FROM `$tableName`
+                    TIMESTAMPDIFF(HOUR, `{$tableName}`.created_at, ?) AS hours_since
+                FROM `{$tableName}`
                 LEFT JOIN (
                     SELECT
                         `viewable_id`,
                         SUM(`count`) as total_views,
                         COUNT(DISTINCT `fingerprint_id`) as unique_views
                     FROM `views`
-                    WHERE `viewable_type` = '$modelClass'
+                    WHERE `viewable_type` = '{$modelClass}'
                     GROUP BY `viewable_id`
-                ) AS view_stats ON view_stats.viewable_id = `$tableName`.id
+                ) AS view_stats ON view_stats.viewable_id = `{$tableName}`.id
                 LEFT JOIN (
                     SELECT
                         `topic_id`,
@@ -67,15 +67,15 @@ trait Trendable
                     FROM `posts`
                     WHERE `type` = 'forum'
                     GROUP BY `topic_id`
-                ) AS post_stats ON post_stats.topic_id = `$tableName`.id
+                ) AS post_stats ON post_stats.topic_id = `{$tableName}`.id
                 LEFT JOIN (
                     SELECT
                         `readable_id`,
                         COUNT(*) as read_count
                     FROM `reads`
-                    WHERE `readable_type` = '$modelClass'
+                    WHERE `readable_type` = '{$modelClass}'
                     GROUP BY `readable_id`
-                ) AS read_stats ON read_stats.readable_id = `$tableName`.id
+                ) AS read_stats ON read_stats.readable_id = `{$tableName}`.id
                 LEFT JOIN (
                     SELECT
                         `posts`.`topic_id`,
@@ -84,7 +84,7 @@ trait Trendable
                     LEFT JOIN `likes` ON `likes`.`likeable_type` = 'App\\\\Models\\\\Post' AND `likes`.`likeable_id` = `posts`.`id`
                     WHERE `posts`.`type` = 'forum'
                     GROUP BY `posts`.`topic_id`
-                ) AS like_stats ON like_stats.topic_id = `$tableName`.id
+                ) AS like_stats ON like_stats.topic_id = `{$tableName}`.id
             ),
             final_scores AS (
                 SELECT *,
@@ -127,7 +127,7 @@ trait Trendable
         $timeframes = Config::get('trending.query.timeframes', []);
 
         if (! isset($timeframes[$timeframe])) {
-            throw new InvalidArgumentException("Invalid timeframe: {$timeframe}");
+            throw new InvalidArgumentException('Invalid timeframe: '.$timeframe);
         }
 
         $hours = $timeframes[$timeframe];

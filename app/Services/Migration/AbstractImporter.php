@@ -77,19 +77,19 @@ abstract class AbstractImporter implements EntityImporter
             $sourcePath = ltrim(rtrim($sourcePath, '/'), '/');
             $extension = pathinfo($sourcePath, PATHINFO_EXTENSION);
 
-            $blob = file_get_contents("$baseUrl/$sourcePath");
+            $blob = file_get_contents(sprintf('%s/%s', $baseUrl, $sourcePath));
 
             $name = Str::random(40);
-            $fullStoragePath = "$storagePath/$name.$extension";
+            $fullStoragePath = sprintf('%s/%s.%s', $storagePath, $name, $extension);
             $result = Storage::put($fullStoragePath, $blob, 'public');
 
             if ($result) {
                 return $fullStoragePath;
             }
-        } catch (Throwable $e) {
+        } catch (Throwable $throwable) {
             Log::error('Failed to download file', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'error' => $throwable->getMessage(),
+                'trace' => $throwable->getTraceAsString(),
             ]);
         }
 

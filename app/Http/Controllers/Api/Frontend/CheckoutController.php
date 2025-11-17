@@ -90,8 +90,8 @@ class CheckoutController
         foreach ($cart->cartItems as $item) {
             if (! $item->product || ! $item->product->externalProductId) {
                 return ApiResource::error(
-                    message: "$item->name is not available for purchase.",
-                    errors: ['product' => ["$item->name is not configured for purchase."]],
+                    message: $item->name.' is not available for purchase.',
+                    errors: ['product' => [$item->name.' is not configured for purchase.']],
                     status: 400
                 );
             }
@@ -100,8 +100,8 @@ class CheckoutController
 
             if (! $selectedPrice || ! $selectedPrice->externalPriceId) {
                 return ApiResource::error(
-                    message: "No prices are configured for $item->name.",
-                    errors: ['price' => ["Price not configured for $item->name."]],
+                    message: sprintf('No prices are configured for %s.', $item->name),
+                    errors: ['price' => [sprintf('Price not configured for %s.', $item->name)]],
                     status: 400
                 );
             }

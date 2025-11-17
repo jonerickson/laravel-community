@@ -17,7 +17,7 @@ class OrdersRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->description('The user\'s order history.')
+            ->description("The user's order history.")
             ->emptyStateHeading('No order history')
             ->emptyStateDescription('This user has no order history.')
             ->emptyStateIcon('heroicon-o-shopping-cart')

@@ -139,7 +139,7 @@ class DiscountService
                 DiscountType::Manual => 'MANUAL',
             };
 
-            $code = Str::upper("{$prefix}-".Str::random(4).'-'.Str::random(4).'-'.Str::random(4));
+            $code = Str::upper($prefix.'-'.Str::random(4).'-'.Str::random(4).'-'.Str::random(4));
 
             if (! Discount::query()->where('code', $code)->exists()) {
                 return $code;

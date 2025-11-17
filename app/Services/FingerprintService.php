@@ -32,7 +32,7 @@ class FingerprintService
 
         $response = Http::withToken($this->apiKey)
             ->acceptJson()
-            ->get("$this->baseUrl/events/$requestId")
+            ->get(sprintf('%s/events/%s', $this->baseUrl, $requestId))
             ->throw();
 
         return $response->json();

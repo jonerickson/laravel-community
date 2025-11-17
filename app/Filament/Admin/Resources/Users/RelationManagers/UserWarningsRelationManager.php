@@ -57,7 +57,7 @@ class UserWarningsRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('warning.name')
-            ->description('The user\'s warning history.')
+            ->description("The user's warning history.")
             ->emptyStateHeading('No warnings issued')
             ->emptyStateDescription('This user has no warning history.')
             ->emptyStateIcon('heroicon-o-check-circle')

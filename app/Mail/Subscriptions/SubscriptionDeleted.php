@@ -26,7 +26,7 @@ class SubscriptionDeleted extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Subscription Cancelled - {$this->product->name}",
+            subject: 'Subscription Cancelled - '.$this->product->name,
         );
     }
 

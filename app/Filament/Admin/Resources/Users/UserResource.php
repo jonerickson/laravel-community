@@ -94,7 +94,7 @@ class UserResource extends Resource
                                     ->columnSpan(2)
                                     ->components([
                                         Section::make('User Information')
-                                            ->description('The user\'s profile information.')
+                                            ->description("The user's profile information.")
                                             ->columns(1)
                                             ->headerActions([
                                                 ChangePasswordAction::make()
@@ -141,7 +141,7 @@ class UserResource extends Resource
                                                         ]),
                                                 ])->verticallyAlignCenter(),
                                                 Select::make('groups')
-                                                    ->helperText('The groups the user is assigned to. Some of these may be auto-assigned based on products they\'ve purchased or through other platform features. You may manually sync a user\'s groups with the actions above.')
+                                                    ->helperText("The groups the user is assigned to. Some of these may be auto-assigned based on products they've purchased or through other platform features. You may manually sync a user's groups with the actions above.")
                                                     ->relationship('groups', 'name')
                                                     ->multiple()
                                                     ->searchable()
@@ -204,7 +204,7 @@ class UserResource extends Resource
                             ->icon(Heroicon::OutlinedCurrencyDollar)
                             ->schema([
                                 Section::make('Billing Information')
-                                    ->description('The user\'s billing information.')
+                                    ->description("The user's billing information.")
                                     ->columns()
                                     ->schema([
                                         TextInput::make('billing_address')
@@ -267,7 +267,7 @@ class UserResource extends Resource
                                                 $discordIntegration = $record->integrations()->where('provider', 'discord')->first();
 
                                                 if ($discordIntegration?->provider_id) {
-                                                    Cache::forget("discord_user_roles.{$discordIntegration->provider_id}");
+                                                    Cache::forget('discord_user_roles.'.$discordIntegration->provider_id);
                                                 }
 
                                                 Cache::forget('discord_guild_roles');

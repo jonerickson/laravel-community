@@ -90,7 +90,7 @@ class ForumImporter extends AbstractImporter
         $totalForums = $baseQuery->clone()->countOffset();
 
         if ($output->isVerbose()) {
-            $components->info("Found $totalForums forums to migrate...");
+            $components->info(sprintf('Found %s forums to migrate...', $totalForums));
         }
 
         $progressBar = $output->createProgressBar($totalForums);
@@ -129,7 +129,7 @@ class ForumImporter extends AbstractImporter
 
                     $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $components->error("Failed to import forum: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
+                    $components->error(sprintf('Failed to import forum: %s in %s on Line %d.', $e->getMessage(), $fileName, $e->getLine()));
                 }
 
                 $processed++;
@@ -167,7 +167,7 @@ class ForumImporter extends AbstractImporter
         $totalCategories = $baseQuery->clone()->countOffset();
 
         if ($output->isVerbose()) {
-            $components->info("Found {$totalCategories} forum categories to migrate...");
+            $components->info(sprintf('Found %s forum categories to migrate...', $totalCategories));
         }
 
         $progressBar = $output->createProgressBar($totalCategories);
@@ -203,7 +203,7 @@ class ForumImporter extends AbstractImporter
 
                     $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $components->error("Failed to import forum category: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
+                    $components->error(sprintf('Failed to import forum category: %s in %s on Line %d.', $e->getMessage(), $fileName, $e->getLine()));
                 }
 
                 $processed++;
@@ -218,15 +218,15 @@ class ForumImporter extends AbstractImporter
         $output->newLine(2);
 
         if ($output->isVerbose()) {
-            $components->info("Migrated $processed forum categories...");
+            $components->info(sprintf('Migrated %d forum categories...', $processed));
         }
     }
 
     protected function importCategory(object $sourceCategory, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $name = $this->source instanceof InvisionCommunitySource
-            ? $this->source->getLanguageResolver()->resolveForumName($sourceCategory->id, "Invision Forum Category $sourceCategory->id")
-            : "Invision Forum Category $sourceCategory->id";
+            ? $this->source->getLanguageResolver()->resolveForumName($sourceCategory->id, 'Invision Forum Category '.$sourceCategory->id)
+            : 'Invision Forum Category '.$sourceCategory->id;
 
         $description = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveForumDescription($sourceCategory->id)
@@ -298,8 +298,8 @@ class ForumImporter extends AbstractImporter
     protected function importForum(object $sourceForum, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $name = $this->source instanceof InvisionCommunitySource
-            ? $this->source->getLanguageResolver()->resolveForumName($sourceForum->id, "Invision Forum $sourceForum->id")
-            : "Invision Forum $sourceForum->id";
+            ? $this->source->getLanguageResolver()->resolveForumName($sourceForum->id, 'Invision Forum '.$sourceForum->id)
+            : 'Invision Forum '.$sourceForum->id;
 
         $description = $this->source instanceof InvisionCommunitySource
             ? $this->source->getLanguageResolver()->resolveForumDescription($sourceForum->id)
@@ -399,7 +399,7 @@ class ForumImporter extends AbstractImporter
 
                 $output->newLine(2);
                 $fileName = Str::of($e->getFile())->classBasename();
-                $components->error("Failed to update forum parent relationship: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
+                $components->error(sprintf('Failed to update forum parent relationship: %s in %s on Line %d.', $e->getMessage(), $fileName, $e->getLine()));
             }
 
             $progressBar->advance();

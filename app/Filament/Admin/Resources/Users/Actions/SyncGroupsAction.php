@@ -27,8 +27,8 @@ class SyncGroupsAction extends Action
         $this->modalHeading('Sync Groups');
         $this->modalDescription('This will manually add and remove the user to all the groups they should belong to. Only the default admin and member groups will remain if previously assigned.');
         $this->modalSubmitActionLabel('Sync');
-        $this->successNotificationTitle('The user\'s groups have been successfully synced.');
-        $this->failureNotificationTitle('The user\'s groups could not be synced. Please try again later.');
+        $this->successNotificationTitle("The user's groups have been successfully synced.");
+        $this->failureNotificationTitle("The user's groups could not be synced. Please try again later.");
 
         $this->action(function (SyncGroupsAction $action): void {
             if (! ($user = $action->getUser()) instanceof User) {

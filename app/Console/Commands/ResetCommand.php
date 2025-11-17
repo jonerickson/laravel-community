@@ -186,7 +186,7 @@ class ResetCommand extends Command
         $model = $config['model'];
         $label = $config['label'];
 
-        $this->components->task("Deleting $label", function () use ($key, $model): void {
+        $this->components->task('Deleting '.$label, function () use ($key, $model): void {
             match ($key) {
                 'forums' => $this->deleteForums(),
                 'orders' => $this->deleteOrders(),

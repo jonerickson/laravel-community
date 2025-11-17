@@ -90,7 +90,7 @@ class SubscriptionImporter extends AbstractImporter
         $totalSubscriptions = $baseQuery->clone()->countOffset();
 
         if ($output->isVerbose()) {
-            $components->info("Found {$totalSubscriptions} subscription packages to migrate...");
+            $components->info(sprintf('Found %s subscription packages to migrate...', $totalSubscriptions));
         }
 
         $progressBar = $output->createProgressBar($totalSubscriptions);
@@ -124,7 +124,7 @@ class SubscriptionImporter extends AbstractImporter
 
                     $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $components->error("Failed to import subscription: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
+                    $components->error(sprintf('Failed to import subscription: %s in %s on Line %d.', $e->getMessage(), $fileName, $e->getLine()));
                 }
 
                 $processed++;
@@ -144,8 +144,8 @@ class SubscriptionImporter extends AbstractImporter
     protected function importSubscription(object $sourceSubscription, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
         $name = $this->source instanceof InvisionCommunitySource
-            ? $this->source->getLanguageResolver()->resolveSubscriptionPackageName($sourceSubscription->sp_id, "Invision Subscription $sourceSubscription->sp_id")
-            : "Invision Subscription $sourceSubscription->sp_id";
+            ? $this->source->getLanguageResolver()->resolveSubscriptionPackageName($sourceSubscription->sp_id, 'Invision Subscription '.$sourceSubscription->sp_id)
+            : 'Invision Subscription '.$sourceSubscription->sp_id;
 
         $slug = Str::of($name)
             ->slug()
@@ -264,7 +264,7 @@ class SubscriptionImporter extends AbstractImporter
                         $price->forceFill([
                             'product_id' => $product->id,
                             'name' => $interval instanceof SubscriptionInterval
-                                ? "$term {$interval->value}"
+                                ? sprintf('%d %s', $term, $interval->value)
                                 : 'One-Time',
                             'description' => null,
                             'amount' => $amount,
@@ -298,7 +298,7 @@ class SubscriptionImporter extends AbstractImporter
                         $price = new Price;
                         $price->forceFill([
                             'product_id' => $product->id,
-                            'name' => "$currency Monthly",
+                            'name' => $currency.' Monthly',
                             'description' => null,
                             'amount' => $amount,
                             'currency' => $currency,
@@ -313,11 +313,11 @@ class SubscriptionImporter extends AbstractImporter
                     }
                 }
             }
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             Log::error('Failed to create subscription prices', [
                 'product_id' => $product->id ?? 'N/A',
                 'source_subscription_id' => $sourceSubscription->sp_id,
-                'error' => $e->getMessage(),
+                'error' => $exception->getMessage(),
             ]);
 
             if (! $config->isDryRun) {
@@ -327,7 +327,7 @@ class SubscriptionImporter extends AbstractImporter
                     $result->recordFailed('subscription_prices', [
                         'product_id' => $product->id ?? 'N/A',
                         'source_subscription_id' => $sourceSubscription->sp_id,
-                        'error' => $e->getMessage(),
+                        'error' => $exception->getMessage(),
                     ]);
                 }
             }

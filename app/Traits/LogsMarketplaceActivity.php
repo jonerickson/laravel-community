@@ -48,7 +48,7 @@ trait LogsMarketplaceActivity
     protected function logWishlist(bool $added = true): void
     {
         $action = $added ? 'added to' : 'removed from';
-        $this->logMarketplaceActivity("Product {$action} wishlist", [
+        $this->logMarketplaceActivity(sprintf('Product %s wishlist', $action), [
             'action' => $added ? 'added' : 'removed',
             'product_id' => $this->id ?? null,
             'product_name' => $this->name ?? null,

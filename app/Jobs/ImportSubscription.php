@@ -55,12 +55,12 @@ class ImportSubscription implements ShouldQueue
                     ],
                 ]
             );
-        } catch (Throwable $e) {
+        } catch (Throwable $throwable) {
             Log::error('Failed to import subscription', [
                 'user_id' => $this->order->user_id,
                 'order_id' => $this->order->id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'error' => $throwable->getMessage(),
+                'trace' => $throwable->getTraceAsString(),
             ]);
         }
     }

@@ -89,7 +89,7 @@ class PostImporter extends AbstractImporter
         $totalPosts = $baseQuery->clone()->countOffset();
 
         if ($output->isVerbose()) {
-            $components->info("Found {$totalPosts} posts to migrate...");
+            $components->info(sprintf('Found %s posts to migrate...', $totalPosts));
         }
 
         $progressBar = $output->createProgressBar($totalPosts);
@@ -123,7 +123,7 @@ class PostImporter extends AbstractImporter
 
                     $output->newLine(2);
                     $fileName = Str::of($e->getFile())->classBasename();
-                    $components->error("Failed to import post: {$e->getMessage()} in $fileName on Line {$e->getLine()}.");
+                    $components->error(sprintf('Failed to import post: %s in %s on Line %d.', $e->getMessage(), $fileName, $e->getLine()));
                 }
 
                 $processed++;
@@ -176,7 +176,7 @@ class PostImporter extends AbstractImporter
         $post->forceFill([
             'type' => PostType::Forum,
             'topic_id' => $topic->id,
-            'title' => Str::of("Re: $topic->title")->trim()->limit(255)->toString(),
+            'title' => Str::of('Re: '.$topic->title)->trim()->limit(255, '')->toString(),
             'content' => $this->modifyContent($sourcePost->post ?? '', $config),
             'is_published' => true,
             'is_approved' => true,

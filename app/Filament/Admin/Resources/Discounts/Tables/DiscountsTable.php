@@ -63,7 +63,7 @@ class DiscountsTable
                         $max = $record->max_uses;
 
                         if ($max) {
-                            return "$used / $max";
+                            return sprintf('%s / %s', $used, $max);
                         }
 
                         return (string) $used;

@@ -42,7 +42,7 @@ class DiscordApiService
      */
     public function isUserInServer(string $discordUserId): bool
     {
-        $response = $this->makeRequest('get', "/guilds/$this->guildId/members/$discordUserId");
+        $response = $this->makeRequest('get', sprintf('/guilds/%s/members/%s', $this->guildId, $discordUserId));
 
         return ! is_null($response);
     }
@@ -61,7 +61,7 @@ class DiscordApiService
             $payload['roles'] = $roleIds;
         }
 
-        $response = $this->makeRequest('put', "/guilds/$this->guildId/members/$discordUserId", $payload);
+        $response = $this->makeRequest('put', sprintf('/guilds/%s/members/%s', $this->guildId, $discordUserId), $payload);
 
         return ! is_null($response);
     }
@@ -72,7 +72,7 @@ class DiscordApiService
      */
     public function removeUserFromServer(string $discordUserId): bool
     {
-        $response = $this->makeRequest('delete', "/guilds/$this->guildId/members/$discordUserId");
+        $response = $this->makeRequest('delete', sprintf('/guilds/%s/members/%s', $this->guildId, $discordUserId));
 
         return ! is_null($response);
     }
@@ -83,7 +83,7 @@ class DiscordApiService
      */
     public function getUserRoleIds(string $discordUserId): Collection
     {
-        $response = $this->makeRequest('get', "/guilds/$this->guildId/members/$discordUserId");
+        $response = $this->makeRequest('get', sprintf('/guilds/%s/members/%s', $this->guildId, $discordUserId));
 
         if (is_null($response)) {
             return new Collection;
@@ -98,7 +98,7 @@ class DiscordApiService
      */
     public function addRole(string $discordUserId, string $roleId): bool
     {
-        $response = $this->makeRequest('put', "/guilds/$this->guildId/members/$discordUserId/roles/$roleId");
+        $response = $this->makeRequest('put', sprintf('/guilds/%s/members/%s/roles/%s', $this->guildId, $discordUserId, $roleId));
 
         $this->resetCachedUserRoles($discordUserId);
 
@@ -111,7 +111,7 @@ class DiscordApiService
      */
     public function removeRole(string $discordUserId, string $roleId): bool
     {
-        $response = $this->makeRequest('delete', "/guilds/$this->guildId/members/$discordUserId/roles/$roleId");
+        $response = $this->makeRequest('delete', sprintf('/guilds/%s/members/%s/roles/%s', $this->guildId, $discordUserId, $roleId));
 
         $this->resetCachedUserRoles($discordUserId);
 
@@ -120,12 +120,12 @@ class DiscordApiService
 
     public function getCachedUserRoleIds(string $discordUserId): Collection
     {
-        return Cache::remember("discord_user_roles.{$discordUserId}", now()->addMinutes(5), fn (): Collection => $this->getUserRoleIds($discordUserId));
+        return Cache::remember('discord_user_roles.'.$discordUserId, now()->addMinutes(5), fn (): Collection => $this->getUserRoleIds($discordUserId));
     }
 
     public function resetCachedUserRoles(string $discordUserId): void
     {
-        Cache::forget("discord_user_roles.$discordUserId");
+        Cache::forget('discord_user_roles.'.$discordUserId);
     }
 
     /**
@@ -134,7 +134,7 @@ class DiscordApiService
      */
     public function listRoles(): Collection
     {
-        $response = $this->makeRequest('get', "/guilds/$this->guildId/roles");
+        $response = $this->makeRequest('get', sprintf('/guilds/%s/roles', $this->guildId));
 
         if (is_null($response)) {
             return new Collection;

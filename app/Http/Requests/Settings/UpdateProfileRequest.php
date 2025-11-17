@@ -21,7 +21,7 @@ class UpdateProfileRequest extends FormRequest
 
     public function rules(): array
     {
-        $fields = Field::query()->get()->mapWithKeys(fn (Field $field): array => ["fields.$field->id" => $field->type->getRules($field)])->toArray();
+        $fields = Field::query()->get()->mapWithKeys(fn (Field $field): array => ['fields.'.$field->id => $field->type->getRules($field)])->toArray();
 
         return array_merge($fields, [
             'name' => ['required', 'string', 'max:255'],
@@ -33,7 +33,7 @@ class UpdateProfileRequest extends FormRequest
     #[Override]
     public function attributes(): array
     {
-        $fields = Field::query()->get()->mapWithKeys(fn (Field $field): array => ["fields.$field->id" => Str::lower($field->label)])->toArray();
+        $fields = Field::query()->get()->mapWithKeys(fn (Field $field): array => ['fields.'.$field->id => Str::lower($field->label)])->toArray();
 
         return array_merge($fields, [
             'name' => 'name',

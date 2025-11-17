@@ -19,6 +19,6 @@ trait Searchable
         $table = $this->getTable();
         $environment = App::environment();
 
-        return "{$table}_{$environment}_index";
+        return sprintf('%s_%s_index', $table, $environment);
     }
 }

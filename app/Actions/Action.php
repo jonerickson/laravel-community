@@ -28,8 +28,8 @@ abstract class Action implements Actionable
     {
         try {
             $response = $this();
-        } catch (Throwable $exception) {
-            return $this->handleFailure($exception);
+        } catch (Throwable $throwable) {
+            return $this->handleFailure($throwable);
         }
 
         return $response;
@@ -41,7 +41,7 @@ abstract class Action implements Actionable
     protected function handleFailure(Throwable $exception)
     {
         if (method_exists($this, 'failed')) {
-            return call_user_func([$this, 'failed'], $exception);
+            return $this->failed($exception);
         }
 
         throw $exception;

@@ -393,7 +393,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
 
     public function getActivityDescription(string $eventName): string
     {
-        return "User account $eventName";
+        return 'User account '.$eventName;
     }
 
     public function getActivityLogName(): string

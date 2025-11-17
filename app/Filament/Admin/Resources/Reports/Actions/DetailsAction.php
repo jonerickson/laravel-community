@@ -22,7 +22,7 @@ class DetailsAction extends Action
         $this->icon('heroicon-o-document-text');
         $this->color('gray');
         $this->modalHeading('Report Details');
-        $this->modalDescription(fn (Report $record): string => "Report #{$record->id} - {$record->reason->getLabel()}");
+        $this->modalDescription(fn (Report $record): string => sprintf('Report #%d - %s', $record->id, $record->reason->getLabel()));
         $this->modalSubmitAction(false);
         $this->modalCancelActionLabel('Close');
         $this->schema([

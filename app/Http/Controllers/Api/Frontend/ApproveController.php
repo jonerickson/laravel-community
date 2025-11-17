@@ -22,7 +22,7 @@ class ApproveController extends Controller
     {
         $approvable = $request->resolveApprovable();
 
-        if (! $approvable) {
+        if ($approvable === null) {
             return ApiResource::error(
                 message: 'The specified item could not be found.'
             );
@@ -34,7 +34,7 @@ class ApproveController extends Controller
 
         return ApiResource::success(
             resource: $approvable->fresh(),
-            message: "The {$request->validated('type')} has been successfully approved."
+            message: sprintf('The %s has been successfully approved.', $request->validated('type'))
         );
     }
 
@@ -45,7 +45,7 @@ class ApproveController extends Controller
     {
         $approvable = $request->resolveApprovable();
 
-        if (! $approvable) {
+        if ($approvable === null) {
             return ApiResource::error(
                 message: 'The specified item could not be found.'
             );
@@ -57,7 +57,7 @@ class ApproveController extends Controller
 
         return ApiResource::success(
             resource: $approvable->fresh(),
-            message: "The {$request->validated('type')} has been successfully unapproved."
+            message: sprintf('The %s has been successfully unapproved.', $request->validated('type'))
         );
     }
 }
