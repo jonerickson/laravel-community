@@ -351,6 +351,7 @@ class ForumImporter extends AbstractImporter
                 ->trim()
                 ->limit(25, '')
                 ->unique('forums', 'slug')
+                ->slug()
                 ->toString();
         }
 

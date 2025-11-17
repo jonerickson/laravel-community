@@ -179,6 +179,7 @@ class TopicImporter extends AbstractImporter
                 ->trim()
                 ->limit(25, '')
                 ->unique('topics', 'slug')
+                ->slug()
                 ->toString();
         }
 
