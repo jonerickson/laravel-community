@@ -209,7 +209,7 @@ class OrderImporter extends AbstractImporter
             $this->cacheOrderMapping($sourceOrder->i_id, $order->id);
         }
 
-        $orderItems = $this->createOrderItems($sourceOrder, $order, $config, $result, $output);
+        $orderItems = $this->createOrderItems($sourceOrder, $order, $output, $components);
 
         if (! $config->isDryRun) {
             /** @var OrderItem $orderItem */
@@ -256,7 +256,7 @@ class OrderImporter extends AbstractImporter
         };
     }
 
-    protected function createOrderItems(object $sourceOrder, Order $order, MigrationConfig $config, MigrationResult $result, OutputStyle $output): array
+    protected function createOrderItems(object $sourceOrder, Order $order, OutputStyle $output, Factory $components): array
     {
         $orderItems = [];
 
@@ -298,17 +298,9 @@ class OrderImporter extends AbstractImporter
                 'error' => $exception->getMessage(),
             ]);
 
-            if (! $config->isDryRun) {
-                $result->incrementFailed('order_items');
-
-                if ($output->isVerbose()) {
-                    $result->recordFailed('order_items', [
-                        'order_id' => $order->id ?? 'N/A',
-                        'source_order_id' => $sourceOrder->i_id,
-                        'error' => $exception->getMessage(),
-                    ]);
-                }
-            }
+            $output->newLine(2);
+            $fileName = Str::of($exception->getFile())->classBasename();
+            $components->error(sprintf('Failed to create order item: %s in %s on Line %d.', $exception->getMessage(), $fileName, $exception->getLine()));
         }
 
         return $orderItems;

@@ -171,7 +171,7 @@ class MigrateCommand extends Command
             $peakMemory = memory_get_peak_usage(true);
 
             $this->components->success(sprintf('Completed: Migrated %s, Skipped %s, Failed %s', $stats['migrated'], $stats['skipped'], $stats['failed']));
-            $this->components->info('Memory - Current: '.round($endMemory / 1024 / 1024, 2).'MB, Peak: '.round($peakMemory / 1024 / 1024, 2).'MB');
+            $this->components->info('Ending - Memory: '.round($endMemory / 1024 / 1024, 2).'MB, Peak: '.round($peakMemory / 1024 / 1024, 2).'MB');
 
             return self::SUCCESS;
         } catch (Exception $exception) {
@@ -245,7 +245,7 @@ class MigrateCommand extends Command
             }
 
             if ($config->offset !== null && $config->offset !== 0) {
-                $this->components->warn(sprintf('Starting migration from offset %s (skipping first %s records).', $config->offset, $config->offset));
+                $this->components->warn(sprintf('Starting migration from offset %s.', $config->offset));
             }
 
             if ($config->excluded !== []) {
