@@ -19,11 +19,9 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     {
         $this->hideSensitiveRequestDetails();
 
-        $isLocal = $this->app->environment('local', 'staging');
-
         Telescope::filter(fn (IncomingEntry $entry): bool => match (true) {
             App::runningConsoleCommand('app:migrate') => false,
-            $isLocal => true,
+            $this->app->environment('local', 'staging') => true,
             $entry->isReportableException(), $entry->isFailedRequest(), $entry->isFailedJob(), $entry->isScheduledTask() => true,
             default => $entry->hasMonitoredTag()
         });
