@@ -195,7 +195,9 @@ class PostImporter extends AbstractImporter
                 'source_id' => $sourcePost->pid,
                 'target_id' => $post->id ?? 'N/A (dry run)',
                 'topic' => $topic->title,
-                'author' => $author->name,
+                'author' => $author instanceof User
+                    ? $author->name
+                    : 'Guest',
             ]);
         }
     }

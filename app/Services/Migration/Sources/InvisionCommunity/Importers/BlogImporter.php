@@ -222,7 +222,9 @@ class BlogImporter extends AbstractImporter
                 'target_id' => $post->id ?? 'N/A (dry run)',
                 'title' => $post->title,
                 'slug' => $post->slug,
-                'author' => $author->name,
+                'author' => $author instanceof User
+                    ? $author->name
+                    : 'Guest',
                 'published_at' => $post->published_at?->toDateTimeString() ?? 'N/A',
             ]);
         }

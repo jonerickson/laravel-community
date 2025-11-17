@@ -222,7 +222,9 @@ class TopicImporter extends AbstractImporter
                 'target_id' => $topic->id ?? 'N/A (dry run)',
                 'title' => $topic->title,
                 'slug' => $topic->slug,
-                'author' => $author->name,
+                'author' => $author instanceof User
+                    ? $author->name
+                    : 'Guest',
             ]);
         }
     }

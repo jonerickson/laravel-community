@@ -162,20 +162,6 @@ class BlogCommentImporter extends AbstractImporter
 
         $author = $this->findAuthor($sourceComment);
 
-        if (! $author instanceof User) {
-            $result->incrementFailed(self::ENTITY_NAME);
-
-            if ($output->isVerbose()) {
-                $result->recordFailed(self::ENTITY_NAME, [
-                    'source_id' => $sourceComment->comment_id,
-                    'entry_id' => $sourceComment->comment_entry_id,
-                    'error' => 'Could not find author',
-                ]);
-            }
-
-            return;
-        }
-
         $comment = new Comment;
         $comment->forceFill([
             'commentable_type' => Post::class,
@@ -183,7 +169,9 @@ class BlogCommentImporter extends AbstractImporter
             'content' => $sourceComment->comment_text,
             'is_approved' => (bool) $sourceComment->comment_approved,
             'parent_id' => null,
-            'created_by' => $author->id,
+            'created_by' => $author instanceof User
+                ? $author->id
+                : null,
             'created_at' => Carbon::createFromTimestamp($sourceComment->comment_date),
             'updated_at' => $sourceComment->comment_edit_time
                 ? Carbon::createFromTimestamp($sourceComment->comment_edit_time)
@@ -203,7 +191,9 @@ class BlogCommentImporter extends AbstractImporter
                 'target_id' => $comment->id ?? 'N/A (dry run)',
                 'entry_id' => $sourceComment->comment_entry_id,
                 'blog_post_id' => $blogPostId,
-                'author' => $author->name,
+                'author' => $author instanceof User
+                    ? $author->name
+                    : 'Guest',
                 'created_at' => $comment->created_at?->toDateTimeString() ?? 'N/A',
             ]);
         }
