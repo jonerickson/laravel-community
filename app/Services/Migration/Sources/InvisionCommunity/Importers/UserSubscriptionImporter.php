@@ -6,7 +6,6 @@ namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Data\SubscriptionData;
 use App\Enums\ProrationBehavior;
-use App\Enums\Role;
 use App\Jobs\ImportSubscription;
 use App\Managers\PaymentManager;
 use App\Models\Order;
@@ -256,10 +255,6 @@ class UserSubscriptionImporter extends AbstractImporter
 
         if ($mappedUserId !== null && $mappedUserId !== 0) {
             return User::query()->find($mappedUserId);
-        }
-
-        if ($adminUser = User::query()->role(Role::Administrator)->oldest()->first()) {
-            return $adminUser;
         }
 
         return null;

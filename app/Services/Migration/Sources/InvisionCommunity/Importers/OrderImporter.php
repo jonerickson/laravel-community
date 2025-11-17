@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Enums\OrderStatus;
-use App\Enums\Role;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Price;
@@ -340,10 +339,6 @@ class OrderImporter extends AbstractImporter
 
         if ($mappedUserId !== null && $mappedUserId !== 0) {
             return User::query()->find($mappedUserId);
-        }
-
-        if ($adminUser = User::query()->role(Role::Administrator)->oldest()->first()) {
-            return $adminUser;
         }
 
         return null;

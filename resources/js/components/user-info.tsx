@@ -42,7 +42,7 @@ export function UserInfo({ user, showEmail = false, showGroups = false }: { user
     );
 
     if (!user.referenceId) {
-        return <div className="flex flex-row items-center gap-2 transition-opacity hover:opacity-80">{content}</div>;
+        return <div className="flex flex-row items-center gap-2 transition-opacity">{content}</div>;
     }
 
     return (

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Enums\PostType;
-use App\Enums\Role;
 use App\Models\Post;
 use App\Models\Topic;
 use App\Models\User;
@@ -145,21 +144,6 @@ class PostImporter extends AbstractImporter
 
     protected function importPost(object $sourcePost, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
     {
-        $author = $this->findOrCreateAuthor($sourcePost);
-
-        if (! $author instanceof User) {
-            $result->incrementFailed(self::ENTITY_NAME);
-
-            if ($output->isVerbose()) {
-                $result->recordFailed(self::ENTITY_NAME, [
-                    'source_id' => $sourcePost->pid,
-                    'error' => 'Could not find or create author',
-                ]);
-            }
-
-            return;
-        }
-
         $topic = $this->findTopic($sourcePost);
 
         if (! $topic instanceof Topic) {
@@ -175,6 +159,8 @@ class PostImporter extends AbstractImporter
             return;
         }
 
+        $author = $this->findAuthor($sourcePost);
+
         $post = new Post;
         $post->forceFill([
             'type' => PostType::Forum,
@@ -184,7 +170,9 @@ class PostImporter extends AbstractImporter
             'is_published' => true,
             'is_approved' => true,
             'comments_enabled' => false,
-            'created_by' => $author->id,
+            'created_by' => $author instanceof User
+                ? $author->id
+                : null,
             'created_at' => $sourcePost->post_date
                 ? Carbon::createFromTimestamp($sourcePost->post_date)
                 : Carbon::now(),
@@ -212,16 +200,12 @@ class PostImporter extends AbstractImporter
         }
     }
 
-    protected function findOrCreateAuthor(object $sourcePost): ?User
+    protected function findAuthor(object $sourcePost): ?User
     {
         $mappedUserId = UserImporter::getUserMapping((int) $sourcePost->author_id);
 
         if ($mappedUserId !== null && $mappedUserId !== 0) {
             return User::query()->find($mappedUserId);
-        }
-
-        if ($adminUser = User::query()->role(Role::Administrator)->oldest()->first()) {
-            return $adminUser;
         }
 
         return null;

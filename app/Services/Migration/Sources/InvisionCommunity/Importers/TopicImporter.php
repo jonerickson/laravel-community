@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
-use App\Enums\Role;
 use App\Models\Forum;
 use App\Models\Topic;
 use App\Models\User;
@@ -168,23 +167,7 @@ class TopicImporter extends AbstractImporter
             return;
         }
 
-        $author = $this->findOrCreateAuthor($sourceTopic);
-
-        if (! $author instanceof User) {
-            $result->incrementFailed(self::ENTITY_NAME);
-
-            if ($output->isVerbose()) {
-                $result->recordFailed(self::ENTITY_NAME, [
-                    'source_id' => $sourceTopic->tid,
-                    'title' => $title,
-                    'error' => 'Could not find or create author',
-                ]);
-            }
-
-            return;
-        }
-
-        $forum = $this->findOrCreateForum($sourceTopic);
+        $forum = $this->findForum($sourceTopic);
 
         if (! $forum instanceof Forum) {
             $result->incrementFailed(self::ENTITY_NAME);
@@ -200,6 +183,8 @@ class TopicImporter extends AbstractImporter
             return;
         }
 
+        $author = $this->findAuthor($sourceTopic);
+
         $topic = new Topic;
         $topic->forceFill([
             'title' => Str::of($title)->trim()->limit(255, '')->toString(),
@@ -207,7 +192,9 @@ class TopicImporter extends AbstractImporter
             'forum_id' => $forum->id,
             'is_pinned' => $sourceTopic->pinned,
             'is_locked' => false,
-            'created_by' => $author->id,
+            'created_by' => $author instanceof User
+                ? $author->id
+                : null,
             'created_at' => $sourceTopic->start_date
                 ? Carbon::createFromTimestamp($sourceTopic->start_date)
                 : Carbon::now(),
@@ -234,7 +221,7 @@ class TopicImporter extends AbstractImporter
         }
     }
 
-    protected function findOrCreateAuthor(object $sourceTopic): ?User
+    protected function findAuthor(object $sourceTopic): ?User
     {
         $mappedUserId = UserImporter::getUserMapping((int) $sourceTopic->starter_id);
 
@@ -242,14 +229,10 @@ class TopicImporter extends AbstractImporter
             return User::query()->find($mappedUserId);
         }
 
-        if ($adminUser = User::query()->role(Role::Administrator)->oldest()->first()) {
-            return $adminUser;
-        }
-
         return null;
     }
 
-    protected function findOrCreateForum(object $sourceTopic): ?Forum
+    protected function findForum(object $sourceTopic): ?Forum
     {
         $mappedForumId = ForumImporter::getForumMapping((int) $sourceTopic->forum_id);
 

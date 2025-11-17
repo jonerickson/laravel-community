@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Enums\PostType;
-use App\Enums\Role;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
@@ -169,25 +168,9 @@ class BlogImporter extends AbstractImporter
             return;
         }
 
-        $author = $this->findOrCreateAuthor($sourceBlogEntry);
-
-        if (! $author instanceof User) {
-            $result->incrementFailed(self::ENTITY_NAME);
-
-            if ($output->isVerbose()) {
-                $result->recordFailed(self::ENTITY_NAME, [
-                    'source_id' => $sourceBlogEntry->entry_id,
-                    'title' => $title,
-                    'slug' => $slug,
-                    'error' => 'Could not find or create author',
-                ]);
-            }
-
-            return;
-        }
-
         $content = $sourceBlogEntry->entry_content ?? '';
         $excerpt = Str::of($sourceBlogEntry->entry_content)->stripTags()->limit(200)->toString();
+        $author = $this->findAuthor($sourceBlogEntry);
 
         $post = new Post;
         $post->forceFill([
@@ -204,7 +187,9 @@ class BlogImporter extends AbstractImporter
             'published_at' => $sourceBlogEntry->entry_publish_date
                 ? Carbon::createFromTimestamp($sourceBlogEntry->entry_publish_date)
                 : Carbon::createFromTimestamp($sourceBlogEntry->entry_date),
-            'created_by' => $author->id,
+            'created_by' => $author instanceof User
+                ? $author->id
+                : null,
             'created_at' => Carbon::createFromTimestamp($sourceBlogEntry->entry_date),
             'updated_at' => $sourceBlogEntry->entry_last_update
                 ? Carbon::createFromTimestamp($sourceBlogEntry->entry_last_update)
@@ -243,16 +228,12 @@ class BlogImporter extends AbstractImporter
         }
     }
 
-    protected function findOrCreateAuthor(object $sourceBlogEntry): ?User
+    protected function findAuthor(object $sourceBlogEntry): ?User
     {
         $mappedUserId = UserImporter::getUserMapping((int) $sourceBlogEntry->entry_author_id);
 
         if ($mappedUserId !== null && $mappedUserId !== 0) {
             return User::query()->find($mappedUserId);
-        }
-
-        if ($adminUser = User::query()->role(Role::Administrator)->oldest()->first()) {
-            return $adminUser;
         }
 
         return null;
