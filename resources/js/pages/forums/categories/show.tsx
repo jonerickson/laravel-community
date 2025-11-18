@@ -16,7 +16,7 @@ interface CategoryShowProps {
 }
 
 export default function ForumCategoryShow({ category, forums }: CategoryShowProps) {
-    const { name: siteName } = usePage<App.Data.SharedData>().props;
+    const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -35,7 +35,7 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
         name: category.name,
         description: category.description || `Forums in ${category.name} category`,
         url: window.location.href,
-        image: category.featuredImageUrl,
+        image: category.featuredImageUrl || logoUrl,
         inLanguage: 'en',
         isPartOf: {
             '@type': 'WebSite',
@@ -82,6 +82,7 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                 <meta property="og:title" content={`Forums - ${category.name} - ${siteName}`} />
                 <meta property="og:description" content={category.description || `Forums in ${category.name} category`} />
                 <meta property="og:type" content="website" />
+                <meta property="og:image" content={logoUrl} />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">

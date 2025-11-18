@@ -34,6 +34,8 @@ class SharedData extends Data
 
     public ?int $cartCount = null;
 
+    public string $logoUrl;
+
     public string|false|null $memberCount = null;
 
     public string|false|null $postCount = null;

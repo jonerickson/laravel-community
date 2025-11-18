@@ -77,6 +77,7 @@ class HandleInertiaRequests extends Middleware
             'cartCount' => $this->shoppingCartService->getCartCount(),
             'memberCount' => Cache::remember('member_count', now()->addHour(), fn () => Number::abbreviate(User::count())),
             'postCount' => Cache::remember('post_count', now()->addHour(), fn () => Number::abbreviate(Post::count())),
+            'logoUrl' => asset('images/logo.svg'),
             'flash' => null,
             'name' => config('app.name'),
             'email' => config('app.email'),

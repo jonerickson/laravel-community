@@ -29,7 +29,7 @@ interface ForumShowProps {
 
 export default function ForumShow({ forum, children, topics }: ForumShowProps) {
     const { can } = usePermissions();
-    const { name: siteName, auth } = usePage<App.Data.SharedData>().props;
+    const { name: siteName, auth, logoUrl } = usePage<App.Data.SharedData>().props;
     const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
     const { loading: isDeleting, execute: executeBulkDelete } = useApiRequest();
 
@@ -66,7 +66,7 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
         description: forum.description || `Discussions and topics in ${forum.name}`,
         url: window.location.href,
         inLanguage: 'en',
-        image: forum.category?.featuredImageUrl,
+        image: forum.category?.featuredImageUrl || logoUrl,
         isPartOf: {
             '@type': 'WebSite',
             name: siteName,
@@ -183,6 +183,7 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
                 <meta property="og:title" content={`Forums - ${forum.name} - ${siteName}`} />
                 <meta property="og:description" content={forum.description || `Discussions and topics in ${forum.name}`} />
                 <meta property="og:type" content="website" />
+                <meta property="og:image" content={logoUrl} />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">

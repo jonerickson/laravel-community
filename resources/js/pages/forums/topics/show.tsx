@@ -29,7 +29,7 @@ interface TopicShowProps {
 
 export default function ForumTopicShow({ forum, topic, posts, recentViewers }: TopicShowProps) {
     const { can } = usePermissions();
-    const { name: siteName } = usePage<App.Data.SharedData>().props;
+    const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const [quotedContent, setQuotedContent] = useState<string>('');
     const [quotedAuthor, setQuotedAuthor] = useState<string>('');
 
@@ -124,7 +124,7 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
         url: currentUrl,
         mainEntityOfPage: currentUrl,
         inLanguage: 'en',
-        image: topic.forum?.category?.featuredImageUrl,
+        image: topic.forum?.category?.featuredImageUrl || logoUrl,
         author: {
             '@type': 'Person',
             name: topic.author.name,
@@ -188,6 +188,7 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
                 <meta property="og:title" content={`${topic.title} - ${forum.name} - Forums`} />
                 <meta property="og:description" content={topic.description || `Discussion topic: ${topic.title}`} />
                 <meta property="og:type" content="article" />
+                <meta property="og:image" content={logoUrl} />
                 <meta property="article:author" content={topic.author.name} />
                 <meta property="article:published_time" content={topic.createdAt || undefined} />
                 <meta property="article:modified_time" content={topic.updatedAt || undefined} />

@@ -500,6 +500,7 @@ declare namespace App.Data {
         address: string | null;
         slogan: string | null;
         cartCount: number | null;
+        logoUrl: string;
         memberCount: string | boolean | null;
         postCount: string | boolean | null;
         flash: App.Data.FlashData | null;
