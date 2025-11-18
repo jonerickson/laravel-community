@@ -53,8 +53,8 @@ class ForumController extends Controller
 
         return Inertia::render('forums/show', [
             'forum' => ForumData::from($forum),
-            'children' => Inertia::defer(fn (): Collection => ForumData::collect($children)),
-            'topics' => Inertia::defer(fn (): PaginatedData => PaginatedData::from(TopicData::collect($topics->setCollection($filteredTopics), PaginatedDataCollection::class)->items())),
+            'children' => Inertia::defer(fn (): Collection => ForumData::collect($children), 'children'),
+            'topics' => Inertia::defer(fn (): PaginatedData => PaginatedData::from(TopicData::collect($topics->setCollection($filteredTopics), PaginatedDataCollection::class)->items()), 'topics'),
         ]);
     }
 }
