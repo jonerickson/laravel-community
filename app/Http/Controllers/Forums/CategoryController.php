@@ -13,6 +13,7 @@ use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -89,7 +90,7 @@ class CategoryController extends Controller
 
         return Inertia::render('forums/categories/show', [
             'category' => ForumCategoryData::from($category),
-            'forums' => ForumData::collect($forums),
+            'forums' => Inertia::defer(fn (): Collection => ForumData::collect($forums)),
         ]);
     }
 }

@@ -11,14 +11,14 @@ interface LoadingProps {
 export default function Loading({ className, variant = 'default', cols = 4, count = 1, rows = 5 }: LoadingProps) {
     if (variant === 'table') {
         return (
-            <div className={cn('overflow-hidden rounded-xl bg-muted dark:bg-muted/30', className)}>
+            <div className={cn('overflow-hidden rounded-xl bg-muted/50 dark:bg-muted/30', className)}>
                 <div className="w-full">
-                    <div className="bg-muted/50 px-4 py-3">
+                    <div className="bg-muted px-4 py-3 dark:bg-muted/30">
                         <div className="flex gap-4">
                             {Array.from({ length: cols }).map((_, i) => (
                                 <div
                                     key={i}
-                                    className={cn('h-4 animate-pulse rounded bg-card/80', {
+                                    className={cn('h-8 animate-pulse rounded bg-muted dark:bg-muted/40', {
                                         'w-1/4': cols === 4,
                                         'w-1/3': cols === 3,
                                         'w-1/2': cols === 2,
@@ -29,14 +29,14 @@ export default function Loading({ className, variant = 'default', cols = 4, coun
                         </div>
                     </div>
 
-                    <div className="divide-y divide-muted/50">
+                    <div className="flex flex-col space-y-4 py-4">
                         {Array.from({ length: rows }).map((_, rowIndex) => (
-                            <div key={rowIndex} className="px-4 py-3">
+                            <div key={rowIndex} className="px-4">
                                 <div className="flex gap-4">
                                     {Array.from({ length: cols }).map((_, colIndex) => (
                                         <div
                                             key={colIndex}
-                                            className={cn('h-4 animate-pulse rounded bg-card', {
+                                            className={cn('animate-pulse rounded bg-muted p-4 dark:bg-muted/30', {
                                                 'w-1/4': cols === 4,
                                                 'w-1/3': cols === 3,
                                                 'w-1/2': cols === 2,
@@ -60,38 +60,38 @@ export default function Loading({ className, variant = 'default', cols = 4, coun
         return (
             <div className={cn('space-y-4', className)}>
                 {Array.from({ length: count }).map((_, i) => (
-                    <div key={i} className="overflow-hidden rounded-xl bg-muted dark:bg-muted/30">
+                    <div key={i} className="overflow-hidden rounded-xl bg-muted/50 dark:bg-muted/30">
                         <div className="p-6">
                             <div className="flex flex-col gap-4 md:flex-row">
                                 <div className="flex min-w-0 flex-row items-start justify-between gap-2 md:w-1/4 md:flex-col md:items-center md:justify-start lg:w-1/6">
                                     <div className="flex flex-row items-center gap-4 md:flex-col md:items-center md:gap-2 md:px-8">
-                                        <div className="size-12 animate-pulse rounded-full bg-card" />
+                                        <div className="size-12 animate-pulse rounded-full bg-muted dark:bg-muted/50" />
 
                                         <div className="flex flex-col items-start gap-2 md:items-center">
-                                            <div className="h-4 w-24 animate-pulse rounded bg-card" />
-                                            <div className="h-3 w-16 animate-pulse rounded bg-card" />
+                                            <div className="h-4 w-24 animate-pulse rounded bg-muted dark:bg-muted/50" />
+                                            <div className="h-3 w-16 animate-pulse rounded bg-muted dark:bg-muted/50" />
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="min-w-0 flex-1">
                                     <div className="mb-4 hidden items-center justify-between md:flex">
-                                        <div className="h-4 w-32 animate-pulse rounded bg-card" />
+                                        <div className="h-4 w-32 animate-pulse rounded bg-muted dark:bg-muted/50" />
                                     </div>
 
                                     <div className="space-y-2">
-                                        <div className="h-4 w-full animate-pulse rounded bg-card" />
-                                        <div className="h-4 w-5/6 animate-pulse rounded bg-card" />
-                                        <div className="h-4 w-4/6 animate-pulse rounded bg-card" />
-                                        <div className="h-4 w-3/6 animate-pulse rounded bg-card" />
+                                        <div className="h-4 w-full animate-pulse rounded bg-muted dark:bg-muted/50" />
+                                        <div className="h-4 w-5/6 animate-pulse rounded bg-muted dark:bg-muted/50" />
+                                        <div className="h-4 w-4/6 animate-pulse rounded bg-muted dark:bg-muted/50" />
+                                        <div className="h-4 w-3/6 animate-pulse rounded bg-muted dark:bg-muted/50" />
                                     </div>
 
-                                    <div className="mt-4 flex items-start justify-between rounded-sm bg-muted/50 p-2">
+                                    <div className="mt-4 flex items-start justify-between rounded-sm bg-muted p-2 dark:bg-muted/30">
                                         <div className="flex gap-2">
-                                            <div className="h-8 w-20 animate-pulse rounded bg-card" />
-                                            <div className="h-8 w-20 animate-pulse rounded bg-card" />
+                                            <div className="h-8 w-20 animate-pulse rounded bg-muted dark:bg-muted/40" />
+                                            <div className="h-8 w-20 animate-pulse rounded bg-muted dark:bg-muted/40" />
                                         </div>
-                                        <div className="h-8 w-24 animate-pulse rounded bg-card" />
+                                        <div className="h-8 w-24 animate-pulse rounded bg-muted dark:bg-muted/40" />
                                     </div>
                                 </div>
                             </div>
@@ -114,7 +114,7 @@ export default function Loading({ className, variant = 'default', cols = 4, coun
                     })}
                 >
                     {Array.from({ length: cols }).map((_, i) => (
-                        <div key={i} className="relative aspect-square animate-pulse rounded-lg bg-muted dark:bg-muted/30" />
+                        <div key={i} className="relative aspect-square animate-pulse rounded-lg bg-muted/50 dark:bg-muted/30" />
                     ))}
                 </div>
             </div>
@@ -130,7 +130,7 @@ export default function Loading({ className, variant = 'default', cols = 4, coun
                     {heights.map((height, i) => (
                         <div
                             key={i}
-                            className={cn('relative mb-6 w-full animate-pulse break-inside-avoid rounded-lg bg-muted dark:bg-muted/30', height)}
+                            className={cn('relative mb-6 w-full animate-pulse break-inside-avoid rounded-lg bg-muted/50 dark:bg-muted/30', height)}
                         />
                     ))}
                 </div>
@@ -141,11 +141,11 @@ export default function Loading({ className, variant = 'default', cols = 4, coun
     return (
         <div className={cn('overflow-hidden rounded-xl bg-muted/50 dark:bg-muted/30', className)}>
             <div className="space-y-4 p-6">
-                <div className="h-6 w-1/3 animate-pulse rounded bg-muted/50" />
+                <div className="h-6 w-1/3 animate-pulse rounded bg-muted dark:bg-muted/50" />
                 <div className="space-y-2">
-                    <div className="h-4 w-full animate-pulse rounded bg-muted/50" />
-                    <div className="h-4 w-5/6 animate-pulse rounded bg-muted/50" />
-                    <div className="h-4 w-4/6 animate-pulse rounded bg-muted/50" />
+                    <div className="h-4 w-full animate-pulse rounded bg-muted dark:bg-muted/50" />
+                    <div className="h-4 w-5/6 animate-pulse rounded bg-muted dark:bg-muted/50" />
+                    <div className="h-4 w-4/6 animate-pulse rounded bg-muted dark:bg-muted/50" />
                 </div>
             </div>
         </div>

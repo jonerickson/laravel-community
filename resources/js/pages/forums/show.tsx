@@ -1,6 +1,7 @@
 import { EmptyState } from '@/components/empty-state';
 import { FollowButton } from '@/components/follow-button';
 import Heading from '@/components/heading';
+import Loading from '@/components/loading';
 import RichEditorContent from '@/components/rich-editor-content';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -14,7 +15,7 @@ import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { stripCharacters } from '@/utils/truncate';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, Circle, Eye, EyeOff, LibraryBig, Lock, MessageSquare, Pin, Plus, ThumbsDown, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -22,13 +23,13 @@ import { route } from 'ziggy-js';
 
 interface ForumShowProps {
     forum: App.Data.ForumData;
+    children: App.Data.ForumData[];
     topics: App.Data.PaginatedData<App.Data.TopicData>;
 }
 
-export default function ForumShow({ forum, topics: initialTopics }: ForumShowProps) {
+export default function ForumShow({ forum, children, topics }: ForumShowProps) {
     const { can } = usePermissions();
     const { name: siteName, auth } = usePage<App.Data.SharedData>().props;
-    const [topics, setTopics] = useState<App.Data.TopicData[]>(initialTopics.data);
     const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
     const { loading: isDeleting, execute: executeBulkDelete } = useApiRequest();
 
@@ -77,7 +78,7 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                 item: breadcrumb.href,
             })),
         },
-        hasPart: topics.map((topic) => ({
+        hasPart: topics?.data.map((topic) => ({
             '@type': 'DiscussionForumPosting',
             headline: topic.title,
             description: topic.description || `Discussion topic: ${topic.title}`,
@@ -102,7 +103,7 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                 },
             ],
         })),
-        numberOfItems: topics.length,
+        numberOfItems: topics?.data.length,
     };
 
     const handleSelectTopic = (topicId: number, checked: boolean) => {
@@ -115,7 +116,7 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
 
     const handleSelectAll = (checked: boolean) => {
         if (checked) {
-            setSelectedTopics(topics.map((topic) => topic.id));
+            setSelectedTopics(topics.data.map((topic) => topic.id));
         } else {
             setSelectedTopics([]);
         }
@@ -137,9 +138,8 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
             },
             {
                 onSuccess: () => {
-                    setTopics((prevTopics) => prevTopics.filter((topic) => !selectedTopics.includes(topic.id)));
                     setSelectedTopics([]);
-                    router.reload();
+                    router.reload({ only: ['topics'] });
                 },
             },
         );
@@ -188,7 +188,7 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                                             </Button>
                                         </>
                                     )}
-                                    {selectedTopics.length === 0 && topics.length > 0 && (
+                                    {selectedTopics.length === 0 && topics && topics.data.length > 0 && (
                                         <Button variant="outline" onClick={() => handleSelectAll(true)}>
                                             Select All
                                         </Button>
@@ -216,217 +216,224 @@ export default function ForumShow({ forum, topics: initialTopics }: ForumShowPro
                     </Alert>
                 )}
 
-                {forum.children && forum.children.length > 0 && (
-                    <div className="relative rounded-md border bg-background">
-                        <Table className="table table-fixed">
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[60%] pl-4">Subforums</TableHead>
-                                    <TableHead className="hidden w-[10%] text-center md:table-cell">Topics</TableHead>
-                                    <TableHead className="hidden w-[10%] text-center md:table-cell">Posts</TableHead>
-                                    <TableHead className="hidden w-[20%] pr-4 text-right md:table-cell">Latest Activity</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {forum.children.map((subforum) => (
-                                    <TableRow key={subforum.id} className="hover:bg-accent/20">
-                                        <TableCell className="p-4">
-                                            <div className="flex items-start gap-3">
-                                                <div
-                                                    className="flex h-10 w-10 items-center justify-center rounded-lg text-white"
-                                                    style={{ backgroundColor: subforum.color }}
-                                                >
-                                                    <MessageSquare className="size-5" />
-                                                </div>
-                                                <div className="min-w-0 flex-1">
-                                                    <Link
-                                                        href={route('forums.show', { forum: subforum.slug })}
-                                                        className="font-medium hover:underline"
-                                                    >
-                                                        {subforum.name}
-                                                    </Link>
-                                                    {subforum.description && (
-                                                        <p className="mt-1 text-sm text-wrap break-words text-muted-foreground">
-                                                            {subforum.description}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="hidden p-4 text-center md:table-cell">
-                                            <div className="flex items-center justify-center gap-1">
-                                                <MessageSquare className="size-4" />
-                                                <span>{subforum.topicsCount || 0}</span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="hidden p-4 text-center md:table-cell">
-                                            <div className="flex items-center justify-center gap-1">
-                                                <MessageSquare className="size-4" />
-                                                <span>{subforum.postsCount || 0}</span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="hidden p-4 text-right md:table-cell">
-                                            {subforum.latestTopic ? (
-                                                <div className="text-sm">
-                                                    <div className="mb-1">
-                                                        <Link
-                                                            href={route('forums.topics.show', {
-                                                                forum: subforum.slug,
-                                                                topic: subforum.latestTopic.slug,
-                                                            })}
-                                                            className="font-medium text-wrap break-words hover:underline"
-                                                        >
-                                                            {subforum.latestTopic.title}
-                                                        </Link>
-                                                    </div>
-                                                    <div className="flex items-center justify-end gap-2 text-xs text-muted-foreground">
-                                                        <Avatar className="size-4">
-                                                            <AvatarFallback className="text-xs">
-                                                                {subforum.latestTopic.author?.name?.charAt(0).toUpperCase() || 'U'}
-                                                            </AvatarFallback>
-                                                        </Avatar>
-                                                        <span>by {subforum.latestTopic.author?.name}</span>
-                                                        <span>•</span>
-                                                        <span>
-                                                            {subforum.latestTopic.lastPost?.createdAt
-                                                                ? formatDistanceToNow(new Date(subforum.latestTopic.lastPost.createdAt), {
-                                                                      addSuffix: true,
-                                                                  })
-                                                                : 'N/A'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="text-sm text-muted-foreground">No topics yet</div>
-                                            )}
-                                        </TableCell>
+                <Deferred fallback={<></>} data="children">
+                    {children && children.length > 0 && (
+                        <div className="relative rounded-md border bg-background">
+                            <Table className="table table-fixed">
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-[60%] pl-4">Subforums</TableHead>
+                                        <TableHead className="hidden w-[10%] text-center md:table-cell">Topics</TableHead>
+                                        <TableHead className="hidden w-[10%] text-center md:table-cell">Posts</TableHead>
+                                        <TableHead className="hidden w-[20%] pr-4 text-right md:table-cell">Latest Activity</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
-                )}
-
-                <Pagination pagination={initialTopics} baseUrl={route('forums.show', forum)} entityLabel="topic" />
-
-                {topics.length > 0 ? (
-                    <div className="relative rounded-md border bg-background">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[80%] pl-4">Topics</TableHead>
-                                    <TableHead className="w-[5%] text-center">Replies</TableHead>
-                                    <TableHead className="w-[5%] text-center">Views</TableHead>
-                                    <TableHead className="w-[10%] pr-4 text-right">Last Activity</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {topics.map((topic) => (
-                                    <TableRow
-                                        key={topic.id}
-                                        className={`hover:bg-accent/20 ${selectedTopics.includes(topic.id) ? 'bg-info-foreground' : ''}`}
-                                    >
-                                        <TableCell className="p-4">
-                                            <div className="flex items-start gap-3">
-                                                {can('delete_topics') ? (
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            handleSelectTopic(topic.id, !selectedTopics.includes(topic.id));
-                                                        }}
-                                                        className="relative"
+                                </TableHeader>
+                                <TableBody>
+                                    {children.map((subforum) => (
+                                        <TableRow key={subforum.id} className="hover:bg-accent/20">
+                                            <TableCell className="p-4">
+                                                <div className="flex items-start gap-3">
+                                                    <div
+                                                        className="flex h-10 w-10 items-center justify-center rounded-lg text-white"
+                                                        style={{ backgroundColor: subforum.color }}
                                                     >
-                                                        {selectedTopics.includes(topic.id) ? (
-                                                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600">
-                                                                <Checkbox checked={true} className="pointer-events-none border-white text-white" />
-                                                            </div>
-                                                        ) : (
-                                                            <Avatar className="h-8 w-8 transition-opacity hover:opacity-75">
+                                                        <MessageSquare className="size-5" />
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <Link
+                                                            href={route('forums.show', { forum: subforum.slug })}
+                                                            className="font-medium hover:underline"
+                                                        >
+                                                            {subforum.name}
+                                                        </Link>
+                                                        {subforum.description && (
+                                                            <p className="mt-1 text-sm text-wrap break-words text-muted-foreground">
+                                                                {subforum.description}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="hidden p-4 text-center md:table-cell">
+                                                <div className="flex items-center justify-center gap-1">
+                                                    <MessageSquare className="size-4" />
+                                                    <span>{subforum.topicsCount || 0}</span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="hidden p-4 text-center md:table-cell">
+                                                <div className="flex items-center justify-center gap-1">
+                                                    <MessageSquare className="size-4" />
+                                                    <span>{subforum.postsCount || 0}</span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="hidden p-4 text-right md:table-cell">
+                                                {subforum.latestTopic ? (
+                                                    <div className="text-sm">
+                                                        <div className="mb-1">
+                                                            <Link
+                                                                href={route('forums.topics.show', {
+                                                                    forum: subforum.slug,
+                                                                    topic: subforum.latestTopic.slug,
+                                                                })}
+                                                                className="font-medium text-wrap break-words hover:underline"
+                                                            >
+                                                                {subforum.latestTopic.title}
+                                                            </Link>
+                                                        </div>
+                                                        <div className="flex items-center justify-end gap-2 text-xs text-muted-foreground">
+                                                            <Avatar className="size-4">
                                                                 <AvatarFallback className="text-xs">
-                                                                    {topic.author.name.charAt(0).toUpperCase()}
+                                                                    {subforum.latestTopic.author?.name?.charAt(0).toUpperCase() || 'U'}
                                                                 </AvatarFallback>
                                                             </Avatar>
-                                                        )}
-                                                    </button>
-                                                ) : (
-                                                    <Avatar className="h-8 w-8">
-                                                        <AvatarFallback className="text-xs">
-                                                            {topic.author.name.charAt(0).toUpperCase()}
-                                                        </AvatarFallback>
-                                                    </Avatar>
-                                                )}
-                                                <div className="min-w-0 flex-1">
-                                                    <div className="mb-1 flex items-center gap-2">
-                                                        {auth && auth.user && !topic.isReadByUser && (
-                                                            <Circle className="size-3 fill-info text-info" />
-                                                        )}
-                                                        {topic.isHot && <span className="text-sm">🔥</span>}
-                                                        {topic.isPinned && <Pin className="size-4 text-info" />}
-                                                        {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
-                                                        {can('report_posts') && topic.hasReportedContent && (
-                                                            <AlertTriangle className="size-4 text-destructive" />
-                                                        )}
-                                                        {can('publish_posts') && topic.hasUnpublishedContent && (
-                                                            <EyeOff className="size-4 text-warning" />
-                                                        )}
-                                                        {can('approve_posts') && topic.hasUnapprovedContent && (
-                                                            <ThumbsDown className="size-4 text-warning" />
-                                                        )}
-                                                        <Link
-                                                            href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
-                                                            className={cn('hover:underline', {
-                                                                'font-normal text-muted-foreground': auth && auth.user && topic.isReadByUser,
-                                                                'font-medium text-foreground': !topic.isReadByUser,
-                                                            })}
-                                                        >
-                                                            {topic.title}
-                                                        </Link>
-                                                    </div>
-                                                    <div className="text-xs text-muted-foreground">
-                                                        Started by {topic.author.name} •{' '}
-                                                        {topic.createdAt
-                                                            ? formatDistanceToNow(new Date(topic.createdAt), { addSuffix: true })
-                                                            : 'Unknown time'}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="p-4 text-center">
-                                            <div className="flex items-center justify-center gap-1">
-                                                <MessageSquare className="size-4" />
-                                                <span>{topic.postsCount}</span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="p-4 text-center">
-                                            <div className="flex items-center justify-center gap-1">
-                                                <Eye className="size-4" />
-                                                <span>{topic.viewsCount}</span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="p-4 text-right">
-                                            {topic.lastPost ? (
-                                                <div className="text-sm">
-                                                    <div className="font-medium">{topic.lastPost.author?.name}</div>
-                                                    {topic.lastPost.createdAt && (
-                                                        <div className="text-xs text-muted-foreground">
-                                                            {formatDistanceToNow(new Date(topic.lastPost.createdAt), { addSuffix: true })}
+                                                            <span>by {subforum.latestTopic.author?.name}</span>
+                                                            <span>•</span>
+                                                            <span>
+                                                                {subforum.latestTopic.lastPost?.createdAt
+                                                                    ? formatDistanceToNow(new Date(subforum.latestTopic.lastPost.createdAt), {
+                                                                          addSuffix: true,
+                                                                      })
+                                                                    : 'N/A'}
+                                                            </span>
                                                         </div>
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                <div className="text-sm text-muted-foreground">No replies</div>
-                                            )}
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
-                ) : (
-                    <EmptyState icon={<LibraryBig />} title="No topics yet" description="Be the first to start a discussion in this forum." />
-                )}
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-sm text-muted-foreground">No topics yet</div>
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    )}
+                </Deferred>
 
-                <Pagination pagination={initialTopics} baseUrl={route('forums.show', forum)} entityLabel="topic" />
+                {topics && topics.data.length > 0 && <Pagination pagination={topics} baseUrl={route('forums.show', forum)} entityLabel="topic" />}
+
+                <Deferred fallback={<Loading variant="table" />} data="topics">
+                    {topics && topics.data.length > 0 ? (
+                        <div className="relative rounded-md border bg-background">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-[80%] pl-4">Topics</TableHead>
+                                        <TableHead className="w-[5%] text-center">Replies</TableHead>
+                                        <TableHead className="w-[5%] text-center">Views</TableHead>
+                                        <TableHead className="w-[10%] pr-4 text-right">Last Activity</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {topics.data.map((topic) => (
+                                        <TableRow
+                                            key={topic.id}
+                                            className={`hover:bg-accent/20 ${selectedTopics.includes(topic.id) ? 'bg-info-foreground' : ''}`}
+                                        >
+                                            <TableCell className="p-4">
+                                                <div className="flex items-start gap-3">
+                                                    {can('delete_topics') ? (
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                handleSelectTopic(topic.id, !selectedTopics.includes(topic.id));
+                                                            }}
+                                                            className="relative"
+                                                        >
+                                                            {selectedTopics.includes(topic.id) ? (
+                                                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600">
+                                                                    <Checkbox
+                                                                        checked={true}
+                                                                        className="pointer-events-none border-white text-white"
+                                                                    />
+                                                                </div>
+                                                            ) : (
+                                                                <Avatar className="h-8 w-8 transition-opacity hover:opacity-75">
+                                                                    <AvatarFallback className="text-xs">
+                                                                        {topic.author.name.charAt(0).toUpperCase()}
+                                                                    </AvatarFallback>
+                                                                </Avatar>
+                                                            )}
+                                                        </button>
+                                                    ) : (
+                                                        <Avatar className="h-8 w-8">
+                                                            <AvatarFallback className="text-xs">
+                                                                {topic.author.name.charAt(0).toUpperCase()}
+                                                            </AvatarFallback>
+                                                        </Avatar>
+                                                    )}
+                                                    <div className="min-w-0 flex-1">
+                                                        <div className="mb-1 flex items-center gap-2">
+                                                            {auth && auth.user && !topic.isReadByUser && (
+                                                                <Circle className="size-3 fill-info text-info" />
+                                                            )}
+                                                            {topic.isHot && <span className="text-sm">🔥</span>}
+                                                            {topic.isPinned && <Pin className="size-4 text-info" />}
+                                                            {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
+                                                            {can('report_posts') && topic.hasReportedContent && (
+                                                                <AlertTriangle className="size-4 text-destructive" />
+                                                            )}
+                                                            {can('publish_posts') && topic.hasUnpublishedContent && (
+                                                                <EyeOff className="size-4 text-warning" />
+                                                            )}
+                                                            {can('approve_posts') && topic.hasUnapprovedContent && (
+                                                                <ThumbsDown className="size-4 text-warning" />
+                                                            )}
+                                                            <Link
+                                                                href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
+                                                                className={cn('hover:underline', {
+                                                                    'font-normal text-muted-foreground': auth && auth.user && topic.isReadByUser,
+                                                                    'font-medium text-foreground': !topic.isReadByUser,
+                                                                })}
+                                                            >
+                                                                {topic.title}
+                                                            </Link>
+                                                        </div>
+                                                        <div className="text-xs text-muted-foreground">
+                                                            Started by {topic.author.name} •{' '}
+                                                            {topic.createdAt
+                                                                ? formatDistanceToNow(new Date(topic.createdAt), { addSuffix: true })
+                                                                : 'Unknown time'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="p-4 text-center">
+                                                <div className="flex items-center justify-center gap-1">
+                                                    <MessageSquare className="size-4" />
+                                                    <span>{topic.postsCount}</span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="p-4 text-center">
+                                                <div className="flex items-center justify-center gap-1">
+                                                    <Eye className="size-4" />
+                                                    <span>{topic.viewsCount}</span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="p-4 text-right">
+                                                {topic.lastPost ? (
+                                                    <div className="text-sm">
+                                                        <div className="font-medium">{topic.lastPost.author?.name}</div>
+                                                        {topic.lastPost.createdAt && (
+                                                            <div className="text-xs text-muted-foreground">
+                                                                {formatDistanceToNow(new Date(topic.lastPost.createdAt), { addSuffix: true })}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-sm text-muted-foreground">No replies</div>
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    ) : (
+                        <EmptyState icon={<LibraryBig />} title="No topics yet" description="Be the first to start a discussion in this forum." />
+                    )}
+                </Deferred>
+
+                {topics && topics.data.length > 0 && <Pagination pagination={topics} baseUrl={route('forums.show', forum)} entityLabel="topic" />}
             </div>
         </AppLayout>
     );

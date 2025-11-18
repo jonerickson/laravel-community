@@ -253,7 +253,7 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
                     <Pagination pagination={posts} baseUrl={route('forums.topics.show', { forum, topic })} entityLabel="post" />
                 )}
 
-                <Deferred fallback={<Loading variant="forum-post" />} data="posts">
+                <Deferred fallback={<Loading variant="forum-post" count={2} />} data="posts">
                     <div className="mt-0">
                         {posts && posts.data.length > 0 ? (
                             <div className="grid gap-6">
