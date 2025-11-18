@@ -18,6 +18,8 @@ class CheckBannedUser
     public function handle(Request $request, Closure $next): Response
     {
         if (($user = request()->user())) {
+            $user->loadMissing(['fingerprints', 'activeWarningsWithActiveConsequence.warningConsequence']);
+
             throw_if($user->is_banned && ! $request->routeIs('policies.*') && ! $request->routeIs('api.fingerprint'), new BannedException(
                 fingerprint: $user->fingerprints->first(),
             ));

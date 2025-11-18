@@ -31,10 +31,16 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
 
     const structuredData = {
         '@context': 'https://schema.org',
-        '@type': 'WebPage',
+        '@type': 'CollectionPage',
         name: category.name,
         description: category.description || `Forums in ${category.name} category`,
         url: window.location.href,
+        image: category.featuredImageUrl,
+        inLanguage: 'en',
+        isPartOf: {
+            '@type': 'WebSite',
+            name: siteName,
+        },
         publisher: {
             '@type': 'Organization',
             name: siteName,
@@ -49,29 +55,24 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                 item: breadcrumb.href,
             })),
         },
-        mainEntity: {
+        mainEntity: forums?.map((forum) => ({
             '@type': 'CollectionPage',
-            name: category.name,
-            description: category.description || `Forums in ${category.name} category`,
-            hasPart: forums?.map((forum) => ({
-                '@type': 'CollectionPage',
-                name: forum.name,
-                description: forum.description,
-                url: route('forums.categories.show', { category: category.slug }),
-                interactionStatistic: [
-                    {
-                        '@type': 'InteractionCounter',
-                        interactionType: 'https://schema.org/CommentAction',
-                        userInteractionCount: forum.topicsCount || 0,
-                    },
-                    {
-                        '@type': 'InteractionCounter',
-                        interactionType: 'https://schema.org/ReplyAction',
-                        userInteractionCount: forum.postsCount || 0,
-                    },
-                ],
-            })),
-        },
+            name: forum.name,
+            description: forum.description,
+            url: route('forums.categories.show', { category: category.slug }),
+            interactionStatistic: [
+                {
+                    '@type': 'InteractionCounter',
+                    interactionType: 'https://schema.org/CreateAction',
+                    userInteractionCount: forum.topicsCount || 0,
+                },
+                {
+                    '@type': 'InteractionCounter',
+                    interactionType: 'https://schema.org/CommentAction',
+                    userInteractionCount: forum.postsCount || 0,
+                },
+            ],
+        })),
     };
 
     return (

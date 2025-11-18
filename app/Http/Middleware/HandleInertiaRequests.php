@@ -37,17 +37,26 @@ class HandleInertiaRequests extends Middleware
     #[Override]
     public function share(Request $request): array
     {
+        $user = $request->user();
+
+        if ($user) {
+            $user->loadMissing([
+                'activeWarningsWithActiveConsequence.warningConsequence',
+                'userWarnings',
+                'activeWarnings.warning',
+            ]);
+        }
+
         $sharedData = SharedData::from([
             'auth' => AuthData::from([
-                'user' => ($user = $request->user()) ? UserData::from($user) : null,
+                'user' => $user ? UserData::from($user) : null,
                 'isAdmin' => $user?->hasAnyRole(Role::Administrator, Role::SupportAgent) ?? false,
                 'roles' => $user?->roles?->pluck('name')->toArray() ?? [],
                 'can' => Permission::all()->mapWithKeys(fn (Permission $permission): array => [$permission->name => Gate::forUser($user)->check($permission->name)])->toArray(),
                 'mustVerifyEmail' => $user && ! $user->hasVerifiedEmail(),
             ]),
             'announcements' => AnnouncementData::collect(Announcement::query()
-                ->with('author')
-                ->with('reads')
+                ->with(['author', 'reads'])
                 ->current()
                 ->unread()
                 ->latest()

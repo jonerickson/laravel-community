@@ -86,6 +86,8 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read WarningConsequenceType|null $active_consequence_type
  * @property-read Collection<int, UserWarning> $activeWarnings
  * @property-read int|null $active_warnings_count
+ * @property-read Collection<int, UserWarning> $activeWarningsWithActiveConsequence
+ * @property-read int|null $active_warnings_with_active_consequence_count
  * @property-read Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read Collection<int, Report> $approvedReports
@@ -232,12 +234,6 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         'app_authentication_secret',
     ];
 
-    protected $appends = [
-        'is_banned',
-        'active_consequence',
-        'active_consequence_type',
-    ];
-
     protected $dispatchesEvents = [
         'created' => UserCreated::class,
         'updated' => UserUpdated::class,
@@ -311,6 +307,11 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         return $this->userWarnings()->active();
     }
 
+    public function activeWarningsWithActiveConsequence(): HasMany
+    {
+        return $this->activeWarnings()->activeConsequence();
+    }
+
     public function warningPoints(): Attribute
     {
         return Attribute::make(
@@ -321,14 +322,10 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     public function activeConsequence(): Attribute
     {
         return Attribute::make(
-            get: fn (): ?WarningConsequence => null
-            //            $this->userWarnings()
-            //                    ->activeConsequence()
-            //                    ->with('warningConsequence')
-            //                    ->orderByDesc('consequence_expires_at')
-            //                    ->first()
-            //                    ?->warningConsequence
-        )->shouldCache();
+            get: fn (): ?WarningConsequence => $this->activeWarningsWithActiveConsequence
+                ->sortByDesc('consequence_expires_at')
+                ->first()
+                ?->warningConsequence)->shouldCache();
     }
 
     public function activeConsequenceType(): Attribute
@@ -340,7 +337,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     public function isBanned(): Attribute
     {
         return Attribute::make(
-            get: fn (): bool => $this->fingerprints()->banned()->exists() || $this->active_consequence_type === WarningConsequenceType::Ban,
+            get: fn (): bool => $this->fingerprints->firstWhere('is_banned', true) || $this->active_consequence_type === WarningConsequenceType::Ban,
         )->shouldCache();
     }
 

@@ -65,9 +65,19 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
         name: forum.name,
         description: forum.description || `Discussions and topics in ${forum.name}`,
         url: window.location.href,
+        inLanguage: 'en',
+        image: forum.category?.featuredImageUrl,
+        isPartOf: {
+            '@type': 'WebSite',
+            name: siteName,
+        },
         publisher: {
             '@type': 'Organization',
             name: siteName,
+        },
+        about: {
+            '@type': 'Thing',
+            name: forum.category?.name,
         },
         breadcrumb: {
             '@type': 'BreadcrumbList',
@@ -78,18 +88,19 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
                 item: breadcrumb.href,
             })),
         },
-        hasPart: topics?.data.map((topic) => ({
+        mainEntity: topics?.data.map((topic) => ({
             '@type': 'DiscussionForumPosting',
             headline: topic.title,
-            description: topic.description || `Discussion topic: ${topic.title}`,
-            text: topic.lastPost?.content,
+            text: stripCharacters(topic.lastPost?.content || ''),
+            url: route('forums.topics.show', { forum: forum.slug, topic: topic.slug }),
+            datePublished: topic.createdAt,
             dateCreated: topic.createdAt,
             dateModified: topic.updatedAt,
             author: {
                 '@type': 'Person',
                 name: topic.author.name,
+                url: route('users.show', { user: topic.author.referenceId }),
             },
-            url: route('forums.topics.show', { forum: forum.slug, topic: topic.slug }),
             interactionStatistic: [
                 {
                     '@type': 'InteractionCounter',
@@ -98,12 +109,32 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
                 },
                 {
                     '@type': 'InteractionCounter',
-                    interactionType: 'https://schema.org/ReplyAction',
+                    interactionType: 'https://schema.org/CommentAction',
                     userInteractionCount: topic.postsCount,
                 },
             ],
+            comment: {
+                '@type': 'Comment',
+                '@id': route('forums.topics.show', { forum: forum.slug, topic: topic.slug }) + '#' + topic.lastPost?.id,
+                url: route('forums.topics.show', { forum: forum.slug, topic: topic.slug }) + '#' + topic.lastPost?.id,
+                text: stripCharacters(topic.lastPost?.content || ''),
+                datePublished: topic.lastPost?.createdAt,
+                dateCreated: topic.lastPost?.createdAt,
+                dateModified: topic.lastPost?.updatedAt,
+                author: {
+                    '@type': 'Person',
+                    name: topic.lastPost?.author.name,
+                    url: route('users.show', { user: topic.lastPost?.author.referenceId }),
+                },
+                interactionStatistic: [
+                    {
+                        '@type': 'InteractionCounter',
+                        interactionType: 'https://schema.org/LikeAction',
+                        userInteractionCount: topic.lastPost?.likesCount || 0,
+                    },
+                ],
+            },
         })),
-        numberOfItems: topics?.data.length,
     };
 
     const handleSelectTopic = (topicId: number, checked: boolean) => {

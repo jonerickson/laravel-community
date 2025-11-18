@@ -32,11 +32,11 @@ export default function ForumTopicReply({ forumSlug, topicSlug, onCancel, onSucc
         post(route('forums.posts.store', { forum: forumSlug, topic: topicSlug }), {
             preserveScroll: true,
             onSuccess: () => {
+                reset('content');
+
                 if (onSuccess) {
                     onSuccess();
                 }
-
-                reset('content');
             },
         });
     };

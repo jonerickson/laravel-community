@@ -24,6 +24,7 @@ use Filament\Support\Facades\FilamentColor;
 use Filament\Tables\Table;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Context;
@@ -109,32 +110,32 @@ class AppServiceProvider extends ServiceProvider
                     ->uncompromised();
             }));
 
-        RateLimiter::for('comment', fn (\Illuminate\Http\Request $request): array => [
+        RateLimiter::for('comment', fn (Request $request): array => [
             Limit::perMinute(5)->by($request->fingerprintId() ?: $request->ip()),
             Limit::perHour(10)->by($request->fingerprintId() ?: $request->ip()),
         ]);
 
-        RateLimiter::for('login', fn (\Illuminate\Http\Request $request): array => [
+        RateLimiter::for('login', fn (Request $request): array => [
             Limit::perMinute(5)->by($request->fingerprintId() ?: $request->ip()),
             Limit::perHour(30)->by($request->fingerprintId() ?: $request->ip()),
         ]);
 
-        RateLimiter::for('post', fn (\Illuminate\Http\Request $request): array => [
+        RateLimiter::for('post', fn (Request $request): array => [
             Limit::perMinute(2)->by($request->fingerprintId() ?: $request->ip()),
             Limit::perHour(20)->by($request->fingerprintId() ?: $request->ip()),
         ]);
 
-        RateLimiter::for('register', fn (\Illuminate\Http\Request $request): array => [
+        RateLimiter::for('register', fn (Request $request): array => [
             Limit::perMinute(2)->by($request->fingerprintId() ?: $request->ip()),
             Limit::perHour(5)->by($request->fingerprintId() ?: $request->ip()),
         ]);
 
-        RateLimiter::for('report', fn (\Illuminate\Http\Request $request): array => [
+        RateLimiter::for('report', fn (Request $request): array => [
             Limit::perMinute(2)->by($request->fingerprintId() ?: $request->ip()),
             Limit::perHour(5)->by($request->fingerprintId() ?: $request->ip()),
         ]);
 
-        RateLimiter::for('support-ticket', fn (\Illuminate\Http\Request $request): array => [
+        RateLimiter::for('support-ticket', fn (Request $request): array => [
             Limit::perMinute(2)->by($request->fingerprintId() ?: $request->ip()),
             Limit::perHour(5)->by($request->fingerprintId() ?: $request->ip()),
         ]);

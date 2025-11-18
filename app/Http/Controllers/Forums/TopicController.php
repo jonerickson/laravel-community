@@ -19,6 +19,7 @@ use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -80,7 +81,7 @@ class TopicController extends Controller
     /**
      * @throws AuthorizationException
      */
-    public function show(Forum $forum, Topic $topic): Response
+    public function show(Request $request, Forum $forum, Topic $topic): Response|RedirectResponse
     {
         $this->authorize('view', $forum);
         $this->authorize('view', $topic);
@@ -95,12 +96,21 @@ class TopicController extends Controller
             ->posts()
             ->latestActivity()
             ->with(['author.groups', 'reads', 'views', 'likes.author', 'comments'])
+            ->withCount(['likes'])
             ->paginate();
 
         $filteredPosts = $posts
             ->collect()
             ->filter(fn (Post $post) => Gate::check('view', $post))
             ->values();
+
+        $currentPage = $request->integer('page', 1);
+
+        if ($posts->isEmpty() && $currentPage > 1) {
+            return redirect()->to(
+                request()->fullUrlWithQuery(['page' => $posts->lastPage()])
+            );
+        }
 
         return Inertia::render('forums/topics/show', [
             'forum' => ForumData::from($forum),

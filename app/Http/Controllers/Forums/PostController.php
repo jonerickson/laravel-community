@@ -17,6 +17,7 @@ use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Uri;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -33,21 +34,24 @@ class PostController extends Controller
         $this->authorize('view', $topic);
         $this->authorize('create', Post::class);
 
-        $topic->posts()->create([
+        $post = $topic->posts()->create([
             'type' => PostType::Forum,
             'title' => 'Re: '.$topic->title,
             'content' => $request->validated('content'),
         ]);
 
-        $totalPosts = $topic->posts()->count();
-        $postsPerPage = 10;
-        $lastPage = (int) ceil($totalPosts / $postsPerPage);
+        $posts = $topic->posts()->paginate();
+        $currentPage = Uri::of($request->header('referer'))->query()->integer('page', 1);
 
-        return to_route('forums.topics.show', [
-            'forum' => $forum,
-            'topic' => $topic,
-            'page' => $lastPage,
-        ])->with('message', 'Your reply was successfully added.');
+        if ($currentPage !== $posts->lastPage()) {
+            return to_route('forums.topics.show', [
+                'forum' => $forum,
+                'topic' => $topic,
+                'page' => $posts->lastPage(),
+            ])->withFragment((string) $post->id);
+        }
+
+        return back()->with('message', 'Your reply was successfully added.')->withFragment((string) $post->id);
     }
 
     /**

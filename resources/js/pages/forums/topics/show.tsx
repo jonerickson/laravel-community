@@ -13,6 +13,7 @@ import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
+import { stripCharacters } from '@/utils/truncate';
 import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, ArrowDown, ArrowLeft, Clock, Eye, EyeOff, MessageSquare, Reply, ThumbsDown, User } from 'lucide-react';
@@ -107,31 +108,31 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
         );
     }, [topic, can]);
 
+    const handleReplySubmitted = () => {
+        router.reload({ only: ['posts'] });
+    };
+
     const structuredData = {
         '@context': 'https://schema.org',
         '@type': 'DiscussionForumPosting',
         '@id': currentUrl,
+        name: topic.title,
         headline: topic.title,
-        description: topic.description || `Discussion topic: ${topic.title}`,
+        datePublished: topic.createdAt,
         dateCreated: topic.createdAt,
         dateModified: topic.updatedAt,
         url: currentUrl,
-        mainEntityOfPage: {
-            '@type': 'WebPage',
-            '@id': currentUrl,
-        },
+        mainEntityOfPage: currentUrl,
+        inLanguage: 'en',
+        image: topic.forum?.category?.featuredImageUrl,
         author: {
             '@type': 'Person',
             name: topic.author.name,
+            url: route('users.show', { user: topic.author.referenceId }),
         },
         publisher: {
             '@type': 'Organization',
             name: siteName,
-        },
-        isPartOf: {
-            '@type': 'CollectionPage',
-            name: forum.name,
-            url: route('forums.show', { forum: forum.slug }),
         },
         breadcrumb: {
             '@type': 'BreadcrumbList',
@@ -150,7 +151,7 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
             },
             {
                 '@type': 'InteractionCounter',
-                interactionType: 'https://schema.org/ReplyAction',
+                interactionType: 'https://schema.org/CommentAction',
                 userInteractionCount: topic.postsCount || 0,
             },
         ],
@@ -159,14 +160,24 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
             .filter((post) => post.author)
             .map((post) => ({
                 '@type': 'Comment',
-                '@id': `${currentUrl}#post-${post.id}`,
-                text: post.content,
+                '@id': `${currentUrl}#${post.id}`,
+                url: `${currentUrl}#${post.id}`,
+                text: stripCharacters(post.content),
+                datePublished: post.createdAt,
                 dateCreated: post.createdAt,
                 dateModified: post.updatedAt,
                 author: {
                     '@type': 'Person',
                     name: post.author.name,
+                    url: route('users.show', { user: post.author.referenceId }),
                 },
+                interactionStatistic: [
+                    {
+                        '@type': 'InteractionCounter',
+                        interactionType: 'https://schema.org/LikeAction',
+                        userInteractionCount: post.likesCount || 0,
+                    },
+                ],
             })),
     };
 
@@ -276,7 +287,13 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
                 </Deferred>
 
                 {can('reply_topics') && !topic.isLocked && posts && posts.data.length > 0 && (
-                    <ForumTopicReply forumSlug={forum.slug} topicSlug={topic.slug} quotedContent={quotedContent} quotedAuthor={quotedAuthor} />
+                    <ForumTopicReply
+                        forumSlug={forum.slug}
+                        topicSlug={topic.slug}
+                        quotedContent={quotedContent}
+                        quotedAuthor={quotedAuthor}
+                        onSuccess={handleReplySubmitted}
+                    />
                 )}
 
                 <div className="flex justify-start py-4">

@@ -32,6 +32,7 @@ class CategoryController extends Controller
         $categories = ForumCategory::query()
             ->active()
             ->ordered()
+            ->with(['groups'])
             ->with(['forums' => function (HasMany|Forum $query): void {
                 $query
                     ->whereNull('parent_id')
@@ -40,11 +41,10 @@ class CategoryController extends Controller
                     ->with(['latestTopics' => function (HasMany|Topic $subQuery): void {
                         $subQuery
                             ->withCount('posts')
-                            ->with(['author'])
+                            ->with(['author', 'lastPost'])
                             ->limit(3);
                     }]);
             }])
-            ->with(['groups'])
             ->get()
             ->loadCount([
                 'forums as posts_count' => function ($query): void {
@@ -79,10 +79,10 @@ class CategoryController extends Controller
 
         $forums = $category
             ->forums()
+            ->with(['latestTopic.author', 'latestTopic.lastPost'])
             ->whereNull('parent_id')
             ->active()
             ->ordered()
-            ->with('latestTopic.lastPost.author')
             ->withCount(['topics', 'posts'])
             ->get()
             ->filter(fn (Forum $forum) => Gate::check('view', $forum))
