@@ -160,6 +160,9 @@ class UserSubscriptionImporter extends AbstractImporter
             if ($output->isVerbose()) {
                 $result->recordSkipped(self::ENTITY_NAME, [
                     'source_id' => $sourceUserSubscription->sub_id,
+                    'purchase_id' => 'N/A',
+                    'invoice_id' => 'N/A',
+                    'name' => 'N/A',
                     'reason' => 'User not found',
                 ]);
             }
@@ -195,6 +198,8 @@ class UserSubscriptionImporter extends AbstractImporter
             if ($output->isVerbose()) {
                 $result->recordSkipped(self::ENTITY_NAME, [
                     'source_id' => $sourceUserSubscription->sub_id,
+                    'purchase_id' => $sourceUserSubscription->sub_purchase_id,
+                    'invoice_id' => $sourceUserSubscription->sub_invoice_id,
                     'name' => $user->name,
                     'reason' => 'Order not found',
                 ]);
@@ -216,6 +221,8 @@ class UserSubscriptionImporter extends AbstractImporter
                 if ($output->isVerbose()) {
                     $result->recordSkipped(self::ENTITY_NAME, [
                         'source_id' => $sourceUserSubscription->sub_id,
+                        'purchase_id' => $sourceUserSubscription->sub_purchase_id,
+                        'invoice_id' => $sourceUserSubscription->sub_invoice_id,
                         'name' => $user->name,
                         'reason' => 'Expiration date does not exist or is in the past',
                     ]);
@@ -230,6 +237,8 @@ class UserSubscriptionImporter extends AbstractImporter
                 if ($output->isVerbose()) {
                     $result->recordSkipped(self::ENTITY_NAME, [
                         'source_id' => $sourceUserSubscription->sub_id,
+                        'purchase_id' => $sourceUserSubscription->sub_purchase_id,
+                        'invoice_id' => $sourceUserSubscription->sub_invoice_id,
                         'name' => $user->name,
                         'reason' => 'User already has current subscription',
                     ]);
