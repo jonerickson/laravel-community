@@ -128,7 +128,7 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
         author: {
             '@type': 'Person',
             name: topic.author.name,
-            url: route('users.show', { user: topic.author.referenceId }),
+            url: topic.author.referenceId ? route('users.show', { user: topic.author.referenceId }) : null,
         },
         publisher: {
             '@type': 'Organization',
@@ -169,7 +169,7 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
                 author: {
                     '@type': 'Person',
                     name: post.author.name,
-                    url: route('users.show', { user: post.author.referenceId }),
+                    url: post.author.referenceId ? route('users.show', { user: post.author.referenceId }) : null,
                 },
                 interactionStatistic: [
                     {

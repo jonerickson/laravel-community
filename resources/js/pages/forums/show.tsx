@@ -99,7 +99,7 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
             author: {
                 '@type': 'Person',
                 name: topic.author.name,
-                url: route('users.show', { user: topic.author.referenceId }),
+                url: topic.author.referenceId ? route('users.show', { user: topic.author.referenceId }) : null,
             },
             interactionStatistic: [
                 {
@@ -124,7 +124,7 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
                 author: {
                     '@type': 'Person',
                     name: topic.lastPost?.author.name,
-                    url: route('users.show', { user: topic.lastPost?.author.referenceId }),
+                    url: topic.lastPost?.author.referenceId ? route('users.show', { user: topic.lastPost?.author.referenceId }) : null,
                 },
                 interactionStatistic: [
                     {
