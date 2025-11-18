@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Data\SubscriptionData;
+use App\Enums\OrderStatus;
 use App\Enums\ProrationBehavior;
+use App\Enums\SubscriptionInterval;
 use App\Jobs\ImportSubscription;
 use App\Managers\PaymentManager;
 use App\Models\Order;
+use App\Models\Price;
+use App\Models\Product;
 use App\Models\User;
 use App\Services\Migration\AbstractImporter;
 use App\Services\Migration\Contracts\MigrationSource;
@@ -172,9 +176,9 @@ class UserSubscriptionImporter extends AbstractImporter
 
         $this->setStripeCustomerId($user, $sourceUserSubscription->sub_member_id, $config);
 
-        $orderId = OrderImporter::getOrderMapping((int) $sourceUserSubscription->sub_invoice_id);
+        $price = $this->findPrice($sourceUserSubscription);
 
-        if ($orderId === null || $orderId === 0) {
+        if (! $price instanceof Price) {
             $result->incrementSkipped(self::ENTITY_NAME);
 
             if ($output->isVerbose()) {
@@ -183,30 +187,14 @@ class UserSubscriptionImporter extends AbstractImporter
                     'purchase_id' => $sourceUserSubscription->sub_purchase_id,
                     'invoice_id' => $sourceUserSubscription->sub_invoice_id,
                     'name' => $user->name,
-                    'reason' => 'Order not found from imported orders',
+                    'reason' => 'Price not found',
                 ]);
             }
 
             return;
         }
 
-        $order = Order::query()->find($orderId);
-
-        if (! $order instanceof Order) {
-            $result->incrementSkipped(self::ENTITY_NAME);
-
-            if ($output->isVerbose()) {
-                $result->recordSkipped(self::ENTITY_NAME, [
-                    'source_id' => $sourceUserSubscription->sub_id,
-                    'purchase_id' => $sourceUserSubscription->sub_purchase_id,
-                    'invoice_id' => $sourceUserSubscription->sub_invoice_id,
-                    'name' => $user->name,
-                    'reason' => 'Order not found',
-                ]);
-            }
-
-            return;
-        }
+        $order = $this->createOrder($user, $price);
 
         if (! $config->isDryRun) {
             $backdateStartDate = isset($sourceUserSubscription->sub_start)
@@ -271,6 +259,63 @@ class UserSubscriptionImporter extends AbstractImporter
         }
 
         return null;
+    }
+
+    protected function findPrice(object $sourceUserSubscription): ?Price
+    {
+        if (! isset($sourceUserSubscription->sub_purchase_id) || $sourceUserSubscription->sub_purchase_id === 0) {
+            return null;
+        }
+
+        $sourcePurchase = DB::connection($this->source->getConnection())
+            ->table('nexus_purchases')
+            ->where('ps_id', $sourceUserSubscription->sub_purchase_id)
+            ->first();
+
+        if ($sourcePurchase === null || $sourcePurchase->ps_type !== 'subscription' || ! isset($sourcePurchase->ps_item_id) || $sourcePurchase->ps_item_id === 0) {
+            return null;
+        }
+
+        $mappedProductId = SubscriptionImporter::getSubscriptionMapping((int) $sourcePurchase->ps_item_id);
+
+        if ($mappedProductId === null || $mappedProductId === 0) {
+            return null;
+        }
+
+        $product = Product::query()->with('prices')->find($mappedProductId);
+
+        if (! $product instanceof Product) {
+            return null;
+        }
+
+        $interval = match ($sourcePurchase->ps_renewal_unit) {
+            'y' => SubscriptionInterval::Yearly,
+            default => SubscriptionInterval::Monthly,
+        };
+
+        return $product->prices->firstWhere('interval', $interval);
+    }
+
+    protected function createOrder(User $user, Price $price): Order
+    {
+        $order = Order::create([
+            'user_id' => $user->id,
+            'status' => OrderStatus::Succeeded,
+            'amount_due' => 0,
+            'amount_overpaid' => 0,
+            'amount_remaining' => 0,
+            'amount_paid' => 0,
+        ]);
+
+        $order->items()->create([
+            'name' => 'Website Migration',
+            'description' => 'This order was created automatically to transfer your subscription to a new platform.',
+            'price_id' => $price->id,
+            'amount' => 0,
+            'quantity' => 1,
+        ]);
+
+        return $order;
     }
 
     protected function getExpirationDate(object $sourceUserSubscription): ?CarbonInterface
