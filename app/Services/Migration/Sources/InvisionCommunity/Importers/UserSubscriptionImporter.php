@@ -179,6 +179,7 @@ class UserSubscriptionImporter extends AbstractImporter
                     'source_id' => $sourceUserSubscription->sub_id,
                     'purchase_id' => $sourceUserSubscription->sub_purchase_id,
                     'invoice_id' => $sourceUserSubscription->sub_invoice_id,
+                    'name' => $user->name,
                     'reason' => 'Order not found from imported orders',
                 ]);
             }
@@ -194,6 +195,7 @@ class UserSubscriptionImporter extends AbstractImporter
             if ($output->isVerbose()) {
                 $result->recordSkipped(self::ENTITY_NAME, [
                     'source_id' => $sourceUserSubscription->sub_id,
+                    'name' => $user->name,
                     'reason' => 'Order not found',
                 ]);
             }
@@ -214,6 +216,7 @@ class UserSubscriptionImporter extends AbstractImporter
                 if ($output->isVerbose()) {
                     $result->recordSkipped(self::ENTITY_NAME, [
                         'source_id' => $sourceUserSubscription->sub_id,
+                        'name' => $user->name,
                         'reason' => 'Expiration date does not exist or is in the past',
                     ]);
                 }
@@ -227,6 +230,7 @@ class UserSubscriptionImporter extends AbstractImporter
                 if ($output->isVerbose()) {
                     $result->recordSkipped(self::ENTITY_NAME, [
                         'source_id' => $sourceUserSubscription->sub_id,
+                        'name' => $user->name,
                         'reason' => 'User already has current subscription',
                     ]);
                 }
@@ -243,8 +247,8 @@ class UserSubscriptionImporter extends AbstractImporter
             $result->recordMigrated(self::ENTITY_NAME, [
                 'source_id' => $sourceUserSubscription->sub_id,
                 'user_id' => $user->id,
-                'user_name' => $user->name,
                 'order_id' => $order->id,
+                'name' => $user->name,
             ]);
         }
     }
