@@ -51,10 +51,10 @@ class UserData extends Data
     public array $integrations = [];
 
     /**
-     * @var UserOrderData[]
+     * @var UserProductData[]
      */
-    #[ApiProperty(property: 'orders', serialize: new Groups(['user']))]
-    public array $orders = [];
+    #[ApiProperty(property: 'products', serialize: new Groups(['user']))]
+    public array $products = [];
 
     public static function from(mixed ...$payloads): static
     {
@@ -73,15 +73,5 @@ class UserData extends Data
         }
 
         return $object;
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public function with(): array
-    {
-        return [
-            'test' => 'test',
-        ];
     }
 }

@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Data\SubscriptionData;
 use App\Enums\OrderStatus;
+use App\Enums\ProductType;
 use App\Enums\Role;
 use App\Enums\WarningConsequenceType;
 use App\Events\UserCreated;
@@ -271,11 +272,12 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     {
         return $this->hasManyDeep(
             related: Product::class,
-            through: [Order::class, OrderItem::class],
-            foreignKeys: ['user_id', 'order_id', 'id'],
-            localKeys: ['id', 'id', 'product_id']
+            through: [Order::class, OrderItem::class, Price::class],
+            foreignKeys: ['user_id', 'order_id', 'id', 'id'],
+            localKeys: ['id', 'id', 'price_id', 'product_id']
         )
             ->where('orders.status', OrderStatus::Succeeded)
+            ->where('products.type', ProductType::Product)
             ->distinct();
     }
 

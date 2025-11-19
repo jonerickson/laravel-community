@@ -9,23 +9,15 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Data\Api\UserData;
-use App\Enums\OrderStatus;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\LaravelData\PaginatedDataCollection;
 
 class UserProvider implements ProviderInterface
 {
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $query = User::query()
-            ->with('integrations')
-            ->with(['orders' => function (HasMany $query): void {
-                $query
-                    ->with('items.price.product')
-                    ->where('status', OrderStatus::Succeeded);
-            }]);
+        $query = User::query()->with(['integrations', 'products']);
 
         $request = $context['request'] ?? request();
 
