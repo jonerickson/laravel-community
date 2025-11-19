@@ -109,15 +109,15 @@ CREATE TABLE `comments` (
   `rating` tinyint DEFAULT NULL,
   `is_approved` tinyint(1) NOT NULL DEFAULT '0',
   `parent_id` bigint unsigned DEFAULT NULL,
-  `created_by` bigint unsigned NOT NULL,
+  `created_by` bigint unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `comments_commentable_type_commentable_id_index` (`commentable_type`,`commentable_id`),
-  KEY `comments_created_by_foreign` (`created_by`),
   KEY `comments_parent_id_foreign` (`parent_id`),
   KEY `comments_is_approved_created_at_index` (`is_approved`,`created_at`),
-  CONSTRAINT `comments_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  KEY `comments_created_by_foreign` (`created_by`),
+  CONSTRAINT `comments_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `comments_parent_id_foreign` FOREIGN KEY (`parent_id`) REFERENCES `comments` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -418,13 +418,13 @@ DROP TABLE IF EXISTS `knowledge_base_articles`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `knowledge_base_articles` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `excerpt` text COLLATE utf8mb4_unicode_ci,
-  `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `excerpt` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `category_id` bigint unsigned DEFAULT NULL,
-  `featured_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `featured_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `metadata` json DEFAULT NULL,
   `is_published` tinyint(1) NOT NULL DEFAULT '0',
   `published_at` timestamp NULL DEFAULT NULL,
@@ -447,12 +447,12 @@ DROP TABLE IF EXISTS `knowledge_base_categories`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `knowledge_base_categories` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `icon` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `color` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `featured_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `color` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `featured_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `order` int NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -865,16 +865,16 @@ CREATE TABLE `posts` (
   `featured_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `metadata` json DEFAULT NULL,
   `published_at` timestamp NULL DEFAULT NULL,
-  `created_by` bigint unsigned NOT NULL,
+  `created_by` bigint unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `posts_slug_unique` (`slug`),
   KEY `posts_is_published_published_at_index` (`is_published`,`published_at`),
-  KEY `posts_created_by_index` (`created_by`),
   KEY `posts_topic_id_foreign` (`topic_id`),
   KEY `posts_type_topic_id_index` (`type`,`topic_id`),
-  CONSTRAINT `posts_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  KEY `posts_created_by_foreign` (`created_by`),
+  CONSTRAINT `posts_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `posts_topic_id_foreign` FOREIGN KEY (`topic_id`) REFERENCES `topics` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1254,14 +1254,14 @@ CREATE TABLE `topics` (
   `forum_id` bigint unsigned NOT NULL,
   `is_pinned` tinyint(1) NOT NULL DEFAULT '0',
   `is_locked` tinyint(1) NOT NULL DEFAULT '0',
-  `created_by` bigint unsigned NOT NULL,
+  `created_by` bigint unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `topics_slug_unique` (`slug`),
   KEY `topics_forum_id_is_pinned_index` (`forum_id`,`is_pinned`),
-  KEY `topics_created_by_index` (`created_by`),
-  CONSTRAINT `topics_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  KEY `topics_created_by_foreign` (`created_by`),
+  CONSTRAINT `topics_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `topics_forum_id_foreign` FOREIGN KEY (`forum_id`) REFERENCES `forums` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1553,7 +1553,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (143,'2025_11_11_18
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (144,'2025_11_11_181835_add_reference_id_to_files_table',49);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (147,'2025_11_12_174357_change_product_description_to_null',50);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (152,'2025_11_13_225851_update_amount_column_types',51);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (153,'2025_09_28_202015_create_email_settings',52);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (154,'2025_09_28_202053_create_general_settings',52);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (155,'2025_11_15_214902_create_knowledge_base_categories_table',52);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (156,'2025_11_15_214944_create_knowledge_base_articles_table',52);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (157,'2025_09_28_202015_create_email_settings',53);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (158,'2025_09_28_202053_create_general_settings',53);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (159,'2025_11_17_185644_allow_forum_authors_to_be_null',53);
