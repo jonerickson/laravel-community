@@ -30,7 +30,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
@@ -71,9 +70,7 @@ class StripeDriver implements PaymentProcessor
                 $payload['description'] = $description;
             }
 
-            $stripeProduct = $this->stripe->products->create($payload, [
-                'idempotency_key' => $this->getIdempotencyKey(),
-            ]);
+            $stripeProduct = $this->stripe->products->create($payload);
 
             $product->updateQuietly([
                 'external_product_id' => $stripeProduct->id,
@@ -110,9 +107,7 @@ class StripeDriver implements PaymentProcessor
                 $payload['description'] = $description;
             }
 
-            $this->stripe->products->update($product->external_product_id, $payload, [
-                'idempotency_key' => $this->getIdempotencyKey(),
-            ]);
+            $this->stripe->products->update($product->external_product_id, $payload);
 
             return ProductData::from($product);
         });
@@ -125,9 +120,7 @@ class StripeDriver implements PaymentProcessor
                 return false;
             }
 
-            $this->stripe->products->delete($product->external_product_id, null, [
-                'idempotency_key' => $this->getIdempotencyKey(),
-            ]);
+            $this->stripe->products->delete($product->external_product_id);
 
             $product->updateQuietly([
                 'external_product_id' => null,
@@ -179,9 +172,7 @@ class StripeDriver implements PaymentProcessor
                 ];
             }
 
-            $stripePrice = $this->stripe->prices->create($stripeParams, [
-                'idempotency_key' => $this->getIdempotencyKey(),
-            ]);
+            $stripePrice = $this->stripe->prices->create($stripeParams);
 
             $price->updateQuietly([
                 'external_price_id' => $stripePrice->id,
@@ -208,8 +199,6 @@ class StripeDriver implements PaymentProcessor
                     'price_id' => $price->reference_id,
                     ...$price->metadata ?? [],
                 ]),
-            ], [
-                'idempotency_key' => $this->getIdempotencyKey(),
             ]);
 
             if ($price->is_default) {
@@ -240,8 +229,6 @@ class StripeDriver implements PaymentProcessor
 
             $this->stripe->prices->update($price->external_price_id, [
                 'active' => false,
-            ], [
-                'idempotency_key' => $this->getIdempotencyKey(),
             ]);
 
             return true;
@@ -449,9 +436,7 @@ class StripeDriver implements PaymentProcessor
                 return false;
             }
 
-            $this->stripe->customers->delete($user->stripeId(), null, [
-                'idempotency_key' => $this->getIdempotencyKey(),
-            ]);
+            $this->stripe->customers->delete($user->stripeId());
 
             $user->forceFill([
                 'stripe_id' => null,
@@ -748,9 +733,7 @@ class StripeDriver implements PaymentProcessor
                         $couponParams['currency'] = 'usd';
                     }
 
-                    $stripeCoupon = $this->stripe->coupons->create($couponParams, [
-                        'idempotency_key' => $this->getIdempotencyKey().'-'.$discount->id,
-                    ]);
+                    $stripeCoupon = $this->stripe->coupons->create($couponParams);
 
                     $discounts[] = ['coupon' => $stripeCoupon->id];
                 }
@@ -804,10 +787,7 @@ class StripeDriver implements PaymentProcessor
                 $checkoutParams['allow_promotion_codes'] = filled($allowPromotionCodes);
             }
 
-            $checkoutSession = $this->stripe->checkout->sessions->create(
-                $checkoutParams,
-                ['idempotency_key' => $this->getIdempotencyKey().'-checkout']
-            );
+            $checkoutSession = $this->stripe->checkout->sessions->create($checkoutParams);
 
             $order->updateQuietly([
                 'external_checkout_id' => $checkoutSession->id,
@@ -892,8 +872,6 @@ class StripeDriver implements PaymentProcessor
                     default => null,
                 },
                 'metadata' => $metadata,
-            ], [
-                'idempotency_key' => $this->getIdempotencyKey(),
             ]);
 
             $order->update([
@@ -918,14 +896,10 @@ class StripeDriver implements PaymentProcessor
             ]);
 
             if (filled($order->external_checkout_id)) {
-                $session = $this->stripe->checkout->sessions->retrieve($order->external_checkout_id, null, [
-                    'idempotency_key' => $this->getIdempotencyKey(),
-                ]);
+                $session = $this->stripe->checkout->sessions->retrieve($order->external_checkout_id);
 
                 if ($session->status === 'open') {
-                    $this->stripe->checkout->sessions->expire($order->external_checkout_id, null, [
-                        'idempotency_key' => $this->getIdempotencyKey(),
-                    ]);
+                    $this->stripe->checkout->sessions->expire($order->external_checkout_id);
                 }
             }
 
@@ -966,13 +940,5 @@ class StripeDriver implements PaymentProcessor
 
             return $defaultValue;
         }
-    }
-
-    private function getIdempotencyKey(): string
-    {
-        $callingMethod = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'] ?? 'unknown';
-        $requestId = Context::get('request_id');
-
-        return $requestId ? sprintf('%s-%s', $requestId, $callingMethod) : $callingMethod;
     }
 }
