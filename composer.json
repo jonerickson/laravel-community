@@ -31,6 +31,7 @@
         "spatie/enum": "^3.13",
         "spatie/laravel-activitylog": "^4.10.2",
         "spatie/laravel-data": "^4.18",
+        "spatie/laravel-google-fonts": "^1.4",
         "spatie/laravel-permission": "^6.21",
         "spatie/laravel-settings": "^3.4.4",
         "spatie/laravel-typescript-transformer": "^2.5.2",
