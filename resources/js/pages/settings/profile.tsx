@@ -92,7 +92,7 @@ export default function Profile({ fields }: ProfilePageProps) {
             <SettingsLayout>
                 <div className="space-y-6">
                     <div className="flex items-center justify-between gap-2">
-                        <HeadingSmall title="Profile information" description="Update your name and email address" />
+                        <HeadingSmall title="Profile information" description="Update your username and email address" />
                         {auth && auth.user && auth.user.referenceId && (
                             <Button variant="outline" asChild>
                                 <a target="_blank" href={route('users.show', auth.user.referenceId)}>
@@ -123,14 +123,14 @@ export default function Profile({ fields }: ProfilePageProps) {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="name">Name</Label>
+                            <Label htmlFor="name">Username</Label>
                             <Input
                                 id="name"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
                                 required
                                 autoComplete="name"
-                                placeholder="Full name"
+                                placeholder="Username"
                             />
                             <InputError message={errors.name} />
                         </div>

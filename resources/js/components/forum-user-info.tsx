@@ -52,7 +52,10 @@ export default function ForumUserInfo({
     }
 
     return (
-        <Link href={user.referenceId} className="flex flex-row items-center gap-4 hover:opacity-80 md:flex-col md:items-center md:gap-2 md:px-8">
+        <Link
+            href={route('users.show', { user: user.referenceId })}
+            className="flex flex-row items-center gap-4 hover:opacity-80 md:flex-col md:items-center md:gap-2 md:px-8"
+        >
             {content}
         </Link>
     );

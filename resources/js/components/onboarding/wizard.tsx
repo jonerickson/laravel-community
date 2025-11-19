@@ -125,7 +125,7 @@ export function WizardSteps({ steps }: WizardStepsProps) {
                                 <div
                                     aria-hidden="true"
                                     className={cn(
-                                        'absolute top-[1.125rem] left-[calc(50%+1.25rem)] h-0.5 w-[calc(100%-2.5rem)] transition-colors sm:top-5 sm:left-[calc(50%+1.5rem)] sm:w-[calc(100%-3rem)]',
+                                        'absolute top-[1.5rem] left-[calc(50%+1.7rem)] h-0.5 w-[calc(100%-3rem)] transition-colors sm:top-[1.7rem] sm:left-[calc(50%+2.2rem)] sm:w-[calc(100%-4rem)]',
                                         {
                                             'bg-primary': isComplete,
                                             'bg-muted': !isComplete,

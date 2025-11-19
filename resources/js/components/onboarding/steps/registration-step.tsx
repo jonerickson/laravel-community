@@ -23,7 +23,7 @@ export function RegistrationStep({ data, errors, processing, onChange, onNext }:
         <div className="flex flex-col gap-6">
             <div className="grid gap-6">
                 <div className="grid gap-2">
-                    <Label htmlFor="name">Full name</Label>
+                    <Label htmlFor="name">Username</Label>
                     <div className="relative">
                         <Input
                             id="name"
