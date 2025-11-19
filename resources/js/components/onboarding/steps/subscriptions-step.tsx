@@ -85,7 +85,7 @@ export function SubscriptionsStep({
                                         disabled={processing || !subscription.defaultPrice}
                                         className="w-full"
                                     >
-                                        {!processing && processingSubscriptionId !== subscription.id ? (
+                                        {processing && processingSubscriptionId === subscription.id ? (
                                             <>
                                                 <LoaderCircle className="size-4 animate-spin" />
                                                 Processing...
