@@ -3,7 +3,10 @@
     "name": "jonerickson/laravel-starter-kit",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "keywords": [
+        "laravel",
+        "framework"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.4",
@@ -35,7 +38,9 @@
         "spatie/laravel-permission": "^6.21",
         "spatie/laravel-settings": "^3.4.4",
         "spatie/laravel-typescript-transformer": "^2.5.2",
+        "spatie/laravel-webhook-server": "^3.8",
         "staudenmeir/eloquent-has-many-deep": "^1.21.1",
+        "symfony/expression-language": "^7.3",
         "tightenco/ziggy": "^2.6"
     },
     "require-dev": {
@@ -123,7 +128,7 @@
             "@cs-fix app/Models"
         ],
         "facades": [
-          "@php -f vendor/bin/facade.php -- \\\\App\\\\Facades\\\\PaymentProcessor \\\\App\\\\Facades\\\\SupportTicket"
+            "@php -f vendor/bin/facade.php --  \\\\App\\\\Facades\\\\ExpressionLanguage \\\\App\\\\Facades\\\\PaymentProcessor \\\\App\\\\Facades\\\\SupportTicket"
         ],
         "ide": [
             "@php artisan ide-helper:generate",

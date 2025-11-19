@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Enums\Role;
+use App\Managers\ExpressionLanguageManager;
 use App\Models\Blacklist;
 use App\Models\Fingerprint;
 use App\Models\KnowledgeBaseArticle;
@@ -48,6 +49,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Cashier::ignoreRoutes();
         Passport::ignoreRoutes();
+
+        $this->app->singleton('expression-language', fn (): ExpressionLanguageManager => new ExpressionLanguageManager);
     }
 
     public function boot(): void
