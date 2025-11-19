@@ -80,8 +80,7 @@
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi",
             "@php artisan filament:upgrade --ansi",
-            "@php artisan api-platform:install --ansi",
-            "@php artisan boost:install -n --ansi"
+            "@php artisan api-platform:install --ansi"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
@@ -102,6 +101,7 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
             "@php artisan passport:keys --force",
+            "@php artisan boost:install -n --ansi",
             "@php artisan migrate --force",
             "npm install",
             "npm run build",
