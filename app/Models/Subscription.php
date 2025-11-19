@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Cashier\Subscription as BaseSubscription;
 
 /**
@@ -21,6 +22,7 @@ use Laravel\Cashier\Subscription as BaseSubscription;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Cashier\SubscriptionItem> $items
  * @property-read int|null $items_count
  * @property-read User|null $owner
+ * @property-read Price|null $price
  * @property-read User|null $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription active()
@@ -55,5 +57,8 @@ use Laravel\Cashier\Subscription as BaseSubscription;
  */
 class Subscription extends BaseSubscription
 {
-    //
+    public function price(): BelongsTo
+    {
+        return $this->belongsTo(Price::class, 'stripe_price', 'external_price_id');
+    }
 }

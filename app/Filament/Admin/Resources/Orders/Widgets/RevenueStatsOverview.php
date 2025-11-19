@@ -7,7 +7,6 @@ namespace App\Filament\Admin\Resources\Orders\Widgets;
 use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\Subscription;
-use Exception;
 use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -63,28 +62,26 @@ class RevenueStatsOverview extends StatsOverviewWidget
 
     protected function calculateMRR(): float
     {
-        $activeSubscriptions = Subscription::where('stripe_status', 'active')
+        $activeSubscriptions = Subscription::query()
+            ->where('stripe_status', 'active')
             ->orWhere('stripe_status', 'trialing')
+            ->with('price')
             ->get();
 
         $mrr = 0;
 
         foreach ($activeSubscriptions as $subscription) {
-            try {
-                $stripeSubscription = $subscription->asStripeSubscription();
-
-                foreach ($stripeSubscription->items->data as $item) {
-                    $amount = ($item->price->unit_amount / 100) ?? 0;
-                    $interval = $item->price->recurring->interval ?? 'month';
-
-                    if ($interval === 'year') {
-                        $mrr += $amount / 12;
-                    } elseif ($interval === 'month') {
-                        $mrr += $amount;
-                    }
-                }
-            } catch (Exception) {
+            if (! $subscription->price) {
                 continue;
+            }
+
+            $amount = $subscription->price->amount;
+            $interval = $subscription->price->interval?->value;
+
+            if ($interval === 'year') {
+                $mrr += $amount / 12;
+            } elseif ($interval === 'month') {
+                $mrr += $amount;
             }
         }
 
