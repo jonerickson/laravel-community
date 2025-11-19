@@ -6,7 +6,7 @@ import StoreIndexCategoriesItem from '@/components/store-index-categories-item';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem } from '@/types';
-import { Deferred, Head, Link } from '@inertiajs/react';
+import { Deferred, Head, Link, usePage } from '@inertiajs/react';
 import { Folder, ImageIcon, Star, UserPlus } from 'lucide-react';
 import { route } from 'ziggy-js';
 
@@ -24,9 +24,18 @@ interface StoreIndexProps {
 }
 
 export default function StoreIndex({ categories, featuredProducts, userProvidedProducts }: StoreIndexProps) {
+    const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Store" />
+            <Head title="Store">
+                <meta name="description" content="Browse our most popular products" />
+                <meta property="og:title" content={`Store - ${siteName}`} />
+                <meta property="og:description" content="Browse our most popular products" />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content={logoUrl} />
+            </Head>
+
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div>
                     <div className="sm:flex sm:items-baseline sm:justify-between">

@@ -26,7 +26,7 @@ interface KnowledgeBaseSearchProps {
 }
 
 export default function KnowledgeBaseSearch({ results, query: initialQuery }: KnowledgeBaseSearchProps) {
-    const { name: siteName } = usePage<App.Data.SharedData>().props;
+    const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const [searchQuery, setSearchQuery] = useState(initialQuery || '');
 
     const handleSearch = (e: React.FormEvent) => {
@@ -41,10 +41,11 @@ export default function KnowledgeBaseSearch({ results, query: initialQuery }: Kn
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Search: ${initialQuery || 'Knowledge base'}`}>
+            <Head title={`Search: ${initialQuery ? `${initialQuery} - Knowledge base` : 'Knowledge base'}`}>
                 <meta name="description" content={`Search results for "${initialQuery}" in the ${siteName} knowledge base`} />
-                <meta property="og:title" content={`Search: ${initialQuery} - ${siteName}`} />
+                <meta property="og:title" content={`Search: ${initialQuery} - Knowledge Base - ${siteName}`} />
                 <meta property="og:description" content={`Search results for "${initialQuery}" in the ${siteName} knowledge base`} />
+                <meta property="og:image" content={logoUrl} />
             </Head>
 
             <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto">

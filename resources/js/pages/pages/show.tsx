@@ -8,7 +8,7 @@ interface PageShowProps {
 }
 
 export default function PageShow({ page }: PageShowProps) {
-    const { name: siteName } = usePage<App.Data.SharedData>().props;
+    const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const scriptExecutedRef = useRef(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -39,12 +39,12 @@ export default function PageShow({ page }: PageShowProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head>
-                <title>{page.title}</title>
+            <Head title={page.title}>
                 <meta name="description" content={pageDescription} />
                 <meta property="og:title" content={`${page.title} - ${siteName}`} />
                 <meta property="og:description" content={pageDescription} />
                 <meta property="og:type" content="website" />
+                <meta property="og:image" content={logoUrl} />
                 {page.cssContent && <style dangerouslySetInnerHTML={{ __html: page.cssContent }} />}
             </Head>
 

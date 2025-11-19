@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 
 interface EditPostProps {
@@ -15,6 +15,7 @@ interface EditPostProps {
 }
 
 export default function ForumPostEdit({ forum, topic, post }: EditPostProps) {
+    const { logoUrl, siteName } = usePage<App.Data.SharedData>().props;
     const { data, setData, patch, processing, errors } = useForm({
         content: post.content,
     });
@@ -70,12 +71,14 @@ export default function ForumPostEdit({ forum, topic, post }: EditPostProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Forums - ${topic.title} - Edit post`}>
+            <Head title={`Edit post - ${topic.title} - Forums`}>
                 <meta name="description" content={`Edit post in ${topic.title}`} />
-                <meta property="og:title" content={`Forums - ${topic.title} - Edit Post`} />
+                <meta property="og:title" content={`Edit Post - ${topic.title} - Forums - ${siteName}`} />
                 <meta property="og:description" content={`Edit post in ${topic.title}`} />
                 <meta property="og:type" content="website" />
+                <meta property="og:image" content={logoUrl} />
             </Head>
+
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <Heading title="Edit post" description={`Editing your post in "${topic.title}"`} />
 

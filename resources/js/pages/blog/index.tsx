@@ -18,7 +18,7 @@ interface BlogIndexProps {
 }
 
 export default function BlogIndex({ posts }: BlogIndexProps) {
-    const { name: siteName } = usePage<App.Data.SharedData>().props;
+    const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
 
     const structuredData = {
         '@context': 'https://schema.org',
@@ -79,6 +79,7 @@ export default function BlogIndex({ posts }: BlogIndexProps) {
                 <meta property="og:title" content={`Blog - ${siteName}`} />
                 <meta property="og:description" content={`Browse our latest blog posts and articles from ${siteName}`} />
                 <meta property="og:type" content="website" />
+                <meta property="og:image" content={logoUrl} />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
             <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto">

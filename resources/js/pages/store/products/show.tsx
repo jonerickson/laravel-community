@@ -1,7 +1,7 @@
 import Product from '@/components/store-product';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 
 interface ProductPageProps {
     product: App.Data.ProductData;
@@ -9,6 +9,8 @@ interface ProductPageProps {
 }
 
 export default function StoreProductShow({ product, reviews }: ProductPageProps) {
+    const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Store',
@@ -22,7 +24,14 @@ export default function StoreProductShow({ product, reviews }: ProductPageProps)
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={product.name} />
+            <Head title={`${product.name} - Store`}>
+                <meta name="description" content={product.description || ''} />
+                <meta property="og:title" content={`${product.name} - Store - ${siteName}`} />
+                <meta property="og:description" content={product.description || ''} />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content={logoUrl} />
+            </Head>
+
             <div className="lg:py-2">
                 <Product product={product} reviews={reviews} />
             </div>

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn, currency } from '@/lib/utils';
 import { stripCharacters } from '@/utils/truncate';
-import { Deferred, Link, usePage } from '@inertiajs/react';
+import { Deferred, Head, Link, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
     BarChart3,
@@ -76,10 +76,18 @@ const features = [
 
 export default function Home({ subscriptions = [] }: HomeProps) {
     const page = usePage<App.Data.SharedData>();
-    const { name, auth, memberCount, postCount } = page.props;
+    const { name, auth, memberCount, postCount, slogan, logoUrl } = page.props;
 
     return (
         <div className="min-h-screen bg-background text-foreground">
+            <Head title="Home">
+                <meta name="description" content={slogan || ''} />
+                <meta property="og:title" content={name} />
+                <meta property="og:description" content={slogan || ''} />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content={logoUrl} />
+            </Head>
+
             <AppHeader />
 
             <main>

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 
 interface CreateTopicProps {
@@ -14,6 +14,7 @@ interface CreateTopicProps {
 }
 
 export default function ForumTopicCreate({ forum }: CreateTopicProps) {
+    const { siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         description: '',
@@ -60,12 +61,14 @@ export default function ForumTopicCreate({ forum }: CreateTopicProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Forums - ${forum.name} - Create topic`}>
+            <Head title={`Create topic - ${forum.name} - Forums`}>
                 <meta name="description" content={`Create topic in ${forum.name}`} />
-                <meta property="og:title" content={`Forums - ${forum.name} - Create Topic`} />
+                <meta property="og:title" content={`Create Topic - ${forum.name} - Forums - ${siteName}`} />
                 <meta property="og:description" content={`Create topic in ${forum.name}`} />
                 <meta property="og:type" content="website" />
+                <meta property="og:image" content={logoUrl} />
             </Head>
+
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <Heading title="Create new topic" description={`Start a new discussion in ${forum.name}`} />
 

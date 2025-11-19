@@ -15,7 +15,7 @@ interface KnowledgeBaseShowProps {
 }
 
 export default function KnowledgeBaseShow({ article, relatedArticles }: KnowledgeBaseShowProps) {
-    const { name: siteName } = usePage<App.Data.SharedData>().props;
+    const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const pageDescription = article.excerpt || article.content.substring(0, 160).replace(/<[^>]*>/g, '') + '...';
     const publishedDate = new Date(article.publishedAt || article.createdAt || new Date());
     const formattedDate = publishedDate.toLocaleDateString('en-US', {
@@ -66,15 +66,14 @@ export default function KnowledgeBaseShow({ article, relatedArticles }: Knowledg
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head>
-                <title>{article.title}</title>
+            <Head title={`${article.title} - Knowledge base`}>
                 <meta name="description" content={pageDescription} />
-                <meta property="og:title" content={article.title} />
+                <meta property="og:title" content={`${article.title} - Knowledge Base - ${siteName}`} />
                 <meta property="og:description" content={pageDescription} />
                 <meta property="og:type" content="article" />
-                {article.featuredImageUrl && <meta property="og:image" content={article.featuredImageUrl} />}
+                <meta property="og:image" content={article.featuredImageUrl || logoUrl} />
                 <meta property="article:published_time" content={article.publishedAt || article.createdAt || undefined} />
-                {article.author && <meta property="article:author" content={article.author.name} />}
+                <meta property="article:author" content={article.author.name} />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
 

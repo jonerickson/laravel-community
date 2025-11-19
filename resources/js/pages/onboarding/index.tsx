@@ -5,7 +5,7 @@ import { RegistrationStep } from '@/components/onboarding/steps/registration-ste
 import { SubscriptionsStep } from '@/components/onboarding/steps/subscriptions-step';
 import { Wizard, WizardContent, WizardStep, WizardSteps } from '@/components/onboarding/wizard';
 import OnboardingLayout from '@/layouts/onboarding-layout';
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 type OnboardingProps = {
@@ -51,6 +51,7 @@ export default function Onboarding({
     hasSubscription,
     emailVerified,
 }: OnboardingProps) {
+    const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const [currentStep, setCurrentStep] = useState(initialStep);
 
     useEffect(() => {
@@ -156,7 +157,13 @@ export default function Onboarding({
 
     return (
         <OnboardingLayout title="Welcome" description="Let's get your account set up in just a few steps.">
-            <Head title="Onboarding" />
+            <Head title="Onboarding">
+                <meta name="description" content="Let's get your account set up in just a few steps." />
+                <meta property="og:title" content={`Onboarding - ${siteName}`} />
+                <meta property="og:description" content="Let's get your account set up in just a few steps." />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content={logoUrl} />
+            </Head>
 
             <Wizard initialStep={currentStep} onStepChange={setCurrentStep}>
                 <WizardSteps steps={wizardSteps} />

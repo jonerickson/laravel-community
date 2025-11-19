@@ -182,6 +182,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Shopping cart" />
+
             <div className="flex h-full flex-1 flex-col overflow-x-auto">
                 <div className="flex items-start justify-between">
                     <Heading title="Shopping cart" description={`${items.length} ${items.length === 1 ? 'item' : 'items'} in your cart`} />

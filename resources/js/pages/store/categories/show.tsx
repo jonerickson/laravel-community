@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Pagination } from '@/components/ui/pagination';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Folder, ShoppingBag } from 'lucide-react';
 
 interface StoreCategoryShowProps {
@@ -14,6 +14,8 @@ interface StoreCategoryShowProps {
 }
 
 export default function StoreCategoryShow({ category, products }: StoreCategoryShowProps) {
+    const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Store',
@@ -72,11 +74,13 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Store - ${category.name}`}>
                 <meta name="description" content={category.description || `Products in ${category.name} category`} />
-                <meta property="og:title" content={`${category.name} - Store`} />
+                <meta property="og:title" content={`${category.name} - Store - ${siteName}`} />
                 <meta property="og:description" content={category.description || `Products in ${category.name} category`} />
                 <meta property="og:type" content="website" />
+                <meta property="og:image" content={category.featuredImageUrl || logoUrl} />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
+
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="-mb-8">
                     <Heading title={category.name} description={category.description || undefined} />

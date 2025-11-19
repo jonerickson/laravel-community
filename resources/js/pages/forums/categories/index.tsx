@@ -24,7 +24,7 @@ interface ForumsIndexProps {
 
 export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
     const { can } = usePermissions();
-    const { name: siteName } = usePage<App.Data.SharedData>().props;
+    const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const allForums = categories.flatMap((category) => category.forums || []);
@@ -84,8 +84,10 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                 <meta property="og:title" content={`Forums - ${siteName}`} />
                 <meta property="og:description" content="Connect with our community and get support through our forums" />
                 <meta property="og:type" content="website" />
+                <meta property="og:image" content={logoUrl} />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
+
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start sm:gap-0">
                     <div className="flex items-start gap-4">

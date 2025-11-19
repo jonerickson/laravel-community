@@ -20,7 +20,7 @@ interface ReviewsPageProps {
 }
 
 export default function Reviews({ subscription, reviews }: ReviewsPageProps) {
-    const { auth } = usePage<SharedData>().props;
+    const { name: siteName, auth, logoUrl } = usePage<SharedData>().props;
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
 
@@ -45,7 +45,13 @@ export default function Reviews({ subscription, reviews }: ReviewsPageProps) {
 
     return (
         <AppLayout>
-            <Head title={`${subscription.name} - Reviews`} />
+            <Head title={`${subscription.name} - Reviews`}>
+                <meta name="description" content={subscription.description || ''} />
+                <meta property="og:title" content={`${subscription.name} - Reviews - ${siteName}`} />
+                <meta property="og:description" content={subscription.description || ''} />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content={subscription.featuredImageUrl || logoUrl} />
+            </Head>
 
             <div className="mx-auto w-full max-w-4xl space-y-6">
                 <Button variant="ghost" size="sm" onClick={() => router.visit(route('store.subscriptions'))} className="mb-4">

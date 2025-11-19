@@ -2,7 +2,7 @@ import Heading from '@/components/heading';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Calendar, FileText } from 'lucide-react';
 
 interface PoliciesCategoryProps {
@@ -11,6 +11,8 @@ interface PoliciesCategoryProps {
 }
 
 export default function PolicyCategoryShow({ category, policies }: PoliciesCategoryProps) {
+    const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Policies',
@@ -24,7 +26,14 @@ export default function PolicyCategoryShow({ category, policies }: PoliciesCateg
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Policies - ${category.name}`} />
+            <Head title={`${category.name} - Policies`}>
+                <meta name="description" content={category.description || `Policies in ${category.name} category`} />
+                <meta property="og:title" content={`${category.name} - Policies - ${siteName}`} />
+                <meta property="og:description" content={category.description || `Policies in ${category.name} category`} />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content={logoUrl} />
+            </Head>
+
             <div className="flex h-full flex-1 flex-col overflow-x-auto">
                 <Heading title={category.name} description={category.description || `Browse ${category.name.toLowerCase()} and related documents`} />
 

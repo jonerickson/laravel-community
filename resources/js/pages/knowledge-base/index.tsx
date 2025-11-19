@@ -27,7 +27,7 @@ interface KnowledgeBaseIndexProps {
 }
 
 export default function KnowledgeBaseIndex({ articles, categories, filters }: KnowledgeBaseIndexProps) {
-    const { name: siteName } = usePage<App.Data.SharedData>().props;
+    const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const [searchQuery, setSearchQuery] = useState('');
 
     const handleSearch = (e: React.FormEvent) => {
@@ -71,6 +71,7 @@ export default function KnowledgeBaseIndex({ articles, categories, filters }: Kn
                 <meta property="og:title" content={`Knowledge Base - ${siteName}`} />
                 <meta property="og:description" content={`Browse our knowledge base articles and documentation from ${siteName}`} />
                 <meta property="og:type" content="website" />
+                <meta property="og:image" content={logoUrl} />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
 

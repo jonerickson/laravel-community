@@ -10,10 +10,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { cn, currency } from '@/lib/utils';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { AlertCircle, Check, ChevronDown, Crown, LoaderCircle, Package, RefreshCw, Rocket, Shield, Star, Users, X, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import SharedData = App.Data.SharedData;
 
 interface SubscriptionsProps {
     subscriptionProducts: App.Data.ProductData[];
@@ -330,6 +331,7 @@ function PricingCard({
 }
 
 export default function Subscriptions({ subscriptionProducts, subscriptionReviews, currentSubscription, portalUrl }: SubscriptionsProps) {
+    const { name: siteName, logoUrl } = usePage<SharedData>().props;
     const [billingCycle, setBillingCycle] = useState<App.Enums.SubscriptionInterval>('month');
     const [policiesAgreed, setPoliciesAgreed] = useState<Record<number, boolean>>({});
     const [expandedCards, setExpandedCards] = useState<Record<number, boolean>>({});
@@ -455,7 +457,13 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
 
     return (
         <AppLayout>
-            <Head title="Subscriptions" />
+            <Head title="Subscriptions">
+                <meta name="description" content="Select the perfect subscription plan for your needs. Upgrade or downgrade anytime" />
+                <meta property="og:title" content={`Subscriptions - ${siteName}`} />
+                <meta property="og:description" content="Select the perfect subscription plan for your needs. Upgrade or downgrade anytime" />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content={logoUrl} />
+            </Head>
 
             <div className="text-center">
                 <Heading title="Choose your plan" description="Select the perfect subscription plan for your needs. Upgrade or downgrade anytime." />

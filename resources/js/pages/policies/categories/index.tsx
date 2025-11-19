@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import AppLayout from '@/layouts/app-layout';
 import { pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { File, FileText, Folder } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -19,9 +19,18 @@ interface PoliciesIndexProps {
 }
 
 export default function PolicyCategoryIndex({ categories }: PoliciesIndexProps) {
+    const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Policies" />
+            <Head title="Policies">
+                <meta name="description" content="Browse our policies, terms of service, and legal documents" />
+                <meta property="og:title" content={`Policies - ${siteName}`} />
+                <meta property="og:description" content="Browse our policies, terms of service, and legal documents" />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content={logoUrl} />
+            </Head>
+
             <div className="flex h-full flex-1 flex-col overflow-x-auto">
                 <Heading title="Policies" description="Browse our policies, terms of service, and legal documents" />
                 <div className="grid gap-6 md:grid-cols-2">

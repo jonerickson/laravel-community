@@ -3,7 +3,7 @@ import Heading from '@/components/heading';
 import StoreIndexCategoriesItem from '@/components/store-index-categories-item';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { FolderIcon } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -22,9 +22,18 @@ interface StoreCategoriesIndexProps {
 }
 
 export default function StoreCategoriesIndex({ categories }: StoreCategoriesIndexProps) {
+    const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Store" />
+            <Head title="Store - Categories">
+                <meta name="description" content="Browse all product categories" />
+                <meta property="og:title" content={`Store - Categories - ${siteName}`} />
+                <meta property="og:description" content="Browse all product categories" />
+                <meta property="og:type" content="website" />
+                <meta property="og:image" content={logoUrl} />
+            </Head>
+
             <div className="flex h-full flex-1 flex-col gap-8 overflow-x-auto">
                 <Heading title="All product categories" description="Browse all product categories" />
 

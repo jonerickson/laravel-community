@@ -183,9 +183,9 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Forums - ${forum.name} - ${topic.title}`}>
+            <Head title={`${topic.title} - ${forum.name} - Forums`}>
                 <meta name="description" content={topic.description || `Discussion topic: ${topic.title}`} />
-                <meta property="og:title" content={`${topic.title} - ${forum.name} - Forums`} />
+                <meta property="og:title" content={`${topic.title} - ${forum.name} - Forums - ${siteName}`} />
                 <meta property="og:description" content={topic.description || `Discussion topic: ${topic.title}`} />
                 <meta property="og:type" content="article" />
                 <meta property="og:image" content={logoUrl} />
@@ -194,6 +194,7 @@ export default function ForumTopicShow({ forum, topic, posts, recentViewers }: T
                 <meta property="article:modified_time" content={topic.updatedAt || undefined} />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
+
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex flex-col items-start justify-between gap-2 sm:flex-row">
                     <div className="flex w-full items-center justify-between sm:items-start lg:items-center">

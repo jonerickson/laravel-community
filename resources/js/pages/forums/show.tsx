@@ -178,14 +178,15 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Forums - ${forum.name}`}>
+            <Head title={`${forum.name} - ${forum.category?.name} - Forums`}>
                 <meta name="description" content={forum.description || `Discussions and topics in ${forum.name}`} />
-                <meta property="og:title" content={`Forums - ${forum.name} - ${siteName}`} />
+                <meta property="og:title" content={`${forum.name} - ${forum.category?.name} - Forums - ${siteName}`} />
                 <meta property="og:description" content={forum.description || `Discussions and topics in ${forum.name}`} />
                 <meta property="og:type" content="website" />
                 <meta property="og:image" content={logoUrl} />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
+
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto">
                 <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start sm:gap-0">
                     <div className="flex items-start gap-4">

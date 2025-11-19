@@ -22,7 +22,7 @@ interface BlogShowProps {
 }
 
 export default function BlogShow({ post, comments, recentViewers }: BlogShowProps) {
-    const { name: siteName } = usePage<App.Data.SharedData>().props;
+    const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const pageDescription = post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, '') + '...';
     const { can } = usePermissions();
     const publishedDate = new Date(post.publishedAt || post.createdAt || new Date());
@@ -98,15 +98,14 @@ export default function BlogShow({ post, comments, recentViewers }: BlogShowProp
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head>
-                <title>{post.title}</title>
+            <Head title={`${post.title} - Blog`}>
                 <meta name="description" content={pageDescription} />
-                <meta property="og:title" content={post.title} />
+                <meta property="og:title" content={`${post.title} - Blog - ${siteName}`} />
                 <meta property="og:description" content={pageDescription} />
                 <meta property="og:type" content="article" />
-                {post.featuredImageUrl && <meta property="og:image" content={post.featuredImageUrl} />}
+                <meta property="og:image" content={post.featuredImageUrl || logoUrl} />
                 <meta property="article:published_time" content={post.publishedAt || post.createdAt || undefined} />
-                {post.author && <meta property="article:author" content={post.author.name} />}
+                <meta property="article:author" content={post.author.name} />
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </Head>
 
