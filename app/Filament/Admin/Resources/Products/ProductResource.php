@@ -26,6 +26,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Group as GroupSchema;
 use Filament\Schemas\Components\Section;
@@ -157,6 +158,20 @@ class ProductResource extends Resource
                     ]),
                 GroupSchema::make()
                     ->components([
+                        Section::make('Details')
+                            ->components([
+                                TextEntry::make('created_at')
+                                    ->label('Created')
+                                    ->since()
+                                    ->dateTimeTooltip(),
+                                TextEntry::make('updated_at')
+                                    ->label('Updated')
+                                    ->since()
+                                    ->dateTimeTooltip(),
+                                TextEntry::make('reference_id')
+                                    ->label('Reference ID')
+                                    ->copyable(),
+                            ]),
                         Section::make('Publishing')
                             ->components([
                                 Toggle::make('is_featured')

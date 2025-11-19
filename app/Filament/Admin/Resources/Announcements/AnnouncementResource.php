@@ -8,19 +8,18 @@ use App\Enums\AnnouncementType;
 use App\Filament\Admin\Resources\Announcements\Pages\CreateAnnouncement;
 use App\Filament\Admin\Resources\Announcements\Pages\EditAnnouncement;
 use App\Filament\Admin\Resources\Announcements\Pages\ListAnnouncements;
-use App\Filament\Admin\Resources\Announcements\Pages\ViewAnnouncement;
 use App\Models\Announcement;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
@@ -96,6 +95,17 @@ class AnnouncementResource extends Resource
                     ]),
                 Group::make()
                     ->schema([
+                        Section::make('Details')
+                            ->components([
+                                TextEntry::make('created_at')
+                                    ->label('Created')
+                                    ->since()
+                                    ->dateTimeTooltip(),
+                                TextEntry::make('updated_at')
+                                    ->label('Updated')
+                                    ->since()
+                                    ->dateTimeTooltip(),
+                            ]),
                         Section::make('Settings')
                             ->columnSpanFull()
                             ->schema([
@@ -188,7 +198,6 @@ class AnnouncementResource extends Resource
                     ),
             ])
             ->recordActions([
-                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -205,7 +214,6 @@ class AnnouncementResource extends Resource
         return [
             'index' => ListAnnouncements::route('/'),
             'create' => CreateAnnouncement::route('/create'),
-            'view' => ViewAnnouncement::route('/{record}'),
             'edit' => EditAnnouncement::route('/{record}/edit'),
         ];
     }

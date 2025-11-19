@@ -13,10 +13,12 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
@@ -65,6 +67,17 @@ class TopicResource extends Resource
                     ]),
                 Group::make()
                     ->schema([
+                        Section::make('Details')
+                            ->components([
+                                TextEntry::make('created_at')
+                                    ->label('Created')
+                                    ->since()
+                                    ->dateTimeTooltip(),
+                                TextEntry::make('updated_at')
+                                    ->label('Updated')
+                                    ->since()
+                                    ->dateTimeTooltip(),
+                            ]),
                         Section::make('Publishing')
                             ->columns(1)
                             ->schema([
@@ -152,6 +165,11 @@ class TopicResource extends Resource
                     ->label('Pinned'),
             ])
             ->recordActions([
+                ViewAction::make()
+                    ->url(fn (Topic $record): string => route('forums.topics.show', [
+                        'forum' => $record->forum,
+                        'topic' => $record,
+                    ])),
                 EditAction::make(),
                 DeleteAction::make()
                     ->modalDescription('Are you sure you would like to do this? This will delete all posts in the topic as well.'),

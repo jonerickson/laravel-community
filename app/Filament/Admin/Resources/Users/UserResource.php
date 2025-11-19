@@ -160,19 +160,18 @@ class UserResource extends Resource
                                 Group::make()
                                     ->components([
                                         Section::make('Details')
-                                            ->collapsible()
-                                            ->persistCollapsed()
                                             ->components([
                                                 TextEntry::make('created_at')
                                                     ->label('Created')
-                                                    ->dateTime()
                                                     ->since()
                                                     ->dateTimeTooltip(),
                                                 TextEntry::make('updated_at')
                                                     ->label('Updated')
-                                                    ->dateTime()
                                                     ->since()
                                                     ->dateTimeTooltip(),
+                                                TextEntry::make('reference_id')
+                                                    ->label('Reference ID')
+                                                    ->copyable(),
                                             ]),
                                         Section::make('Permissions')
                                             ->visible(fn () => Auth::user()->hasRole(\App\Enums\Role::Administrator))

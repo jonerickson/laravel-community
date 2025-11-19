@@ -23,6 +23,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Group as GroupSchema;
 use Filament\Schemas\Components\Section;
@@ -89,6 +90,17 @@ class GroupResource extends Resource
                     ]),
                 GroupSchema::make()
                     ->components([
+                        Section::make('Details')
+                            ->components([
+                                TextEntry::make('created_at')
+                                    ->label('Created')
+                                    ->since()
+                                    ->dateTimeTooltip(),
+                                TextEntry::make('updated_at')
+                                    ->label('Updated')
+                                    ->since()
+                                    ->dateTimeTooltip(),
+                            ]),
                         Section::make('Permissions')
                             ->collapsible()
                             ->persistCollapsed()

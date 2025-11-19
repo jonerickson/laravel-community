@@ -17,7 +17,7 @@ class OrderInfolist
             ->components([
                 Section::make('Order Information')
                     ->columnSpanFull()
-                    ->columns()
+                    ->columns(4)
                     ->schema([
                         TextEntry::make('reference_id')
                             ->label('Order Number')
@@ -25,6 +25,14 @@ class OrderInfolist
                         TextEntry::make('invoice_number')
                             ->label('Invoice Number')
                             ->default(new HtmlString('&mdash;')),
+                        TextEntry::make('created_at')
+                            ->label('Created')
+                            ->since()
+                            ->dateTimeTooltip(),
+                        TextEntry::make('updated_at')
+                            ->label('Updated')
+                            ->since()
+                            ->dateTimeTooltip(),
                         TextEntry::make('user.name')
                             ->label('User'),
                         TextEntry::make('status')

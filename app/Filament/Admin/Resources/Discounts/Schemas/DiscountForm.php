@@ -113,6 +113,20 @@ class DiscountForm
                     ]),
                 Group::make()
                     ->components([
+                        Section::make('Details')
+                            ->components([
+                                TextEntry::make('created_at')
+                                    ->label('Created')
+                                    ->since()
+                                    ->dateTimeTooltip(),
+                                TextEntry::make('updated_at')
+                                    ->label('Updated')
+                                    ->since()
+                                    ->dateTimeTooltip(),
+                                TextEntry::make('reference_id')
+                                    ->label('Reference ID')
+                                    ->copyable(),
+                            ]),
                         Section::make('Associations')
                             ->components([
                                 Select::make('user_id')

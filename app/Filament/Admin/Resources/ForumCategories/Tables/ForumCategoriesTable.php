@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\ForumCategories\Tables;
 
+use App\Models\ForumCategory;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -71,6 +73,10 @@ class ForumCategoriesTable
                     ->searchable(),
             ])
             ->recordActions([
+                ViewAction::make()
+                    ->url(fn (ForumCategory $record): string => route('forums.categories.show', [
+                        'category' => $record,
+                    ])),
                 EditAction::make(),
                 DeleteAction::make(),
             ])

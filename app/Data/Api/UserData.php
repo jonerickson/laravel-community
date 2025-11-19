@@ -65,6 +65,7 @@ class UserData extends Data
                 'id' => $user->getKey(),
                 'name' => $subscription->product?->name,
                 'status' => $subscription->status,
+                'product_reference_id' => $subscription->product?->referenceId,
                 'created_at' => $subscription->createdAt,
                 'updated_at' => $subscription->updatedAt,
                 'ends_at' => $subscription->endsAt,

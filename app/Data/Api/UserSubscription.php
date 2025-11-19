@@ -32,6 +32,9 @@ class UserSubscription extends Data
     #[ApiProperty(property: 'status', serialize: new Groups(['user']))]
     public SubscriptionStatus $status;
 
+    #[ApiProperty(property: 'productReferenceId', serialize: new Groups(['user']))]
+    public ?string $product_reference_id = null;
+
     #[ApiProperty(property: 'createdAt', serialize: new Groups(['user']))]
     public ?CarbonImmutable $created_at = null;
 

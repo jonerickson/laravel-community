@@ -11,18 +11,21 @@ use App\Filament\Admin\Resources\Forums\RelationManagers\TopicsRelationManager;
 use App\Models\Forum;
 use App\Models\Group as GroupModel;
 use BackedEnum;
-use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Group as GroupSchema;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
@@ -51,69 +54,96 @@ class ForumResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(3)
             ->components([
-                Section::make('Forum Information')
-                    ->columnSpanFull()
-                    ->columns()
+                GroupSchema::make()
+                    ->columnSpan(['lg' => 2])
                     ->schema([
-                        TextInput::make('name')
-                            ->helperText('The name of the forum.')
-                            ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $context, $state, Set $set): mixed => $context === 'create' ? $set('slug', Str::slug($state)) : null),
-                        TextInput::make('slug')
-                            ->disabledOn('edit')
-                            ->required()
-                            ->maxLength(255)
-                            ->helperText('A SEO friendly title.')
-                            ->unique(ignoreRecord: true)
-                            ->rules(['alpha_dash']),
-                        Select::make('category_id')
-                            ->required()
-                            ->searchable()
+                        Section::make('Forum Information')
                             ->columnSpanFull()
-                            ->preload()
-                            ->relationship('category', 'name'),
-                        Select::make('parent_id')
-                            ->label('Parent Forum')
-                            ->relationship('parent', 'name')
-                            ->columnSpanFull()
-                            ->nullable()
-                            ->preload()
-                            ->searchable()
-                            ->helperText('Optional parent forum to create a subforum.'),
-                        Textarea::make('description')
-                            ->helperText('A helpful description on what the forum is about.')
-                            ->columnSpanFull()
-                            ->maxLength(65535)
-                            ->rows(3),
-                        RichEditor::make('rules')
-                            ->columnSpanFull()
-                            ->nullable()
-                            ->helperText('Optional rules to display at the top of the forum.'),
-                        TextInput::make('icon')
-                            ->maxLength(255)
-                            ->helperText('Icon class or emoji.'),
-                        ColorPicker::make('color')
-                            ->required()
-                            ->default('#3b82f6'),
+                            ->columns()
+                            ->schema([
+                                TextInput::make('name')
+                                    ->helperText('The name of the forum.')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(fn (string $context, $state, Set $set): mixed => $context === 'create' ? $set('slug', Str::slug($state)) : null),
+                                TextInput::make('slug')
+                                    ->disabledOn('edit')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->helperText('A SEO friendly title.')
+                                    ->unique(ignoreRecord: true)
+                                    ->rules(['alpha_dash']),
+                                Select::make('category_id')
+                                    ->required()
+                                    ->searchable()
+                                    ->columnSpanFull()
+                                    ->preload()
+                                    ->relationship('category', 'name'),
+                                Select::make('parent_id')
+                                    ->label('Parent Forum')
+                                    ->relationship('parent', 'name')
+                                    ->columnSpanFull()
+                                    ->nullable()
+                                    ->preload()
+                                    ->searchable()
+                                    ->helperText('Optional parent forum to create a subforum.'),
+                                Textarea::make('description')
+                                    ->helperText('A helpful description on what the forum is about.')
+                                    ->columnSpanFull()
+                                    ->maxLength(65535)
+                                    ->rows(3),
+                                RichEditor::make('rules')
+                                    ->columnSpanFull()
+                                    ->nullable()
+                                    ->helperText('Optional rules to display at the top of the forum.'),
+                                TextInput::make('icon')
+                                    ->maxLength(255)
+                                    ->helperText('Icon class or emoji.'),
+                                ColorPicker::make('color')
+                                    ->required()
+                                    ->default('#3b82f6'),
+                            ]),
                     ]),
-                Section::make('Permissions')
-                    ->columnSpanFull()
+                GroupSchema::make()
                     ->schema([
-                        Select::make('groups')
-                            ->default(fn (): Collection => collect([
-                                ...GroupModel::query()->defaultGuestGroups()->pluck('id'),
-                                ...GroupModel::query()->defaultMemberGroups()->pluck('id'),
-                            ]))
-                            ->relationship('groups', 'name')
-                            ->preload()
-                            ->searchable()
-                            ->multiple()
-                            ->helperText('The groups that are allowed to view this forum.'),
+                        Section::make('Details')
+                            ->components([
+                                TextEntry::make('created_at')
+                                    ->label('Created')
+                                    ->since()
+                                    ->dateTimeTooltip(),
+                                TextEntry::make('updated_at')
+                                    ->label('Updated')
+                                    ->since()
+                                    ->dateTimeTooltip(),
+                            ]),
+                        Section::make('Publishing')
+                            ->schema([
+                                Toggle::make('is_active')
+                                    ->label('Active')
+                                    ->helperText('Allow the forum to be accessed.')
+                                    ->default(true),
+                            ]),
+                        Section::make('Permissions')
+                            ->columnSpanFull()
+                            ->schema([
+                                Select::make('groups')
+                                    ->default(fn (): Collection => collect([
+                                        ...GroupModel::query()->defaultGuestGroups()->pluck('id'),
+                                        ...GroupModel::query()->defaultMemberGroups()->pluck('id'),
+                                    ]))
+                                    ->relationship('groups', 'name')
+                                    ->preload()
+                                    ->searchable()
+                                    ->multiple()
+                                    ->helperText('The groups that are allowed to view this forum.'),
+                            ]),
                     ]),
             ]);
+
     }
 
     #[Override]
@@ -183,11 +213,8 @@ class ForumResource extends Resource
                     ->titlePrefixedWithLabel(false),
             ])
             ->recordActions([
-                Action::make('view')
-                    ->label('View')
-                    ->icon('heroicon-o-eye')
-                    ->url(fn (Forum $record): string => route('forums.show', $record))
-                    ->openUrlInNewTab(),
+                ViewAction::make('view')
+                    ->url(fn (Forum $record): string => route('forums.show', $record)),
                 EditAction::make(),
                 DeleteAction::make()
                     ->modalDescription('Are you sure you would like to do this? This will delete all topics and posts in the forum as well.'),
