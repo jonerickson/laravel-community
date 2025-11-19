@@ -12,7 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { cn, currency } from '@/lib/utils';
 import { Head, useForm } from '@inertiajs/react';
-import { Calendar, FileText, Loader2, MessageSquare, Search as SearchIcon, Shield, ShoppingBag, User } from 'lucide-react';
+import { Calendar, FileText, LoaderCircle, MessageSquare, Search as SearchIcon, Shield, ShoppingBag, User } from 'lucide-react';
 import { FormEvent, useEffect } from 'react';
 
 interface SearchResult {
@@ -299,7 +299,7 @@ export default function Search({ results, query: initialQuery, filters: initialF
                             />
                             {processing && data.q.length > 0 && (
                                 <div className="absolute top-1/2 right-3 -translate-y-1/2">
-                                    <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                                    <LoaderCircle className="size-4 animate-spin text-muted-foreground" />
                                 </div>
                             )}
                         </form>

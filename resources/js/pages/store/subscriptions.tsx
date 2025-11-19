@@ -11,7 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { cn, currency } from '@/lib/utils';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { AlertCircle, Check, ChevronDown, Crown, Package, RefreshCw, Rocket, Shield, Star, Users, X, Zap } from 'lucide-react';
+import { AlertCircle, Check, ChevronDown, Crown, LoaderCircle, Package, RefreshCw, Rocket, Shield, Star, Users, X, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -269,7 +269,7 @@ function PricingCard({
                                         >
                                             {isContinuing ? (
                                                 <>
-                                                    <div className="mr-2 size-4 animate-spin rounded-full border-2 border-current border-b-transparent" />
+                                                    <LoaderCircle className="size-4 animate-spin" />
                                                     Continuing...
                                                 </>
                                             ) : (
@@ -289,7 +289,7 @@ function PricingCard({
                                         >
                                             {isCancelling ? (
                                                 <>
-                                                    <div className="mr-2 size-4 animate-spin rounded-full border-2 border-current border-b-transparent" />
+                                                    <LoaderCircle className="size-4 animate-spin" />
                                                     Cancelling...
                                                 </>
                                             ) : (
@@ -311,7 +311,7 @@ function PricingCard({
                         >
                             {isSubscribing ? (
                                 <>
-                                    <div className="mr-2 size-4 animate-spin rounded-full border-2 border-current border-b-transparent" />
+                                    <LoaderCircle className="size-4 animate-spin" />
                                     Processing...
                                 </>
                             ) : plan.policies && plan.policies.length > 0 && !policiesAgreed[plan.id] ? (

@@ -42,7 +42,7 @@ export function CustomFieldStep({ fields, data, errors, processing, onChange, on
                     <p className="text-sm text-muted-foreground">
                         <strong className="font-medium text-foreground">No profile fields</strong>
                         <br />
-                        There are not custom profile fields that need attention at this time.
+                        There are no custom profile fields that need your attention at this time.
                     </p>
                 </div>
             )}

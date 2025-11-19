@@ -61,7 +61,7 @@ class ApiTokenResource extends Resource
                             ->required(),
                         DateTimePicker::make('expires_at')
                             ->label('Expires')
-                            ->helperText('Leave empty for tokens that never expire'),
+                            ->helperText('Leave empty to automatically set expiration date to 1 year.'),
                     ]),
             ]);
     }
