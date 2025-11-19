@@ -197,10 +197,7 @@ class UserSubscriptionImporter extends AbstractImporter
         $order = $this->createOrder($user, $price);
 
         if (! $config->isDryRun) {
-            $backdateStartDate = isset($sourceUserSubscription->sub_start)
-                ? Carbon::parse($sourceUserSubscription->sub_start)
-                : now();
-
+            $backdateStartDate = $this->getStartDate($sourceUserSubscription);
             $billingCycleAnchor = $this->getExpirationDate($sourceUserSubscription);
 
             if (is_null($billingCycleAnchor) || ($billingCycleAnchor instanceof CarbonInterface && $billingCycleAnchor->isPast())) {
@@ -308,8 +305,8 @@ class UserSubscriptionImporter extends AbstractImporter
         ]);
 
         $order->items()->create([
-            'name' => 'Website Migration',
-            'description' => 'This order was created automatically to transfer your subscription to a new platform.',
+            'name' => $price->product->name.' - Website Migration',
+            'description' => 'This order was created automatically to transfer your subscription to a new platform. Your renewal schedule will remain the same. If you do not have a payment method on file, an invoice will be generated for you at the next regularly scheduled renewal date.',
             'price_id' => $price->id,
             'amount' => 0,
             'quantity' => 1,
@@ -318,19 +315,40 @@ class UserSubscriptionImporter extends AbstractImporter
         return $order;
     }
 
+    protected function getStartDate(object $sourceUserSubscription): ?CarbonInterface
+    {
+        if (isset($sourceUserSubscription->sub_purchase_id)) {
+            $sourcePurchase = DB::connection($this->source->getConnection())
+                ->table('nexus_purchases')
+                ->where('ps_id', $sourceUserSubscription->sub_purchase_id)
+                ->first();
+
+            if ($sourcePurchase && isset($sourcePurchase->ps_start) && is_numeric($sourcePurchase->ps_start)) {
+                return Carbon::parse($sourcePurchase->ps_start);
+            }
+        }
+
+        return isset($sourceUserSubscription->ps_start)
+            ? Carbon::parse($sourceUserSubscription->ps_start)
+            : null;
+    }
+
     protected function getExpirationDate(object $sourceUserSubscription): ?CarbonInterface
     {
-        $expirationDate = $sourceUserSubscription->sub_expire;
-
-        if (isset($sourceUserSubscription->sub_purchase_id) && isset($expirationDate) && is_numeric($expirationDate)) {
-            $sourcePurchase = DB::connection($this->source->getConnection())->table('nexus_purchases')->where('ps_id', $sourceUserSubscription->sub_purchase_id)->first();
+        if (isset($sourceUserSubscription->sub_purchase_id)) {
+            $sourcePurchase = DB::connection($this->source->getConnection())
+                ->table('nexus_purchases')
+                ->where('ps_id', $sourceUserSubscription->sub_purchase_id)
+                ->first();
 
             if ($sourcePurchase && isset($sourcePurchase->ps_expire) && is_numeric($sourcePurchase->ps_expire)) {
                 return Carbon::parse($sourcePurchase->ps_expire);
             }
         }
 
-        return isset($expirationDate) ? Carbon::parse($expirationDate) : null;
+        return isset($sourceUserSubscription->sub_expire)
+            ? Carbon::parse($sourceUserSubscription->sub_expire)
+            : null;
     }
 
     protected function setStripeCustomerId(User $user, int $memberId, MigrationConfig $config): void
