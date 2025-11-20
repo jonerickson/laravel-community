@@ -36,6 +36,7 @@ class CategoryController extends Controller
             ->with(['forums' => function (HasMany|Forum $query): void {
                 $query
                     ->whereNull('parent_id')
+                    ->withCount(['topics', 'posts'])
                     ->active()
                     ->ordered()
                     ->with(['latestTopics' => function (HasMany|Topic $subQuery): void {
