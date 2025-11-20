@@ -12,11 +12,11 @@ use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -24,7 +24,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Passport\Token;
 use Override;
 use UnitEnum;
@@ -45,24 +44,23 @@ class ApiTokenResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(1)
             ->components([
-                Section::make('API Key Information')
-                    ->columnSpanFull()
-                    ->schema([
-                        TextInput::make('name')
-                            ->required()
-                            ->maxLength(255),
-                        Select::make('tokenable_id')
-                            ->disabledOn('edit')
-                            ->options(User::query()->role(Role::Administrator)->orderBy('name')->pluck('name', 'id'))
-                            ->preload()
-                            ->label('User')
-                            ->searchable()
-                            ->required(),
-                        DateTimePicker::make('expires_at')
-                            ->label('Expires')
-                            ->helperText('Leave empty to automatically set expiration date to 1 year.'),
-                    ]),
+                TextInput::make('name')
+                    ->required()
+                    ->maxLength(255),
+                Select::make('tokenable_id')
+                    ->visibleOn('create')
+                    ->disabledOn('edit')
+                    ->options(User::query()->role(Role::Administrator)->orderBy('name')->pluck('name', 'id'))
+                    ->preload()
+                    ->label('User')
+                    ->searchable()
+                    ->required(),
+                DateTimePicker::make('expires_at')
+                    ->visibleOn('create')
+                    ->label('Expires')
+                    ->helperText('Leave empty to automatically set expiration date to 1 year.'),
             ]);
     }
 
@@ -108,6 +106,7 @@ class ApiTokenResource extends Resource
                     ),
             ])
             ->recordActions([
+                EditAction::make(),
                 DeleteAction::make()
                     ->label('Revoke')
                     ->modalHeading('Revoke API Token')
@@ -132,10 +131,5 @@ class ApiTokenResource extends Resource
             'index' => ListApiTokens::route('/'),
             'create' => CreateApiToken::route('/create'),
         ];
-    }
-
-    public static function canEdit(Model $record): bool
-    {
-        return false;
     }
 }
