@@ -23,7 +23,7 @@ class SubscriptionController
 
         if (! $order instanceof Order) {
             return back()
-                ->with('message', 'Unable to checkout. Please try again later.')
+                ->with('message', 'We were unable to start your subscription. Please try again later.')
                 ->with('messageVariant', 'error');
         }
 
@@ -39,7 +39,7 @@ class SubscriptionController
 
         if (! $checkoutUrl) {
             return back()
-                ->with('message', 'Unable to checkout. Please try again later.')
+                ->with('message', 'We were unable to start your subscription. Please try again later.')
                 ->with('messageVariant', 'error');
         }
 

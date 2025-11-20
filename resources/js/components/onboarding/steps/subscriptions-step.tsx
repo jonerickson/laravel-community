@@ -56,11 +56,7 @@ export function SubscriptionsStep({
             ) : subscriptions.length > 0 ? (
                 <div className="grid grid-cols-1 gap-4">
                     {subscriptions.map((subscription) => {
-                        const defaultPrice = subscription.prices.find((price: App.Data.PriceData) => price.isDefault) ||
-                            subscription.prices[0] || {
-                                amount: 0,
-                                interval: 'month',
-                            };
+                        const defaultPrice = subscription.prices.find((price: App.Data.PriceData) => price.isDefault) || subscription.prices[0];
 
                         return (
                             <Card key={subscription.id}>
@@ -81,8 +77,8 @@ export function SubscriptionsStep({
                                 <CardFooter>
                                     <Button
                                         type="button"
-                                        onClick={() => handleSelectPlan(subscription.id, subscription.defaultPrice?.id ?? 0)}
-                                        disabled={processing || !subscription.defaultPrice}
+                                        onClick={() => handleSelectPlan(subscription.id, defaultPrice?.id ?? 0)}
+                                        disabled={processing || !defaultPrice}
                                         className="w-full"
                                     >
                                         {processing && processingSubscriptionId === subscription.id ? (
@@ -90,7 +86,7 @@ export function SubscriptionsStep({
                                                 <LoaderCircle className="size-4 animate-spin" />
                                                 Processing...
                                             </>
-                                        ) : !subscription.defaultPrice ? (
+                                        ) : !defaultPrice ? (
                                             'Not available'
                                         ) : (
                                             'Choose plan'
