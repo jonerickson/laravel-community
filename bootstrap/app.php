@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Exceptions\BannedException;
+use App\Http\Middleware\AddSentryContext;
 use App\Http\Middleware\CheckBannedUser;
 use App\Http\Middleware\EnsureAccountHasEmail;
 use App\Http\Middleware\EnsureAccountHasPassword;
@@ -18,6 +19,7 @@ use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Laravel\Passport\Http\Middleware\CreateFreshApiToken;
+use Sentry\Laravel\Integration;
 use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -43,6 +45,10 @@ return Application::configure(basePath: dirname(__DIR__))
             AddQueuedCookiesToResponse::class,
         ]);
 
+        $middleware->append([
+            AddSentryContext::class,
+        ]);
+
         $middleware->alias([
             'password' => EnsureAccountHasPassword::class,
             'email' => EnsureAccountHasEmail::class,
@@ -60,7 +66,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToPriorityList(EnsureEmailIsVerified::class, EnsureAccountHasEmail::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        Integration::handles($exceptions);
+
         $exceptions->shouldRenderJsonWhen(fn (Request $request) => $request->is('api/*'));
+
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
             if ($request->expectsJson()) {
                 return $response;

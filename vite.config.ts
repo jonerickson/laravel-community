@@ -1,32 +1,52 @@
+import { sentryVitePlugin } from '@sentry/vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import laravel from 'laravel-vite-plugin';
 import { resolve } from 'node:path';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 
-export default defineConfig({
-    plugins: [
-        laravel({
-            input: [
-                'resources/css/app.css',
-                'resources/js/app.tsx',
-                'resources/css/filament/admin/theme.css',
-                'resources/css/filament/marketplace/theme.css'
-            ],
-            ssr: 'resources/js/ssr.tsx',
-            refresh: true,
-        }),
-        react(),
-        tailwindcss(),
-        ViteImageOptimizer(),
-    ],
-    esbuild: {
-        jsx: 'automatic',
-    },
-    resolve: {
-        alias: {
-            'ziggy-js': resolve(__dirname, 'vendor/tightenco/ziggy'),
+export default defineConfig(({ mode }) => {
+    const env = loadEnv(mode, process.cwd())
+
+    return {
+        plugins: [
+            laravel({
+                input: [
+                    'resources/css/app.css',
+                    'resources/js/app.tsx',
+                    'resources/css/filament/admin/theme.css',
+                    'resources/css/filament/marketplace/theme.css',
+                ],
+                ssr: 'resources/js/ssr.tsx',
+                refresh: true,
+            }),
+            react(),
+            tailwindcss(),
+            ViteImageOptimizer(),
+            ...(env.VITE_SENTRY_AUTH_TOKEN
+                ? [
+                    sentryVitePlugin({
+                        org: env.VITE_SENTRY_ORG,
+                        project: env.VITE_SENTRY_REACT_PROJECT,
+                        authToken: env.VITE_SENTRY_AUTH_TOKEN,
+                    }),
+                ]
+                : []),
+        ],
+
+        esbuild: {
+            jsx: 'automatic',
         },
-    },
+
+        resolve: {
+            alias: {
+                'ziggy-js': resolve(__dirname, 'vendor/tightenco/ziggy'),
+            },
+        },
+
+        build: {
+            sourcemap: 'hidden',
+        },
+    }
 });
