@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\ApiTokens;
 
 use App\Enums\Role;
-use App\Filament\Admin\Resources\ApiTokens\Pages\CreateApiToken;
 use App\Filament\Admin\Resources\ApiTokens\Pages\ListApiTokens;
 use App\Models\User;
 use BackedEnum;
@@ -129,7 +128,6 @@ class ApiTokenResource extends Resource
     {
         return [
             'index' => ListApiTokens::route('/'),
-            'create' => CreateApiToken::route('/create'),
         ];
     }
 }

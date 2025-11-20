@@ -15,6 +15,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -71,6 +72,21 @@ class AdminPanelProvider extends PanelProvider
             ->maxContentWidth(Width::Full)
             ->sidebarCollapsibleOnDesktop()
             ->darkMode()
-            ->viteTheme('resources/css/filament/admin/theme.css');
+            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->renderHook(PanelsRenderHook::HEAD_END, fn (): string => <<<'HTML'
+<script>
+    window.addEventListener('copy-to-clipboard', event => {
+        navigator.clipboard.writeText(event.detail.text)
+            .then(() => {
+                new FilamentNotification()
+                    .success()
+                    .title('The item has been successfully copied.')
+                    .send()
+            })
+            .catch(err => console.error('Clipboard error:', err));
+    });
+</script>
+HTML
+            );
     }
 }
