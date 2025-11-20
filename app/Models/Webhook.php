@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Enums\WebhookMethod;
+use App\Enums\HttpMethod;
+use App\Traits\Loggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,14 +13,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $event
  * @property string $url
- * @property WebhookMethod $method
+ * @property HttpMethod $method
  * @property array<array-key, mixed>|null $headers
- * @property string|null $resource_type
- * @property int|null $resource_id
  * @property array<array-key, mixed>|null $payload
  * @property string $secret
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Log> $logs
+ * @property-read int|null $logs_count
  *
  * @method static \Database\Factories\WebhookFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook newModelQuery()
@@ -31,8 +32,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereMethod($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook wherePayload($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereResourceId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereResourceType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereSecret($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Webhook whereUrl($value)
@@ -42,6 +41,7 @@ use Illuminate\Database\Eloquent\Model;
 class Webhook extends Model
 {
     use HasFactory;
+    use Loggable;
 
     protected $fillable = [
         'event',
@@ -55,7 +55,7 @@ class Webhook extends Model
     protected function casts(): array
     {
         return [
-            'method' => WebhookMethod::class,
+            'method' => HttpMethod::class,
             'headers' => 'json',
             'payload' => 'json',
             'secret' => 'encrypted',

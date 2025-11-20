@@ -9,7 +9,6 @@ use App\Filament\Admin\Resources\Posts\Pages\CreatePost;
 use App\Filament\Admin\Resources\Posts\Pages\EditPost;
 use App\Filament\Admin\Resources\Posts\Pages\ListPosts;
 use App\Filament\Admin\Resources\Posts\RelationManagers\CommentsRelationManager;
-use App\Filament\Admin\Resources\Posts\Widgets\PostStatsOverview;
 use App\Models\Post;
 use BackedEnum;
 use Filament\Actions\BulkAction;
@@ -49,14 +48,6 @@ class PostResource extends Resource
     protected static ?string $model = Post::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
-
-    #[Override]
-    public static function getWidgets(): array
-    {
-        return [
-            PostStatsOverview::make(),
-        ];
-    }
 
     #[Override]
     public static function form(Schema $schema): Schema

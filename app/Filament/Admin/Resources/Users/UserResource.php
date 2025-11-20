@@ -68,15 +68,6 @@ class UserResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     #[Override]
-    public static function getWidgets(): array
-    {
-        return [
-            UserStatsOverview::make(),
-            RegistrationsTable::make(),
-        ];
-    }
-
-    #[Override]
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -488,6 +479,15 @@ class UserResource extends Resource
             'index' => ListUsers::route('/'),
             'create' => CreateUser::route('/create'),
             'edit' => EditUser::route('/{record}/edit'),
+        ];
+    }
+
+    #[Override]
+    public static function getWidgets(): array
+    {
+        return [
+            UserStatsOverview::make(),
+            RegistrationsTable::make(),
         ];
     }
 }

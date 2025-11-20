@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Webhooks\Schemas;
 
-use App\Enums\WebhookMethod;
+use App\Enums\HttpMethod;
 use App\Events\SubscriptionCreated;
 use App\Events\SubscriptionDeleted;
 use App\Facades\ExpressionLanguage;
@@ -45,8 +45,8 @@ class WebhookForm
                             ->columnSpanFull(),
                         Select::make('method')
                             ->helperText('The HTTP method that the webhook will be sent with.')
-                            ->default(WebhookMethod::Post)
-                            ->options(WebhookMethod::class)
+                            ->default(HttpMethod::Post)
+                            ->options(HttpMethod::class)
                             ->required()
                             ->columnSpanFull(),
                         KeyValue::make('headers')

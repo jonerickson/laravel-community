@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Webhooks\Tables;
 
-use App\Enums\WebhookMethod;
+use App\Enums\HttpMethod;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -42,7 +42,7 @@ class WebhooksTable
             ])
             ->filters([
                 SelectFilter::make('method')
-                    ->options(WebhookMethod::class),
+                    ->options(HttpMethod::class),
             ])
             ->recordActions([
                 EditAction::make(),

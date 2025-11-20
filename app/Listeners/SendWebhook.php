@@ -21,6 +21,10 @@ class SendWebhook implements ShouldQueue
     public function handle(SubscriptionCreated|SubscriptionDeleted $event): void
     {
         Webhook::query()->whereEvent($event::class)->each(function (Webhook $webhook) use ($event): void {
+            if (blank($webhook->payload)) {
+                return;
+            }
+
             $payload = ExpressionLanguage::evaluate($webhook->payload, [
                 'event' => $event,
             ]);
@@ -28,6 +32,13 @@ class SendWebhook implements ShouldQueue
             if (is_null($payload) || $payload === []) {
                 return;
             }
+
+            $webhook->logs()->create([
+                'endpoint' => $webhook->url,
+                'method' => $webhook->method->value,
+                'request_body' => $payload,
+                'request_headers' => $webhook->headers,
+            ]);
 
             WebhookCall::create()
                 ->url($webhook->url)
