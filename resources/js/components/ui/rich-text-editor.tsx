@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { useApiRequest } from '@/hooks/use-api-request';
 import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
 import Image from '@tiptap/extension-image';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -27,6 +28,7 @@ import {
     Link as LinkIcon,
     List,
     ListOrdered,
+    Loader2,
     MoreHorizontal,
     Quote,
     Redo,
@@ -36,6 +38,7 @@ import {
     Undo,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { route } from 'ziggy-js';
 
 const ResizableImage = Image.extend({
     addAttributes() {
@@ -255,6 +258,7 @@ function ImageDialog({ editor, isOpen, onOpenChange }: ImageDialogProps) {
     const [imageUrl, setImageUrl] = useState('');
     const [altText, setAltText] = useState('');
     const [file, setFile] = useState<File | null>(null);
+    const { loading, execute } = useApiRequest<App.Data.FileData>();
 
     useEffect(() => {
         if (isOpen) {
@@ -272,25 +276,38 @@ function ImageDialog({ editor, isOpen, onOpenChange }: ImageDialogProps) {
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!editor) return;
 
         if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const dataUrl = event.target?.result as string;
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('visibility', 'public');
+
+            const response = await execute({
+                url: route('api.file.store'),
+                method: 'POST',
+                data: formData,
+                config: {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                },
+            });
+
+            if (response?.url) {
                 editor
                     .chain()
                     .focus()
                     .setImage({
-                        src: dataUrl,
+                        src: response.url,
                         alt: altText || file.name,
                     })
                     .run();
-            };
-            reader.readAsDataURL(file);
+                onOpenChange(false);
+            }
         } else if (imageUrl) {
             editor
                 .chain()
@@ -300,9 +317,8 @@ function ImageDialog({ editor, isOpen, onOpenChange }: ImageDialogProps) {
                     alt: altText || 'Image',
                 })
                 .run();
+            onOpenChange(false);
         }
-
-        onOpenChange(false);
     };
 
     return (
@@ -313,8 +329,8 @@ function ImageDialog({ editor, isOpen, onOpenChange }: ImageDialogProps) {
                 </DialogHeader>
                 <div className="grid gap-4 pb-4">
                     <div className="grid gap-2">
-                        <label className="text-sm font-medium">Upload Image</label>
-                        <Input type="file" accept="image/*" onChange={handleFileChange} />
+                        <label className="text-sm font-medium">Upload image</label>
+                        <Input type="file" accept="image/*" onChange={handleFileChange} disabled={loading} />
                     </div>
                     <div className="text-center text-sm text-muted-foreground">or</div>
                     <div className="grid gap-2">
@@ -323,20 +339,21 @@ function ImageDialog({ editor, isOpen, onOpenChange }: ImageDialogProps) {
                             value={imageUrl}
                             onChange={(e) => setImageUrl(e.target.value)}
                             placeholder="https://example.com/image.jpg"
-                            disabled={!!file}
+                            disabled={!!file || loading}
                         />
                     </div>
                     <div className="grid gap-2">
-                        <label className="text-sm font-medium">Alt Text (Optional)</label>
-                        <Input value={altText} onChange={(e) => setAltText(e.target.value)} placeholder="Describe the image" />
+                        <label className="text-sm font-medium">Alt text (optional)</label>
+                        <Input value={altText} onChange={(e) => setAltText(e.target.value)} placeholder="Describe the image" disabled={loading} />
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                    <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
                         Cancel
                     </Button>
-                    <Button type="button" onClick={handleSubmit} disabled={!file && !imageUrl}>
-                        Insert Image
+                    <Button type="button" onClick={handleSubmit} disabled={(!file && !imageUrl) || loading}>
+                        {loading && <Loader2 className="mr-2 size-4 animate-spin" />}
+                        {loading ? 'Uploading...' : 'Insert image'}
                     </Button>
                 </DialogFooter>
             </DialogContent>

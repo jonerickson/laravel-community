@@ -24792,6 +24792,10 @@ namespace App\Http\Requests\Api\Frontend {
             }
     /**
      */
+    class StoreFileRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
+    /**
+     */
     class StoreFollowRequest extends \Illuminate\Foundation\Http\FormRequest {
             }
     /**

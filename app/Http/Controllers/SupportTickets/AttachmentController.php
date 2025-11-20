@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\SupportTickets;
 
+use App\Enums\FileVisibility;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SupportTickets\StoreSupportTicketAttachmentRequest;
 use App\Models\File;
@@ -29,6 +30,7 @@ class AttachmentController extends Controller
             'name' => $file->getClientOriginalName(),
             'filename' => $file->getClientOriginalName(),
             'path' => $path,
+            'visibility' => FileVisibility::Private,
         ]);
 
         return to_route('support.show', $ticket->reference_id)

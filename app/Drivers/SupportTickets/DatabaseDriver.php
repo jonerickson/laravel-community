@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Drivers\SupportTickets;
 
 use App\Contracts\SupportTicketProvider;
+use App\Enums\FileVisibility;
 use App\Enums\SupportTicketStatus;
 use App\Models\Comment;
 use App\Models\SupportTicket;
@@ -172,6 +173,7 @@ class DatabaseDriver implements SupportTicketProvider
                 'filename' => $filename,
                 'mime' => mime_content_type($filePath) ?: 'application/octet-stream',
                 'size' => filesize($filePath),
+                'visibility' => FileVisibility::Private,
             ]);
 
             return [

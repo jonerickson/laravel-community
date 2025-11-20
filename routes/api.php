@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\Frontend\ApproveController;
 use App\Http\Controllers\Api\Frontend\CheckoutController;
 use App\Http\Controllers\Api\Frontend\DiscountController;
+use App\Http\Controllers\Api\Frontend\FileController;
 use App\Http\Controllers\Api\Frontend\FingerprintController;
 use App\Http\Controllers\Api\Frontend\FollowController;
 use App\Http\Controllers\Api\Frontend\LikeController;
@@ -35,6 +36,8 @@ Route::group(['domain' => config('app.url'), 'middleware' => [EnsureFrontendRequ
         Route::delete('/approve', [ApproveController::class, 'destroy'])->name('approve.destroy');
         Route::post('/checkout', CheckoutController::class)->name('checkout');
         Route::post('/comments', [ReviewController::class, 'store'])->middleware('throttle:comment')->name('comments.store');
+        Route::post('/file', [FileController::class, 'store'])->name('file.store');
+        Route::delete('/file', [FileController::class, 'destroy'])->name('file.destroy');
         Route::post('/follow', [FollowController::class, 'store'])->name('follow.store');
         Route::delete('/follow/', [FollowController::class, 'destroy'])->name('follow.destroy');
         Route::delete('/forums/topics', [TopicController::class, 'destroy'])->name('forums.topics.destroy');

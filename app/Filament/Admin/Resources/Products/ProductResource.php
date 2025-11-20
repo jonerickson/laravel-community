@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Products;
 
+use App\Enums\FileVisibility;
 use App\Enums\ProductApprovalStatus;
 use App\Enums\ProductTaxCode;
 use App\Enums\ProductType;
@@ -18,6 +19,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
@@ -153,6 +155,8 @@ class ProductResource extends Resource
                                             ->required()
                                             ->visibility('private')
                                             ->hiddenLabel(),
+                                        Hidden::make('visibility')
+                                            ->default(FileVisibility::Private),
                                     ]),
                             ]),
                     ]),

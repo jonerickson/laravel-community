@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\FileVisibility;
 use App\Traits\HasReferenceId;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,6 +26,7 @@ use Override;
  * @property string|null $filename
  * @property string|null $mime
  * @property string|null $size
+ * @property FileVisibility $visibility
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Model|Eloquent|null $resource
@@ -45,12 +47,17 @@ use Override;
  * @method static Builder<static>|File whereResourceType($value)
  * @method static Builder<static>|File whereSize($value)
  * @method static Builder<static>|File whereUpdatedAt($value)
+ * @method static Builder<static>|File whereVisibility($value)
  *
  * @mixin Eloquent
  */
 class File extends Model
 {
     use HasReferenceId;
+
+    protected $attributes = [
+        'visibility' => FileVisibility::Private,
+    ];
 
     protected $fillable = [
         'name',
@@ -59,6 +66,7 @@ class File extends Model
         'path',
         'mime',
         'size',
+        'visibility',
     ];
 
     protected $appends = [
@@ -73,8 +81,10 @@ class File extends Model
     public function url(): Attribute
     {
         return Attribute::get(fn (): ?string => $this->path
-            ? Storage::temporaryUrl($this->path, now()->addHour())
-            : null
+            ? ($this->visibility === FileVisibility::Public
+                ? Storage::url($this->path)
+                : Storage::temporaryUrl($this->path, now()->addHour())
+            ) : null
         )->shouldCache();
     }
 
@@ -95,5 +105,12 @@ class File extends Model
                 Storage::delete($model->path);
             }
         });
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'visibility' => FileVisibility::class,
+        ];
     }
 }

@@ -59,7 +59,7 @@ class DashboardController
         return TopicData::collect(Topic::trending(5)
             ->with(['forum', 'author', 'lastPost.author'])
             ->get()
-            ->filter(fn (Topic $topic) => Gate::check('view', [$topic, $topic->forum])));
+            ->filter(fn (Topic $topic) => Gate::check('view', $topic)));
     }
 
     private function getLatestBlogPosts(): Collection
