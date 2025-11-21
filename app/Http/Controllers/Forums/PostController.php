@@ -98,6 +98,7 @@ class PostController extends Controller
 
         $post->delete();
 
-        return back()->with('message', 'The post was successfully deleted.');
+        return to_route('forums.topics.show', ['forum' => $forum, 'topic' => $topic])
+            ->with('message', 'The post was successfully deleted.');
     }
 }
