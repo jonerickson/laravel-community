@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
+use App\Enums\RenderEngine;
 use App\Events\SubscriptionCreated;
 use App\Events\SubscriptionDeleted;
 use App\Facades\ExpressionLanguage;
@@ -11,6 +12,8 @@ use App\Models\Webhook;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Str;
 use Spatie\WebhookServer\WebhookCall;
 
 class SendWebhook implements ShouldQueue
@@ -21,15 +24,25 @@ class SendWebhook implements ShouldQueue
     public function handle(SubscriptionCreated|SubscriptionDeleted $event): void
     {
         Webhook::query()->whereEvent($event::class)->each(function (Webhook $webhook) use ($event): void {
-            if (blank($webhook->payload)) {
+            if (($webhook->render === RenderEngine::Blade && blank($webhook->payload_text)) || ($webhook->render === RenderEngine::ExpressionLanguage && blank($webhook->payload_json))) {
                 return;
             }
 
-            $payload = ExpressionLanguage::evaluate($webhook->payload, [
-                'event' => $event,
-            ]);
+            if ($webhook->render === RenderEngine::ExpressionLanguage) {
+                $payload = ExpressionLanguage::evaluate($webhook->payload_json, [
+                    'event' => $event,
+                ]);
+            } else {
+                $json = Blade::render($webhook->payload_text, ['event' => $event]);
 
-            if (is_null($payload) || $payload === []) {
+                if (! Str::isJson($json)) {
+                    return;
+                }
+
+                $payload = json_decode($json, true);
+            }
+
+            if (! is_array($payload) || $payload === []) {
                 return;
             }
 

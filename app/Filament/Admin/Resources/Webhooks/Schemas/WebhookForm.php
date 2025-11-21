@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Webhooks\Schemas;
 
 use App\Enums\HttpMethod;
+use App\Enums\RenderEngine;
 use App\Events\SubscriptionCreated;
 use App\Events\SubscriptionDeleted;
 use App\Facades\ExpressionLanguage;
 use Closure;
 use Filament\Forms\Components\CodeEditor;
 use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
@@ -52,10 +54,28 @@ class WebhookForm
                         KeyValue::make('headers')
                             ->helperText('Any additiional headers that should be added to the HTTP request.')
                             ->keyLabel('Header'),
-                        CodeEditor::make('payload')
+                        Radio::make('render')
+                            ->live()
+                            ->label('Renderer')
+                            ->helperText('The rendering engine that will be used to generate the payload.')
+                            ->default(RenderEngine::ExpressionLanguage)
+                            ->options(RenderEngine::class)
+                            ->required(),
+                        CodeEditor::make('payload_text')
+                            ->label('Payload')
+                            ->visible(fn (Get $get): bool => $get('render') === RenderEngine::Blade)
+                            ->language(CodeEditor\Enums\Language::Html)
                             ->helperText(new HtmlString(<<<'HTML'
-The webhook body that will be sent. You may use <a href="https://symfony.com/doc/current/components/expression_language.html" target="_blank" class="underline">Symfony Expression Language</a> to compose the JSON payload. All expressions must be prefixed with <span class="font-mono bg-gray-200 px-1">expr:</span>
-HTML
+ The webhook body that will be sent. You may use <a href="https://laravel.com/docs/12.x/blade" target="_blank" class="underline">Blade Templating Engine</a> to compose the JSON payload. The final output should be JSON encoded.
+ HTML
+                            ))
+                            ->required(),
+                        CodeEditor::make('payload_json')
+                            ->label('Payload')
+                            ->visible(fn (Get $get): bool => $get('render') === RenderEngine::ExpressionLanguage)
+                            ->helperText(new HtmlString(<<<'HTML'
+ The webhook body that will be sent. You may use <a href="https://symfony.com/doc/current/components/expression_language.html" target="_blank" class="underline">Symfony Expression Language</a> to compose the JSON payload. All expressions must be prefixed with <span class="font-mono bg-gray-200 dark:bg-gray-700 px-1">expr:</span>
+ HTML
                             ))
                             ->language(CodeEditor\Enums\Language::Json)
                             ->required()
