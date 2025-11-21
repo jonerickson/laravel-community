@@ -14,8 +14,9 @@ class App implements Preset
 {
     public function configure(Policy $policy): void
     {
-        $assetUrl = Uri::of(config('app.asset_url'))->host();
-        $fingerprintEndpoint = Uri::of(config('services.fingerprint.endpoint'))->host();
+        $assetUrl = Uri::of(config('app.asset_url') ?? '')->host();
+        $s3Url = Uri::of(config('filesystems.disks.s3.endpoint') ?? '')->host();
+        $fingerprintEndpoint = Uri::of(config('services.fingerprint.endpoint') ?? '')->host();
 
         $policy
             ->add(Directive::BASE, Keyword::SELF)
@@ -24,11 +25,11 @@ class App implements Preset
             ->add(Directive::FONT, Keyword::SELF)
             ->add(Directive::FORM_ACTION, Keyword::SELF)
             ->add(Directive::FRAME, Keyword::SELF)
-            ->add(Directive::IMG, [Keyword::SELF, 'ui-avatars.com', 'blob:'])
+            ->add(Directive::IMG, [Keyword::SELF, 'ui-avatars.com', 'blob:', $assetUrl, $s3Url])
             ->add(Directive::MEDIA, Keyword::SELF)
             ->add(Directive::OBJECT, Keyword::NONE)
-            ->add(Directive::SCRIPT, array_filter([Keyword::SELF, 'fpnpmcdn.net', $fingerprintEndpoint, $assetUrl]))
-            ->add(Directive::STYLE, array_filter([Keyword::SELF, Keyword::UNSAFE_INLINE, $assetUrl]));
+            ->add(Directive::SCRIPT, array_filter([Keyword::SELF, 'fpnpmcdn.net', $fingerprintEndpoint, $s3Url, $assetUrl]))
+            ->add(Directive::STYLE, array_filter([Keyword::SELF, Keyword::UNSAFE_INLINE, $s3Url, $assetUrl]));
 
         if ($this->isProtectedRoute()) {
             $policy->add(Directive::SCRIPT, [Keyword::UNSAFE_INLINE, Keyword::UNSAFE_EVAL]);
