@@ -22,7 +22,7 @@ class App implements Preset
             ->add(Directive::BASE, Keyword::SELF)
             ->add(Directive::CONNECT, array_filter([Keyword::SELF, 'api.fpjs.io', $s3Url, $fingerprintEndpoint]))
             ->add(Directive::DEFAULT, Keyword::SELF)
-            ->add(Directive::FONT, Keyword::SELF)
+            ->add(Directive::FONT, [Keyword::SELF, $assetUrl, $s3Url])
             ->add(Directive::FORM_ACTION, Keyword::SELF)
             ->add(Directive::FRAME, Keyword::SELF)
             ->add(Directive::IMG, [Keyword::SELF, 'ui-avatars.com', 'blob:', $assetUrl, $s3Url])
