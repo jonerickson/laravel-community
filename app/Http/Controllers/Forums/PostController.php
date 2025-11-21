@@ -51,7 +51,8 @@ class PostController extends Controller
             ])->withFragment((string) $post->id);
         }
 
-        return back()->with('message', 'Your reply was successfully added.')->withFragment((string) $post->id);
+        return to_route('forums.topics.show', ['forum' => $forum, 'topic' => $topic])
+            ->with('message', 'Your reply was successfully added.')->withFragment((string) $post->id);
     }
 
     /**
