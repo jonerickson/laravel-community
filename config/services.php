@@ -26,6 +26,7 @@ return [
     ],
 
     'fingerprint' => [
+        'endpoint' => env('FINGERPRINT_ENDPONT'),
         'api_key' => env('FINGERPRINT_API_KEY'),
         'suspect_score_threshold' => env('FINGERPRINT_SUSPECT_THRESHOLD', 0.75),
     ],
