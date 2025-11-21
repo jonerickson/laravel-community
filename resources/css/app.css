@@ -100,9 +100,9 @@
     }
 
     .prose img {
-        height: auto !important;
-        width: auto !important;
         max-width: 100% !important;
+        height: auto;
+        display: block;
     }
 }
 

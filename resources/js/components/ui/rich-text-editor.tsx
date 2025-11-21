@@ -4,7 +4,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from '@/components/ui/input';
 import { useApiRequest } from '@/hooks/use-api-request';
 import Emoji, { gitHubEmojis } from '@tiptap/extension-emoji';
-import Image from '@tiptap/extension-image';
 import Placeholder from '@tiptap/extension-placeholder';
 import TextAlign from '@tiptap/extension-text-align';
 import { EditorContent, useEditor, type Editor } from '@tiptap/react';
@@ -38,136 +37,9 @@ import {
     Undo,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { ResizableImage } from 'tiptap-extension-resizable-image';
+import 'tiptap-extension-resizable-image/styles.css';
 import { route } from 'ziggy-js';
-
-const ResizableImage = Image.extend({
-    addAttributes() {
-        return {
-            ...this.parent?.(),
-            width: {
-                default: null,
-                parseHTML: (element) => element.getAttribute('width'),
-                renderHTML: (attributes) => {
-                    if (!attributes.width) {
-                        return {};
-                    }
-                    return { width: attributes.width };
-                },
-            },
-            height: {
-                default: null,
-                parseHTML: (element) => element.getAttribute('height'),
-                renderHTML: (attributes) => {
-                    if (!attributes.height) {
-                        return {};
-                    }
-                    return { height: attributes.height };
-                },
-            },
-        };
-    },
-    addNodeView() {
-        return ({ node, HTMLAttributes, getPos, editor }) => {
-            const container = document.createElement('div');
-            container.className = 'relative inline-block group max-w-full';
-
-            const img = document.createElement('img');
-            Object.entries(HTMLAttributes).forEach(([key, value]) => {
-                img.setAttribute(key, value);
-            });
-            img.className = 'max-w-full h-auto rounded-md cursor-pointer';
-            img.style.width = node.attrs.width ? `${node.attrs.width}px` : 'auto';
-            img.style.height = node.attrs.height ? `${node.attrs.height}px` : 'auto';
-
-            const resizeHandle = document.createElement('div');
-            resizeHandle.className =
-                'absolute bottom-0 right-0 w-3 h-3 bg-background border border-border rounded-sm cursor-se-resize opacity-0 group-hover:opacity-100 transition-opacity shadow-sm';
-            resizeHandle.style.transform = 'translate(50%, 50%)';
-
-            const gripDots = document.createElement('div');
-            gripDots.className = 'absolute inset-0 flex items-center justify-center pointer-events-none';
-            gripDots.innerHTML = `
-                <svg width="8" height="8" viewBox="0 0 8 8" class="text-muted-foreground">
-                    <circle cx="2" cy="6" r="0.5" fill="currentColor"/>
-                    <circle cx="6" cy="2" r="0.5" fill="currentColor"/>
-                    <circle cx="6" cy="6" r="0.5" fill="currentColor"/>
-                </svg>
-            `;
-            resizeHandle.appendChild(gripDots);
-
-            let isResizing = false;
-            let startX = 0;
-            let startWidth = 0;
-            let startHeight = 0;
-
-            const startResize = (e: MouseEvent) => {
-                e.preventDefault();
-                isResizing = true;
-                startX = e.clientX;
-                startWidth = img.offsetWidth;
-                startHeight = img.offsetHeight;
-                document.addEventListener('mousemove', doResize);
-                document.addEventListener('mouseup', stopResize);
-            };
-
-            const doResize = (e: MouseEvent) => {
-                if (!isResizing) return;
-
-                const deltaX = e.clientX - startX;
-
-                const newWidth = Math.max(50, startWidth + deltaX);
-                const aspectRatio = startWidth / startHeight;
-                const newHeight = newWidth / aspectRatio;
-
-                img.style.width = `${newWidth}px`;
-                img.style.height = `${newHeight}px`;
-            };
-
-            const stopResize = () => {
-                if (!isResizing) return;
-                isResizing = false;
-
-                const width = parseInt(img.style.width);
-                const height = parseInt(img.style.height);
-
-                const pos = getPos();
-                if (typeof pos === 'number') {
-                    editor.view.dispatch(
-                        editor.view.state.tr.setNodeMarkup(pos, null, {
-                            ...node.attrs,
-                            width,
-                            height,
-                        }),
-                    );
-                }
-
-                document.removeEventListener('mousemove', doResize);
-                document.removeEventListener('mouseup', stopResize);
-            };
-
-            resizeHandle.addEventListener('mousedown', startResize);
-
-            container.appendChild(img);
-            container.appendChild(resizeHandle);
-
-            return {
-                dom: container,
-                update: (updatedNode) => {
-                    if (updatedNode.type !== node.type) return false;
-
-                    if (updatedNode.attrs.width) {
-                        img.style.width = `${updatedNode.attrs.width}px`;
-                    }
-                    if (updatedNode.attrs.height) {
-                        img.style.height = `${updatedNode.attrs.height}px`;
-                    }
-
-                    return true;
-                },
-            };
-        };
-    },
-});
 
 interface RichTextEditorProps {
     content: string;
@@ -301,7 +173,7 @@ function ImageDialog({ editor, isOpen, onOpenChange }: ImageDialogProps) {
                 editor
                     .chain()
                     .focus()
-                    .setImage({
+                    .setResizableImage({
                         src: response.url,
                         alt: altText || file.name,
                     })
@@ -312,7 +184,7 @@ function ImageDialog({ editor, isOpen, onOpenChange }: ImageDialogProps) {
             editor
                 .chain()
                 .focus()
-                .setImage({
+                .setResizableImage({
                     src: imageUrl,
                     alt: altText || 'Image',
                 })
@@ -431,10 +303,13 @@ export function RichTextEditor({ content, onChange, placeholder = 'Start typing.
             TextAlign.configure({
                 types: ['heading', 'paragraph'],
             }),
-            ResizableImage,
             Emoji.configure({
                 emojis: gitHubEmojis,
                 enableEmoticons: true,
+            }),
+            ResizableImage.configure({
+                defaultWidth: 200,
+                defaultHeight: 200,
             }),
         ],
         content,
