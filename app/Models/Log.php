@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\HttpMethod;
+use App\Enums\HttpStatusCode;
 use Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -67,6 +68,7 @@ class Log extends Model
             'request_headers' => 'array',
             'response_content' => 'json',
             'response_headers' => 'array',
+            'status' => HttpStatusCode::class,
         ];
     }
 }

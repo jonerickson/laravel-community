@@ -46,7 +46,7 @@ class SendWebhook implements ShouldQueue
                 return;
             }
 
-            $webhook->logs()->create([
+            $log = $webhook->logs()->create([
                 'endpoint' => $webhook->url,
                 'method' => $webhook->method->value,
                 'request_body' => $payload,
@@ -56,6 +56,7 @@ class SendWebhook implements ShouldQueue
             WebhookCall::create()
                 ->url($webhook->url)
                 ->withHeaders($webhook->headers)
+                ->meta(['log_id' => $log->getKey()])
                 ->useHttpVerb($webhook->method->value)
                 ->useSecret($webhook->secret)
                 ->payload($payload)
