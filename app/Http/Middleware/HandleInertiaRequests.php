@@ -20,7 +20,6 @@ use App\Services\ShoppingCartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\Number;
 use Inertia\Middleware;
 use Override;
@@ -80,7 +79,6 @@ class HandleInertiaRequests extends Middleware
             'postCount' => Cache::remember('post_count', now()->addHour(), fn () => Number::abbreviate(Post::count())),
             'logoUrl' => asset('images/logo.svg'),
             'flash' => null,
-            'nonce' => Vite::cspNonce(),
             'name' => config('app.name'),
             'email' => config('app.email'),
             'phone' => config('app.phone'),

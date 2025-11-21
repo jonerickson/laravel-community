@@ -46,6 +46,7 @@ export default defineConfig(({ mode }) => {
         },
 
         build: {
+            cssCodeSplit: true,
             sourcemap: 'hidden',
         },
     }

@@ -36,7 +36,7 @@ class LogApiRequest
                 'x-csrf-token',
                 'x-xsrf-token',
                 'php-auth-pw',
-            ]))->map(fn ($header) => implode(', ', $header))->all(),
+            ]))->map(fn ($header): string => implode(', ', $header))->all(),
             'request_body' => $this->captureRequestBody($request),
             'loggable_type' => $user ? $user::class : null,
             'loggable_id' => $user ? $user->getKey() : null,
@@ -51,11 +51,7 @@ class LogApiRequest
 
     private function isFirstParty(Request $request): bool
     {
-        if ($request->host() === Uri::of(config('app.url'))->host()) {
-            return true;
-        }
-
-        return false;
+        return $request->host() === Uri::of(config('app.url'))->host();
     }
 
     /**

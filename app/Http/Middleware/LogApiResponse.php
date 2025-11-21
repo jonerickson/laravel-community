@@ -44,7 +44,7 @@ class LogApiResponse
 
         $log->update([
             'status' => $response->getStatusCode(),
-            'response_headers' => collect($response->headers)->map(fn ($header) => implode(', ', $header))->all(),
+            'response_headers' => collect($response->headers)->map(fn ($header): string => implode(', ', $header))->all(),
             'response_content' => $processed['content'] ?? null,
         ]);
 

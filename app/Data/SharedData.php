@@ -42,8 +42,6 @@ class SharedData extends Data
 
     public ?FlashData $flash = null;
 
-    public string $nonce;
-
     public bool $sidebarOpen;
 
     #[LiteralTypeScriptType('Config & { location: string }')]

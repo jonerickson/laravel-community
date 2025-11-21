@@ -1,7 +1,6 @@
 <?php
 
-use Spatie\Csp\Directive;
-use Spatie\Csp\Keyword;
+declare(strict_types=1);
 
 return [
 
@@ -10,17 +9,18 @@ return [
      * any class that implements `Spatie\Csp\Preset`
      */
     'presets' => [
-        Spatie\Csp\Presets\Basic::class,
+        App\Support\Csp\Presets\App::class,
+        Spatie\Csp\Presets\BunnyFonts::class,
+        Spatie\Csp\Presets\JsDelivr::class,
         Spatie\Csp\Presets\Sentry::class,
         Spatie\Csp\Presets\Stripe::class,
-        App\Support\Csp\AppPreset::class,
     ],
 
     /**
      * Register additional global CSP directives here.
      */
     'directives' => [
-//         [Directive::FONT, [Keyword::UNSAFE_INLINE]],
+        //         [Directive::FONT, [Keyword::UNSAFE_INLINE]],
     ],
 
     /*
@@ -52,7 +52,7 @@ return [
     /**
      * Headers will be added when Vite is hot reloading.
      */
-    'enabled_while_hot_reloading' => env('CSP_ENABLED_WHILE_HOT_RELOADING', true),
+    'enabled_while_hot_reloading' => env('CSP_ENABLED_WHILE_HOT_RELOADING', false),
 
     /*
      * The class responsible for generating the nonces used in inline tags and headers.

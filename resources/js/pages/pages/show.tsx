@@ -8,7 +8,7 @@ interface PageShowProps {
 }
 
 export default function PageShow({ page }: PageShowProps) {
-    const { name: siteName, logoUrl, nonce } = usePage<App.Data.SharedData>().props;
+    const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const scriptExecutedRef = useRef(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -25,7 +25,6 @@ export default function PageShow({ page }: PageShowProps) {
             try {
                 const script = document.createElement('script');
                 script.textContent = page.jsContent;
-                script.nonce = nonce;
                 document.body.appendChild(script);
                 scriptExecutedRef.current = true;
 
