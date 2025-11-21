@@ -99,8 +99,7 @@ class SubscriptionsController extends Controller
             );
 
             if (! $result) {
-                return back()
-                    ->with('message', 'We were unable to start your subscription. Please try again later.');
+                return back()->with('message', 'We were unable to start your subscription. Please try again later.');
             }
 
             return inertia()->location($result);
@@ -112,12 +111,10 @@ class SubscriptionsController extends Controller
         );
 
         if (! $result) {
-            return back()
-                ->with('message', 'We were unable to change your subscription. Please try again later.');
+            return back()->with('message', 'We were unable to change your subscription. Please try again later.');
         }
 
-        return to_route('store.subscriptions')
-            ->with('message', 'Your subscription was successfully updated.');
+        return back()->with('message', 'Your subscription was successfully updated.');
     }
 
     public function update(SubscriptionUpdateRequest $request): RedirectResponse
@@ -129,8 +126,7 @@ class SubscriptionsController extends Controller
         $success = $this->paymentManager->continueSubscription($this->user);
 
         if ($success) {
-            return to_route('store.subscriptions')
-                ->with('message', 'Your subscription has resumed successfully.');
+            return back()->with('message', 'Your subscription has resumed successfully.');
         }
 
         return back()->with('message', 'We were unable to resume your subscription. Please try again later.');
@@ -157,7 +153,6 @@ class SubscriptionsController extends Controller
             ? 'Your subscription has been cancelled immediately.'
             : 'Your subscription has been scheduled to cancel at the end of the billing cycle.';
 
-        return to_route('store.subscriptions')
-            ->with('message', $message);
+        return back()->with('message', $message);
     }
 }

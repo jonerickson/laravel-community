@@ -50,9 +50,7 @@ class ProductController extends Controller
             quantity: $quantity
         );
 
-        return to_route('store.products.show', [
-            'product' => $product,
-        ])->with('message', 'The item was successfully added to your shopping cart.');
+        return back()->with('message', 'The item was successfully added to your shopping cart.');
     }
 
     public function show(Request $request, Product $product): Response

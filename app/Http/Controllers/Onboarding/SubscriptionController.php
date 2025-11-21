@@ -22,9 +22,10 @@ class SubscriptionController
         $order = $this->shoppingCartService->getOrCreatePendingOrder();
 
         if (! $order instanceof Order) {
-            return back()
-                ->with('message', 'We were unable to start your subscription. Please try again later.')
-                ->with('messageVariant', 'error');
+            return back()->with([
+                'message' => 'We were unable to start your subscription. Please try again later.',
+                'messageVariant' => 'error',
+            ]);
         }
 
         $this->shoppingCartService->addItem(
@@ -38,9 +39,10 @@ class SubscriptionController
         );
 
         if (! $checkoutUrl) {
-            return back()
-                ->with('message', 'We were unable to start your subscription. Please try again later.')
-                ->with('messageVariant', 'error');
+            return back()->with([
+                'message' => 'We were unable to start your subscription. Please try again later.',
+                'messageVariant' => 'error',
+            ]);
         }
 
         return inertia()->location($checkoutUrl);

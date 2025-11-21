@@ -33,8 +33,7 @@ class AttachmentController extends Controller
             'visibility' => FileVisibility::Private,
         ]);
 
-        return to_route('support.show', $ticket->reference_id)
-            ->with('message', 'Your attachment was successfully added.');
+        return back()->with('message', 'Your attachment was successfully added.');
     }
 
     public function destroy(SupportTicket $ticket, File $file): Response
@@ -44,7 +43,6 @@ class AttachmentController extends Controller
 
         $file->delete();
 
-        return to_route('support.show', $ticket->reference_id)
-            ->with('message', 'The attachment was successfully deleted.');
+        return back()->with('message', 'The attachment was successfully deleted.');
     }
 }

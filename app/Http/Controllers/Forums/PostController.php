@@ -97,9 +97,15 @@ class PostController extends Controller
         $this->authorize('view', $topic);
         $this->authorize('delete', $post);
 
+        if ($topic->posts()->count() === 1) {
+            return back()->with([
+                'message' => 'You cannot delete the last post in a topic. Delete the topic instead.',
+                'messageVariant' => 'error',
+            ]);
+        }
+
         $post->delete();
 
-        return to_route('forums.topics.show', ['forum' => $forum, 'topic' => $topic])
-            ->with('message', 'The post was successfully deleted.');
+        return back()->with('message', 'The post was successfully deleted.');
     }
 }

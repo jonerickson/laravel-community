@@ -30,8 +30,7 @@ class CommentController extends Controller
             'parent_id' => $request->validated('parent_id'),
         ]);
 
-        return to_route('blog.show', [$post])
-            ->with('message', 'Your comment was successfully added.');
+        return back()->with('message', 'Your comment was successfully added.');
     }
 
     /**
@@ -44,8 +43,7 @@ class CommentController extends Controller
 
         $comment->update($request->only('content'));
 
-        return to_route('blog.show', [$post])
-            ->with('message', 'The comment has been successfully updated.');
+        return back()->with('message', 'The comment has been successfully updated.');
     }
 
     /**
@@ -58,7 +56,6 @@ class CommentController extends Controller
 
         $comment->delete();
 
-        return to_route('blog.show', [$post])
-            ->with('message', 'The comment was successfully deleted.');
+        return back()->with('message', 'The comment was successfully deleted.');
     }
 }

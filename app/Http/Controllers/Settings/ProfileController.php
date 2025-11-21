@@ -71,7 +71,7 @@ class ProfileController extends Controller
             }
         }
 
-        return to_route('settings.profile.edit');
+        return back()->with('message', 'Your profile was successfully updated.');
     }
 
     public function destroy(Request $request): RedirectResponse
