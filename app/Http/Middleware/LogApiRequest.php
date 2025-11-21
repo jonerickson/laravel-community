@@ -25,12 +25,13 @@ class LogApiRequest
         $log = Log::create([
             'endpoint' => $request->getPathInfo(),
             'method' => strtolower($request->getMethod()),
-            'request_headers' => collect($request->headers)->reject(fn ($value, $key): bool => in_array(strtolower($key), [
+            'request_headers' => collect($request->headers)->reject(fn ($header, $value): bool => in_array(strtolower($value), [
                 'cookie',
                 'authorization',
                 'x-csrf-token',
                 'x-xsrf-token',
-            ]))->map(fn ($value): ?string => $value[0] ?? null)->toArray(),
+                'php-auth-pw',
+            ]))->map(fn ($header) => implode(', ', $header))->all(),
             'request_body' => $this->captureRequestBody($request),
             'loggable_type' => $user ? $user::class : null,
             'loggable_id' => $user ? $user->getKey() : null,
