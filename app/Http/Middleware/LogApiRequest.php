@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Uri;
 use JsonException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,6 +21,10 @@ class LogApiRequest
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if ($this->isFirstParty($request)) {
+            return $next($request);
+        }
+
         $user = Auth::guard('api')->user();
 
         $log = Log::create([
@@ -42,6 +47,15 @@ class LogApiRequest
         ]);
 
         return $next($request);
+    }
+
+    private function isFirstParty(Request $request): bool
+    {
+        if ($request->host() === Uri::of(config('app.url'))->host()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

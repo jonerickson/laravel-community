@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Filament\Admin\Resources\Logs\Actions;
+
+use App\Models\Log;
+use Filament\Actions\Action;
+
+class PurgeAction extends Action
+{
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->label('Purge');
+        $this->color('danger');
+        $this->requiresConfirmation();
+        $this->modalHeading('Purge Logs');
+        $this->modalDescription('Are you sure you want to purge the log? This will delete all logs.');
+        $this->modalSubmitActionLabel('Purge Logs');
+        $this->successNotificationTitle('The logs have been successfully purged.');
+        $this->action(function (PurgeAction $action) {
+            Log::truncate();
+            $action->success();
+        });
+    }
+
+    public static function getDefaultName(): ?string
+    {
+        return 'purge';
+    }
+}
