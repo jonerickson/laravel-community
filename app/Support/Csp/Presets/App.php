@@ -15,7 +15,7 @@ class App implements Preset
     public function configure(Policy $policy): void
     {
         $assetUrl = Uri::of(config('app.asset_url'))->host();
-        $fingerprintEndpoint = Uri::of(config('services.fingerprint'))->host();
+        $fingerprintEndpoint = Uri::of(config('services.fingerprint.endpoint'))->host();
 
         $policy
             ->add(Directive::BASE, Keyword::SELF)
