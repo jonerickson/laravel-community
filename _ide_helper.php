@@ -24440,7 +24440,7 @@ namespace Illuminate\Support {
          * @param string|null $connection
          * @param bool $throw
          * @param int $maxAttempts
-         * @return static
+         * @return \Illuminate\Support\Stringable
          * @static
          */
         public static function unique($table, $column = 'id', $fallback = null, $connection = null, $throw = true, $maxAttempts = 5)
@@ -33232,11 +33232,6 @@ namespace  {
 }
 
 
-namespace Facades\Livewire\Features\SupportFileUploads {
-    /**
-     * @mixin \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl     */
-    class GenerateSignedUploadUrl extends \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl {}
-}
 
 
 

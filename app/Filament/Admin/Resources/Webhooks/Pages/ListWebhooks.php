@@ -6,7 +6,7 @@ namespace App\Filament\Admin\Resources\Webhooks\Pages;
 
 use App\Filament\Admin\Resources\Logs\LogResource;
 use App\Filament\Admin\Resources\Webhooks\WebhookResource;
-use App\Filament\Admin\Resources\Webhooks\Widgets\ApiLogActivity;
+use App\Filament\Admin\Resources\Webhooks\Widgets\WebhookLogActivity;
 use App\Models\Webhook;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
@@ -35,7 +35,7 @@ class ListWebhooks extends ListRecords
     protected function getHeaderWidgets(): array
     {
         return [
-            ApiLogActivity::class,
+            WebhookLogActivity::class,
         ];
     }
 }

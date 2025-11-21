@@ -108,7 +108,7 @@ class OrderImporter extends AbstractImporter
                 }
 
                 try {
-                    $this->importOrder($sourceOrder, $config, $result, $output);
+                    $this->importOrder($sourceOrder, $config, $result, $output, $components);
                 } catch (Exception $e) {
                     $result->incrementFailed(self::ENTITY_NAME);
 
@@ -144,7 +144,7 @@ class OrderImporter extends AbstractImporter
         return $processed;
     }
 
-    protected function importOrder(object $sourceOrder, MigrationConfig $config, MigrationResult $result, OutputStyle $output): void
+    protected function importOrder(object $sourceOrder, MigrationConfig $config, MigrationResult $result, OutputStyle $output, Factory $components): void
     {
         $user = $this->findUser($sourceOrder);
 

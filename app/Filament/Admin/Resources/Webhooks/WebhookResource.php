@@ -10,7 +10,6 @@ use App\Filament\Admin\Resources\Webhooks\Pages\ListWebhooks;
 use App\Filament\Admin\Resources\Webhooks\RelationManagers\LogsRelationManager;
 use App\Filament\Admin\Resources\Webhooks\Schemas\WebhookForm;
 use App\Filament\Admin\Resources\Webhooks\Tables\WebhooksTable;
-use App\Filament\Admin\Resources\Webhooks\Widgets\WebhookLogActivity;
 use App\Models\Webhook;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -58,14 +57,6 @@ class WebhookResource extends Resource
             'index' => ListWebhooks::route('/'),
             'create' => CreateWebhook::route('/create'),
             'edit' => EditWebhook::route('/{record}/edit'),
-        ];
-    }
-
-    #[Override]
-    public static function getWidgets(): array
-    {
-        return [
-            WebhookLogActivity::make(),
         ];
     }
 }

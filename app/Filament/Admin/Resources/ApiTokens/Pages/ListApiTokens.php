@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\ApiTokens\Pages;
 
 use App\Filament\Admin\Resources\ApiTokens\ApiTokenResource;
+use App\Filament\Admin\Resources\ApiTokens\Widgets\ApiLogActivity;
 use App\Filament\Admin\Resources\Logs\LogResource;
 use App\Models\User;
 use Filament\Actions\Action;
@@ -13,6 +14,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Override;
 
 class ListApiTokens extends ListRecords
 {
@@ -58,6 +60,14 @@ class ListApiTokens extends ListRecords
 
                     return $result->getToken();
                 }),
+        ];
+    }
+
+    #[Override]
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            ApiLogActivity::class,
         ];
     }
 }

@@ -65,6 +65,6 @@ class MacroServiceProvider extends ServiceProvider
             return $candidate;
         });
 
-        Stringable::macro('unique', fn (string $table, string $column = 'id', mixed $fallback = null, ?string $connection = null, bool $throw = true, int $maxAttempts = 5): static => new static(Str::unique($this->value, $table, $column, $fallback, $connection, $throw, $maxAttempts)));
+        Stringable::macro('unique', fn (string $table, string $column = 'id', mixed $fallback = null, ?string $connection = null, bool $throw = true, int $maxAttempts = 5): Stringable => new Stringable(Str::unique($this->value, $table, $column, $fallback, $connection, $throw, $maxAttempts)));
     }
 }
