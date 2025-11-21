@@ -23,6 +23,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Laravel\Passport\Http\Middleware\CreateFreshApiToken;
 use Sentry\Laravel\Integration;
+use Spatie\Csp\AddCspHeaders;
 use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -53,6 +54,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append([
             AttachTraceAndRequestId::class,
             AddSentryContext::class,
+            AddCspHeaders::class,
         ]);
 
         $middleware->alias([

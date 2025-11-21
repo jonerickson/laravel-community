@@ -4,7 +4,7 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        <script>
+        <script nonce="{{ Vite::cspNonce() }}">
             (function () {
                 const appearance = '{{ $appearance ?? 'system' }}';
 
@@ -18,7 +18,7 @@
             })();
         </script>
 
-        <style>
+        <style nonce="{{ Vite::cspNonce() }}">
             html {
                 background-color: oklch(1 0 0);
             }
@@ -34,8 +34,8 @@
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-        @googlefonts
-        @routes
+        @googlefonts(['nonce' => Vite::cspNonce()])
+        @routes(nonce: Vite::cspNonce())
         @viteReactRefresh
         @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
         @inertiaHead

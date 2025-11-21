@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
@@ -166,5 +167,7 @@ class AppServiceProvider extends ServiceProvider
                 'scopes' => $parameters['scopes'],
             ])
         );
+
+        Vite::useCspNonce();
     }
 }

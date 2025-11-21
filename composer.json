@@ -35,6 +35,7 @@
         "sentry/sentry-laravel": "^4.19",
         "spatie/enum": "^3.13",
         "spatie/laravel-activitylog": "^4.10.2",
+        "spatie/laravel-csp": "^3.21",
         "spatie/laravel-data": "^4.18",
         "spatie/laravel-google-fonts": "^1.4",
         "spatie/laravel-permission": "^6.21",

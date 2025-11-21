@@ -506,6 +506,7 @@ declare namespace App.Data {
         memberCount: string | boolean | null;
         postCount: string | boolean | null;
         flash: App.Data.FlashData | null;
+        nonce: string;
         sidebarOpen: boolean;
         ziggy: Config & { location: string };
     };
