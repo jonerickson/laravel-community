@@ -6,6 +6,7 @@ namespace App\Filament\Admin\Resources\ApiTokens;
 
 use App\Enums\Role;
 use App\Filament\Admin\Resources\ApiTokens\Pages\ListApiTokens;
+use App\Filament\Admin\Resources\ApiTokens\Widgets\ApiLogActivity;
 use App\Models\User;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -128,6 +129,14 @@ class ApiTokenResource extends Resource
     {
         return [
             'index' => ListApiTokens::route('/'),
+        ];
+    }
+
+    #[Override]
+    public static function getWidgets(): array
+    {
+        return [
+            ApiLogActivity::make(),
         ];
     }
 }

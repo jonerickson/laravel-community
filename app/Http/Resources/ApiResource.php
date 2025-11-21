@@ -8,6 +8,7 @@ use App\Data\ApiData;
 use App\Data\ApiMetaData;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Context;
 use Override;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -50,6 +51,8 @@ class ApiResource extends JsonResource
             'timestamp' => now(),
             'version' => '1.0',
             'additional' => $this->meta,
+            'request_id' => Context::get('request_id'),
+            'trace_id' => Context::get('trace_id'),
         ]);
 
         $apiData = ApiData::from([

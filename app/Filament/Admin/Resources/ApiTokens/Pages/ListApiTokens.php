@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\ApiTokens\Pages;
 
 use App\Filament\Admin\Resources\ApiTokens\ApiTokenResource;
+use App\Filament\Admin\Resources\Logs\LogResource;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
@@ -27,6 +28,11 @@ class ListApiTokens extends ListRecords
             Action::make('documentation')
                 ->color('gray')
                 ->url(fn (): string => config('app.url').'/api/v1', shouldOpenInNewTab: true),
+            Action::make('logs')
+                ->url(LogResource::getIndexUrl([
+                    'filters[type][type]' => User::class,
+                ]))
+                ->color('gray'),
             CreateAction::make()
                 ->successNotification(fn (): Notification => Notification::make()
                     ->duration('persistent')

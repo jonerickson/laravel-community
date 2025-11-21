@@ -24,6 +24,8 @@ declare namespace App.Data {
     export type ApiMetaData = {
         timestamp: string | null;
         version: string;
+        requestId: string;
+        traceId: string;
         additional: Array<unknown>;
     };
     export type AuthData = {
@@ -622,6 +624,28 @@ declare namespace App.Enums {
     export type DiscountType = 'gift_card' | 'promo_code' | 'manual';
     export type DiscountValueType = 'fixed' | 'percentage';
     export type FieldType = 'checkbox' | 'date' | 'datetime' | 'number' | 'radio' | 'rich_text' | 'select' | 'text' | 'textarea';
+    export type FileVisibility = 'public' | 'private';
+    export type HttpMethod = 'head' | 'get' | 'post' | 'put' | 'patch' | 'delete' | 'options';
+    export type HttpStatusCode =
+        | '200'
+        | '201'
+        | '202'
+        | '204'
+        | '301'
+        | '302'
+        | '303'
+        | '400'
+        | '401'
+        | '402'
+        | '403'
+        | '404'
+        | '405'
+        | '406'
+        | '409'
+        | '422'
+        | '423'
+        | '500'
+        | '503';
     export type KnowledgeBaseArticleType = 'guide' | 'faq' | 'changelog' | 'troubleshooting' | 'announcement' | 'other';
     export type OrderRefundReason = 'duplicate' | 'fraudulent' | 'requested_by_customer' | 'other';
     export type OrderStatus =
@@ -666,6 +690,7 @@ declare namespace App.Enums {
     export type ProductType = 'product' | 'subscription';
     export type ProrationBehavior = 'create_prorations' | 'always_invoice' | 'none';
     export type PublishableStatus = 'published' | 'draft';
+    export type RenderEngine = 'blade' | 'expression_language';
     export type ReportReason = 'spam' | 'harassment' | 'inappropriate_content' | 'abuse' | 'impersonation' | 'false_information' | 'other';
     export type ReportStatus = 'pending' | 'reviewed' | 'approved' | 'rejected';
     export type Role = 'super-admin' | 'moderator' | 'user' | 'guest' | 'support-agent';

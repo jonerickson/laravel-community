@@ -19,6 +19,10 @@ class ApiMetaData extends Data
 
     public string $version;
 
+    public string $requestId;
+
+    public string $traceId;
+
     #[LiteralTypeScriptType('Array<unknown>')]
     /** @var mixed[] */
     public array $additional = [];

@@ -27,6 +27,7 @@ return [
     'routes' => [
         'domain' => env('APP_URL'),
         'middleware' => [
+            'api',
             'web',
             'auth:api,web',
         ],

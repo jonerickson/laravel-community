@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Webhooks\Pages;
 
+use App\Filament\Admin\Resources\Logs\LogResource;
 use App\Filament\Admin\Resources\Webhooks\WebhookResource;
-use App\Filament\Admin\Resources\Webhooks\Widgets\WebhookLogActivity;
+use App\Filament\Admin\Resources\Webhooks\Widgets\ApiLogActivity;
+use App\Models\Webhook;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Override;
@@ -19,6 +22,11 @@ class ListWebhooks extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('logs')
+                ->url(LogResource::getIndexUrl([
+                    'filters[type][type]' => Webhook::class,
+                ]))
+                ->color('gray'),
             CreateAction::make(),
         ];
     }
@@ -27,7 +35,7 @@ class ListWebhooks extends ListRecords
     protected function getHeaderWidgets(): array
     {
         return [
-            WebhookLogActivity::class,
+            ApiLogActivity::class,
         ];
     }
 }

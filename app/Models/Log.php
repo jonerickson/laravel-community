@@ -7,14 +7,18 @@ namespace App\Models;
 use App\Enums\HttpMethod;
 use App\Enums\HttpStatusCode;
 use Eloquent;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Facades\Context;
+use Override;
 
 /**
  * @property int $id
+ * @property string $request_id
  * @property string $endpoint
  * @property HttpMethod $method
- * @property string|null $status
+ * @property HttpStatusCode|null $status
  * @property array<array-key, mixed>|null $request_body
  * @property array<array-key, mixed>|null $request_headers
  * @property array<array-key, mixed>|null $response_content
@@ -24,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Model|Eloquent|null $loggable
+ * @property-read string|null $type
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Log newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Log newQuery()
@@ -36,6 +41,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Log whereMethod($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Log whereRequestBody($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Log whereRequestHeaders($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Log whereRequestId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Log whereResponseContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Log whereResponseHeaders($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Log whereStatus($value)
@@ -46,6 +52,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class Log extends Model
 {
     protected $fillable = [
+        'request_id',
         'endpoint',
         'method',
         'status',
@@ -53,11 +60,32 @@ class Log extends Model
         'request_headers',
         'response_content',
         'response_headers',
+        'loggable_type',
+        'loggable_id',
+    ];
+
+    protected $appends = [
+        'type',
     ];
 
     public function loggable(): MorphTo
     {
         return $this->morphTo('loggable');
+    }
+
+    public function type(): Attribute
+    {
+        return Attribute::get(fn (): ?string => match (true) {
+            $this->loggable instanceof User => 'API',
+            $this->loggable instanceof Webhook => 'Webhook',
+            default => null,
+        });
+    }
+
+    #[Override]
+    protected static function booted(): void
+    {
+        static::creating(fn (Log $log) => $log->forceFill(['request_id' => Context::get('request_id')]));
     }
 
     protected function casts(): array

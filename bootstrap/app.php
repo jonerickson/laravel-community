@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 use App\Exceptions\BannedException;
 use App\Http\Middleware\AddSentryContext;
+use App\Http\Middleware\AttachTraceAndRequestId;
 use App\Http\Middleware\CheckBannedUser;
 use App\Http\Middleware\EnsureAccountHasEmail;
 use App\Http\Middleware\EnsureAccountHasPassword;
 use App\Http\Middleware\ForceOnboarding;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\LogApiRequest;
+use App\Http\Middleware\LogApiResponse;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Foundation\Application;
@@ -43,9 +46,12 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->api([
             AddQueuedCookiesToResponse::class,
+            LogApiRequest::class,
+            LogApiResponse::class,
         ]);
 
         $middleware->append([
+            AttachTraceAndRequestId::class,
             AddSentryContext::class,
         ]);
 
