@@ -11,6 +11,7 @@ use Filament\Actions\CreateAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class ListApiTokens extends ListRecords
 {
@@ -31,7 +32,7 @@ class ListApiTokens extends ListRecords
                     ->duration('persistent')
                     ->success()
                     ->title('Your API key was successfully created. Copy the token below as it will not be shown again.')
-                    ->body($this->token ?? 'No token was specified.')
+                    ->body(Str::limit($this->token) ?? 'No token was specified.')
                     ->actions([
                         Action::make('copy')
                             ->label('Copy API Key')
