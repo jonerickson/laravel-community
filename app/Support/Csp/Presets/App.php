@@ -15,7 +15,7 @@ class App implements Preset
     public function configure(Policy $policy): void
     {
         $assetUrl = Uri::of(config('app.asset_url') ?? '')->host();
-        $s3Url = Uri::of(config('filesystems.disks.s3.endpoint') ?? '')->host();
+        $s3Url = Uri::of(config('filesystems.disks.s3.url') ?? '')->host();
         $fingerprintEndpoint = Uri::of(config('services.fingerprint.endpoint') ?? '')->host();
 
         $policy
