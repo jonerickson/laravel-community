@@ -511,8 +511,15 @@ class StripeDriver implements PaymentProcessor
                 ))
                 ->when($firstParty, fn (SubscriptionBuilder $builder) => $builder->checkout(
                     sessionOptions: [
+                        'branding_settings' => [
+                            'display_name' => config('app.name'),
+                            'border_style' => 'rounded',
+                            'background_color' => '#f9f9f9',
+                            'button_color' => '#171719',
+                            'font_family' => 'inter',
+                        ],
+                        'billing_address_collection' => 'required',
                         'client_reference_id' => $order->reference_id,
-                        'origin_context' => 'web',
                         'consent_collection' => [
                             'terms_of_service' => 'required',
                         ],
@@ -524,13 +531,11 @@ class StripeDriver implements PaymentProcessor
                                 'message' => 'Order Number: '.$order->reference_id,
                             ],
                         ],
-                        'branding_settings' => [
-                            'display_name' => config('app.name'),
-                            'border_style' => 'rounded',
-                            'background_color' => '#f9f9f9',
-                            'button_color' => '#171719',
-                            'font_family' => 'inter',
+                        'customer_update' => [
+                            'name' => 'auto',
+                            'address' => 'auto',
                         ],
+                        'origin_context' => 'web',
                         'success_url' => URL::signedRoute('store.checkout.success', [
                             'order' => $order->reference_id,
                             'redirect' => $successUrl ?? route('store.subscriptions', absolute: false),
