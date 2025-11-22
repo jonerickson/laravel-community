@@ -219,7 +219,7 @@ class Post extends Model implements HasLabel, Sluggable
         return match ($this->type) {
             PostType::Blog => route('blog.show', $this),
             PostType::Forum => $this->topic
-                ? route('forums.topics.show', [$this->topic->forum, $this->topic]).'#post-'.$this->id
+                ? route('forums.topics.show', [$this->topic->forum, $this->topic]).'#'.$this->id
                 : null,
         };
     }

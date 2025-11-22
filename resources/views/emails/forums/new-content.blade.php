@@ -29,7 +29,7 @@ Hello {{ $recipient->name }},
 </x-mail::panel>
 @endif
 
-<x-mail::button :url="$isNewTopic ? route('forums.topics.show', ['forum' => $content->forum->slug, 'topic' => $content->slug]) : route('forums.topics.show', ['forum' => $content->topic->forum->slug, 'topic' => $content->topic->slug]) . '#post-' . $content->id">
+<x-mail::button :url="$isNewTopic ? route('forums.topics.show', ['forum' => $content->forum->slug, 'topic' => $content->slug]) : route('forums.topics.show', ['forum' => $content->topic->forum->slug, 'topic' => $content->topic->slug]) . '#'.$content->id">
 View {{ $isNewTopic ? 'topic' : 'reply' }}
 </x-mail::button>
 

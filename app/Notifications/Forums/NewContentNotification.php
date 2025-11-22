@@ -66,6 +66,6 @@ class NewContentNotification extends Notification implements ShouldQueue
         return route('forums.topics.show', [
             'forum' => $this->content->topic->forum->slug,
             'topic' => $this->content->topic->slug,
-        ]).'#post-'.$this->content->id;
+        ]).'#'.$this->content->id;
     }
 }
