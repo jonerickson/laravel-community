@@ -10,6 +10,7 @@ use App\Http\Resources\ApiResource;
 use App\Models\File;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Validation\ValidationException;
 
 class FileController extends Controller
 {
@@ -25,6 +26,12 @@ class FileController extends Controller
 
         $function = $visibility === 'public' ? 'storePublicly' : 'store';
         $path = $uploadedFile->$function('files');
+
+        if ($path === false) {
+            throw ValidationException::withMessages([
+                'file' => 'The file could not be uploaded. Please try again.',
+            ]);
+        }
 
         $file = File::query()->create([
             'name' => $uploadedFile->getClientOriginalName(),
