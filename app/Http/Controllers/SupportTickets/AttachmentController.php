@@ -11,6 +11,7 @@ use App\Models\File;
 use App\Models\SupportTicket;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
 class AttachmentController extends Controller
@@ -25,6 +26,12 @@ class AttachmentController extends Controller
         /** @var UploadedFile $file */
         $file = $request->validated('attachment');
         $path = $file->store('support');
+
+        if ($path === false) {
+            throw ValidationException::withMessages([
+                'attachment' => 'The attachment could not be uploaded. Please try again.',
+            ]);
+        }
 
         $ticket->files()->create([
             'name' => $file->getClientOriginalName(),
