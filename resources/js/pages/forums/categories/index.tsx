@@ -5,7 +5,6 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
-// import type { BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { MessageSquare, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -22,13 +21,6 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
 
     const allForums = categories.flatMap((category) => category.forums || []);
 
-    // const breadcrumbs: BreadcrumbItem[] = [
-    //     {
-    //         title: 'Forums',
-    //         href: route('forums.index'),
-    //     },
-    // ];
-
     const structuredData = {
         '@context': 'https://schema.org',
         '@type': 'CollectionPage',
@@ -39,15 +31,6 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
             '@type': 'Organization',
             name: siteName,
         },
-        // breadcrumb: {
-        //     '@type': 'BreadcrumbList',
-        //     itemListElement: breadcrumbs.map((breadcrumb, index) => ({
-        //         '@type': 'ListItem',
-        //         position: index + 1,
-        //         name: breadcrumb.title,
-        //         item: breadcrumb.href,
-        //     })),
-        // },
         hasPart: categories.map((category) => ({
             '@type': 'CollectionPage',
             name: category.name,
