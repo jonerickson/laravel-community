@@ -11,13 +11,6 @@ import { MessageSquare, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { route } from 'ziggy-js';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Forums',
-        href: route('forums.index'),
-    },
-];
-
 interface ForumsIndexProps {
     categories: App.Data.ForumCategoryData[];
 }
@@ -28,6 +21,13 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const allForums = categories.flatMap((category) => category.forums || []);
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Forums',
+            href: route('forums.index'),
+        },
+    ];
 
     const structuredData = {
         '@context': 'https://schema.org',
