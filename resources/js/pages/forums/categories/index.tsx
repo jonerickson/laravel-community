@@ -5,7 +5,7 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
+// import type { BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { MessageSquare, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -22,12 +22,12 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
 
     const allForums = categories.flatMap((category) => category.forums || []);
 
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Forums',
-            href: route('forums.index'),
-        },
-    ];
+    // const breadcrumbs: BreadcrumbItem[] = [
+    //     {
+    //         title: 'Forums',
+    //         href: route('forums.index'),
+    //     },
+    // ];
 
     const structuredData = {
         '@context': 'https://schema.org',
@@ -39,15 +39,15 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
             '@type': 'Organization',
             name: siteName,
         },
-        breadcrumb: {
-            '@type': 'BreadcrumbList',
-            itemListElement: breadcrumbs.map((breadcrumb, index) => ({
-                '@type': 'ListItem',
-                position: index + 1,
-                name: breadcrumb.title,
-                item: breadcrumb.href,
-            })),
-        },
+        // breadcrumb: {
+        //     '@type': 'BreadcrumbList',
+        //     itemListElement: breadcrumbs.map((breadcrumb, index) => ({
+        //         '@type': 'ListItem',
+        //         position: index + 1,
+        //         name: breadcrumb.title,
+        //         item: breadcrumb.href,
+        //     })),
+        // },
         hasPart: categories.map((category) => ({
             '@type': 'CollectionPage',
             name: category.name,
@@ -78,7 +78,7 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout>
             <Head title="Forums">
                 <meta name="description" content="Connect with our community and get support through our forums" />
                 <meta property="og:title" content={`Forums - ${siteName}`} />
