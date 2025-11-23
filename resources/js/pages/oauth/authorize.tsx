@@ -34,11 +34,13 @@ interface AuthorizeProps {
 }
 
 export default function OAuthAuthorize({ request, authToken, client, user, scopes }: AuthorizeProps) {
-    const {
-        post,
-        delete: destroy,
-        processing,
-    } = useForm({
+    const { post: approve, processing: submitProcessing } = useForm({
+        state: request.state,
+        client_id: request.client_id,
+        auth_token: authToken,
+    });
+
+    const { delete: deny, processing: cancelProcessing } = useForm({
         state: request.state,
         client_id: request.client_id,
         auth_token: authToken,
@@ -47,13 +49,13 @@ export default function OAuthAuthorize({ request, authToken, client, user, scope
     const handleApprove: FormEventHandler = (e) => {
         e.preventDefault();
 
-        post(route('passport.authorizations.approve'));
+        approve(route('passport.authorizations.approve'));
     };
 
     const handleDeny: FormEventHandler = (e) => {
         e.preventDefault();
 
-        destroy(route('passport.authorizations.deny'));
+        deny(route('passport.authorizations.deny'));
     };
 
     return (
@@ -99,12 +101,12 @@ export default function OAuthAuthorize({ request, authToken, client, user, scope
                     )}
 
                     <div className="space-y-3">
-                        <Button onClick={handleApprove} className="w-full" disabled={processing}>
-                            {processing && <LoaderCircle className="mr-2 size-4 animate-spin" />}
+                        <Button onClick={handleApprove} className="w-full" disabled={submitProcessing}>
+                            {submitProcessing && <LoaderCircle className="mr-2 size-4 animate-spin" />}
                             Authorize
                         </Button>
 
-                        <Button onClick={handleDeny} variant="outline" className="w-full" disabled={processing}>
+                        <Button onClick={handleDeny} variant="outline" className="w-full" disabled={cancelProcessing}>
                             Cancel
                         </Button>
                     </div>
