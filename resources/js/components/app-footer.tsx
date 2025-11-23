@@ -3,7 +3,22 @@ import { Icon } from '@/components/icon';
 import { useLayout } from '@/hooks';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, CalendarSync, Folder, Grid, Home, LibraryBig, Mail, MapPin, Newspaper, Phone, ShoppingCart } from 'lucide-react';
+import {
+    BookOpen,
+    CalendarSync,
+    CircleUser,
+    Folder,
+    Grid,
+    HelpCircle,
+    Home,
+    LibraryBig,
+    Mail,
+    MapPin,
+    Newspaper,
+    Phone,
+    Search,
+    ShoppingCart,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -48,6 +63,12 @@ const mainNavItems: NavItem[] = [
 ];
 
 const supportNavItems: NavItem[] = [
+    {
+        title: 'Knowledge Base',
+        href: () => route('knowledge-base.index'),
+        icon: HelpCircle,
+        isActive: () => true,
+    },
     {
         title: 'Policies',
         href: () => route('policies.index'),
@@ -125,31 +146,32 @@ export function AppFooter() {
                                     {item.title}
                                 </Link>
                             ))}
-                            <Link
-                                href={route('forums.index')}
-                                className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                            >
-                                <LibraryBig className="size-4" />
-                                Community Forums
-                            </Link>
-                            <Link
-                                href={route('blog.index')}
-                                className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                            >
-                                <Newspaper className="size-4" />
-                                Blog & Updates
-                            </Link>
                         </div>
                     </div>
 
                     <div className="space-y-4">
-                        <HeadingSmall title="Legal" />
+                        <HeadingSmall title="Other" />
                         <div className="space-y-2">
                             <Link
-                                href={route('policies.index')}
-                                className="block text-sm text-muted-foreground transition-colors hover:text-foreground"
+                                href={route('settings.profile.edit')}
+                                className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
                             >
-                                All Policies
+                                <CircleUser className="size-4" />
+                                My Account
+                            </Link>
+                            <Link
+                                href={route('search')}
+                                className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                            >
+                                <Search className="size-4" />
+                                Search
+                            </Link>
+                            <Link
+                                href={route('store.cart.index')}
+                                className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                            >
+                                <ShoppingCart className="size-4" />
+                                Shopping Cart
                             </Link>
                         </div>
                     </div>
