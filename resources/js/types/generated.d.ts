@@ -503,8 +503,8 @@ declare namespace App.Data {
         slogan: string | null;
         logoUrl: string;
         cartCount: number;
-        memberCount: string;
-        postCount: string;
+        memberCount: number;
+        postCount: number;
         discordCount: number;
         robloxCount: number;
         flash: App.Data.FlashData | null;

@@ -9,7 +9,7 @@ import { AbstractBackgroundPattern } from '@/components/ui/abstract-background-p
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn, currency } from '@/lib/utils';
+import { abbreviateNumber, cn, currency } from '@/lib/utils';
 import { stripCharacters } from '@/utils/truncate';
 import { Deferred, Head, Link, usePage } from '@inertiajs/react';
 import {
@@ -78,7 +78,7 @@ const features = [
 
 export default function Home({ subscriptions = [] }: HomeProps) {
     const page = usePage<App.Data.SharedData>();
-    const { name, auth, memberCount, postCount, slogan, logoUrl } = page.props;
+    const { name, auth, memberCount, postCount, discordCount, robloxCount, slogan, logoUrl } = page.props;
 
     return (
         <div className="min-h-screen bg-background text-foreground">
@@ -149,14 +149,22 @@ export default function Home({ subscriptions = [] }: HomeProps) {
 
                 <section className="border-y border-border/40 py-16">
                     <div className="container mx-auto px-6 sm:px-4">
-                        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+                        <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-6">
                             <div className="text-center">
-                                <div className="text-gaming-blue mb-2 text-3xl font-bold md:text-4xl">{postCount}+</div>
-                                <div className="text-sm text-muted-foreground">Active Discussions</div>
+                                <div className="text-gaming-purple mb-2 text-3xl font-bold md:text-4xl">{abbreviateNumber(memberCount)}+</div>
+                                <div className="text-sm text-muted-foreground">Connected Members</div>
                             </div>
                             <div className="text-center">
-                                <div className="text-gaming-purple mb-2 text-3xl font-bold md:text-4xl">{memberCount}+</div>
-                                <div className="text-sm text-muted-foreground">Connected Members</div>
+                                <div className="text-gaming-purple mb-2 text-3xl font-bold md:text-4xl">{abbreviateNumber(discordCount)}+</div>
+                                <div className="text-sm text-muted-foreground">Discord Members</div>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-gaming-purple mb-2 text-3xl font-bold md:text-4xl">{abbreviateNumber(robloxCount)}+</div>
+                                <div className="text-sm text-muted-foreground">Roblox Members</div>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-gaming-blue mb-2 text-3xl font-bold md:text-4xl">{abbreviateNumber(postCount)}+</div>
+                                <div className="text-sm text-muted-foreground">Active Discussions</div>
                             </div>
                             <div className="text-center">
                                 <div className="text-gaming-green mb-2 text-3xl font-bold md:text-4xl">99.9%</div>

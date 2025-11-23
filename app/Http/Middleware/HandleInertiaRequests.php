@@ -77,8 +77,8 @@ class HandleInertiaRequests extends Middleware
                 ]))
                 ->toArray()),
             'cartCount' => $this->shoppingCartService->getCartCount(),
-            'memberCount' => (string) Cache::remember('member_count', now()->addHour(), fn () => Number::abbreviate(User::count())),
-            'postCount' => (string) Cache::remember('post_count', now()->addHour(), fn () => Number::abbreviate(Post::count())),
+            'memberCount' => (int) Cache::remember('member_count', now()->addHour(), fn () => User::count()),
+            'postCount' => (int) Cache::remember('post_count', now()->addHour(), fn () => Post::count()),
             'discordCount' => (int) Cache::remember('discord_count', now()->addHour(), fn () => app(DiscordService::class)->getPresenceCount()),
             'robloxCount' => (int) Cache::remember('roblox_count', now()->addHour(), fn () => app(RobloxService::class)->getMemberCount()),
             'logoUrl' => asset('images/logo.svg'),

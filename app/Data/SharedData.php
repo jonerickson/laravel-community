@@ -36,9 +36,9 @@ class SharedData extends Data
 
     public int $cartCount;
 
-    public string $memberCount;
+    public int $memberCount;
 
-    public string $postCount;
+    public int $postCount;
 
     public int $discordCount;
 
