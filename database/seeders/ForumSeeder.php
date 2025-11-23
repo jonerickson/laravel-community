@@ -82,8 +82,8 @@ class ForumSeeder extends Seeder
         ];
 
         $author = User::first() ?? User::factory()->create();
-        $memberGroup = Group::defaultMemberGroups()->first() ?? Group::factory()->asDefaultMemberGroup()->create();
-        $guestGroup = Group::defaultGuestGroups()->first() ?? Group::factory()->asDefaultGuest()->create();
+        $memberGroup = Group::defaultMemberGroup() ?? Group::factory()->asDefaultMemberGroup()->create();
+        $guestGroup = Group::defaultGuestGroup() ?? Group::factory()->asDefaultGuest()->create();
         $adminGroup = Group::query()->where('name', 'Administrators')->first() ?? Group::factory()->state(['name' => 'Administrators'])->create();
 
         foreach ($categories as $category) {

@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -92,6 +93,16 @@ class Group extends Model
     protected $dispatchesEvents = [
         'saving' => GroupSaving::class,
     ];
+
+    public static function defaultGuestGroup(): ?Group
+    {
+        return Cache::memo()->remember('default_guest_group', now()->addHour(), fn () => Group::query()->defaultGuestGroups()->first());
+    }
+
+    public static function defaultMemberGroup(): ?Group
+    {
+        return Cache::memo()->remember('default_member_group', now()->addHour(), fn () => Group::query()->defaultMemberGroups()->first());
+    }
 
     public function users(): BelongsToMany
     {

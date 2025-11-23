@@ -6,6 +6,7 @@ namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Models\Forum;
 use App\Models\ForumCategory;
+use App\Models\Group;
 use App\Services\Migration\AbstractImporter;
 use App\Services\Migration\MigrationConfig;
 use App\Services\Migration\MigrationResult;
@@ -273,7 +274,7 @@ class ForumImporter extends AbstractImporter
 
         if (! $config->isDryRun) {
             $category->save();
-            $category->groups()->sync([GroupImporter::getDefaultMemberGroup(), GroupImporter::getDefaultGuestGroup()]);
+            $category->groups()->sync([Group::defaultMemberGroup(), Group::defaultGuestGroup()]);
             $this->cacheCategoryMapping($sourceCategory->id, $category->id);
 
             if (($imagePath = $sourceCategory->card_image) && ($baseUrl = $this->source->getBaseUrl()) && $config->downloadMedia) {
@@ -368,7 +369,7 @@ class ForumImporter extends AbstractImporter
 
         if (! $config->isDryRun) {
             $forum->save();
-            $forum->groups()->sync([GroupImporter::getDefaultMemberGroup(), GroupImporter::getDefaultGuestGroup()]);
+            $forum->groups()->sync([Group::defaultMemberGroup(), Group::defaultGuestGroup()]);
             $this->cacheForumMapping($sourceForum->id, $forum->id);
         }
 

@@ -31,16 +31,6 @@ class GroupImporter extends AbstractImporter
         return (int) Cache::tags(self::CACHE_TAG)->get(self::CACHE_KEY_PREFIX.$sourceGroupId);
     }
 
-    public static function getDefaultMemberGroup(): ?int
-    {
-        return (int) Cache::remember(self::CACHE_KEY_PREFIX.'default_member_group_id', self::CACHE_TTL, fn () => Group::defaultMemberGroups()->value('id'));
-    }
-
-    public static function getDefaultGuestGroup(): ?int
-    {
-        return (int) Cache::remember(self::CACHE_KEY_PREFIX.'default_guest_group_id', self::CACHE_TTL, fn () => Group::defaultGuestGroups()->value('id'));
-    }
-
     public function getEntityName(): string
     {
         return self::ENTITY_NAME;

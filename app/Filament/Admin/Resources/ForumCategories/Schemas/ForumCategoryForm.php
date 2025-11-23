@@ -101,8 +101,8 @@ class ForumCategoryForm
                             ->schema([
                                 Select::make('groups')
                                     ->default(fn (): Collection => collect([
-                                        ...GroupModel::query()->defaultGuestGroups()->pluck('id'),
-                                        ...GroupModel::query()->defaultMemberGroups()->pluck('id'),
+                                        GroupModel::defaultMemberGroup()?->id,
+                                        GroupModel::defaultGuestGroup()?->id,
                                     ]))
                                     ->relationship('groups', 'name')
                                     ->preload()
