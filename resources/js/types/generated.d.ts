@@ -503,8 +503,9 @@ declare namespace App.Data {
         slogan: string | null;
         cartCount: number | null;
         logoUrl: string;
-        memberCount: string | boolean | null;
-        postCount: string | boolean | null;
+        memberCount: string | null;
+        postCount: string | null;
+        discordCount: string | null;
         flash: App.Data.FlashData | null;
         sidebarOpen: boolean;
         ziggy: Config & { location: string };

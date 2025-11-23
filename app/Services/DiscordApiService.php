@@ -17,6 +17,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Sleep;
+use Illuminate\Support\Uri;
 use Psr\Log\LoggerInterface;
 
 class DiscordApiService
@@ -34,6 +35,17 @@ class DiscordApiService
         protected LoggerInterface $log,
     ) {
         //
+    }
+
+    /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
+    public function getPresenceCount(): int
+    {
+        $response = $this->makeRequest('get', Uri::of(sprintf('/guilds/%s/preview', $this->guildId))->withQuery(['with_counts' => 'true'])->value());
+
+        return (int) $response->json('approximate_presence_count') ?? 0;
     }
 
     /**
@@ -75,6 +87,21 @@ class DiscordApiService
         $response = $this->makeRequest('delete', sprintf('/guilds/%s/members/%s', $this->guildId, $discordUserId));
 
         return ! is_null($response);
+    }
+
+    /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
+    public function listRoles(): Collection
+    {
+        $response = $this->makeRequest('get', sprintf('/guilds/%s/roles', $this->guildId));
+
+        if (is_null($response)) {
+            return new Collection;
+        }
+
+        return collect($response->json());
     }
 
     /**
@@ -126,21 +153,6 @@ class DiscordApiService
     public function resetCachedUserRoles(string $discordUserId): void
     {
         Cache::forget('discord_user_roles.'.$discordUserId);
-    }
-
-    /**
-     * @throws RequestException
-     * @throws ConnectionException
-     */
-    public function listRoles(): Collection
-    {
-        $response = $this->makeRequest('get', sprintf('/guilds/%s/roles', $this->guildId));
-
-        if (is_null($response)) {
-            return new Collection;
-        }
-
-        return collect($response->json());
     }
 
     public function getCachedGuildRoles(): Collection

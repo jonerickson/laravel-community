@@ -16,6 +16,7 @@ use App\Models\Page;
 use App\Models\Permission;
 use App\Models\Post;
 use App\Models\User;
+use App\Services\DiscordApiService;
 use App\Services\ShoppingCartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -75,8 +76,9 @@ class HandleInertiaRequests extends Middleware
                 ]))
                 ->toArray()),
             'cartCount' => $this->shoppingCartService->getCartCount(),
-            'memberCount' => Cache::remember('member_count', now()->addHour(), fn () => Number::abbreviate(User::count())),
-            'postCount' => Cache::remember('post_count', now()->addHour(), fn () => Number::abbreviate(Post::count())),
+            'memberCount' => (string) Cache::remember('member_count', now()->addHour(), fn () => Number::abbreviate(User::count())),
+            'postCount' => (string) Cache::remember('post_count', now()->addHour(), fn () => Number::abbreviate(Post::count())),
+            'discordCount' => (int) Cache::remember('discord_count', now()->addHour(), fn () => app(DiscordApiService::class)->getPresenceCount()),
             'logoUrl' => asset('images/logo.svg'),
             'flash' => null,
             'name' => config('app.name'),
