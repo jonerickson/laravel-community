@@ -36,11 +36,11 @@ class SharedData extends Data
 
     public string $logoUrl;
 
-    public ?string $memberCount = null;
+    public string $memberCount;
 
-    public ?string $postCount = null;
+    public string $postCount;
 
-    public ?string $discordCount = null;
+    public int $discordCount;
 
     public ?FlashData $flash = null;
 
