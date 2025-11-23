@@ -16,7 +16,8 @@ use App\Models\Page;
 use App\Models\Permission;
 use App\Models\Post;
 use App\Models\User;
-use App\Services\DiscordApiService;
+use App\Services\Integrations\DiscordService;
+use App\Services\Integrations\RobloxService;
 use App\Services\ShoppingCartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -78,7 +79,8 @@ class HandleInertiaRequests extends Middleware
             'cartCount' => $this->shoppingCartService->getCartCount(),
             'memberCount' => (string) Cache::remember('member_count', now()->addHour(), fn () => Number::abbreviate(User::count())),
             'postCount' => (string) Cache::remember('post_count', now()->addHour(), fn () => Number::abbreviate(Post::count())),
-            'discordCount' => (int) Cache::remember('discord_count', now()->addHour(), fn () => app(DiscordApiService::class)->getPresenceCount()),
+            'discordCount' => (int) Cache::remember('discord_count', now()->addHour(), fn () => app(DiscordService::class)->getPresenceCount()),
+            'robloxCount' => (int) Cache::remember('roblox_count', now()->addHour(), fn () => app(RobloxService::class)->getMemberCount()),
             'logoUrl' => asset('images/logo.svg'),
             'flash' => null,
             'name' => config('app.name'),

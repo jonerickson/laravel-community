@@ -1,8 +1,10 @@
 import { AppFooter } from '@/components/app-footer';
 import { AppHeader } from '@/components/app-header';
+import { DiscordOnlineCount } from '@/components/discord-online-count';
 import { EmptyState } from '@/components/empty-state';
 import HeadingLarge from '@/components/heading-large';
 import Loading from '@/components/loading';
+import { RobloxMemberCount } from '@/components/roblox-member-count';
 import { AbstractBackgroundPattern } from '@/components/ui/abstract-background-pattern';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -98,9 +100,17 @@ export default function Home({ subscriptions = [] }: HomeProps) {
 
                     <div className="relative z-20 container mx-auto px-6 text-center sm:px-4">
                         <div className="mx-auto max-w-5xl">
-                            <div className="mb-8 inline-flex items-center rounded-full border border-border/40 bg-background px-3 py-1 text-sm text-muted-foreground">
-                                <Rocket className="text-gaming-blue mr-2 h-4 w-4" />
-                                Now powering {memberCount}+ members
+                            <div className="mb-8 flex flex-wrap items-center justify-center gap-2">
+                                <div className="inline-flex items-center rounded-full border border-border/40 bg-background px-3 py-1 text-sm text-muted-foreground">
+                                    <Rocket className="text-gaming-blue mr-2 h-4 w-4" />
+                                    Now powering {memberCount}+ members
+                                </div>
+                                <div className="inline-flex items-center rounded-full border border-border/40 bg-background px-3 py-1 text-sm text-muted-foreground">
+                                    <DiscordOnlineCount />
+                                </div>
+                                <div className="inline-flex items-center rounded-full border border-border/40 bg-background px-3 py-1 text-sm text-muted-foreground">
+                                    <RobloxMemberCount />
+                                </div>
                             </div>
 
                             <h1 className="mb-6 text-4xl font-bold tracking-tight text-balance md:text-6xl lg:text-7xl">

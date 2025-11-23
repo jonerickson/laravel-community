@@ -42,6 +42,8 @@ class SharedData extends Data
 
     public int $discordCount;
 
+    public int $robloxCount;
+
     public ?FlashData $flash = null;
 
     public bool $sidebarOpen;

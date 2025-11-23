@@ -46,6 +46,8 @@ return [
     ],
 
     'roblox' => [
+        'api_key' => env('ROBLOX_API_KEY'),
+        'group_id' => env('ROBLOX_GROUP_ID'),
         'enabled' => env('ROBLOX_ENABLED', false),
         'client_id' => env('ROBLOX_CLIENT_ID'),
         'client_secret' => env('ROBLOX_CLIENT_SECRET'),

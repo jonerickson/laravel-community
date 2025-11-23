@@ -6,7 +6,7 @@ namespace App\Jobs\Discord;
 
 use App\Models\Group;
 use App\Models\User;
-use App\Services\DiscordApiService;
+use App\Services\Integrations\DiscordService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Http\Client\ConnectionException;
@@ -30,7 +30,7 @@ class SyncRoles implements ShouldQueue
     {
         $user = User::findOrFail($this->userId);
 
-        $discordApiService = app(DiscordApiService::class);
+        $discordApiService = app(DiscordService::class);
 
         if (! $discordIntegration = $user->integrations()->latest()->firstWhere('provider', 'discord')) {
             return;

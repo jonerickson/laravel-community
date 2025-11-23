@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Listeners\Discord;
 
 use App\Events\UserIntegrationCreated;
-use App\Services\DiscordApiService;
+use App\Services\Integrations\DiscordService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Http\Client\ConnectionException;
@@ -19,7 +19,7 @@ class AddUserToServer implements ShouldQueue
     use InteractsWithQueue;
 
     public function __construct(
-        private readonly DiscordApiService $discord,
+        private readonly DiscordService $discord,
     ) {
         //
     }

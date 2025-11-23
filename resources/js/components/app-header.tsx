@@ -1,5 +1,4 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { DiscordOnlineCount } from '@/components/discord-online-count';
 import { GlobalSearch } from '@/components/global-search';
 import { Icon } from '@/components/icon';
 import { ShoppingCartIcon } from '@/components/shopping-cart-icon';
@@ -201,8 +200,6 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     </div>
 
                     <div className="ml-auto flex items-center space-x-2">
-                        <DiscordOnlineCount className="hidden sm:flex" />
-
                         <div className="relative flex items-center space-x-1">
                             <Tooltip>
                                 <TooltipTrigger asChild>

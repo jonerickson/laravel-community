@@ -21,7 +21,7 @@ use App\Models\Fingerprint;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
-use App\Services\DiscordApiService;
+use App\Services\Integrations\DiscordService;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -275,7 +275,7 @@ class UserResource extends Resource
                                                     return [];
                                                 }
 
-                                                $discordApi = app(DiscordApiService::class);
+                                                $discordApi = app(DiscordService::class);
                                                 $roleIds = $discordApi->getCachedUserRoleIds($discordIntegration->provider_id);
                                                 $guildRoles = $discordApi->getCachedGuildRoles();
 

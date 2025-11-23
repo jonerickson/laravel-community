@@ -506,6 +506,7 @@ declare namespace App.Data {
         memberCount: string;
         postCount: string;
         discordCount: number;
+        robloxCount: number;
         flash: App.Data.FlashData | null;
         sidebarOpen: boolean;
         ziggy: Config & { location: string };

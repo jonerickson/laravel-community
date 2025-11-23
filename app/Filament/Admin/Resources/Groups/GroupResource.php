@@ -10,7 +10,7 @@ use App\Filament\Admin\Resources\Groups\Pages\ListGroups;
 use App\Models\Group;
 use App\Models\Permission;
 use App\Models\Role;
-use App\Services\DiscordApiService;
+use App\Services\Integrations\DiscordService;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -136,7 +136,7 @@ class GroupResource extends Resource
                                         ->required()
                                         ->hiddenLabel()
                                         ->options(function () {
-                                            $discordApi = app(DiscordApiService::class);
+                                            $discordApi = app(DiscordService::class);
 
                                             return $discordApi->listRoles()->pluck('name', 'id');
                                         })

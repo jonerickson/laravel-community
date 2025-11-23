@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\Integrations;
 
 use Exception;
 use Illuminate\Container\Attributes\Config;
@@ -20,7 +20,7 @@ use Illuminate\Support\Sleep;
 use Illuminate\Support\Uri;
 use Psr\Log\LoggerInterface;
 
-class DiscordApiService
+class DiscordService
 {
     protected string $baseUrl = 'https://discord.com/api/v10/';
 
@@ -225,6 +225,8 @@ class DiscordApiService
     protected function client(): PendingRequest|Factory
     {
         return Http::withToken($this->botToken, 'Bot')
+            ->withUserAgent(config('app.name'))
+            ->acceptJson()
             ->baseUrl($this->baseUrl);
     }
 }
