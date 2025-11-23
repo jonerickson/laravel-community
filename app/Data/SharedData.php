@@ -40,6 +40,8 @@ class SharedData extends Data
 
     public int $postCount;
 
+    public int $discordOnlineCount;
+
     public int $discordCount;
 
     public int $robloxCount;

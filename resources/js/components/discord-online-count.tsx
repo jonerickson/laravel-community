@@ -7,9 +7,9 @@ interface DiscordOnlineCountProps {
 }
 
 export function DiscordOnlineCount({ className }: DiscordOnlineCountProps) {
-    const { discordCount } = usePage<App.Data.SharedData>().props;
+    const { discordOnlineCount } = usePage<App.Data.SharedData>().props;
 
-    if (!discordCount) {
+    if (!discordOnlineCount) {
         return null;
     }
 
@@ -19,7 +19,7 @@ export function DiscordOnlineCount({ className }: DiscordOnlineCountProps) {
                 <DiscordIcon className="size-4 text-[#5865F2]" />
                 <span className="absolute -top-1 -right-0.5 size-2 rounded-full bg-success ring-2 ring-background" />
             </div>
-            <span className="font-medium tabular-nums">{abbreviateNumber(discordCount)}</span>
+            <span className="font-medium tabular-nums">{abbreviateNumber(discordOnlineCount)}</span>
             <span className="hidden sm:inline-flex">online</span>
         </div>
     );

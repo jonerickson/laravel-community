@@ -505,6 +505,7 @@ declare namespace App.Data {
         cartCount: number;
         memberCount: number;
         postCount: number;
+        discordOnlineCount: number;
         discordCount: number;
         robloxCount: number;
         flash: App.Data.FlashData | null;

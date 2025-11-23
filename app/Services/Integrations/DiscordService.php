@@ -56,6 +56,21 @@ class DiscordService
      * @throws RequestException
      * @throws ConnectionException
      */
+    public function getMemberCount(): int
+    {
+        $response = $this->makeRequest('get', Uri::of(sprintf('/guilds/%s/preview', $this->guildId))->withQuery(['with_counts' => 'true'])->value());
+
+        if (is_null($response)) {
+            return 0;
+        }
+
+        return (int) $response->json('approximate_member_count') ?? 0;
+    }
+
+    /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
     public function isUserInServer(string $discordUserId): bool
     {
         $response = $this->makeRequest('get', sprintf('/guilds/%s/members/%s', $this->guildId, $discordUserId));
