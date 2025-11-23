@@ -32,9 +32,9 @@ class SharedData extends Data
 
     public ?string $slogan = null;
 
-    public ?int $cartCount = null;
-
     public string $logoUrl;
+
+    public int $cartCount;
 
     public string $memberCount;
 

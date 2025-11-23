@@ -501,8 +501,8 @@ declare namespace App.Data {
         phone: string | null;
         address: string | null;
         slogan: string | null;
-        cartCount: number | null;
         logoUrl: string;
+        cartCount: number;
         memberCount: string;
         postCount: string;
         discordCount: number;
