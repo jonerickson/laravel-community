@@ -16,7 +16,7 @@ class AssignDefaultMemberGroup
             return;
         }
 
-        if (!($group = Group::defaultMemberGroup()) instanceof \App\Models\Group) {
+        if (! ($group = Group::defaultMemberGroup()) instanceof Group) {
             return;
         }
 
