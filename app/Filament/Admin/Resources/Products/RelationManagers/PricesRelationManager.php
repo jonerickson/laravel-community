@@ -8,6 +8,7 @@ use App\Enums\PriceType;
 use App\Enums\SubscriptionInterval;
 use App\Filament\Admin\Resources\Prices\Actions\CreateExternalPriceAction;
 use App\Filament\Admin\Resources\Prices\Actions\DeleteExternalPriceAction;
+use App\Filament\Admin\Resources\Prices\Actions\SwapAction;
 use App\Filament\Admin\Resources\Prices\Actions\SyncExternalPriceAction;
 use App\Filament\Admin\Resources\Prices\Actions\UpdateExternalPriceAction;
 use App\Models\Price;
@@ -170,6 +171,7 @@ class PricesRelationManager extends RelationManager
                 CreateExternalPriceAction::make(),
                 DeleteExternalPriceAction::make(),
                 UpdateExternalPriceAction::make(),
+                SwapAction::make(),
                 EditAction::make()
                     ->modalDescription('Use the update external price tool to update the product price.'),
                 DeleteAction::make(),

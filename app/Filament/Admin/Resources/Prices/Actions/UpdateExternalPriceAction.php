@@ -12,6 +12,7 @@ use App\Managers\PaymentManager;
 use App\Models\Price;
 use Closure;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Enums\Width;
@@ -54,6 +55,11 @@ class UpdateExternalPriceAction extends Action
             TextEntry::make('interval')
                 ->getStateUsing(fn (Price $record) => $record->interval)
                 ->helperText('When changing a price, the interval must remain the same. To change the interval, create a new price instead.'),
+            Radio::make('proration_behavior')
+                ->required()
+                ->label('Proration Behavior')
+                ->default(ProrationBehavior::CreateProrations)
+                ->options(ProrationBehavior::class),
         ]);
 
         $this->action(function (UpdateExternalPriceAction $action, Price $record, array $data): void {
@@ -89,7 +95,7 @@ class UpdateExternalPriceAction extends Action
             }
 
             if ($subscribers->isNotEmpty()) {
-                CreateSwapSubscriptionsBatchAction::execute($subscribers, $newPrice, ProrationBehavior::CreateProrations, PaymentBehavior::DefaultIncomplete);
+                CreateSwapSubscriptionsBatchAction::execute($subscribers, $newPrice, $data['proration_behavior'], PaymentBehavior::DefaultIncomplete);
             }
 
             $paymentManager->deletePrice($record);

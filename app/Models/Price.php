@@ -123,7 +123,7 @@ class Price extends Model implements HasLabel
 
     public function subscriptions(): HasMany
     {
-        return $this->hasMany(Subscription::class, 'stripe_price');
+        return $this->hasMany(Subscription::class, 'stripe_price', 'external_price_id');
     }
 
     public function scopeDefault(Builder $query): void

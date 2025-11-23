@@ -304,12 +304,15 @@ class ConcurrentMigrationManager
             if ($line === '') {
                 continue;
             }
+
             if ($line === '0') {
                 continue;
             }
+
             if ($this->isProgressBarOutput($line)) {
                 continue;
             }
+
             $line = trim($line);
 
             if ($this->isUnicodeTableBorder($line)) {

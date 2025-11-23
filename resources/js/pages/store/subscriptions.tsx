@@ -247,7 +247,7 @@ function PricingCard({
                                     <p className="text-sm font-medium text-destructive">Payment Issue</p>
                                     <p className="text-xs text-muted-foreground">
                                         {currentSubscription.status === 'past_due'
-                                            ? 'Your payment is past due. Please update your payment method to continue your subscription.'
+                                            ? 'Your payment is past due. Please pay any open invoice or update your payment method to continue your subscription.'
                                             : 'Your payment is incomplete. Please complete your payment to activate your subscription.'}
                                     </p>
                                 </div>

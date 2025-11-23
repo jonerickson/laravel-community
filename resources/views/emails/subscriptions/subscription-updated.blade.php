@@ -16,7 +16,7 @@ Your subscription **{{ $product->name }}** has been updated.
   🆓 You're in a **trial period**. Enjoy exploring all the features!
   @break
 @case(\App\Enums\SubscriptionStatus::PastDue)
-  ⚠️ Your subscription is **past due**. Please update your payment method to avoid service interruption.
+  ⚠️ Your subscription is **past due**. Please pay any open invoice or update your payment method to continue your subscription.
   @break
 @case(\App\Enums\SubscriptionStatus::Unpaid)
   💳 Your subscription is **unpaid**. Please complete payment to continue your subscription.

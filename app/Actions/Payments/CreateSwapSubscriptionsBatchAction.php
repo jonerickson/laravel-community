@@ -40,7 +40,7 @@ class CreateSwapSubscriptionsBatchAction extends Action
             paymentBehavior: $this->paymentBehavior,
         )));
 
-        $batch->dispatch();
+        $batch->name('Swap Subscriptions')->dispatch();
 
         return true;
     }
