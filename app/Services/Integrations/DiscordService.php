@@ -45,6 +45,10 @@ class DiscordService
     {
         $response = $this->makeRequest('get', Uri::of(sprintf('/guilds/%s/preview', $this->guildId))->withQuery(['with_counts' => 'true'])->value());
 
+        if (is_null($response)) {
+            return 0;
+        }
+
         return (int) $response->json('approximate_presence_count') ?? 0;
     }
 

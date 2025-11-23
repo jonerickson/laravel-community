@@ -42,6 +42,10 @@ class RobloxService
     {
         $response = $this->makeRequest('get', sprintf('/groups/%s', $this->groupId));
 
+        if (is_null($response)) {
+            return 0;
+        }
+
         return (int) $response->json('memberCount') ?? 0;
     }
 

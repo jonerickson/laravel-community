@@ -22,7 +22,6 @@ use App\Services\ShoppingCartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Number;
 use Inertia\Middleware;
 use Override;
 use Tighten\Ziggy\Ziggy;
