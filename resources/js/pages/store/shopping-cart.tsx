@@ -10,7 +10,7 @@ import { useCartOperations } from '@/hooks/use-cart-operations';
 import AppLayout from '@/layouts/app-layout';
 import { currency } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { Check, ImageIcon, ShoppingCart as ShoppingCartIcon, Ticket, Trash2, XIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -46,6 +46,7 @@ interface DiscountInfo {
 }
 
 export default function ShoppingCart({ cartItems = [], order = null }: ShoppingCartProps) {
+    const { auth } = usePage<App.Data.SharedData>().props;
     const { items, setItems, updateQuantity, removeItem, proceedToCheckout, calculateTotals, loading } = useCartOperations(cartItems);
     const [policiesAgreed, setPoliciesAgreed] = useState(false);
     const [discountCode, setDiscountCode] = useState('');
@@ -186,7 +187,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
             <div className="flex h-full flex-1 flex-col overflow-x-auto">
                 <div className="flex items-start justify-between">
                     <Heading title="Shopping cart" description={`${items.length} ${items.length === 1 ? 'item' : 'items'} in your cart`} />
-                    {items.length > 0 && (
+                    {auth && auth.user && items.length > 0 && (
                         <Button variant="outline" onClick={clearCart} disabled={clearCartProcessing}>
                             <Trash2 className="mr-2 size-4" />
                             {clearCartProcessing ? 'Clearing...' : 'Empty cart'}
