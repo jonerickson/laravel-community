@@ -173,6 +173,9 @@ class MigrateCommand extends Command
             $this->components->success(sprintf('Completed: Migrated %s, Skipped %s, Failed %s', $stats['migrated'], $stats['skipped'], $stats['failed']));
             $this->components->info('Ending - Memory: '.round($endMemory / 1024 / 1024, 2).'MB, Peak: '.round($peakMemory / 1024 / 1024, 2).'MB');
 
+            $this->displayResults($result);
+            $this->displayVerboseResults($result);
+
             return self::SUCCESS;
         } catch (Exception $exception) {
             unregister_tick_function($checkMemory);
@@ -270,17 +273,8 @@ class MigrateCommand extends Command
 
             $this->components->success('Migration completed successfully!');
 
-            if ($result->toTableRows() !== []) {
-                $this->components->info('Migration results:');
-                table(
-                    ['Entity', 'Migrated', 'Skipped', 'Failed'],
-                    $result->toTableRows(),
-                );
-            } else {
-                $this->components->info('No results to display.');
-            }
-
-            $this->displayVerboseOutput($result);
+            $this->displayResults($result);
+            $this->displayVerboseResults($result);
 
             if ($this->option('cleanup')) {
                 $this->components->warn('Cleaning up...');
@@ -352,6 +346,8 @@ class MigrateCommand extends Command
             source: $source,
             totalRecords: $totalRecords,
         );
+
+        $this->components->success('Migration completed successfully!');
 
         if ($this->option('cleanup')) {
             $this->components->warn('Cleaning up...');
@@ -427,7 +423,20 @@ class MigrateCommand extends Command
         $service->setOptionalDependencies($selected);
     }
 
-    protected function displayVerboseOutput(MigrationResult $result): void
+    protected function displayResults(MigrationResult $result): void
+    {
+        if ($result->toTableRows() !== []) {
+            $this->components->info('Migration results:');
+            table(
+                ['Entity', 'Migrated', 'Skipped', 'Failed'],
+                $result->toTableRows(),
+            );
+        } else {
+            $this->components->info('No results to display.');
+        }
+    }
+
+    protected function displayVerboseResults(MigrationResult $result): void
     {
         if (! $this->output->isVerbose()) {
             return;

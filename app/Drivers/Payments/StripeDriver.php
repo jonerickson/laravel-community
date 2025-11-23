@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use Laravel\Cashier\PaymentMethod;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\SubscriptionBuilder;
 use Stripe\Checkout\Session;
@@ -333,7 +334,7 @@ class StripeDriver implements PaymentProcessor
     public function updatePaymentMethod(User $user, string $paymentMethodId, bool $isDefault): ?PaymentMethodData
     {
         return $this->executeWithErrorHandling('updatePaymentMethod', function () use ($user, $paymentMethodId, $isDefault): ?\App\Data\PaymentMethodData {
-            if (! $paymentMethod = $user->findPaymentMethod($paymentMethodId)) {
+            if (! ($paymentMethod = $user->findPaymentMethod($paymentMethodId)) instanceof PaymentMethod) {
                 return null;
             }
 
@@ -348,7 +349,7 @@ class StripeDriver implements PaymentProcessor
     public function deletePaymentMethod(User $user, string $paymentMethodId): bool
     {
         return $this->executeWithErrorHandling('deletePaymentMethod', function () use ($user, $paymentMethodId): bool {
-            if (! $user->findPaymentMethod($paymentMethodId)) {
+            if (! $user->findPaymentMethod($paymentMethodId) instanceof PaymentMethod) {
                 return false;
             }
 
@@ -503,7 +504,7 @@ class StripeDriver implements PaymentProcessor
                 ->when($paymentBehavior === PaymentBehavior::PendingIfIncomplete, fn (SubscriptionBuilder $builder) => $builder->pendingIfPaymentFails())
                 ->withMetadata($metadata)
                 ->when(! $chargeNow, fn (SubscriptionBuilder $builder) => $builder->createAndSendInvoice($customerOptions, $subscriptionOptions))
-                ->when(! $firstParty, fn (SubscriptionBuilder $builder) => $builder->create(
+                ->when(! $firstParty, fn (SubscriptionBuilder $builder): Subscription => $builder->create(
                     customerOptions: $customerOptions,
                     subscriptionOptions: array_merge($subscriptionOptions, [
                         'backdate_start_date' => $backdateStartDate instanceof CarbonInterface ? $backdateStartDate->getTimestamp() : null,
@@ -635,7 +636,7 @@ class StripeDriver implements PaymentProcessor
     public function currentSubscription(User $user): ?SubscriptionData
     {
         return $this->executeWithErrorHandling('currentSubscription', function () use ($user): ?SubscriptionData {
-            if (! $subscription = $user->subscription()) {
+            if (! ($subscription = $user->subscription()) instanceof Subscription) {
                 return null;
             }
 
@@ -923,7 +924,7 @@ class StripeDriver implements PaymentProcessor
 
     public function getBillingPortalUrl(User $user): ?string
     {
-        return $this->executeWithErrorHandling('getBillingPortalUrl', fn (): ?string => $user->billingPortalUrl(
+        return $this->executeWithErrorHandling('getBillingPortalUrl', fn (): string => $user->billingPortalUrl(
             returnUrl: route('settings.billing'),
         ));
     }

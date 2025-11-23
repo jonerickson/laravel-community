@@ -266,38 +266,100 @@ class ConcurrentMigrationManager
      */
     protected function streamProcessOutput(Process $process, array &$data): void
     {
-        $newOutput = substr($process->getOutput(), $data['output_position']);
-        $newError = substr($process->getErrorOutput(), $data['error_position']);
-        $color = $data['color'] ?? 'comment';
+        $this->handleStreamChunk(
+            $process->getOutput(),
+            $data['output_position'],
+            $data['offset'],
+            $data['color'] ?? 'comment',
+            false,
+        );
 
-        if ($newOutput !== '' && $newOutput !== '0') {
-            $lines = explode("\n", rtrim($newOutput, "\n"));
-            foreach ($lines as $line) {
-                if ($line !== '' && $line !== '0' && ! $this->isProgressBarOutput($line)) {
-                    $this->output->writeln(sprintf('<fg=%s>[Worker %s]</> %s', $color, $data['offset'], $line));
-                }
-            }
+        $this->handleStreamChunk(
+            $process->getErrorOutput(),
+            $data['error_position'],
+            $data['offset'],
+            $data['color'] ?? 'comment',
+            true,
+        );
+    }
 
-            $data['output_position'] += strlen($newOutput);
+    protected function handleStreamChunk(
+        string $buffer,
+        int &$position,
+        int $workerOffset,
+        string $color,
+        bool $isError
+    ): void {
+        $chunk = substr($buffer, $position);
+
+        if ($chunk === '' || $chunk === '0') {
+            return;
         }
 
-        if ($newError !== '' && $newError !== '0') {
-            $lines = explode("\n", rtrim($newError, "\n"));
-            foreach ($lines as $line) {
-                if ($line !== '' && $line !== '0' && ! $this->isProgressBarOutput($line)) {
-                    $this->output->writeln(sprintf('<fg=%s>[Worker %s ERROR]</> %s', $color, $data['offset'], $line));
-                }
+        $lines = explode("\n", rtrim($chunk, "\n"));
+
+        $isInsideTable = false;
+
+        foreach ($lines as $line) {
+            if ($line === '') {
+                continue;
+            }
+            if ($line === '0') {
+                continue;
+            }
+            if ($this->isProgressBarOutput($line)) {
+                continue;
+            }
+            $line = trim($line);
+
+            if ($this->isUnicodeTableBorder($line)) {
+                $isInsideTable = true;
+                $this->output->writeln($line);
+
+                continue;
             }
 
-            $data['error_position'] += strlen($newError);
+            if ($isInsideTable) {
+                if ($this->isUnicodeTableRow($line)) {
+                    $this->output->writeln($line);
+
+                    continue;
+                }
+
+                $isInsideTable = false;
+            }
+
+            $prefix = sprintf(
+                '<fg=%s>[Worker %s%s]</> ',
+                $color,
+                $workerOffset,
+                $isError ? ' ERROR' : '',
+            );
+
+            $this->output->writeln($prefix.$line);
         }
+
+        $position += strlen($chunk);
+    }
+
+    protected function isUnicodeTableBorder(string $line): bool
+    {
+        return preg_match('/^[┌├└][─┬┼┴]+[┐┤┘]$/u', $this->stripAnsi($line)) === 1;
+    }
+
+    protected function isUnicodeTableRow(string $line): bool
+    {
+        return preg_match('/^│.*│$/u', $this->stripAnsi($line)) === 1;
     }
 
     protected function isProgressBarOutput(string $line): bool
     {
-        return preg_match('/[\x1B\x9B][\[\]()#;?]*(?:\d{1,4}(?:;\d{0,4})*)?[0-9A-ORZcf-nqry=><]/', $line)
-            || str_contains($line, "\r")
-            || preg_match('/^\s*[\-=>\s]+\s*\d+/', $line);
+        return (bool) preg_match('/^\s*\d+\/\d+\s*\[.*]\s*\d+%/', $this->stripAnsi($line));
+    }
+
+    protected function stripAnsi(string $line): string
+    {
+        return preg_replace('/\e\[[0-9;]*m/', '', $line);
     }
 
     protected function assignWorkerColor(int $offset): string
