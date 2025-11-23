@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
@@ -44,6 +45,8 @@ use Illuminate\Support\Stringable;
  * @property-read bool $is_one_time
  * @property-read bool $is_recurring
  * @property-read Product $product
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Subscription> $subscriptions
+ * @property-read int|null $subscriptions_count
  *
  * @method static Builder<static>|Price active()
  * @method static Builder<static>|Price default()
@@ -116,6 +119,11 @@ class Price extends Model implements HasLabel
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class, 'stripe_price');
     }
 
     public function scopeDefault(Builder $query): void

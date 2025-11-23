@@ -139,6 +139,11 @@ class PricesRelationManager extends RelationManager
                     ->label('External Price')
                     ->default(false)
                     ->boolean(),
+                TextColumn::make('subscriptions_count')
+                    ->visible(fn (): bool => (bool) $this->getOwnerRecord()->isSubscription())
+                    ->label('# of Subscriptions')
+                    ->numeric()
+                    ->counts('subscriptions'),
                 TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime()
