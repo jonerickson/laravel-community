@@ -30,6 +30,7 @@ class ForumController extends Controller
         $this->authorize('view', $forum);
 
         $forum->loadMissing(['category', 'parent']);
+        $forum->loadCount(['followers']);
 
         $children = $forum
             ->children()

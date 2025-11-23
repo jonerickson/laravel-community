@@ -88,7 +88,7 @@ class TopicController extends Controller
 
         $topic->incrementViews();
         $topic->loadMissing(['author']);
-        $topic->loadCount(['posts', 'views']);
+        $topic->loadCount(['posts', 'views', 'followers']);
 
         $posts = $topic
             ->posts()
