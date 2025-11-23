@@ -377,6 +377,13 @@ function SubscriptionCards({ subscriptions }: SubscriptionCardsProps) {
                             </div>
                         )}
                         <CardHeader>
+                            {subscription.featuredImageUrl && (
+                                <img
+                                    alt={subscription.name}
+                                    src={subscription.featuredImageUrl}
+                                    className="mb-4 aspect-[16/9] w-full rounded-2xl bg-muted object-cover"
+                                />
+                            )}
                             <CardTitle>{subscription.name}</CardTitle>
                             {subscription.description && <CardDescription>{stripCharacters(subscription.description)}</CardDescription>}
                             {defaultPrice && (

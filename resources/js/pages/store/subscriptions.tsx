@@ -126,9 +126,13 @@ function PricingCard({
                 </div>
             )}
             <CardHeader className="pb-4 text-center">
-                <div className={`mx-auto mb-4 rounded-full bg-gradient-to-r p-3 ${color} w-fit text-white`}>
-                    <Icon className="h-8 w-8" />
-                </div>
+                {plan.featuredImageUrl ? (
+                    <img alt={plan.name} src={plan.featuredImageUrl} className="mb-4 aspect-[16/9] w-full rounded-2xl bg-muted object-cover" />
+                ) : (
+                    <div className={`mx-auto mb-4 rounded-full bg-gradient-to-r p-3 ${color} w-fit text-white`}>
+                        <Icon className="h-8 w-8" />
+                    </div>
+                )}
                 <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
                 <CardDescription className="text-base">
                     <Link
