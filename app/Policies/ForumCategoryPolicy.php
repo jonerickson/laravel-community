@@ -31,6 +31,6 @@ class ForumCategoryPolicy
 
         return Gate::forUser($user)->check('view_forums_category')
             && $category->is_active
-            && ($groups->intersect($category->groups)->isNotEmpty() ?? false);
+            && ($groups->pluck('id')->intersect($category->groups->pluck('id'))->isNotEmpty() ?? false);
     }
 }
