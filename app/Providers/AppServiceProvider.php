@@ -19,6 +19,7 @@ use App\Models\User;
 use App\Providers\Social\DiscordProvider;
 use App\Providers\Social\RobloxProvider;
 use App\Services\PermissionService;
+use App\Support\Passport\IdTokenResponse;
 use Filament\Facades\Filament;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
@@ -103,6 +104,13 @@ class AppServiceProvider extends ServiceProvider
 
         Model::automaticallyEagerLoadRelationships();
         Model::shouldBeStrict();
+
+        Passport::useAuthorizationServerResponseType(app(IdTokenResponse::class));
+        Passport::tokensCan([
+            'openid' => 'Can perform single sign-on',
+            'profile' => 'Can access your user profile',
+            'email' => 'Can access your email address',
+        ]);
 
         Password::defaults(fn () => Password::min(8)
             ->when($this->app->environment(['staging', 'production']), function (Password $password): void {
