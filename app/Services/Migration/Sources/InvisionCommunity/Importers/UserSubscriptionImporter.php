@@ -6,6 +6,8 @@ namespace App\Services\Migration\Sources\InvisionCommunity\Importers;
 
 use App\Data\SubscriptionData;
 use App\Enums\OrderStatus;
+use App\Enums\PriceType;
+use App\Enums\ProductType;
 use App\Enums\ProrationBehavior;
 use App\Enums\SubscriptionInterval;
 use App\Jobs\ImportSubscription;
@@ -200,7 +202,25 @@ class UserSubscriptionImporter extends AbstractImporter
             $backdateStartDate = $this->getStartDate($sourceUserSubscription);
             $billingCycleAnchor = $this->getExpirationDate($sourceUserSubscription);
 
-            if (is_null($billingCycleAnchor) || ($billingCycleAnchor instanceof CarbonInterface && $billingCycleAnchor->isPast())) {
+            if (is_null($billingCycleAnchor)) {
+                $this->createOrderForNonExpiringSubscription($user);
+
+                $result->incrementSkipped(self::ENTITY_NAME);
+
+                if ($output->isVerbose()) {
+                    $result->recordSkipped(self::ENTITY_NAME, [
+                        'source_id' => $sourceUserSubscription->sub_id,
+                        'purchase_id' => $sourceUserSubscription->sub_purchase_id,
+                        'invoice_id' => $sourceUserSubscription->sub_invoice_id,
+                        'name' => $user->name,
+                        'reason' => 'Created non-expiring subscription product',
+                    ]);
+                }
+
+                return;
+            }
+
+            if ($billingCycleAnchor instanceof CarbonInterface && $billingCycleAnchor->isPast()) {
                 $result->incrementSkipped(self::ENTITY_NAME);
 
                 if ($output->isVerbose()) {
@@ -293,6 +313,43 @@ class UserSubscriptionImporter extends AbstractImporter
         return $product->prices->firstWhere('interval', $interval);
     }
 
+    protected function createOrderForNonExpiringSubscription(User $user): Order
+    {
+        $product = Product::firstOrCreate([
+            'name' => 'Non Expiring Subscription',
+            'type' => ProductType::Product,
+        ]);
+
+        $price = $product->prices()->create([
+            'name' => 'One-Time',
+            'type' => PriceType::OneTime,
+            'amount' => 0,
+            'currency' => 'USD',
+            'interval_count' => 1,
+            'is_active' => 1,
+            'is_default' => 1,
+        ]);
+
+        $order = Order::create([
+            'user_id' => $user->id,
+            'status' => OrderStatus::Succeeded,
+            'amount_due' => 0,
+            'amount_overpaid' => 0,
+            'amount_remaining' => 0,
+            'amount_paid' => 0,
+        ]);
+
+        $order->items()->create([
+            'name' => $product->name,
+            'description' => '',
+            'price_id' => $price->id,
+            'amount' => 0,
+            'quantity' => 1,
+        ]);
+
+        return $order;
+    }
+
     protected function createOrder(User $user, Price $price): Order
     {
         $order = Order::create([
@@ -341,12 +398,12 @@ class UserSubscriptionImporter extends AbstractImporter
                 ->where('ps_id', $sourceUserSubscription->sub_purchase_id)
                 ->first();
 
-            if ($sourcePurchase && isset($sourcePurchase->ps_expire) && is_numeric($sourcePurchase->ps_expire)) {
+            if ($sourcePurchase && isset($sourcePurchase->ps_expire) && is_numeric($sourcePurchase->ps_expire) && $sourcePurchase->ps_expire !== 0) {
                 return Carbon::parse($sourcePurchase->ps_expire);
             }
         }
 
-        return isset($sourceUserSubscription->sub_expire)
+        return isset($sourceUserSubscription->sub_expire) && $sourceUserSubscription->sub_expire !== 0
             ? Carbon::parse($sourceUserSubscription->sub_expire)
             : null;
     }
