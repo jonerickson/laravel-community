@@ -98,18 +98,24 @@ export function AppFooter() {
                         </Link>
                         <p className="text-sm text-muted-foreground">{slogan}</p>
                         <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Mail className="size-4" />
-                                <span>{email}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Phone className="size-4" />
-                                <span>{phone}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <MapPin className="size-4" />
-                                <span>{address}</span>
-                            </div>
+                            {email && (
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Mail className="size-4" />
+                                    <span>{email}</span>
+                                </div>
+                            )}
+                            {phone && (
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Phone className="size-4" />
+                                    <span>{phone}</span>
+                                </div>
+                            )}
+                            {address && (
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <MapPin className="size-4" />
+                                    <span>{address}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
