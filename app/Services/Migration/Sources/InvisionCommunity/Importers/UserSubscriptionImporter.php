@@ -435,7 +435,6 @@ class UserSubscriptionImporter extends AbstractImporter
             ->table($this->getSourceTable())
             ->whereNotNull('sub_member_id')
             ->whereNotNull('sub_package_id')
-            ->where('sub_renews', 1)
             ->where('sub_active', 1)
             ->where('sub_cancelled', 0)
             ->orderBy('sub_id')
