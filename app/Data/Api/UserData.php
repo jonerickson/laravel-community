@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
+use App\Api\State\Providers\MeProvider;
 use App\Api\State\Providers\UserProvider;
 use App\Facades\PaymentProcessor;
 use App\Models\User;
@@ -18,13 +19,13 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
-        new Get(uriTemplate: 'users/{id}'),
-        new GetCollection(uriTemplate: 'users'),
+        new Get(uriTemplate: 'me', provider: MeProvider::class),
+        new Get(uriTemplate: 'users/{id}', provider: UserProvider::class),
+        new GetCollection(uriTemplate: 'users', provider: UserProvider::class),
     ],
     normalizationContext: [
         AbstractItemNormalizer::GROUPS => ['user'],
     ],
-    provider: UserProvider::class,
 )]
 class UserData extends Data
 {

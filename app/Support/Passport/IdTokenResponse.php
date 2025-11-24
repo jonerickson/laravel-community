@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Support\Passport;
 
 use App\Models\User;
-use DateTimeImmutable;
+use Carbon\CarbonImmutable;
 use Laravel\Passport\Bridge\AccessToken;
 use Laravel\Passport\Passport;
 use Lcobucci\JWT\Configuration;
@@ -16,6 +16,7 @@ use League\OAuth2\Server\CryptKeyInterface;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ScopeEntityInterface;
 use League\OAuth2\Server\ResponseTypes\BearerTokenResponse;
+use Override;
 
 class IdTokenResponse extends BearerTokenResponse
 {
@@ -26,6 +27,7 @@ class IdTokenResponse extends BearerTokenResponse
         $this->privateKey = new CryptKey('file://'.Passport::keyPath('oauth-private.key'), null, Passport::$validateKeyPermissions);
     }
 
+    #[Override]
     protected function getExtraParams(AccessTokenEntityInterface $accessToken): array
     {
         if (! $this->isOpenIdRequest($accessToken)) {
@@ -56,8 +58,8 @@ class IdTokenResponse extends BearerTokenResponse
         $builder = $config->builder()
             ->permittedFor($accessToken->getClient()->getIdentifier())
             ->identifiedBy($accessToken->getIdentifier())
-            ->issuedAt(new DateTimeImmutable)
-            ->canOnlyBeUsedAfter(new DateTimeImmutable)
+            ->issuedAt(CarbonImmutable::now())
+            ->canOnlyBeUsedAfter(CarbonImmutable::now())
             ->expiresAt($accessToken->getExpiryDateTime())
             ->relatedTo($accessToken->getUserIdentifier())
             ->withClaim('name', $user->name);
@@ -80,7 +82,7 @@ class IdTokenResponse extends BearerTokenResponse
     {
         return array_any(
             $accessToken->getScopes(),
-            fn (ScopeEntityInterface $scope) => $scope->getIdentifier() === 'openid'
+            fn (ScopeEntityInterface $scope): bool => $scope->getIdentifier() === 'openid'
         );
     }
 
@@ -88,7 +90,7 @@ class IdTokenResponse extends BearerTokenResponse
     {
         return array_any(
             $accessToken->getScopes(),
-            fn ($tokenScope) => $tokenScope->getIdentifier() === $scope
+            fn ($tokenScope): bool => $tokenScope->getIdentifier() === $scope
         );
     }
 
