@@ -11,9 +11,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['domain' => config('app.url')], function (): void {
     Route::get('/', HomeController::class)->name('home');
-    Route::get('/maintenance', MaintenanceController::class)->name('maintenance');
-    Route::get('/search', SearchController::class)->name('search');
-
+    Route::get('maintenance', MaintenanceController::class)->name('maintenance');
+    Route::get('search', SearchController::class)->name('search');
     Route::get('users/{user:reference_id}', [UserController::class, 'show'])->name('users.show');
 
     Route::group(['middleware' => ['auth', 'email', 'password', 'verified', 'onboarded']], function (): void {
@@ -28,7 +27,6 @@ Route::group(['domain' => config('app.url')], function (): void {
     require __DIR__.'/knowledge-base.php';
     require __DIR__.'/onboarding.php';
     require __DIR__.'/pages.php';
-    require __DIR__.'/passport.php';
     require __DIR__.'/policies.php';
     require __DIR__.'/settings.php';
     require __DIR__.'/store.php';
