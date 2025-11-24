@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class LoginRequest extends FormRequest
 {
@@ -32,10 +34,17 @@ class LoginRequest extends FormRequest
 
     /**
      * @throws ValidationException
+     * @throws Throwable
      */
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
+
+        if ($user = User::firstWhere('email', $this->validated('email'))) {
+            throw_if(blank($user->password), ValidationException::withMessages([
+                'email' => 'Please reset your password or login with a social identity provider.',
+            ]));
+        }
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
