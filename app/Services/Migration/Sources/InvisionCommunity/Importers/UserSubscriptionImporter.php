@@ -398,7 +398,11 @@ class UserSubscriptionImporter extends AbstractImporter
                 ->where('ps_id', $sourceUserSubscription->sub_purchase_id)
                 ->first();
 
-            if ($sourcePurchase && isset($sourcePurchase->ps_expire) && is_numeric($sourcePurchase->ps_expire) && $sourcePurchase->ps_expire !== 0) {
+            if ($sourcePurchase->ps_expire === 0) {
+                return null;
+            }
+
+            if ($sourcePurchase && isset($sourcePurchase->ps_expire) && is_numeric($sourcePurchase->ps_expire)) {
                 return Carbon::parse($sourcePurchase->ps_expire);
             }
         }
