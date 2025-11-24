@@ -8,40 +8,30 @@ use App\Events\PriceCreated;
 use App\Events\PriceDeleted;
 use App\Events\PriceUpdated;
 use App\Managers\PaymentManager;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\App;
 
-class SyncPriceWithPaymentProvider implements ShouldQueue
+class SyncPriceWithPaymentProvider
 {
-    use Dispatchable;
-    use InteractsWithQueue;
-
-    public function __construct(
-        private readonly PaymentManager $paymentManager
-    ) {
-        //
-    }
-
     public function handle(PriceCreated|PriceUpdated|PriceDeleted $event): void
     {
         if (App::runningConsoleCommand('app:migrate')) {
             return;
         }
 
+        $paymentManager = app(PaymentManager::class);
+
         if (! $event->price->product->external_product_id) {
             return;
         }
 
         match (true) {
-            $event instanceof PriceCreated => $this->handleProductPriceCreated($event),
-            $event instanceof PriceUpdated => $this->handleProductPriceUpdated($event),
-            $event instanceof PriceDeleted => $this->handleProductPriceDeleted($event),
+            $event instanceof PriceCreated => $this->handleProductPriceCreated($event, $paymentManager),
+            $event instanceof PriceUpdated => $this->handleProductPriceUpdated($event, $paymentManager),
+            $event instanceof PriceDeleted => $this->handleProductPriceDeleted($event, $paymentManager),
         };
     }
 
-    protected function handleProductPriceCreated(PriceCreated $event): void
+    protected function handleProductPriceCreated(PriceCreated $event, PaymentManager $paymentManager): void
     {
         $price = $event->price;
 
@@ -49,10 +39,10 @@ class SyncPriceWithPaymentProvider implements ShouldQueue
             return;
         }
 
-        $this->paymentManager->createPrice($price);
+        $paymentManager->createPrice($price);
     }
 
-    protected function handleProductPriceUpdated(PriceUpdated $event): void
+    protected function handleProductPriceUpdated(PriceUpdated $event, PaymentManager $paymentManager): void
     {
         $price = $event->price;
 
@@ -60,10 +50,10 @@ class SyncPriceWithPaymentProvider implements ShouldQueue
             return;
         }
 
-        $this->paymentManager->updatePrice($price);
+        $paymentManager->updatePrice($price);
     }
 
-    protected function handleProductPriceDeleted(PriceDeleted $event): void
+    protected function handleProductPriceDeleted(PriceDeleted $event, PaymentManager $paymentManager): void
     {
         $price = $event->price;
 
@@ -71,6 +61,6 @@ class SyncPriceWithPaymentProvider implements ShouldQueue
             return;
         }
 
-        $this->paymentManager->deletePrice($price);
+        $paymentManager->deletePrice($price);
     }
 }

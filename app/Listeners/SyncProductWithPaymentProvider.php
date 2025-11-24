@@ -8,59 +8,49 @@ use App\Events\ProductCreated;
 use App\Events\ProductDeleted;
 use App\Events\ProductUpdated;
 use App\Managers\PaymentManager;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\App;
 
-class SyncProductWithPaymentProvider implements ShouldQueue
+class SyncProductWithPaymentProvider
 {
-    use Dispatchable;
-    use InteractsWithQueue;
-
-    public function __construct(
-        private readonly PaymentManager $paymentManager
-    ) {
-        //
-    }
-
     public function handle(ProductCreated|ProductUpdated|ProductDeleted $event): void
     {
         if (App::runningConsoleCommand('app:migrate')) {
             return;
         }
 
+        $paymentManager = app(PaymentManager::class);
+
         match (true) {
-            $event instanceof ProductCreated => $this->handleProductCreated($event),
-            $event instanceof ProductUpdated => $this->handleProductUpdated($event),
-            $event instanceof ProductDeleted => $this->handleProductDeleted($event),
+            $event instanceof ProductCreated => $this->handleProductCreated($event, $paymentManager),
+            $event instanceof ProductUpdated => $this->handleProductUpdated($event, $paymentManager),
+            $event instanceof ProductDeleted => $this->handleProductDeleted($event, $paymentManager),
         };
     }
 
-    protected function handleProductCreated(ProductCreated $event): void
+    protected function handleProductCreated(ProductCreated $event, PaymentManager $paymentManager): void
     {
         if ($event->product->external_product_id) {
             return;
         }
 
-        $this->paymentManager->createProduct($event->product);
+        $paymentManager->createProduct($event->product);
     }
 
-    protected function handleProductUpdated(ProductUpdated $event): void
+    protected function handleProductUpdated(ProductUpdated $event, PaymentManager $paymentManager): void
     {
         if (! $event->product->external_product_id) {
             return;
         }
 
-        $this->paymentManager->updateProduct($event->product);
+        $paymentManager->updateProduct($event->product);
     }
 
-    protected function handleProductDeleted(ProductDeleted $event): void
+    protected function handleProductDeleted(ProductDeleted $event, PaymentManager $paymentManager): void
     {
         if (! $event->product->external_product_id) {
             return;
         }
 
-        $this->paymentManager->deleteProduct($event->product);
+        $paymentManager->deleteProduct($event->product);
     }
 }
