@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Override;
 
@@ -245,7 +246,7 @@ class Post extends Model implements HasLabel, Sluggable
 
     public function shouldBeSearchable(): bool
     {
-        return $this->is_published;
+        return Gate::check('view', $this);
     }
 
     /**

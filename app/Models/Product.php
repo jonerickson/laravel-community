@@ -38,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 /**
@@ -337,6 +338,11 @@ class Product extends Model implements HasLabel, Sluggable
             'categories' => $this->categories->pluck('name')->implode(', '),
             'type' => $this->type->value ?? '',
         ];
+    }
+
+    public function shouldBeSearchable(): bool
+    {
+        return Gate::check('view', $this);
     }
 
     /**

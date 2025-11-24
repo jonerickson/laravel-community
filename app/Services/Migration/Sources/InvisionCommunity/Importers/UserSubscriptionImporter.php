@@ -218,7 +218,7 @@ class UserSubscriptionImporter extends AbstractImporter
                 return;
             }
 
-            if ($billingCycleAnchor instanceof CarbonInterface && $billingCycleAnchor->isPast()) {
+            if ($billingCycleAnchor->isPast()) {
                 $result->incrementSkipped(self::ENTITY_NAME);
 
                 if ($output->isVerbose()) {

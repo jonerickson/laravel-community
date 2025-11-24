@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 /**
@@ -125,7 +126,7 @@ class Policy extends Model implements Sluggable
 
     public function shouldBeSearchable(): bool
     {
-        return $this->is_active && ($this->effective_at === null || $this->effective_at->isPast());
+        return Gate::check('view', $this);
     }
 
     public function getUrl(): ?string
