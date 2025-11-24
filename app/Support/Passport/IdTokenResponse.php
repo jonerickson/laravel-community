@@ -32,9 +32,48 @@ class IdTokenResponse extends BearerTokenResponse
             return [];
         }
 
+        $user = $this->getUserEntity($accessToken);
+
+        if (is_null($user)) {
+            return [];
+        }
+
         return [
-            'id_token' => $this->makeIdToken($accessToken),
+            'id_token' => $this->makeIdToken($accessToken, $user),
         ];
+    }
+
+    protected function makeIdToken(AccessToken $accessToken, User $user): string
+    {
+        $privateKeyContents = $this->privateKey->getKeyContents();
+
+        $config = Configuration::forAsymmetricSigner(
+            new Sha256,
+            InMemory::plainText($privateKeyContents, $this->privateKey->getPassPhrase() ?? ''),
+            InMemory::plainText('empty', 'empty')
+        );
+
+        $builder = $config->builder()
+            ->permittedFor($accessToken->getClient()->getIdentifier())
+            ->identifiedBy($accessToken->getIdentifier())
+            ->issuedAt(new DateTimeImmutable)
+            ->canOnlyBeUsedAfter(new DateTimeImmutable)
+            ->expiresAt($accessToken->getExpiryDateTime())
+            ->relatedTo($accessToken->getUserIdentifier())
+            ->withClaim('name', $user->name);
+
+        if ($this->hasScope($accessToken, 'email')) {
+            $builder = $builder->withClaim('email', $user->email)
+                ->withClaim('email_verified', $user->email_verified_at !== null);
+        }
+
+        if ($this->hasScope($accessToken, 'profile')) {
+            $builder = $builder->withClaim('picture', $user->avatar_url);
+        }
+
+        return $builder
+            ->getToken($config->signer(), $config->signingKey())
+            ->toString();
     }
 
     protected function isOpenIdRequest(AccessToken $accessToken): bool
@@ -45,43 +84,6 @@ class IdTokenResponse extends BearerTokenResponse
         );
     }
 
-    protected function makeIdToken(AccessToken $accessToken): string
-    {
-        $privateKeyContents = $this->privateKey->getKeyContents();
-
-        $config = Configuration::forAsymmetricSigner(
-            new Sha256,
-            InMemory::plainText($privateKeyContents, $this->privateKey->getPassPhrase() ?? ''),
-            InMemory::base64Encoded('empty', 'empty')
-        );
-
-        $now = new DateTimeImmutable;
-        $user = $this->getUserEntity($accessToken);
-
-        $builder = $config->builder()
-            ->issuedBy(config('app.url'))
-            ->permittedFor($accessToken->getClient()->getIdentifier())
-            ->identifiedBy($accessToken->getIdentifier())
-            ->issuedAt($now)
-            ->expiresAt($accessToken->getExpiryDateTime())
-            ->relatedTo((string) $user->id)
-            ->withClaim('name', $user->name);
-
-        if ($this->hasScope($accessToken, 'email')) {
-            $builder->withClaim('email', $user->email);
-            $builder->withClaim('email_verified', $user->email_verified_at !== null);
-        }
-
-        if ($this->hasScope($accessToken, 'profile')) {
-            $builder->withClaim('avatar_url', $user->avatar_url);
-            $builder->withClaim('reference_id', $user->reference_id);
-        }
-
-        return $builder
-            ->getToken($config->signer(), $config->signingKey())
-            ->toString();
-    }
-
     protected function hasScope(AccessToken $accessToken, string $scope): bool
     {
         return array_any(
@@ -90,7 +92,7 @@ class IdTokenResponse extends BearerTokenResponse
         );
     }
 
-    protected function getUserEntity(AccessToken $accessToken): User
+    protected function getUserEntity(AccessToken $accessToken): ?User
     {
         return User::find($accessToken->getUserIdentifier());
     }
