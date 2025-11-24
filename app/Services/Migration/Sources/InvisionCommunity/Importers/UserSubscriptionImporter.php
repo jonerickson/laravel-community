@@ -196,8 +196,6 @@ class UserSubscriptionImporter extends AbstractImporter
             return;
         }
 
-        $order = $this->createOrder($user, $price);
-
         if (! $config->isDryRun) {
             $backdateStartDate = $this->getStartDate($sourceUserSubscription);
             $billingCycleAnchor = $this->getExpirationDate($sourceUserSubscription);
@@ -251,6 +249,8 @@ class UserSubscriptionImporter extends AbstractImporter
 
                 return;
             }
+
+            $order = $this->createOrder($user, $price);
 
             ImportSubscription::dispatch($order, ProrationBehavior::None, $backdateStartDate, $billingCycleAnchor);
         }
