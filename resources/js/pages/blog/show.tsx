@@ -181,7 +181,7 @@ export default function BlogShow({ post, comments, recentViewers }: BlogShowProp
                                 <img
                                     src={post.featuredImageUrl}
                                     alt={`Featured image for ${post.title}`}
-                                    className="aspect-video w-full rounded-lg object-cover"
+                                    className="relative aspect-video w-full rounded-lg object-cover"
                                     itemProp="url"
                                     loading="eager"
                                 />
