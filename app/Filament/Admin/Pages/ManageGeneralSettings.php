@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Pages;
 
 use App\Enums\Role;
+use App\Filament\Admin\Clusters\Settings\SettingsCluster;
 use App\Settings\GeneralSettings;
 use BackedEnum;
 use Filament\Forms\Components\TextInput;
@@ -14,7 +15,6 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
 use Override;
-use UnitEnum;
 
 class ManageGeneralSettings extends SettingsPage
 {
@@ -22,13 +22,15 @@ class ManageGeneralSettings extends SettingsPage
 
     protected static string $settings = GeneralSettings::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Settings';
+    protected static ?string $cluster = SettingsCluster::class;
 
     protected static ?string $navigationLabel = 'General';
 
     protected static ?string $title = 'General Settings';
 
     protected ?string $subheading = 'Manage your main platform settings.';
+
+    protected static ?int $navigationSort = -3;
 
     public static function canAccess(): bool
     {

@@ -25,6 +25,7 @@ type OnboardingProps = {
     subscriptions: App.Data.ProductData[];
     hasSubscription: boolean;
     emailVerified: boolean;
+    policies: App.Data.PolicyData[];
 };
 
 type OnboardingFormData = Record<string, string> & {
@@ -32,6 +33,7 @@ type OnboardingFormData = Record<string, string> & {
     email: string;
     password: string;
     password_confirmation: string;
+    policy: Record<number, boolean>;
 };
 
 const wizardSteps = [
@@ -50,6 +52,7 @@ export default function Onboarding({
     subscriptions,
     hasSubscription,
     emailVerified,
+    policies,
 }: OnboardingProps) {
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const [currentStep, setCurrentStep] = useState(initialStep);
@@ -69,6 +72,7 @@ export default function Onboarding({
         email: '',
         password: '',
         password_confirmation: '',
+        policy: {},
     });
 
     const {
@@ -91,8 +95,8 @@ export default function Onboarding({
         quantity: 1,
     });
 
-    const updateRegisterField = (field: string, value: string) => {
-        setRegisterData(field as keyof OnboardingFormData, value);
+    const updateRegisterField = (field: string, value: string | Record<number, boolean>) => {
+        setRegisterData(field as keyof OnboardingFormData, value as any);
     };
 
     const updateProfileField = (fieldId: number, value: string) => {
@@ -176,6 +180,7 @@ export default function Onboarding({
                             processing={registerProcessing}
                             onChange={updateRegisterField}
                             onNext={handleRegistration}
+                            policies={policies}
                         />
                     </WizardStep>
 

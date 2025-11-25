@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Pages;
 
 use App\Enums\Role;
+use App\Filament\Admin\Clusters\Settings\SettingsCluster;
 use App\Settings\EmailSettings;
 use BackedEnum;
 use Filament\Forms\Components\RichEditor;
@@ -22,9 +23,13 @@ class ManageEmailSettings extends SettingsPage
 
     protected static string $settings = EmailSettings::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Settings';
+    protected static ?string $cluster = SettingsCluster::class;
+
+    protected static string|UnitEnum|null $navigationGroup = 'System';
 
     protected static ?string $navigationLabel = 'Emails';
+
+    protected static ?int $navigationSort = -1;
 
     protected static ?string $title = 'Email Settings';
 

@@ -13,7 +13,7 @@ class PermissionService
 
     public static function hasPermissionTo(string $permission, ?User $user = null): bool
     {
-        if (blank($user) && ($guestGroup = static::getDefaultGuestGroup())) {
+        if (blank($user) && ($guestGroup = Group::defaultGuestGroup())) {
             return $guestGroup->hasPermissionTo($permission);
         }
 
@@ -32,10 +32,5 @@ class PermissionService
         }
 
         return false;
-    }
-
-    protected static function getDefaultGuestGroup(): ?Group
-    {
-        return static::$defaultGuestGroup ?? static::$defaultGuestGroup = Group::query()->defaultGuestGroups()->first();
     }
 }

@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Onboarding;
 
 use App\Data\FieldData;
+use App\Data\PolicyData;
 use App\Data\ProductData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Onboarding\OnboardingUpdateRequest;
 use App\Managers\PaymentManager;
 use App\Models\Field;
+use App\Models\Policy;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\OnboardingService;
+use App\Settings\RegistrationSettings;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\RedirectResponse;
@@ -27,6 +30,7 @@ class OnboardingController extends Controller
     public function __construct(
         private readonly OnboardingService $onboardingService,
         private readonly PaymentManager $paymentManager,
+        private readonly RegistrationSettings $registrationSettings,
         #[CurrentUser]
         private readonly ?User $user = null,
     ) {}
@@ -71,6 +75,8 @@ class OnboardingController extends Controller
             ->filter(fn (Product $product) => Gate::check('view', $product))
             ->values();
 
+        $policies = Policy::query()->with('category')->whereIn('id', $this->registrationSettings->required_policy_ids)->get();
+
         return Inertia::render('onboarding/index', [
             'customFields' => $customFields,
             'initialStep' => $initialStep,
@@ -89,6 +95,7 @@ class OnboardingController extends Controller
                 ],
             ],
             'emailVerified' => $this->user && $this->user->hasVerifiedEmail(),
+            'policies' => PolicyData::collect($policies),
         ]);
     }
 
