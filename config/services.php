@@ -16,6 +16,11 @@ return [
     |
     */
 
+    'cloudflare' => [
+        'api_key' => getenv('CF_CACHE_API_TOKEN'),
+        'zone_id' => getenv('CF_CACHE_ZONE_ID'),
+    ],
+
     'discord' => [
         'enabled' => env('DISCORD_ENABLED', false),
         'client_id' => env('DISCORD_CLIENT_ID'),
