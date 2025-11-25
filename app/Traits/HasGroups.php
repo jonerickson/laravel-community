@@ -49,10 +49,12 @@ trait HasGroups
             $currentSubscription = $paymentManager->currentSubscription($this);
         }
 
+        $currentGroupIds = $this->groups()->pluck('groups.id');
+
         $baseGroupIds = match (true) {
             $this instanceof User => Group::query()->whereHas('roles', function (Builder $query): void {
                 $query->whereIn('name', Collection::wrap(Role::cases())->map->value->toArray());
-            })->whereKeyNot(Group::defaultGuestGroup())->pluck('id'),
+            })->whereKeyNot(Group::defaultGuestGroup())->pluck('id')->intersect($currentGroupIds),
             default => collect(),
         };
 
@@ -84,8 +86,10 @@ trait HasGroups
         };
 
         $groupsUnique = $baseGroupIds
+            ->add(Group::defaultMemberGroup()->id)
             ->merge($additionalGroupIds)
-            ->unique();
+            ->unique()
+            ->reject(fn (int $id) => $id === Group::defaultGuestGroup()?->id);
 
         $this->groups()->sync($groupsUnique, $detaching);
     }
