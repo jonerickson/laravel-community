@@ -90,6 +90,10 @@ class Comment extends Model
         'parent_id',
     ];
 
+    protected $touches = [
+        'commentable',
+    ];
+
     public function commentable(): MorphTo
     {
         return $this->morphTo();

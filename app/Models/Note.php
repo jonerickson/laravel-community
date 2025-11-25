@@ -48,6 +48,10 @@ class Note extends Model
         'notable_id',
     ];
 
+    protected $touches = [
+        'notable',
+    ];
+
     public function notable(): MorphTo
     {
         return $this->morphTo();

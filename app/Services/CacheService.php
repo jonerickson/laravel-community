@@ -24,8 +24,6 @@ class CacheService
     public function purgeByKey(string $key): void
     {
         Cache::forget($key);
-
-        $this->getByKey($key);
     }
 
     public function getByKey(string $key): ?array

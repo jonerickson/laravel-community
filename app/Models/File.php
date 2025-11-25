@@ -73,6 +73,10 @@ class File extends Model
         'url',
     ];
 
+    protected $touches = [
+        'resource',
+    ];
+
     public function resource(): MorphTo
     {
         return $this->morphTo('resource');

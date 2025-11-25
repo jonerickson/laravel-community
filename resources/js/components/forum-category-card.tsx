@@ -17,6 +17,19 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
     const { auth } = usePage<App.Data.SharedData>().props;
     const { can } = usePermissions();
 
+    const allTopics = (category.forums || [])
+        .flatMap((forum) =>
+            (forum.latestTopics || []).map((topic) => ({
+                ...topic,
+                forum,
+            })),
+        )
+        .sort((a, b) => {
+            const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+            const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+            return dateB - dateA;
+        });
+
     return (
         <Card className="overflow-hidden py-0 transition-shadow hover:shadow-sm">
             <CardContent className="p-0">
@@ -43,8 +56,8 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
                             {category.forums && category.forums.length > 0 && (
                                 <div className="mt-4 flex flex-wrap gap-2 md:flex-col md:gap-0 md:space-y-2">
                                     {category.forums.map((forum) => (
-                                        <Button size="sm" variant="outline" asChild>
-                                            <div key={forum.id} className="flex w-full items-center justify-start gap-2 sm:w-auto">
+                                        <Button key={forum.id} size="sm" variant="outline" asChild>
+                                            <div className="flex w-full items-center justify-start gap-2 sm:w-auto">
                                                 <div className="h-2 w-2 rounded-full" style={{ backgroundColor: forum.color }} />
                                                 <Link
                                                     href={route('forums.show', { forum: forum.slug })}
@@ -62,63 +75,61 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
 
                     <div className="flex-1 py-3">
                         <div className="space-y-1">
-                            {category.forums?.flatMap((forum) =>
-                                (forum.latestTopics || []).slice(0, 5).map((topic) => (
-                                    <Link
-                                        key={`${forum.id}-${topic.id}`}
-                                        href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}
-                                        className="flex items-center gap-3 px-4 py-2 hover:bg-accent/20 sm:px-6"
-                                    >
-                                        <div className="flex-shrink-0">
-                                            <div
-                                                className="flex size-6 items-center justify-center rounded-full text-sm font-medium text-white sm:size-8"
-                                                style={{ backgroundColor: forum.color }}
+                            {allTopics.map((topic) => (
+                                <Link
+                                    key={`${topic.forum.id}-${topic.id}`}
+                                    href={route('forums.topics.show', { forum: topic.forum.slug, topic: topic.slug })}
+                                    className="flex items-center gap-3 px-4 py-2 hover:bg-accent/20 sm:px-6"
+                                >
+                                    <div className="flex-shrink-0">
+                                        <div
+                                            className="flex size-6 items-center justify-center rounded-full text-sm font-medium text-white sm:size-8"
+                                            style={{ backgroundColor: topic.forum.color }}
+                                        >
+                                            {topic.author.name?.charAt(0).toUpperCase() || 'U'}
+                                        </div>
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex items-center gap-2">
+                                            {auth && auth.user && !topic.isReadByUser && <Circle className="size-3 fill-info text-info" />}
+                                            {topic.isHot && <span className="text-sm">🔥</span>}
+                                            {topic.isPinned && <Pin className="size-4 text-info" />}
+                                            {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
+                                            {can('report_posts') && topic.hasReportedContent && (
+                                                <AlertTriangle className="size-4 text-destructive" />
+                                            )}
+                                            {can('publish_posts') && topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
+                                            {can('approve_posts') && topic.hasUnapprovedContent && <ThumbsDown className="size-4 text-warning" />}
+                                            <span
+                                                className={cn('truncate text-sm sm:text-base', {
+                                                    'font-normal text-muted-foreground': auth && auth.user && topic.isReadByUser,
+                                                    'font-medium text-foreground': !topic.isReadByUser,
+                                                })}
                                             >
-                                                {topic.author.name?.charAt(0).toUpperCase() || 'U'}
+                                                {topic.title}
+                                            </span>
+                                        </div>
+                                        <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                                            <span className="text-nowrap">Started by {topic.author.name}</span>
+                                            <span>•</span>
+                                            <span className="truncate text-nowrap">
+                                                {topic.lastPost?.createdAt
+                                                    ? formatDistanceToNow(new Date(topic.lastPost.createdAt), { addSuffix: true })
+                                                    : 'N/A'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex-shrink-0 text-right">
+                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                            <div className="flex items-center gap-1">
+                                                <MessageSquare className="size-3" />
+                                                <span>{topic.postsCount}</span>
                                             </div>
                                         </div>
-                                        <div className="min-w-0 flex-1">
-                                            <div className="flex items-center gap-2">
-                                                {auth && auth.user && !topic.isReadByUser && <Circle className="size-3 fill-info text-info" />}
-                                                {topic.isHot && <span className="text-sm">🔥</span>}
-                                                {topic.isPinned && <Pin className="size-4 text-info" />}
-                                                {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
-                                                {can('report_posts') && topic.hasReportedContent && (
-                                                    <AlertTriangle className="size-4 text-destructive" />
-                                                )}
-                                                {can('publish_posts') && topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
-                                                {can('approve_posts') && topic.hasUnapprovedContent && <ThumbsDown className="size-4 text-warning" />}
-                                                <span
-                                                    className={cn('truncate text-sm sm:text-base', {
-                                                        'font-normal text-muted-foreground': auth && auth.user && topic.isReadByUser,
-                                                        'font-medium text-foreground': !topic.isReadByUser,
-                                                    })}
-                                                >
-                                                    {topic.title}
-                                                </span>
-                                            </div>
-                                            <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                                                <span className="text-nowrap">Started by {topic.author.name}</span>
-                                                <span>•</span>
-                                                <span className="truncate text-nowrap">
-                                                    {topic.lastPost?.createdAt
-                                                        ? formatDistanceToNow(new Date(topic.lastPost.createdAt), { addSuffix: true })
-                                                        : 'N/A'}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div className="flex-shrink-0 text-right">
-                                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                <div className="flex items-center gap-1">
-                                                    <MessageSquare className="size-3" />
-                                                    <span>{topic.postsCount}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                )),
-                            )}
-                            {!category.forums?.some((forum) => forum.latestTopics && forum.latestTopics.length > 0) && (
+                                    </div>
+                                </Link>
+                            ))}
+                            {allTopics.length === 0 && (
                                 <EmptyState title="No topics" description="There are no recent topics to show." border={false} />
                             )}
                         </div>

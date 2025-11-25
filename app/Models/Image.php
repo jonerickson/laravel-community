@@ -48,6 +48,10 @@ class Image extends Model
         'url',
     ];
 
+    protected $touches = [
+        'imageable',
+    ];
+
     public function imageable(): MorphTo
     {
         return $this->morphTo('imageable');
