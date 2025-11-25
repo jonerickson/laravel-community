@@ -65,6 +65,7 @@ class MacroServiceProvider extends ServiceProvider
             return $candidate;
         });
 
+        /** @phpstan-ignore-next-line */
         Stringable::macro('unique', fn (string $table, string $column = 'id', mixed $fallback = null, ?string $connection = null, bool $throw = true, int $maxAttempts = 5): Stringable => new Stringable(Str::unique($this->value, $table, $column, $fallback, $connection, $throw, $maxAttempts)));
     }
 }

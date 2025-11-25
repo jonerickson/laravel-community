@@ -18,14 +18,17 @@ class App implements Preset
         $s3Url = Uri::of(config('filesystems.disks.s3.url') ?? '')->host();
         $fingerprintEndpoint = Uri::of(config('services.fingerprint.endpoint') ?? '')->host();
 
+        /** @phpstan-ignore-next-line */
+        $imgSrc = explode(',', env('CSP_IMG_SRC') ?? '');
+
         $policy
             ->add(Directive::BASE, Keyword::SELF)
             ->add(Directive::CONNECT, array_filter([Keyword::SELF, 'api.fpjs.io', $s3Url, $fingerprintEndpoint]))
             ->add(Directive::DEFAULT, Keyword::SELF)
-            ->add(Directive::FONT, [Keyword::SELF, $assetUrl, $s3Url])
+            ->add(Directive::FONT, array_filter([Keyword::SELF, $assetUrl, $s3Url]))
             ->add(Directive::FORM_ACTION, Keyword::SELF)
             ->add(Directive::FRAME, Keyword::SELF)
-            ->add(Directive::IMG, [Keyword::SELF, 'ui-avatars.com', 'blob:', $assetUrl, $s3Url])
+            ->add(Directive::IMG, array_filter([Keyword::SELF, 'ui-avatars.com', 'blob:', $assetUrl, $s3Url, ...$imgSrc]))
             ->add(Directive::MEDIA, Keyword::SELF)
             ->add(Directive::OBJECT, Keyword::NONE)
             ->add(Directive::SCRIPT, array_filter([Keyword::SELF, 'fpnpmcdn.net', $fingerprintEndpoint, $s3Url, $assetUrl]))

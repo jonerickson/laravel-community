@@ -196,6 +196,8 @@ class UserSubscriptionImporter extends AbstractImporter
             return;
         }
 
+        $order = null;
+
         if (! $config->isDryRun) {
             $backdateStartDate = $this->getStartDate($sourceUserSubscription);
             $billingCycleAnchor = $this->getExpirationDate($sourceUserSubscription);
@@ -261,7 +263,7 @@ class UserSubscriptionImporter extends AbstractImporter
             $result->recordMigrated(self::ENTITY_NAME, [
                 'source_id' => $sourceUserSubscription->sub_id,
                 'user_id' => $user->id,
-                'order_id' => $order->id,
+                'order_id' => $order?->id,
                 'name' => $user->name,
             ]);
         }
