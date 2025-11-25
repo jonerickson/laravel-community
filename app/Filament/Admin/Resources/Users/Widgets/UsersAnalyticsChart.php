@@ -20,7 +20,7 @@ class UsersAnalyticsChart extends ChartWidget
 
     protected static ?int $sort = 1;
 
-    protected ?string $maxHeight = '350px';
+    protected ?string $maxHeight = '400px';
 
     #[Override]
     protected function getData(): array

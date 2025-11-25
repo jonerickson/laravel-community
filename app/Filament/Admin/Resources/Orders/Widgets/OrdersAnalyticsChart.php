@@ -21,7 +21,7 @@ class OrdersAnalyticsChart extends ChartWidget
 
     protected static ?int $sort = 1;
 
-    protected ?string $maxHeight = '200px';
+    protected ?string $maxHeight = '400px';
 
     #[Override]
     protected function getData(): array
