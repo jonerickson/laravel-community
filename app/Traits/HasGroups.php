@@ -52,7 +52,7 @@ trait HasGroups
         $baseGroupIds = match (true) {
             $this instanceof User => Group::query()->whereHas('roles', function (Builder $query): void {
                 $query->whereIn('name', Collection::wrap(Role::cases())->map->value->toArray());
-            })->pluck('id'),
+            })->whereKeyNot(Group::defaultGuestGroup())->pluck('id'),
             default => collect(),
         };
 
