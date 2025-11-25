@@ -60,6 +60,7 @@ class SendWebhook implements ShouldQueue
                 ->useHttpVerb($webhook->method->value)
                 ->useSecret($webhook->secret)
                 ->payload($payload)
+                ->onQueue('webhooks')
                 ->dispatch();
         });
     }
