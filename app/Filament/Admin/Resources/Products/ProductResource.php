@@ -304,6 +304,10 @@ class ProductResource extends Resource
                     ->searchable()
                     ->listWithLineBreaks()
                     ->limitList(2),
+                TextColumn::make('groups.name')
+                    ->badge()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('defaultPrice.amount')
                     ->label('Default Price')
                     ->default(0)

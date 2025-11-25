@@ -165,6 +165,16 @@ class GroupResource extends Resource
                 TextColumn::make('roles.name')
                     ->placeholder('No Roles')
                     ->badge(),
+                TextColumn::make('discordRoles.discord_role_id')
+                    ->label('Discord Roles')
+                    ->visible(fn (): bool => config('services.discord.enabled') && config('services.discord.guild_id'))
+                    ->formatStateUsing(function ($state) {
+                        $discordApi = app(DiscordService::class);
+
+                        return $discordApi->getCachedGuildRoles()[$state] ?? 'Unknown';
+                    })
+                    ->badge()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 ColorColumn::make('color'),
                 ToggleColumn::make('is_active')
                     ->label('Active'),
