@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Users\Pages;
 
+use App\Filament\Admin\Resources\Users\Actions\BanAction;
 use App\Filament\Admin\Resources\Users\Actions\SyncGroupsAction;
+use App\Filament\Admin\Resources\Users\Actions\UnbanAction;
 use App\Filament\Admin\Resources\Users\UserResource;
 use App\Models\User;
 use Filament\Actions\ActionGroup;
@@ -21,6 +23,8 @@ class EditUser extends EditRecord
         return [
             DeleteAction::make(),
             ActionGroup::make([
+                BanAction::make(),
+                UnbanAction::make(),
                 SyncGroupsAction::make()
                     ->user(fn (User $record): Model|int|string|null => $this->record),
             ]),

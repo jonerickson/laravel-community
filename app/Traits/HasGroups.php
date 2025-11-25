@@ -89,7 +89,7 @@ trait HasGroups
             ->add(Group::defaultMemberGroup()->id)
             ->merge($additionalGroupIds)
             ->unique()
-            ->reject(fn (int $id) => $id === Group::defaultGuestGroup()?->id);
+            ->reject(fn (int $id): bool => $id === Group::defaultGuestGroup()?->id);
 
         $this->groups()->sync($groupsUnique, $detaching);
     }

@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Users;
 
+use App\Filament\Admin\Resources\Users\Actions\BanAction;
+use App\Filament\Admin\Resources\Users\Actions\BulkBanUsersAction;
+use App\Filament\Admin\Resources\Users\Actions\BulkSyncGroupsAction;
+use App\Filament\Admin\Resources\Users\Actions\BulkUnbanUsersAction;
 use App\Filament\Admin\Resources\Users\Actions\ChangePasswordAction;
+use App\Filament\Admin\Resources\Users\Actions\UnbanAction;
 use App\Filament\Admin\Resources\Users\Pages\CreateUser;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Filament\Admin\Resources\Users\Pages\ListUsers;
@@ -17,20 +22,17 @@ use App\Filament\Admin\Resources\Users\Widgets\UserStatsOverview;
 use App\Filament\Exports\UserExporter;
 use App\Livewire\PaymentMethods\ListPaymentMethods;
 use App\Livewire\Subscriptions\ListSubscriptions;
-use App\Models\Fingerprint;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\Integrations\DiscordService;
 use BackedEnum;
 use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ExportBulkAction;
-use Filament\Facades\Filament;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
@@ -405,32 +407,8 @@ class UserResource extends Resource
             ])
             ->groups(['groups.name'])
             ->recordActions([
-                Action::make('ban')
-                    ->label('Ban User')
-                    ->icon('heroicon-o-x-circle')
-                    ->color('danger')
-                    ->visible(fn (User $record): bool => ! $record->is_banned && $record->fingerprints->count())
-                    ->schema([
-                        Textarea::make('ban_reason')
-                            ->label('Ban Reason')
-                            ->required()
-                            ->maxLength(1000),
-                    ])
-                    ->action(fn (User $record, array $data) => $record->fingerprints()->each(fn (Fingerprint $fingerprint) => $fingerprint->banFingerprint($data['ban_reason'], Filament::auth()->user())))
-                    ->requiresConfirmation()
-                    ->modalHeading('Ban User')
-                    ->modalDescription('Are you sure you want to ban this user? They will be immediately logged out and unable to access the site.')
-                    ->modalSubmitActionLabel('Ban User'),
-                Action::make('unban')
-                    ->label('Unban User')
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->visible(fn (User $record): bool => $record->is_banned && $record->fingerprints->count())
-                    ->action(fn (User $record) => $record->fingerprints()->each(fn (Fingerprint $fingerprint) => $fingerprint->unbanFingerprint()))
-                    ->requiresConfirmation()
-                    ->modalHeading('Unban User')
-                    ->modalDescription('Are you sure you want to unban this user?')
-                    ->modalSubmitActionLabel('Unban User'),
+                BanAction::make(),
+                UnbanAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -439,26 +417,9 @@ class UserResource extends Resource
                     ->exporter(UserExporter::class),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    BulkAction::make('bulk_ban')
-                        ->label('Ban selected users')
-                        ->icon('heroicon-o-x-circle')
-                        ->color('danger')
-                        ->schema([
-                            Textarea::make('ban_reason')
-                                ->label('Ban Reason')
-                                ->required()
-                                ->maxLength(1000),
-                        ])
-                        ->action(function (array $data, $records): void {
-                            foreach ($records as $record) {
-                                if (! $record->is_banned) {
-                                    $record->banUser($data['ban_reason'], Auth::user());
-                                }
-                            }
-                        })
-                        ->requiresConfirmation()
-                        ->modalHeading('Ban Selected Users')
-                        ->modalDescription('Are you sure you want to ban the selected users?'),
+                    BulkBanUsersAction::make(),
+                    BulkUnbanUsersAction::make(),
+                    BulkSyncGroupsAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
