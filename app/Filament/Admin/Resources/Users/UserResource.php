@@ -24,6 +24,7 @@ use App\Livewire\PaymentMethods\ListPaymentMethods;
 use App\Livewire\Subscriptions\ListSubscriptions;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\Subscription;
 use App\Models\User;
 use App\Services\Integrations\DiscordService;
 use BackedEnum;
@@ -53,8 +54,10 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -368,6 +371,17 @@ class UserResource extends Resource
                     ->placeholder('No Roles')
                     ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('subscriptions.name')
+                    ->label('Subscription')
+                    ->sortable()
+                    ->placeholder('No Subscription')
+                    ->badge()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('products.name')
+                    ->sortable()
+                    ->placeholder('No Products')
+                    ->badge()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_banned')
                     ->label('Banned')
                     ->boolean()
@@ -406,6 +420,65 @@ class UserResource extends Resource
                     ->multiple()
                     ->searchable()
                     ->preload(),
+                SelectFilter::make('subscriptions')
+                    ->label('Subscription')
+                    ->relationship('subscriptions', 'id')
+                    ->multiple()
+                    ->searchable()
+                    ->preload()
+                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? ''),
+                Filter::make('subscription_status')
+                    ->schema([
+                        Select::make('subscription_status')
+                            ->label('Subscription Status')
+                            ->options([
+                                'active' => 'Active',
+                                'cancelled' => 'Cancelled',
+                                'ended' => 'Ended',
+                                'expired_trial' => 'Expired Trial',
+                                'grace_period' => 'On Grace Period',
+                                'trialing' => 'On Trial',
+                                'past_due' => 'Past Due',
+                            ]),
+                    ])
+                    ->label('Has active subscription')
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when(
+                            $data['subscription_status'] === 'active',
+                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->active()),
+                        )
+                        ->when(
+                            $data['subscription_status'] === 'cancelled',
+                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->canceled()),
+                        )
+                        ->when(
+                            $data['subscription_status'] === 'ended',
+                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->ended()),
+                        )
+                        ->when(
+                            $data['subscription_status'] === 'expired_trial',
+                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->expiredTrial()),
+                        )
+                        ->when(
+                            $data['subscription_status'] === 'grace_period',
+                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->onGracePeriod()),
+                        )
+                        ->when(
+                            $data['subscription_status'] === 'trialing',
+                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->onTrial()),
+                        )
+                        ->when(
+                            $data['subscription_status'] === 'past_due',
+                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->pastDue()),
+                        )
+                    ),
+                Filter::make('has_no_subscription')
+                    ->label('Has no active subscription')
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when(
+                            $data['isActive'],
+                            fn (Builder $query, $date): Builder => $query->whereDoesntHave('subscriptions', fn (Builder|Subscription $query) => $query->active()),
+                        )),
             ])
             ->groups(['groups.name'])
             ->recordActions([

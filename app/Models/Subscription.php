@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Cashier\Subscription as BaseSubscription;
 
@@ -60,5 +61,10 @@ class Subscription extends BaseSubscription
     public function price(): BelongsTo
     {
         return $this->belongsTo(Price::class, 'stripe_price', 'external_price_id');
+    }
+
+    public function name(): Attribute
+    {
+        return Attribute::get(fn () => $this->price?->product?->name);
     }
 }

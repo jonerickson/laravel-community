@@ -73,6 +73,7 @@ class IntegrationsRelationManager extends RelationManager
                     ->copyable()
                     ->label('Email'),
                 ImageColumn::make('provider_avatar')
+                    ->placeholder('No Avatar')
                     ->label('Avatar')
                     ->circular(),
                 TextColumn::make('last_synced_at')

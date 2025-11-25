@@ -13,14 +13,8 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -38,52 +32,6 @@ class UserFingerprintResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDevicePhoneMobile;
 
     protected static ?string $label = 'Fingerprints';
-
-    #[Override]
-    public static function form(Schema $schema): Schema
-    {
-        return $schema
-            ->components([
-                TextInput::make('fingerprint_id')
-                    ->label('Fingerprint ID')
-                    ->required()
-                    ->disabled(),
-                Select::make('user_id')
-                    ->label('Associated User')
-                    ->relationship('user', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->disabled(),
-                TextInput::make('ip_address')
-                    ->label('IP Address')
-                    ->disabled(),
-                TextInput::make('user_agent')
-                    ->label('User Agent')
-                    ->disabled(),
-                DateTimePicker::make('first_seen_at')
-                    ->label('First Seen')
-                    ->disabled(),
-                DateTimePicker::make('last_seen_at')
-                    ->label('Last Seen')
-                    ->disabled(),
-                Toggle::make('is_banned')
-                    ->label('Banned')
-                    ->reactive(),
-                DateTimePicker::make('banned_at')
-                    ->label('Ban Date')
-                    ->visible(fn (Get $get): mixed => $get('is_banned'))
-                    ->disabled(),
-                Textarea::make('ban_reason')
-                    ->label('Ban Reason')
-                    ->visible(fn (Get $get): mixed => $get('is_banned'))
-                    ->maxLength(1000),
-                Select::make('banned_by')
-                    ->label('Banned By')
-                    ->relationship('bannedBy', 'name')
-                    ->visible(fn (Get $get): mixed => $get('is_banned'))
-                    ->disabled(),
-            ]);
-    }
 
     #[Override]
     public static function table(Table $table): Table
@@ -115,11 +63,18 @@ class UserFingerprintResource extends Resource
                     ->falseColor('success')
                     ->tooltip(fn ($record) => $record->is_banned ? $record->ban_reason : null),
                 TextColumn::make('first_seen_at')
+                    ->placeholder('Not Seen')
                     ->label('First Seen')
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('last_seen_at')
+                    ->placeholder('Not Seen')
                     ->label('Last Seen')
+                    ->dateTime()
+                    ->sortable(),
+                TextColumn::make('last_seen_at')
+                    ->placeholder('Not Checked')
+                    ->label('Last Checked')
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('user_agent')
