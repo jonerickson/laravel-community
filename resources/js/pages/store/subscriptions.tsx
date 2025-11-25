@@ -149,6 +149,11 @@ function PricingCard({
                         <span className="text-4xl font-bold">{currency(price, false)}</span>
                         <span className="ml-1 text-muted-foreground">/ {billingCycle}</span>
                     </div>
+                    {plan.trialDays > 0 && (
+                        <div className="mt-2">
+                            <Badge variant="secondary">{plan.trialDays}-day free trial</Badge>
+                        </div>
+                    )}
                     {billingCycle === 'year' && yearlyDiscount > 0 && (
                         <div className="mt-2">
                             <Badge variant="secondary">Save {yearlyDiscount}% annually</Badge>

@@ -204,6 +204,7 @@ class ProductResource extends Resource
                                     ->helperText('Allow customers to use discount codes when purchasing this product that were generated from this platform.')
                                     ->columnSpanFull(),
                                 TextInput::make('trial_days')
+                                    ->required()
                                     ->default(0)
                                     ->visible(fn (Get $get): bool => $get('type') === ProductType::Subscription)
                                     ->label('Trial Mode')
