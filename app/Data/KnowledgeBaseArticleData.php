@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Data;
 
-use App\Data\Traits\HasDataPermissions;
 use App\Enums\KnowledgeBaseArticleType;
 use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\MapInputName;
@@ -17,8 +16,6 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 #[MapInputName(SnakeCaseMapper::class)]
 class KnowledgeBaseArticleData extends Data
 {
-    use HasDataPermissions;
-
     public int $id;
 
     public KnowledgeBaseArticleType $type;

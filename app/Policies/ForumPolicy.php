@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Data\ForumData;
 use App\Models\Forum;
 use App\Models\Group;
 use App\Models\User;
@@ -25,19 +26,20 @@ class ForumPolicy
         return Gate::forUser($user)->check('view_any_forums');
     }
 
-    public function view(?User $user, array|Forum $forum): bool
+    public function view(?User $user, ForumData|Forum $forum): bool
     {
         $groups = $user instanceof User ? $user->groups : collect([Group::defaultGuestGroup()]);
 
-        if (is_array($forum)) {
+        if ($forum instanceof ForumData) {
             return Gate::forUser($user)->check('view_forums')
-                && ($forum['isActive'] ?? false)
-                && ($groups->pluck('id')->intersect(collect(data_get($forum, 'groups'))->pluck('id'))->isNotEmpty() ?? false);
+                && $forum->isActive
+                && (blank($forum->category) || Gate::check('view', $forum->category))
+                && ($groups->pluck('id')->intersect(collect($forum->groups)->pluck('id'))->isNotEmpty() ?? false);
         }
 
         return Gate::forUser($user)->check('view_forums')
             && $forum->is_active
-            && ($forum->category === null || Gate::forUser($user)->check('view', $forum->category))
+            && (blank($forum->category) || Gate::forUser($user)->check('view', $forum->category))
             && ($groups->pluck('id')->intersect($forum->groups->pluck('id'))->isNotEmpty() ?? false);
     }
 }

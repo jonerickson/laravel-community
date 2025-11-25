@@ -35,7 +35,10 @@ class BlogController extends Controller
     {
         $this->authorize('viewAny', Post::class);
 
-        $posts = PostData::collect($this->cache->getByKey('blog.index'), PaginatedDataCollection::class);
+        $posts = PostData::collect(collect($this->cache->getByKey('blog.index'))
+            ->filter(fn (array $post) => Gate::check('view', PostData::from($post)))
+            ->values()
+            ->all(), PaginatedDataCollection::class);
 
         return Inertia::render('blog/index', [
             'posts' => Inertia::scroll(fn () => $posts->items()),

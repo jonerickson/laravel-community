@@ -13,7 +13,6 @@ use App\Services\CacheService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -36,10 +35,10 @@ class CategoryController extends Controller
         $this->authorize('viewAny', ForumCategory::class);
 
         $categories = collect($this->cache->getByKey('forums.categories.index'))
-            ->filter(fn (array $category) => Gate::getPolicyFor(ForumCategory::class)->view(Auth::user(), $category))
-            ->map(function (array $category) {
+            ->filter(fn (array $category) => Gate::check('view', ForumCategoryData::from($category)))
+            ->map(function (array $category): array {
                 $category['forums'] = collect($category['forums'] ?? [])
-                    ->filter(fn (array $forum) => Gate::getPolicyFor(Forum::class)->view(Auth::user(), $forum))
+                    ->filter(fn (array $forum) => Gate::check('view', ForumData::from($forum)))
                     ->values()
                     ->toArray();
 

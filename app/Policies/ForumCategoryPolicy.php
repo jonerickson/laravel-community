@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Data\ForumCategoryData;
 use App\Models\ForumCategory;
 use App\Models\Group;
 use App\Models\User;
@@ -25,14 +26,14 @@ class ForumCategoryPolicy
         return Gate::forUser($user)->check('view_any_forums_categories');
     }
 
-    public function view(?User $user, array|ForumCategory $category): bool
+    public function view(?User $user, ForumCategoryData|ForumCategory $category): bool
     {
         $groups = $user instanceof User ? $user->groups : collect([Group::defaultGuestGroup()]);
 
-        if (is_array($category)) {
+        if ($category instanceof ForumCategoryData) {
             return Gate::forUser($user)->check('view_forums_category')
-                && ($category['isActive'] ?? false)
-                && ($groups->pluck('id')->intersect(collect(data_get($category, 'groups'))->pluck('id'))->isNotEmpty() ?? false);
+                && $category->isActive
+                && ($groups->pluck('id')->intersect(collect($category->groups)->pluck('id'))->isNotEmpty() ?? false);
         }
 
         return Gate::forUser($user)->check('view_forums_category')

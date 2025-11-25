@@ -44,63 +44,57 @@ class CacheService
 
     protected function blogIndex()
     {
-        return Cache::flexible('blog.index', [60 * 60, 60 * 60 * 24], function () {
-            return PostData::collect(Post::query()
-                ->blog()
-                ->with(['comments', 'author', 'reads'])
-                ->withCount(['views', 'comments'])
-                ->published()
-                ->latest()
-                ->get()
-            )->toArray();
-        });
+        return Cache::flexible('blog.index', [60 * 60, 60 * 60 * 24], fn () => PostData::collect(Post::query()
+            ->blog()
+            ->with(['comments', 'author', 'reads'])
+            ->withCount(['views', 'comments'])
+            ->published()
+            ->latest()
+            ->get()
+        )->toArray());
     }
 
     protected function subscriptionsIndex()
     {
-        return Cache::flexible('subscriptions.index', [60 * 60 * 24, 60 * 60 * 48], function () {
-            return ProductData::collect(Product::query()
-                ->subscriptions()
-                ->visible()
-                ->with(['approvedReviews' => fn (MorphMany|Comment $query) => $query->latest()])
-                ->with(['prices' => fn (HasMany|Price $query) => $query->recurring()->active()])
-                ->with('categories')
-                ->with('policies.category')
-                ->ordered()
-                ->get()
-            )->toArray();
-        });
+        return Cache::flexible('subscriptions.index', [60 * 60 * 24, 60 * 60 * 48], fn () => ProductData::collect(Product::query()
+            ->subscriptions()
+            ->visible()
+            ->with(['approvedReviews' => fn (MorphMany|Comment $query) => $query->latest()])
+            ->with(['prices' => fn (HasMany|Price $query) => $query->recurring()->active()])
+            ->with('categories')
+            ->with('policies.category')
+            ->ordered()
+            ->get()
+        )->toArray());
     }
 
     protected function forumsCategoriesIndex(): array
     {
-        return Cache::flexible('forums.categories.index', [60 * 10, 60 * 60], function () {
-            return ForumCategoryData::collect(ForumCategory::query()
-                ->active()
-                ->ordered()
-                ->with(['groups'])
-                ->with(['forums' => function (HasMany|Forum $query): void {
-                    $query
-                        ->whereNull('parent_id')
-                        ->withCount(['topics', 'posts'])
-                        ->active()
-                        ->ordered()
-                        ->with(['groups'])
-                        ->with(['latestTopics' => function (HasMany|Topic $subQuery): void {
-                            $subQuery
-                                ->withCount('posts')
-                                ->with(['author', 'lastPost'])
-                                ->limit(3);
-                        }]);
-                }])
-                ->get()
-                ->loadCount([
-                    'forums as posts_count' => function ($query): void {
-                        $query->join('topics', 'topics.forum_id', '=', 'forums.id')
-                            ->join('posts', 'posts.topic_id', '=', 'topics.id');
-                    },
-                ])
-            )->toArray();
-        });
+        return Cache::flexible('forums.categories.index', [60 * 10, 60 * 60], fn () => ForumCategoryData::collect(ForumCategory::query()
+            ->active()
+            ->ordered()
+            ->with(['groups'])
+            ->with(['forums' => function (HasMany|Forum $query): void {
+                $query
+                    ->whereNull('parent_id')
+                    ->withCount(['topics', 'posts'])
+                    ->active()
+                    ->ordered()
+                    ->with(['groups'])
+                    ->with(['latestTopics' => function (HasMany|Topic $subQuery): void {
+                        $subQuery
+                            ->withCount('posts')
+                            ->with(['author', 'lastPost'])
+                            ->limit(3);
+                    }]);
+            }])
+            ->get()
+            ->loadCount([
+                'forums as posts_count' => function ($query): void {
+                    $query->join('topics', 'topics.forum_id', '=', 'forums.id')
+                        ->join('posts', 'posts.topic_id', '=', 'topics.id');
+                },
+            ])
+        )->toArray());
     }
 }

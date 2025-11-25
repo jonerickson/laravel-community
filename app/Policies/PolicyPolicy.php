@@ -27,7 +27,7 @@ class PolicyPolicy
     public function view(?User $user, Policy $policy): bool
     {
         return $policy->is_active
-            && ($policy->category === null || Gate::forUser($user)->check('view', $policy->category))
+            && (blank($policy->category) || Gate::forUser($user)->check('view', $policy->category))
             && (! $policy->effective_at || ! $policy->effective_at->isFuture());
     }
 }

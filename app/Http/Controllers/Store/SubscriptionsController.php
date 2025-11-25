@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Store;
 
 use App\Data\CommentData;
+use App\Data\ProductData;
 use App\Data\SubscriptionData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Store\SubscriptionCancelRequest;
@@ -18,7 +19,6 @@ use App\Services\CacheService;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -43,11 +43,12 @@ class SubscriptionsController extends Controller
         $this->authorize('viewAny', Product::class);
 
         $subscriptions = collect($this->cache->getByKey('subscriptions.index'))
-            ->filter(fn (array $product) => Gate::getPolicyFor(Product::class)->view(Auth::user(), $product))
+            ->filter(fn (array $product) => Gate::check('view', ProductData::from($product)))
             ->values();
 
         $subscriptionReviews = $subscriptions->mapWithKeys(function (array $product): array {
-            $reviews = CommentData::collect(Product::with('reviews')->findOrFail($product['id'])
+            $reviews = CommentData::collect(Product::with('reviews')
+                ->findOrFail($product['id'])
                 ->approvedReviews
                 ->values()
                 ->all(), PaginatedDataCollection::class);

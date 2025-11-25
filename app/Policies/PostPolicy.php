@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Data\PostData;
 use App\Enums\WarningConsequenceType;
 use App\Models\Post;
 use App\Models\User;
@@ -25,8 +26,15 @@ class PostPolicy
         return Gate::forUser($user)->check('view_any_posts');
     }
 
-    public function view(?User $user, Post $post): bool
+    public function view(?User $user, PostData|Post $post): bool
     {
+        if ($post instanceof PostData) {
+            return Gate::forUser($user)->check('view_posts')
+                && ($post->isApproved || (! $post->isApproved && (($user && $post->author->id === $user->id)) || Gate::forUser($user)->check('approve', Post::find($post['id']))))
+                && ($post->isPublished || (! $post->isPublished && (($user && $post->author->id === $user->id)) || Gate::forUser($user)->check('publish', Post::find($post['id']))))
+                && ($post->isReported || (! $post->isReported && (($user && $post->author->id === $user->id)) || Gate::forUser($user)->check('report', Post::find($post['id']))));
+        }
+
         return Gate::forUser($user)->check('view_posts')
             && ($post->is_approved || (! $post->is_approved && (($user && $post->isAuthoredBy($user)) || Gate::forUser($user)->check('approve', $post))))
             && ($post->is_published || (! $post->is_published && (($user && $post->isAuthoredBy($user)) || Gate::forUser($user)->check('publish', $post))))
