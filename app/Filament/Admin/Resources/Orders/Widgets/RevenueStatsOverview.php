@@ -10,6 +10,7 @@ use App\Models\Subscription;
 use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Number;
 use Override;
 
@@ -63,8 +64,9 @@ class RevenueStatsOverview extends StatsOverviewWidget
     protected function calculateMRR(): float
     {
         $activeSubscriptions = Subscription::query()
-            ->where('stripe_status', 'active')
-            ->orWhere('stripe_status', 'trialing')
+            ->orWhere(fn (Builder $query) => $query->active())
+            ->orWhere(fn (Builder $query) => $query->onTrial())
+            ->orWhere(fn (Builder $query) => $query->onGracePeriod())
             ->with('price')
             ->get();
 
