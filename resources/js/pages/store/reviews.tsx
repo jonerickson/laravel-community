@@ -185,7 +185,7 @@ export default function Reviews({ subscription, reviews }: ReviewsPageProps) {
                                                             ? formatDistanceToNow(new Date(review.createdAt), { addSuffix: true })
                                                             : 'N/A'}
                                                     </p>
-                                                    {review.content && <p className="text-sm leading-relaxed text-foreground">{review.content}</p>}
+                                                    <RichEditorContent content={review.content} className="leading-relaxed" />
                                                 </div>
                                             </div>
                                         </div>

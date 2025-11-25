@@ -12,6 +12,7 @@ use App\Filament\Admin\Resources\Products\Pages\CreateProduct;
 use App\Filament\Admin\Resources\Products\Pages\EditProduct;
 use App\Filament\Admin\Resources\Products\Pages\ListProducts;
 use App\Filament\Admin\Resources\Products\RelationManagers\PricesRelationManager;
+use App\Filament\Admin\Resources\Products\RelationManagers\ReviewsRelationManager;
 use App\Models\Product;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -376,6 +377,7 @@ class ProductResource extends Resource
     {
         return [
             PricesRelationManager::class,
+            ReviewsRelationManager::class,
         ];
     }
 

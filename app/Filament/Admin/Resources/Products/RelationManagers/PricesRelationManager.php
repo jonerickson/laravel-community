@@ -12,6 +12,7 @@ use App\Filament\Admin\Resources\Prices\Actions\SwapAction;
 use App\Filament\Admin\Resources\Prices\Actions\SyncExternalPriceAction;
 use App\Filament\Admin\Resources\Prices\Actions\UpdateExternalPriceAction;
 use App\Models\Price;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -25,6 +26,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Support\RawJs;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -36,6 +38,8 @@ use Illuminate\Database\Eloquent\Model;
 class PricesRelationManager extends RelationManager
 {
     protected static string $relationship = 'prices';
+
+    protected static string|BackedEnum|null $icon = Heroicon::OutlinedCurrencyDollar;
 
     public function form(Schema $schema): Schema
     {

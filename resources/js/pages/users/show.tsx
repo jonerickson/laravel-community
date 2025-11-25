@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useInitials } from '@/hooks/use-initials';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
+import { stripCharacters } from '@/utils/truncate';
 import { Head } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { Calendar, User as UserIcon } from 'lucide-react';
@@ -91,7 +92,7 @@ export default function Show({ user }: UserProfilePageProps) {
                     </CardHeader>
                 </Card>
 
-                {user.signature && (
+                {user.signature && stripCharacters(user.signature || '').length > 0 && (
                     <Card>
                         <CardHeader>
                             <div className="-mb-6">

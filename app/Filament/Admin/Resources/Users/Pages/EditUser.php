@@ -9,6 +9,7 @@ use App\Filament\Admin\Resources\Users\Actions\SyncGroupsAction;
 use App\Filament\Admin\Resources\Users\Actions\UnbanAction;
 use App\Filament\Admin\Resources\Users\UserResource;
 use App\Models\User;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
@@ -21,6 +22,9 @@ class EditUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('profile')
+                ->color('gray')
+                ->url(fn (User $record): string => route('users.show', $record), shouldOpenInNewTab: true),
             DeleteAction::make(),
             ActionGroup::make([
                 BanAction::make(),
