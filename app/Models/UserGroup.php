@@ -34,7 +34,7 @@ class UserGroup extends Pivot
 
     protected $dispatchesEvents = [
         'created' => UserGroupCreated::class,
-        'deleted' => UserGroupDeleted::class,
+        'deleting' => UserGroupDeleted::class,
     ];
 
     public function user(): BelongsTo

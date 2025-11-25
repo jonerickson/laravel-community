@@ -34,17 +34,14 @@ export default defineConfig(({ mode }) => {
                 ]
                 : []),
         ],
-
         esbuild: {
             jsx: 'automatic',
         },
-
         resolve: {
             alias: {
                 'ziggy-js': resolve(__dirname, 'vendor/tightenco/ziggy'),
             },
         },
-
         build: {
             cssCodeSplit: true,
             sourcemap: 'hidden',

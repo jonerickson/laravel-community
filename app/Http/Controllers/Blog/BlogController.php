@@ -10,6 +10,7 @@ use App\Data\RecentViewerData;
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\Post;
+use App\Services\CacheService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Gate;
@@ -21,6 +22,12 @@ class BlogController extends Controller
 {
     use AuthorizesRequests;
 
+    public function __construct(
+        protected readonly CacheService $cache,
+    ) {
+        //
+    }
+
     /**
      * @throws AuthorizationException
      */
@@ -28,16 +35,7 @@ class BlogController extends Controller
     {
         $this->authorize('viewAny', Post::class);
 
-        $posts = PostData::collect(Post::query()
-            ->blog()
-            ->with(['comments', 'author', 'reads'])
-            ->withCount(['views', 'comments'])
-            ->published()
-            ->latest()
-            ->get()
-            ->filter(fn (Post $post) => Gate::check('view', $post))
-            ->values()
-            ->all(), PaginatedDataCollection::class);
+        $posts = PostData::collect($this->cache->getByKey('blog.index'), PaginatedDataCollection::class);
 
         return Inertia::render('blog/index', [
             'posts' => Inertia::scroll(fn () => $posts->items()),

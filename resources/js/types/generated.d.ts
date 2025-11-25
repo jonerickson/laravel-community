@@ -158,6 +158,7 @@ declare namespace App.Data {
         featuredImage: string | null;
         featuredImageUrl: string | null;
         forums: Array<App.Data.ForumData> | null;
+        groups: Array<App.Data.GroupData> | null;
         createdAt: string | null;
         updatedAt: string | null;
     };
@@ -181,6 +182,7 @@ declare namespace App.Data {
         latestTopic: App.Data.TopicData | null;
         category: App.Data.ForumCategoryData | null;
         parent: App.Data.ForumData | null;
+        groups: Array<App.Data.GroupData> | null;
         createdAt: string | null;
         updatedAt: string | null;
     };

@@ -25,9 +25,15 @@ class ForumPolicy
         return Gate::forUser($user)->check('view_any_forums');
     }
 
-    public function view(?User $user, Forum $forum): bool
+    public function view(?User $user, array|Forum $forum): bool
     {
         $groups = $user instanceof User ? $user->groups : collect([Group::defaultGuestGroup()]);
+
+        if (is_array($forum)) {
+            return Gate::forUser($user)->check('view_forums')
+                && ($forum['isActive'] ?? false)
+                && ($groups->pluck('id')->intersect(collect(data_get($forum, 'groups'))->pluck('id'))->isNotEmpty() ?? false);
+        }
 
         return Gate::forUser($user)->check('view_forums')
             && $forum->is_active

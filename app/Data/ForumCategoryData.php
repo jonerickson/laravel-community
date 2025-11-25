@@ -39,6 +39,9 @@ class ForumCategoryData extends Data
     /** @var ForumData[] */
     public ?array $forums = null;
 
+    /** @var GroupData[] */
+    public ?array $groups = null;
+
     public ?CarbonImmutable $createdAt = null;
 
     public ?CarbonImmutable $updatedAt = null;

@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\Sluggable;
+use App\Events\ForumCreated;
+use App\Events\ForumDeleted;
+use App\Events\ForumUpdated;
 use App\Traits\Activateable;
 use App\Traits\Followable;
 use App\Traits\HasGroups;
@@ -95,6 +98,12 @@ class Forum extends Model implements Sluggable
         'rules',
         'icon',
         'color',
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => ForumCreated::class,
+        'updated' => ForumUpdated::class,
+        'deleting' => ForumDeleted::class,
     ];
 
     public function generateSlug(): ?string

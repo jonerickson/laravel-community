@@ -8,6 +8,8 @@ use App\Contracts\Sluggable;
 use App\Enums\PostType;
 use App\Enums\WarningConsequenceType;
 use App\Events\PostCreated;
+use App\Events\PostDeleted;
+use App\Events\PostUpdated;
 use App\Traits\Approvable;
 use App\Traits\Commentable;
 use App\Traits\Featureable;
@@ -171,6 +173,8 @@ class Post extends Model implements HasLabel, Sluggable
 
     protected $dispatchesEvents = [
         'created' => PostCreated::class,
+        'updated' => PostUpdated::class,
+        'deleting' => PostDeleted::class,
     ];
 
     public function generateSlug(): ?string

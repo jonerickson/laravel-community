@@ -25,9 +25,15 @@ class ForumCategoryPolicy
         return Gate::forUser($user)->check('view_any_forums_categories');
     }
 
-    public function view(?User $user, ForumCategory $category): bool
+    public function view(?User $user, array|ForumCategory $category): bool
     {
         $groups = $user instanceof User ? $user->groups : collect([Group::defaultGuestGroup()]);
+
+        if (is_array($category)) {
+            return Gate::forUser($user)->check('view_forums_category')
+                && ($category['isActive'] ?? false)
+                && ($groups->pluck('id')->intersect(collect(data_get($category, 'groups'))->pluck('id'))->isNotEmpty() ?? false);
+        }
 
         return Gate::forUser($user)->check('view_forums_category')
             && $category->is_active

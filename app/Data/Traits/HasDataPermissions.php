@@ -19,6 +19,7 @@ trait HasDataPermissions
     {
         return [
             ModelPermissionNormalizer::class,
+            ...config('data.normalizers'),
         ];
     }
 }

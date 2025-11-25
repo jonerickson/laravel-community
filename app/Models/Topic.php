@@ -6,6 +6,8 @@ namespace App\Models;
 
 use App\Contracts\Sluggable;
 use App\Events\TopicCreated;
+use App\Events\TopicDeleted;
+use App\Events\TopicUpdated;
 use App\Traits\Followable;
 use App\Traits\HasAuthor;
 use App\Traits\HasLogging;
@@ -125,6 +127,8 @@ class Topic extends Model implements Sluggable
 
     protected $dispatchesEvents = [
         'created' => TopicCreated::class,
+        'updated' => TopicUpdated::class,
+        'deleting' => TopicDeleted::class,
     ];
 
     public function generateSlug(): ?string

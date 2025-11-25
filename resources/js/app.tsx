@@ -23,9 +23,15 @@ createInertiaApp({
     resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),
     setup({ el, App, props }) {
         const root = createRoot(el, {
-            onUncaughtError: Sentry.reactErrorHandler(),
-            onCaughtError: Sentry.reactErrorHandler(),
-            onRecoverableError: Sentry.reactErrorHandler(),
+            onUncaughtError: Sentry.reactErrorHandler((error, errorInfo) => {
+                console.error('Uncaught error', error, errorInfo.componentStack);
+            }),
+            onCaughtError: Sentry.reactErrorHandler((error, errorInfo) => {
+                console.warn('Caught error', error, errorInfo.componentStack);
+            }),
+            onRecoverableError: Sentry.reactErrorHandler((error, errorInfo) => {
+                console.warn('Recoverable error', error, errorInfo.componentStack);
+            }),
         });
 
         root.render(

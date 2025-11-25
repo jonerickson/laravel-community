@@ -53,6 +53,9 @@ class ForumData extends Data
 
     public ?ForumData $parent = null;
 
+    /** @var GroupData[] */
+    public ?array $groups = null;
+
     public ?CarbonImmutable $createdAt = null;
 
     public ?CarbonImmutable $updatedAt = null;

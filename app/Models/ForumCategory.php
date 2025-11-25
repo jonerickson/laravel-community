@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\Sluggable;
+use App\Events\ForumCategoryCreated;
+use App\Events\ForumCategoryDeleted;
+use App\Events\ForumCategoryUpdated;
 use App\Traits\Activateable;
 use App\Traits\HasColor;
 use App\Traits\HasFeaturedImage;
@@ -79,6 +82,12 @@ class ForumCategory extends Model implements Sluggable
         'name',
         'description',
         'is_active',
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => ForumCategoryCreated::class,
+        'updated' => ForumCategoryUpdated::class,
+        'deleting' => ForumCategoryDeleted::class,
     ];
 
     public function forums(): HasMany
