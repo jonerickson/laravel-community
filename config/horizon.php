@@ -121,7 +121,7 @@ return [
     */
 
     'silenced' => [
-        // App\Jobs\ExampleJob::class,
+        Laravel\Telescope\Jobs\ProcessPendingUpdates::class,
     ],
 
     'silenced_tags' => [
@@ -204,16 +204,21 @@ return [
     'environments' => [
         'production' => [
             'supervisor-1' => [
-                'maxProcesses' => 10,
+                'minProcesses' => 3,
+                'maxProcesses' => 15,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
                 'force' => true,
+                'tries' => 3,
+                'backoff' => [1, 5, 10],
+                'timeout' => 120,
+                'memory' => 512,
             ],
         ],
 
         'staging' => [
             'supervisor-1' => [
-                'maxProcesses' => 10,
+                'maxProcesses' => 5,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
