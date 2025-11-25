@@ -1,5 +1,6 @@
 import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import usePermissions from '@/hooks/use-permissions';
 import { cn, pluralize } from '@/lib/utils';
@@ -20,7 +21,7 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
         <Card className="overflow-hidden py-0 transition-shadow hover:shadow-sm">
             <CardContent className="p-0">
                 <div className="flex flex-col md:flex-row">
-                    <div className="w-full border-b bg-primary/5 px-4 py-4 sm:px-6 md:w-64 md:border-r md:border-b-0">
+                    <div className="w-full border-b bg-primary/5 px-4 py-4 sm:px-6 md:w-72 md:border-r md:border-b-0">
                         <div className="space-y-3">
                             <Link href={route('forums.categories.show', { category: category.slug })}>
                                 <Heading title={category.name} description={category.description || undefined} />
@@ -40,14 +41,19 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
                                 </div>
                             </Link>
                             {category.forums && category.forums.length > 0 && (
-                                <div className="mt-2 flex flex-wrap gap-3 md:flex-col md:gap-0 md:space-y-2">
+                                <div className="mt-4 flex flex-wrap gap-2 md:flex-col md:gap-0 md:space-y-2">
                                     {category.forums.map((forum) => (
-                                        <div key={forum.id} className="flex items-center gap-2">
-                                            <div className="h-2 w-2 rounded-full" style={{ backgroundColor: forum.color }} />
-                                            <Link href={route('forums.show', { forum: forum.slug })} className="text-sm font-medium hover:underline">
-                                                {forum.name}
-                                            </Link>
-                                        </div>
+                                        <Button size="sm" variant="outline" asChild>
+                                            <div key={forum.id} className="flex w-full items-center justify-start gap-2 sm:w-auto">
+                                                <div className="h-2 w-2 rounded-full" style={{ backgroundColor: forum.color }} />
+                                                <Link
+                                                    href={route('forums.show', { forum: forum.slug })}
+                                                    className="text-sm font-medium hover:underline"
+                                                >
+                                                    {forum.name}
+                                                </Link>
+                                            </div>
+                                        </Button>
                                     ))}
                                 </div>
                             )}
