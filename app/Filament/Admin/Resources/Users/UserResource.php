@@ -54,7 +54,6 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -357,12 +356,15 @@ class UserResource extends Resource
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('email')
+                    ->sortable()
                     ->copyable()
                     ->searchable(),
                 TextColumn::make('groups.name')
+                    ->sortable()
                     ->placeholder('No Groups')
                     ->badge(),
                 TextColumn::make('roles.name')
+                    ->sortable()
                     ->placeholder('No Roles')
                     ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -394,13 +396,13 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TernaryFilter::make('is_banned')
-                    ->label('Banned Status')
-                    ->trueLabel('Banned users only')
-                    ->falseLabel('Active users only')
-                    ->native(false),
                 SelectFilter::make('groups')
                     ->relationship('groups', 'name')
+                    ->multiple()
+                    ->searchable()
+                    ->preload(),
+                SelectFilter::make('roles')
+                    ->relationship('roles', 'name')
                     ->multiple()
                     ->searchable()
                     ->preload(),
