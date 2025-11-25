@@ -22,6 +22,7 @@ use Laravel\Cashier\Subscription as BaseSubscription;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Cashier\SubscriptionItem> $items
  * @property-read int|null $items_count
+ * @property-read mixed $name
  * @property-read User|null $owner
  * @property-read Price|null $price
  * @property-read User|null $user

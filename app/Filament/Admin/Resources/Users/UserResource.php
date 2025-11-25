@@ -431,6 +431,9 @@ class UserResource extends Resource
                     ->schema([
                         Select::make('subscription_status')
                             ->label('Subscription Status')
+                            ->multiple()
+                            ->searchable()
+                            ->preload()
                             ->options([
                                 'active' => 'Active',
                                 'cancelled' => 'Cancelled',
@@ -444,32 +447,32 @@ class UserResource extends Resource
                     ->label('Has active subscription')
                     ->query(fn (Builder $query, array $data): Builder => $query
                         ->when(
-                            $data['subscription_status'] === 'active',
-                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->active()),
+                            in_array('active', $data['subscription_status']),
+                            fn (Builder $query, $date): Builder => $query->orWhereHas('subscriptions', fn (Builder|Subscription $query) => $query->active()),
                         )
                         ->when(
-                            $data['subscription_status'] === 'cancelled',
-                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->canceled()),
+                            in_array('cancelled', $data['subscription_status']),
+                            fn (Builder $query, $date): Builder => $query->orWhereHas('subscriptions', fn (Builder|Subscription $query) => $query->canceled()),
                         )
                         ->when(
-                            $data['subscription_status'] === 'ended',
-                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->ended()),
+                            in_array('ended', $data['subscription_status']),
+                            fn (Builder $query, $date): Builder => $query->orWhereHas('subscriptions', fn (Builder|Subscription $query) => $query->ended()),
                         )
                         ->when(
-                            $data['subscription_status'] === 'expired_trial',
-                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->expiredTrial()),
+                            in_array('expired_trial', $data['subscription_status']),
+                            fn (Builder $query, $date): Builder => $query->orWhereHas('subscriptions', fn (Builder|Subscription $query) => $query->expiredTrial()),
                         )
                         ->when(
-                            $data['subscription_status'] === 'grace_period',
-                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->onGracePeriod()),
+                            in_array('grace_period', $data['subscription_status']),
+                            fn (Builder $query, $date): Builder => $query->orWhereHas('subscriptions', fn (Builder|Subscription $query) => $query->onGracePeriod()),
                         )
                         ->when(
-                            $data['subscription_status'] === 'trialing',
-                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->onTrial()),
+                            in_array('trialing', $data['subscription_status']),
+                            fn (Builder $query, $date): Builder => $query->orWhereHas('subscriptions', fn (Builder|Subscription $query) => $query->onTrial()),
                         )
                         ->when(
-                            $data['subscription_status'] === 'past_due',
-                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->pastDue()),
+                            in_array('past_due', $data['subscription_status']),
+                            fn (Builder $query, $date): Builder => $query->orWhereHas('subscriptions', fn (Builder|Subscription $query) => $query->pastDue()),
                         )
                     ),
                 Filter::make('has_no_subscription')
