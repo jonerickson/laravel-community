@@ -23,9 +23,8 @@ class BustForumCache
         //
     }
 
-    public function handle(
-        ForumCategoryCreated|ForumCategoryUpdated|ForumCategoryDeleted|ForumCreated|ForumUpdated|ForumDeleted|TopicCreated|TopicUpdated|TopicDeleted $event
-    ): void {
+    public function handle(ForumCategoryCreated|ForumCategoryUpdated|ForumCategoryDeleted|ForumCreated|ForumUpdated|ForumDeleted|TopicCreated|TopicUpdated|TopicDeleted $event): void
+    {
         $this->cache->purgeByKey('forums.categories.index');
     }
 }

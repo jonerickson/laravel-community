@@ -5,23 +5,20 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Store;
 
 use App\Data\CommentData;
-use App\Data\ProductData;
 use App\Data\SubscriptionData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Store\SubscriptionCancelRequest;
 use App\Http\Requests\Store\SubscriptionCheckoutRequest;
 use App\Http\Requests\Store\SubscriptionUpdateRequest;
 use App\Managers\PaymentManager;
-use App\Models\Comment;
 use App\Models\Order;
-use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
+use App\Services\CacheService;
 use Illuminate\Container\Attributes\CurrentUser;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -34,6 +31,7 @@ class SubscriptionsController extends Controller
 
     public function __construct(
         private readonly PaymentManager $paymentManager,
+        private readonly CacheService $cache,
         #[CurrentUser]
         private readonly ?User $user = null,
     ) {
@@ -44,29 +42,21 @@ class SubscriptionsController extends Controller
     {
         $this->authorize('viewAny', Product::class);
 
-        $subscriptions = Product::query()
-            ->subscriptions()
-            ->visible()
-            ->with(['approvedReviews' => fn (MorphMany|Comment $query) => $query->latest()])
-            ->with(['prices' => fn (HasMany|Price $query) => $query->recurring()->active()])
-            ->with('categories')
-            ->with('policies.category')
-            ->ordered()
-            ->get()
-            ->filter(fn (Product $product) => Gate::check('view', $product))
+        $subscriptions = collect($this->cache->getByKey('subscriptions.index'))
+            ->filter(fn (array $product) => Gate::getPolicyFor(Product::class)->view(Auth::user(), $product))
             ->values();
 
-        $subscriptionReviews = $subscriptions->mapWithKeys(function (Product $product): array {
-            $reviews = CommentData::collect($product
+        $subscriptionReviews = $subscriptions->mapWithKeys(function (array $product): array {
+            $reviews = CommentData::collect(Product::with('reviews')->findOrFail($product['id'])
                 ->approvedReviews
                 ->values()
                 ->all(), PaginatedDataCollection::class);
 
-            return [$product->id => $reviews->items()];
+            return [$product['id'] => $reviews->items()];
         });
 
         return Inertia::render('store/subscriptions', [
-            'subscriptionProducts' => ProductData::collect($subscriptions),
+            'subscriptionProducts' => $subscriptions,
             'subscriptionReviews' => $subscriptionReviews,
             'currentSubscription' => $this->user instanceof User
                 ? $this->paymentManager->currentSubscription($this->user)

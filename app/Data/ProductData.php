@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use App\Enums\ProductApprovalStatus;
 use App\Enums\ProductTaxCode;
 use App\Enums\ProductType;
 use Carbon\CarbonImmutable;
@@ -36,6 +37,10 @@ class ProductData extends Data
     public bool $isSubscriptionOnly;
 
     public bool $isMarketplaceProduct;
+
+    public ProductApprovalStatus $approvalStatus;
+
+    public bool $isVisible;
 
     public int $trialDays;
 

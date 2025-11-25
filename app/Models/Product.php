@@ -311,21 +311,6 @@ class Product extends Model implements HasLabel, Sluggable
             ->shouldCache();
     }
 
-    public function isApproved(): bool
-    {
-        return $this->approval_status === ProductApprovalStatus::Approved;
-    }
-
-    public function isPending(): bool
-    {
-        return $this->approval_status === ProductApprovalStatus::Pending;
-    }
-
-    public function isRejected(): bool
-    {
-        return $this->approval_status === ProductApprovalStatus::Rejected;
-    }
-
     /**
      * @return array<string, int|string|null>
      */

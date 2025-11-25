@@ -6,11 +6,16 @@ namespace App\Services;
 
 use App\Data\ForumCategoryData;
 use App\Data\PostData;
+use App\Data\ProductData;
+use App\Models\Comment;
 use App\Models\Forum;
 use App\Models\ForumCategory;
 use App\Models\Post;
+use App\Models\Price;
+use App\Models\Product;
 use App\Models\Topic;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
@@ -46,6 +51,22 @@ class CacheService
                 ->withCount(['views', 'comments'])
                 ->published()
                 ->latest()
+                ->get()
+            )->toArray();
+        });
+    }
+
+    protected function subscriptionsIndex()
+    {
+        return Cache::flexible('subscriptions.index', [60 * 60 * 24, 60 * 60 * 48], function () {
+            return ProductData::collect(Product::query()
+                ->subscriptions()
+                ->visible()
+                ->with(['approvedReviews' => fn (MorphMany|Comment $query) => $query->latest()])
+                ->with(['prices' => fn (HasMany|Price $query) => $query->recurring()->active()])
+                ->with('categories')
+                ->with('policies.category')
+                ->ordered()
                 ->get()
             )->toArray();
         });
