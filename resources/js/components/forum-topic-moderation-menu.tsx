@@ -1,22 +1,27 @@
+import ForumSelectionDialog from '@/components/forum-selection-dialog';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApiRequest } from '@/hooks/use-api-request';
 import usePermissions from '@/hooks/use-permissions';
 import { router, useForm } from '@inertiajs/react';
-import { Lock, LockOpen, MoreHorizontal, Pin, PinOff, Trash } from 'lucide-react';
+import { ArrowLeftRight, Lock, LockOpen, MoreHorizontal, Pin, PinOff, Trash } from 'lucide-react';
+import { useState } from 'react';
 
 interface ForumTopicModerationMenuProps {
     topic: App.Data.TopicData;
     forum: App.Data.ForumData;
+    forums: App.Data.ForumData[];
 }
 
-export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicModerationMenuProps) {
+export default function ForumTopicModerationMenu({ topic, forum, forums }: ForumTopicModerationMenuProps) {
     const { can, hasAnyPermission } = usePermissions();
     const { delete: deleteTopic } = useForm();
     const { execute: pinTopic, loading: pinLoading } = useApiRequest();
     const { execute: lockTopic, loading: lockLoading } = useApiRequest();
+    const { execute: moveTopic, loading: moveLoading } = useApiRequest();
+    const [showMoveDialog, setShowMoveDialog] = useState(false);
 
-    if (!hasAnyPermission(['delete_topics', 'pin_topics', 'lock_topics'])) {
+    if (!hasAnyPermission(['move_topics', 'delete_topics', 'pin_topics', 'lock_topics'])) {
         return null;
     }
 
@@ -78,54 +83,95 @@ export default function ForumTopicModerationMenu({ topic, forum }: ForumTopicMod
         );
     };
 
+    const handleOpenMoveDialog = () => {
+        setShowMoveDialog(true);
+    };
+
+    const handleMoveTopic = async (targetForum: App.Data.ForumData) => {
+        setShowMoveDialog(false);
+        await moveTopic(
+            {
+                url: route('api.forums.topics.update', { topic: topic.slug }),
+                method: 'PUT',
+                data: {
+                    topic_id: topic.id,
+                    target_forum_id: targetForum.id,
+                },
+            },
+            {
+                onSuccess: () => {
+                    router.visit(route('forums.topics.show', { forum: targetForum.slug, topic: topic.slug }));
+                },
+            },
+        );
+    };
+
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <MoreHorizontal className="size-4" />
-                    <span className="sr-only">Open menu</span>
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                {can('pin_topics') && (
-                    <DropdownMenuItem onClick={handleTogglePin} disabled={pinLoading}>
-                        {topic.isPinned ? (
-                            <>
-                                <PinOff className="mr-2 size-4" />
-                                Unpin Topic
-                            </>
-                        ) : (
-                            <>
-                                <Pin className="mr-2 size-4" />
-                                Pin Topic
-                            </>
-                        )}
-                    </DropdownMenuItem>
-                )}
+        <>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <MoreHorizontal className="size-4" />
+                        <span className="sr-only">Open menu</span>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    {can('pin_topics') && (
+                        <DropdownMenuItem onClick={handleTogglePin} disabled={pinLoading}>
+                            {topic.isPinned ? (
+                                <>
+                                    <PinOff className="mr-2 size-4" />
+                                    Unpin Topic
+                                </>
+                            ) : (
+                                <>
+                                    <Pin className="mr-2 size-4" />
+                                    Pin Topic
+                                </>
+                            )}
+                        </DropdownMenuItem>
+                    )}
 
-                {can('lock_topics') && (
-                    <DropdownMenuItem onClick={handleToggleLock} disabled={lockLoading}>
-                        {topic.isLocked ? (
-                            <>
-                                <LockOpen className="mr-2 size-4" />
-                                Unlock Topic
-                            </>
-                        ) : (
-                            <>
-                                <Lock className="mr-2 size-4" />
-                                Lock Topic
-                            </>
-                        )}
-                    </DropdownMenuItem>
-                )}
+                    {can('lock_topics') && (
+                        <DropdownMenuItem onClick={handleToggleLock} disabled={lockLoading}>
+                            {topic.isLocked ? (
+                                <>
+                                    <LockOpen className="mr-2 size-4" />
+                                    Unlock Topic
+                                </>
+                            ) : (
+                                <>
+                                    <Lock className="mr-2 size-4" />
+                                    Lock Topic
+                                </>
+                            )}
+                        </DropdownMenuItem>
+                    )}
 
-                {topic.permissions.canDelete && (
-                    <DropdownMenuItem onClick={handleDeleteTopic} className="text-destructive focus:text-destructive">
-                        <Trash className="mr-2 size-4 text-destructive" />
-                        Delete Topic
-                    </DropdownMenuItem>
-                )}
-            </DropdownMenuContent>
-        </DropdownMenu>
+                    {can('move_topics') && (
+                        <DropdownMenuItem onClick={handleOpenMoveDialog} disabled={moveLoading}>
+                            <ArrowLeftRight className="mr-2 size-4" />
+                            Move Topic
+                        </DropdownMenuItem>
+                    )}
+
+                    {topic.permissions.canDelete && (
+                        <DropdownMenuItem onClick={handleDeleteTopic} className="text-destructive focus:text-destructive">
+                            <Trash className="mr-2 size-4 text-destructive" />
+                            Delete Topic
+                        </DropdownMenuItem>
+                    )}
+                </DropdownMenuContent>
+            </DropdownMenu>
+
+            <ForumSelectionDialog
+                forums={forums}
+                isOpen={showMoveDialog}
+                onClose={() => setShowMoveDialog(false)}
+                onSelect={handleMoveTopic}
+                title="Move topic"
+                description="Choose which forum to move this topic to."
+            />
+        </>
     );
 }

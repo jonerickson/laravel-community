@@ -20,6 +20,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -110,10 +111,19 @@ class TopicController extends Controller
             );
         }
 
+        $forums = Forum::query()
+            ->active()
+            ->ordered()
+            ->withCount(['topics', 'posts'])
+            ->get()
+            ->filter(fn (Forum $forum) => Gate::check('view', $forum))
+            ->values();
+
         return Inertia::render('forums/topics/show', [
             'forum' => ForumData::from($forum),
             'topic' => TopicData::from($topic),
             'posts' => Inertia::defer(fn (): PaginatedData => PaginatedData::from(PostData::collect($posts->setCollection($filteredPosts), PaginatedDataCollection::class)->items()), 'posts'),
+            'forums' => Inertia::defer(fn (): Collection => ForumData::collect($forums), 'forums'),
             'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($topic->getRecentViewers()), 'viewers'),
         ]);
     }

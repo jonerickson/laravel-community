@@ -41,6 +41,7 @@ Route::group(['domain' => config('app.url'), 'middleware' => [EnsureFrontendRequ
         Route::post('/follow', [FollowController::class, 'store'])->name('follow.store');
         Route::delete('/follow/', [FollowController::class, 'destroy'])->name('follow.destroy');
         Route::delete('/forums/topics', [TopicController::class, 'destroy'])->name('forums.topics.destroy');
+        Route::put('/forums/topics/{topic:slug}', [TopicController::class, 'update'])->name('forums.topics.update');
         Route::post('/like', LikeController::class)->name('like');
         Route::get('/payment-methods', PaymentMethodController::class)->name('payment-methods');
         Route::post('/pin', [PinController::class, 'store'])->name('pin.store');

@@ -5,7 +5,7 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { MessageSquare, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { route } from 'ziggy-js';
@@ -98,7 +98,14 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                     <EmptyState icon={<MessageSquare />} title="No forums available" description="Check back later for community discussions." />
                 )}
 
-                <ForumSelectionDialog forums={allForums} isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} />
+                <ForumSelectionDialog
+                    forums={allForums}
+                    isOpen={isDialogOpen}
+                    onClose={() => setIsDialogOpen(false)}
+                    onSelect={(forum) => router.get(route('forums.topics.create', { forum: forum.slug }))}
+                    title="Select a forum"
+                    description="Choose which forum you'd like to create a new topic in."
+                />
             </div>
         </AppLayout>
     );

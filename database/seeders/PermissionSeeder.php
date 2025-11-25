@@ -112,6 +112,7 @@ class PermissionSeeder extends Seeder
             'pin_topics',
             'lock_topics',
             'report_topics',
+            'move_topics',
         ]);
     }
 

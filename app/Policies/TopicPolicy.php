@@ -115,4 +115,14 @@ class TopicPolicy
         return Gate::forUser($user)->check('lock_topics')
             && $this->view($user, $topic);
     }
+
+    public function move(?User $user, Topic $topic): bool
+    {
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        return Gate::forUser($user)->check('move_topics')
+            && $this->view($user, $topic);
+    }
 }

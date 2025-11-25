@@ -2,7 +2,6 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { router } from '@inertiajs/react';
 import { MessageSquare, Search } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -10,9 +9,12 @@ interface ForumSelectionDialogProps {
     forums: App.Data.ForumData[];
     isOpen: boolean;
     onClose: () => void;
+    onSelect: (forum: App.Data.ForumData) => void;
+    title: string;
+    description: string;
 }
 
-export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumSelectionDialogProps) {
+export default function ForumSelectionDialog({ forums, isOpen, onClose, onSelect, title, description }: ForumSelectionDialogProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedIndex, setSelectedIndex] = useState(0);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -20,7 +22,7 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumS
 
     const handleForumSelect = (forum: App.Data.ForumData) => {
         onClose();
-        router.get(route('forums.topics.create', { forum: forum.slug }));
+        onSelect(forum);
     };
 
     const filteredForums = forums.filter(
@@ -86,8 +88,8 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose }: ForumS
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
-                    <DialogTitle>Select a forum</DialogTitle>
-                    <DialogDescription>Choose which forum you'd like to create a new topic in.</DialogDescription>
+                    <DialogTitle>{title}</DialogTitle>
+                    <DialogDescription>{description}</DialogDescription>
                 </DialogHeader>
                 <div className="relative">
                     <Input
