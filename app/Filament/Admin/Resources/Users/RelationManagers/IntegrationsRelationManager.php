@@ -43,7 +43,7 @@ class IntegrationsRelationManager extends RelationManager
                     ->label('Provider Email')
                     ->default(fn () => $this->getOwnerRecord()?->email)
                     ->readOnly()
-                    ->required()
+                    ->nullable()
                     ->helperText("The user's account email for the provider. This cannot be edited because it is required to be the same email as the user account that is currently being updated."),
             ]);
     }
@@ -70,6 +70,7 @@ class IntegrationsRelationManager extends RelationManager
                     ->copyable()
                     ->label('Name'),
                 TextColumn::make('provider_email')
+                    ->placeholder('No Email')
                     ->copyable()
                     ->label('Email'),
                 ImageColumn::make('provider_avatar')
