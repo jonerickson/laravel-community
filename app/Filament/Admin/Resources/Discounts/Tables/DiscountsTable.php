@@ -6,6 +6,7 @@ namespace App\Filament\Admin\Resources\Discounts\Tables;
 
 use App\Enums\DiscountType;
 use App\Enums\DiscountValueType;
+use App\Models\Discount;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -71,12 +72,10 @@ class DiscountsTable
                     ->sortable(),
                 IconColumn::make('is_valid')
                     ->label('Valid')
-                    ->boolean()
-                    ->sortable(),
+                    ->boolean(),
                 IconColumn::make('is_expired')
                     ->label('Expired')
-                    ->boolean()
-                    ->sortable(),
+                    ->boolean(),
                 TextColumn::make('customer.name')
                     ->label('User')
                     ->searchable()
@@ -114,16 +113,10 @@ class DiscountsTable
                     ->label('Discount Type')
                     ->options(DiscountValueType::class)
                     ->native(false),
-                Filter::make('expired')
-                    ->label('Expired Discounts')
-                    ->query(fn (Builder $query): Builder => $query->expired()),
-                Filter::make('active')
-                    ->label('Active Discounts')
-                    ->query(fn (Builder $query): Builder => $query->active()),
                 TernaryFilter::make('has_balance')
                     ->label('Has Balance')
                     ->queries(
-                        true: fn (Builder $query): Builder => $query->withBalance(),
+                        true: fn (Builder|Discount $query): Builder => $query->withBalance(),
                         false: fn (Builder $query): Builder => $query->whereNotNull('current_balance')->where('current_balance', '<=', 0),
                     )
                     ->native(false),
@@ -135,6 +128,12 @@ class DiscountsTable
                     ->relationship('product', 'name')
                     ->searchable()
                     ->preload(),
+                Filter::make('expired')
+                    ->label('Expired Discounts')
+                    ->query(fn (Builder|Discount $query): Builder => $query->expired()),
+                Filter::make('active')
+                    ->label('Active Discounts')
+                    ->query(fn (Builder|Discount $query): Builder => $query->active()),
             ])
             ->recordActions([
                 EditAction::make(),

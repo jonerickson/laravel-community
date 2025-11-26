@@ -126,6 +126,8 @@ class DiscountForm
                                 TextEntry::make('reference_id')
                                     ->label('Reference ID')
                                     ->copyable(),
+                                TextEntry::make('times_used')
+                                    ->label('Times Used'),
                             ]),
                         Section::make('Associations')
                             ->components([
@@ -134,14 +136,14 @@ class DiscountForm
                                     ->relationship('customer', 'name')
                                     ->searchable()
                                     ->preload()
-                                    ->helperText('Assign this discount to a specific user. Leave empty for general use.')
+                                    ->helperText('Assign this discount to a specific user. Only the designated user can apply the discount. Leave empty for general use.')
                                     ->nullable(),
                                 Select::make('product_id')
                                     ->label('Product')
                                     ->relationship('product', 'name')
                                     ->searchable()
                                     ->preload()
-                                    ->helperText('Associate this discount with a product (e.g., gift card product). When the product is purchase, this discount will be issued to the customer.')
+                                    ->helperText('Associate this discount with a product (e.g., gift card product). When the product is purchased, a matching discount will be created and issued to the customer.')
                                     ->nullable(),
                             ]),
                         Section::make('Dates')
@@ -154,18 +156,6 @@ class DiscountForm
                                     ->label('Activated At')
                                     ->helperText('When this discount becomes active. Leave empty to activate immediately.')
                                     ->nullable(),
-                            ]),
-                        Section::make('Statistics')
-                            ->visibleOn('edit')
-                            ->components([
-                                TextEntry::make('times_used')
-                                    ->label('Times Used'),
-                                TextEntry::make('created_at')
-                                    ->label('Created At')
-                                    ->dateTime(),
-                                TextEntry::make('updated_at')
-                                    ->label('Last Updated')
-                                    ->dateTime(),
                             ]),
                     ]),
             ]);

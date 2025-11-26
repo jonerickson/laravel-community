@@ -45,7 +45,7 @@ enum DiscountType: string implements HasColor, HasDescription, HasIcon, HasLabel
     public function getDescription(): string
     {
         return match ($this) {
-            self::GiftCard => 'A gift card purchased by a customer that can be redeemed for its remaining balance.',
+            self::GiftCard => "A gift card purchased by a customer that can be redeemed for it's remaining balance. The order amount will be deducted from the remaining amount automatically after purchase.",
             self::PromoCode => 'A promotional code that can be shared and used by multiple customers.',
             self::Manual => 'A manual discount created by an administrator for a specific order.',
         };
