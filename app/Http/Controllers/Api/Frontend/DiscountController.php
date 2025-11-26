@@ -13,7 +13,7 @@ use App\Models\Order;
 use App\Services\DiscountService;
 use App\Services\ShoppingCartService;
 use Illuminate\Support\Number;
-use RuntimeException;
+use Throwable;
 
 class DiscountController
 {
@@ -76,10 +76,10 @@ class DiscountController
 
         try {
             $this->cartService->applyDiscount($order, $discount);
-        } catch (RuntimeException $runtimeException) {
+        } catch (Throwable $throwable) {
             return ApiResource::error(
-                message: $runtimeException->getMessage(),
-                errors: ['code' => [$runtimeException->getMessage()]],
+                message: $throwable->getMessage(),
+                errors: ['code' => [$throwable->getMessage()]],
                 status: 422
             );
         }

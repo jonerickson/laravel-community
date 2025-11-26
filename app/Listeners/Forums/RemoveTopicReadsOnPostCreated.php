@@ -6,9 +6,15 @@ namespace App\Listeners\Forums;
 
 use App\Enums\PostType;
 use App\Events\PostCreated;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
 
-class RemoveTopicReadsOnPostCreated
+class RemoveTopicReadsOnPostCreated implements ShouldQueue
 {
+    use Dispatchable;
+    use InteractsWithQueue;
+
     public function handle(PostCreated $event): void
     {
         if ($event->post->type !== PostType::Forum) {

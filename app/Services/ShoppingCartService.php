@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use RuntimeException;
+use Throwable;
 
 class ShoppingCartService
 {
@@ -105,6 +106,9 @@ class ShoppingCartService
         }
     }
 
+    /**
+     * @throws Throwable
+     */
     public function applyDiscount(Order $order, Discount $discount): void
     {
         if ($order->discounts()->where('discount_id', $discount->id)->exists()) {
