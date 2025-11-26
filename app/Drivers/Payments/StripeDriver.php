@@ -34,12 +34,14 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Laravel\Cashier\PaymentMethod;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\SubscriptionBuilder;
 use Stripe\Checkout\Session;
 use Stripe\Exception\ApiErrorException;
+use Stripe\Exception\RateLimitException;
 use Stripe\Stripe;
 use Stripe\StripeClient;
 
@@ -941,16 +943,44 @@ class StripeDriver implements PaymentProcessor
             return $defaultValue;
         }
 
-        try {
-            return $callback();
-        } catch (ApiErrorException $exception) {
-            Log::error('Stripe payment processor API error in '.$method, ['method' => $method, 'exception' => $exception]);
+        $attempt = 0;
+        $maxRetries = 3;
 
-            return $defaultValue;
-        } catch (Exception $exception) {
-            Log::error('Stripe payment processor exception in '.$method, ['method' => $method, 'exception' => $exception]);
+        while ($attempt < $maxRetries) {
+            try {
+                return $callback();
+            } catch (RateLimitException $exception) {
+                $attempt++;
+                $retryAfter = (int) ($exception->getHttpHeaders()['Retry-After'] ?? (2 ** $attempt));
 
-            return $defaultValue;
+                if ($attempt >= $maxRetries) {
+                    Log::error('Stripe rate limit exceeded after '.$maxRetries.' attempts in '.$method, [
+                        'method' => $method,
+                        'exception' => $exception,
+                        'retry_after' => $retryAfter,
+                    ]);
+
+                    return $defaultValue;
+                }
+
+                Log::warning('Stripe rate limit hit in '.$method.', retrying after '.$retryAfter.' seconds', [
+                    'method' => $method,
+                    'attempt' => $attempt,
+                    'max_retries' => $maxRetries,
+                ]);
+
+                Sleep::for($retryAfter)->seconds();
+            } catch (ApiErrorException $exception) {
+                Log::error('Stripe payment processor API error in '.$method, ['method' => $method, 'exception' => $exception]);
+
+                return $defaultValue;
+            } catch (Exception $exception) {
+                Log::error('Stripe payment processor exception in '.$method, ['method' => $method, 'exception' => $exception]);
+
+                return $defaultValue;
+            }
         }
+
+        return $defaultValue;
     }
 }
