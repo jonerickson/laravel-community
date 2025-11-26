@@ -925,9 +925,15 @@ class StripeDriver implements PaymentProcessor
 
     public function getBillingPortalUrl(User $user): ?string
     {
-        return Cache::remember('billing_portal:'.$user->id, 3600, fn (): mixed => $this->executeWithErrorHandling('getBillingPortalUrl', fn (): string => $user->billingPortalUrl(
-            returnUrl: route('settings.billing'),
-        )));
+        return Cache::remember('billing_portal:'.$user->id, 3600, fn (): mixed => $this->executeWithErrorHandling('getBillingPortalUrl', function () use ($user): ?string {
+            if (! $user->hasStripeId()) {
+                return null;
+            }
+
+            return $user->billingPortalUrl(
+                returnUrl: route('settings.billing'),
+            );
+        }));
     }
 
     private function executeWithErrorHandling(string $method, callable $callback, mixed $defaultValue = null): mixed
