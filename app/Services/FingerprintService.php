@@ -64,6 +64,6 @@ class FingerprintService
 
         $suspectScore = $eventData['suspect_score'] ?? 0;
 
-        return $suspectScore >= $this->suspectScoreThreshold;
+        return (int) $suspectScore >= $this->suspectScoreThreshold;
     }
 }
