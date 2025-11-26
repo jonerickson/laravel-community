@@ -59,6 +59,29 @@ trait Viewable
         $this->recordView();
     }
 
+    public function getRecentViewers(int $hours = 24, int $limit = 10): array
+    {
+        $recentViewers = $this
+            ->views()
+            ->where('updated_at', '>=', now()->subHours($hours))
+            ->whereHas('fingerprint.user')
+            ->orderBy('updated_at', 'desc')
+            ->distinct()
+            ->get()
+            ->take($limit)
+            ->values();
+
+        return $recentViewers->map(fn (View $view): array => [
+            'user' => [
+                'id' => $view->fingerprint->user->id,
+                'referenceId' => $view->fingerprint->user->reference_id,
+                'name' => $view->fingerprint->user->name,
+                'avatarUrl' => $view->fingerprint->user->avatar_url,
+            ],
+            'viewed_at' => $view->updated_at->toISOString(),
+        ])->toArray();
+    }
+
     protected static function bootViewable(): void
     {
         static::deleting(function (Model $model): void {

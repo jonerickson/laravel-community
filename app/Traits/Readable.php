@@ -135,29 +135,6 @@ trait Readable
         )->shouldCache();
     }
 
-    public function getRecentViewers(int $hours = 24, int $limit = 10): array
-    {
-        $recentViewers = $this
-            ->reads()
-            ->where('updated_at', '>=', now()->subHours($hours))
-            ->with('author')
-            ->orderBy('updated_at', 'desc')
-            ->get()
-            ->unique('created_by')
-            ->take($limit)
-            ->values();
-
-        return $recentViewers->map(fn (Read $read): array => [
-            'user' => [
-                'id' => $read->author->id,
-                'referenceId' => $read->author->reference_id,
-                'name' => $read->author->name,
-                'avatarUrl' => $read->author->avatar_url,
-            ],
-            'viewed_at' => $read->updated_at->toISOString(),
-        ])->toArray();
-    }
-
     protected function initializeReadable(): void
     {
         $this->mergeAppends([

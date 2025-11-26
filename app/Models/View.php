@@ -58,7 +58,7 @@ class View extends Model
 
     public function fingerprint(): BelongsTo
     {
-        return $this->belongsTo(Fingerprint::class, 'fingerprint_id', 'session_id');
+        return $this->belongsTo(Fingerprint::class, 'fingerprint_id', 'fingerprint_id');
     }
 
     /**
