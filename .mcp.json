@@ -10,10 +10,7 @@
         "playwright": {
             "type": "stdio",
             "command": "npx",
-            "args": [
-                "@playwright/mcp@latest"
-            ],
-            "env": []
+            "args": ["@playwright/mcp@latest"]
         },
         "herd": {
             "command": "php",
@@ -23,6 +20,10 @@
             "env": {
                 "SITE_PATH": "/Users/jonerickson/Code/mi"
             }
+        },
+        "sentry": {
+            "command": "npx",
+            "args": ["-y", "mcp-remote@latest", "https://mcp.sentry.dev/mcp"]
         }
     }
 }

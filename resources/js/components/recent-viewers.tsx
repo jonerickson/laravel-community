@@ -8,7 +8,7 @@ interface RecentViewersProps {
 }
 
 export default function RecentViewers({ viewers }: RecentViewersProps) {
-    if (!viewers || viewers.length === 0) {
+    if (!viewers || !Array.isArray(viewers) || viewers.length === 0) {
         return null;
     }
 

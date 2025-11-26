@@ -72,7 +72,7 @@ class BlogController extends Controller
         return Inertia::render('blog/show', [
             'post' => PostData::from($post),
             'comments' => Inertia::scroll(fn () => $comments->items(), 'comments'),
-            'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($post->getRecentViewers()), 'viewers'),
+            'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($post->getRecentViewers()), 'recentViewers'),
         ]);
     }
 }

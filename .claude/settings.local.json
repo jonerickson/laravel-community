@@ -10,7 +10,9 @@
       "mcp__laravel-boost__browser-logs",
       "mcp__laravel-boost__tinker",
       "Bash(npm run types:*)",
-      "Bash(php artisan make:*)"
+      "Bash(php artisan make:*)",
+      "mcp__sentry__find_organizations",
+      "mcp__sentry__get_issue_details"
     ],
     "deny": []
   },

@@ -124,7 +124,7 @@ class TopicController extends Controller
             'topic' => TopicData::from($topic),
             'posts' => Inertia::defer(fn (): PaginatedData => PaginatedData::from(PostData::collect($posts->setCollection($filteredPosts), PaginatedDataCollection::class)->items()), 'posts'),
             'forums' => Inertia::defer(fn (): Collection => ForumData::collect($forums), 'forums'),
-            'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($topic->getRecentViewers()), 'viewers'),
+            'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($topic->getRecentViewers()), 'recentViewers'),
         ]);
     }
 
