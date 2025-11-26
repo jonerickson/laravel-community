@@ -120,7 +120,7 @@ class UserResource extends Resource
                                                                 ->downloadable(),
                                                         ]),
                                                     Section::make()
-                                                        ->columns(2)
+                                                        ->columns()
                                                         ->contained(false)
                                                         ->components([
                                                             TextInput::make('name')
@@ -128,6 +128,7 @@ class UserResource extends Resource
                                                                 ->required()
                                                                 ->maxLength(255),
                                                             TextInput::make('email')
+                                                                ->unique()
                                                                 ->email()
                                                                 ->required()
                                                                 ->maxLength(255),
