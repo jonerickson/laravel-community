@@ -10,13 +10,6 @@ import { Deferred, Head, Link, usePage } from '@inertiajs/react';
 import { Folder, ImageIcon, Star, UserPlus } from 'lucide-react';
 import { route } from 'ziggy-js';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Store',
-        href: route('store.index'),
-    },
-];
-
 interface StoreIndexProps {
     categories: App.Data.ProductCategoryData[];
     featuredProducts: App.Data.ProductData[];
@@ -25,6 +18,12 @@ interface StoreIndexProps {
 
 export default function StoreIndex({ categories, featuredProducts, userProvidedProducts }: StoreIndexProps) {
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Store',
+            href: route('store.index'),
+        },
+    ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

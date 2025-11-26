@@ -14,17 +14,7 @@ import type { BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { useState } from 'react';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Support',
-        href: route('support.index'),
-    },
-    {
-        title: 'Create Ticket',
-        href: route('support.create'),
-    },
-];
+import { route } from 'ziggy-js';
 
 interface CreateSupportTicketProps {
     categories: App.Data.SupportTicketCategoryData[];
@@ -33,13 +23,23 @@ interface CreateSupportTicketProps {
 
 export default function CreateSupportTicket({ categories, orders }: CreateSupportTicketProps) {
     const [orderSearchOpen, setOrderSearchOpen] = useState(false);
-
     const { data, setData, post, processing, errors, reset } = useForm({
         subject: '',
         description: '',
         support_ticket_category_id: '',
         order_id: '',
     });
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Support',
+            href: route('support.index'),
+        },
+        {
+            title: 'Create Ticket',
+            href: route('support.create'),
+        },
+    ];
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

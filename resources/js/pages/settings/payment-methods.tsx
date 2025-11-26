@@ -14,17 +14,7 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { CreditCard, Plus } from 'lucide-react';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Settings',
-        href: route('settings'),
-    },
-    {
-        title: 'Payment Methods',
-        href: route('settings.payment-methods'),
-    },
-];
+import { route } from 'ziggy-js';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
 
@@ -37,6 +27,16 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
     const [showAddDialog, setShowAddDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<App.Data.PaymentMethodData | null>(null);
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Settings',
+            href: route('settings'),
+        },
+        {
+            title: 'Payment Methods',
+            href: route('settings.payment-methods'),
+        },
+    ];
 
     const updateForm = useForm({
         method: '',

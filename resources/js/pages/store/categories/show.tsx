@@ -15,7 +15,6 @@ interface StoreCategoryShowProps {
 
 export default function StoreCategoryShow({ category, products }: StoreCategoryShowProps) {
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
-
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Store',

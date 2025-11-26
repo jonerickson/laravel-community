@@ -22,13 +22,6 @@ interface SupportTicketShowProps {
 export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
     const [showCommentForm, setShowCommentForm] = useState(false);
     const [showAttachmentForm, setShowAttachmentForm] = useState(false);
-
-    const updateForm = useForm({
-        action: '',
-    });
-
-    const deleteAttachmentForm = useForm({});
-
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Support',
@@ -39,6 +32,12 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
             href: route('support.show', ticket.referenceId),
         },
     ];
+
+    const updateForm = useForm({
+        action: '',
+    });
+
+    const deleteAttachmentForm = useForm({});
 
     const createdAt = ticket.createdAt ? new Date(ticket.createdAt) : new Date();
     const updatedAt = ticket.updatedAt ? new Date(ticket.updatedAt) : new Date();

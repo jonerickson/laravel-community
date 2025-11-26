@@ -12,23 +12,24 @@ import { currency, date } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, Copy, Gift, Ticket } from 'lucide-react';
 import { toast } from 'sonner';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Settings',
-        href: route('settings'),
-    },
-    {
-        title: 'Discounts',
-        href: route('settings.discounts'),
-    },
-];
+import { route } from 'ziggy-js';
 
 interface DiscountsProps {
     discounts: App.Data.DiscountData[];
 }
 
 export default function Discounts({ discounts }: DiscountsProps) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Settings',
+            href: route('settings'),
+        },
+        {
+            title: 'Discounts',
+            href: route('settings.discounts'),
+        },
+    ];
+
     const copyToClipboard = async (text: string, label: string) => {
         try {
             await navigator.clipboard.writeText(text);

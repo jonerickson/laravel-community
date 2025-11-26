@@ -17,7 +17,6 @@ interface CategoryShowProps {
 
 export default function ForumCategoryShow({ category, forums }: CategoryShowProps) {
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
-
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Forums',

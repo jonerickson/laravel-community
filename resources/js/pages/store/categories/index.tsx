@@ -5,17 +5,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { FolderIcon } from 'lucide-react';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Store',
-        href: route('store.index'),
-    },
-    {
-        title: 'Categories',
-        href: route('store.categories.index'),
-    },
-];
+import { route } from 'ziggy-js';
 
 interface StoreCategoriesIndexProps {
     categories: App.Data.ProductCategoryData[];
@@ -23,6 +13,16 @@ interface StoreCategoriesIndexProps {
 
 export default function StoreCategoriesIndex({ categories }: StoreCategoriesIndexProps) {
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Store',
+            href: route('store.index'),
+        },
+        {
+            title: 'Categories',
+            href: route('store.categories.index'),
+        },
+    ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

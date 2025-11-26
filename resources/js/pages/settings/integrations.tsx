@@ -10,17 +10,7 @@ import { Head } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Link2, Plus, User } from 'lucide-react';
 import { useState } from 'react';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Settings',
-        href: route('settings'),
-    },
-    {
-        title: 'Integrations',
-        href: route('settings.integrations.index'),
-    },
-];
+import { route } from 'ziggy-js';
 
 interface Integration {
     provider: string;
@@ -50,6 +40,16 @@ interface ConnectedAccountsProps {
 
 export default function Integrations({ connectedAccounts }: ConnectedAccountsProps) {
     const [showAddDialog, setShowAddDialog] = useState(false);
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Settings',
+            href: route('settings'),
+        },
+        {
+            title: 'Integrations',
+            href: route('settings.integrations.index'),
+        },
+    ];
 
     const handleConnectIntegration = (provider: string) => {
         window.location.href = route('oauth.redirect', {

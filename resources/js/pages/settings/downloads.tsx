@@ -8,17 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { Download as DownloadIcon, File } from 'lucide-react';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Settings',
-        href: route('settings'),
-    },
-    {
-        title: 'Downloads',
-        href: route('settings.downloads'),
-    },
-];
+import { route } from 'ziggy-js';
 
 interface DownloadsPageProps {
     downloads: App.Data.DownloadData[];
@@ -26,6 +16,16 @@ interface DownloadsPageProps {
 
 export default function Downloads() {
     const { downloads } = usePage<App.Data.SharedData>().props as unknown as DownloadsPageProps;
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Settings',
+            href: route('settings'),
+        },
+        {
+            title: 'Downloads',
+            href: route('settings.downloads'),
+        },
+    ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

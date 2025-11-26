@@ -17,17 +17,7 @@ import { useInitials } from '@/hooks/use-initials';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { User } from 'lucide-react';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Settings',
-        href: route('settings'),
-    },
-    {
-        title: 'Account Information',
-        href: route('settings.profile.edit'),
-    },
-];
+import { route } from 'ziggy-js';
 
 interface ProfilePageProps {
     fields: App.Data.FieldData[];
@@ -46,6 +36,16 @@ export default function Profile({ fields }: ProfilePageProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const getInitials = useInitials();
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Settings',
+            href: route('settings'),
+        },
+        {
+            title: 'Account Information',
+            href: route('settings.profile.edit'),
+        },
+    ];
 
     const initialFields: Record<number, string> = {};
     fields.forEach((field) => {

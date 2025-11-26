@@ -14,23 +14,24 @@ import { truncate } from '@/utils/truncate';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, Copy, CreditCard, ExternalLink, FileText, Repeat } from 'lucide-react';
 import { toast } from 'sonner';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Settings',
-        href: route('settings'),
-    },
-    {
-        title: 'Orders',
-        href: route('settings.orders'),
-    },
-];
+import { route } from 'ziggy-js';
 
 interface OrdersProps {
     orders: App.Data.OrderData[];
 }
 
 export default function Orders({ orders }: OrdersProps) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Settings',
+            href: route('settings'),
+        },
+        {
+            title: 'Orders',
+            href: route('settings.orders'),
+        },
+    ];
+
     const copyToClipboard = async (text: string, label: string) => {
         try {
             await navigator.clipboard.writeText(text);

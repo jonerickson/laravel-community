@@ -12,7 +12,6 @@ interface PoliciesCategoryProps {
 
 export default function PolicyCategoryShow({ category, policies }: PoliciesCategoryProps) {
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
-
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Policies',

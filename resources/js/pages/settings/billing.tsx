@@ -13,17 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { ExternalLink } from 'lucide-react';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Settings',
-        href: route('settings'),
-    },
-    {
-        title: 'Billing Information',
-        href: route('settings.billing'),
-    },
-];
+import { route } from 'ziggy-js';
 
 interface BillingProps {
     user: {
@@ -64,6 +54,17 @@ const countries = [
 ];
 
 export default function Billing({ user, portalUrl }: BillingProps) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Settings',
+            href: route('settings'),
+        },
+        {
+            title: 'Billing Information',
+            href: route('settings.billing'),
+        },
+    ];
+
     const { data, setData, post, errors, processing, recentlySuccessful } = useForm<BillingForm>({
         billing_address: user.billing_address || '',
         billing_address_line_2: user.billing_address_line_2 || '',

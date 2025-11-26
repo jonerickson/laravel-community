@@ -11,19 +11,20 @@ import { formatPriority, formatStatus, getPriorityVariant, getStatusVariant } fr
 import { Head, Link, router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Calendar, Clock, Flag, HelpCircle, Plus, Tag, Ticket, User } from 'lucide-react';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Support',
-        href: route('support.index'),
-    },
-];
+import { route } from 'ziggy-js';
 
 interface SupportTicketsIndexProps {
     tickets: App.Data.PaginatedData<App.Data.SupportTicketData>;
 }
 
 export default function SupportTicketsIndex({ tickets }: SupportTicketsIndexProps) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Support',
+            href: route('support.index'),
+        },
+    ];
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Support tickets" />

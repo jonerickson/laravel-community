@@ -8,17 +8,7 @@ import type { BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { Search, SearchX } from 'lucide-react';
 import { useState } from 'react';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Knowledge Base',
-        href: route('knowledge-base.index'),
-    },
-    {
-        title: 'Search',
-        href: route('knowledge-base.search'),
-    },
-];
+import { route } from 'ziggy-js';
 
 interface KnowledgeBaseSearchProps {
     results: App.Data.KnowledgeBaseArticleData[];
@@ -28,6 +18,16 @@ interface KnowledgeBaseSearchProps {
 export default function KnowledgeBaseSearch({ results, query: initialQuery }: KnowledgeBaseSearchProps) {
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const [searchQuery, setSearchQuery] = useState(initialQuery || '');
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Knowledge Base',
+            href: route('knowledge-base.index'),
+        },
+        {
+            title: 'Search',
+            href: route('knowledge-base.search'),
+        },
+    ];
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();

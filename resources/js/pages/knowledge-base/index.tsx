@@ -9,13 +9,7 @@ import type { BreadcrumbItem } from '@/types';
 import { Head, InfiniteScroll, router, usePage } from '@inertiajs/react';
 import { BookOpen } from 'lucide-react';
 import { useState } from 'react';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Knowledge Base',
-        href: route('knowledge-base.index'),
-    },
-];
+import { route } from 'ziggy-js';
 
 interface KnowledgeBaseIndexProps {
     articles: App.Data.PaginatedData<App.Data.KnowledgeBaseArticleData>;
@@ -29,6 +23,12 @@ interface KnowledgeBaseIndexProps {
 export default function KnowledgeBaseIndex({ articles, categories, filters }: KnowledgeBaseIndexProps) {
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const [searchQuery, setSearchQuery] = useState('');
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Knowledge Base',
+            href: route('knowledge-base.index'),
+        },
+    ];
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();

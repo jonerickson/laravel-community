@@ -10,13 +10,6 @@ import { Deferred, Head, Link, router } from '@inertiajs/react';
 import { Flame, Rss, ShoppingCart, Ticket } from 'lucide-react';
 import { route } from 'ziggy-js';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: route('dashboard'),
-    },
-];
-
 interface DashboardProps {
     newestProduct?: App.Data.ProductData;
     popularProduct?: App.Data.ProductData;
@@ -34,6 +27,13 @@ export default function Dashboard({
     trendingTopics = [],
     latestBlogPosts = [],
 }: DashboardProps) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Dashboard',
+            href: route('dashboard'),
+        },
+    ];
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />

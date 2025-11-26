@@ -16,17 +16,6 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { route } from 'ziggy-js';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Store',
-        href: route('store.index'),
-    },
-    {
-        title: 'Shopping Cart',
-        href: route('store.cart.index'),
-    },
-];
-
 interface ShoppingCartProps {
     cartItems: App.Data.CartItemData[];
     cartCount?: number;
@@ -56,6 +45,16 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
     const finalTotal = appliedDiscount ? appliedDiscount.new_total : total;
     const { loading: validatingDiscount, execute: validateDiscount } = useApiRequest();
     const { loading: removingDiscount, execute: removeDiscountRequest } = useApiRequest();
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Store',
+            href: route('store.index'),
+        },
+        {
+            title: 'Shopping Cart',
+            href: route('store.cart.index'),
+        },
+    ];
 
     useEffect(() => {
         if (order && order.discounts && order.discounts.length > 0) {

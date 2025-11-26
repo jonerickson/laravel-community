@@ -6,13 +6,7 @@ import { pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { File, FileText, Folder } from 'lucide-react';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Policies',
-        href: route('policies.index'),
-    },
-];
+import { route } from 'ziggy-js';
 
 interface PoliciesIndexProps {
     categories: App.Data.PolicyCategoryData[];
@@ -20,6 +14,12 @@ interface PoliciesIndexProps {
 
 export default function PolicyCategoryIndex({ categories }: PoliciesIndexProps) {
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Policies',
+            href: route('policies.index'),
+        },
+    ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

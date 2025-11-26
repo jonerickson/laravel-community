@@ -10,7 +10,6 @@ interface PageShowProps {
 export default function PageShow({ page }: PageShowProps) {
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const scriptExecutedRef = useRef(false);
-
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: page.title,

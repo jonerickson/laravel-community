@@ -5,13 +5,7 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Head, InfiniteScroll, usePage } from '@inertiajs/react';
 import { Newspaper } from 'lucide-react';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Blog',
-        href: route('blog.index'),
-    },
-];
+import { route } from 'ziggy-js';
 
 interface BlogIndexProps {
     posts: App.Data.PaginatedData<App.Data.PostData>;
@@ -19,6 +13,12 @@ interface BlogIndexProps {
 
 export default function BlogIndex({ posts }: BlogIndexProps) {
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Blog',
+            href: route('blog.index'),
+        },
+    ];
 
     const structuredData = {
         '@context': 'https://schema.org',

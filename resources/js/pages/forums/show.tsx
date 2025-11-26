@@ -32,7 +32,6 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
     const { name: siteName, auth, logoUrl } = usePage<App.Data.SharedData>().props;
     const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
     const { loading: isDeleting, execute: executeBulkDelete } = useApiRequest();
-
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Forums',

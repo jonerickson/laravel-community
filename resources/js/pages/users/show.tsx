@@ -18,7 +18,6 @@ interface UserProfilePageProps {
 
 export default function Show({ user }: UserProfilePageProps) {
     const getInitials = useInitials();
-
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',

@@ -10,7 +10,6 @@ interface ProductPageProps {
 
 export default function StoreProductShow({ product, reviews }: ProductPageProps) {
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
-
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Store',
