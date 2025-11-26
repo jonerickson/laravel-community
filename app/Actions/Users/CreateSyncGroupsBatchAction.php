@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Users;
 
 use App\Actions\Action;
-use App\Jobs\SyncGroups;
+use App\Jobs\Users\SyncGroups;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;

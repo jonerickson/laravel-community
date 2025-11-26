@@ -124,7 +124,7 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('comment', fn (Request $request): array => [
             Limit::perMinute(5)->by($request->fingerprintId() ?: $request->ip()),
-            Limit::perHour(10)->by($request->fingerprintId() ?: $request->ip()),
+            Limit::perHour(20)->by($request->fingerprintId() ?: $request->ip()),
         ]);
 
         RateLimiter::for('login', fn (Request $request): array => [
@@ -133,23 +133,23 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         RateLimiter::for('post', fn (Request $request): array => [
-            Limit::perMinute(2)->by($request->fingerprintId() ?: $request->ip()),
-            Limit::perHour(20)->by($request->fingerprintId() ?: $request->ip()),
+            Limit::perMinute(10)->by($request->fingerprintId() ?: $request->ip()),
+            Limit::perHour(25)->by($request->fingerprintId() ?: $request->ip()),
         ]);
 
         RateLimiter::for('register', fn (Request $request): array => [
-            Limit::perMinute(2)->by($request->fingerprintId() ?: $request->ip()),
-            Limit::perHour(5)->by($request->fingerprintId() ?: $request->ip()),
+            Limit::perMinute(5)->by($request->fingerprintId() ?: $request->ip()),
+            Limit::perHour(10)->by($request->fingerprintId() ?: $request->ip()),
         ]);
 
         RateLimiter::for('report', fn (Request $request): array => [
-            Limit::perMinute(2)->by($request->fingerprintId() ?: $request->ip()),
-            Limit::perHour(5)->by($request->fingerprintId() ?: $request->ip()),
+            Limit::perMinute(5)->by($request->fingerprintId() ?: $request->ip()),
+            Limit::perHour(10)->by($request->fingerprintId() ?: $request->ip()),
         ]);
 
         RateLimiter::for('support-ticket', fn (Request $request): array => [
-            Limit::perMinute(2)->by($request->fingerprintId() ?: $request->ip()),
-            Limit::perHour(5)->by($request->fingerprintId() ?: $request->ip()),
+            Limit::perMinute(3)->by($request->fingerprintId() ?: $request->ip()),
+            Limit::perHour(10)->by($request->fingerprintId() ?: $request->ip()),
         ]);
 
         Socialite::extend('discord', fn () => Socialite::buildProvider(

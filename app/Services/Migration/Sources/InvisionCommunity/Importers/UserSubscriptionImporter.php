@@ -10,7 +10,7 @@ use App\Enums\PriceType;
 use App\Enums\ProductType;
 use App\Enums\ProrationBehavior;
 use App\Enums\SubscriptionInterval;
-use App\Jobs\ImportSubscription;
+use App\Jobs\Store\ImportSubscription;
 use App\Managers\PaymentManager;
 use App\Models\Order;
 use App\Models\Price;
