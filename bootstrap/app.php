@@ -81,6 +81,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->shouldRenderJsonWhen(fn (Request $request) => $request->is('api/*'));
 
+        $exceptions->dontReport([
+            BannedException::class,
+        ]);
+
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
             if ($request->expectsJson()) {
                 return $response;
