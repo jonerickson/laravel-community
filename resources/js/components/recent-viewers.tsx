@@ -16,12 +16,12 @@ export default function RecentViewers({ viewers }: RecentViewersProps) {
         <Card>
             <CardContent className="pt-0">
                 <CardTitle className="flex items-center gap-2 text-base">Recently viewed</CardTitle>
-                <div className="mt-4 flex flex-wrap gap-2 hover:opacity-80">
+                <div className="mt-4 flex flex-wrap gap-2">
                     {viewers.map((viewer) => (
                         <Link
                             href={route('users.show', viewer.user.referenceId)}
                             key={viewer.user.id}
-                            className="flex items-center gap-2 rounded-md bg-muted/50 p-2 text-sm"
+                            className="flex items-center gap-2 rounded-md bg-muted/50 p-2 text-sm hover:opacity-80"
                         >
                             <Avatar className="h-6 w-6">
                                 {viewer.user.avatarUrl && <AvatarImage src={viewer.user.avatarUrl} alt={viewer.user.name} />}
