@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Onboarding;
 
+use App\Models\Order;
+use App\Models\Price;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Override;
@@ -21,9 +24,7 @@ class OnboardingSubscribeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_id' => ['required', 'exists:products,id'],
-            'price_id' => ['nullable', 'exists:prices,id'],
-            'quantity' => ['required', 'integer', 'min:1', 'max:99'],
+            'price_id' => ['required', 'integer', 'exists:prices,id'],
         ];
     }
 
@@ -34,13 +35,24 @@ class OnboardingSubscribeRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'product_id.required' => 'Product is required.',
-            'product_id.exists' => 'The selected product is invalid.',
-            'price_id.exists' => 'The selected price is invalid.',
-            'quantity.required' => 'Quantity is required.',
-            'quantity.integer' => 'Quantity must be a valid number.',
-            'quantity.min' => 'Quantity must be at least 1.',
-            'quantity.max' => 'Quantity cannot exceed 99.',
+            'price_id.required' => 'A product price must be selected.',
+            'price_id.integer' => 'The price ID must be a valid number.',
+            'price_id.exists' => 'The selected price does not exist.',
         ];
+    }
+
+    public function getPrice(): Price
+    {
+        return Price::findOrFail($this->validated('price_id'));
+    }
+
+    public function generateOrder(User $user): Order
+    {
+        $order = $user->orders()->create();
+        $order->items()->create([
+            'price_id' => $this->integer('price_id'),
+        ]);
+
+        return $order;
     }
 }

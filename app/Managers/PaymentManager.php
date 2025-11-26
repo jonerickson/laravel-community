@@ -128,9 +128,9 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deleteCustomer($user);
     }
 
-    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete, CarbonInterface|int|null $backdateStartDate = null, CarbonInterface|int|null $billingCycleAnchor = null, ?string $successUrl = null, array $customerOptions = [], array $subscriptionOptions = []): bool|string|SubscriptionData
+    public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete, CarbonInterface|int|null $backdateStartDate = null, CarbonInterface|int|null $billingCycleAnchor = null, ?string $successUrl = null, ?string $cancelUrl = null, array $customerOptions = [], array $subscriptionOptions = []): bool|string|SubscriptionData
     {
-        return $this->driver()->startSubscription($order, $chargeNow, $firstParty, $prorationBehavior, $paymentBehavior, $backdateStartDate, $billingCycleAnchor, $successUrl, $customerOptions, $subscriptionOptions);
+        return $this->driver()->startSubscription($order, $chargeNow, $firstParty, $prorationBehavior, $paymentBehavior, $backdateStartDate, $billingCycleAnchor, $successUrl, $cancelUrl, $customerOptions, $subscriptionOptions);
     }
 
     public function swapSubscription(User $user, Price $price, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete): bool|SubscriptionData

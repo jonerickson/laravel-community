@@ -110,7 +110,7 @@ export default function AuthLogin({ status, error, canResetPassword, discordEnab
 
                     <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
                         {processing && <LoaderCircle className="size-4 animate-spin" />}
-                        Log in
+                        {processing ? 'Logging in...' : 'Log in'}
                     </Button>
 
                     <div className="flex items-center">

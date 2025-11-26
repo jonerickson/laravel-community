@@ -1,3 +1,4 @@
+import RichEditorContent from '@/components/rich-editor-content';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -404,7 +405,10 @@ export function GlobalSearch() {
                                             </div>
 
                                             {result.description && (
-                                                <div className="line-clamp-1 text-sm text-muted-foreground">{result.description}</div>
+                                                <RichEditorContent
+                                                    className="line-clamp-1 text-sm text-muted-foreground"
+                                                    content={result.description}
+                                                />
                                             )}
 
                                             {result.excerpt && <div className="line-clamp-1 text-sm text-muted-foreground">{result.excerpt}</div>}

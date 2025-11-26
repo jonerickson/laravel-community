@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import RichEditorContent from '@/components/rich-editor-content';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { currency } from '@/lib/utils';
@@ -9,7 +10,7 @@ type SubscriptionsStepProps = {
     subscriptions: App.Data.ProductData[];
     hasSubscription: boolean;
     processing: boolean;
-    onStartSubscription: (productId: number, priceId: number) => void;
+    onStartSubscription: (priceId: number) => void;
     onNext: () => void;
     onPrevious: () => void;
     title?: string;
@@ -30,7 +31,7 @@ export function SubscriptionsStep({
 
     const handleSelectPlan = (productId: number, priceId: number) => {
         setProcessingSubscriptionId(productId);
-        onStartSubscription(productId, priceId);
+        onStartSubscription(priceId);
     };
     return (
         <div className="flex flex-col gap-6">
@@ -62,7 +63,11 @@ export function SubscriptionsStep({
                             <Card key={subscription.id}>
                                 <CardHeader className="text-center">
                                     <CardTitle className="text-xl">{subscription.name}</CardTitle>
-                                    {subscription.description && <CardDescription className="text-sm">{subscription.description}</CardDescription>}
+                                    {subscription.description && (
+                                        <CardDescription>
+                                            <RichEditorContent content={subscription.description} />
+                                        </CardDescription>
+                                    )}
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div className="text-center">

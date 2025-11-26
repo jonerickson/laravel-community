@@ -12,7 +12,6 @@ use App\Http\Requests\Store\SubscriptionCancelRequest;
 use App\Http\Requests\Store\SubscriptionCheckoutRequest;
 use App\Http\Requests\Store\SubscriptionUpdateRequest;
 use App\Managers\PaymentManager;
-use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\CacheService;
@@ -77,16 +76,8 @@ class SubscriptionsController extends Controller
         $currentSubscription = $this->paymentManager->currentSubscription($this->user);
 
         if (! $currentSubscription instanceof SubscriptionData) {
-            $order = Order::create([
-                'user_id' => $this->user->id,
-            ]);
-
-            $order->items()->create([
-                'price_id' => $price->id,
-            ]);
-
             $result = $this->paymentManager->startSubscription(
-                order: $order,
+                order: $request->generateOrder($this->user),
             );
 
             if (! $result) {

@@ -91,8 +91,6 @@ export default function Onboarding({
         transform: transformSubscribe,
     } = useForm({
         price_id: '',
-        product_id: '',
-        quantity: 1,
     });
 
     const updateRegisterField = (field: string, value: string | Record<number, boolean>) => {
@@ -126,11 +124,9 @@ export default function Onboarding({
         saveProfile(route('onboarding.profile'));
     };
 
-    const handleSubscribe = (productId: number, priceId: number) => {
+    const handleSubscribe = (priceId: number) => {
         transformSubscribe(() => ({
             price_id: priceId,
-            product_id: productId,
-            quantity: 1,
         }));
 
         subscribe(route('onboarding.subscribe'));

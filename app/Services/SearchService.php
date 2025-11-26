@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Data\PaginatedData;
 use App\Data\SearchResultData;
+use App\Enums\ProductType;
 use App\Models\Policy;
 use App\Models\Post;
 use App\Models\Product;
@@ -192,7 +193,9 @@ class SearchService
                 'type' => 'product',
                 'title' => $product->name,
                 'description' => $product->description,
-                'url' => route('store.products.show', $product->slug),
+                'url' => $product->type === ProductType::Product
+                    ? route('store.products.show', $product->slug)
+                    : route('store.subscriptions'),
                 'price' => $product->defaultPrice?->amount,
                 'category_name' => $product->categories->first()?->name,
                 'created_at' => $product->created_at,

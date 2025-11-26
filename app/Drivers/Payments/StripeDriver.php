@@ -457,10 +457,11 @@ class StripeDriver implements PaymentProcessor
         CarbonInterface|int|null $backdateStartDate = null,
         CarbonInterface|int|null $billingCycleAnchor = null,
         ?string $successUrl = null,
+        ?string $cancelUrl = null,
         array $customerOptions = [],
         array $subscriptionOptions = [],
     ): bool|string|SubscriptionData {
-        return $this->executeWithErrorHandling('startSubscription', function () use ($order, $chargeNow, $firstParty, $prorationBehavior, $paymentBehavior, $backdateStartDate, $billingCycleAnchor, $customerOptions, $subscriptionOptions, $successUrl): bool|string|SubscriptionData {
+        return $this->executeWithErrorHandling('startSubscription', function () use ($order, $chargeNow, $firstParty, $prorationBehavior, $paymentBehavior, $backdateStartDate, $billingCycleAnchor, $successUrl, $cancelUrl, $customerOptions, $subscriptionOptions): bool|string|SubscriptionData {
             $lineItems = [];
 
             foreach ($order->items as $orderItem) {
@@ -494,7 +495,7 @@ class StripeDriver implements PaymentProcessor
             /** @var Subscription|Session $result */
             $result = $order->user
                 ->newSubscription('default', $lineItems)
-                ->when(filled($trialDays), fn (SubscriptionBuilder $builder) => $builder->trialDays($trialDays->product->trial_days))
+                ->when(filled($trialDays), fn (SubscriptionBuilder $builder) => $builder->trialDays($trialDays->price->product->trial_days))
                 ->when(filled($allowPromotionCodes), fn (SubscriptionBuilder $builder) => $builder->allowPromotionCodes())
                 ->when(filled($billingCycleAnchor), fn (SubscriptionBuilder $builder) => $builder->trialUntil($billingCycleAnchor))
                 ->when($prorationBehavior === ProrationBehavior::None, fn (SubscriptionBuilder $builder) => $builder->noProrate())
@@ -540,11 +541,11 @@ class StripeDriver implements PaymentProcessor
                         'origin_context' => 'web',
                         'success_url' => URL::signedRoute('store.checkout.success', [
                             'order' => $order->reference_id,
-                            'redirect' => $successUrl ?? route('store.subscriptions', absolute: false),
+                            'redirect' => $successUrl ?? route('store.subscriptions'),
                         ]),
                         'cancel_url' => URL::signedRoute('store.checkout.cancel', [
                             'order' => $order->reference_id,
-                            'redirect' => route('store.subscriptions', absolute: false),
+                            'redirect' => $cancelUrl ?? route('store.subscriptions'),
                         ]),
                     ],
                     customerOptions: $customerOptions

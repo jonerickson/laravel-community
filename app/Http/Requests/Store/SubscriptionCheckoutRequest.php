@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Store;
 
+use App\Models\Order;
 use App\Models\Price;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Override;
@@ -42,5 +44,15 @@ class SubscriptionCheckoutRequest extends FormRequest
     public function getPrice(): Price
     {
         return Price::findOrFail($this->validated('price_id'));
+    }
+
+    public function generateOrder(User $user): Order
+    {
+        $order = $user->orders()->create();
+        $order->items()->create([
+            'price_id' => $this->integer('price_id'),
+        ]);
+
+        return $order;
     }
 }
