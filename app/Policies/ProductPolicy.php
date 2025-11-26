@@ -33,7 +33,7 @@ class ProductPolicy
         if ($product instanceof ProductData) {
             return ($product->approvalStatus === ProductApprovalStatus::Approved)
                 && $product->isVisible
-                && (blank($product->categories) || collect($product->categories)->some(fn (ProductCategoryData $category) => Gate::check('view', $category)));
+                && (blank($product->categories) || collect($product->categories)->some(fn (ProductCategoryData $category) => Gate::getPolicyFor(ProductCategory::class)->view($user, $category)));
         }
 
         return $product->approval_status === ProductApprovalStatus::Approved

@@ -10,8 +10,10 @@ use App\Data\RecentViewerData;
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\Post;
+use App\Models\User;
 use App\Services\CacheService;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -24,6 +26,8 @@ class BlogController extends Controller
 
     public function __construct(
         protected readonly CacheService $cache,
+        #[CurrentUser]
+        protected readonly ?User $user = null,
     ) {
         //
     }
@@ -36,7 +40,7 @@ class BlogController extends Controller
         $this->authorize('viewAny', Post::class);
 
         $posts = PostData::collect(collect($this->cache->getByKey('blog.index'))
-            ->filter(fn (array $post) => Gate::check('view', PostData::from($post)))
+            ->filter(fn (array $post) => Gate::getPolicyFor(Post::class)->view($this->user, PostData::from($post)))
             ->values()
             ->all(), PaginatedDataCollection::class);
 

@@ -6,6 +6,7 @@ namespace App\Policies;
 
 use App\Data\ForumData;
 use App\Models\Forum;
+use App\Models\ForumCategory;
 use App\Models\Group;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
@@ -33,7 +34,7 @@ class ForumPolicy
         if ($forum instanceof ForumData) {
             return Gate::forUser($user)->check('view_forums')
                 && $forum->isActive
-                && (blank($forum->category) || Gate::check('view', $forum->category))
+                && (blank($forum->category) || Gate::getPolicyFor(ForumCategory::class)->view($user, $forum->category))
                 && ($groups->pluck('id')->intersect(collect($forum->groups)->pluck('id'))->isNotEmpty() ?? false);
         }
 

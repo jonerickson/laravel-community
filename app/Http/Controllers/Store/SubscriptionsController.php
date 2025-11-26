@@ -42,7 +42,7 @@ class SubscriptionsController extends Controller
         $this->authorize('viewAny', Product::class);
 
         $subscriptions = collect($this->cache->getByKey('subscriptions.index'))
-            ->filter(fn (array $product) => Gate::check('view', ProductData::from($product)))
+            ->filter(fn (array $product) => Gate::getPolicyFor(Product::class)->view($this->user, ProductData::from($product)))
             ->values();
 
         $subscriptionReviews = $subscriptions->mapWithKeys(function (array $product): array {

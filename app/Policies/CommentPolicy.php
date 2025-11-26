@@ -28,7 +28,7 @@ class CommentPolicy
     public function view(?User $user, Comment $comment): bool
     {
         return Gate::forUser($user)->check('view_comments')
-            && ($comment->is_approved || (! $comment->is_approved && (($user && $comment->isAuthoredBy($user)) || Gate::forUser($user)->check('approve', $comment))));
+            && ($comment->is_approved || ($user && $comment->isAuthoredBy($user) || Gate::forUser($user)->check('approve', $comment)));
     }
 
     public function create(?User $user): bool

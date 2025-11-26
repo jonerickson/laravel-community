@@ -9,8 +9,10 @@ use App\Data\ForumData;
 use App\Http\Controllers\Controller;
 use App\Models\Forum;
 use App\Models\ForumCategory;
+use App\Models\User;
 use App\Services\CacheService;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -23,6 +25,8 @@ class CategoryController extends Controller
 
     public function __construct(
         protected readonly CacheService $cache,
+        #[CurrentUser]
+        protected readonly ?User $user = null,
     ) {
         //
     }
@@ -35,10 +39,10 @@ class CategoryController extends Controller
         $this->authorize('viewAny', ForumCategory::class);
 
         $categories = collect($this->cache->getByKey('forums.categories.index'))
-            ->filter(fn (array $category) => Gate::check('view', ForumCategoryData::from($category)))
+            ->filter(fn (array $category) => Gate::getPolicyFor(ForumCategory::class)->view($this->user, ForumCategoryData::from($category)))
             ->map(function (array $category): array {
                 $category['forums'] = collect($category['forums'] ?? [])
-                    ->filter(fn (array $forum) => Gate::check('view', ForumData::from($forum)))
+                    ->filter(fn (array $forum) => Gate::getPolicyFor(Forum::class)->view($this->user, ForumData::from($forum)))
                     ->values()
                     ->toArray();
 
