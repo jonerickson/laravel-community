@@ -507,9 +507,9 @@ class StripeDriver implements PaymentProcessor
                 ->when(! $chargeNow, fn (SubscriptionBuilder $builder) => $builder->createAndSendInvoice($customerOptions, $subscriptionOptions))
                 ->when(! $firstParty, fn (SubscriptionBuilder $builder): Subscription => $builder->create(
                     customerOptions: $customerOptions,
-                    subscriptionOptions: array_merge($subscriptionOptions, [
+                    subscriptionOptions: array_filter(array_merge($subscriptionOptions, [
                         'backdate_start_date' => $backdateStartDate instanceof CarbonInterface ? $backdateStartDate->getTimestamp() : null,
-                    ])
+                    ]))
                 ))
                 ->when($firstParty, fn (SubscriptionBuilder $builder) => $builder->checkout(
                     sessionOptions: [
