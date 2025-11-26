@@ -27,9 +27,9 @@ class ProductCategoryData extends Data
 
     public ?string $featuredImageUrl = null;
 
-    public bool $isVisible;
+    public bool $isVisible = true;
 
-    public bool $isActive;
+    public bool $isActive = true;
 
     public ?ProductCategoryData $parent = null;
 
