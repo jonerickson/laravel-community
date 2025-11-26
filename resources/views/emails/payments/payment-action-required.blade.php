@@ -6,7 +6,9 @@ Hello {{ $order->user->name }},
 Your payment for order **#{{ $order->reference_id }}** requires additional verification to complete the transaction.
 
 **Order Number:** {{ $order->reference_id }}<br>
+@if($order->invoice_number)
 **Invoice Number:** {{ $order->invoice_number }}<br>
+@endif
 **Status:** {{ $order->status->getLabel() }}<br>
 **Amount:** {{ \Illuminate\Support\Number::currency($order->amount) }}<br>
 

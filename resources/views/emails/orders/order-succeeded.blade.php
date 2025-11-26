@@ -6,7 +6,12 @@ Hello {{ $order->user->name }},
 Excellent! Your order **#{{ $order->reference_id }}** has been completed successfully. Thank you for your business!
 
 **Order ID:** {{ $order->reference_id }}<br>
+@if($order->invoice_number)
 **Invoice Number:** {{ $order->invoice_number }}<br>
+@endif
+@if(count($order->discounts))
+**Discounts:** {{ $order->discounts->map->code->implode(', ') }}<br>
+@endif
 **Status:** {{ $order->status->getLabel() }}<br>
 **Total:** {{ \Illuminate\Support\Number::currency($order->amount) }}<br>
 

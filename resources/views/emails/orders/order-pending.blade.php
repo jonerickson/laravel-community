@@ -6,7 +6,9 @@ Hello {{ $order->user->name }},
 Your order **#{{ $order->reference_id }}** is now pending review. We'll process it shortly and send you another update once it's approved.
 
 **Order ID:** {{ $order->reference_id }}<br>
+@if($order->invoice_number)
 **Invoice Number:** {{ $order->invoice_number }}<br>
+@endif
 **Status:** {{ $order->status->getLabel() }}<br>
 **Total:** {{ \Illuminate\Support\Number::currency($order->amount) }}<br>
 

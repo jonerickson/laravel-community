@@ -6,7 +6,9 @@ Hello {{ $order->user->name }},
 Great news! Your order **#{{ $order->reference_id }}** is now being processed. We're preparing your items for shipment.
 
 **Order ID:** {{ $order->reference_id }}<br>
+@if($order->invoice_number)
 **Invoice Number:** {{ $order->invoice_number }}<br>
+@endif
 **Status:** {{ $order->status->getLabel() }}<br>
 **Total:** {{ \Illuminate\Support\Number::currency($order->amount) }}<br>
 

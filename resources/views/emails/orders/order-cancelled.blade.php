@@ -6,7 +6,9 @@ Hello {{ $order->user->name }},
 Your order **#{{ $order->reference_id }}** has been cancelled. If you have any questions about this cancellation, please contact our support team.
 
 **Order Number:** {{ $order->reference_id }}<br>
+@if($order->invoice_number)
 **Invoice Number:** {{ $order->invoice_number }}<br>
+@endif
 **Status:** {{ $order->status->getLabel() }}<br>
 **Total:** {{ \Illuminate\Support\Number::currency($order->amount) }}<br>
 
