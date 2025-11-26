@@ -73,13 +73,16 @@ trait Readable
         }
 
         $existingRead = $this->userRead($user);
+
         if ($existingRead) {
             $existingRead->touch();
 
             return $existingRead;
         }
 
-        return $this->reads()->updateOrCreate([]);
+        return $this->reads()->updateOrCreate([
+            'created_by' => $user->getKey(),
+        ]);
     }
 
     public function markAsUnread(?User $user = null): bool
