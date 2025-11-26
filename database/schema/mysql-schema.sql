@@ -205,7 +205,7 @@ CREATE TABLE `files` (
   `filename` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `mime` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `size` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `visibility` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `visibility` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -221,7 +221,7 @@ CREATE TABLE `fingerprints` (
   `fingerprint_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `request_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ip_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
   `is_banned` tinyint(1) NOT NULL DEFAULT '0',
   `ban_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `banned_by` bigint unsigned DEFAULT NULL,
@@ -487,7 +487,7 @@ DROP TABLE IF EXISTS `logs`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `logs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `request_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `request_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `endpoint` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `method` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -1128,6 +1128,8 @@ CREATE TABLE `subscription_items` (
   `stripe_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `stripe_product` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `stripe_price` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `meter_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meter_event_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `quantity` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1458,8 +1460,8 @@ CREATE TABLE `webhooks` (
   `method` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `headers` json DEFAULT NULL,
   `payload_json` json DEFAULT NULL,
-  `payload_text` text COLLATE utf8mb4_unicode_ci,
-  `render` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload_text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `render` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `secret` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1599,8 +1601,12 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (159,'2025_11_17_18
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (162,'2025_11_19_214734_create_webhooks_table',54);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (163,'2025_11_19_235851_drop_resource_from_webhooks_table',54);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (164,'2025_11_19_235956_create_logs_table',54);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (165,'2025_09_28_202015_create_email_settings',55);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (166,'2025_09_28_202053_create_general_settings',55);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (167,'2025_11_20_161306_add_visibility_to_files_table',55);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (169,'2025_11_21_054706_update_webhook_columns',56);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (170,'2025_11_21_172754_add_request_id_to_logs_table',57);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (171,'2025_09_28_202015_create_email_settings',58);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (172,'2025_09_28_202053_create_general_settings',58);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (173,'2025_11_25_191628_registration_settings',59);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (174,'2025_11_26_065517_add_meter_id_to_subscription_items_table',60);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (176,'2025_11_26_065518_add_meter_event_name_to_subscription_items_table',61);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (177,'2025_11_26_065811_update_user_agent_column_in_fingerprints_table',62);
