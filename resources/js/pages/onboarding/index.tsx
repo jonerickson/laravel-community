@@ -28,13 +28,13 @@ type OnboardingProps = {
     policies: App.Data.PolicyData[];
 };
 
-type OnboardingFormData = Record<string, string> & {
+type OnboardingFormData = {
     name: string;
     email: string;
     password: string;
     password_confirmation: string;
     policy: Record<number, boolean>;
-};
+} & Record<string, string | Record<number, boolean>>;
 
 const wizardSteps = [
     { title: 'Account', description: 'Create your account' },

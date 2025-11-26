@@ -29,10 +29,8 @@ class BustForumCache
 
     public function handle(ForumCategoryCreated|ForumCategoryUpdated|ForumCategoryDeleted|ForumCreated|ForumUpdated|ForumDeleted|TopicCreated|TopicUpdated|TopicDeleted|PostCreated|PostUpdated|PostDeleted $event): void
     {
-        if (in_array(get_class($event), [PostCreated::class, PostUpdated::class, PostDeleted::class])) {
-            if ($event->post->type !== PostType::Forum) {
-                return;
-            }
+        if (in_array($event::class, [PostCreated::class, PostUpdated::class, PostDeleted::class]) && $event->post->type !== PostType::Forum) {
+            return;
         }
 
         $this->cache->purgeByKey('forums.categories.index');

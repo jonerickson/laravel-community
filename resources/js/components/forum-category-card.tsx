@@ -95,9 +95,7 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
                                             {topic.isHot && <span className="text-sm">🔥</span>}
                                             {topic.isPinned && <Pin className="size-4 text-info" />}
                                             {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
-                                            {can('report_posts') && topic.hasReportedContent && (
-                                                <AlertTriangle className="size-4 text-destructive" />
-                                            )}
+                                            {can('report_posts') && topic.hasReportedContent && <AlertTriangle className="size-4 text-destructive" />}
                                             {can('publish_posts') && topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
                                             {can('approve_posts') && topic.hasUnapprovedContent && <ThumbsDown className="size-4 text-warning" />}
                                             <span

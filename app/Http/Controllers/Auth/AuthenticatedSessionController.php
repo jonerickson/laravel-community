@@ -17,6 +17,7 @@ use Illuminate\Support\Uri;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Throwable;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -36,10 +37,14 @@ class AuthenticatedSessionController extends Controller
         return Inertia::render('auth/login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => $request->session()->get('status'),
+            'error' => $request->session()->get('error'),
             'discordEnabled' => $this->discordEnabled,
         ]);
     }
 
+    /**
+     * @throws Throwable
+     */
     public function store(LoginRequest $request): SymfonyResponse
     {
         $intended = Uri::of(Redirect::getIntendedUrl() ?? '');

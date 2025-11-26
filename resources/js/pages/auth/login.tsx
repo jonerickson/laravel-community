@@ -20,11 +20,12 @@ type LoginForm = {
 
 interface LoginProps {
     status?: string;
+    error?: string;
     canResetPassword: boolean;
     discordEnabled: boolean;
 }
 
-export default function AuthLogin({ status, canResetPassword, discordEnabled }: LoginProps) {
+export default function AuthLogin({ status, error, canResetPassword, discordEnabled }: LoginProps) {
     const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
         email: '',
         password: '',
@@ -51,6 +52,10 @@ export default function AuthLogin({ status, canResetPassword, discordEnabled }: 
     return (
         <AuthLayout title="Log in to your account" description="Enter your email and password below to log in">
             <Head title="Log in" />
+
+            {error && (
+                <div className="rounded-md bg-destructive/10 px-6 py-4 text-center text-sm font-medium text-balance text-destructive">{error}</div>
+            )}
 
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">

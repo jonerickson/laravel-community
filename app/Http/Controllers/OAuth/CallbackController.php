@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\UserIntegration;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Throwable;
@@ -26,52 +27,62 @@ class CallbackController extends Controller
     {
         try {
             $socialUser = Socialite::driver($provider)->user();
-        } catch (Throwable) {
-            return redirect()->intended(route('login'));
+        } catch (Throwable $throwable) {
+            Log::error('Integration login error', [
+                'message' => $throwable->getMessage(),
+            ]);
+
+            return is_null($this->user)
+                ? redirect()->intended(route('login'))->with('error', 'There was an error while trying to login. Please try again.')
+                : redirect()->intended(route('settings.integrations.index'))
+                    ->with([
+                        'message' => 'There was an error while trying to connect your again. Please try again.',
+                        'messageVariant' => 'error',
+                    ]);
         }
 
-        if ($this->user && $socialUser->getEmail() && $this->user->email !== $socialUser->getEmail()) {
-            return to_route('settings.integrations.index')
-                ->with('message', 'The email connected to your social account does not match the email that is currently logged in. Please connect an account that uses the same email.')
-                ->with('messageVariant', 'error');
-        }
-
-        $integration = UserIntegration::firstOrNew([
+        $integration = UserIntegration::with('user')->firstWhere([
             'provider' => $provider,
             'provider_id' => $socialUser->getId(),
-        ], [
-            'provider_name' => $socialUser->getName(),
-            'provider_email' => $socialUser->getEmail(),
-            'provider_avatar' => $socialUser->getAvatar(),
-            'access_token' => property_exists($socialUser, 'token') ? $socialUser->token : null,
         ]);
 
-        if (blank($integration->getKey())) {
-            if ($this->user instanceof User) {
-                $user = $this->user;
-            } else {
-                $user = User::firstOrCreate([
-                    'email' => $email = $socialUser->getEmail(),
-                ], [
-                    'name' => $socialUser->getName(),
-                    'email_verified_at' => $email ? now() : null,
-                ]);
-            }
-
-            $integration->user()->associate($user);
-            $integration->save();
-        } else {
-            $user = $integration->user;
+        if (blank($integration) && is_null($this->user)) {
+            return redirect()
+                ->route('login')
+                ->with('error', sprintf('No account found for this %s connection. Please create an account first or login using your username and password.', ucfirst($provider)));
         }
 
-        $user->logIntegrationLogin($provider);
+        if (blank($integration) && $this->user instanceof User) {
+            $integration = $this->user->integrations()->create([
+                'provider' => $provider,
+                'provider_id' => $socialUser->getId(),
+                'provider_name' => $socialUser->getName(),
+                'provider_email' => $socialUser->getEmail(),
+                'provider_avatar' => $socialUser->getAvatar(),
+                'access_token' => property_exists($socialUser, 'token') ? $socialUser->token : null,
+            ]);
+        } else {
+            $integration->update([
+                'provider_name' => $socialUser->getName(),
+                'provider_avatar' => $socialUser->getAvatar(),
+                'access_token' => property_exists($integration, 'token') ? $integration->token : null,
+            ]);
+        }
 
-        if (! $this->user instanceof User) {
-            Auth::login($user);
+        $integration->user->logIntegrationLogin($provider);
+
+        $loggingIn = false;
+        if (is_null($this->user)) {
+            Auth::login($integration->user);
+
+            $loggingIn = true;
         }
 
         return redirect()
-            ->intended(route('dashboard', absolute: false))
-            ->with('message', 'You have been successfully logged in.');
+            ->intended(route('dashboard'))
+            ->with('message', $loggingIn
+                ? 'You have been successfully logged in.'
+                : 'You have been successfully connected your account.'
+            );
     }
 }
