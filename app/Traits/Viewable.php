@@ -71,7 +71,7 @@ trait Viewable
             ->take($limit)
             ->values();
 
-        return $recentViewers->map(fn (View $view): array => [
+        return $recentViewers->reject(fn (View $view): bool => is_null($view->fingerprint?->user))->map(fn (View $view): array => [
             'user' => [
                 'id' => $view->fingerprint->user->id,
                 'referenceId' => $view->fingerprint->user->reference_id,
