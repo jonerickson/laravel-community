@@ -67,8 +67,8 @@ trait Viewable
             ->whereHas('fingerprint.user')
             ->orderBy('updated_at', 'desc')
             ->distinct()
+            ->limit($limit)
             ->get()
-            ->take($limit)
             ->values();
 
         return $recentViewers->reject(fn (View $view): bool => is_null($view->fingerprint?->user))->map(fn (View $view): array => [

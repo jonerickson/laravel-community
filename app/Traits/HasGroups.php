@@ -39,6 +39,8 @@ trait HasGroups
 
     public function syncGroups(bool $detaching = true): void
     {
+        $currentSubscription = null;
+
         if ($this instanceof User) {
             $paymentManager = app(PaymentManager::class);
             $currentSubscription = $paymentManager->currentSubscription($this);
@@ -67,7 +69,7 @@ trait HasGroups
                         return true;
                     }
 
-                    if (! isset($currentSubscription)) {
+                    if (is_null($currentSubscription)) {
                         return false;
                     }
 

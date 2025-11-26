@@ -15,6 +15,7 @@ class CreateSyncGroupsBatchAction extends Action
 {
     public function __construct(
         protected Collection $users,
+        protected int $chunkSize = 1000,
     ) {
         //
     }
@@ -24,13 +25,15 @@ class CreateSyncGroupsBatchAction extends Action
      */
     public function __invoke(): bool
     {
-        $batch = Bus::batch([]);
+        $this->users->chunk($this->chunkSize)->each(function (Collection $chunk, int $index): void {
+            $jobs = $chunk->map(fn (User $user): SyncGroups => new SyncGroups(
+                userId: $user->id,
+            ))->all();
 
-        $this->users->each(fn (User $user) => $batch->add(new SyncGroups(
-            userId: $user->id,
-        )));
-
-        $batch->name('Sync User Groups')->dispatch();
+            Bus::batch($jobs)
+                ->name('Sync User Groups (Chunk '.($index + 1).')')
+                ->dispatch();
+        });
 
         return true;
     }
