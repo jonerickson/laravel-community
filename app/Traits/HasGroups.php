@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
-use App\Enums\Role;
 use App\Managers\PaymentManager;
 use App\Models\Group;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\UserGroup;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Collection;
 
 trait HasGroups
 {
@@ -42,23 +39,21 @@ trait HasGroups
 
     public function syncGroups(bool $detaching = true): void
     {
-        $currentSubscription = null;
-
         if ($this instanceof User) {
             $paymentManager = app(PaymentManager::class);
             $currentSubscription = $paymentManager->currentSubscription($this);
         }
 
+        // The resource's currently assigned groups
         $currentGroupIds = $this->groups()->pluck('groups.id');
 
-        $baseGroupIds = match (true) {
-            $this instanceof User => Group::query()->whereHas('roles', function (Builder $query): void {
-                $query->whereIn('name', Collection::wrap(Role::cases())->map->value->toArray());
-            })->whereKeyNot(Group::defaultGuestGroup())->pluck('id')->intersect($currentGroupIds),
-            default => collect(),
-        };
+        // All possible groups that can be assigned to a resource based on events such as order history etc.
+        $possibleGroupIds = Product::with('groups')
+            ->get()
+            ->pluck('groups.id');
 
-        $additionalGroupIds = match (true) {
+        // The groups the resource should be assigned based on events such as order history etc.
+        $requiredGroupIds = match (true) {
             $this instanceof User => $this->orders()
                 ->completed()
                 ->with('prices.product.groups')
@@ -72,7 +67,7 @@ trait HasGroups
                         return true;
                     }
 
-                    if ($currentSubscription === null) {
+                    if (! isset($currentSubscription)) {
                         return false;
                     }
 
@@ -85,13 +80,14 @@ trait HasGroups
             default => collect(),
         };
 
-        $groupsUnique = $baseGroupIds
+        $finalGroups = $currentGroupIds
+            ->diff($possibleGroupIds)
             ->add(Group::defaultMemberGroup()->id)
-            ->merge($additionalGroupIds)
+            ->merge($requiredGroupIds)
             ->unique()
             ->reject(fn (int $id): bool => $id === Group::defaultGuestGroup()?->id);
 
-        $this->groups()->sync($groupsUnique, $detaching);
+        $this->groups()->sync($finalGroups, $detaching);
     }
 
     public function hasGroup(Group $group): bool
