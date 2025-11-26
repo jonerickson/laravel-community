@@ -24,7 +24,7 @@ class CreateSyncGroupsBatchAction extends Action
      */
     public function __invoke(): bool
     {
-        $this->userIds->chunk($this->chunkSize)->each(function (Collection $chunk, int $index): void {
+        $this->userIds->lazy()->chunk($this->chunkSize)->each(function (Collection $chunk, int $index): void {
             $jobs = $chunk->map(fn (int $userId): SyncGroups => new SyncGroups(
                 userId: $userId,
             ))->all();
