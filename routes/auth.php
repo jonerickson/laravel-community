@@ -18,7 +18,7 @@ use App\Http\Controllers\OAuth\RedirectController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function (): void {
-    Route::get('register', [RegisteredUserController::class, 'create'])
+    Route::redirect('register', 'onboarding')
         ->name('register');
 
     Route::post('register', [RegisteredUserController::class, 'store'])

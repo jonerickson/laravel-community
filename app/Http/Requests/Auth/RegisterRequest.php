@@ -23,7 +23,7 @@ class RegisterRequest extends FormRequest
     {
         $rules = [
             'name' => ['required', 'string', 'max:255', new NoProfanity, new BlacklistRule],
-            'email' => ['required', 'string', 'lowercase', 'max:255', 'unique:'.User::class, new NoProfanity, new BlacklistRule],
+            'email' => ['required', 'string', 'email', 'lowercase', 'max:255', 'unique:'.User::class, new NoProfanity, new BlacklistRule],
             'password' => ['required', 'confirmed', Password::defaults()],
         ];
 
