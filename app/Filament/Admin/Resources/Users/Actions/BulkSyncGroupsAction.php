@@ -26,7 +26,7 @@ class BulkSyncGroupsAction extends BulkAction
         $this->modalSubmitActionLabel('Perform Sync');
         $this->successNotificationTitle("A background job has been dispatched to update the selected user's groups.");
         $this->action(function (BulkSyncGroupsAction $action, Collection $records): void {
-            CreateSyncGroupsBatchAction::execute($records);
+            CreateSyncGroupsBatchAction::execute($records->pluck('id'));
             $action->success();
         });
     }
