@@ -22,6 +22,7 @@ use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Laravel\Passport\Http\Middleware\CreateFreshApiToken;
+use League\OAuth2\Server\Exception\OAuthServerException;
 use Sentry\Laravel\Integration;
 use Spatie\Csp\AddCspHeaders;
 use Symfony\Component\HttpFoundation\Response;
@@ -82,6 +83,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(fn (Request $request) => $request->is('api/*'));
 
         $exceptions->dontReport([
+            OAuthServerException::class,
             BannedException::class,
         ]);
 
