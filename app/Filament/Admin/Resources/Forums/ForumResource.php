@@ -37,6 +37,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
@@ -152,25 +153,23 @@ class ForumResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->searchable()
+                    ->searchable(query: fn (Builder $query, string $search) => $query->orWhereLike('forums.name', sprintf('%%%s%%', $search)))
                     ->sortable(),
                 TextColumn::make('slug')
-                    ->searchable()
+                    ->searchable(query: fn (Builder $query, string $search) => $query->orWhereLike('forums.slug', sprintf('%%%s%%', $search)))
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('description')
+                    ->searchable(query: fn (Builder $query, string $search) => $query->orWhereLike('forums.description', sprintf('%%%s%%', $search)))
                     ->limit(50)
-                    ->searchable()
                     ->sortable(),
                 TextColumn::make('groups.name')
                     ->badge(),
                 TextColumn::make('category.name')
                     ->sortable()
-                    ->searchable()
                     ->badge(),
                 TextColumn::make('parent.name')
                     ->placeholder('No Parent')
                     ->sortable()
-                    ->searchable()
                     ->badge(),
                 ColorColumn::make('color')
                     ->sortable(),
@@ -197,12 +196,17 @@ class ForumResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TernaryFilter::make('is_active')
+                TernaryFilter::make('forums.is_active')
                     ->label('Active')
                     ->trueLabel('Active forums only')
                     ->falseLabel('Inactive forums only')
                     ->native(false),
-                SelectFilter::make('parent')
+                SelectFilter::make('category.name')
+                    ->relationship('category', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
+                SelectFilter::make('parent.name')
                     ->relationship('parent', 'name')
                     ->multiple()
                     ->preload()

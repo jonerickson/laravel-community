@@ -23,11 +23,11 @@ class BustSubscriptionCache
 
     public function handle(ProductCreated|ProductUpdated|ProductDeleted|PriceCreated|PriceUpdated|PriceDeleted $event): void
     {
-        if (in_array(get_class($event), [ProductCreated::class, ProductUpdated::class, ProductDeleted::class]) && $event->product->type !== ProductType::Subscription) {
+        if (in_array($event::class, [ProductCreated::class, ProductUpdated::class, ProductDeleted::class]) && $event->product->type !== ProductType::Subscription) {
             return;
         }
 
-        if (in_array(get_class($event), [PriceCreated::class, PriceUpdated::class, PriceDeleted::class]) && $event->price->product->type !== ProductType::Subscription) {
+        if (in_array($event::class, [PriceCreated::class, PriceUpdated::class, PriceDeleted::class]) && $event->price->product->type !== ProductType::Subscription) {
             return;
         }
 
