@@ -797,7 +797,7 @@ class StripeDriver implements PaymentProcessor
                 $checkoutParams['allow_promotion_codes'] = filled($allowPromotionCodes);
             }
 
-            $checkoutSession = $this->stripe->checkout->sessions->create($checkoutParams);
+            $checkoutSession = $this->stripe->checkout->sessions->create(array_filter($checkoutParams));
 
             $order->updateQuietly([
                 'external_checkout_id' => $checkoutSession->id,
