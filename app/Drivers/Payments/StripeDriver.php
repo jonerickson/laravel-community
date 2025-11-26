@@ -688,7 +688,7 @@ class StripeDriver implements PaymentProcessor
             $lineItems = [];
 
             foreach ($order->items as $orderItem) {
-                if (! $priceId = $orderItem->price->external_price_id) {
+                if (! $priceId = $orderItem->price?->external_price_id) {
                     continue;
                 }
 
