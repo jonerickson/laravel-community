@@ -11,5 +11,5 @@ class ListFingerprints extends ListRecords
 {
     protected static string $resource = FingerprintResource::class;
 
-    protected ?string $subheading = 'Manage the registered user/device identifies and their access to the system.';
+    protected ?string $subheading = 'Manage the registered user/device identities and their access to the system.';
 }
