@@ -37,6 +37,7 @@ class FingerprintResource extends Resource
     {
         return $table
             ->emptyStateDescription('There are no fingerprints to display.')
+            ->description(sprintf('Current Blacklist Threshold: >= %d', config('services.fingerprint.suspect_score_threshold')))
             ->columns([
                 TextColumn::make('fingerprint_id')
                     ->label('Fingerprint ID')
@@ -107,7 +108,7 @@ class FingerprintResource extends Resource
                         DatePicker::make('last_checked_at_until')
                             ->label('Last Checked At Before'),
                     ])
-                    ->query(fn(Builder $query, array $data): Builder => $query
+                    ->query(fn (Builder $query, array $data): Builder => $query
                         ->when(
                             $data['last_checked_at_from'],
                             fn (Builder $query, $date): Builder => $query->whereDate('last_checked_at', '>=', $date),
@@ -125,7 +126,7 @@ class FingerprintResource extends Resource
                         DatePicker::make('last_seen_at_until')
                             ->label('Last Seen At Before'),
                     ])
-                    ->query(fn(Builder $query, array $data): Builder => $query
+                    ->query(fn (Builder $query, array $data): Builder => $query
                         ->when(
                             $data['last_seen_at_from'],
                             fn (Builder $query, $date): Builder => $query->whereDate('last_seen_at', '>=', $date),
@@ -146,7 +147,7 @@ class FingerprintResource extends Resource
                             ->numeric()
                             ->label('Suspect Score Less Than'),
                     ])
-                    ->query(fn(Builder $query, array $data): Builder => $query
+                    ->query(fn (Builder $query, array $data): Builder => $query
                         ->when(
                             $data['suspect_score_from'],
                             fn (Builder $query, $score): Builder => $query->where('suspect_score', '>=', $score),
