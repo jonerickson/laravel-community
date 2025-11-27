@@ -23,7 +23,9 @@ class AuthorizeRequestAgainstBlacklist
     public function handle(Request $request, Closure $next): Response
     {
         $shouldSkipChecks = $request->routeIs('policies.*')
+            || $request->routeIs('login')
             || $request->routeIs('livewire.*')
+            || $request->routeIs('filament.*')
             || $request->routeIs('admin.*')
             || $request->routeIs('api.fingerprint');
 

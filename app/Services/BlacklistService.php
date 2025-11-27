@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Attributes\CurrentFingerprint;
 use App\Enums\FilterType;
+use App\Enums\Role;
 use App\Events\BlacklistMatch;
 use App\Models\Blacklist;
 use App\Models\Fingerprint;
@@ -29,6 +30,10 @@ class BlacklistService
 
     public function isBlacklisted(mixed $value = null, ?FilterType $filter = null): Blacklist|false
     {
+        if ($this->user instanceof User && $this->user->hasAnyRole(Role::cases())) {
+            return false;
+        }
+
         if (! $filter instanceof FilterType) {
             return $this->checkAllFilters();
         }

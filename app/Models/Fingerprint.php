@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $request_id
  * @property string|null $ip_address
  * @property string|null $user_agent
+ * @property int $suspect_score
  * @property Carbon|null $last_checked_at
  * @property Carbon $first_seen_at
  * @property Carbon $last_seen_at
@@ -39,6 +40,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|Fingerprint whereLastCheckedAt($value)
  * @method static Builder<static>|Fingerprint whereLastSeenAt($value)
  * @method static Builder<static>|Fingerprint whereRequestId($value)
+ * @method static Builder<static>|Fingerprint whereSuspectScore($value)
  * @method static Builder<static>|Fingerprint whereUpdatedAt($value)
  * @method static Builder<static>|Fingerprint whereUserAgent($value)
  * @method static Builder<static>|Fingerprint whereUserId($value)
@@ -49,12 +51,17 @@ class Fingerprint extends Model
 {
     use Blacklistable;
 
+    protected $attributes = [
+        'suspect_score' => 0,
+    ];
+
     protected $fillable = [
         'user_id',
         'fingerprint_id',
         'request_id',
         'ip_address',
         'user_agent',
+        'suspect_score',
         'first_seen_at',
         'last_seen_at',
         'last_checked_at',
@@ -110,6 +117,7 @@ class Fingerprint extends Model
     protected function casts(): array
     {
         return [
+            'suspect_score' => 'integer',
             'first_seen_at' => 'datetime',
             'last_seen_at' => 'datetime',
             'last_checked_at' => 'datetime',

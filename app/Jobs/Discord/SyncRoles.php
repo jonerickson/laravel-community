@@ -11,6 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Collection;
 
 class SyncRoles implements ShouldQueue
 {
@@ -51,6 +52,7 @@ class SyncRoles implements ShouldQueue
             );
         }
 
+        /** @var Collection $expectedRoleIds */
         $expectedRoleIds = $user->getExpectedDiscordRoleIds();
 
         $platformRoleIds = Group::query()

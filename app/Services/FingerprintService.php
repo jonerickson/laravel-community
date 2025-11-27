@@ -49,21 +49,4 @@ class FingerprintService
 
         return $response->json();
     }
-
-    /**
-     * @throws RequestException
-     * @throws ConnectionException
-     */
-    public function isSuspicious(string $requestId): bool
-    {
-        $eventData = $this->getEventData($requestId);
-
-        if (blank($eventData)) {
-            return false;
-        }
-
-        $suspectScore = $eventData['suspect_score'] ?? 0;
-
-        return (int) $suspectScore >= $this->suspectScoreThreshold;
-    }
 }

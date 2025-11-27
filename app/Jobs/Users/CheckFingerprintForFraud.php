@@ -23,13 +23,19 @@ class CheckFingerprintForFraud implements ShouldQueue
      */
     public function handle(FingerprintService $fingerprintService): void
     {
-        if ($fingerprintService->isSuspicious($this->fingerprint->request_id)) {
-            $this->fingerprint->blacklistResource(
-                reason: 'Automatically blacklisted due to suspicious account activity.'
-            );
+        $suspectScoreThreshold = config('services.fingerprint.suspect_score_threshold');
+        $suspectScore = 0;
+
+        if ($eventData = $fingerprintService->getEventData($this->fingerprint->request_id)) {
+            if (($suspectScore = data_get($eventData, 'suspect_score') ?? 0) && $suspectScore >= $suspectScoreThreshold) {
+                $this->fingerprint->blacklistResource(
+                    reason: 'Automatically blacklisted due to suspicious account activity.'
+                );
+            }
         }
 
         $this->fingerprint->update([
+            'suspect_score' => $suspectScore,
             'last_checked_at' => now(),
         ]);
     }

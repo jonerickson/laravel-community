@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Users\RelationManagers;
 
-use App\Filament\Admin\Resources\UserFingerprints\UserFingerprintResource;
+use App\Filament\Admin\Resources\Fingerprints\FingerprintResource;
 use BackedEnum;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Icons\Heroicon;
@@ -14,7 +14,7 @@ class FingerprintsRelationManager extends RelationManager
 {
     protected static string $relationship = 'fingerprints';
 
-    protected static ?string $relatedResource = UserFingerprintResource::class;
+    protected static ?string $relatedResource = FingerprintResource::class;
 
     protected static string|BackedEnum|null $icon = Heroicon::OutlinedDevicePhoneMobile;
 

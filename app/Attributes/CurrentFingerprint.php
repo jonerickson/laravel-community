@@ -22,6 +22,7 @@ class CurrentFingerprint implements ContextualAttribute
 
         return Fingerprint::query()
             ->where('fingerprint_id', $fingerprintId)
+            ->latest()
             ->first();
     }
 }

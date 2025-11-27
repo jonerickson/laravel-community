@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Admin\Resources\UserFingerprints\Actions;
+namespace App\Filament\Admin\Resources\Fingerprints\Actions;
 
 use App\Models\Fingerprint;
 use Filament\Actions\Action;

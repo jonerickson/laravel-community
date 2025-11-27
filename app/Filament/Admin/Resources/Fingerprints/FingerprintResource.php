@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Filament\Admin\Resources\UserFingerprints;
+namespace App\Filament\Admin\Resources\Fingerprints;
 
-use App\Filament\Admin\Resources\UserFingerprints\Actions\BlacklistAction;
-use App\Filament\Admin\Resources\UserFingerprints\Actions\UnblacklistAction;
-use App\Filament\Admin\Resources\UserFingerprints\Pages\ListUserFingerprints;
+use App\Filament\Admin\Resources\Fingerprints\Actions\BlacklistAction;
+use App\Filament\Admin\Resources\Fingerprints\Actions\UnblacklistAction;
+use App\Filament\Admin\Resources\Fingerprints\Pages\ListFingerprints;
 use App\Models\Fingerprint;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Override;
 
-class UserFingerprintResource extends Resource
+class FingerprintResource extends Resource
 {
     protected static ?string $model = Fingerprint::class;
 
@@ -50,6 +50,15 @@ class UserFingerprintResource extends Resource
                     ->label('IP Address')
                     ->searchable()
                     ->copyable(),
+                TextColumn::make('suspect_score')
+                    ->label('Suspect Score')
+                    ->sortable()
+                    ->color(fn ($state, Fingerprint $record) => match (true) {
+                        $state >= 25, $record->is_blacklisted => 'danger',
+                        $state >= 11 && $state < 25 => 'warning',
+                        default => 'success'
+                    })
+                    ->badge(),
                 TextColumn::make('first_seen_at')
                     ->placeholder('Not Seen')
                     ->label('First Seen')
@@ -102,7 +111,7 @@ class UserFingerprintResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListUserFingerprints::route('/'),
+            'index' => ListFingerprints::route('/'),
         ];
     }
 
