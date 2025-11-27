@@ -54,14 +54,21 @@ DROP TABLE IF EXISTS `blacklist`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `blacklist` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `filter` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'string',
   `is_regex` tinyint(1) NOT NULL DEFAULT '0',
   `warning_id` bigint unsigned DEFAULT NULL,
+  `created_by` bigint unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `resource_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `resource_id` bigint unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `blacklist_warning_id_foreign` (`warning_id`),
+  KEY `blacklist_resource_type_resource_id_index` (`resource_type`,`resource_id`),
+  KEY `blacklist_created_by_foreign` (`created_by`),
+  CONSTRAINT `blacklist_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `blacklist_warning_id_foreign` FOREIGN KEY (`warning_id`) REFERENCES `warnings` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -221,11 +228,7 @@ CREATE TABLE `fingerprints` (
   `fingerprint_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `request_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ip_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` text COLLATE utf8mb4_unicode_ci,
-  `is_banned` tinyint(1) NOT NULL DEFAULT '0',
-  `ban_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `banned_by` bigint unsigned DEFAULT NULL,
-  `banned_at` timestamp NULL DEFAULT NULL,
+  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `last_checked_at` timestamp NULL DEFAULT NULL,
   `first_seen_at` timestamp NOT NULL,
   `last_seen_at` timestamp NOT NULL,
@@ -233,12 +236,9 @@ CREATE TABLE `fingerprints` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_fingerprints_user_id_fingerprint_id_unique` (`user_id`,`fingerprint_id`),
-  KEY `users_fingerprints_banned_by_foreign` (`banned_by`),
   KEY `users_fingerprints_fingerprint_id_last_seen_at_index` (`fingerprint_id`,`last_seen_at`),
-  KEY `users_fingerprints_fingerprint_id_is_banned_index` (`fingerprint_id`,`is_banned`),
   KEY `users_fingerprints_fingerprint_id_index` (`fingerprint_id`),
-  CONSTRAINT `fingerprints_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `users_fingerprints_banned_by_foreign` FOREIGN KEY (`banned_by`) REFERENCES `users` (`id`)
+  CONSTRAINT `fingerprints_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `follows`;
@@ -1128,8 +1128,8 @@ CREATE TABLE `subscription_items` (
   `stripe_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `stripe_product` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `stripe_price` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `meter_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `meter_event_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meter_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meter_event_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `quantity` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1468,6 +1468,22 @@ CREATE TABLE `webhooks` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `whitelist`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `whitelist` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `content` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `filter` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'string',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `resource_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `resource_id` bigint unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `whitelist_resource_type_resource_id_index` (`resource_type`,`resource_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -1604,9 +1620,13 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (164,'2025_11_19_23
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (167,'2025_11_20_161306_add_visibility_to_files_table',55);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (169,'2025_11_21_054706_update_webhook_columns',56);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (170,'2025_11_21_172754_add_request_id_to_logs_table',57);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (171,'2025_09_28_202015_create_email_settings',58);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (172,'2025_09_28_202053_create_general_settings',58);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (173,'2025_11_25_191628_registration_settings',59);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (174,'2025_11_26_065517_add_meter_id_to_subscription_items_table',60);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (176,'2025_11_26_065518_add_meter_event_name_to_subscription_items_table',61);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (177,'2025_11_26_065811_update_user_agent_column_in_fingerprints_table',62);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (178,'2025_09_28_202015_create_email_settings',63);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (179,'2025_09_28_202053_create_general_settings',63);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (180,'2025_11_25_191628_registration_settings',63);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (181,'2025_11_26_224810_add_filter_to_blacklist_table',63);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (182,'2025_11_26_225200_create_whitelist_table',63);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (183,'2025_11_27_050547_remove_ban_from_fingerprints_table',63);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (184,'2025_11_27_051532_add_resource_to_blacklist_table',63);
