@@ -15,7 +15,7 @@ use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
 
-class HandleOrderEvent
+class SendOrderMail
 {
     public function handle(OrderCancelled|OrderPending|OrderProcessing|OrderSucceeded $event): void
     {

@@ -12,7 +12,7 @@ use App\Events\OrderSaved;
 use App\Events\OrderSucceeded;
 use Illuminate\Support\Facades\App;
 
-class HandleOrderSaved
+class DispatchOrderStatusEvents
 {
     public function handle(OrderSaved $event): void
     {

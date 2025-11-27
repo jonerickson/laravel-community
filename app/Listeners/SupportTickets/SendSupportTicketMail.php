@@ -18,7 +18,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
 
-class HandleSupportTicketEvent implements ShouldQueue
+class SendSupportTicketMail implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
