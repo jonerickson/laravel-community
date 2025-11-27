@@ -12,10 +12,13 @@ use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -53,7 +56,7 @@ class FingerprintResource extends Resource
                 TextColumn::make('suspect_score')
                     ->label('Suspect Score')
                     ->sortable()
-                    ->color(fn ($state, Fingerprint $record) => match (true) {
+                    ->color(fn ($state, Fingerprint $record): string => match (true) {
                         $state >= 25, $record->is_blacklisted => 'danger',
                         $state >= 11 && $state < 25 => 'warning',
                         default => 'success'
@@ -87,11 +90,77 @@ class FingerprintResource extends Resource
                     ->dateTime()
                     ->sortable(),
             ])
+            ->filtersFormColumns(2)
             ->filters([
+                SelectFilter::make('user.name')
+                    ->columnSpanFull()
+                    ->relationship('user', 'name')
+                    ->preload()
+                    ->multiple()
+                    ->searchable(),
+                Filter::make('last_checked_at')
+                    ->columnSpanFull()
+                    ->columns()
+                    ->schema([
+                        DatePicker::make('last_checked_at_from')
+                            ->label('Last Checked At After'),
+                        DatePicker::make('last_checked_at_until')
+                            ->label('Last Checked At Before'),
+                    ])
+                    ->query(fn(Builder $query, array $data): Builder => $query
+                        ->when(
+                            $data['last_checked_at_from'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('last_checked_at', '>=', $date),
+                        )
+                        ->when(
+                            $data['last_checked_at_until'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('last_checked_at', '<=', $date),
+                        )),
+                Filter::make('last_seen_at')
+                    ->columnSpanFull()
+                    ->columns()
+                    ->schema([
+                        DatePicker::make('last_seen_at_from')
+                            ->label('Last Seen At After'),
+                        DatePicker::make('last_seen_at_until')
+                            ->label('Last Seen At Before'),
+                    ])
+                    ->query(fn(Builder $query, array $data): Builder => $query
+                        ->when(
+                            $data['last_seen_at_from'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('last_seen_at', '>=', $date),
+                        )
+                        ->when(
+                            $data['last_seen_at_until'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('last_seen_at', '<=', $date),
+                        )),
+                Filter::make('suspect_score')
+                    ->label('Suspect Score Between')
+                    ->columnSpanFull()
+                    ->columns()
+                    ->schema([
+                        TextInput::make('suspect_score_from')
+                            ->numeric()
+                            ->label('Suspect Score Greater Than'),
+                        TextInput::make('suspect_score_until')
+                            ->numeric()
+                            ->label('Suspect Score Less Than'),
+                    ])
+                    ->query(fn(Builder $query, array $data): Builder => $query
+                        ->when(
+                            $data['suspect_score_from'],
+                            fn (Builder $query, $score): Builder => $query->where('suspect_score', '>=', $score),
+                        )
+                        ->when(
+                            $data['suspect_score_until'],
+                            fn (Builder $query, $score): Builder => $query->where('suspect_score', '<=', $score),
+                        )),
                 Filter::make('has_user')
+                    ->columnSpanFull()
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('user_id'))
                     ->label('Associated with user'),
                 Filter::make('recent_activity')
+                    ->columnSpanFull()
                     ->query(fn (Builder $query): Builder => $query->where('last_seen_at', '>=', now()->subDays(7)))
                     ->label('Active in last 7 days'),
             ])
