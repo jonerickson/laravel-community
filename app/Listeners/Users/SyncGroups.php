@@ -26,7 +26,7 @@ class SyncGroups implements ShouldQueue
             return;
         }
 
-        $user = match (get_class($event)) {
+        $user = match ($event::class) {
             SubscriptionCreated::class, SubscriptionDeleted::class => $event->user,
             OrderSucceeded::class, OrderCancelled::class => $event->order->user,
             Login::class => $event->user,

@@ -60,12 +60,16 @@ class CallbackController extends Controller
                 'provider_email' => $socialUser->getEmail(),
                 'provider_avatar' => $socialUser->getAvatar(),
                 'access_token' => property_exists($socialUser, 'token') ? $socialUser->token : null,
+                'refresh_token' => property_exists($socialUser, 'refreshToken') ? $socialUser->refreshToken : null,
+                'expires_at' => property_exists($socialUser, 'expiresIn') ? now()->addSeconds($socialUser->expiresIn) : null,
             ]);
         } else {
             $integration->update([
                 'provider_name' => $socialUser->getName(),
                 'provider_avatar' => $socialUser->getAvatar(),
                 'access_token' => property_exists($integration, 'token') ? $integration->token : null,
+                'refresh_token' => property_exists($socialUser, 'refreshToken') ? $socialUser->refreshToken : null,
+                'expires_at' => property_exists($socialUser, 'expiresIn') ? now()->addSeconds($socialUser->expiresIn) : null,
             ]);
         }
 

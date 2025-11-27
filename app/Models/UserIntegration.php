@@ -25,6 +25,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
  * @property string|null $provider_email
  * @property string|null $provider_avatar
  * @property string|null $access_token
+ * @property string|null $refresh_token
+ * @property \Illuminate\Support\Carbon|null $expires_at
  * @property \Illuminate\Support\Carbon|null $last_synced_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -37,6 +39,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereAccessToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereExpiresAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereLastSyncedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereProvider($value)
@@ -44,6 +47,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereProviderEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereProviderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereProviderName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereRefreshToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration whereUserId($value)
  *
@@ -76,6 +80,8 @@ class UserIntegration extends Model
         'provider_email',
         'provider_avatar',
         'access_token',
+        'refresh_token',
+        'expires_at',
         'last_synced_at',
     ];
 
@@ -130,6 +136,8 @@ class UserIntegration extends Model
     {
         return [
             'access_token' => 'encrypted',
+            'refresh_token' => 'encrypted',
+            'expires_at' => 'datetime',
             'last_synced_at' => 'datetime',
         ];
     }

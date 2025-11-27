@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Users\RelationManagers;
 
+use App\Models\UserIntegration;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -11,10 +13,14 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\AbstractProvider;
+use Throwable;
 
 class IntegrationsRelationManager extends RelationManager
 {
@@ -82,6 +88,12 @@ class IntegrationsRelationManager extends RelationManager
                     ->dateTime()
                     ->since()
                     ->dateTimeTooltip(),
+                TextColumn::make('expires_at')
+                    ->placeholder('No Expiration')
+                    ->label('Expires')
+                    ->dateTime()
+                    ->since()
+                    ->dateTimeTooltip(),
             ])
             ->headerActions([
                 CreateAction::make()
@@ -90,6 +102,36 @@ class IntegrationsRelationManager extends RelationManager
                     ->modalDescription('Add a new connected account for this user.'),
             ])
             ->recordActions([
+                Action::make('refresh')
+                    ->icon(Heroicon::OutlinedArrowPath)
+                    ->color('gray')
+                    ->successNotificationTitle('The integration has been successfully refreshed.')
+                    ->visible(fn (UserIntegration $record): bool => filled($record->refresh_token) && filled($record->expires_at) && $record->expires_at->isFuture())
+                    ->action(function (Action $action, UserIntegration $record): void {
+                        try {
+                            /** @var AbstractProvider $provider */
+                            $provider = Socialite::driver($record->provider);
+
+                            $token = $provider->refreshToken($record->refresh_token);
+                            $user = $provider->userFromToken($token->token);
+
+                            $record->update([
+                                'provider_name' => $user->getName(),
+                                'provider_avatar' => $user->getAvatar(),
+                                'last_synced_at' => now(),
+                                'access_token' => $token->token,
+                                'refresh_token' => $token->refreshToken,
+                                'expires_at' => now()->addSeconds($token->expiresIn),
+                            ]);
+                        } catch (Throwable $throwable) {
+                            $action->failureNotificationTitle($throwable->getMessage());
+                            $action->failure();
+
+                            return;
+                        }
+
+                        $action->success();
+                    }),
                 EditAction::make(),
                 DeleteAction::make(),
             ]);
