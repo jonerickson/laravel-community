@@ -5,31 +5,15 @@ declare(strict_types=1);
 namespace App\Providers\Social;
 
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Support\Arr;
 use JsonException;
 use Laravel\Socialite\Two\AbstractProvider;
-use Laravel\Socialite\Two\Token;
 use Laravel\Socialite\Two\User;
-use Override;
 
 class RobloxProvider extends AbstractProvider
 {
     protected $scopes = ['openid', 'profile'];
 
     protected $scopeSeparator = ' ';
-
-    #[Override]
-    public function refreshToken($refreshToken): Token
-    {
-        $response = $this->getRefreshTokenResponse($refreshToken);
-
-        return new Token(
-            Arr::get($response, 'access_token'),
-            Arr::get($response, 'refresh_token', $refreshToken),
-            Arr::get($response, 'expires_in'),
-            explode($this->scopeSeparator, (string) Arr::get($response, 'scope', ''))
-        );
-    }
 
     protected function getAuthUrl($state): string
     {
