@@ -17,8 +17,7 @@ class CheckFingerprintForFraudListener
             return;
         }
 
-        $shouldDispatch = ! $event->fingerprint->is_banned
-            && filled($event->fingerprint->request_id)
+        $shouldDispatch = filled($event->fingerprint->request_id)
             && (blank($event->fingerprint->last_checked_at)
             || $event->fingerprint->last_checked_at->isBefore(now()->subDay()));
 

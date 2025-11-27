@@ -14,6 +14,7 @@ use App\Events\UserDeleted;
 use App\Events\UserUpdated;
 use App\Facades\PaymentProcessor;
 use App\Managers\PaymentManager;
+use App\Traits\Blacklistable;
 use App\Traits\HasAvatar;
 use App\Traits\HasEmailAuthentication;
 use App\Traits\HasGroups;
@@ -94,6 +95,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read Collection<int, Report> $approvedReports
  * @property-read int|null $approved_reports_count
  * @property-read string|null $avatar_url
+ * @property-read Blacklist|null $blacklist
  * @property-read Collection<int, \Laravel\Passport\Client> $clients
  * @property-read int|null $clients_count
  * @property-read SubscriptionData|null $current_subscription
@@ -107,7 +109,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read bool $has_password
  * @property-read Collection<int, UserIntegration> $integrations
  * @property-read int|null $integrations_count
- * @property-read bool $is_banned
+ * @property-read bool $is_blacklisted
  * @property-read bool $is_reported
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
@@ -183,6 +185,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 class User extends Authenticatable implements EmailAuthenticationContract, FilamentAvatar, FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery, HasName, MustVerifyEmail, OAuthenticatable
 {
     use Billable;
+    use Blacklistable;
     use DiscordUser;
     use HasApiTokens;
     use HasAvatar;
@@ -205,10 +208,6 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         'email_verified_at',
         'signature',
         'password',
-        'is_banned',
-        'banned_at',
-        'ban_reason',
-        'banned_by',
         'stripe_id',
         'extra_billing_information',
         'billing_address',
@@ -334,13 +333,6 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     {
         return Attribute::get(fn (): ?WarningConsequenceType => $this->active_consequence->type ?? null)
             ->shouldCache();
-    }
-
-    public function isBanned(): Attribute
-    {
-        return Attribute::make(
-            get: fn (): bool => $this->fingerprints->firstWhere('is_banned', true) || $this->active_consequence_type === WarningConsequenceType::Ban,
-        )->shouldCache();
     }
 
     public function hasPassword(): Attribute

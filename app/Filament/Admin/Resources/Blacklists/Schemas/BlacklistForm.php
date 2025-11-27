@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Blacklists\Schemas;
 
+use App\Enums\FilterType;
+use App\Models\Fingerprint;
+use App\Models\User;
 use Exception;
+use Filament\Forms\Components\MorphToSelect;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -25,14 +30,40 @@ class BlacklistForm
                     ->columnSpanFull()
                     ->columns(1)
                     ->schema([
+                        Radio::make('filter')
+                            ->required()
+                            ->live()
+                            ->default(FilterType::String)
+                            ->options(FilterType::class),
                         TextInput::make('content')
+                            ->visible(fn (Get $get): bool => $get('filter') === FilterType::String)
                             ->maxLength(255)
                             ->live()
                             ->helperText('The content that should be prevented. Multiple non-regex items should be separated by a comma. This can be an email address, profanity, or a regex pattern to match multiple items.')
                             ->required(),
+                        TextInput::make('content')
+                            ->label('IP Address')
+                            ->visible(fn (Get $get): bool => $get('filter') === FilterType::IpAddress)
+                            ->maxLength(255)
+                            ->ip()
+                            ->helperText('The IP address that should be blocked.')
+                            ->required(),
+                        MorphToSelect::make('resource')
+                            ->label(fn (Get $get): string => $get('filter')->getLabel())
+                            ->visible(fn (Get $get): bool => in_array($get('filter'), [FilterType::Fingerprint, FilterType::User]))
+                            ->contained(false)
+                            ->searchable()
+                            ->preload()
+                            ->required()
+                            ->types([
+                                MorphToSelect\Type::make(User::class)
+                                    ->titleAttribute('name'),
+                                MorphToSelect\Type::make(Fingerprint::class)
+                                    ->titleAttribute('fingerprint_id'),
+                            ]),
                         Textarea::make('description')
                             ->maxLength(65535)
-                            ->helperText('An optional description of the blacklist entry.')
+                            ->helperText('An optional description of the blacklist entry. This is public facing and will be shown to the user.')
                             ->nullable(),
                         Select::make('warning_id')
                             ->relationship('warning', 'name')
@@ -41,6 +72,7 @@ class BlacklistForm
                             ->searchable()
                             ->nullable(),
                         Toggle::make('is_regex')
+                            ->visible(fn (Get $get): bool => $get('filter') === FilterType::String)
                             ->helperText('The content above is a regex pattern.')
                             ->live()
                             ->required(),

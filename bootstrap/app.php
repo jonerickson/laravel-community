@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Exceptions\BannedException;
+use App\Data\UserData;
+use App\Exceptions\BlacklistedException;
 use App\Http\Middleware\AddSentryContext;
 use App\Http\Middleware\AttachTraceAndRequestId;
-use App\Http\Middleware\CheckBannedUser;
+use App\Http\Middleware\AuthorizeRequestAgainstBlacklist;
 use App\Http\Middleware\EnsureAccountHasEmail;
 use App\Http\Middleware\EnsureAccountHasPassword;
 use App\Http\Middleware\ForceOnboarding;
@@ -13,6 +14,7 @@ use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\LogApiRequest;
 use App\Http\Middleware\LogApiResponse;
+use App\Models\Fingerprint;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Foundation\Application;
@@ -69,7 +71,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             CreateFreshApiToken::class,
-            CheckBannedUser::class,
+            AuthorizeRequestAgainstBlacklist::class,
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
@@ -84,7 +86,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->dontReport([
             OAuthServerException::class,
-            BannedException::class,
+            BlacklistedException::class,
         ]);
 
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
@@ -92,13 +94,16 @@ return Application::configure(basePath: dirname(__DIR__))
                 return $response;
             }
 
-            if ($exception instanceof BannedException) {
+            if ($exception instanceof BlacklistedException) {
                 return Inertia::render('banned', [
-                    'user' => $exception->fingerprint->user,
-                    'fingerprint' => $exception->fingerprint,
-                    'banReason' => $exception->fingerprint?->ban_reason,
-                    'bannedAt' => $exception->fingerprint?->banned_at,
-                    'bannedBy' => $exception->fingerprint?->bannedBy?->name,
+                    'user' => UserData::from($exception->blacklist->resource instanceof Fingerprint
+                        ? $exception->blacklist->resource->user
+                        : $exception->blacklist->resource
+                    ),
+                    'fingerprint' => $exception->blacklist->resource,
+                    'banReason' => $exception->blacklist->description,
+                    'bannedAt' => $exception->blacklist->created_at,
+                    'bannedBy' => UserData::from($exception->blacklist->author),
                 ]);
             }
 

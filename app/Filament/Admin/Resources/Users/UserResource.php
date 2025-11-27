@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Users;
 
-use App\Filament\Admin\Resources\Users\Actions\BanAction;
-use App\Filament\Admin\Resources\Users\Actions\BulkBanUsersAction;
+use App\Filament\Admin\Resources\Users\Actions\BlacklistAction;
+use App\Filament\Admin\Resources\Users\Actions\BulkBlacklistUsersAction;
 use App\Filament\Admin\Resources\Users\Actions\BulkSyncGroupsAction;
-use App\Filament\Admin\Resources\Users\Actions\BulkUnbanUsersAction;
+use App\Filament\Admin\Resources\Users\Actions\BulkUnblacklistUsersAction;
 use App\Filament\Admin\Resources\Users\Actions\ChangePasswordAction;
-use App\Filament\Admin\Resources\Users\Actions\UnbanAction;
+use App\Filament\Admin\Resources\Users\Actions\UnblacklistAction;
 use App\Filament\Admin\Resources\Users\Pages\CreateUser;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Filament\Admin\Resources\Users\Pages\ListUsers;
@@ -383,13 +383,6 @@ class UserResource extends Resource
                     ->placeholder('No Products')
                     ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
-                IconColumn::make('is_banned')
-                    ->label('Banned')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-x-circle')
-                    ->falseIcon('heroicon-o-check-circle')
-                    ->trueColor('danger')
-                    ->falseColor('success'),
                 IconColumn::make('email_verified_at')
                     ->label('Verified')
                     ->boolean()
@@ -486,8 +479,8 @@ class UserResource extends Resource
             ])
             ->groups(['groups.name'])
             ->recordActions([
-                BanAction::make(),
-                UnbanAction::make(),
+                BlacklistAction::make(),
+                UnblacklistAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -496,8 +489,8 @@ class UserResource extends Resource
                     ->exporter(UserExporter::class),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    BulkBanUsersAction::make(),
-                    BulkUnbanUsersAction::make(),
+                    BulkBlacklistUsersAction::make(),
+                    BulkUnblacklistUsersAction::make(),
                     BulkSyncGroupsAction::make(),
                 ]),
             ])

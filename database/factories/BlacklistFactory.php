@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\FilterType;
+use App\Models\Blacklist;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Blacklist>
+ * @extends Factory<Blacklist>
  */
 class BlacklistFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            //
+            'content' => $this->faker->realText(),
+            'description' => $this->faker->sentence(),
+            'filter' => $this->faker->randomElement(FilterType::cases()),
+            'is_regex' => false,
         ];
     }
 }

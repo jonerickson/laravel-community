@@ -54,14 +54,6 @@ class UsersAnalyticsChart extends ChartWidget
                     'tension' => 0.3,
                 ],
                 [
-                    'label' => 'Banned Users',
-                    'data' => $data->pluck('banned')->toArray(),
-                    'borderColor' => 'rgb(239, 68, 68)',
-                    'backgroundColor' => 'rgba(239, 68, 68, 0.1)',
-                    'fill' => true,
-                    'tension' => 0.3,
-                ],
-                [
                     'label' => 'Total Users',
                     'data' => $data->pluck('cumulative')->toArray(),
                     'borderColor' => 'rgb(100, 116, 139)',
@@ -142,14 +134,6 @@ class UsersAnalyticsChart extends ChartWidget
             ->orderBy('date')
             ->pluck('count', 'date');
 
-        $bannedUsers = DB::table('fingerprints')
-            ->select(DB::raw('DATE(banned_at) as date'), DB::raw('count(DISTINCT user_id) as count'))
-            ->where('banned_at', '>=', $startDate)
-            ->whereNotNull('banned_at')
-            ->groupBy('date')
-            ->orderBy('date')
-            ->pluck('count', 'date');
-
         $initialUserCount = DB::table('users')
             ->where('created_at', '<', $startDate)
             ->count();
@@ -167,7 +151,6 @@ class UsersAnalyticsChart extends ChartWidget
                 'registrations' => $registrationsCount,
                 'active' => (int) $activeUsers->get($dateKey, 0),
                 'verifications' => (int) $verifications->get($dateKey, 0),
-                'banned' => (int) $bannedUsers->get($dateKey, 0),
                 'cumulative' => $cumulativeTotal,
             ]);
         }

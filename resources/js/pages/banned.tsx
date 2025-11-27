@@ -7,19 +7,16 @@ import { AlertTriangleIcon, ShieldXIcon } from 'lucide-react';
 interface UserFingerprint {
     id: number;
     fingerprint_id: string;
-    is_banned: boolean;
-    banned_at?: string;
-    ban_reason?: string;
     ip_address?: string;
     user_agent?: string;
 }
 
 interface BannedProps {
-    user: App.Data.UserData;
-    fingerprint?: UserFingerprint;
-    banReason?: string;
-    bannedAt?: string;
-    bannedBy?: string;
+    user: App.Data.UserData | null;
+    fingerprint?: UserFingerprint | null;
+    banReason?: string | null;
+    bannedAt?: string | null;
+    bannedBy?: App.Data.UserData | null;
 }
 
 export default function Banned({ user, fingerprint, banReason, bannedAt, bannedBy }: BannedProps) {
@@ -44,8 +41,8 @@ export default function Banned({ user, fingerprint, banReason, bannedAt, bannedB
                         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive-foreground">
                             <ShieldXIcon className="size-8 text-destructive" />
                         </div>
-                        <CardTitle>Device banned</CardTitle>
-                        <CardDescription>This device has been banned from accessing this platform.</CardDescription>
+                        <CardTitle>Account banned</CardTitle>
+                        <CardDescription>This account has been banned from accessing this platform.</CardDescription>
                     </CardHeader>
 
                     <CardContent className="space-y-6">
@@ -54,22 +51,24 @@ export default function Banned({ user, fingerprint, banReason, bannedAt, bannedB
                                 <AlertTriangleIcon className="mt-0.5 size-5 flex-shrink-0 text-destructive" />
                                 <div className="space-y-2">
                                     <div className="space-y-1 text-sm text-destructive">
-                                        {user && (
+                                        {user && user.id && (
                                             <p>
                                                 <strong>User:</strong> {user.name} ({user.email})
                                             </p>
                                         )}
-                                        {fingerprint && (
+                                        {fingerprint && fingerprint.fingerprint_id && (
                                             <p>
-                                                <strong>Device ID:</strong> {fingerprint.fingerprint_id.substring(0, 12)}...
+                                                <strong>Device ID:</strong> {fingerprint.fingerprint_id}
                                             </p>
                                         )}
-                                        <p>
-                                            <strong>Banned:</strong> {formatDate(bannedAt)}
-                                        </p>
-                                        {bannedBy && (
+                                        {bannedAt && (
                                             <p>
-                                                <strong>Banned by:</strong> {bannedBy}
+                                                <strong>Banned:</strong> {formatDate(bannedAt)}
+                                            </p>
+                                        )}
+                                        {bannedBy && bannedBy.id && (
+                                            <p>
+                                                <strong>Banned by:</strong> {bannedBy.name}
                                             </p>
                                         )}
                                     </div>

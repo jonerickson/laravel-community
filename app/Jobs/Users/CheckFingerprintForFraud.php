@@ -24,8 +24,8 @@ class CheckFingerprintForFraud implements ShouldQueue
     public function handle(FingerprintService $fingerprintService): void
     {
         if ($fingerprintService->isSuspicious($this->fingerprint->request_id)) {
-            $this->fingerprint->banFingerprint(
-                reason: 'Automatically banned due to suspicious account activity.'
+            $this->fingerprint->blacklistResource(
+                reason: 'Automatically blacklisted due to suspicious account activity.'
             );
         }
 

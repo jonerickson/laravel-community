@@ -4,19 +4,14 @@ declare(strict_types=1);
 
 namespace App\Rules;
 
-use App\Events\BlacklistMatch;
-use App\Models\Blacklist;
+use App\Enums\FilterType;
+use App\Services\BlacklistService;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-use Throwable;
 
 class BlacklistRule implements ValidationRule
 {
-    public function __construct(
-        protected ?string $message = null
-    ) {}
+    public $message;
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
@@ -24,47 +19,11 @@ class BlacklistRule implements ValidationRule
             return;
         }
 
-        $blacklists = Cache::remember('blacklist', 3600, fn () => Blacklist::all(['id', 'content', 'is_regex']));
+        $blacklistService = app(BlacklistService::class);
 
-        foreach ($blacklists as $blacklist) {
-            if ($this->isBlacklisted($value, $blacklist)) {
-                event(new BlacklistMatch(
-                    content: $value,
-                    blacklist: $blacklist,
-                    user: Auth::user()
-                ));
-
-                $message = $this->message ?? 'The :attribute contains prohibited content.';
-                $fail($message);
-
-                return;
-            }
+        if ($blacklistService->isBlacklisted($value, FilterType::String)) {
+            $message = $this->message ?? 'The :attribute contains prohibited content.';
+            $fail($message);
         }
-    }
-
-    protected function isBlacklisted(string $value, Blacklist $blacklist): bool
-    {
-        if ($blacklist->is_regex) {
-            return $this->matchesRegexPattern($value, $blacklist->content);
-        }
-
-        return $this->matchesExactContent($value, $blacklist->content);
-    }
-
-    protected function matchesRegexPattern(string $value, string $pattern): bool
-    {
-        try {
-            return preg_match($pattern, $value) === 1;
-        } catch (Throwable) {
-            return false;
-        }
-    }
-
-    protected function matchesExactContent(string $value, string $content): bool
-    {
-        $items = array_map(trim(...), explode(',', $content));
-        $lowerValue = strtolower($value);
-
-        return array_any($items, fn ($item): bool => str_contains($lowerValue, strtolower($item)));
     }
 }
