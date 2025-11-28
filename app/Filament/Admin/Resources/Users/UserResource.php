@@ -6,6 +6,7 @@ namespace App\Filament\Admin\Resources\Users;
 
 use App\Filament\Admin\Resources\Users\Actions\BlacklistAction;
 use App\Filament\Admin\Resources\Users\Actions\BulkBlacklistUsersAction;
+use App\Filament\Admin\Resources\Users\Actions\BulkSwapSubscriptionsAction;
 use App\Filament\Admin\Resources\Users\Actions\BulkSyncGroupsAction;
 use App\Filament\Admin\Resources\Users\Actions\BulkUnblacklistUsersAction;
 use App\Filament\Admin\Resources\Users\Actions\ChangePasswordAction;
@@ -501,6 +502,7 @@ class UserResource extends Resource
                     BulkBlacklistUsersAction::make(),
                     BulkUnblacklistUsersAction::make(),
                     BulkSyncGroupsAction::make(),
+                    BulkSwapSubscriptionsAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

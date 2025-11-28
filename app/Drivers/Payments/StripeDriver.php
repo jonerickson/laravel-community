@@ -235,6 +235,10 @@ class StripeDriver implements PaymentProcessor
                 'active' => false,
             ]);
 
+            $price->update([
+                'is_active' => false,
+            ]);
+
             return true;
         }, false);
     }

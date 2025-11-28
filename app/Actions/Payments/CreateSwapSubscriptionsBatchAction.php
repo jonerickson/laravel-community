@@ -33,8 +33,8 @@ class CreateSwapSubscriptionsBatchAction extends Action
     {
         $batch = Bus::batch([]);
 
-        $this->users->each(fn (CustomerData $user) => $batch->add(new SwapSubscription(
-            user: User::find($user->id),
+        $this->users->each(fn (CustomerData|User $user) => $batch->add(new SwapSubscription(
+            user: $user instanceof CustomerData ? User::find($user->id) : $user,
             price: $this->price,
             prorationBehavior: $this->prorationBehavior,
             paymentBehavior: $this->paymentBehavior,

@@ -16,7 +16,6 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Get;
-use Illuminate\Database\Eloquent\Builder;
 use Override;
 
 class SwapAction extends Action
@@ -57,7 +56,7 @@ class SwapAction extends Action
                 ->required()
                 ->preload()
                 ->searchable()
-                ->options(fn (Get $get) => Price::query()->active()->whereRelation('product', fn (Builder $query) => $query->whereKey($get('product_id')))->get()->mapWithKeys(fn (Price $price): array => [$price->id => $price->getLabel()])),
+                ->options(fn (Get $get) => Price::query()->active()->whereRelation('product', 'id', $get('product_id'))->get()->mapWithKeys(fn (Price $price): array => [$price->id => $price->getLabel()])),
             Radio::make('proration_behavior')
                 ->required()
                 ->label('Proration Behavior')

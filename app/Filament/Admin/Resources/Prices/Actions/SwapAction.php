@@ -42,7 +42,7 @@ class SwapAction extends Action
                 ->required()
                 ->preload()
                 ->searchable()
-                ->options(fn (Price $record) => Price::query()->where('product_id', $record->product_id)->whereKeyNot($record)->get()->mapWithKeys(fn (Price $price): array => [$price->id => $price->getLabel()])),
+                ->options(fn (Price $record) => Price::query()->active()->where('product_id', $record->product_id)->whereKeyNot($record)->get()->mapWithKeys(fn (Price $price): array => [$price->id => $price->getLabel()])),
             Radio::make('proration_behavior')
                 ->required()
                 ->label('Proration Behavior')
