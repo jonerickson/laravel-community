@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Users;
 
+use App\Enums\ProductType;
 use App\Filament\Admin\Resources\Users\Actions\BlacklistAction;
 use App\Filament\Admin\Resources\Users\Actions\BulkBlacklistUsersAction;
 use App\Filament\Admin\Resources\Users\Actions\BulkSwapSubscriptionsAction;
@@ -25,6 +26,7 @@ use App\Jobs\Discord\SyncRoles;
 use App\Livewire\PaymentMethods\ListPaymentMethods;
 use App\Livewire\Subscriptions\ListSubscriptions;
 use App\Models\Permission;
+use App\Models\Price;
 use App\Models\Role;
 use App\Models\Subscription;
 use App\Models\User;
@@ -424,13 +426,21 @@ class UserResource extends Resource
                     ->multiple()
                     ->searchable()
                     ->preload(),
-                SelectFilter::make('subscriptions')
-                    ->label('Subscription')
-                    ->relationship('subscriptions', 'id')
-                    ->multiple()
-                    ->searchable()
-                    ->preload()
-                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? ''),
+                Filter::make('subscription')
+                    ->schema([
+                        Select::make('subscription')
+                            ->label('Subscription Package')
+                            ->multiple()
+                            ->searchable()
+                            ->preload()
+                            ->options(Price::query()->active()->whereRelation('product', 'type', ProductType::Subscription)->get()->mapWithKeys(fn (Price $price): array => [$price->external_price_id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())])),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when(
+                            filled($data['subscription'] ?? null),
+                            fn (Builder|User $query): Builder => $query->whereRelation('subscriptions', 'stripe_price', $data['subscription']),
+                        )
+                    ),
                 Filter::make('subscription_status')
                     ->schema([
                         Select::make('subscription_status')
@@ -448,7 +458,6 @@ class UserResource extends Resource
                                 'past_due' => 'Past Due',
                             ]),
                     ])
-                    ->label('Has active subscription')
                     ->query(fn (Builder $query, array $data): Builder => $query
                         ->when(
                             in_array('active', $data['subscription_status']),
