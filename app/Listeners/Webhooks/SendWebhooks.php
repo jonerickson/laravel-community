@@ -2,11 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Listeners\Store;
+namespace App\Listeners\Webhooks;
 
 use App\Enums\RenderEngine;
+use App\Events\OrderCancelled;
+use App\Events\OrderCreated;
+use App\Events\OrderRefunded;
+use App\Events\PaymentSucceeded;
 use App\Events\SubscriptionCreated;
 use App\Events\SubscriptionDeleted;
+use App\Events\UserCreated;
+use App\Events\UserDeleted;
+use App\Events\UserUpdated;
 use App\Facades\ExpressionLanguage;
 use App\Models\Webhook;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,12 +23,12 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Str;
 use Spatie\WebhookServer\WebhookCall;
 
-class SendOrderWebhooks implements ShouldQueue
+class SendWebhooks implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
 
-    public function handle(SubscriptionCreated|SubscriptionDeleted $event): void
+    public function handle(OrderCreated|OrderCancelled|OrderRefunded|PaymentSucceeded|SubscriptionCreated|SubscriptionDeleted|UserCreated|UserUpdated|UserDeleted $event): void
     {
         Webhook::query()->whereEvent($event::class)->each(function (Webhook $webhook) use ($event): void {
             if (($webhook->render === RenderEngine::Blade && blank($webhook->payload_text)) || ($webhook->render === RenderEngine::ExpressionLanguage && blank($webhook->payload_json))) {

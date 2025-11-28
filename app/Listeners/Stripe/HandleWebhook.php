@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Listeners\Stripe;
 
+use App\Enums\BillingReason;
 use App\Enums\OrderRefundReason;
 use App\Enums\SubscriptionStatus;
 use App\Events\CustomerDeleted;
@@ -74,7 +75,7 @@ class HandleWebhook implements ShouldQueue
         }
 
         match (data_get($event->payload, 'type')) {
-            'invoice.payment_succeeded' => event(new PaymentSucceeded($order)),
+            'invoice.payment_succeeded' => event(new PaymentSucceeded($order, BillingReason::tryFrom(data_get($event->payload, 'data.object.billing_reason')))),
             'invoice.payment_action_required' => event(new PaymentActionRequired($order, $this->resolvePaymentConfirmationUrl($order))),
             'refund.created' => event(new RefundCreated($order, OrderRefundReason::tryFrom(data_get($event->payload, 'data.object.reason') ?? '') ?? OrderRefundReason::Other, data_get($event->payload, 'data.object.reason'))),
             default => null,

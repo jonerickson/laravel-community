@@ -8,6 +8,7 @@ use App\Enums\OrderStatus;
 use App\Events\OrderCancelled;
 use App\Events\OrderPending;
 use App\Events\OrderProcessing;
+use App\Events\OrderRefunded;
 use App\Events\OrderSaved;
 use App\Events\OrderSucceeded;
 use Illuminate\Support\Facades\App;
@@ -25,6 +26,7 @@ class DispatchOrderStatusEvents
                 OrderStatus::Cancelled => event(new OrderCancelled($event->order)),
                 OrderStatus::Pending => event(new OrderPending($event->order)),
                 OrderStatus::Processing => event(new OrderProcessing($event->order)),
+                OrderStatus::Refunded => event(new OrderRefunded($event->order)),
                 OrderStatus::Succeeded => event(new OrderSucceeded($event->order)),
                 default => null
             };

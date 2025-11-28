@@ -6,8 +6,15 @@ namespace App\Filament\Admin\Resources\Webhooks\Schemas;
 
 use App\Enums\HttpMethod;
 use App\Enums\RenderEngine;
+use App\Events\OrderCancelled;
+use App\Events\OrderCreated;
+use App\Events\OrderRefunded;
+use App\Events\PaymentSucceeded;
 use App\Events\SubscriptionCreated;
 use App\Events\SubscriptionDeleted;
+use App\Events\UserCreated;
+use App\Events\UserDeleted;
+use App\Events\UserUpdated;
 use App\Facades\ExpressionLanguage;
 use Closure;
 use Filament\Forms\Components\CodeEditor;
@@ -34,8 +41,15 @@ class WebhookForm
                         Select::make('event')
                             ->helperText('The event that will trigger the webhook to be sent.')
                             ->options([
+                                OrderCreated::class => 'Order Created',
+                                OrderCancelled::class => 'Order Cancelled',
+                                OrderRefunded::class => 'Order Refunded',
+                                PaymentSucceeded::class => 'Payment Succeeded',
                                 SubscriptionCreated::class => 'Subscription Created',
                                 SubscriptionDeleted::class => 'Subscription Deleted',
+                                UserCreated::class => 'User Created',
+                                UserUpdated::class => 'User Updated',
+                                UserDeleted::class => 'User Deleted',
                             ])
                             ->required()
                             ->columnSpanFull(),
