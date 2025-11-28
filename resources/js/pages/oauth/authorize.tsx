@@ -102,7 +102,7 @@ export default function OAuthAuthorize({ request, authToken, client, user, scope
 
                     <div className="space-y-3">
                         <Button onClick={handleApprove} className="w-full" disabled={submitProcessing}>
-                            {submitProcessing && <LoaderCircle className="mr-2 size-4 animate-spin" />}
+                            {submitProcessing && <LoaderCircle className="animate-spin" />}
                             Authorize
                         </Button>
 

@@ -51,7 +51,7 @@ export default function SetEmail({ status }: { status?: string }) {
 
                     <div className="flex items-center">
                         <Button className="w-full" disabled={processing}>
-                            {processing && <LoaderCircle className="size-4 animate-spin" />}
+                            {processing && <LoaderCircle className="animate-spin" />}
                             Email verification link
                         </Button>
                     </div>

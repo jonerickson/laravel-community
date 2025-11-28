@@ -96,7 +96,7 @@ export default function Profile({ fields }: ProfilePageProps) {
                         {auth && auth.user && auth.user.referenceId && (
                             <Button variant="outline" asChild>
                                 <a target="_blank" href={route('users.show', auth.user.referenceId)}>
-                                    <User className="mr-2 size-4" />
+                                    <User />
                                     View Profile
                                 </a>
                             </Button>

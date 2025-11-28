@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Users\Actions;
 
-use App\Jobs\Discord\SyncRoles;
 use App\Models\User;
 use Closure;
 use Filament\Actions\Action;
@@ -38,10 +37,6 @@ class SyncGroupsAction extends Action
             }
 
             $user->syncGroups();
-
-            if (config('services.discord.enabled') && config('services.discord.guild_id')) {
-                SyncRoles::dispatch($user->id);
-            }
 
             $action->success();
         });

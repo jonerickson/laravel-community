@@ -20,6 +20,7 @@ use App\Filament\Admin\Resources\Users\RelationManagers\OrdersRelationManager;
 use App\Filament\Admin\Resources\Users\Widgets\RegistrationsTable;
 use App\Filament\Admin\Resources\Users\Widgets\UserStatsOverview;
 use App\Filament\Exports\UserExporter;
+use App\Jobs\Discord\SyncRoles;
 use App\Livewire\PaymentMethods\ListPaymentMethods;
 use App\Livewire\Subscriptions\ListSubscriptions;
 use App\Models\Permission;
@@ -253,6 +254,14 @@ class UserResource extends Resource
                                     ->persistCollapsed()
                                     ->visible(fn (): bool => config('services.discord.enabled') && config('services.discord.guild_id'))
                                     ->headerActions([
+                                        Action::make('sync_discord_roles')
+                                            ->label('Sync')
+                                            ->color('gray')
+                                            ->successNotificationTitle("A background job has been dispatched to update the user's Discord roles.")
+                                            ->requiresConfirmation(false)
+                                            ->action(function (User $record): void {
+                                                SyncRoles::dispatch($record->id);
+                                            }),
                                         Action::make('refresh_discord_roles')
                                             ->label('Refresh')
                                             ->color('gray')

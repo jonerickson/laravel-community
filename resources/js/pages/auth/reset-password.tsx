@@ -89,7 +89,7 @@ export default function AuthResetPassword({ token, email }: ResetPasswordProps) 
                     </div>
 
                     <Button type="submit" className="mt-4 w-full" disabled={processing}>
-                        {processing && <LoaderCircle className="size-4 animate-spin" />}
+                        {processing && <LoaderCircle className="animate-spin" />}
                         Reset password
                     </Button>
                 </div>

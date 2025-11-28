@@ -226,7 +226,7 @@ export default function ForumTopicShow({ forum, topic, posts, forums, recentView
                             followersCount={topic.followersCount ?? 0}
                         />
                         <Button onClick={goToLatestPost} variant="outline">
-                            <ArrowDown className="mr-2 size-4" />
+                            <ArrowDown />
                             Latest
                         </Button>
                         {can('reply_topics') && !topic.isLocked && (
@@ -234,7 +234,7 @@ export default function ForumTopicShow({ forum, topic, posts, forums, recentView
                                 onClick={() => document.querySelector('[data-reply-form]')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                                 variant="outline"
                             >
-                                <Reply className="mr-2 size-4" />
+                                <Reply />
                                 Reply
                             </Button>
                         )}

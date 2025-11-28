@@ -103,7 +103,7 @@ export default function AuthRegister() {
                     </div>
 
                     <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
-                        {processing && <LoaderCircle className="size-4 animate-spin" />}
+                        {processing && <LoaderCircle className="animate-spin" />}
                         Create account
                     </Button>
                 </div>

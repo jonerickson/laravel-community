@@ -89,13 +89,13 @@ export default function Error({ status = '500' }: ErrorProps) {
                         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
                             {errorDetails.showHome && (
                                 <Button onClick={handleGoHome} variant="default">
-                                    <Home className="mr-2 size-4" />
+                                    <Home />
                                     Go Home
                                 </Button>
                             )}
                             {errorDetails.showRefresh && (
                                 <Button onClick={handleRefresh} variant="outline">
-                                    <RefreshCw className="mr-2 size-4" />
+                                    <RefreshCw />
                                     Try Again
                                 </Button>
                             )}

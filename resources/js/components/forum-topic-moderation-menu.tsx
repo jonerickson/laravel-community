@@ -120,12 +120,12 @@ export default function ForumTopicModerationMenu({ topic, forum, forums }: Forum
                         <DropdownMenuItem onClick={handleTogglePin} disabled={pinLoading}>
                             {topic.isPinned ? (
                                 <>
-                                    <PinOff className="mr-2 size-4" />
+                                    <PinOff />
                                     Unpin Topic
                                 </>
                             ) : (
                                 <>
-                                    <Pin className="mr-2 size-4" />
+                                    <Pin />
                                     Pin Topic
                                 </>
                             )}
@@ -136,12 +136,12 @@ export default function ForumTopicModerationMenu({ topic, forum, forums }: Forum
                         <DropdownMenuItem onClick={handleToggleLock} disabled={lockLoading}>
                             {topic.isLocked ? (
                                 <>
-                                    <LockOpen className="mr-2 size-4" />
+                                    <LockOpen />
                                     Unlock Topic
                                 </>
                             ) : (
                                 <>
-                                    <Lock className="mr-2 size-4" />
+                                    <Lock />
                                     Lock Topic
                                 </>
                             )}
@@ -150,14 +150,14 @@ export default function ForumTopicModerationMenu({ topic, forum, forums }: Forum
 
                     {can('move_topics') && (
                         <DropdownMenuItem onClick={handleOpenMoveDialog} disabled={moveLoading}>
-                            <ArrowLeftRight className="mr-2 size-4" />
+                            <ArrowLeftRight />
                             Move Topic
                         </DropdownMenuItem>
                     )}
 
                     {topic.permissions.canDelete && (
                         <DropdownMenuItem onClick={handleDeleteTopic} className="text-destructive focus:text-destructive">
-                            <Trash className="mr-2 size-4 text-destructive" />
+                            <Trash className="text-destructive" />
                             Delete Topic
                         </DropdownMenuItem>
                     )}

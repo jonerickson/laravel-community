@@ -11,6 +11,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 
 class AddUserToServer implements ShouldQueue
@@ -46,12 +47,13 @@ class AddUserToServer implements ShouldQueue
             return;
         }
 
-        $roleIds = $event->integration->user->getExpectedDiscordRoleIds()->toArray();
+        /** @var Collection $roleIds */
+        $roleIds = $event->integration->user->getExpectedDiscordRoleIds();
 
         $this->discord->addUserToServer(
             discordUserId: $discordId,
             accessToken: $accessToken,
-            roleIds: $roleIds,
+            roleIds: $roleIds->toArray(),
         );
     }
 }

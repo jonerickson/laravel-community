@@ -80,12 +80,12 @@ export default function PaymentMethodCard({ paymentMethod, onSetDefault, onDelet
                         <DropdownMenuContent align="end">
                             {!paymentMethod.isDefault && (
                                 <DropdownMenuItem onClick={onSetDefault}>
-                                    <Star className="mr-2 size-4" />
+                                    <Star />
                                     Set as default
                                 </DropdownMenuItem>
                             )}
                             <DropdownMenuItem onClick={onDelete} className="text-destructive">
-                                <Trash2 className="mr-2 size-4 text-destructive" />
+                                <Trash2 className="text-destructive" />
                                 Remove
                             </DropdownMenuItem>
                         </DropdownMenuContent>

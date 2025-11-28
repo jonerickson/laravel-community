@@ -125,7 +125,7 @@ export function RegistrationStep({ data, errors, processing, onChange, onNext, p
             )}
 
             <Button type="button" className="w-full" onClick={onNext} disabled={processing}>
-                {processing && <LoaderCircle className="size-4 animate-spin" />}
+                {processing && <LoaderCircle className="animate-spin" />}
                 Continue
             </Button>
         </div>

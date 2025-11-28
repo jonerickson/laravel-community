@@ -66,7 +66,7 @@ export default function SetPassword({ status }: { status?: string }) {
 
                     <div className="flex items-center">
                         <Button className="w-full" disabled={processing}>
-                            {processing && <LoaderCircle className="size-4 animate-spin" />}
+                            {processing && <LoaderCircle className="animate-spin" />}
                             Save password
                         </Button>
                     </div>

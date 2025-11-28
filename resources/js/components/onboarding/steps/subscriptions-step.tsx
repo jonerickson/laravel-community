@@ -88,7 +88,7 @@ export function SubscriptionsStep({
                                     >
                                         {processing && processingSubscriptionId === subscription.id ? (
                                             <>
-                                                <LoaderCircle className="size-4 animate-spin" />
+                                                <LoaderCircle className="animate-spin" />
                                                 Processing...
                                             </>
                                         ) : !defaultPrice ? (

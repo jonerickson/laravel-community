@@ -47,7 +47,7 @@ export default function AuthConfirmPassword() {
 
                     <div className="flex items-center">
                         <Button className="w-full" disabled={processing}>
-                            {processing && <LoaderCircle className="size-4 animate-spin" />}
+                            {processing && <LoaderCircle className="animate-spin" />}
                             Confirm password
                         </Button>
                     </div>

@@ -227,7 +227,7 @@ function PricingCard({
                     {isCurrentPlan ? (
                         <>
                             <Button className="w-full" variant="outline" disabled>
-                                <Check className="mr-2 size-4" />
+                                <Check />
                                 Current plan
                             </Button>
 
@@ -261,7 +261,7 @@ function PricingCard({
                             {currentSubscription?.status && ['past_due', 'incomplete'].includes(currentSubscription.status) && portalUrl && (
                                 <Button className="w-full" variant="default" size="sm" asChild>
                                     <a href={portalUrl} target="_blank" rel="noopener noreferrer">
-                                        <AlertCircle className="mr-2 size-4" />
+                                        <AlertCircle />
                                         Pay invoice
                                     </a>
                                 </Button>
@@ -279,12 +279,12 @@ function PricingCard({
                                         >
                                             {isContinuing ? (
                                                 <>
-                                                    <LoaderCircle className="size-4 animate-spin" />
+                                                    <LoaderCircle className="animate-spin" />
                                                     Continuing...
                                                 </>
                                             ) : (
                                                 <>
-                                                    <RefreshCw className="mr-2 size-4" />
+                                                    <RefreshCw />
                                                     Continue subscription
                                                 </>
                                             )}
@@ -299,12 +299,12 @@ function PricingCard({
                                         >
                                             {isCancelling ? (
                                                 <>
-                                                    <LoaderCircle className="size-4 animate-spin" />
+                                                    <LoaderCircle className="animate-spin" />
                                                     Cancelling...
                                                 </>
                                             ) : (
                                                 <>
-                                                    <X className="mr-2 size-4" />
+                                                    <X />
                                                     Cancel subscription
                                                 </>
                                             )}
@@ -321,7 +321,7 @@ function PricingCard({
                         >
                             {isSubscribing ? (
                                 <>
-                                    <LoaderCircle className="size-4 animate-spin" />
+                                    <LoaderCircle className="animate-spin" />
                                     Processing...
                                 </>
                             ) : plan.policies && plan.policies.length > 0 && !policiesAgreed[plan.id] ? (

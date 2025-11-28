@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\Frontend\LikeController;
 use App\Http\Controllers\Api\Frontend\LockController;
 use App\Http\Controllers\Api\Frontend\PaymentMethodController;
 use App\Http\Controllers\Api\Frontend\PinController;
+use App\Http\Controllers\Api\Frontend\Profile\SyncController;
 use App\Http\Controllers\Api\Frontend\PublishController;
 use App\Http\Controllers\Api\Frontend\ReadController;
 use App\Http\Controllers\Api\Frontend\ReportController;
@@ -46,6 +47,7 @@ Route::group(['domain' => config('app.url'), 'middleware' => [EnsureFrontendRequ
         Route::get('/payment-methods', PaymentMethodController::class)->name('payment-methods');
         Route::post('/pin', [PinController::class, 'store'])->name('pin.store');
         Route::delete('/pin', [PinController::class, 'destroy'])->name('pin.destroy');
+        Route::post('/profile/sync', SyncController::class)->name('profile.sync');
         Route::post('/publish', [PublishController::class, 'store'])->name('publish.store');
         Route::delete('/publish', [PublishController::class, 'destroy'])->name('publish.destroy');
         Route::post('/lock', [LockController::class, 'store'])->name('lock.store');

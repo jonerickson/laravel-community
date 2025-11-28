@@ -3,12 +3,13 @@ import HeadingSmall from '@/components/heading-small';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useApiRequest } from '@/hooks';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { Link2, Plus, User } from 'lucide-react';
+import { Link2, LoaderCircle, Plus, RefreshCcw, User } from 'lucide-react';
 import { useState } from 'react';
 import { route } from 'ziggy-js';
 
@@ -40,6 +41,7 @@ interface ConnectedAccountsProps {
 
 export default function Integrations({ connectedAccounts }: ConnectedAccountsProps) {
     const [showAddDialog, setShowAddDialog] = useState(false);
+    const { execute: syncAccounts, loading } = useApiRequest();
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Settings',
@@ -56,6 +58,20 @@ export default function Integrations({ connectedAccounts }: ConnectedAccountsPro
             provider: provider,
             redirect: route('settings.integrations.index', {}, false),
         });
+    };
+
+    const handleSyncAccounts = async () => {
+        await syncAccounts(
+            {
+                url: route('api.profile.sync'),
+                method: 'POST',
+            },
+            {
+                onSuccess: () => {
+                    router.reload({ only: ['connectedAccounts'] });
+                },
+            },
+        );
     };
 
     const getProviderDisplayName = (provider: string) => {
@@ -93,10 +109,16 @@ export default function Integrations({ connectedAccounts }: ConnectedAccountsPro
                     <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                         <HeadingSmall title="Integrations" description="Connect your accounts for enhanced features and authentication" />
                         {availableToConnect.length > 0 && (
-                            <Button variant="outline" onClick={() => setShowAddDialog(true)}>
-                                <Plus className="mr-2 size-4" />
-                                Add Integration
-                            </Button>
+                            <div className="flex items-center gap-2">
+                                <Button variant="outline" onClick={() => setShowAddDialog(true)}>
+                                    <Plus />
+                                    Add Integration
+                                </Button>
+                                <Button variant="secondary" onClick={handleSyncAccounts} disabled={loading}>
+                                    {loading ? <LoaderCircle className='animate-spin' /> : <RefreshCcw />}
+                                    {loading ? 'Syncing...' : 'Sync Accounts'}
+                                </Button>
+                            </div>
                         )}
                     </div>
 

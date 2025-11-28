@@ -130,7 +130,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                                 post: post.slug,
                             })}
                         >
-                            <Edit className="mr-2 size-4" />
+                            <Edit />
                             Edit Post
                         </Link>
                     </DropdownMenuItem>
@@ -140,12 +140,12 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                     <DropdownMenuItem onClick={handleToggleApprove}>
                         {post.isApproved ? (
                             <>
-                                <ThumbsDown className="mr-2 size-4" />
+                                <ThumbsDown />
                                 Unapprove Post
                             </>
                         ) : (
                             <>
-                                <ThumbsUp className="mr-2 size-4" />
+                                <ThumbsUp />
                                 Approve Post
                             </>
                         )}
@@ -156,12 +156,12 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                     <DropdownMenuItem onClick={handleTogglePin} disabled={pinLoading}>
                         {post.isPinned ? (
                             <>
-                                <PinOff className="mr-2 size-4" />
+                                <PinOff />
                                 Unpin Post
                             </>
                         ) : (
                             <>
-                                <Pin className="mr-2 size-4" />
+                                <Pin />
                                 Pin Post
                             </>
                         )}
@@ -172,12 +172,12 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                     <DropdownMenuItem onClick={handleTogglePublish}>
                         {post.isPublished ? (
                             <>
-                                <EyeOff className="mr-2 size-4" />
+                                <EyeOff />
                                 Unpublish Post
                             </>
                         ) : (
                             <>
-                                <Eye className="mr-2 size-4" />
+                                <Eye />
                                 Publish Post
                             </>
                         )}
@@ -186,7 +186,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
 
                 {post.permissions.canDelete && (
                     <DropdownMenuItem onClick={handleDeletePost} className="text-destructive focus:text-destructive">
-                        <Trash className="mr-2 size-4 text-destructive" />
+                        <Trash className="text-destructive" />
                         Delete Post
                     </DropdownMenuItem>
                 )}

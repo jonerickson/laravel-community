@@ -188,7 +188,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                     <Heading title="Shopping cart" description={`${items.length} ${items.length === 1 ? 'item' : 'items'} in your cart`} />
                     {auth && auth.user && items.length > 0 && (
                         <Button variant="outline" onClick={clearCart} disabled={clearCartProcessing}>
-                            <Trash2 className="mr-2 size-4" />
+                            <Trash2 />
                             {clearCartProcessing ? 'Clearing...' : 'Empty cart'}
                         </Button>
                     )}

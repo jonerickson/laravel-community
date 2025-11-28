@@ -137,9 +137,7 @@ export default function CreateSupportTicket({ categories, orders }: CreateSuppor
                                                                 setOrderSearchOpen(false);
                                                             }}
                                                         >
-                                                            <Check
-                                                                className={cn('mr-2 size-4', data.order_id === 'none' ? 'opacity-100' : 'opacity-0')}
-                                                            />
+                                                            <Check className={cn(data.order_id === 'none' ? 'opacity-100' : 'opacity-0')} />
                                                             No related order
                                                         </CommandItem>
                                                         {orders.map((order) => {
@@ -160,7 +158,6 @@ export default function CreateSupportTicket({ categories, orders }: CreateSuppor
                                                                 >
                                                                     <Check
                                                                         className={cn(
-                                                                            'mr-2 size-4',
                                                                             data.order_id === order.id.toString() ? 'opacity-100' : 'opacity-0',
                                                                         )}
                                                                     />

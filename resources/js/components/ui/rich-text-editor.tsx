@@ -27,7 +27,7 @@ import {
     Link as LinkIcon,
     List,
     ListOrdered,
-    Loader2,
+    LoaderCircle,
     MoreHorizontal,
     Quote,
     Redo,
@@ -224,7 +224,7 @@ function ImageDialog({ editor, isOpen, onOpenChange }: ImageDialogProps) {
                         Cancel
                     </Button>
                     <Button type="button" onClick={handleSubmit} disabled={(!file && !imageUrl) || loading}>
-                        {loading && <Loader2 className="mr-2 size-4 animate-spin" />}
+                        {loading && <LoaderCircle className="animate-spin" />}
                         {loading ? 'Uploading...' : 'Insert image'}
                     </Button>
                 </DialogFooter>

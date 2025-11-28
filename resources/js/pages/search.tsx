@@ -299,7 +299,7 @@ export default function Search({ results, query: initialQuery, filters: initialF
                             />
                             {processing && data.q.length > 0 && (
                                 <div className="absolute top-1/2 right-3 -translate-y-1/2">
-                                    <LoaderCircle className="size-4 animate-spin text-muted-foreground" />
+                                    <LoaderCircle className="animate-spin text-muted-foreground" />
                                 </div>
                             )}
                         </form>

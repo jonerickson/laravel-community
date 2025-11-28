@@ -81,7 +81,7 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                     {can('create_topics') && (
                         <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row sm:items-center">
                             <Button onClick={() => setIsDialogOpen(true)}>
-                                <Plus className="mr-2 size-4" />
+                                <Plus />
                                 New Topic
                             </Button>
                         </div>

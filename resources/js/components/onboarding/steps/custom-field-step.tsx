@@ -52,7 +52,7 @@ export function CustomFieldStep({ fields, data, errors, processing, onChange, on
                     Back
                 </Button>
                 <Button type="button" onClick={onNext} disabled={processing} className="flex-1">
-                    {processing && <LoaderCircle className="size-4 animate-spin" />}
+                    {processing && <LoaderCircle className="animate-spin" />}
                     Continue
                 </Button>
             </div>

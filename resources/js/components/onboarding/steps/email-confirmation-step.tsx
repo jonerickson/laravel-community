@@ -60,7 +60,7 @@ export function EmailConfirmationStep({ verified, processing, onResend, onNext, 
             <div className="flex flex-col gap-3">
                 {!verified && (
                     <Button type="button" variant="outline" onClick={handleResend} disabled={resendCooldown > 0 || processing}>
-                        {processing ? <LoaderCircle className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
+                        {processing ? <LoaderCircle className="animate-spin" /> : <RefreshCw />}
                         {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend verification email'}
                     </Button>
                 )}
@@ -72,7 +72,7 @@ export function EmailConfirmationStep({ verified, processing, onResend, onNext, 
                         </Button>
                     )}
                     <Button type="button" onClick={onNext} disabled={!verified || processing} className={onPrevious ? 'flex-1' : 'w-full'}>
-                        {processing && <LoaderCircle className="size-4 animate-spin" />}
+                        {processing && <LoaderCircle className="animate-spin" />}
                         Continue
                     </Button>
                 </div>

@@ -98,7 +98,7 @@ export default function Billing({ user, portalUrl }: BillingProps) {
                         {portalUrl && (
                             <Button variant="outline" asChild>
                                 <a href={portalUrl} target="_blank" rel="noopener noreferrer">
-                                    <ExternalLink className="mr-2 size-4" />
+                                    <ExternalLink />
                                     Billing Portal
                                 </a>
                             </Button>

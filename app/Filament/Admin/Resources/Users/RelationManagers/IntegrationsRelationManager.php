@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Users\RelationManagers;
 
+use App\Actions\Users\RefreshUserIntegrationAction;
 use App\Models\UserIntegration;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
@@ -18,9 +19,6 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
-use Laravel\Socialite\Facades\Socialite;
-use Laravel\Socialite\Two\AbstractProvider;
-use Throwable;
 
 class IntegrationsRelationManager extends RelationManager
 {
@@ -106,31 +104,14 @@ class IntegrationsRelationManager extends RelationManager
                     ->icon(Heroicon::OutlinedArrowPath)
                     ->color('gray')
                     ->successNotificationTitle('The integration has been successfully refreshed.')
+                    ->failureNotificationTitle('We were unable to refresh the integration. Please try again later.')
                     ->visible(fn (UserIntegration $record): bool => filled($record->refresh_token) && filled($record->expires_at) && $record->expires_at->isFuture())
                     ->action(function (Action $action, UserIntegration $record): void {
-                        try {
-                            /** @var AbstractProvider $provider */
-                            $provider = Socialite::driver($record->provider);
-
-                            $token = $provider->refreshToken($record->refresh_token);
-                            $user = $provider->userFromToken($token->token);
-
-                            $record->update([
-                                'provider_name' => $user->getName(),
-                                'provider_avatar' => $user->getAvatar(),
-                                'last_synced_at' => now(),
-                                'access_token' => $token->token,
-                                'refresh_token' => $token->refreshToken,
-                                'expires_at' => now()->addSeconds($token->expiresIn),
-                            ]);
-                        } catch (Throwable $throwable) {
-                            $action->failureNotificationTitle($throwable->getMessage());
+                        if (RefreshUserIntegrationAction::execute($record)) {
+                            $action->success();
+                        } else {
                             $action->failure();
-
-                            return;
                         }
-
-                        $action->success();
                     }),
                 EditAction::make(),
                 DeleteAction::make(),

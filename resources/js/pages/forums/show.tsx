@@ -212,7 +212,7 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
                                     {selectedTopics.length > 0 && (
                                         <>
                                             <Button variant="destructive" onClick={handleBulkDelete} disabled={isDeleting}>
-                                                <Trash2 className="mr-2 size-4" />
+                                                <Trash2 />
                                                 Delete {selectedTopics.length} Topic{selectedTopics.length > 1 ? 's' : ''}
                                             </Button>
                                             <Button variant="outline" onClick={() => setSelectedTopics([])}>
@@ -230,7 +230,7 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
                             {can('create_topics') && (
                                 <Button asChild>
                                     <Link href={route('forums.topics.create', { forum: forum.slug })}>
-                                        <Plus className="mr-2 size-4" />
+                                        <Plus />
                                         New Topic
                                     </Link>
                                 </Button>
