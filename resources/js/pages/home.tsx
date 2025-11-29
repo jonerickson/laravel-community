@@ -103,7 +103,7 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                             <div className="mb-8 flex flex-wrap items-center justify-center gap-2">
                                 <div className="inline-flex items-center rounded-full border border-border/40 bg-background px-3 py-1 text-sm text-muted-foreground">
                                     <Rocket className="text-gaming-blue mr-2 h-4 w-4" />
-                                    Now powering {memberCount}+ members
+                                    Now powering {abbreviateNumber(memberCount)}+ members
                                 </div>
                                 <div className="inline-flex items-center rounded-full border border-border/40 bg-background px-3 py-1 text-sm text-muted-foreground">
                                     <DiscordOnlineCount />
