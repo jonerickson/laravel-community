@@ -108,18 +108,18 @@ export default function Integrations({ connectedAccounts }: ConnectedAccountsPro
                 <div className="space-y-6">
                     <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                         <HeadingSmall title="Integrations" description="Connect your accounts for enhanced features and authentication" />
-                        {availableToConnect.length > 0 && (
-                            <div className="flex items-center gap-2">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                            {availableToConnect.length > 0 && (
                                 <Button variant="outline" onClick={() => setShowAddDialog(true)}>
                                     <Plus />
                                     Add Integration
                                 </Button>
-                                <Button variant="secondary" onClick={handleSyncAccounts} disabled={loading}>
-                                    {loading ? <LoaderCircle className="animate-spin" /> : <RefreshCcw />}
-                                    {loading ? 'Syncing...' : 'Sync Accounts'}
-                                </Button>
-                            </div>
-                        )}
+                            )}
+                            <Button variant="secondary" onClick={handleSyncAccounts} disabled={loading}>
+                                {loading ? <LoaderCircle className="animate-spin" /> : <RefreshCcw />}
+                                {loading ? 'Syncing...' : 'Sync Accounts'}
+                            </Button>
+                        </div>
                     </div>
 
                     {connectedAccounts.length > 0 ? (
