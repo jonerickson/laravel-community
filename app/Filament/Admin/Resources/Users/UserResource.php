@@ -62,6 +62,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -541,6 +542,18 @@ class UserResource extends Resource
         return [
             UserStatsOverview::make(),
             RegistrationsTable::make(),
+        ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['reference_id', 'name', 'email'];
+    }
+
+    public static function getGlobalSearchResultDetails(User|Model $record): array
+    {
+        return [
+            'Email' => $record->email,
         ];
     }
 }

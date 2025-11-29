@@ -32,6 +32,8 @@ class FingerprintResource extends Resource
 
     protected static ?string $label = 'Fingerprints';
 
+    protected static ?string $recordTitleAttribute = 'fingerprint_id';
+
     #[Override]
     public static function table(Table $table): Table
     {
@@ -193,5 +195,19 @@ class FingerprintResource extends Resource
     public static function canEdit(Model $record): bool
     {
         return false;
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['fingerprint_id', 'request_id'];
+    }
+
+    public static function getGlobalSearchResultDetails(Fingerprint|Model $record): array
+    {
+        return [
+            'Request ID' => $record->request_id,
+            'User' => $record->user?->name,
+            'IP Address' => $record->ip_address,
+        ];
     }
 }

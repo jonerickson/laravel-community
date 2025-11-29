@@ -21,6 +21,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Number;
 use Override;
 
 class OrderResource extends Resource
@@ -67,6 +69,21 @@ class OrderResource extends Resource
             'create' => CreateOrder::route('/create'),
             'edit' => EditOrder::route('/{record}/edit'),
             'view' => ViewOrder::route('/{record}'),
+        ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['reference_id'];
+    }
+
+    public static function getGlobalSearchResultDetails(Order|Model $record): array
+    {
+        return [
+            'Customer' => $record->user->name,
+            'Due' => Number::currency($record->amount_due ?? 0),
+            'Status' => $record->status?->getLabel(),
+            'Items' => $record->items->map->name->implode(', '),
         ];
     }
 }
