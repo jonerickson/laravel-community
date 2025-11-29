@@ -51,12 +51,20 @@ trait HasGroups
         }
 
         // The resource's currently assigned groups
-        $currentGroupIds = $this->groups()->pluck('groups.id');
+        $currentGroupIds = $this->groups()
+            ->pluck('groups.id')
+            ->filter()
+            ->unique();
 
         // All possible product groups that can be assigned to a resource based on events such as order history etc.
         $possibleGroupIds = Product::with('groups')
             ->get()
-            ->pluck('groups.id');
+            ->pluck('groups')
+            ->flatten()
+            ->pluck('id')
+            ->filter()
+            ->unique()
+            ->values();
 
         // The product groups the resource should be assigned based on events such as order history etc.
         $requiredProductGroupIds = match (true) {
@@ -72,18 +80,21 @@ trait HasGroups
                 ->pluck('groups')
                 ->flatten()
                 ->pluck('id')
-                ->unique(),
+                ->filter()
+                ->unique()
+                ->values(),
             default => collect(),
         };
 
         $finalGroups = $currentGroupIds
             ->diff($possibleGroupIds)
             ->add(Group::defaultMemberGroup()->id)
-            ->add($currentSubscriptionGroupId)
+            ->merge($currentSubscriptionGroupId)
             ->merge($requiredProductGroupIds)
             ->filter()
             ->unique()
-            ->reject(fn (int $id): bool => $id === Group::defaultGuestGroup()?->id);
+            ->reject(fn (int $id): bool => $id === Group::defaultGuestGroup()?->id)
+            ->values();
 
         $this->groups()->sync($finalGroups, $detaching);
     }
