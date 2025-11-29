@@ -433,7 +433,7 @@ class UserResource extends Resource
                             ->multiple()
                             ->searchable()
                             ->preload()
-                            ->options(Price::query()->active()->whereRelation('product', 'type', ProductType::Subscription)->get()->mapWithKeys(fn (Price $price): array => [$price->external_price_id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())])),
+                            ->options(Price::query()->whereRelation('product', 'type', ProductType::Subscription)->get()->mapWithKeys(fn (Price $price): array => [$price->external_price_id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())])),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query
                         ->when(
