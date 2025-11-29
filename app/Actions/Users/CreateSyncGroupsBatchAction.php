@@ -8,6 +8,7 @@ use App\Actions\Action;
 use App\Jobs\Users\SyncGroups;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\LazyCollection;
 use Throwable;
 
 class CreateSyncGroupsBatchAction extends Action
@@ -24,7 +25,7 @@ class CreateSyncGroupsBatchAction extends Action
      */
     public function __invoke(): bool
     {
-        $this->userIds->lazy()->chunk($this->chunkSize)->each(function (Collection $chunk, int $index): void {
+        $this->userIds->lazy()->chunk($this->chunkSize)->each(function (LazyCollection $chunk, int $index): void {
             $jobs = $chunk->map(fn (int $userId): SyncGroups => new SyncGroups(
                 userId: $userId,
             ))->all();
