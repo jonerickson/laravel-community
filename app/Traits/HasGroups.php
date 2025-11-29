@@ -39,23 +39,27 @@ trait HasGroups
 
     public function syncGroups(bool $detaching = true): void
     {
-        $currentSubscription = null;
+        $currentSubscriptionGroupId = null;
 
         if ($this instanceof User) {
             $paymentManager = app(PaymentManager::class);
             $currentSubscription = $paymentManager->currentSubscription($this);
+
+            if ($currentSubscription) {
+                $currentSubscriptionGroupId = Product::with('groups')->find($currentSubscription->product->id)->groups->pluck('id');
+            }
         }
 
         // The resource's currently assigned groups
         $currentGroupIds = $this->groups()->pluck('groups.id');
 
-        // All possible groups that can be assigned to a resource based on events such as order history etc.
+        // All possible product groups that can be assigned to a resource based on events such as order history etc.
         $possibleGroupIds = Product::with('groups')
             ->get()
             ->pluck('groups.id');
 
-        // The groups the resource should be assigned based on events such as order history etc.
-        $requiredGroupIds = match (true) {
+        // The product groups the resource should be assigned based on events such as order history etc.
+        $requiredProductGroupIds = match (true) {
             $this instanceof User => $this->orders()
                 ->completed()
                 ->with('prices.product.groups')
@@ -64,17 +68,7 @@ trait HasGroups
                 ->flatten()
                 ->pluck('product')
                 ->flatten()
-                ->filter(function (Product $product) use ($currentSubscription): bool {
-                    if ($product->isProduct()) {
-                        return true;
-                    }
-
-                    if (is_null($currentSubscription)) {
-                        return false;
-                    }
-
-                    return $product->id === $currentSubscription->product?->id;
-                })
+                ->reject(fn (Product $product): bool => $product->isSubscription())
                 ->pluck('groups')
                 ->flatten()
                 ->pluck('id')
@@ -85,7 +79,9 @@ trait HasGroups
         $finalGroups = $currentGroupIds
             ->diff($possibleGroupIds)
             ->add(Group::defaultMemberGroup()->id)
-            ->merge($requiredGroupIds)
+            ->add($currentSubscriptionGroupId)
+            ->merge($requiredProductGroupIds)
+            ->filter()
             ->unique()
             ->reject(fn (int $id): bool => $id === Group::defaultGuestGroup()?->id);
 
