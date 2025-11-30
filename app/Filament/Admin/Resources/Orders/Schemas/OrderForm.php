@@ -23,6 +23,7 @@ class OrderForm
                         Select::make('user_id')
                             ->preload()
                             ->searchable()
+                            ->default(fn () => request()->query('user_id'))
                             ->relationship('user', 'name')
                             ->required(),
                         TextInput::make('invoice_number')
