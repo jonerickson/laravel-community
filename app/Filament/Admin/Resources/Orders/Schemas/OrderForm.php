@@ -9,6 +9,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\RawJs;
 
 class OrderForm
 {
@@ -34,6 +35,59 @@ class OrderForm
                             ->searchable()
                             ->options(OrderStatus::class)
                             ->required(),
+                    ]),
+                Section::make('Payment Information')
+                    ->columnSpanFull()
+                    ->columns(4)
+                    ->schema([
+                        TextInput::make('amount_due')
+                            ->helperText('The total amount owed for the order.')
+                            ->label('Due')
+                            ->default(0)
+                            ->required()
+                            ->numeric()
+                            ->mask(RawJs::make('$money($input)'))
+                            ->stripCharacters(',')
+                            ->prefix('$')
+                            ->step(0.01)
+                            ->minValue(0)
+                            ->suffix('USD'),
+                        TextInput::make('amount_paid')
+                            ->helperText('The amount paid-to-date.')
+                            ->label('Paid')
+                            ->default(0)
+                            ->required()
+                            ->numeric()
+                            ->mask(RawJs::make('$money($input)'))
+                            ->stripCharacters(',')
+                            ->prefix('$')
+                            ->step(0.01)
+                            ->minValue(0)
+                            ->suffix('USD'),
+                        TextInput::make('amount_overpaid')
+                            ->helperText('Any overpaid amount.')
+                            ->label('Overpaid')
+                            ->default(0)
+                            ->required()
+                            ->numeric()
+                            ->mask(RawJs::make('$money($input)'))
+                            ->stripCharacters(',')
+                            ->prefix('$')
+                            ->step(0.01)
+                            ->minValue(0)
+                            ->suffix('USD'),
+                        TextInput::make('amount_remaining')
+                            ->helperText('Any remaining amount.')
+                            ->label('Remaining')
+                            ->default(0)
+                            ->required()
+                            ->numeric()
+                            ->mask(RawJs::make('$money($input)'))
+                            ->stripCharacters(',')
+                            ->prefix('$')
+                            ->step(0.01)
+                            ->minValue(0)
+                            ->suffix('USD'),
                     ]),
             ]);
     }

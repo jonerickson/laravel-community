@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Orders\Schemas;
 
+use App\Filament\Admin\Resources\Users\UserResource;
+use App\Models\Order;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -34,6 +36,7 @@ class OrderInfolist
                             ->since()
                             ->dateTimeTooltip(),
                         TextEntry::make('user.name')
+                            ->url(fn (Order $record): string => UserResource::getUrl('edit', ['record' => $record]))
                             ->label('User'),
                         TextEntry::make('status')
                             ->badge(),
@@ -43,18 +46,23 @@ class OrderInfolist
                     ->columns(5)
                     ->schema([
                         TextEntry::make('amount_subtotal')
+                            ->placeholder('No Subtotal')
                             ->label('Subtotal')
                             ->money(),
                         TextEntry::make('amount_due')
+                            ->placeholder('No Amount Due')
                             ->label('Due')
                             ->money(),
-                        TextEntry::make('amount')
+                        TextEntry::make('amount_paid')
+                            ->placeholder('No Amount Paid')
                             ->label('Paid')
                             ->money(),
                         TextEntry::make('amount_overpaid')
+                            ->placeholder('No Amount Overpaid')
                             ->label('Overpaid')
                             ->money(),
                         TextEntry::make('amount_remaining')
+                            ->placeholder('No Amount Remaining')
                             ->label('Remaining')
                             ->money(),
                     ]),

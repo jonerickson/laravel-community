@@ -165,7 +165,7 @@ class Order extends Model
                 return $attributes['amount_paid'] / 100;
             }
 
-            $subtotal = $this->items->sum('amount');
+            $subtotal = $this->amount_subtotal;
             $discountAmount = $this->discounts->sum('pivot.amount_applied');
 
             return $subtotal - $discountAmount;
