@@ -11,6 +11,7 @@ use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Utilities\Get;
@@ -47,13 +48,25 @@ class ItemsRelationManager extends RelationManager
                     ->relationship('price', 'name')
                     ->label('Product')
                     ->required()
+                    ->getSearchResultsUsing(fn (string $search): array => Price::query()
+                        ->with('product')
+                        ->whereRelation('product', 'name', 'like', "%{$search}%")
+                        ->orWhere('name', 'like', "%{$search}%")
+                        ->limit(50)
+                        ->get()
+                        ->mapWithKeys(fn (Price $price): array => [$price->id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())])
+                        ->toArray())
                     ->options(fn (Get $get) => Price::query()->with('product')->active()->get()->mapWithKeys(fn (Price $price): array => [$price->id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())]))
                     ->preload()
-                    ->searchable(),
+                    ->searchable(['prices.name', 'products.name']),
                 TextInput::make('quantity')
                     ->default(1)
                     ->required()
                     ->numeric(),
+                Textarea::make('description')
+                    ->maxLength(65535)
+                    ->helperText('An optional line item description.')
+                    ->nullable(),
             ]);
     }
 
@@ -93,11 +106,12 @@ class ItemsRelationManager extends RelationManager
                     ->createAnother(false),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->modalDescription("Update the order's line item."),
                 DeleteAction::make()
                     ->label('Remove')
                     ->modalHeading('Remove Item')
-                    ->modalDescription('Remove an item from the order.')
+                    ->modalDescription('Are you sure you want to remove this item from the order?')
                     ->modalSubmitActionLabel('Remove')
                     ->requiresConfirmation(),
             ]);

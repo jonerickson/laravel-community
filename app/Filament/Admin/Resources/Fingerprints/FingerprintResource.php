@@ -7,6 +7,7 @@ namespace App\Filament\Admin\Resources\Fingerprints;
 use App\Filament\Admin\Resources\Fingerprints\Actions\BlacklistAction;
 use App\Filament\Admin\Resources\Fingerprints\Actions\UnblacklistAction;
 use App\Filament\Admin\Resources\Fingerprints\Pages\ListFingerprints;
+use App\Filament\Admin\Resources\Users\RelationManagers\FingerprintsRelationManager;
 use App\Models\Fingerprint;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -48,6 +49,7 @@ class FingerprintResource extends Resource
                     ->copyable()
                     ->searchable(),
                 TextColumn::make('user.name')
+                    ->hiddenOn(FingerprintsRelationManager::class)
                     ->label('User')
                     ->searchable()
                     ->sortable()
