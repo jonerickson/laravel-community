@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Subscriptions\Actions;
 
 use App\Enums\OrderStatus;
+use App\Enums\ProductType;
 use App\Managers\PaymentManager;
 use App\Models\Order;
 use App\Models\Price;
-use App\Models\Product;
 use App\Models\User;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Get;
-use Illuminate\Database\Eloquent\Builder;
 use Override;
 
 class NewAction extends Action
@@ -43,19 +42,12 @@ class NewAction extends Action
         });
 
         $this->schema([
-            Select::make('product_id')
+            Select::make('price_id')
                 ->label('Product')
                 ->required()
                 ->preload()
                 ->searchable()
-                ->live(onBlur: true)
-                ->options(Product::query()->subscriptions()->pluck('name', 'id')),
-            Select::make('price_id')
-                ->label('Price')
-                ->required()
-                ->preload()
-                ->searchable()
-                ->options(fn (Get $get) => Price::query()->active()->whereRelation('product', fn (Builder $query) => $query->whereKey($get('product_id')))->get()->mapWithKeys(fn (Price $price): array => [$price->id => $price->getLabel()])),
+                ->options(fn (Get $get) => Price::query()->with('product')->active()->whereRelation('product', 'type', ProductType::Subscription)->get()->mapWithKeys(fn (Price $price): array => [$price->id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())])),
         ]);
 
         $this->action(function (NewAction $action, array $data): void {

@@ -6,10 +6,10 @@ namespace App\Filament\Admin\Resources\Subscriptions\Actions;
 
 use App\Actions\Payments\SwapSubscriptionAction;
 use App\Enums\PaymentBehavior;
+use App\Enums\ProductType;
 use App\Enums\ProrationBehavior;
 use App\Managers\PaymentManager;
 use App\Models\Price;
-use App\Models\Product;
 use App\Models\User;
 use Closure;
 use Filament\Actions\Action;
@@ -44,19 +44,12 @@ class SwapAction extends Action
         });
 
         $this->schema([
-            Select::make('product_id')
+            Select::make('price_id')
                 ->label('Product')
                 ->required()
                 ->preload()
                 ->searchable()
-                ->live(onBlur: true)
-                ->options(Product::query()->subscriptions()->pluck('name', 'id')),
-            Select::make('price_id')
-                ->label('Price')
-                ->required()
-                ->preload()
-                ->searchable()
-                ->options(fn (Get $get) => Price::query()->active()->whereRelation('product', 'id', $get('product_id'))->get()->mapWithKeys(fn (Price $price): array => [$price->id => $price->getLabel()])),
+                ->options(fn (Get $get) => Price::query()->with('product')->active()->whereRelation('product', 'type', ProductType::Subscription)->get()->mapWithKeys(fn (Price $price): array => [$price->id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())])),
             Radio::make('proration_behavior')
                 ->required()
                 ->label('Proration Behavior')

@@ -39,7 +39,7 @@ class BulkSwapSubscriptionsAction extends BulkAction
                 ->required()
                 ->preload()
                 ->searchable()
-                ->options(fn () => Price::query()->active()->whereRelation('product', 'type', ProductType::Subscription)->get()->mapWithKeys(fn (Price $price): array => [$price->id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())])),
+                ->options(fn () => Price::query()->with('product')->active()->whereRelation('product', 'type', ProductType::Subscription)->get()->mapWithKeys(fn (Price $price): array => [$price->id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())])),
             Radio::make('proration_behavior')
                 ->required()
                 ->label('Proration Behavior')

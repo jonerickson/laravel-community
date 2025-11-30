@@ -47,7 +47,7 @@ class ItemsRelationManager extends RelationManager
                     ->relationship('price', 'name')
                     ->label('Product')
                     ->required()
-                    ->options(fn (Get $get) => Price::query()->active()->get()->mapWithKeys(fn (Price $price): array => [$price->id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())]))
+                    ->options(fn (Get $get) => Price::query()->with('product')->active()->get()->mapWithKeys(fn (Price $price): array => [$price->id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())]))
                     ->preload()
                     ->searchable(),
                 TextInput::make('quantity')
