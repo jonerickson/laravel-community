@@ -154,7 +154,9 @@ export default function Orders({ orders }: OrdersProps) {
                 );
             },
             cell: ({ row }) => {
-                const amount = row.getValue('amount') as number | null;
+                const order = row.original;
+                const status = row.getValue('status') as string;
+                const amount = status && status === 'succeeded' ? order.amount : order.amountDue;
                 const formattedAmount = currency(amount);
 
                 return <div className="text-right font-medium">{formattedAmount}</div>;

@@ -179,10 +179,6 @@ class Order extends Model
                 return null;
             }
 
-            if ($this->is_recurring) {
-                return null;
-            }
-
             return rescue(fn () => app(PaymentManager::class)->getCheckoutUrl(
                 order: $this
             ));

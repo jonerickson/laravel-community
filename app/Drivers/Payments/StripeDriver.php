@@ -15,6 +15,7 @@ use App\Enums\OrderRefundReason;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentBehavior;
 use App\Enums\PriceType;
+use App\Enums\ProductType;
 use App\Enums\ProrationBehavior;
 use App\Enums\SubscriptionInterval;
 use App\Jobs\Stripe\UpdateCustomerInformation;
@@ -694,9 +695,14 @@ class StripeDriver implements PaymentProcessor
         return $this->executeWithErrorHandling('getCheckoutUrl', function () use ($order) {
             $lineItems = [];
 
+            $mode = 'payment';
             foreach ($order->items as $orderItem) {
                 if (! $priceId = $orderItem->price?->external_price_id) {
                     continue;
+                }
+
+                if ($mode !== 'subscription' && $orderItem->price->product->type === ProductType::Subscription) {
+                    $mode = 'subscription';
                 }
 
                 $lineItems[] = [
@@ -762,7 +768,7 @@ class StripeDriver implements PaymentProcessor
                 'cancel_url' => URL::signedRoute('store.checkout.cancel', [
                     'order' => $order->reference_id,
                 ]),
-                'mode' => 'payment',
+                'mode' => $mode,
                 'line_items' => $lineItems,
                 'metadata' => $metadata,
                 'consent_collection' => [
@@ -776,7 +782,10 @@ class StripeDriver implements PaymentProcessor
                         'message' => 'Order Number: '.$order->reference_id,
                     ],
                 ],
-                'invoice_creation' => [
+            ];
+
+            if ($mode === 'payment') {
+                $checkoutParams['invoice_creation'] = [
                     'enabled' => true,
                     'invoice_data' => [
                         'custom_fields' => [
@@ -787,13 +796,14 @@ class StripeDriver implements PaymentProcessor
                         ],
                         'metadata' => $metadata,
                     ],
-                ],
-                'payment_intent_data' => [
+                ];
+
+                $checkoutParams['payment_intent_data'] = [
                     'setup_future_usage' => 'off_session',
                     'receipt_email' => $order->user->email,
                     'metadata' => $metadata,
-                ],
-            ];
+                ];
+            }
 
             if (filled($discounts)) {
                 $checkoutParams['discounts'] = $discounts;

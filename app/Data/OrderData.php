@@ -27,6 +27,8 @@ class OrderData extends Data
 
     public ?float $amount = null;
 
+    public ?float $amountDue = null;
+
     public bool $isOneTime;
 
     public bool $isRecurring;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Orders\Schemas;
 
 use App\Enums\OrderStatus;
+use App\Models\Order;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
@@ -38,12 +39,12 @@ class OrderForm
                     ]),
                 Section::make('Payment Information')
                     ->columnSpanFull()
-                    ->columns(4)
+                    ->columns(2)
                     ->schema([
                         TextInput::make('amount_due')
                             ->helperText('The total amount owed for the order.')
                             ->label('Due')
-                            ->default(0)
+                            ->default(fn (?Order $record) => $record->amount_subtotal ?? 0)
                             ->required()
                             ->numeric()
                             ->mask(RawJs::make('$money($input)'))

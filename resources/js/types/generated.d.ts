@@ -226,7 +226,6 @@ declare namespace App.Data {
         metadata: Array<string, unknown> | null;
         createdAt: string | null;
         updatedAt: string | null;
-        permissions: App.Data.PermissionData;
     };
     export type KnowledgeBaseCategoryData = {
         id: number;
@@ -268,6 +267,7 @@ declare namespace App.Data {
         refundReason: string | null;
         refundNotes: string | null;
         amount: number | null;
+        amountDue: number | null;
         isOneTime: boolean;
         isRecurring: boolean;
         checkoutUrl: string | null;
@@ -431,6 +431,8 @@ declare namespace App.Data {
         parentId: number | null;
         featuredImage: string | null;
         featuredImageUrl: string | null;
+        isVisible: boolean;
+        isActive: boolean;
         parent: App.Data.ProductCategoryData | null;
         children: Array<App.Data.ProductCategoryData> | null;
     };
@@ -445,6 +447,8 @@ declare namespace App.Data {
         isFeatured: boolean;
         isSubscriptionOnly: boolean;
         isMarketplaceProduct: boolean;
+        approvalStatus: App.Enums.ProductApprovalStatus;
+        isVisible: boolean;
         trialDays: number;
         allowPromotionCodes: boolean;
         allowDiscountCodes: boolean;
@@ -626,10 +630,12 @@ declare namespace App.Data {
 }
 declare namespace App.Enums {
     export type AnnouncementType = 'info' | 'success' | 'warning' | 'error';
+    export type BillingReason = 'manual' | 'subscription_create' | 'subscription_cycle' | 'subscription_threshold' | 'subscription_update';
     export type DiscountType = 'gift_card' | 'promo_code' | 'manual';
     export type DiscountValueType = 'fixed' | 'percentage';
     export type FieldType = 'checkbox' | 'date' | 'datetime' | 'number' | 'radio' | 'rich_text' | 'select' | 'text' | 'textarea';
     export type FileVisibility = 'public' | 'private';
+    export type FilterType = 'fingerprint' | 'ip_address' | 'user' | 'string';
     export type HttpMethod = 'head' | 'get' | 'post' | 'put' | 'patch' | 'delete' | 'options';
     export type HttpStatusCode =
         | '200'
