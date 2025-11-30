@@ -14,8 +14,10 @@ use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\LogApiRequest;
 use App\Http\Middleware\LogApiResponse;
+use App\Jobs\Store\ClearPendingOrders;
 use App\Models\Fingerprint;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -39,6 +41,9 @@ return Application::configure(basePath: dirname(__DIR__))
             require base_path('routes/misc.php');
         }
     )
+    ->withSchedule(function (Schedule $schedule): void {
+        $schedule->job(ClearPendingOrders::class)->daily();
+    })
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->validateCsrfTokens(except: [
             'stripe/*',
