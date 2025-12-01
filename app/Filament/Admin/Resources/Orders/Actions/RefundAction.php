@@ -36,7 +36,7 @@ class RefundAction extends Action
                 ->nullable()
                 ->helperText('Optional refund notes.'),
         ]);
-        $this->visible(fn (Order $record) => $record->status->canRefund());
+        $this->visible(fn (Order $record): bool => $record->status->canRefund() && filled($record->external_order_id));
         $this->action(function (Order $record, array $data): void {
             $paymentManager = app(PaymentManager::class);
             $paymentManager->refundOrder(

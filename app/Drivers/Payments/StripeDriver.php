@@ -495,7 +495,7 @@ class StripeDriver implements PaymentProcessor
                 ->get()
                 ->firstWhere('price.product.trial_days', '>', 0);
 
-            $metadata = array_merge_recursive([
+            $metadata = array_merge([
                 'order_id' => $order->reference_id,
             ], ...$order->items->map(fn (OrderItem $orderItem) => data_get($orderItem->price->product->metadata, 'metadata', []))->toArray());
 
@@ -730,14 +730,11 @@ class StripeDriver implements PaymentProcessor
                 ->get()
                 ->firstWhere('price.product.allow_discount_codes', false);
 
-            $metadata = array_merge_recursive(
-                [
-                    'order_id' => $order->reference_id,
-                ],
-                ...$order->items
-                    ->map(fn (OrderItem $orderItem) => data_get($orderItem->price->product->metadata, 'metadata', []))
-                    ->toArray()
-            );
+            $metadata = array_merge([
+                'order_id' => $order->reference_id,
+            ], ...$order->items
+                ->map(fn (OrderItem $orderItem) => data_get($orderItem->price->product->metadata, 'metadata', []))
+                ->toArray());
 
             $discounts = [];
             if (! $disallowDiscountCodes && $order->discounts->isNotEmpty()) {
@@ -832,21 +829,14 @@ class StripeDriver implements PaymentProcessor
                 return false;
             }
 
-            $session = $this->stripe->checkout->sessions->retrieve($externalCheckoutId);
-
-            $invoice = null;
-            if ($session && $invoiceId = $session->invoice) {
-                $invoice = $this->stripe->invoices->retrieve($invoiceId);
-            }
-
-            $paymentIntent = null;
-            if ($invoice && ($paymentIntentId = $invoice->payments->data[0]->id ?? null)) {
-                $paymentIntent = $this->stripe->paymentIntents->retrieve($paymentIntentId);
-            }
+            $session = $this->stripe->checkout->sessions->retrieve($externalCheckoutId, [
+                'expand' => ['invoice', 'payment_intent.payment_method'],
+            ]);
 
             $order->updateQuietly([
-                'external_order_id' => $paymentIntentId ?? null,
-                'external_payment_id' => $paymentIntent?->payment_method ?? null,
+                'status' => OrderStatus::Processing,
+                'external_order_id' => $session->payment_intent?->id ?? null,
+                'external_payment_id' => $session->payment_intent?->payment_method?->id ?? null,
             ]);
 
             return true;
