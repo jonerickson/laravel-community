@@ -78,6 +78,7 @@ class InventoryService
                     'quantity_after' => $inventoryItem->quantity_available,
                     'reference_type' => Order::class,
                     'reference_id' => $order->id,
+                    'reason' => sprintf('Reserved for order #%s', $order->id),
                 ]);
 
                 $this->checkAndCreateAlerts($inventoryItem);
@@ -107,7 +108,7 @@ class InventoryService
                     continue;
                 }
 
-                foreach ($inventoryItem->reservations->filter(fn (InventoryReservation $reservation) => $reservation->status === InventoryReservationStatus::Active) as $reservation) {
+                foreach ($inventoryItem->reservations->filter(fn (InventoryReservation $reservation): bool => $reservation->status === InventoryReservationStatus::Active) as $reservation) {
                     $quantityBefore = $inventoryItem->quantity_on_hand;
 
                     $inventoryItem->decrement('quantity_reserved', $reservation->quantity);
@@ -121,6 +122,7 @@ class InventoryService
                         'reference_type' => $reservation->order_id ? Order::class : null,
                         'reference_id' => $reservation->order_id,
                         'created_by' => $order->user_id,
+                        'reason' => sprintf('Sale for order #%s', $order->id),
                     ]);
 
                     $reservation->update([
@@ -149,7 +151,7 @@ class InventoryService
                     continue;
                 }
 
-                foreach ($inventoryItem->reservations->filter(fn (InventoryReservation $reservation) => $reservation->status === InventoryReservationStatus::Active) as $reservation) {
+                foreach ($inventoryItem->reservations->filter(fn (InventoryReservation $reservation): bool => $reservation->status === InventoryReservationStatus::Active) as $reservation) {
                     $quantityBefore = $inventoryItem->quantity_available;
 
                     $inventoryItem->increment('quantity_available', $reservation->quantity);
@@ -163,6 +165,7 @@ class InventoryService
                         'quantity_after' => $inventoryItem->quantity_available,
                         'reference_type' => $reservation->order_id ? Order::class : null,
                         'reference_id' => $reservation->order_id,
+                        'reason' => sprintf('Released for order #%s', $order->id),
                     ]);
 
                     $reservation->update(['status' => InventoryReservationStatus::Cancelled]);
@@ -182,7 +185,7 @@ class InventoryService
             $inventoryItem,
             $quantity,
             InventoryTransactionType::Return,
-            'Return from order #'.$orderId
+            sprintf('Return from order #%s', $orderId),
         );
     }
 
