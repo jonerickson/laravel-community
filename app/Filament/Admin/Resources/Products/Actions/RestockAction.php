@@ -23,7 +23,7 @@ class RestockAction extends Action
         $this->label('Restock');
         $this->color('success');
         $this->icon(Heroicon::OutlinedPlusCircle);
-        $this->visible(fn (?Product $record): bool => ! is_null($record));
+        $this->visible(fn (Product|InventoryItem|null $record): bool => ! is_null($record));
         $this->successNotificationTitle('The inventory was successfully restocked.');
         $this->modalDescription('Restock and add additional quantity available for the product.');
         $this->schema([

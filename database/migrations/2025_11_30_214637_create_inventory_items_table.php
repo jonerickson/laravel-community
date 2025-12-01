@@ -13,7 +13,7 @@ return new class extends Migration
         Schema::create('inventory_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->string('sku')->unique();
+            $table->string('sku')->nullable()->unique();
             $table->integer('quantity_available')->default(0);
             $table->integer('quantity_reserved')->default(0);
             $table->integer('quantity_damaged')->default(0);

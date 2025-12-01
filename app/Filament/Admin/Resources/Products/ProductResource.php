@@ -179,6 +179,7 @@ class ProductResource extends Resource
                             ->schema([
                                 Grid::make(3)
                                     ->columnSpanFull()
+                                    ->visible(fn (Get $get): bool => $get('track_inventory'))
                                     ->schema([
                                         TextEntry::make('quantity_available')
                                             ->color('success')
@@ -199,47 +200,53 @@ class ProductResource extends Resource
                                             ->numeric()
                                             ->default(0),
                                     ]),
+                                Toggle::make('track_inventory')
+                                    ->live()
+                                    ->label('Track Inventory')
+                                    ->default(false)
+                                    ->helperText('Enable inventory tracking for this product.'),
+                                Toggle::make('allow_backorder')
+                                    ->label('Allow Backorders')
+                                    ->default(false)
+                                    ->helperText('Allow orders when out of stock.'),
                                 TextInput::make('sku')
+                                    ->visible(fn (Get $get): bool => $get('track_inventory'))
                                     ->validationAttribute('SKU')
                                     ->requiredWith('track_inventory')
                                     ->columnSpanFull()
                                     ->label('SKU')
                                     ->maxLength(255),
                                 TextInput::make('warehouse_location')
+                                    ->visible(fn (Get $get): bool => $get('track_inventory'))
                                     ->columnSpanFull()
                                     ->label('Warehouse Location')
                                     ->maxLength(255),
                                 TextInput::make('quantity_available')
+                                    ->visible(fn (Get $get, $operation): bool => $get('track_inventory') && $operation === 'create')
                                     ->columnSpanFull()
-                                    ->visibleOn('create')
                                     ->label('Available Quantity')
                                     ->helperText('The currently available quantity. Use the actions above to update.')
                                     ->requiredIf('track_inventory', true)
                                     ->default(0)
                                     ->minValue(0),
                                 TextInput::make('reorder_point')
+                                    ->visible(fn (Get $get): bool => $get('track_inventory'))
                                     ->label('Reorder Point')
                                     ->numeric()
                                     ->minValue(0)
                                     ->helperText('Trigger low stock alert when quantity falls below this.'),
                                 TextInput::make('reorder_quantity')
+                                    ->visible(fn (Get $get): bool => $get('track_inventory'))
                                     ->label('Reorder Quantity')
                                     ->numeric()
                                     ->minValue(0)
                                     ->helperText('Suggested quantity to order when restocking.'),
-                                Toggle::make('track_inventory')
-                                    ->label('Track Inventory')
-                                    ->default(true)
-                                    ->helperText('Enable inventory tracking for this product.'),
-                                Toggle::make('allow_backorder')
-                                    ->label('Allow Backorders')
-                                    ->default(false)
-                                    ->helperText('Allow orders when out of stock.'),
                                 Repeater::make('inventoryAlert')
+                                    ->visible(fn (Get $get, $operation): bool => $get('track_inventory') && $operation === 'edit')
                                     ->columnSpanFull()
                                     ->relationship('alerts')
-                                    ->visibleOn('edit')
                                     ->addActionLabel('Add alert')
+                                    ->default([])
                                     ->schema([
                                         Select::make('alert_type')
                                             ->label('Alert')

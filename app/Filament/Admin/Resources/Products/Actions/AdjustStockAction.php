@@ -25,7 +25,7 @@ class AdjustStockAction extends Action
         $this->label('Adjust stock');
         $this->color('warning');
         $this->icon(Heroicon::OutlinedAdjustmentsHorizontal);
-        $this->visible(fn (?Product $record): bool => ! is_null($record));
+        $this->visible(fn (Product|InventoryItem|null $record): bool => ! is_null($record));
         $this->successNotificationTitle('The stock has been successfully adjusted.');
         $this->modalDescription('Adjust the current stock on hand.');
         $this->schema([

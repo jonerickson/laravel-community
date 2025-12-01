@@ -23,7 +23,7 @@ class MarkDamagedAction extends Action
         $this->label('Mark damaged');
         $this->color('danger');
         $this->icon(Heroicon::OutlinedExclamationTriangle);
-        $this->visible(fn (?Product $record): bool => ! is_null($record));
+        $this->visible(fn (Product|InventoryItem|null $record): bool => ! is_null($record));
         $this->successNotificationTitle('The inventory was marked as damaged.');
         $this->modalDescription('Mark a quantity of product as damaged. This will update the quantity on hand.');
         $this->schema([
