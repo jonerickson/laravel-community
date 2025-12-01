@@ -139,12 +139,11 @@ class WebhookForm
             ->slideOver()
             ->modalCancelActionLabel('Close')
             ->modalSubmitAction(false)
-            ->modalDescription('Generate and test the webhook payload using the example object selected above.')
+            ->modalDescription('Generate and test the webhook payload using the example object selected below.')
             ->schema([
                 Select::make('model')
                     ->label('Object')
                     ->helperText('Select an example object to use to view the schema.')
-                    ->searchable()
                     ->live()
                     ->options(fn (Get $get): array => self::getExampleOptionsForEvent($event))
                     ->afterStateUpdated(function (Set $set, Get $get, $state) use ($webhook, $event): void {
@@ -178,7 +177,6 @@ class WebhookForm
                     ->label('Object')
                     ->helperText('Select an example object to use to view the schema.')
                     ->disabled(fn (Get $get): bool => blank($get('event')))
-                    ->searchable()
                     ->live()
                     ->placeholder(fn (Get $get): string => filled($get('event')) ? 'Select an object' : 'Select an event from above')
                     ->options(function (Get $get): array {
@@ -243,11 +241,11 @@ class WebhookForm
     protected static function getExampleOptionsForEvent(string $event): array
     {
         return match ($event) {
-            OrderCreated::class, PaymentSucceeded::class => Order::query()->completed()->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
-            OrderCancelled::class => Order::query()->cancelled()->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
-            OrderRefunded::class, => Order::query()->refunded()->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
-            SubscriptionCreated::class, SubscriptionUpdated::class, SubscriptionDeleted::class => Product::query()->subscriptions()->get()->mapWithKeys(fn (Product $product): array => [$product->getKey() => $product->name])->toArray(),
-            UserCreated::class, UserUpdated::class, UserDeleted::class => User::all()->mapWithKeys(fn (User $user): array => [$user->getKey() => $user->name])->toArray()
+            OrderCreated::class, PaymentSucceeded::class => Order::query()->completed()->limit(50)->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
+            OrderCancelled::class => Order::query()->cancelled()->limit(50)->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
+            OrderRefunded::class, => Order::query()->refunded()->limit(50)->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
+            SubscriptionCreated::class, SubscriptionUpdated::class, SubscriptionDeleted::class => Product::query()->subscriptions()->limit(50)->get()->mapWithKeys(fn (Product $product): array => [$product->getKey() => $product->name])->toArray(),
+            UserCreated::class, UserUpdated::class, UserDeleted::class => User::query()->limit(50)->get()->mapWithKeys(fn (User $user): array => [$user->getKey() => $user->name])->toArray()
         };
     }
 
