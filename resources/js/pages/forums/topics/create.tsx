@@ -7,6 +7,7 @@ import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { LoaderCircle } from 'lucide-react';
 import { route } from 'ziggy-js';
 
 interface CreateTopicProps {
@@ -105,6 +106,7 @@ export default function ForumTopicCreate({ forum }: CreateTopicProps) {
 
                             <div className="flex items-start gap-4">
                                 <Button type="submit" disabled={processing}>
+                                    {processing && <LoaderCircle className="animate-spin" />}
                                     {processing ? 'Creating topic...' : 'Create topic'}
                                 </Button>
                                 <Button variant="outline" type="button" disabled={processing}>

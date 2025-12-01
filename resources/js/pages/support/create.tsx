@@ -12,7 +12,7 @@ import AppLayout from '@/layouts/app-layout';
 import { cn, currency } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown, LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 import { route } from 'ziggy-js';
 
@@ -206,6 +206,7 @@ export default function CreateSupportTicket({ categories, orders }: CreateSuppor
 
                             <div className="flex items-center gap-4">
                                 <Button type="submit" disabled={processing}>
+                                    {processing && <LoaderCircle className="animate-spin" />}
                                     {processing ? 'Creating ticket...' : 'Create support ticket'}
                                 </Button>
                             </div>

@@ -11,7 +11,7 @@ import AppLayout from '@/layouts/app-layout';
 import { currency } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { Check, ImageIcon, ShoppingCart as ShoppingCartIcon, Ticket, Trash2, XIcon } from 'lucide-react';
+import { Check, ImageIcon, LoaderCircle, ShoppingCart as ShoppingCartIcon, Ticket, Trash2, XIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { route } from 'ziggy-js';
@@ -188,8 +188,8 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                     <Heading title="Shopping cart" description={`${items.length} ${items.length === 1 ? 'item' : 'items'} in your cart`} />
                     {auth && auth.user && items.length > 0 && (
                         <Button variant="outline" onClick={clearCart} disabled={clearCartProcessing}>
-                            <Trash2 />
-                            {clearCartProcessing ? 'Clearing...' : 'Empty cart'}
+                            {clearCartProcessing ? <LoaderCircle className="animate-spin" /> : <Trash2 />}
+                            {clearCartProcessing ? 'Emptying...' : 'Empty cart'}
                         </Button>
                     )}
                 </div>
@@ -353,6 +353,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                                     disabled={removingDiscount}
                                                     className="h-6 px-2 text-xs"
                                                 >
+                                                    {removingDiscount && <LoaderCircle className="animate-spin" />}
                                                     {removingDiscount ? 'Removing...' : 'Remove'}
                                                 </Button>
                                             </div>
@@ -384,6 +385,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                                 onClick={() => void handleApplyDiscount()}
                                                 disabled={validatingDiscount || !discountCode.trim()}
                                             >
+                                                {validatingDiscount && <LoaderCircle className="animate-spin" />}
                                                 {validatingDiscount ? 'Applying...' : 'Apply'}
                                             </Button>
                                         </dd>
@@ -446,6 +448,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                     onClick={proceedToCheckout}
                                     disabled={loading !== null || (policies.length > 0 && !policiesAgreed)}
                                 >
+                                    {loading && <LoaderCircle className="animate-spin" />}
                                     {loading
                                         ? 'Processing...'
                                         : policies.length > 0 && !policiesAgreed

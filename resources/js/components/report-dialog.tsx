@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useReport } from '@/hooks/use-report';
-import { AlertTriangleIcon, FlagIcon } from 'lucide-react';
+import { AlertTriangleIcon, FlagIcon, LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface ReportDialogProps {
@@ -98,6 +98,7 @@ export function ReportDialog({ reportableType, reportableId, trigger, children }
                             Cancel
                         </Button>
                         <Button type="submit" variant="destructive" disabled={isSubmitting || !reason}>
+                            {isSubmitting && <LoaderCircle className="animate-spin" />}
                             {isSubmitting ? 'Submitting...' : 'Submit report'}
                         </Button>
                     </DialogFooter>

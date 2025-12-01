@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { useApiRequest } from '@/hooks';
 import { router, usePage } from '@inertiajs/react';
-import { Bell, BellOff } from 'lucide-react';
+import { Bell, BellOff, LoaderCircle } from 'lucide-react';
 import { route } from 'ziggy-js';
 
 interface FollowButtonProps {
@@ -44,7 +44,7 @@ export function FollowButton({ type, id, isFollowing, followersCount, variant = 
 
     return (
         <Button variant={variant} size={size} onClick={handleToggleFollow} disabled={loading}>
-            {isFollowing ? <BellOff className="h-4 w-4" /> : <Bell className="h-4 w-4" />}
+            {loading ? <LoaderCircle className="animate-spin" /> : isFollowing ? <BellOff className="h-4 w-4" /> : <Bell className="h-4 w-4" />}
             {size !== 'icon' && (
                 <span>
                     {isFollowing ? 'Unfollow' : 'Follow'}

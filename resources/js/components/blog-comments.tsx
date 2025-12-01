@@ -9,7 +9,7 @@ import { UserInfo } from '@/components/user-info';
 import usePermissions from '@/hooks/use-permissions';
 import { cn } from '@/lib/utils';
 import { InfiniteScroll, useForm } from '@inertiajs/react';
-import { Edit, MessageCircle, Reply, Trash } from 'lucide-react';
+import { Edit, LoaderCircle, MessageCircle, Reply, Trash } from 'lucide-react';
 import { useState } from 'react';
 
 interface BlogCommentsProps {
@@ -147,6 +147,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
 
                         <div className="flex gap-2">
                             <Button type="submit" size="sm" disabled={editing}>
+                                {editing && <LoaderCircle className="animate-spin" />}
                                 {editing ? 'Saving...' : 'Save'}
                             </Button>
                             <Button type="button" variant="outline" size="sm" onClick={handleEditCancel} disabled={editing}>
@@ -213,6 +214,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                         </div>
                         <div className="flex gap-2">
                             <Button type="submit" size="sm" disabled={processing}>
+                                {processing && <LoaderCircle className="animate-spin" />}
                                 {processing ? 'Posting...' : 'Post reply'}
                             </Button>
                             <Button type="button" variant="outline" size="sm" onClick={() => onReply(0)} disabled={processing}>
@@ -296,6 +298,7 @@ export default function BlogComments({ post, comments }: BlogCommentsProps) {
                         <InputError message={errors.content} />
                     </div>
                     <Button type="submit" disabled={processing}>
+                        {processing && <LoaderCircle className="animate-spin" />}
                         {processing ? 'Posting...' : 'Post comment'}
                     </Button>
                 </form>

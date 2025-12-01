@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { currency } from '@/lib/utils';
 import { Deferred, useForm } from '@inertiajs/react';
-import { AlertTriangle, ImageIcon, Package } from 'lucide-react';
+import { AlertTriangle, ImageIcon, LoaderCircle, Package } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface ProductProps {
@@ -250,6 +250,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
                             }
                             className="mt-8 flex w-full items-center justify-center"
                         >
+                            {processing && <LoaderCircle className="animate-spin" />}
                             {processing
                                 ? 'Adding...'
                                 : productData.inventoryItem?.trackInventory &&

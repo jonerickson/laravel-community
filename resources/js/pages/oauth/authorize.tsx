@@ -107,6 +107,7 @@ export default function OAuthAuthorize({ request, authToken, client, user, scope
                         </Button>
 
                         <Button onClick={handleDeny} variant="outline" className="w-full" disabled={cancelProcessing}>
+                            {cancelProcessing && <LoaderCircle className="animate-spin" />}
                             Cancel
                         </Button>
                     </div>

@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { useForm } from '@inertiajs/react';
+import { LoaderCircle } from 'lucide-react';
 
 interface SupportTicketCommentFormProps {
     ticket: App.Data.SupportTicketData;
@@ -53,6 +54,7 @@ export default function SupportTicketCommentForm({ ticket, onCancel, onSuccess }
 
                     <div className="flex items-center gap-2">
                         <Button type="submit" disabled={processing || !data.content.trim()}>
+                            {processing && <LoaderCircle className="animate-spin" />}
                             {processing ? 'Adding comment...' : 'Add comment'}
                         </Button>
                         <Button type="button" variant="outline" onClick={handleCancel}>

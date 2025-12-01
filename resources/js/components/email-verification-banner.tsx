@@ -1,5 +1,5 @@
 import { useForm, usePage } from '@inertiajs/react';
-import { Mail } from 'lucide-react';
+import { LoaderCircle, Mail } from 'lucide-react';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,7 @@ export function EmailVerificationBanner() {
                     <AlertDescription>Check your inbox and click the verification link in the email to verify your account.</AlertDescription>
                 </div>
                 <Button size="sm" variant="ghost" onClick={handleResendVerification} disabled={processing}>
+                    {processing && <LoaderCircle className="animate-spin" />}
                     {processing ? 'Sending...' : 'Resend verification'}
                 </Button>
             </div>

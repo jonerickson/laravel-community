@@ -16,7 +16,7 @@ import UpdatePassword from '@/components/update-password';
 import { useInitials } from '@/hooks/use-initials';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { User } from 'lucide-react';
+import { LoaderCircle, User } from 'lucide-react';
 import { route } from 'ziggy-js';
 
 interface ProfilePageProps {
@@ -187,7 +187,10 @@ export default function Profile({ fields }: ProfilePageProps) {
                         )}
 
                         <div className="flex items-center gap-4">
-                            <Button disabled={processing}>{processing ? 'Saving...' : 'Save profile'}</Button>
+                            <Button disabled={processing}>
+                                {processing && <LoaderCircle className="animate-spin" />}
+                                {processing ? 'Saving...' : 'Save profile'}
+                            </Button>
                             <Transition
                                 show={recentlySuccessful}
                                 enter="transition ease-in-out"

@@ -6,6 +6,7 @@ import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { LoaderCircle } from 'lucide-react';
 import { route } from 'ziggy-js';
 
 interface EditPostProps {
@@ -100,6 +101,7 @@ export default function ForumPostEdit({ forum, topic, post }: EditPostProps) {
 
                             <div className="flex items-center gap-4">
                                 <Button type="submit" disabled={processing}>
+                                    {processing && <LoaderCircle className="animate-spin" />}
                                     {processing ? 'Saving...' : 'Save changes'}
                                 </Button>
                                 <Button variant="outline" type="button" disabled={processing}>

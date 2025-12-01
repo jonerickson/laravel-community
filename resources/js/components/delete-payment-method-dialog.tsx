@@ -2,6 +2,7 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { usePaymentMethods } from '@/hooks/use-payment-methods';
+import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface DeletePaymentMethodDialogProps {
@@ -71,6 +72,7 @@ export default function DeletePaymentMethodDialog({ open, onOpenChange, paymentM
                         Cancel
                     </Button>
                     <Button type="button" variant="destructive" onClick={handleDelete} disabled={loading}>
+                        {loading && <LoaderCircle className="animate-spin" />}
                         {loading ? 'Deleting...' : 'Delete payment method'}
                     </Button>
                 </DialogFooter>

@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { useForm } from '@inertiajs/react';
+import { LoaderCircle } from 'lucide-react';
 import { useEffect } from 'react';
 
 interface ForumTopicReplyProps {
@@ -59,6 +60,7 @@ export default function ForumTopicReply({ forumSlug, topicSlug, onCancel, onSucc
 
                     <div className="flex items-center gap-2">
                         <Button type="submit" disabled={processing}>
+                            {processing && <LoaderCircle className="animate-spin" />}
                             {processing ? 'Posting...' : 'Post reply'}
                         </Button>
                         {onCancel && (

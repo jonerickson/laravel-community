@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from '@/components/ui/input';
 import { usePaymentMethods } from '@/hooks/use-payment-methods';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface AddPaymentMethodDialogProps {
@@ -95,6 +96,7 @@ export default function AddPaymentMethodDialog({ open, onOpenChange }: AddPaymen
                             Cancel
                         </Button>
                         <Button type="submit" disabled={loading || !stripe || !elements}>
+                            {loading && <LoaderCircle className="animate-spin" />}
                             {loading ? 'Adding...' : 'Add payment method'}
                         </Button>
                     </div>

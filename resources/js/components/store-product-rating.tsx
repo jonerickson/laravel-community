@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useApiRequest } from '@/hooks/use-api-request';
 import { cn } from '@/lib/utils';
-import { Star } from 'lucide-react';
+import { LoaderCircle, Star } from 'lucide-react';
 import { useState } from 'react';
 
 interface ProductRatingProps {
@@ -91,6 +91,7 @@ export function StoreProductRating({ product, onRatingAdded }: ProductRatingProp
             </div>
 
             <Button onClick={handleSubmit} disabled={isSubmitting || rating === 0} className="w-full">
+                {isSubmitting && <LoaderCircle className="animate-spin" />}
                 {isSubmitting ? 'Submitting...' : 'Submit review'}
             </Button>
         </div>

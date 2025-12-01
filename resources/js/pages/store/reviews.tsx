@@ -10,7 +10,7 @@ import AppLayout from '@/layouts/app-layout';
 import { cn, currency, pluralize } from '@/lib/utils';
 import { Head, InfiniteScroll, router, useForm, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
-import { ArrowLeft, MessageSquare, Star } from 'lucide-react';
+import { ArrowLeft, LoaderCircle, MessageSquare, Star } from 'lucide-react';
 import { useState } from 'react';
 import SharedData = App.Data.SharedData;
 
@@ -149,6 +149,7 @@ export default function Reviews({ subscription, reviews }: ReviewsPageProps) {
                                 </div>
 
                                 <Button type="submit" disabled={processing || rating === 0} className="w-full">
+                                    {processing && <LoaderCircle className="animate-spin" />}
                                     {processing ? 'Submitting...' : 'Submit review'}
                                 </Button>
                             </form>

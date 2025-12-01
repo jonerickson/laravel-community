@@ -6,7 +6,7 @@ import { useCartOperations } from '@/hooks/use-cart-operations';
 import { getPriceDisplay } from '@/utils/price-display';
 import { stripCharacters, truncate } from '@/utils/truncate';
 import { Link, router } from '@inertiajs/react';
-import { ImageIcon } from 'lucide-react';
+import { ImageIcon, LoaderCircle } from 'lucide-react';
 
 export default function StoreCategoriesProductItem({ product }: { product: App.Data.ProductData }) {
     const { addItem, loading } = useCartOperations();
@@ -53,6 +53,7 @@ export default function StoreCategoriesProductItem({ product }: { product: App.D
                         <Link href={route('store.products.show', { product: product.slug })}>View</Link>
                     </Button>
                     <Button className="w-full" onClick={handleAddToCart} disabled={loading === product.id}>
+                        {loading && <LoaderCircle className="animate-spin" />}
                         {loading === product.id ? 'Adding...' : product.defaultPrice ? 'Add to cart' : 'Select options'}
                     </Button>
                 </div>

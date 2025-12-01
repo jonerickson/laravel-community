@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 // No import needed, using App.Data.SupportTicketData directly
 import { useForm } from '@inertiajs/react';
-import { X } from 'lucide-react';
+import { LoaderCircle, X } from 'lucide-react';
 
 interface SupportTicketAttachmentFormProps {
     ticket: App.Data.SupportTicketData;
@@ -79,6 +79,7 @@ export default function SupportTicketAttachmentForm({ ticket, onCancel, onSucces
 
                     <div className="flex items-center gap-2">
                         <Button type="submit" disabled={processing || !data.attachment}>
+                            {processing && <LoaderCircle className="animate-spin" />}
                             {processing ? 'Uploading...' : 'Upload attachment'}
                         </Button>
                         <Button type="button" variant="outline" onClick={handleCancel}>

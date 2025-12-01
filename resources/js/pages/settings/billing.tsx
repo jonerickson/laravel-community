@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, LoaderCircle } from 'lucide-react';
 import { route } from 'ziggy-js';
 
 interface BillingProps {
@@ -210,7 +210,10 @@ export default function Billing({ user, portalUrl }: BillingProps) {
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <Button disabled={processing}>{processing ? 'Saving...' : 'Save'}</Button>
+                            <Button disabled={processing}>
+                                {processing && <LoaderCircle className="animate-spin" />}
+                                {processing ? 'Saving...' : 'Save'}
+                            </Button>
 
                             <Transition
                                 show={recentlySuccessful}

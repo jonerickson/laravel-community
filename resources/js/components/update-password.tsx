@@ -7,6 +7,7 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { LoaderCircle } from 'lucide-react';
 
 type PasswordForm = {
     current_password: string;
@@ -86,7 +87,10 @@ export default function UpdatePassword() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <Button disabled={processing}>{processing ? 'Updating...' : hasPassword ? 'Update password' : 'Set password'}</Button>
+                    <Button disabled={processing}>
+                        {processing && <LoaderCircle className="animate-spin" />}
+                        {processing ? 'Updating...' : hasPassword ? 'Update password' : 'Set password'}
+                    </Button>
                     <Transition
                         show={recentlySuccessful}
                         enter="transition ease-in-out"
