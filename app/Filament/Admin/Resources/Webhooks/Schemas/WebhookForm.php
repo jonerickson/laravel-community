@@ -232,7 +232,7 @@ class WebhookForm
     protected static function generateStateForEvent(string $event, int $modelId): array
     {
         return match ($event) {
-            OrderCreated::class, OrderCancelled::class, OrderRefunded::class, PaymentSucceeded::class => ['order' => Order::query()->with(['items', 'discounts', 'user'])->findOrFail($modelId)],
+            OrderCreated::class, OrderCancelled::class, OrderRefunded::class, PaymentSucceeded::class => ['order' => Order::query()->with(['items.price.product', 'discounts', 'user.integrations'])->findOrFail($modelId)],
             SubscriptionCreated::class, SubscriptionUpdated::class, SubscriptionDeleted::class => ['user' => Auth::user(), 'product' => Product::query()->findOrFail($modelId)],
             UserCreated::class, UserUpdated::class, UserDeleted::class => ['user' => User::query()->with(['integrations', 'pendingReports'])->findOrFail($modelId)],
         };
