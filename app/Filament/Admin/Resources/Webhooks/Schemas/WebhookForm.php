@@ -123,10 +123,12 @@ class WebhookForm
     protected static function payloadAction(): Action
     {
         return Action::make('generate_preview')
-            ->label('Example Payload')
+            ->label('See Example Object')
             ->icon(Heroicon::OutlinedCodeBracket)
             ->slideOver()
-            ->modalDescription('The schema below represents the data passed to the webhook.')
+            ->modalCancelActionLabel('Close')
+            ->modalSubmitAction(false)
+            ->modalDescription('The data below represents the event object schema passed to the webhook as it is sent.')
             ->schema([
                 Select::make('event')
                     ->helperText('The event triggering the webhook.')
@@ -134,7 +136,7 @@ class WebhookForm
                     ->options(self::events()),
                 Select::make('model')
                     ->label('Object')
-                    ->helperText('Select am example object to use to generate the payload.')
+                    ->helperText('Select an example object to use to view the schema.')
                     ->disabled(fn (Get $get): bool => blank($get('event')))
                     ->searchable()
                     ->live()
@@ -150,9 +152,10 @@ class WebhookForm
                             return;
                         }
 
-                        $set('payload', self::generatePayloadForEvent($event, self::generateStateForEvent($event, $state)));
+                        $set('schema', self::generatePayloadForEvent($event, self::generateStateForEvent($event, $state)));
                     }),
-                CodeEditor::make('payload')
+                CodeEditor::make('schema')
+                    ->helperText('The schema that will be passed to the webook for the selected event.')
                     ->language(CodeEditor\Enums\Language::Json),
             ]);
     }
