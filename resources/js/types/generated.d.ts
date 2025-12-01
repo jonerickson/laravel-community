@@ -207,12 +207,12 @@ declare namespace App.Data {
         quantityAvailable: number;
         quantityReserved: number;
         quantityDamaged: number;
+        quantityOnHand: number;
         reorderPoint: number | null;
         reorderQuantity: number | null;
         warehouseLocation: string | null;
         trackInventory: boolean;
         allowBackorder: boolean;
-        quantityOnHand: number;
         isLowStock: boolean;
         isOutOfStock: boolean;
     };
@@ -676,7 +676,7 @@ declare namespace App.Enums {
         | '503';
     export type InventoryAlertType = 'low_stock' | 'out_of_stock' | 'reorder';
     export type InventoryReservationStatus = 'active' | 'fulfilled' | 'cancelled' | 'expired';
-    export type InventoryTransactionType = 'adjustment' | 'sale' | 'return' | 'damage' | 'restock';
+    export type InventoryTransactionType = 'adjustment' | 'sale' | 'return' | 'damage' | 'restock' | 'reserved' | 'released';
     export type KnowledgeBaseArticleType = 'guide' | 'faq' | 'changelog' | 'troubleshooting' | 'announcement' | 'other';
     export type OrderRefundReason = 'duplicate' | 'fraudulent' | 'requested_by_customer' | 'other';
     export type OrderStatus =
