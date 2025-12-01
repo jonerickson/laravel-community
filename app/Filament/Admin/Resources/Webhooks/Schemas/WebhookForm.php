@@ -140,6 +140,7 @@ class WebhookForm
                     ->disabled(fn (Get $get): bool => blank($get('event')))
                     ->searchable()
                     ->live()
+                    ->placeholder(fn (Get $get) => filled($get('event')) ? 'Select an object' : 'Select an event from above')
                     ->options(function (Get $get): array {
                         if (blank($event = $get('event'))) {
                             return [];
