@@ -201,9 +201,9 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                 <HeadingSmall title="Items in your shopping cart" />
                             </div>
 
-                            <ul role="list" className="divide-y divide-border border-t border-b border-border">
+                            <ul role="list" className="divide-y divide-border overflow-hidden rounded-xl">
                                 {items.map((item) => (
-                                    <li key={item.productId} className="relative flex items-start bg-background p-4 sm:p-6">
+                                    <li key={item.productId} className="relative flex flex-col items-start gap-4 bg-card p-6 sm:flex-row sm:gap-6">
                                         <div className="shrink-0">
                                             {item.product?.featuredImageUrl ? (
                                                 <img
@@ -218,7 +218,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                             )}
                                         </div>
 
-                                        <div className="ml-4 flex flex-1 flex-col sm:ml-6">
+                                        <div className="flex flex-1 flex-col">
                                             <div className="relative flex h-full flex-col pr-9 sm:pr-0">
                                                 <div className="flex flex-1 flex-col gap-3">
                                                     <div className="flex-grow">
@@ -324,7 +324,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                             </ul>
                         </section>
 
-                        <section aria-labelledby="summary-heading" className="relative mt-16 rounded-lg bg-muted p-4 sm:p-6 lg:col-span-5 lg:mt-0">
+                        <section aria-labelledby="summary-heading" className="relative mt-16 rounded-lg bg-card p-4 sm:p-6 lg:col-span-5 lg:mt-0">
                             <HeadingSmall title="Order summary" />
 
                             <dl className="divide-shadow-muted mt-6 divide-y">

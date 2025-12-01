@@ -50,7 +50,7 @@ class CategoryController extends Controller
             ->whereHas('categories', fn (Builder $query) => $query->whereKey($category->id))
             ->approved()
             ->visible()
-            ->with('defaultPrice')
+            ->with(['defaultPrice', 'inventoryItem'])
             ->with(['prices' => function (Price|HasMany $query): void {
                 $query->active();
             }])

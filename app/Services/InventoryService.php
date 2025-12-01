@@ -25,9 +25,8 @@ class InventoryService
         int $quantity,
         InventoryTransactionType $type,
         ?string $reason = null,
-        ?int $performedBy = null
     ): InventoryTransaction {
-        return DB::transaction(function () use ($inventoryItem, $quantity, $type, $reason, $performedBy) {
+        return DB::transaction(function () use ($inventoryItem, $quantity, $type, $reason) {
             $quantityBefore = $inventoryItem->quantity_available;
 
             $inventoryItem->increment('quantity_available', $quantity);
@@ -39,7 +38,6 @@ class InventoryService
                 'quantity_before' => $quantityBefore,
                 'quantity_after' => $inventoryItem->quantity_available,
                 'reason' => $reason,
-                'created_by' => $performedBy,
             ]);
 
             $this->checkAndCreateAlerts($inventoryItem);
@@ -97,60 +95,81 @@ class InventoryService
     /**
      * @throws Throwable
      */
-    public function fulfillReservation(InventoryReservation $reservation): void
+    public function fulfillReservations(Order $order): void
     {
-        DB::transaction(function () use ($reservation): void {
-            $inventoryItem = $reservation->inventoryItem;
+        $order->loadMissing(['prices.product.inventoryItem.reservations']);
 
-            $quantityBefore = $inventoryItem->quantity_reserved;
+        DB::transaction(function () use ($order): void {
+            foreach ($order->items as $item) {
+                $inventoryItem = $item->price->product->inventoryItem;
 
-            $inventoryItem->decrement('quantity_reserved', $reservation->quantity);
-            $inventoryItem->refresh();
+                if (! $inventoryItem) {
+                    continue;
+                }
 
-            $inventoryItem->transactions()->create([
-                'type' => InventoryTransactionType::Sale,
-                'quantity' => -$reservation->quantity,
-                'quantity_before' => $quantityBefore,
-                'quantity_after' => $inventoryItem->quantity_reserved,
-                'reference_type' => $reservation->order_id ? Order::class : null,
-                'reference_id' => $reservation->order_id,
-            ]);
+                foreach ($inventoryItem->reservations->filter(fn (InventoryReservation $reservation) => $reservation->status === InventoryReservationStatus::Active) as $reservation) {
+                    $quantityBefore = $inventoryItem->quantity_on_hand;
 
-            $reservation->update([
-                'status' => InventoryReservationStatus::Fulfilled,
-                'fulfilled_at' => now(),
-            ]);
+                    $inventoryItem->decrement('quantity_reserved', $reservation->quantity);
+                    $inventoryItem->refresh();
 
-            $this->checkAndCreateAlerts($inventoryItem);
+                    $inventoryItem->transactions()->create([
+                        'type' => InventoryTransactionType::Sale,
+                        'quantity' => -$reservation->quantity,
+                        'quantity_before' => $quantityBefore,
+                        'quantity_after' => $inventoryItem->quantity_available,
+                        'reference_type' => $reservation->order_id ? Order::class : null,
+                        'reference_id' => $reservation->order_id,
+                        'created_by' => $order->user_id,
+                    ]);
+
+                    $reservation->update([
+                        'status' => InventoryReservationStatus::Fulfilled,
+                        'fulfilled_at' => now(),
+                    ]);
+
+                    $this->checkAndCreateAlerts($inventoryItem);
+                }
+            }
         });
     }
 
     /**
      * @throws Throwable
      */
-    public function releaseReservation(InventoryReservation $reservation): void
+    public function releaseReservations(Order $order): void
     {
-        DB::transaction(function () use ($reservation): void {
-            $inventoryItem = $reservation->inventoryItem;
+        $order->loadMissing(['prices.product.inventoryItem.reservations']);
 
-            $quantityBefore = $inventoryItem->quantity_available;
+        DB::transaction(function () use ($order): void {
+            foreach ($order->items as $item) {
+                $inventoryItem = $item->price->product->inventoryItem;
 
-            $inventoryItem->increment('quantity_available', $reservation->quantity);
-            $inventoryItem->decrement('quantity_reserved', $reservation->quantity);
-            $inventoryItem->refresh();
+                if (! $inventoryItem) {
+                    continue;
+                }
 
-            $inventoryItem->transactions()->create([
-                'type' => InventoryTransactionType::Released,
-                'quantity' => $reservation->quantity,
-                'quantity_before' => $quantityBefore,
-                'quantity_after' => $inventoryItem->quantity_available,
-                'reference_type' => $reservation->order_id ? Order::class : null,
-                'reference_id' => $reservation->order_id,
-            ]);
+                foreach ($inventoryItem->reservations->filter(fn (InventoryReservation $reservation) => $reservation->status === InventoryReservationStatus::Active) as $reservation) {
+                    $quantityBefore = $inventoryItem->quantity_available;
 
-            $reservation->update(['status' => InventoryReservationStatus::Cancelled]);
+                    $inventoryItem->increment('quantity_available', $reservation->quantity);
+                    $inventoryItem->decrement('quantity_reserved', $reservation->quantity);
+                    $inventoryItem->refresh();
 
-            $this->checkAndCreateAlerts($inventoryItem);
+                    $inventoryItem->transactions()->create([
+                        'type' => InventoryTransactionType::Released,
+                        'quantity' => $reservation->quantity,
+                        'quantity_before' => $quantityBefore,
+                        'quantity_after' => $inventoryItem->quantity_available,
+                        'reference_type' => $reservation->order_id ? Order::class : null,
+                        'reference_id' => $reservation->order_id,
+                    ]);
+
+                    $reservation->update(['status' => InventoryReservationStatus::Cancelled]);
+
+                    $this->checkAndCreateAlerts($inventoryItem);
+                }
+            }
         });
     }
 

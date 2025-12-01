@@ -55,6 +55,7 @@ class TransactionsRelationManager extends RelationManager
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('reason')
+                    ->placeholder('No Reason Provided')
                     ->searchable()
                     ->wrap()
                     ->toggleable(),
@@ -68,8 +69,13 @@ class TransactionsRelationManager extends RelationManager
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('reference_type')
-                    ->label('Reference')
+                    ->label('Reference Type')
                     ->formatStateUsing(fn (?string $state): string => $state ? class_basename($state) : 'N/A')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('reference.id')
+                    ->label('Reference ID')
+                    ->searchable()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label('Date')

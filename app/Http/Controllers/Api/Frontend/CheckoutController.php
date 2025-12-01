@@ -108,12 +108,24 @@ class CheckoutController
                     status: 400
                 );
             }
+        }
 
+        $result = $this->paymentManager->getCheckoutUrl(
+            order: $order,
+        );
+
+        if (! is_string($result)) {
+            return ApiResource::error(
+                message: 'Failed to create checkout session. Please try again.',
+            );
+        }
+
+        foreach ($cart->cartItems as $item) {
             if ($item->product->inventoryItem?->trackInventory) {
-                if ($item->product->inventoryItem->quantityAvailableForSale <= 0) {
+                if ($item->product->inventoryItem->quantityAvailable <= 0 && ! $item->product->inventoryItem->allowBackorder) {
                     return ApiResource::error(
-                        message: sprintf('Insufficient inventory for %s.', $item->name),
-                        errors: ['inventory' => [sprintf('Not enough stock available for %s.', $item->name)]],
+                        message: sprintf('There is not enough stock available for %s. Please adjust your quantity and try again.', $item->name),
+                        errors: ['inventory' => [sprintf('There is not enough stock available for %s. Please adjust your quantity and try again.', $item->name)]],
                         status: 400
                     );
                 }
@@ -128,16 +140,6 @@ class CheckoutController
                     );
                 }
             }
-        }
-
-        $result = $this->paymentManager->getCheckoutUrl(
-            order: $order,
-        );
-
-        if (! is_string($result)) {
-            return ApiResource::error(
-                message: 'Failed to create checkout session. Please try again.',
-            );
         }
 
         $checkoutData = CheckoutData::from([

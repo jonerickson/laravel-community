@@ -29,25 +29,26 @@ export default function StoreCategoriesProductItem({ product }: { product: App.D
                     <ImageIcon className="size-12 text-muted-foreground" />
                 </div>
             )}
-            <div className="flex flex-1 flex-col pt-4">
-                <div className="flex-1">
-                    <div className="mb-2 flex items-center gap-2">
-                        <HeadingSmall title={product.name} description={truncate(stripCharacters(product.description || ''))} />
-                    </div>
-                    <div className="mt-3">
+            <div className="flex flex-1 flex-col gap-2 pt-4">
+                <div className="flex-1 space-y-2">
+                    {(product.isFeatured || product.isMarketplaceProduct || product.inventoryItem?.isLowStock) && (
+                        <div className="flex flex-wrap items-center gap-2">
+                            {product.isFeatured && (
+                                <Badge variant="default" className="bg-info text-xs text-info-foreground">
+                                    Featured
+                                </Badge>
+                            )}
+                            {product.inventoryItem && product.inventoryItem.isLowStock && <Badge variant="warning">Low Stock</Badge>}
+                            {product.isMarketplaceProduct && <Badge variant="secondary">Community Provided Provided</Badge>}
+                        </div>
+                    )}
+                    <HeadingSmall title={product.name} description={truncate(stripCharacters(product.description || ''))} />
+                    <div className="mt-2">
                         <StarRating rating={product.averageRating || 0} size="sm" className="mb-1" />
                     </div>
                 </div>
-                <div className="mt-3 space-y-2">
-                    <div className="flex items-center gap-2">
-                        <p className="text-base font-medium text-primary">{getPriceDisplay(product)}</p>
-                        {product.isFeatured && (
-                            <Badge variant="default" className="bg-info text-xs text-info-foreground">
-                                Featured
-                            </Badge>
-                        )}
-                        {product.isMarketplaceProduct && <Badge variant="secondary">Community Provided</Badge>}
-                    </div>
+                <div className="space-y-2">
+                    <p className="text-base font-medium text-primary">{getPriceDisplay(product)}</p>
                     <Button className="w-full" variant="outline" asChild>
                         <Link href={route('store.products.show', { product: product.slug })}>View</Link>
                     </Button>

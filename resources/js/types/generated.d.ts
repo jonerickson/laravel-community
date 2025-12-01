@@ -213,7 +213,6 @@ declare namespace App.Data {
         trackInventory: boolean;
         allowBackorder: boolean;
         quantityOnHand: number;
-        quantityAvailableForSale: number;
         isLowStock: boolean;
         isOutOfStock: boolean;
     };

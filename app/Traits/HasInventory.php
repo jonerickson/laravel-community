@@ -7,7 +7,6 @@ namespace App\Traits;
 use App\Models\InventoryItem;
 use App\Models\InventoryTransaction;
 use Eloquent;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -29,11 +28,6 @@ trait HasInventory
             'product_id',
             'inventory_item_id'
         );
-    }
-
-    public function availableQuantity(): Attribute
-    {
-        return Attribute::get(fn (): int => $this->inventoryItem?->quantity_available_for_sale ?? 0);
     }
 
     public function hasStock(int $quantity = 1): bool

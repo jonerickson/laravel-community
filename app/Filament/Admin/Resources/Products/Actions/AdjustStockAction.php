@@ -12,7 +12,6 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Support\Icons\Heroicon;
-use Illuminate\Support\Facades\Auth;
 use Override;
 
 class AdjustStockAction extends Action
@@ -44,7 +43,6 @@ class AdjustStockAction extends Action
                 (int) $data['quantity'],
                 InventoryTransactionType::Adjustment,
                 $data['reason'],
-                Auth::id()
             );
             $action->success();
         });

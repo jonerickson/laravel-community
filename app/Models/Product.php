@@ -75,7 +75,6 @@ use Illuminate\Support\Str;
  * @property-read Collection<int, Comment> $approvedReviews
  * @property-read int|null $approved_reviews_count
  * @property-read User|null $approver
- * @property-read int $available_quantity
  * @property-read int|float $average_rating
  * @property-read Collection<int, ProductCategory> $categories
  * @property-read int|null $categories_count

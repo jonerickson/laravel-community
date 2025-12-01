@@ -45,21 +45,7 @@ class UpdateProductInventory implements ShouldQueue
      */
     protected function handleOrderSucceeded(InventoryService $inventoryService, Order $order): void
     {
-        $orderItems = $order->items()
-            ->with('price.product.inventoryItem.reservations')
-            ->get();
-
-        foreach ($orderItems as $item) {
-            $reservations = $item->price?->product?->inventoryItem?->reservations;
-
-            if (blank($reservations)) {
-                continue;
-            }
-
-            foreach ($reservations as $reservation) {
-                $inventoryService->fulfillReservation($reservation);
-            }
-        }
+        $inventoryService->fulfillReservations($order);
     }
 
     /**
@@ -91,20 +77,6 @@ class UpdateProductInventory implements ShouldQueue
      */
     protected function handleOrderCancelled(InventoryService $inventoryService, Order $order): void
     {
-        $orderItems = $order->items()
-            ->with('price.product.inventoryItem.reservations')
-            ->get();
-
-        foreach ($orderItems as $item) {
-            $reservations = $item->price?->product?->inventoryItem?->reservations;
-
-            if (blank($reservations)) {
-                continue;
-            }
-
-            foreach ($reservations as $reservation) {
-                $inventoryService->releaseReservation($reservation);
-            }
-        }
+        $inventoryService->releaseReservations($order);
     }
 }

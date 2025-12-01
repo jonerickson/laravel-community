@@ -25,6 +25,8 @@ class InventoryItemData extends Data
 
     public int $quantityDamaged;
 
+    public int $quantityOnHand;
+
     public ?int $reorderPoint = null;
 
     public ?int $reorderQuantity = null;
@@ -34,10 +36,6 @@ class InventoryItemData extends Data
     public bool $trackInventory;
 
     public bool $allowBackorder;
-
-    public int $quantityOnHand;
-
-    public int $quantityAvailableForSale;
 
     public bool $isLowStock;
 

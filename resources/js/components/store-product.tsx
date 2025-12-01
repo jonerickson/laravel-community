@@ -3,7 +3,7 @@ import HeadingSmall from '@/components/heading-small';
 import RichEditorContent from '@/components/rich-editor-content';
 import { StarRating } from '@/components/star-rating';
 import { StoreProductRatingDialog } from '@/components/store-product-rating-dialog';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -93,16 +93,16 @@ export default function Product({ product: productData, reviews }: ProductProps)
                     {productData.inventoryItem?.trackInventory && (
                         <div className="mt-4 flex items-center gap-2">
                             <Package className="h-4 w-4 text-muted-foreground" />
-                            {!productData.inventoryItem.isOutOfStock ? (
-                                <Badge variant="outline" className="border-green-500 text-green-700 dark:text-green-400">
+                            {!productData.inventoryItem.isOutOfStock && productData.inventoryItem.quantityAvailable > 0 ? (
+                                <Badge variant="outline" className="border-success text-success">
                                     {productData.inventoryItem.quantityAvailable} in stock
                                 </Badge>
                             ) : productData.inventoryItem.allowBackorder ? (
-                                <Badge variant="outline" className="border-yellow-500 text-yellow-700 dark:text-yellow-400">
+                                <Badge variant="outline" className="border-warning text-warning">
                                     Available on backorder
                                 </Badge>
                             ) : (
-                                <Badge variant="outline" className="border-red-500 text-red-700 dark:text-red-400">
+                                <Badge variant="outline" className="border-destructive text-destructive">
                                     Out of stock
                                 </Badge>
                             )}
@@ -154,15 +154,33 @@ export default function Product({ product: productData, reviews }: ProductProps)
                         </div>
                     )}
 
+                    {productData.inventoryItem?.trackInventory &&
+                        productData.inventoryItem.isOutOfStock &&
+                        !productData.inventoryItem.allowBackorder && (
+                            <Alert variant="destructive" className="mt-6">
+                                <AlertTriangle className="h-4 w-4" />
+                                <AlertTitle>Out Of Stock</AlertTitle>
+                                <AlertDescription>This product is currently out of stock and unavailable for purchase.</AlertDescription>
+                            </Alert>
+                        )}
+
                     {productData && (
-                        <div className="mt-8 space-y-4">
+                        <div className="mt-6 space-y-4">
                             {productData.prices && productData.prices.length > 0 && (
                                 <div className="space-y-2">
                                     <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
                                         <label htmlFor="price" className="text-sm font-medium">
                                             Price:
                                         </label>
-                                        <Select value={selectedPriceId?.toString() || ''} onValueChange={handlePriceChange}>
+                                        <Select
+                                            value={selectedPriceId?.toString() || ''}
+                                            onValueChange={handlePriceChange}
+                                            disabled={
+                                                productData.inventoryItem?.trackInventory &&
+                                                productData.inventoryItem.isOutOfStock &&
+                                                !productData.inventoryItem.allowBackorder
+                                            }
+                                        >
                                             <SelectTrigger className="w-full">
                                                 <SelectValue placeholder="Select price" />
                                             </SelectTrigger>
@@ -200,7 +218,9 @@ export default function Product({ product: productData, reviews }: ProductProps)
                                         <SelectContent>
                                             {(() => {
                                                 const maxQuantity =
-                                                    productData.inventoryItem?.trackInventory && !productData.inventoryItem.isOutOfStock
+                                                    productData.inventoryItem?.trackInventory &&
+                                                    !productData.inventoryItem.isOutOfStock &&
+                                                    !productData.inventoryItem.allowBackorder
                                                         ? Math.min(10, productData.inventoryItem.quantityAvailable)
                                                         : 10;
                                                 return Array.from({ length: maxQuantity }, (_, i) => i + 1).map((num) => (
@@ -216,15 +236,6 @@ export default function Product({ product: productData, reviews }: ProductProps)
                             </div>
                         </div>
                     )}
-
-                    {productData.inventoryItem?.trackInventory &&
-                        productData.inventoryItem.isOutOfStock &&
-                        !productData.inventoryItem.allowBackorder && (
-                            <Alert variant="destructive" className="mt-6">
-                                <AlertTriangle className="h-4 w-4" />
-                                <AlertDescription>This product is currently out of stock and unavailable for purchase.</AlertDescription>
-                            </Alert>
-                        )}
 
                     <form onSubmit={handleSubmit}>
                         <Button

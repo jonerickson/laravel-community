@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @property int $id
  * @property int $product_id
- * @property string $sku
+ * @property string|null $sku
  * @property int $quantity_available
  * @property int $quantity_reserved
  * @property int $quantity_damaged
@@ -28,7 +28,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read bool $is_low_stock
  * @property-read bool $is_out_of_stock
  * @property-read Product $product
- * @property-read int $quantity_available_for_sale
  * @property-read int $quantity_on_hand
  * @property-read \Illuminate\Database\Eloquent\Collection<int, InventoryReservation> $reservations
  * @property-read int|null $reservations_count
@@ -69,6 +68,12 @@ class InventoryItem extends Model
         'allow_backorder',
     ];
 
+    protected $appends = [
+        'is_low_stock',
+        'is_out_of_stock',
+        'quantity_on_hand',
+    ];
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
@@ -92,11 +97,6 @@ class InventoryItem extends Model
     public function quantityOnHand(): Attribute
     {
         return Attribute::get(fn (): int => $this->quantity_available + $this->quantity_reserved);
-    }
-
-    public function quantityAvailableForSale(): Attribute
-    {
-        return Attribute::get(fn (): int => max(0, $this->quantity_available - $this->quantity_reserved));
     }
 
     public function isLowStock(): Attribute
