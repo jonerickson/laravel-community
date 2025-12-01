@@ -645,10 +645,14 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                                     <span className="font-medium text-foreground">{pendingChangePlan?.planName}</span>
                                 </div>
                             </div>
-                            <div className="rounded-md bg-info-foreground p-3">
+                            <div className="space-y-2 rounded-md bg-info-foreground p-3">
                                 <p className="text-xs text-info">
                                     Your billing will be prorated based on the time remaining in your current billing cycle. The change will take
                                     effect immediately and the updated charges, if any, will be available on the next invoice.
+                                </p>
+                                <p className="text-xs text-info">
+                                    <span className="font-bold">NOTE:</span> If you are currently on a trial, you will be charged the full amount of
+                                    the new subscription price immediately.
                                 </p>
                             </div>
                         </div>

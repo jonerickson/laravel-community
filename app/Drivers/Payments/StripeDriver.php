@@ -594,7 +594,10 @@ class StripeDriver implements PaymentProcessor
                 PaymentBehavior::PendingIfIncomplete => $subscription->pendingIfPaymentFails(),
             };
 
-            $subscription->endTrial();
+            if ($subscription->onTrial()) {
+                $subscription->noProrate()->endTrial();
+            }
+
             $subscription->swap($price->external_price_id);
 
             return true;
