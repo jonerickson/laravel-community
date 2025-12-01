@@ -150,8 +150,6 @@ class WebhookForm
                             return;
                         }
 
-                        dump($state, $event);
-
                         $set('payload', self::generatePayloadForEvent($event, self::generateStateForEvent($event, $state)));
                     }),
                 CodeEditor::make('payload')
