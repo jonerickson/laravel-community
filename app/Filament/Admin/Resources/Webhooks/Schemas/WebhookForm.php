@@ -232,7 +232,7 @@ class WebhookForm
     protected static function generateStateForEvent(string $event, int $modelId): array
     {
         return match ($event) {
-            OrderCreated::class, OrderCancelled::class, OrderRefunded::class, PaymentSucceeded::class => ['order' => Order::query()->with(['items', 'discounts'])->findOrFail($modelId)],
+            OrderCreated::class, OrderCancelled::class, OrderRefunded::class, PaymentSucceeded::class => ['order' => Order::query()->with(['items', 'discounts', 'user'])->findOrFail($modelId)],
             SubscriptionCreated::class, SubscriptionUpdated::class, SubscriptionDeleted::class => ['user' => Auth::user(), 'product' => Product::query()->findOrFail($modelId)],
             UserCreated::class, UserUpdated::class, UserDeleted::class => ['user' => User::query()->with(['integrations', 'pendingReports'])->findOrFail($modelId)],
         };
@@ -241,11 +241,11 @@ class WebhookForm
     protected static function getExampleOptionsForEvent(string $event): array
     {
         return match ($event) {
-            OrderCreated::class, PaymentSucceeded::class => Order::query()->completed()->limit(50)->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
-            OrderCancelled::class => Order::query()->cancelled()->limit(50)->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
-            OrderRefunded::class, => Order::query()->refunded()->limit(50)->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
-            SubscriptionCreated::class, SubscriptionUpdated::class, SubscriptionDeleted::class => Product::query()->subscriptions()->limit(50)->get()->mapWithKeys(fn (Product $product): array => [$product->getKey() => $product->name])->toArray(),
-            UserCreated::class, UserUpdated::class, UserDeleted::class => User::query()->limit(50)->get()->mapWithKeys(fn (User $user): array => [$user->getKey() => $user->name])->toArray()
+            OrderCreated::class, PaymentSucceeded::class => Order::query()->completed()->latest()->limit(50)->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
+            OrderCancelled::class => Order::query()->cancelled()->latest()->limit(50)->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
+            OrderRefunded::class, => Order::query()->refunded()->latest()->limit(50)->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
+            SubscriptionCreated::class, SubscriptionUpdated::class, SubscriptionDeleted::class => Product::query()->subscriptions()->orderBy('name')->limit(50)->get()->mapWithKeys(fn (Product $product): array => [$product->getKey() => $product->name])->toArray(),
+            UserCreated::class, UserUpdated::class, UserDeleted::class => User::query()->orderBy('name')->limit(50)->get()->mapWithKeys(fn (User $user): array => [$user->getKey() => $user->name])->toArray()
         };
     }
 
