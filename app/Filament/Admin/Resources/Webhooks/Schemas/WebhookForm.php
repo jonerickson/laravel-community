@@ -16,7 +16,11 @@ use App\Events\UserCreated;
 use App\Events\UserDeleted;
 use App\Events\UserUpdated;
 use App\Facades\ExpressionLanguage;
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\User;
 use Closure;
+use Filament\Actions\Action;
 use Filament\Forms\Components\CodeEditor;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Radio;
@@ -24,7 +28,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Throwable;
@@ -40,17 +46,7 @@ class WebhookForm
                     ->schema([
                         Select::make('event')
                             ->helperText('The event that will trigger the webhook to be sent.')
-                            ->options([
-                                OrderCreated::class => 'Order Created',
-                                OrderCancelled::class => 'Order Cancelled',
-                                OrderRefunded::class => 'Order Refunded',
-                                PaymentSucceeded::class => 'Payment Succeeded',
-                                SubscriptionCreated::class => 'Subscription Created',
-                                SubscriptionDeleted::class => 'Subscription Deleted',
-                                UserCreated::class => 'User Created',
-                                UserUpdated::class => 'User Updated',
-                                UserDeleted::class => 'User Deleted',
-                            ])
+                            ->options(self::events())
                             ->required()
                             ->columnSpanFull(),
                         TextInput::make('url')
@@ -76,6 +72,7 @@ class WebhookForm
                             ->options(RenderEngine::class)
                             ->required(),
                         CodeEditor::make('payload_text')
+                            ->hintAction(fn (): Action => self::payloadAction())
                             ->label('Payload')
                             ->visible(fn (Get $get): bool => $get('render') === RenderEngine::Blade)
                             ->language(CodeEditor\Enums\Language::Html)
@@ -85,6 +82,7 @@ class WebhookForm
                             ))
                             ->required(),
                         CodeEditor::make('payload_json')
+                            ->hintAction(fn (): Action => self::payloadAction())
                             ->label('Payload')
                             ->visible(fn (Get $get): bool => $get('render') === RenderEngine::ExpressionLanguage)
                             ->helperText(new HtmlString(<<<'HTML'
@@ -120,5 +118,86 @@ class WebhookForm
                             ->helperText('The secret the webhook will be signed with using the Signature header.'),
                     ]),
             ]);
+    }
+
+    protected static function payloadAction(): Action
+    {
+        return Action::make('generate_preview')
+            ->label('Example Payload')
+            ->icon(Heroicon::OutlinedCodeBracket)
+            ->slideOver()
+            ->modalDescription('The schema below represents the data passed to the webhook.')
+            ->schema([
+                Select::make('event')
+                    ->helperText('The event triggering the webhook.')
+                    ->live()
+                    ->options(self::events()),
+                Select::make('model')
+                    ->label('Object')
+                    ->helperText('Select am example object to use to generate the payload.')
+                    ->disabled(fn (Get $get): bool => blank($get('event')))
+                    ->searchable()
+                    ->live()
+                    ->options(function (Get $get): array {
+                        if (blank($event = $get('event'))) {
+                            return [];
+                        }
+
+                        return self::getExampleOptionsForEvent($event);
+                    })
+                    ->afterStateUpdated(function (Set $set, Get $get, $state): void {
+                        if (blank($state) || blank($event = $get('event'))) {
+                            return;
+                        }
+
+                        dump($state, $event);
+
+                        $set('payload', self::generatePayloadForEvent($event, self::generateStateForEvent($event, $state)));
+                    }),
+                CodeEditor::make('payload')
+                    ->language(CodeEditor\Enums\Language::Json),
+            ]);
+    }
+
+    protected static function generatePayloadForEvent(string $event, array $state): string
+    {
+        if (blank($state)) {
+            return '';
+        }
+
+        return json_encode(app($event, $state), JSON_PRETTY_PRINT);
+    }
+
+    protected static function generateStateForEvent(string $event, int $modelId): array
+    {
+        return match ($event) {
+            OrderCreated::class, OrderCancelled::class, OrderRefunded::class, PaymentSucceeded::class => ['order' => Order::query()->with(['items', 'discounts'])->findOrFail($modelId)],
+            SubscriptionCreated::class, SubscriptionDeleted::class => ['product' => Product::query()->findOrFail($modelId)],
+            UserCreated::class, UserUpdated::class, UserDeleted::class => ['user' => User::query()->with(['integrations', 'pendingReports'])->findOrFail($modelId)],
+        };
+    }
+
+    protected static function getExampleOptionsForEvent(string $event): array
+    {
+        return match ($event) {
+            OrderCreated::class, OrderCancelled::class, OrderRefunded::class, PaymentSucceeded::class => Order::all()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
+            SubscriptionCreated::class, SubscriptionDeleted::class => Product::all()->mapWithKeys(fn (Product $product): array => [$product->getKey() => $product->name])->toArray(),
+            UserCreated::class, UserUpdated::class, UserDeleted::class => User::all()->mapWithKeys(fn (User $user): array => [$user->getKey() => $user->name])->toArray()
+        };
+    }
+
+    protected static function events(): array
+    {
+        return [
+            OrderCreated::class => 'Order Created',
+            OrderCancelled::class => 'Order Cancelled',
+            OrderRefunded::class => 'Order Refunded',
+            PaymentSucceeded::class => 'Payment Succeeded',
+            SubscriptionCreated::class => 'Subscription Created',
+            SubscriptionDeleted::class => 'Subscription Deleted',
+            UserCreated::class => 'User Created',
+            UserUpdated::class => 'User Updated',
+            UserDeleted::class => 'User Deleted',
+        ];
     }
 }

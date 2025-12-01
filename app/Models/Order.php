@@ -9,6 +9,7 @@ use App\Events\OrderSaved;
 use App\Managers\PaymentManager;
 use App\Traits\HasNotes;
 use App\Traits\HasReferenceId;
+use Filament\Support\Contracts\HasLabel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Number;
 use Override;
 
 /**
@@ -86,7 +88,7 @@ use Override;
  *
  * @mixin \Eloquent
  */
-class Order extends Model
+class Order extends Model implements HasLabel
 {
     use HasFactory;
     use HasNotes;
@@ -250,6 +252,11 @@ class Order extends Model
     public function scopeCompleted(Builder $query): void
     {
         $query->where('status', OrderStatus::Succeeded);
+    }
+
+    public function getLabel(): string
+    {
+        return sprintf('%s - %s - %s - %s', $this->reference_id, $this->user->name, Number::currency($this->amount), $this->status->getLabel());
     }
 
     #[Override]
