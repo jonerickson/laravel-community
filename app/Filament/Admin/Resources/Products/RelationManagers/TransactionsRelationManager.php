@@ -38,7 +38,7 @@ class TransactionsRelationManager extends RelationManager
                 TextColumn::make('quantity')
                     ->numeric()
                     ->sortable()
-                    ->formatStateUsing(fn (int $state, InventoryTransaction $record): string => $state > 0 ? "+{$state}" : (string) $state)
+                    ->formatStateUsing(fn (int $state, InventoryTransaction $record): string => $state > 0 ? '+'.$state : (string) $state)
                     ->color(fn (int $state): string => match (true) {
                         $state > 0 => 'success',
                         $state < 0 => 'danger',

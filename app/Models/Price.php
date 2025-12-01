@@ -17,6 +17,7 @@ use Filament\Support\Contracts\HasLabel;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -50,6 +51,7 @@ use Illuminate\Support\Stringable;
  *
  * @method static Builder<static>|Price active()
  * @method static Builder<static>|Price default()
+ * @method static \Database\Factories\PriceFactory factory($count = null, $state = [])
  * @method static Builder<static>|Price inactive()
  * @method static Builder<static>|Price newModelQuery()
  * @method static Builder<static>|Price newQuery()
@@ -80,6 +82,7 @@ use Illuminate\Support\Stringable;
 class Price extends Model implements HasLabel
 {
     use Activateable;
+    use HasFactory;
     use HasMetadata;
     use HasReferenceId;
 

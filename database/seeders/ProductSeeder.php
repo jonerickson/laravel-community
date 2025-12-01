@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Enums\SubscriptionInterval;
 use App\Models\Group;
 use App\Models\Price;
 use App\Models\Product;
@@ -26,54 +25,32 @@ class ProductSeeder extends Seeder
             'featured_image' => 'boilerplate/product-category-1.jpg',
         ])->create();
 
-        $products = Product::factory()
-            ->approved()
-            ->count(4)
-            ->featured()
-            ->recycle($productCategory)
-            ->hasAttached($productCategory, relationship: 'categories')
-            ->hasAttached(Group::firstOrCreate(['name' => 'Customers']), relationship: 'groups')
-            ->product()
-            ->state(new Sequence(
-                fn (Sequence $sequence) => [
-                    'name' => $name = "Product $sequence->index",
+        foreach (range(0, 3) as $index) {
+            Product::factory()
+                ->approved()
+                ->featured()
+                ->recycle($productCategory)
+                ->hasAttached($productCategory, relationship: 'categories')
+                ->hasAttached(Group::firstOrCreate(['name' => 'Customers']), relationship: 'groups')
+                ->product()
+                ->state([
+                    'name' => $name = "Product $index",
                     'slug' => Str::slug($name),
-                    'featured_image' => "boilerplate/product-$sequence->index.jpg",
-                    'external_product_id' => env('STRIPE_PRODUCT_'.($sequence->index + 1)),
-                ],
-            ))
-            ->create();
-
-        foreach ($products as $index => $product) {
-            $priceKey1 = 'STRIPE_PRODUCT_'.($index + 1).'_PRICE_1';
-            $priceKey2 = 'STRIPE_PRODUCT_'.($index + 1).'_PRICE_2';
-
-            if (env($priceKey1)) {
-                Price::factory()
-                    ->for($product)
-                    ->withStripePriceId($priceKey1)
-                    ->oneTime()
-                    ->default()
-                    ->active()
-                    ->create([
-                        'name' => 'Monthly',
-                        'interval_count' => 1,
-                        'interval' => 'month',
-                    ]);
-            }
-
-            if (env($priceKey2)) {
-                Price::factory()
-                    ->for($product)
-                    ->withStripePriceId($priceKey2)
+                    'featured_image' => "boilerplate/product-$index.jpg",
+                    'external_product_id' => env(sprintf('STRIPE_PRODUCT_%s', $index)),
+                ])
+                ->has(Price::factory()
+                    ->count(2)
                     ->oneTime()
                     ->active()
-                    ->create([
-                        'name' => 'Yearly',
-                        'interval_count' => 1,
-                        'interval' => SubscriptionInterval::Yearly,
-                    ]);
-            }
+                    ->state(new Sequence(
+                        fn (Sequence $sequence) => [
+                            'is_default' => $sequence->index === 0,
+                            'external_price_id' => env(sprintf('STRIPE_PRODUCT_%s_PRICE_%s', $index, $sequence->index)),
+                        ]
+                    ))
+                )
+                ->create();
         }
 
         $subscriptionCategory = ProductCategory::factory()->hidden()->active()->state([
@@ -81,20 +58,19 @@ class ProductSeeder extends Seeder
             'slug' => Str::slug($name),
         ])->create();
 
-        $subscriptions = Product::factory()
-            ->approved()
-            ->count(4)
-            ->recycle($subscriptionCategory)
-            ->hasAttached($subscriptionCategory, relationship: 'categories')
-            ->hasAttached(Group::firstOrCreate(['name' => 'Customers']), relationship: 'groups')
-            ->subscription()
-            ->state(new Sequence(
-                fn (Sequence $sequence) => [
-                    'name' => $name = "Subscription $sequence->index",
+        foreach (range(0, 2) as $index) {
+            Product::factory()
+                ->approved()
+                ->recycle($subscriptionCategory)
+                ->hasAttached($subscriptionCategory, relationship: 'categories')
+                ->hasAttached(Group::firstOrCreate(['name' => 'Customers']), relationship: 'groups')
+                ->subscription()
+                ->state([
+                    'name' => $name = "Subscription $index",
                     'slug' => Str::slug($name),
                     'featured_image' => null,
-                    'external_product_id' => null,
-                    'is_featured' => $sequence->index === 1,
+                    'external_product_id' => env(sprintf('STRIPE_SUBSCRIPTION_%s', $index)),
+                    'is_featured' => $index === 1,
                     'is_subscription_only' => true,
                     'metadata' => [
                         'features' => [
@@ -103,40 +79,20 @@ class ProductSeeder extends Seeder
                             'An example of feature 3.',
                         ],
                     ],
-                ],
-            ))
-            ->create();
-
-        foreach ($subscriptions as $index => $subscription) {
-            $priceKey1 = 'STRIPE_SUBSCRIPTION_'.($index + 1).'_PRICE_1';
-            $priceKey2 = 'STRIPE_SUBSCRIPTION_'.($index + 1).'_PRICE_2';
-
-            if (env($priceKey1)) {
-                Price::factory()
-                    ->for($subscription)
-                    ->withStripePriceId($priceKey1)
+                ])
+                ->has(Price::factory()
+                    ->count(2)
                     ->monthly()
-                    ->default()
                     ->active()
-                    ->create([
-                        'name' => 'Monthly',
-                        'interval_count' => 1,
-                        'interval' => 'month',
-                    ]);
-            }
-
-            if (env($priceKey2)) {
-                Price::factory()
-                    ->for($subscription)
-                    ->withStripePriceId($priceKey2)
-                    ->yearly()
-                    ->active()
-                    ->create([
-                        'name' => 'Yearly',
-                        'interval_count' => 1,
-                        'interval' => SubscriptionInterval::Yearly,
-                    ]);
-            }
+                    ->recurring()
+                    ->state(new Sequence(
+                        fn (Sequence $sequence) => [
+                            'is_default' => $sequence->index === 0,
+                            'external_price_id' => env(sprintf('STRIPE_SUBSCRIPTION_%s_PRICE_%s', $index, $sequence->index)),
+                        ]
+                    ))
+                )
+                ->create();
         }
     }
 }

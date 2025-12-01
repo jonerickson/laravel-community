@@ -99,7 +99,7 @@ class InventoryService
      */
     public function fulfillReservation(InventoryReservation $reservation): void
     {
-        DB::transaction(function () use ($reservation) {
+        DB::transaction(function () use ($reservation): void {
             $inventoryItem = $reservation->inventoryItem;
 
             $quantityBefore = $inventoryItem->quantity_reserved;
@@ -112,7 +112,7 @@ class InventoryService
                 'quantity' => -$reservation->quantity,
                 'quantity_before' => $quantityBefore,
                 'quantity_after' => $inventoryItem->quantity_reserved,
-                'reference_type' => $reservation->order_id ? 'App\Models\Order' : null,
+                'reference_type' => $reservation->order_id ? Order::class : null,
                 'reference_id' => $reservation->order_id,
             ]);
 
@@ -130,7 +130,7 @@ class InventoryService
      */
     public function releaseReservation(InventoryReservation $reservation): void
     {
-        DB::transaction(function () use ($reservation) {
+        DB::transaction(function () use ($reservation): void {
             $inventoryItem = $reservation->inventoryItem;
 
             $quantityBefore = $inventoryItem->quantity_available;
@@ -144,7 +144,7 @@ class InventoryService
                 'quantity' => $reservation->quantity,
                 'quantity_before' => $quantityBefore,
                 'quantity_after' => $inventoryItem->quantity_available,
-                'reference_type' => $reservation->order_id ? 'App\Models\Order' : null,
+                'reference_type' => $reservation->order_id ? Order::class : null,
                 'reference_id' => $reservation->order_id,
             ]);
 
@@ -163,7 +163,7 @@ class InventoryService
             $inventoryItem,
             $quantity,
             InventoryTransactionType::Return,
-            "Return from order #{$orderId}"
+            'Return from order #'.$orderId
         );
     }
 
@@ -172,7 +172,7 @@ class InventoryService
      */
     public function markDamaged(InventoryItem $inventoryItem, int $quantity, ?string $reason = null): void
     {
-        DB::transaction(function () use ($inventoryItem, $quantity, $reason) {
+        DB::transaction(function () use ($inventoryItem, $quantity, $reason): void {
             $quantityBefore = $inventoryItem->quantity_available;
 
             $inventoryItem->decrement('quantity_available', $quantity);

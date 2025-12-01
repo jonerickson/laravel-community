@@ -118,6 +118,9 @@ class InventoryItem extends Model
         return $this->quantity_available >= $quantity || $this->allow_backorder;
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [

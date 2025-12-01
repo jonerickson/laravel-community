@@ -59,8 +59,7 @@ class CacheService
             ->visible()
             ->with(['approvedReviews' => fn (MorphMany|Comment $query) => $query->latest()])
             ->with(['prices' => fn (HasMany|Price $query) => $query->recurring()->active()])
-            ->with('categories')
-            ->with('policies.category')
+            ->with(['categories', 'policies.category', 'defaultPrice'])
             ->ordered()
             ->get()
         )->toArray());

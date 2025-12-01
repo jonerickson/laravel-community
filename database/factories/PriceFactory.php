@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\PriceType;
 use App\Enums\SubscriptionInterval;
 use App\Models\Price;
 use App\Models\Product;
@@ -48,6 +49,8 @@ class PriceFactory extends Factory
     public function oneTime(): static
     {
         return $this->state(fn (array $attributes) => [
+            'name' => 'One-Time',
+            'type' => PriceType::OneTime,
             'interval' => null,
             'interval_count' => 1,
         ]);
@@ -56,6 +59,7 @@ class PriceFactory extends Factory
     public function recurring(): static
     {
         return $this->state(fn (array $attributes) => [
+            'type' => PriceType::Recurring,
             'interval' => $this->faker->randomElement(SubscriptionInterval::cases()),
             'interval_count' => $this->faker->numberBetween(1, 12),
         ]);
@@ -64,6 +68,8 @@ class PriceFactory extends Factory
     public function monthly(): static
     {
         return $this->state(fn (array $attributes) => [
+            'name' => 'Monthly',
+            'type' => PriceType::Recurring,
             'interval' => SubscriptionInterval::Monthly,
             'interval_count' => 1,
         ]);
@@ -72,6 +78,8 @@ class PriceFactory extends Factory
     public function yearly(): static
     {
         return $this->state(fn (array $attributes) => [
+            'name' => 'Yearly',
+            'type' => PriceType::Recurring,
             'interval' => SubscriptionInterval::Yearly,
             'interval_count' => 1,
         ]);

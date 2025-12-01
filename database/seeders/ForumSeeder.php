@@ -59,26 +59,6 @@ class ForumSeeder extends Seeder
                     ],
                 ],
             ],
-            [
-                'name' => 'Development',
-                'description' => 'Suggest new features and improvements',
-                'icon' => 'lightbulb',
-                'color' => '#f59e0b',
-                'forums' => [
-                    [
-                        'name' => 'Marketplace',
-                        'description' => 'Buy, sell, and trade products and services with the community.',
-                    ],
-                    [
-                        'name' => 'Requests',
-                        'description' => 'Request new features, improvements, or custom development work.',
-                    ],
-                    [
-                        'name' => 'Development Support',
-                        'description' => 'Get help with coding, APIs, integrations, and development questions.',
-                    ],
-                ],
-            ],
         ];
 
         $author = User::first() ?? User::factory()->create();
@@ -101,7 +81,7 @@ class ForumSeeder extends Seeder
                     ->hasAttached($guestGroup)
                     ->create()
                     ->each(function (Forum $forum) use ($author) {
-                        Topic::factory(5)
+                        Topic::factory(3)
                             ->for($forum)
                             ->for($author, 'author')
                             ->create()
@@ -111,7 +91,7 @@ class ForumSeeder extends Seeder
                                     ->forum()
                                     ->for($topic)
                                     ->for($author, 'author')
-                                    ->count(10)
+                                    ->count(3)
                                     ->create();
                             });
                     });

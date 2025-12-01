@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Products\Actions;
 
 use App\Models\InventoryItem;
+use App\Models\Product;
 use App\Services\InventoryService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
@@ -22,7 +23,7 @@ class RestockAction extends Action
         $this->label('Restock');
         $this->color('success');
         $this->icon(Heroicon::OutlinedPlusCircle);
-        $this->visible(fn (?InventoryItem $record) => ! is_null($record));
+        $this->visible(fn (?Product $record): bool => ! is_null($record));
         $this->successNotificationTitle('The inventory was successfully restocked.');
         $this->modalDescription('Restock and add additional quantity available for the product.');
         $this->schema([
@@ -37,6 +38,7 @@ class RestockAction extends Action
         $this->action(function (InventoryItem $record, array $data, Action $action): void {
             $service = app(InventoryService::class);
             $service->restock($record, (int) $data['quantity'], $data['notes'] ?? null);
+
             $action->success();
         });
     }

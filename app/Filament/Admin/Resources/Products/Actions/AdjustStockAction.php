@@ -6,6 +6,7 @@ namespace App\Filament\Admin\Resources\Products\Actions;
 
 use App\Enums\InventoryTransactionType;
 use App\Models\InventoryItem;
+use App\Models\Product;
 use App\Services\InventoryService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
@@ -24,7 +25,7 @@ class AdjustStockAction extends Action
         $this->label('Adjust stock');
         $this->color('warning');
         $this->icon(Heroicon::OutlinedAdjustmentsHorizontal);
-        $this->visible(fn (?InventoryItem $record) => ! is_null($record));
+        $this->visible(fn (?Product $record): bool => ! is_null($record));
         $this->successNotificationTitle('The stock has been successfully adjusted.');
         $this->modalDescription('Adjust the current stock on hand.');
         $this->schema([
