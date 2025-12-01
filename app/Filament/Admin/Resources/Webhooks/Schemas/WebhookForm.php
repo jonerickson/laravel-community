@@ -12,6 +12,7 @@ use App\Events\OrderRefunded;
 use App\Events\PaymentSucceeded;
 use App\Events\SubscriptionCreated;
 use App\Events\SubscriptionDeleted;
+use App\Events\SubscriptionUpdated;
 use App\Events\UserCreated;
 use App\Events\UserDeleted;
 use App\Events\UserUpdated;
@@ -19,6 +20,7 @@ use App\Facades\ExpressionLanguage;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\Webhook;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\CodeEditor;
@@ -31,6 +33,8 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Throwable;
@@ -72,7 +76,10 @@ class WebhookForm
                             ->options(RenderEngine::class)
                             ->required(),
                         CodeEditor::make('payload_text')
-                            ->hintAction(fn (): Action => self::payloadAction())
+                            ->hintActions([
+                                self::seeExampleObjectAction(),
+                                fn (?Webhook $record, Get $get): Action => self::testPayloadAction($record, $get('event')),
+                            ])
                             ->label('Payload')
                             ->visible(fn (Get $get): bool => $get('render') === RenderEngine::Blade)
                             ->language(CodeEditor\Enums\Language::Html)
@@ -82,7 +89,10 @@ class WebhookForm
                             ))
                             ->required(),
                         CodeEditor::make('payload_json')
-                            ->hintAction(fn (): Action => self::payloadAction())
+                            ->hintActions([
+                                self::seeExampleObjectAction(),
+                                fn (?Webhook $record, Get $get): Action => self::testPayloadAction($record, $get('event')),
+                            ])
                             ->label('Payload')
                             ->visible(fn (Get $get): bool => $get('render') === RenderEngine::ExpressionLanguage)
                             ->helperText(new HtmlString(<<<'HTML'
@@ -120,9 +130,39 @@ class WebhookForm
             ]);
     }
 
-    protected static function payloadAction(): Action
+    protected static function testPayloadAction(?Webhook $webhook = null, ?string $event = null): Action
     {
-        return Action::make('generate_preview')
+        return Action::make('test_payload')
+            ->visible(fn (): bool => filled($event) && filled($webhook))
+            ->icon(Heroicon::OutlinedCommandLine)
+            ->label('Test Payload')
+            ->slideOver()
+            ->modalCancelActionLabel('Close')
+            ->modalSubmitAction(false)
+            ->modalDescription('Generate and test the webhook payload using the example object selected above.')
+            ->schema([
+                Select::make('model')
+                    ->label('Object')
+                    ->helperText('Select an example object to use to view the schema.')
+                    ->searchable()
+                    ->live()
+                    ->options(fn (Get $get): array => self::getExampleOptionsForEvent($event))
+                    ->afterStateUpdated(function (Set $set, Get $get, $state) use ($webhook, $event): void {
+                        if (blank($state)) {
+                            return;
+                        }
+
+                        $set('payload', self::generatePayloadForEvent($webhook, $event, self::generateStateForEvent($event, $state)));
+                    }),
+                CodeEditor::make('payload')
+                    ->helperText('The payload that will be generated when the webhook sends.')
+                    ->language(CodeEditor\Enums\Language::Json),
+            ]);
+    }
+
+    protected static function seeExampleObjectAction(): Action
+    {
+        return Action::make('example_object')
             ->label('See Example Object')
             ->icon(Heroicon::OutlinedCodeBracket)
             ->slideOver()
@@ -140,7 +180,7 @@ class WebhookForm
                     ->disabled(fn (Get $get): bool => blank($get('event')))
                     ->searchable()
                     ->live()
-                    ->placeholder(fn (Get $get) => filled($get('event')) ? 'Select an object' : 'Select an event from above')
+                    ->placeholder(fn (Get $get): string => filled($get('event')) ? 'Select an object' : 'Select an event from above')
                     ->options(function (Get $get): array {
                         if (blank($event = $get('event'))) {
                             return [];
@@ -153,15 +193,36 @@ class WebhookForm
                             return;
                         }
 
-                        $set('schema', self::generatePayloadForEvent($event, self::generateStateForEvent($event, $state)));
+                        $set('schema', self::generateSchemaForEvent($event, self::generateStateForEvent($event, $state)));
                     }),
                 CodeEditor::make('schema')
-                    ->helperText('The schema that will be passed to the webook for the selected event.')
+                    ->helperText('The schema that will be passed to the webhook for the selected event.')
                     ->language(CodeEditor\Enums\Language::Json),
             ]);
     }
 
-    protected static function generatePayloadForEvent(string $event, array $state): string
+    protected static function generatePayloadForEvent(Webhook $webhook, string $event, array $state): string
+    {
+        if (blank($state)) {
+            return 'Unable to generate state for the example object.';
+        }
+
+        if (($webhook->render === RenderEngine::Blade && blank($webhook->payload_text)) || ($webhook->render === RenderEngine::ExpressionLanguage && blank($webhook->payload_json))) {
+            return 'The provided webhook payload is empty. Please build the payload before testing it.';
+        }
+
+        if ($webhook->render === RenderEngine::ExpressionLanguage) {
+            $payload = ExpressionLanguage::evaluate($webhook->payload_json, [
+                'event' => app($event, $state),
+            ]);
+        } else {
+            $payload = json_decode(Blade::render($webhook->payload_text, ['event' => app($event, $state)]), true);
+        }
+
+        return json_encode($payload, JSON_PRETTY_PRINT);
+    }
+
+    protected static function generateSchemaForEvent(string $event, array $state): string
     {
         if (blank($state)) {
             return '';
@@ -174,7 +235,7 @@ class WebhookForm
     {
         return match ($event) {
             OrderCreated::class, OrderCancelled::class, OrderRefunded::class, PaymentSucceeded::class => ['order' => Order::query()->with(['items', 'discounts'])->findOrFail($modelId)],
-            SubscriptionCreated::class, SubscriptionDeleted::class => ['product' => Product::query()->findOrFail($modelId)],
+            SubscriptionCreated::class, SubscriptionUpdated::class, SubscriptionDeleted::class => ['user' => Auth::user(), 'product' => Product::query()->findOrFail($modelId)],
             UserCreated::class, UserUpdated::class, UserDeleted::class => ['user' => User::query()->with(['integrations', 'pendingReports'])->findOrFail($modelId)],
         };
     }
@@ -182,8 +243,10 @@ class WebhookForm
     protected static function getExampleOptionsForEvent(string $event): array
     {
         return match ($event) {
-            OrderCreated::class, OrderCancelled::class, OrderRefunded::class, PaymentSucceeded::class => Order::all()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
-            SubscriptionCreated::class, SubscriptionDeleted::class => Product::all()->mapWithKeys(fn (Product $product): array => [$product->getKey() => $product->name])->toArray(),
+            OrderCreated::class, PaymentSucceeded::class => Order::query()->completed()->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
+            OrderCancelled::class => Order::query()->cancelled()->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
+            OrderRefunded::class, => Order::query()->refunded()->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
+            SubscriptionCreated::class, SubscriptionUpdated::class, SubscriptionDeleted::class => Product::query()->subscriptions()->get()->mapWithKeys(fn (Product $product): array => [$product->getKey() => $product->name])->toArray(),
             UserCreated::class, UserUpdated::class, UserDeleted::class => User::all()->mapWithKeys(fn (User $user): array => [$user->getKey() => $user->name])->toArray()
         };
     }
@@ -196,6 +259,7 @@ class WebhookForm
             OrderRefunded::class => 'Order Refunded',
             PaymentSucceeded::class => 'Payment Succeeded',
             SubscriptionCreated::class => 'Subscription Created',
+            SubscriptionUpdated::class => 'Subscription Updated',
             SubscriptionDeleted::class => 'Subscription Deleted',
             UserCreated::class => 'User Created',
             UserUpdated::class => 'User Updated',

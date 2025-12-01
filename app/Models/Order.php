@@ -60,12 +60,14 @@ use Override;
  * @property-read int|null $prices_count
  * @property-read User $user
  *
+ * @method static Builder<static>|Order cancelled()
  * @method static Builder<static>|Order completed()
  * @method static \Database\Factories\OrderFactory factory($count = null, $state = [])
  * @method static Builder<static>|Order newModelQuery()
  * @method static Builder<static>|Order newQuery()
  * @method static Builder<static>|Order query()
  * @method static Builder<static>|Order readyToView()
+ * @method static Builder<static>|Order refunded()
  * @method static Builder<static>|Order whereAmountDue($value)
  * @method static Builder<static>|Order whereAmountOverpaid($value)
  * @method static Builder<static>|Order whereAmountPaid($value)
@@ -252,6 +254,16 @@ class Order extends Model implements HasLabel
     public function scopeCompleted(Builder $query): void
     {
         $query->where('status', OrderStatus::Succeeded);
+    }
+
+    public function scopeCancelled(Builder $query): void
+    {
+        $query->where('status', OrderStatus::Cancelled);
+    }
+
+    public function scopeRefunded(Builder $query): void
+    {
+        $query->where('status', OrderStatus::Refunded);
     }
 
     public function getLabel(): string
