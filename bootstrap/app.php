@@ -15,6 +15,7 @@ use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\LogApiRequest;
 use App\Http\Middleware\LogApiResponse;
 use App\Jobs\Store\ClearPendingOrders;
+use App\Jobs\Store\ReleaseExpiredInventoryReservations;
 use App\Models\Fingerprint;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Console\Scheduling\Schedule;
@@ -43,6 +44,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withSchedule(function (Schedule $schedule): void {
         $schedule->job(ClearPendingOrders::class)->daily();
+        $schedule->job(ReleaseExpiredInventoryReservations::class)->hourly();
     })
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->validateCsrfTokens(except: [

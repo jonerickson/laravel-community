@@ -47,6 +47,7 @@ class KnowledgeBaseCategoriesTable
                     ->counts('articles')
                     ->sortable(),
                 TextColumn::make('created_at')
+                    ->label('Created')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

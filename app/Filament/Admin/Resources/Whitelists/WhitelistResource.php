@@ -41,14 +41,6 @@ class WhitelistResource extends Resource
         return WhitelistsTable::configure($table);
     }
 
-    #[Override]
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [

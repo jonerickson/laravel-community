@@ -72,6 +72,8 @@ class ProductData extends Data
     /** @var PolicyData[] */
     public array $policies;
 
+    public ?InventoryItemData $inventoryItem = null;
+
     public ?CarbonImmutable $createdAt = null;
 
     public ?CarbonImmutable $updatedAt = null;

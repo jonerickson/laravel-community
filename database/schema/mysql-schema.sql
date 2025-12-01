@@ -229,6 +229,7 @@ CREATE TABLE `fingerprints` (
   `request_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ip_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `suspect_score` int NOT NULL DEFAULT '0',
   `last_checked_at` timestamp NULL DEFAULT NULL,
   `first_seen_at` timestamp NOT NULL,
   `last_seen_at` timestamp NOT NULL,
@@ -1369,6 +1370,8 @@ CREATE TABLE `users_integrations` (
   `provider_email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `provider_avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `access_token` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `refresh_token` text COLLATE utf8mb4_unicode_ci,
+  `expires_at` timestamp NULL DEFAULT NULL,
   `last_synced_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1630,3 +1633,5 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (181,'2025_11_26_22
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (182,'2025_11_26_225200_create_whitelist_table',63);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (183,'2025_11_27_050547_remove_ban_from_fingerprints_table',63);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (184,'2025_11_27_051532_add_resource_to_blacklist_table',63);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (185,'2025_11_27_213428_add_suspect_score_to_fingerprints_table',64);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (187,'2025_11_27_222646_add_refresh_token_to_users_integrations_table',65);

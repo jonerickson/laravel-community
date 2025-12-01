@@ -5,14 +5,19 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Products;
 
 use App\Enums\FileVisibility;
+use App\Enums\InventoryAlertType;
 use App\Enums\ProductApprovalStatus;
 use App\Enums\ProductTaxCode;
 use App\Enums\ProductType;
+use App\Filament\Admin\Resources\Products\Actions\AdjustStockAction;
+use App\Filament\Admin\Resources\Products\Actions\MarkDamagedAction;
+use App\Filament\Admin\Resources\Products\Actions\RestockAction;
 use App\Filament\Admin\Resources\Products\Pages\CreateProduct;
 use App\Filament\Admin\Resources\Products\Pages\EditProduct;
 use App\Filament\Admin\Resources\Products\Pages\ListProducts;
 use App\Filament\Admin\Resources\Products\RelationManagers\PricesRelationManager;
 use App\Filament\Admin\Resources\Products\RelationManagers\ReviewsRelationManager;
+use App\Filament\Admin\Resources\Products\RelationManagers\TransactionsRelationManager;
 use App\Models\Product;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -31,6 +36,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group as GroupSchema;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
@@ -158,6 +164,92 @@ class ProductResource extends Resource
                                             ->hiddenLabel(),
                                         Hidden::make('visibility')
                                             ->default(FileVisibility::Private),
+                                    ]),
+                            ]),
+                        Section::make('Inventory')
+                            ->columnSpanFull()
+                            ->description('Manage inventory levels and settings for this product.')
+                            ->relationship('inventoryItem')
+                            ->headerActions([
+                                RestockAction::make(),
+                                AdjustStockAction::make(),
+                                MarkDamagedAction::make(),
+                            ])
+                            ->columns()
+                            ->schema([
+                                Grid::make(3)
+                                    ->columnSpanFull()
+                                    ->schema([
+                                        TextEntry::make('quantity_available')
+                                            ->color('success')
+                                            ->visibleOn('edit')
+                                            ->label('Available Quantity')
+                                            ->numeric()
+                                            ->default(0),
+                                        TextEntry::make('quantity_reserved')
+                                            ->color('info')
+                                            ->visibleOn('edit')
+                                            ->label('Reserved')
+                                            ->numeric()
+                                            ->default(0),
+                                        TextEntry::make('quantity_damaged')
+                                            ->color('danger')
+                                            ->visibleOn('edit')
+                                            ->label('Damaged')
+                                            ->numeric()
+                                            ->default(0),
+                                    ]),
+                                TextInput::make('sku')
+                                    ->validationAttribute('SKU')
+                                    ->requiredWith('track_inventory')
+                                    ->columnSpanFull()
+                                    ->label('SKU')
+                                    ->maxLength(255),
+                                TextInput::make('warehouse_location')
+                                    ->columnSpanFull()
+                                    ->label('Warehouse Location')
+                                    ->maxLength(255),
+                                TextInput::make('quantity_available')
+                                    ->columnSpanFull()
+                                    ->visibleOn('create')
+                                    ->label('Available Quantity')
+                                    ->helperText('The currently available quantity. Use the actions above to update.')
+                                    ->requiredIf('track_inventory', true)
+                                    ->default(0)
+                                    ->minValue(0),
+                                TextInput::make('reorder_point')
+                                    ->label('Reorder Point')
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->helperText('Trigger low stock alert when quantity falls below this.'),
+                                TextInput::make('reorder_quantity')
+                                    ->label('Reorder Quantity')
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->helperText('Suggested quantity to order when restocking.'),
+                                Toggle::make('track_inventory')
+                                    ->label('Track Inventory')
+                                    ->default(true)
+                                    ->helperText('Enable inventory tracking for this product.'),
+                                Toggle::make('allow_backorder')
+                                    ->label('Allow Backorders')
+                                    ->default(false)
+                                    ->helperText('Allow orders when out of stock.'),
+                                Repeater::make('inventoryAlert')
+                                    ->columnSpanFull()
+                                    ->relationship('alerts')
+                                    ->visibleOn('edit')
+                                    ->addActionLabel('Add alert')
+                                    ->schema([
+                                        Select::make('alert_type')
+                                            ->label('Alert')
+                                            ->options(InventoryAlertType::class)
+                                            ->required(),
+                                        TextInput::make('threshold_value')
+                                            ->helperText('The inventory level at which the alert will be triggered.')
+                                            ->label('Threshold Value')
+                                            ->required()
+                                            ->numeric(),
                                     ]),
                             ]),
                     ]),
@@ -378,6 +470,7 @@ class ProductResource extends Resource
         return [
             PricesRelationManager::class,
             ReviewsRelationManager::class,
+            TransactionsRelationManager::class,
         ];
     }
 

@@ -3,11 +3,13 @@ import HeadingSmall from '@/components/heading-small';
 import RichEditorContent from '@/components/rich-editor-content';
 import { StarRating } from '@/components/star-rating';
 import { StoreProductRatingDialog } from '@/components/store-product-rating-dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { currency } from '@/lib/utils';
 import { Deferred, useForm } from '@inertiajs/react';
-import { ImageIcon } from 'lucide-react';
+import { AlertTriangle, ImageIcon, Package } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface ProductProps {
@@ -87,6 +89,25 @@ export default function Product({ product: productData, reviews }: ProductProps)
                             <StoreProductRatingDialog product={productData} reviews={reviews} />
                         </Deferred>
                     </div>
+
+                    {productData.inventoryItem?.trackInventory && (
+                        <div className="mt-4 flex items-center gap-2">
+                            <Package className="h-4 w-4 text-muted-foreground" />
+                            {!productData.inventoryItem.isOutOfStock ? (
+                                <Badge variant="outline" className="border-green-500 text-green-700 dark:text-green-400">
+                                    {productData.inventoryItem.quantityAvailable} in stock
+                                </Badge>
+                            ) : productData.inventoryItem.allowBackorder ? (
+                                <Badge variant="outline" className="border-yellow-500 text-yellow-700 dark:text-yellow-400">
+                                    Available on backorder
+                                </Badge>
+                            ) : (
+                                <Badge variant="outline" className="border-red-500 text-red-700 dark:text-red-400">
+                                    Out of stock
+                                </Badge>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 <div className="mt-6 lg:col-span-7 lg:col-start-1 lg:row-span-3 lg:row-start-1 lg:mt-0 lg:flex lg:flex-col">
@@ -164,16 +185,30 @@ export default function Product({ product: productData, reviews }: ProductProps)
                                     <label htmlFor="quantity" className="text-sm font-medium">
                                         Quantity:
                                     </label>
-                                    <Select value={data.quantity.toString()} onValueChange={handleQuantityChange}>
+                                    <Select
+                                        value={data.quantity.toString()}
+                                        onValueChange={handleQuantityChange}
+                                        disabled={
+                                            productData.inventoryItem?.trackInventory &&
+                                            productData.inventoryItem.isOutOfStock &&
+                                            !productData.inventoryItem.allowBackorder
+                                        }
+                                    >
                                         <SelectTrigger className="lg:w-[180px]">
                                             <SelectValue placeholder="Quantity" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                                                <SelectItem key={num} value={num.toString()}>
-                                                    {num}
-                                                </SelectItem>
-                                            ))}
+                                            {(() => {
+                                                const maxQuantity =
+                                                    productData.inventoryItem?.trackInventory && !productData.inventoryItem.isOutOfStock
+                                                        ? Math.min(10, productData.inventoryItem.quantityAvailable)
+                                                        : 10;
+                                                return Array.from({ length: maxQuantity }, (_, i) => i + 1).map((num) => (
+                                                    <SelectItem key={num} value={num.toString()}>
+                                                        {num}
+                                                    </SelectItem>
+                                                ));
+                                            })()}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -182,13 +217,35 @@ export default function Product({ product: productData, reviews }: ProductProps)
                         </div>
                     )}
 
+                    {productData.inventoryItem?.trackInventory &&
+                        productData.inventoryItem.isOutOfStock &&
+                        !productData.inventoryItem.allowBackorder && (
+                            <Alert variant="destructive" className="mt-6">
+                                <AlertTriangle className="h-4 w-4" />
+                                <AlertDescription>This product is currently out of stock and unavailable for purchase.</AlertDescription>
+                            </Alert>
+                        )}
+
                     <form onSubmit={handleSubmit}>
                         <Button
                             type="submit"
-                            disabled={processing || !productData || !data.price_id}
+                            disabled={
+                                processing ||
+                                !productData ||
+                                !data.price_id ||
+                                (productData.inventoryItem?.trackInventory &&
+                                    productData.inventoryItem.isOutOfStock &&
+                                    !productData.inventoryItem.allowBackorder)
+                            }
                             className="mt-8 flex w-full items-center justify-center"
                         >
-                            {processing ? 'Adding...' : 'Add to cart'}
+                            {processing
+                                ? 'Adding...'
+                                : productData.inventoryItem?.trackInventory &&
+                                    productData.inventoryItem.isOutOfStock &&
+                                    !productData.inventoryItem.allowBackorder
+                                  ? 'Out of stock'
+                                  : 'Add to cart'}
                         </Button>
                     </form>
 

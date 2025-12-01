@@ -309,7 +309,7 @@ class StripeDriver implements PaymentProcessor
 
     public function findInvoice(Order $order): ?InvoiceData
     {
-        return $this->executeWithErrorHandling('findInvoice', function () use ($order): ?\App\Data\InvoiceData {
+        return $this->executeWithErrorHandling('findInvoice', function () use ($order): ?InvoiceData {
             if (blank($invoiceId = $order->external_invoice_id)) {
                 return null;
             }
@@ -321,7 +321,7 @@ class StripeDriver implements PaymentProcessor
                 'amount' => $invoice->total,
                 'invoice_url' => $invoice->hosted_invoice_url,
                 'invoice_pdf_url' => $invoice->invoice_pdf,
-                'external_payment_id' => $invoice->payment_intent,
+                'external_payment_id' => $invoice->payments->data[0]->id ?? null,
             ]);
         });
     }
@@ -840,7 +840,7 @@ class StripeDriver implements PaymentProcessor
             }
 
             $paymentIntent = null;
-            if ($invoice && $paymentIntentId = $invoice->payment_intent) {
+            if ($invoice && ($paymentIntentId = $invoice->payments->data[0]->id ?? null)) {
                 $paymentIntent = $this->stripe->paymentIntents->retrieve($paymentIntentId);
             }
 

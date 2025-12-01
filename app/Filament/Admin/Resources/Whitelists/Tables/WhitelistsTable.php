@@ -40,9 +40,11 @@ class WhitelistsTable
                     ->wrap()
                     ->limit(),
                 TextColumn::make('created_at')
+                    ->label('Created')
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('updated_at')
+                    ->label('Updated')
                     ->dateTime()
                     ->sortable(),
             ])

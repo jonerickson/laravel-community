@@ -200,6 +200,23 @@ declare namespace App.Data {
         createdAt: string | null;
         updatedAt: string | null;
     };
+    export type InventoryItemData = {
+        id: number;
+        productId: number;
+        sku: string;
+        quantityAvailable: number;
+        quantityReserved: number;
+        quantityDamaged: number;
+        reorderPoint: number | null;
+        reorderQuantity: number | null;
+        warehouseLocation: string | null;
+        trackInventory: boolean;
+        allowBackorder: boolean;
+        quantityOnHand: number;
+        quantityAvailableForSale: number;
+        isLowStock: boolean;
+        isOutOfStock: boolean;
+    };
     export type InvoiceData = {
         externalInvoiceId: string;
         amount: number;
@@ -462,6 +479,7 @@ declare namespace App.Data {
         reviewsCount: number;
         categories: Array<App.Data.ProductCategoryData>;
         policies: Array<App.Data.PolicyData>;
+        inventoryItem: App.Data.InventoryItemData | null;
         createdAt: string | null;
         updatedAt: string | null;
     };
@@ -657,6 +675,9 @@ declare namespace App.Enums {
         | '423'
         | '500'
         | '503';
+    export type InventoryAlertType = 'low_stock' | 'out_of_stock' | 'reorder';
+    export type InventoryReservationStatus = 'active' | 'fulfilled' | 'cancelled' | 'expired';
+    export type InventoryTransactionType = 'adjustment' | 'sale' | 'return' | 'damage' | 'restock';
     export type KnowledgeBaseArticleType = 'guide' | 'faq' | 'changelog' | 'troubleshooting' | 'announcement' | 'other';
     export type OrderRefundReason = 'duplicate' | 'fraudulent' | 'requested_by_customer' | 'other';
     export type OrderStatus =

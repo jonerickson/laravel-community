@@ -11,15 +11,18 @@ use App\Http\Resources\ApiResource;
 use App\Managers\PaymentManager;
 use App\Models\Order;
 use App\Models\User;
+use App\Services\InventoryService;
 use App\Services\ShoppingCartService;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\Request;
+use Throwable;
 
 class CheckoutController
 {
     public function __construct(
         private readonly ShoppingCartService $cartService,
         private readonly PaymentManager $paymentManager,
+        private readonly InventoryService $inventoryService,
         #[CurrentUser]
         private readonly ?User $user = null,
     ) {}
@@ -104,6 +107,26 @@ class CheckoutController
                     errors: ['price' => [sprintf('Price not configured for %s.', $item->name)]],
                     status: 400
                 );
+            }
+
+            if ($item->product->inventoryItem?->trackInventory) {
+                if ($item->product->inventoryItem->quantityAvailableForSale <= 0) {
+                    return ApiResource::error(
+                        message: sprintf('Insufficient inventory for %s.', $item->name),
+                        errors: ['inventory' => [sprintf('Not enough stock available for %s.', $item->name)]],
+                        status: 400
+                    );
+                }
+
+                try {
+                    $this->inventoryService->reserveInventory($order);
+                } catch (Throwable $e) {
+                    return ApiResource::error(
+                        message: sprintf('Failed to reserve inventory for %s: %s', $item->name, $e->getMessage()),
+                        errors: ['inventory' => [sprintf('Could not reserve %s.', $item->name)]],
+                        status: 400
+                    );
+                }
             }
         }
 

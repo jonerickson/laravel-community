@@ -15,6 +15,7 @@ use App\Traits\Featureable;
 use App\Traits\HasFeaturedImage;
 use App\Traits\HasFiles;
 use App\Traits\HasGroups;
+use App\Traits\HasInventory;
 use App\Traits\HasLogging;
 use App\Traits\HasMetadata;
 use App\Traits\HasReferenceId;
@@ -74,6 +75,7 @@ use Illuminate\Support\Str;
  * @property-read Collection<int, Comment> $approvedReviews
  * @property-read int|null $approved_reviews_count
  * @property-read User|null $approver
+ * @property-read int $available_quantity
  * @property-read int|float $average_rating
  * @property-read Collection<int, ProductCategory> $categories
  * @property-read int|null $categories_count
@@ -86,6 +88,9 @@ use Illuminate\Support\Str;
  * @property-read int|null $files_count
  * @property-read Collection<int, Group> $groups
  * @property-read int|null $groups_count
+ * @property-read InventoryItem|null $inventoryItem
+ * @property-read Collection<int, InventoryTransaction> $inventoryTransactions
+ * @property-read int|null $inventory_transactions_count
  * @property-read bool $is_marketplace_product
  * @property-read Collection<int, OrderItem> $orderItems
  * @property-read int|null $order_items_count
@@ -154,6 +159,7 @@ class Product extends Model implements HasLabel, Sluggable
     use HasFeaturedImage;
     use HasFiles;
     use HasGroups;
+    use HasInventory;
     use HasLogging;
     use HasMetadata;
     use HasReferenceId;

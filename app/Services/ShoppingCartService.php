@@ -72,8 +72,7 @@ class ShoppingCartService
                 ->where('id', $orderId)
                 ->whereBelongsTo($this->user)
                 ->where('status', OrderStatus::Pending)
-                ->with('items')
-                ->with('discounts')
+                ->with(['items.price.product.inventoryItem', 'discounts'])
                 ->first();
 
             if ($order) {
@@ -193,7 +192,8 @@ class ShoppingCartService
 
         $orderItems = $order->items()->with([
             'price.product' => function ($query): void {
-                $query->with('defaultPrice')
+                $query
+                    ->with(['defaultPrice', 'inventoryItem'])
                     ->with(['prices' => function (Price|HasMany $query): void {
                         $query->active()->orderBy('is_default', 'desc');
                     }])

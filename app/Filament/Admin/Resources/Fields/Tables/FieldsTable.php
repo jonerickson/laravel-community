@@ -33,6 +33,7 @@ class FieldsTable
                     ->boolean()
                     ->label('Public'),
                 Columns\TextColumn::make('created_at')
+                    ->label('Created')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
