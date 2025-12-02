@@ -25,7 +25,7 @@ export default function BlogIndex({ posts }: BlogIndexProps) {
         '@type': 'Blog',
         name: `${siteName} Blog`,
         description: 'Browse our latest blog posts and articles',
-        url: window.location.href,
+        url: route('blog.index'),
         publisher: {
             '@type': 'Organization',
             name: siteName,

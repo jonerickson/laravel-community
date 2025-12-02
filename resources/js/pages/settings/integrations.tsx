@@ -115,10 +115,12 @@ export default function Integrations({ connectedAccounts }: ConnectedAccountsPro
                                     Add Integration
                                 </Button>
                             )}
-                            <Button variant="secondary" onClick={handleSyncAccounts} disabled={loading}>
-                                {loading ? <LoaderCircle className="animate-spin" /> : <RefreshCcw />}
-                                {loading ? 'Syncing...' : 'Sync Accounts'}
-                            </Button>
+                            {connectedAccounts.length > 0 && (
+                                <Button variant="secondary" onClick={handleSyncAccounts} disabled={loading}>
+                                    {loading ? <LoaderCircle className="animate-spin" /> : <RefreshCcw />}
+                                    {loading ? 'Syncing...' : 'Sync Accounts'}
+                                </Button>
+                            )}
                         </div>
                     </div>
 

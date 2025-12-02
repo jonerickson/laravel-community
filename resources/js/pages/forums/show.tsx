@@ -65,7 +65,7 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
         '@type': 'CollectionPage',
         name: forum.name,
         description: forum.description || `Discussions and topics in ${forum.name}`,
-        url: window.location.href,
+        url: route('forums.show', { forum: forum.slug }),
         inLanguage: 'en',
         image: forum.category?.featuredImageUrl || logoUrl,
         isPartOf: {

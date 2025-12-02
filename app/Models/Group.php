@@ -98,14 +98,26 @@ class Group extends Model
         'saving' => GroupSaving::class,
     ];
 
+    protected static ?Group $defaultGuestGroup = null;
+
+    protected static ?Group $defaultMemberGroup = null;
+
     public static function defaultGuestGroup(): ?Group
     {
-        return Cache::memo()->remember('default_guest_group', now()->addHour(), fn () => Group::query()->defaultGuestGroups()->first());
+        if (isset(static::$defaultGuestGroup)) {
+            return static::$defaultGuestGroup;
+        }
+
+        return static::$defaultGuestGroup = Cache::memo()->remember('default_guest_group', now()->addHour(), fn () => Group::query()->with(['permissions', 'roles'])->defaultGuestGroups()->first());
     }
 
     public static function defaultMemberGroup(): ?Group
     {
-        return Cache::memo()->remember('default_member_group', now()->addHour(), fn () => Group::query()->defaultMemberGroups()->first());
+        if (isset(static::$defaultMemberGroup)) {
+            return static::$defaultMemberGroup;
+        }
+
+        return static::$defaultMemberGroup = Cache::memo()->remember('default_member_group', now()->addHour(), fn () => Group::query()->with(['permissions', 'roles'])->defaultMemberGroups()->first());
     }
 
     public function users(): BelongsToMany

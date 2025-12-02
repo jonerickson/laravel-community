@@ -57,7 +57,7 @@ export default function KnowledgeBaseIndex({ articles, categories, filters }: Kn
         '@type': 'CollectionPage',
         name: `${siteName} Knowledge Base`,
         description: 'Browse our knowledge base articles and documentation',
-        url: window.location.href,
+        url: route('knowledge-base.index'),
         publisher: {
             '@type': 'Organization',
             name: siteName,

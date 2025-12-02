@@ -43,7 +43,7 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
         '@type': 'CollectionPage',
         name: category.name,
         description: category.description || `Products in ${category.name} category`,
-        url: window.location.href,
+        url: route('store.categories.show', { category: category.slug }),
         breadcrumb: {
             '@type': 'BreadcrumbList',
             itemListElement: breadcrumbs.map((breadcrumb, index) => ({

@@ -30,7 +30,7 @@ class BlacklistsTable
                     ->badge(),
                 TextColumn::make('content')
                     ->label('Entry')
-                    ->getStateUsing(fn (Blacklist $record): string => match ($record->filter) {
+                    ->getStateUsing(fn (Blacklist $record): ?string => match ($record->filter) {
                         FilterType::Fingerprint => $record->resource instanceof Fingerprint ? $record->resource->fingerprint_id : null,
                         FilterType::User => $record->resource instanceof User ? $record->resource->name : null,
                         default => $record->content,

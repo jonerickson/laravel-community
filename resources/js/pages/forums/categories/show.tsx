@@ -33,7 +33,7 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
         '@type': 'CollectionPage',
         name: category.name,
         description: category.description || `Forums in ${category.name} category`,
-        url: window.location.href,
+        url: route('forums.categories.show', { category: category.slug }),
         image: category.featuredImageUrl || logoUrl,
         inLanguage: 'en',
         isPartOf: {
