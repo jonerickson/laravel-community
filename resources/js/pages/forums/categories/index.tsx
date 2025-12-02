@@ -26,7 +26,7 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
         '@type': 'CollectionPage',
         name: `${siteName} Forums`,
         description: 'Connect with our community and get support',
-        url: route('forums.categories.index'),
+        url: route('forums.index'),
         publisher: {
             '@type': 'Organization',
             name: siteName,
