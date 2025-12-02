@@ -104,20 +104,12 @@ class Group extends Model
 
     public static function defaultGuestGroup(): ?Group
     {
-        if (isset(static::$defaultGuestGroup)) {
-            return static::$defaultGuestGroup;
-        }
-
-        return static::$defaultGuestGroup = Cache::memo()->remember('default_guest_group', now()->addHour(), fn () => Group::query()->with(['permissions', 'roles'])->defaultGuestGroups()->first());
+        return static::$defaultGuestGroup ?? static::$defaultGuestGroup = Cache::memo()->remember('default_guest_group', now()->addHour(), fn () => Group::query()->with(['permissions', 'roles'])->defaultGuestGroups()->first());
     }
 
     public static function defaultMemberGroup(): ?Group
     {
-        if (isset(static::$defaultMemberGroup)) {
-            return static::$defaultMemberGroup;
-        }
-
-        return static::$defaultMemberGroup = Cache::memo()->remember('default_member_group', now()->addHour(), fn () => Group::query()->with(['permissions', 'roles'])->defaultMemberGroups()->first());
+        return static::$defaultMemberGroup ?? static::$defaultMemberGroup = Cache::memo()->remember('default_member_group', now()->addHour(), fn () => Group::query()->with(['permissions', 'roles'])->defaultMemberGroups()->first());
     }
 
     public function users(): BelongsToMany

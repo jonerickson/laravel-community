@@ -23,7 +23,7 @@ class KnowledgeBaseController extends Controller
     public function index(Request $request): Response
     {
         $query = KnowledgeBaseArticle::query()
-            ->with(['category', 'author'])
+            ->with(['category', 'author.groups'])
             ->published()
             ->latest('published_at');
 

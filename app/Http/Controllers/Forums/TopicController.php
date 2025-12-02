@@ -94,7 +94,7 @@ class TopicController extends Controller
         $posts = $topic
             ->posts()
             ->latestActivity()
-            ->with(['author.groups', 'reads', 'views', 'likes.author', 'comments'])
+            ->with(['author.groups'])
             ->withCount(['likes'])
             ->paginate();
 

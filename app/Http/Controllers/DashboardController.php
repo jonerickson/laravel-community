@@ -45,7 +45,7 @@ class DashboardController
     private function getSupportTickets(): Collection
     {
         return SupportTicketData::collect(SupportTicket::query()
-            ->with(['category', 'author'])
+            ->with(['category', 'author.groups'])
             ->whereBelongsTo($this->user, 'author')
             ->active()
             ->latest()
@@ -57,7 +57,7 @@ class DashboardController
     private function getTrendingTopics(): Collection
     {
         return TopicData::collect(Topic::trending(5)
-            ->with(['forum', 'author', 'lastPost.author'])
+            ->with(['forum', 'author.groups', 'lastPost.author.groups'])
             ->get()
             ->filter(fn (Topic $topic) => Gate::check('view', $topic)));
     }
@@ -67,7 +67,7 @@ class DashboardController
         return PostData::collect(Post::query()
             ->blog()
             ->published()
-            ->with('author')
+            ->with(['author.groups'])
             ->latest('published_at')
             ->limit(3)
             ->get()
@@ -102,7 +102,7 @@ class DashboardController
             ->products()
             ->approved()
             ->visible()
-            ->with(['defaultPrice', 'categories'])
+            ->with(['defaultPrice', 'categories', 'approvedReviews'])
             ->with(['prices' => function (Price|HasMany $query): void {
                 $query->active();
             }])

@@ -62,7 +62,7 @@ class ProductController extends Controller
 
         $reviews = CommentData::collect($product
             ->reviews()
-            ->with('author')
+            ->with(['author.groups'])
             ->approved()
             ->latest()
             ->get()

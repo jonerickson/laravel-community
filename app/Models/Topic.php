@@ -163,23 +163,23 @@ class Topic extends Model implements Sluggable
     public function hasReportedContent(): Attribute
     {
         return Attribute::make(
-            get: fn (): bool => $this->posts
-                ->filter(fn (Post $post) => $post->pendingReports->isNotEmpty())
-                ->isNotEmpty()
+            get: fn (): bool => $this
+                ->whereHas('posts', fn (Builder|Post $query) => $query->whereHas('pendingReports'))
+                ->exists()
         )->shouldCache();
     }
 
     public function hasUnpublishedContent(): Attribute
     {
         return Attribute::make(
-            get: fn (): bool => $this->posts->where('is_published', false)->isNotEmpty()
+            get: fn (): bool => $this->posts()->where('is_published', false)->exists()
         )->shouldCache();
     }
 
     public function hasUnapprovedContent(): Attribute
     {
         return Attribute::make(
-            get: fn (): bool => $this->posts->where('is_approved', false)->isNotEmpty()
+            get: fn (): bool => $this->posts()->where('is_approved', false)->exists()
         )->shouldCache();
     }
 
@@ -193,9 +193,9 @@ class Topic extends Model implements Sluggable
                 }
 
                 $dayAgo = now()->subDay();
-                $recentPosts = $this->posts
+                $recentPosts = $this->posts()
                     ->where('created_at', '>=', $dayAgo)
-                    ->values();
+                    ->get();
 
                 $postsInLast24h = $recentPosts->count();
                 $postingScore = $postsInLast24h * 2;
@@ -207,7 +207,7 @@ class Topic extends Model implements Sluggable
 
                 return $totalScore >= 10;
             }
-        )->shouldCache();
+        );
     }
 
     /**

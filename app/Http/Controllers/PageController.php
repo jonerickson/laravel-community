@@ -18,7 +18,7 @@ class PageController extends Controller
     {
         $this->authorize('view', $page);
 
-        $page->load('author');
+        $page->load(['author.groups']);
 
         return Inertia::render('pages/show', [
             'page' => PageData::from($page),

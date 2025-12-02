@@ -8,6 +8,7 @@ use App\Data\ReadData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Frontend\StoreReadRequest;
 use App\Http\Resources\ApiResource;
+use App\Models\Read;
 use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
 
@@ -34,7 +35,7 @@ class ReadController extends Controller
 
         $readData = ReadData::from([
             'markedAsRead' => ! is_bool($result),
-            'isReadByUser' => $readable->fresh()->is_read_by_user,
+            'isReadByUser' => (bool) $result,
             'type' => $request->validated('type'),
             'id' => $request->validated('id'),
         ]);
