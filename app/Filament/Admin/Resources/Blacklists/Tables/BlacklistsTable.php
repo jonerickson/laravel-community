@@ -29,6 +29,7 @@ class BlacklistsTable
                     ->sortable()
                     ->badge(),
                 TextColumn::make('content')
+                    ->placeholder('No Entry')
                     ->label('Entry')
                     ->getStateUsing(fn (Blacklist $record): ?string => match ($record->filter) {
                         FilterType::Fingerprint => $record->resource instanceof Fingerprint ? $record->resource->fingerprint_id : null,
@@ -83,6 +84,7 @@ class BlacklistsTable
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 }
