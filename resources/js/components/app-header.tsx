@@ -17,62 +17,6 @@ import { BookOpen, CalendarSync, Folder, Grid, Home, LibraryBig, Menu, Newspaper
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Home',
-        href: '/',
-        icon: Home,
-        shouldShow: (auth: App.Data.AuthData): boolean => auth?.user === null,
-        isActive: () => route().current('home'),
-    },
-    {
-        title: 'Dashboard',
-        href: () => route('dashboard'),
-        icon: Grid,
-        shouldShow: (auth: App.Data.AuthData): boolean => auth?.user !== null,
-        isActive: () => route().current('dashboard'),
-    },
-    {
-        title: 'Blog',
-        href: () => route('blog.index'),
-        icon: Newspaper,
-        isActive: () => route().current('blog.*'),
-    },
-    {
-        title: 'Forums',
-        href: () => route('forums.index'),
-        icon: LibraryBig,
-        isActive: () => route().current('forums.*'),
-    },
-    {
-        title: 'Store',
-        href: () => route('store.index'),
-        icon: ShoppingCart,
-        isActive: () => route().current('store.*') && !route().current('store.subscriptions'),
-    },
-    {
-        title: 'Subscriptions',
-        href: () => route('store.subscriptions'),
-        icon: CalendarSync,
-        isActive: () => route().current('store.subscriptions'),
-    },
-];
-
-const rightNavItems: NavItem[] = [
-    {
-        title: 'Policies',
-        href: () => route('policies.index'),
-        icon: Folder,
-        isActive: () => route().current('policies.*'),
-    },
-    {
-        title: 'Support',
-        href: () => route('support.index'),
-        icon: BookOpen,
-        isActive: () => route().current('support.*'),
-    },
-];
-
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
 interface AppHeaderProps {
@@ -81,8 +25,64 @@ interface AppHeaderProps {
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const page = usePage<App.Data.SharedData>();
-    const { auth, navigationPages, discordCount } = page.props;
+    const { auth, navigationPages } = page.props;
     const getInitials = useInitials();
+
+    const mainNavItems: NavItem[] = [
+        {
+            title: 'Home',
+            href: '/',
+            icon: Home,
+            shouldShow: (auth: App.Data.AuthData): boolean => auth?.user === null,
+            isActive: () => route().current('home'),
+        },
+        {
+            title: 'Dashboard',
+            href: () => route('dashboard'),
+            icon: Grid,
+            shouldShow: (auth: App.Data.AuthData): boolean => auth?.user !== null,
+            isActive: () => route().current('dashboard'),
+        },
+        {
+            title: 'Blog',
+            href: () => route('blog.index'),
+            icon: Newspaper,
+            isActive: () => route().current('blog.*'),
+        },
+        {
+            title: 'Forums',
+            href: () => route('forums.index'),
+            icon: LibraryBig,
+            isActive: () => route().current('forums.*'),
+        },
+        {
+            title: 'Store',
+            href: () => route('store.index'),
+            icon: ShoppingCart,
+            isActive: () => route().current('store.*') && !route().current('store.subscriptions'),
+        },
+        {
+            title: 'Subscriptions',
+            href: () => route('store.subscriptions'),
+            icon: CalendarSync,
+            isActive: () => route().current('store.subscriptions'),
+        },
+    ];
+
+    const rightNavItems: NavItem[] = [
+        {
+            title: 'Policies',
+            href: () => route('policies.index'),
+            icon: Folder,
+            isActive: () => route().current('policies.*'),
+        },
+        {
+            title: 'Support',
+            href: () => route('support.index'),
+            icon: BookOpen,
+            isActive: () => route().current('support.*'),
+        },
+    ];
 
     return (
         <>

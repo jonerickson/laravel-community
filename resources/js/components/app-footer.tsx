@@ -21,72 +21,72 @@ import {
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Home',
-        href: '/',
-        icon: Home,
-        shouldShow: (auth: App.Data.AuthData): boolean => auth?.user === null,
-        isActive: () => true,
-    },
-    {
-        title: 'Dashboard',
-        href: () => route('dashboard'),
-        icon: Grid,
-        shouldShow: (auth: App.Data.AuthData): boolean => auth?.user !== null,
-        isActive: () => true,
-    },
-    {
-        title: 'Blog',
-        href: () => route('blog.index'),
-        icon: Newspaper,
-        isActive: () => true,
-    },
-    {
-        title: 'Forums',
-        href: () => route('forums.index'),
-        icon: LibraryBig,
-        isActive: () => true,
-    },
-    {
-        title: 'Store',
-        href: () => route('store.index'),
-        icon: ShoppingCart,
-        isActive: () => true,
-    },
-    {
-        title: 'Subscriptions',
-        href: () => route('store.subscriptions'),
-        icon: CalendarSync,
-        isActive: () => true,
-    },
-];
-
-const supportNavItems: NavItem[] = [
-    {
-        title: 'Knowledge Base',
-        href: () => route('knowledge-base.index'),
-        icon: HelpCircle,
-        isActive: () => true,
-    },
-    {
-        title: 'Policies',
-        href: () => route('policies.index'),
-        icon: Folder,
-        isActive: () => true,
-    },
-    {
-        title: 'Support',
-        href: () => route('support.index'),
-        icon: BookOpen,
-        isActive: () => true,
-    },
-];
-
 export function AppFooter() {
     const page = usePage<App.Data.SharedData>();
     const { auth, name, phone, email, address, slogan } = page.props;
     const { layout } = useLayout();
+
+    const mainNavItems: NavItem[] = [
+        {
+            title: 'Home',
+            href: '/',
+            icon: Home,
+            shouldShow: (auth: App.Data.AuthData): boolean => auth?.user === null,
+            isActive: () => true,
+        },
+        {
+            title: 'Dashboard',
+            href: () => route('dashboard'),
+            icon: Grid,
+            shouldShow: (auth: App.Data.AuthData): boolean => auth?.user !== null,
+            isActive: () => true,
+        },
+        {
+            title: 'Blog',
+            href: () => route('blog.index'),
+            icon: Newspaper,
+            isActive: () => true,
+        },
+        {
+            title: 'Forums',
+            href: () => route('forums.index'),
+            icon: LibraryBig,
+            isActive: () => true,
+        },
+        {
+            title: 'Store',
+            href: () => route('store.index'),
+            icon: ShoppingCart,
+            isActive: () => true,
+        },
+        {
+            title: 'Subscriptions',
+            href: () => route('store.subscriptions'),
+            icon: CalendarSync,
+            isActive: () => true,
+        },
+    ];
+
+    const supportNavItems: NavItem[] = [
+        {
+            title: 'Knowledge Base',
+            href: () => route('knowledge-base.index'),
+            icon: HelpCircle,
+            isActive: () => true,
+        },
+        {
+            title: 'Policies',
+            href: () => route('policies.index'),
+            icon: Folder,
+            isActive: () => true,
+        },
+        {
+            title: 'Support',
+            href: () => route('support.index'),
+            icon: BookOpen,
+            isActive: () => true,
+        },
+    ];
 
     return (
         <footer className="border-t border-sidebar-border/80 bg-sidebar/30">

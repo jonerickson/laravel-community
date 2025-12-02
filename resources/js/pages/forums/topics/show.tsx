@@ -33,6 +33,7 @@ export default function ForumTopicShow({ forum, topic, posts, forums, recentView
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const [quotedContent, setQuotedContent] = useState<string>('');
     const [quotedAuthor, setQuotedAuthor] = useState<string>('');
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Forums',
