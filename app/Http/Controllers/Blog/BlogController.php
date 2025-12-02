@@ -57,7 +57,7 @@ class BlogController extends Controller
         $this->authorize('view', $post);
 
         $post->incrementViews();
-        $post->loadMissing(['author']);
+        $post->loadMissing(['author.groups']);
         $post->loadCount(['views', 'comments']);
 
         $comments = CommentData::collect($post

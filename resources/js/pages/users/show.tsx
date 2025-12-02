@@ -1,5 +1,6 @@
 import Heading from '@/components/heading';
 import RichEditorContent from '@/components/rich-editor-content';
+import { StyledUserName } from '@/components/styled-user-name';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -44,7 +45,9 @@ export default function Show({ user }: UserProfilePageProps) {
 
                             <div className="flex-1 space-y-4 text-center sm:text-left">
                                 <div>
-                                    <h1 className="text-3xl font-bold">{user.name}</h1>
+                                    <h1 className="text-3xl font-bold">
+                                        <StyledUserName user={user} />
+                                    </h1>
                                     {user.groups.length > 0 && (
                                         <div className="mt-2 flex flex-wrap justify-center gap-2 sm:justify-start">
                                             {user.groups.map((group) => (

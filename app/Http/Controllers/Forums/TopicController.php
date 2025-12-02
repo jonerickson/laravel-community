@@ -88,7 +88,7 @@ class TopicController extends Controller
         $forum->loadMissing(['parent', 'category']);
 
         $topic->incrementViews();
-        $topic->loadMissing(['author']);
+        $topic->loadMissing(['author.groups']);
         $topic->loadCount(['posts', 'views', 'followers']);
 
         $posts = $topic

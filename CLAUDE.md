@@ -189,7 +189,7 @@ This is a modern Laravel + React marketplace application. It features:
 - **Do not run tests after a prompt unless otherwise instructed**
 
 ### Code Generation
-- Use `php artisan types` to update TypeScript definitions after model changes
+- Use `composer types` to update TypeScript definitions after model changes
 - Use `composer facades` to generate documentation for custom facades
 - Use `composer ide` to regenerate IDE helper files after significant changes
 

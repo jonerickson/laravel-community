@@ -12,12 +12,8 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 #[TypeScript]
 #[MapInputName(SnakeCaseMapper::class)]
-class GroupData extends Data
+class GroupStyleData extends Data
 {
-    public int $id;
-
-    public string $name;
-
     public string $color;
 
     public GroupStyleType $style;

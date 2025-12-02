@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\GroupStyleType;
 use App\Events\GroupSaving;
 use App\Traits\Activateable;
 use App\Traits\HasFiles;
+use App\Traits\HasIcon;
 use App\Traits\Orderable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -76,6 +78,7 @@ class Group extends Model
     use Activateable;
     use HasFactory;
     use HasFiles;
+    use HasIcon;
     use HasRoles;
     use Orderable;
 
@@ -86,6 +89,7 @@ class Group extends Model
         'description',
         'image',
         'color',
+        'style',
         'is_default_guest',
         'is_default_member',
     ];
@@ -162,6 +166,7 @@ class Group extends Model
     protected function casts(): array
     {
         return [
+            'style' => GroupStyleType::class,
             'is_default_member' => 'boolean',
             'is_default_guest' => 'boolean',
         ];

@@ -210,6 +210,16 @@
     }
 }
 
+@keyframes holographic-shift {
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
 @layer utilities {
     .glow-indigo {
         box-shadow:

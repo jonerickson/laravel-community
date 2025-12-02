@@ -1,3 +1,4 @@
+import { StyledUserName } from '@/components/styled-user-name';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Link } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
@@ -20,7 +21,7 @@ export default function ForumUserInfo({
 
             <div className="flex flex-col items-start md:items-center md:gap-2">
                 <div className="text-left md:text-center">
-                    <div className="text-sm font-bold tracking-tight">{user.name}</div>
+                    <StyledUserName user={user} className="text-sm tracking-tight" />
                     <div className="hidden text-xs text-muted-foreground md:block">{isAuthor ? 'Author' : ''}</div>
                 </div>
 

@@ -44,7 +44,7 @@ class CacheService
     {
         return Cache::flexible('blog.index', [60 * 60, 60 * 60 * 24], fn () => PostData::collect(Post::query()
             ->blog()
-            ->with(['comments', 'author', 'reads'])
+            ->with(['comments', 'author.groups', 'reads'])
             ->withCount(['views', 'comments'])
             ->published()
             ->latest()

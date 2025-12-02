@@ -190,6 +190,13 @@ declare namespace App.Data {
         id: number;
         name: string;
         color: string;
+        style: App.Enums.GroupStyleType;
+        icon: string | null;
+    };
+    export type GroupStyleData = {
+        color: string;
+        style: App.Enums.GroupStyleType;
+        icon: string | null;
     };
     export type ImageData = {
         id: number;
@@ -627,6 +634,7 @@ declare namespace App.Data {
         emailVerifiedAt: string | null;
         groups: Array<App.Data.GroupData>;
         fields: Array<App.Data.FieldData>;
+        displayStyle: App.Data.GroupStyleData | null;
         warningPoints: number;
         activeConsequenceType: App.Enums.WarningConsequenceType | null;
         hasPassword: boolean;
@@ -653,6 +661,7 @@ declare namespace App.Enums {
     export type FieldType = 'checkbox' | 'date' | 'datetime' | 'number' | 'radio' | 'rich_text' | 'select' | 'text' | 'textarea';
     export type FileVisibility = 'public' | 'private';
     export type FilterType = 'fingerprint' | 'ip_address' | 'user' | 'string';
+    export type GroupStyleType = 'solid' | 'gradient' | 'holographic';
     export type HttpMethod = 'head' | 'get' | 'post' | 'put' | 'patch' | 'delete' | 'options';
     export type HttpStatusCode =
         | '200'

@@ -3,6 +3,7 @@ import { FollowButton } from '@/components/follow-button';
 import Heading from '@/components/heading';
 import Loading from '@/components/loading';
 import RichEditorContent from '@/components/rich-editor-content';
+import { StyledUserName } from '@/components/styled-user-name';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -445,7 +446,7 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
                                             <TableCell className="p-4 text-right">
                                                 {topic.lastPost ? (
                                                     <div className="text-sm">
-                                                        <div className="font-medium">{topic.lastPost.author?.name}</div>
+                                                        <StyledUserName user={topic.lastPost.author} showIcon={false} />
                                                         {topic.lastPost.createdAt && (
                                                             <div className="text-xs text-muted-foreground">
                                                                 {formatDistanceToNow(new Date(topic.lastPost.createdAt), { addSuffix: true })}

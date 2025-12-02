@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Groups;
 
+use App\Enums\GroupStyleType;
 use App\Filament\Admin\Resources\Groups\Pages\CreateGroup;
 use App\Filament\Admin\Resources\Groups\Pages\EditGroup;
 use App\Filament\Admin\Resources\Groups\Pages\ListGroups;
@@ -64,8 +65,15 @@ class GroupResource extends Resource
                                     ->maxLength(65535)
                                     ->nullable(),
                                 ColorPicker::make('color')
+                                    ->helperText('The color to apply to user names who are in this group.')
                                     ->required(),
-                                FileUpload::make('image')
+                                Select::make('style')
+                                    ->helperText('The style to apply to user names who are in this group.')
+                                    ->default(GroupStyleType::Solid)
+                                    ->options(GroupStyleType::class)
+                                    ->required(),
+                                FileUpload::make('icon')
+                                    ->helperText('An icon to apply to user names who are in this group.')
                                     ->nullable()
                                     ->directory('groups')
                                     ->visibility('public')
@@ -200,7 +208,7 @@ class GroupResource extends Resource
                     DeleteBulkAction::make(),
                 ]),
             ])
-            ->reorderable()
+            ->reorderable('order')
             ->defaultSort('order');
     }
 

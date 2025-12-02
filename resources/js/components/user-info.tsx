@@ -1,3 +1,4 @@
+import { StyledUserName } from '@/components/styled-user-name';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useInitials } from '@/hooks/use-initials';
 import { Link } from '@inertiajs/react';
@@ -19,7 +20,7 @@ export function UserInfo({ user, showEmail = false, showGroups = false }: { user
             </Avatar>
             <div className="flex flex-col">
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{user.name}</span>
+                    <StyledUserName user={user} className="truncate" />
                     {showEmail && <span className="truncate text-xs text-muted-foreground">{user.email}</span>}
                 </div>
                 {showGroups && user.groups.length > 0 && (

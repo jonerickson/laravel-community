@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
+use App\Data\GroupStyleData;
 use App\Managers\PaymentManager;
 use App\Models\Group;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\UserGroup;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Storage;
 
 trait HasGroups
 {
@@ -107,5 +110,26 @@ trait HasGroups
     public function hasAnyGroup(array $groupIds): bool
     {
         return $this->groups()->whereIn('groups.id', $groupIds)->exists();
+    }
+
+    public function displayStyle(): Attribute
+    {
+        return Attribute::make(
+            get: function (): ?GroupStyleData {
+                $primaryGroup = $this->groups->filter->is_active->sortBy('order')->first();
+
+                if (! $primaryGroup) {
+                    return null;
+                }
+
+                return GroupStyleData::from([
+                    'color' => $primaryGroup->color,
+                    'style' => $primaryGroup->style,
+                    'icon' => $primaryGroup->icon
+                        ? Storage::url($primaryGroup->icon)
+                        : null,
+                ]);
+            }
+        )->shouldCache();
     }
 }

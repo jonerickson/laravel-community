@@ -131,7 +131,7 @@ export default function BlogShow({ post, comments, recentViewers }: BlogShowProp
                         <div className="-mt-4 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                             {post.author && (
                                 <div itemProp="author" itemScope itemType="https://schema.org/Person">
-                                    <UserInfo user={post.author} showEmail={false} />
+                                    <UserInfo user={post.author} showGroups={false} />
                                     <meta itemProp="name" content={post.author.name} />
                                 </div>
                             )}
