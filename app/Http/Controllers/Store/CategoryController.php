@@ -52,7 +52,7 @@ class CategoryController extends Controller
             ->visible()
             ->with(['defaultPrice', 'inventoryItem'])
             ->with(['prices' => function (Price|HasMany $query): void {
-                $query->active();
+                $query->active()->visible();
             }])
             ->where('is_subscription_only', false)
             ->ordered()

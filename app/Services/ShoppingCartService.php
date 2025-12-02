@@ -195,7 +195,7 @@ class ShoppingCartService
                 $query
                     ->with(['defaultPrice', 'inventoryItem'])
                     ->with(['prices' => function (Price|HasMany $query): void {
-                        $query->active()->orderBy('is_default', 'desc');
+                        $query->active()->visible()->orderBy('is_default', 'desc');
                     }])
                     ->with(['policies' => function (Policy|BelongsToMany $query): void {
                         $query->active()->effective()->orderBy('title');

@@ -42,6 +42,7 @@ use Override;
  * @property-read ForumCategory|null $category
  * @property-read Collection<int, Forum> $children
  * @property-read int|null $children_count
+ * @property-read \App\Data\GroupStyleData|null $display_style
  * @property-read Collection<int, Follow> $followers
  * @property-read int|null $followers_count
  * @property-read Collection<int, Follow> $follows

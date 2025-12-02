@@ -99,6 +99,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read Collection<int, \Laravel\Passport\Client> $clients
  * @property-read int|null $clients_count
  * @property-read SubscriptionData|null $current_subscription
+ * @property-read \App\Data\GroupStyleData|null $display_style
  * @property-read Collection<int, Field> $fields
  * @property-read int|null $fields_count
  * @property-read Collection<int, Fingerprint> $fingerprints

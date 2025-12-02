@@ -71,7 +71,7 @@ class ProductController extends Controller
             ->all(), PaginatedDataCollection::class);
 
         $product->load(['prices' => function (HasMany|Price $query): void {
-            $query->active();
+            $query->active()->visible();
         }]);
 
         return Inertia::render('store/products/show', [

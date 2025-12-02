@@ -24,6 +24,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -91,13 +92,21 @@ class PricesRelationManager extends RelationManager
                     ->maxValue(365)
                     ->visible(fn (Get $get): bool => $get('type') === PriceType::Recurring)
                     ->helperText('Number of intervals (e.g., every 2 months).'),
-                Toggle::make('is_active')
-                    ->label('Active')
-                    ->default(true)
-                    ->helperText('Whether this price is available for purchase.'),
-                Toggle::make('is_default')
-                    ->label('Default')
-                    ->helperText('Whether this is the default price option.'),
+                Grid::make(3)
+                    ->columnSpanFull()
+                    ->schema([
+                        Toggle::make('is_active')
+                            ->label('Active')
+                            ->default(true)
+                            ->helperText('Whether this price is available for purchase.'),
+                        Toggle::make('is_visible')
+                            ->label('Visible')
+                            ->default(true)
+                            ->helperText('Whether this price can be seen publicly.'),
+                        Toggle::make('is_default')
+                            ->label('Default')
+                            ->helperText('Whether this is the default price option.'),
+                    ]),
                 Textarea::make('description')
                     ->maxLength(65535)
                     ->columnSpanFull()
@@ -135,6 +144,10 @@ class PricesRelationManager extends RelationManager
                     ->boolean()
                     ->label('Active')
                     ->sortable(),
+                IconColumn::make('is_visible')
+                    ->boolean()
+                    ->label('Visible')
+                    ->sortable(),
                 IconColumn::make('is_default')
                     ->boolean()
                     ->label('Default')
@@ -165,6 +178,8 @@ class PricesRelationManager extends RelationManager
                     ->options(SubscriptionInterval::class)
                     ->placeholder('All Intervals')
                     ->visible(fn () => $this->getOwnerRecord()->isSubscription()),
+                TernaryFilter::make('is_visible')
+                    ->label('Visible'),
             ])
             ->headerActions([
                 SyncExternalPriceAction::make('sync')

@@ -8,7 +8,6 @@ use App\Data\ReadData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Frontend\StoreReadRequest;
 use App\Http\Resources\ApiResource;
-use App\Models\Read;
 use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
 

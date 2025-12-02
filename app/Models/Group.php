@@ -27,6 +27,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $description
  * @property string|null $image
  * @property string $color
+ * @property GroupStyleType $style
+ * @property string|null $icon
  * @property int $order
  * @property bool $is_active
  * @property bool $is_default_guest
@@ -60,6 +62,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder<static>|Group whereColor($value)
  * @method static Builder<static>|Group whereCreatedAt($value)
  * @method static Builder<static>|Group whereDescription($value)
+ * @method static Builder<static>|Group whereIcon($value)
  * @method static Builder<static>|Group whereId($value)
  * @method static Builder<static>|Group whereImage($value)
  * @method static Builder<static>|Group whereIsActive($value)
@@ -67,6 +70,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder<static>|Group whereIsDefaultMember($value)
  * @method static Builder<static>|Group whereName($value)
  * @method static Builder<static>|Group whereOrder($value)
+ * @method static Builder<static>|Group whereStyle($value)
  * @method static Builder<static>|Group whereUpdatedAt($value)
  * @method static Builder<static>|Group withoutPermission($permissions)
  * @method static Builder<static>|Group withoutRole($roles, $guard = null)

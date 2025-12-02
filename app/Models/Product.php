@@ -81,6 +81,7 @@ use Illuminate\Support\Str;
  * @property-read Collection<int, Comment> $comments
  * @property-read int|null $comments_count
  * @property-read Price|null $defaultPrice
+ * @property-read \App\Data\GroupStyleData|null $display_style
  * @property-read string|null $featured_image_url
  * @property-read File|null $file
  * @property-read Collection<int, File> $files

@@ -82,7 +82,7 @@ class DashboardController
             ->visible()
             ->with(['defaultPrice', 'categories'])
             ->with(['prices' => function (Price|HasMany $query): void {
-                $query->active();
+                $query->active()->visible();
             }])
             ->latest()
             ->get()
@@ -104,7 +104,7 @@ class DashboardController
             ->visible()
             ->with(['defaultPrice', 'categories', 'approvedReviews'])
             ->with(['prices' => function (Price|HasMany $query): void {
-                $query->active();
+                $query->active()->visible();
             }])
             ->trending()
             ->get()
@@ -127,7 +127,7 @@ class DashboardController
             ->featured()
             ->with(['defaultPrice', 'categories'])
             ->with(['prices' => function (Price|HasMany $query): void {
-                $query->active();
+                $query->active()->visible();
             }])
             ->inRandomOrder()
             ->get()

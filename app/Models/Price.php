@@ -13,6 +13,7 @@ use App\Events\PriceUpdated;
 use App\Traits\Activateable;
 use App\Traits\HasMetadata;
 use App\Traits\HasReferenceId;
+use App\Traits\Visible;
 use Filament\Support\Contracts\HasLabel;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
@@ -43,6 +44,7 @@ use Illuminate\Support\Stringable;
  * @property array<array-key, mixed>|null $metadata
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property bool $is_visible
  * @property-read bool $is_one_time
  * @property-read bool $is_recurring
  * @property-read Product $product
@@ -52,12 +54,14 @@ use Illuminate\Support\Stringable;
  * @method static Builder<static>|Price active()
  * @method static Builder<static>|Price default()
  * @method static \Database\Factories\PriceFactory factory($count = null, $state = [])
+ * @method static Builder<static>|Price hidden()
  * @method static Builder<static>|Price inactive()
  * @method static Builder<static>|Price newModelQuery()
  * @method static Builder<static>|Price newQuery()
  * @method static Builder<static>|Price oneTime()
  * @method static Builder<static>|Price query()
  * @method static Builder<static>|Price recurring()
+ * @method static Builder<static>|Price visible()
  * @method static Builder<static>|Price whereAmount($value)
  * @method static Builder<static>|Price whereCreatedAt($value)
  * @method static Builder<static>|Price whereCurrency($value)
@@ -68,6 +72,7 @@ use Illuminate\Support\Stringable;
  * @method static Builder<static>|Price whereIntervalCount($value)
  * @method static Builder<static>|Price whereIsActive($value)
  * @method static Builder<static>|Price whereIsDefault($value)
+ * @method static Builder<static>|Price whereIsVisible($value)
  * @method static Builder<static>|Price whereMetadata($value)
  * @method static Builder<static>|Price whereName($value)
  * @method static Builder<static>|Price whereProductId($value)
@@ -85,6 +90,7 @@ class Price extends Model implements HasLabel
     use HasFactory;
     use HasMetadata;
     use HasReferenceId;
+    use Visible;
 
     protected $fillable = [
         'product_id',

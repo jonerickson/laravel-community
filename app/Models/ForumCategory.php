@@ -34,6 +34,7 @@ use Illuminate\Support\Str;
  * @property bool $is_active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Data\GroupStyleData|null $display_style
  * @property-read string|null $featured_image_url
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Forum> $forums
  * @property-read int|null $forums_count
