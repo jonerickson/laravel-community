@@ -9,6 +9,8 @@ use App\Models\Forum;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Str;
 use Override;
 
 class EditForum extends EditRecord
@@ -23,6 +25,12 @@ class EditForum extends EditRecord
     public function getContentTabIcon(): ?string
     {
         return 'heroicon-o-chat-bubble-left-right';
+    }
+
+    #[Override]
+    public function getSubheading(): string|Htmlable|null
+    {
+        return Str::limit($this->record?->description);
     }
 
     protected function getHeaderActions(): array

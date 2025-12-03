@@ -6,6 +6,10 @@ namespace App\Traits;
 
 use App\Data\GroupStyleData;
 use App\Managers\PaymentManager;
+use App\Models\Forum;
+use App\Models\ForumCategory;
+use App\Models\ForumCategoryGroup;
+use App\Models\ForumGroup;
 use App\Models\Group;
 use App\Models\Product;
 use App\Models\User;
@@ -25,6 +29,18 @@ trait HasGroups
 
         if (static::class === User::class) {
             return $relation->using(UserGroup::class);
+        }
+
+        if (static::class === Forum::class) {
+            return $relation
+                ->withPivot(['read', 'write', 'delete'])
+                ->using(ForumGroup::class);
+        }
+
+        if (static::class === ForumCategory::class) {
+            return $relation
+                ->withPivot(['read', 'write', 'delete'])
+                ->using(ForumCategoryGroup::class);
         }
 
         return $relation;

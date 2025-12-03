@@ -122,6 +122,20 @@ class Group extends Model
         return static::$defaultMemberGroup ?? static::$defaultMemberGroup = Cache::memo()->remember('default_member_group', now()->addHour(), fn () => Group::query()->with(['permissions', 'roles'])->defaultMemberGroups()->first());
     }
 
+    public function forums(): BelongsToMany
+    {
+        return $this->belongsToMany(Forum::class, 'forums_groups')
+            ->withPivot(['read', 'write', 'delete'])
+            ->using(ForumGroup::class);
+    }
+
+    public function forumCategories(): BelongsToMany
+    {
+        return $this->belongsToMany(ForumCategory::class, 'forums_categories_groups')
+            ->withPivot(['read', 'write', 'delete'])
+            ->using(ForumCategoryGroup::class);
+    }
+
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'users_groups')

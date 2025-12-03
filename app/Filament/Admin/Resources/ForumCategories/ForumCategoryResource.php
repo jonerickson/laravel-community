@@ -7,6 +7,7 @@ namespace App\Filament\Admin\Resources\ForumCategories;
 use App\Filament\Admin\Resources\ForumCategories\Pages\CreateForumCategory;
 use App\Filament\Admin\Resources\ForumCategories\Pages\EditForumCategory;
 use App\Filament\Admin\Resources\ForumCategories\Pages\ListForumCategories;
+use App\Filament\Admin\Resources\ForumCategories\RelationManagers\GroupsRelationManager;
 use App\Filament\Admin\Resources\ForumCategories\Schemas\ForumCategoryForm;
 use App\Filament\Admin\Resources\ForumCategories\Tables\ForumCategoriesTable;
 use App\Models\ForumCategory;
@@ -37,6 +38,14 @@ class ForumCategoryResource extends Resource
     public static function table(Table $table): Table
     {
         return ForumCategoriesTable::configure($table);
+    }
+
+    #[Override]
+    public static function getRelations(): array
+    {
+        return [
+            GroupsRelationManager::make(),
+        ];
     }
 
     public static function getPages(): array

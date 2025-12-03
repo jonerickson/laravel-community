@@ -12,10 +12,19 @@ use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Str;
+use Override;
 
 class EditProduct extends EditRecord
 {
     protected static string $resource = ProductResource::class;
+
+    #[Override]
+    public function getSubheading(): string|Htmlable|null
+    {
+        return Str::of($this->record?->description)->stripTags()->limit()->toString();
+    }
 
     protected function getHeaderActions(): array
     {

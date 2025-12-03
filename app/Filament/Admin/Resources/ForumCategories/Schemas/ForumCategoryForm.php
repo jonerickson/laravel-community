@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\ForumCategories\Schemas;
 
-use App\Models\Group as GroupModel;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -16,7 +14,6 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class ForumCategoryForm
@@ -95,20 +92,6 @@ class ForumCategoryForm
                                     ->label('Active')
                                     ->helperText('Allow the category to be accessed.')
                                     ->default(true),
-                            ]),
-                        Section::make('Permissions')
-                            ->columnSpanFull()
-                            ->schema([
-                                Select::make('groups')
-                                    ->default(fn (): Collection => collect([
-                                        GroupModel::defaultMemberGroup()?->id,
-                                        GroupModel::defaultGuestGroup()?->id,
-                                    ]))
-                                    ->relationship('groups', 'name')
-                                    ->preload()
-                                    ->searchable()
-                                    ->multiple()
-                                    ->helperText('The groups that are allowed to view this forum category.'),
                             ]),
                     ]),
             ]);

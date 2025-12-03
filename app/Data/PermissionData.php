@@ -16,6 +16,7 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 class PermissionData extends Data
 {
     public function __construct(
+        public bool $canCreate = false,
         public bool $canUpdate = false,
         public bool $canDelete = false,
     ) {
@@ -25,6 +26,7 @@ class PermissionData extends Data
     public static function fromModel(Model $model): self
     {
         return new self(
+            canCreate: Gate::check('create', $model),
             canUpdate: Gate::check('update', $model),
             canDelete: Gate::check('delete', $model),
         );

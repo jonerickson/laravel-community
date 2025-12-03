@@ -7,9 +7,9 @@ namespace App\Filament\Admin\Resources\Forums;
 use App\Filament\Admin\Resources\Forums\Pages\CreateForum;
 use App\Filament\Admin\Resources\Forums\Pages\EditForum;
 use App\Filament\Admin\Resources\Forums\Pages\ListForums;
+use App\Filament\Admin\Resources\Forums\RelationManagers\GroupsRelationManager;
 use App\Filament\Admin\Resources\Forums\RelationManagers\TopicsRelationManager;
 use App\Models\Forum;
-use App\Models\Group as GroupModel;
 use BackedEnum;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -38,7 +38,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Override;
@@ -127,20 +126,6 @@ class ForumResource extends Resource
                                     ->label('Active')
                                     ->helperText('Allow the forum to be accessed.')
                                     ->default(true),
-                            ]),
-                        Section::make('Permissions')
-                            ->columnSpanFull()
-                            ->schema([
-                                Select::make('groups')
-                                    ->default(fn (): Collection => collect([
-                                        GroupModel::defaultMemberGroup()?->id,
-                                        GroupModel::defaultGuestGroup()?->id,
-                                    ]))
-                                    ->relationship('groups', 'name')
-                                    ->preload()
-                                    ->searchable()
-                                    ->multiple()
-                                    ->helperText('The groups that are allowed to view this forum.'),
                             ]),
                     ]),
             ]);
@@ -251,6 +236,7 @@ class ForumResource extends Resource
     public static function getRelations(): array
     {
         return [
+            GroupsRelationManager::make(),
             TopicsRelationManager::make(),
         ];
     }
