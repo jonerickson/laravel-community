@@ -10,6 +10,7 @@ use App\Filament\Admin\Resources\Forums\Pages\ListForums;
 use App\Filament\Admin\Resources\Forums\RelationManagers\GroupsRelationManager;
 use App\Filament\Admin\Resources\Forums\RelationManagers\TopicsRelationManager;
 use App\Models\Forum;
+use App\Services\CacheService;
 use BackedEnum;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -38,7 +39,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Override;
@@ -86,37 +86,40 @@ class ForumResource extends Resource
                                 Select::make('parent_id')
                                     ->label('Parent Forum')
                                     ->options(function () {
-                                        $forums = Forum::query()
-                                            ->whereNull('parent_id')
-                                            ->ordered()
-                                            ->with(['children' => function (HasMany|Forum $query) {
-                                                $query->ordered()->with(['children' => function (HasMany|Forum $subQuery) {
-                                                    $subQuery->ordered()->with(['children' => function (HasMany|Forum $subQuery) {
-                                                        $subQuery->ordered();
-                                                    }]);
-                                                }]);
-                                            }])
-                                            ->get();
+                                        $cacheService = app(CacheService::class);
+                                        $categories = $cacheService->getByKey('forums.categories.index');
+
+                                        if (! $categories) {
+                                            return [];
+                                        }
 
                                         $options = [];
 
-                                        foreach ($forums as $forum) {
+                                        foreach ($categories as $category) {
                                             $groupOptions = [];
 
-                                            foreach ($forum->children as $child) {
-                                                $groupOptions[$child->id] = $child->name;
+                                            if (! isset($category['forums'])) {
+                                                continue;
+                                            }
 
-                                                foreach ($child->children as $grandchild) {
-                                                    $groupOptions[$grandchild->id] = '→ '.$grandchild->name;
+                                            foreach ($category['forums'] as $forum) {
+                                                $groupOptions[$forum['id']] = $forum['name'];
 
-                                                    foreach ($grandchild->children as $greatGrandchild) {
-                                                        $groupOptions[$greatGrandchild->id] = '→ → '.$greatGrandchild->name;
+                                                if (isset($forum['children'])) {
+                                                    foreach ($forum['children'] as $child) {
+                                                        $groupOptions[$child['id']] = '→ '.$child['name'];
+
+                                                        if (isset($child['children'])) {
+                                                            foreach ($child['children'] as $grandchild) {
+                                                                $groupOptions[$grandchild['id']] = '→ → '.$grandchild['name'];
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
 
                                             if (! empty($groupOptions)) {
-                                                $options[$forum->name] = $groupOptions;
+                                                $options[$category['name']] = $groupOptions;
                                             }
                                         }
 
