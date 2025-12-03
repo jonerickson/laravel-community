@@ -35,6 +35,21 @@ class HandleInertiaRequests extends Middleware
         //
     }
 
+    /**
+     * We have to override the parent function because when an asset URL is used,
+     * it uses a hash of the asset URL. When deploying new changes, the asset
+     * URL does not change and therefor a new version is not detected. Revert to
+     * using a hash of the build manifest.
+     */
+    public function version(Request $request): ?string
+    {
+        if (file_exists($manifest = public_path('build/manifest.json'))) {
+            return hash_file('xxh128', $manifest);
+        }
+
+        return parent::version($request);
+    }
+
     #[Override]
     public function share(Request $request): array
     {
