@@ -14,9 +14,11 @@ use App\Enums\PostType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Forums\StoreTopicRequest;
 use App\Models\Forum;
+use App\Models\Group;
 use App\Models\Post;
 use App\Models\Topic;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -94,7 +96,9 @@ class TopicController extends Controller
         $posts = $topic
             ->posts()
             ->latestActivity()
-            ->with(['author.groups'])
+            ->with(['author.groups' => function (BelongsToMany|Group $query): void {
+                $query->ordered();
+            }])
             ->withCount(['likes'])
             ->paginate();
 

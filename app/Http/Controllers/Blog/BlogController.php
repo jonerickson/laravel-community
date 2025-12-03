@@ -9,11 +9,13 @@ use App\Data\PostData;
 use App\Data\RecentViewerData;
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
+use App\Models\Group;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\CacheService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -62,7 +64,13 @@ class BlogController extends Controller
 
         $comments = CommentData::collect($post
             ->comments()
-            ->with(['author.groups', 'replies.author.groups', 'parent', 'likes.author'])
+            ->with(['parent', 'likes.author'])
+            ->with(['replies.author.groups' => function (BelongsToMany|Group $query): void {
+                $query->ordered();
+            }])
+            ->with(['author.groups' => function (BelongsToMany|Group $query): void {
+                $query->ordered();
+            }])
             ->latest()
             ->get()
             ->filter(fn (Comment $comment) => Gate::check('view', $comment))

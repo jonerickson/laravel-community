@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Data\UserData;
 use App\Models\Field;
+use App\Models\Group;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Inertia\Inertia;
@@ -15,8 +16,12 @@ class UserController extends Controller
 {
     public function show(User $user): Response
     {
-        $user->loadMissing(['groups', 'fields' => function (BelongsToMany|Field $query): void {
+        $user->loadMissing(['fields' => function (BelongsToMany|Field $query): void {
             $query->where('is_public', true)->ordered();
+        }]);
+
+        $user->loadMissing(['groups' => function (BelongsToMany|Group $query): void {
+            $query->ordered();
         }]);
 
         $user->setRelation('fields', $user->fields->map(function (Field $field): Field {
