@@ -13,8 +13,8 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 
 class ReviewsRelationManager extends RelationManager
@@ -52,7 +52,9 @@ class ReviewsRelationManager extends RelationManager
                     ->html()
                     ->wrap()
                     ->sortable(),
-                ToggleColumn::make('is_approved')
+                IconColumn::make('is_approved')
+                    ->sortable()
+                    ->boolean()
                     ->label('Approved'),
                 TextColumn::make('created_at')
                     ->label('Created')

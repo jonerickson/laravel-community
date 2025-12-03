@@ -21,7 +21,7 @@ class UserController extends Controller
         }]);
 
         $user->loadMissing(['groups' => function (BelongsToMany|Group $query): void {
-            $query->ordered();
+            $query->active()->visible()->ordered();
         }]);
 
         $user->setRelation('fields', $user->fields->map(function (Field $field): Field {

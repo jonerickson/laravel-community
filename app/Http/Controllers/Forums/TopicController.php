@@ -97,7 +97,7 @@ class TopicController extends Controller
             ->posts()
             ->latestActivity()
             ->with(['author.groups' => function (BelongsToMany|Group $query): void {
-                $query->ordered();
+                $query->active()->visible()->ordered();
             }])
             ->withCount(['likes'])
             ->paginate();

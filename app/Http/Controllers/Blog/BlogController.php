@@ -66,10 +66,10 @@ class BlogController extends Controller
             ->comments()
             ->with(['parent', 'likes.author'])
             ->with(['replies.author.groups' => function (BelongsToMany|Group $query): void {
-                $query->ordered();
+                $query->active()->visible()->ordered();
             }])
             ->with(['author.groups' => function (BelongsToMany|Group $query): void {
-                $query->ordered();
+                $query->active()->visible()->ordered();
             }])
             ->latest()
             ->get()

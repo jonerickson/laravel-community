@@ -12,9 +12,9 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
@@ -44,7 +44,8 @@ class KnowledgeBaseArticlesTable
                     ->label('Category')
                     ->sortable()
                     ->toggleable(),
-                ToggleColumn::make('is_published')
+                IconColumn::make('is_published')
+                    ->boolean()
                     ->sortable()
                     ->label('Published'),
                 TextColumn::make('author.name')

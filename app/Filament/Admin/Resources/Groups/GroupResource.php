@@ -24,6 +24,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Group as GroupSchema;
@@ -34,7 +35,6 @@ use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
@@ -108,6 +108,18 @@ class GroupResource extends Resource
                                     ->label('Updated')
                                     ->since()
                                     ->dateTimeTooltip(),
+                            ]),
+                        Section::make('Settings')
+                            ->columnSpanFull()
+                            ->schema([
+                                Toggle::make('is_active')
+                                    ->label('Active')
+                                    ->default(true)
+                                    ->helperText('Prevent this group from being used.'),
+                                Toggle::make('is_visible')
+                                    ->label('Visible')
+                                    ->default(true)
+                                    ->helperText('Hide this group from being publicly visible.'),
                             ]),
                         Section::make('Permissions')
                             ->collapsible()
@@ -184,8 +196,14 @@ class GroupResource extends Resource
                     ->badge()
                     ->toggleable(isToggledHiddenByDefault: true),
                 ColorColumn::make('color'),
-                ToggleColumn::make('is_active')
+                IconColumn::make('is_active')
+                    ->boolean()
+                    ->sortable()
                     ->label('Active'),
+                IconColumn::make('is_visible')
+                    ->label('Visible')
+                    ->boolean()
+                    ->sortable(),
                 IconColumn::make('is_default_guest')
                     ->sortable()
                     ->boolean()
@@ -198,6 +216,8 @@ class GroupResource extends Resource
             ->filters([
                 TernaryFilter::make('is_active')
                     ->label('Active'),
+                TernaryFilter::make('is_visible')
+                    ->label('Visible'),
             ])
             ->recordActions([
                 EditAction::make(),

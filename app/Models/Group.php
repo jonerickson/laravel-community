@@ -10,6 +10,7 @@ use App\Traits\Activateable;
 use App\Traits\HasFiles;
 use App\Traits\HasIcon;
 use App\Traits\Orderable;
+use App\Traits\Visible;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -31,6 +32,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $icon
  * @property int $order
  * @property bool $is_active
+ * @property bool $is_visible
  * @property bool $is_default_guest
  * @property bool $is_default_member
  * @property Carbon|null $created_at
@@ -52,6 +54,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder<static>|Group defaultGuestGroups()
  * @method static Builder<static>|Group defaultMemberGroups()
  * @method static \Database\Factories\GroupFactory factory($count = null, $state = [])
+ * @method static Builder<static>|Group hidden()
  * @method static Builder<static>|Group inactive()
  * @method static Builder<static>|Group newModelQuery()
  * @method static Builder<static>|Group newQuery()
@@ -59,6 +62,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder<static>|Group permission($permissions, $without = false)
  * @method static Builder<static>|Group query()
  * @method static Builder<static>|Group role($roles, $guard = null, $without = false)
+ * @method static Builder<static>|Group visible()
  * @method static Builder<static>|Group whereColor($value)
  * @method static Builder<static>|Group whereCreatedAt($value)
  * @method static Builder<static>|Group whereDescription($value)
@@ -68,6 +72,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder<static>|Group whereIsActive($value)
  * @method static Builder<static>|Group whereIsDefaultGuest($value)
  * @method static Builder<static>|Group whereIsDefaultMember($value)
+ * @method static Builder<static>|Group whereIsVisible($value)
  * @method static Builder<static>|Group whereName($value)
  * @method static Builder<static>|Group whereOrder($value)
  * @method static Builder<static>|Group whereStyle($value)
@@ -85,6 +90,7 @@ class Group extends Model
     use HasIcon;
     use HasRoles;
     use Orderable;
+    use Visible;
 
     protected string $guard_name = 'web';
 

@@ -31,8 +31,8 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ColorColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Grouping\Group;
@@ -173,9 +173,10 @@ class ForumResource extends Resource
                     ->badge(),
                 ColorColumn::make('color')
                     ->sortable(),
-                ToggleColumn::make('is_active')
-                    ->label('Active')
-                    ->sortable(),
+                IconColumn::make('is_active')
+                    ->sortable()
+                    ->boolean()
+                    ->label('Active'),
                 TextColumn::make('topics_count')
                     ->label('Topics')
                     ->counts('topics')

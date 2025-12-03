@@ -25,8 +25,8 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -145,10 +145,12 @@ class AnnouncementResource extends Resource
                     ->weight('bold'),
                 TextColumn::make('type')
                     ->badge(),
-                ToggleColumn::make('is_active')
+                IconColumn::make('is_active')
                     ->sortable()
+                    ->boolean()
                     ->label('Active'),
-                ToggleColumn::make('is_dismissible')
+                IconColumn::make('is_dismissible')
+                    ->boolean()
                     ->sortable()
                     ->label('Dismissible'),
                 TextColumn::make('starts_at')

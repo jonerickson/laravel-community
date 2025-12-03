@@ -24,8 +24,8 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
@@ -132,10 +132,12 @@ class TopicResource extends Resource
                     ->label('Posts')
                     ->counts('posts')
                     ->sortable(),
-                ToggleColumn::make('is_pinned')
+                IconColumn::make('is_pinned')
+                    ->boolean()
                     ->sortable()
                     ->label('Pinned'),
-                ToggleColumn::make('is_locked')
+                IconColumn::make('is_locked')
+                    ->boolean()
                     ->sortable()
                     ->label('Locked'),
                 TextColumn::make('created_at')

@@ -116,7 +116,13 @@ trait HasGroups
     {
         return Attribute::make(
             get: function (): ?GroupStyleData {
-                $primaryGroup = $this->groups->filter->is_active->sortBy('order')->first();
+                $primaryGroup = $this->groups
+                    ->filter(fn (Group $group) => $group->is_active)
+                    ->filter(fn (Group $group) => $group->is_visible)
+                    ->reject(fn (Group $group): bool => $group->id === Group::defaultGuestGroup()?->id)
+                    ->reject(fn (Group $group): bool => $group->id === Group::defaultMemberGroup()?->id)
+                    ->sortBy('order')
+                    ->first();
 
                 if (! $primaryGroup) {
                     return null;

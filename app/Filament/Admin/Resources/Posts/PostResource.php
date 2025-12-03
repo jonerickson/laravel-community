@@ -32,6 +32,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -194,10 +195,12 @@ class PostResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->limit(50),
-                ToggleColumn::make('is_published')
+                IconColumn::make('is_published')
+                    ->boolean()
                     ->sortable()
                     ->label('Published'),
-                ToggleColumn::make('is_featured')
+                IconColumn::make('is_featured')
+                    ->boolean()
                     ->sortable()
                     ->label('Featured'),
                 ToggleColumn::make('comments_enabled')
