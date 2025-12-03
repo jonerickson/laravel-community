@@ -54,15 +54,15 @@ DROP TABLE IF EXISTS `blacklist`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `blacklist` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `content` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `filter` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'string',
+  `filter` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'string',
   `is_regex` tinyint(1) NOT NULL DEFAULT '0',
   `warning_id` bigint unsigned DEFAULT NULL,
   `created_by` bigint unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `resource_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `resource_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `resource_id` bigint unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `blacklist_warning_id_foreign` (`warning_id`),
@@ -335,6 +335,8 @@ CREATE TABLE `groups` (
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `color` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#6b7280',
+  `style` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'solid',
+  `icon` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `order` int NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `is_default_guest` tinyint(1) NOT NULL DEFAULT '0',
@@ -371,6 +373,99 @@ CREATE TABLE `images` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `images_imageable_type_imageable_id_index` (`imageable_type`,`imageable_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `inventory_alerts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `inventory_alerts` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `inventory_item_id` bigint unsigned NOT NULL,
+  `alert_type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `threshold_value` int DEFAULT NULL,
+  `current_value` int DEFAULT NULL,
+  `is_resolved` tinyint(1) NOT NULL DEFAULT '0',
+  `resolved_at` timestamp NULL DEFAULT NULL,
+  `resolved_by` bigint unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `inventory_alerts_inventory_item_id_foreign` (`inventory_item_id`),
+  KEY `inventory_alerts_resolved_by_foreign` (`resolved_by`),
+  KEY `inventory_alerts_is_resolved_index` (`is_resolved`),
+  CONSTRAINT `inventory_alerts_inventory_item_id_foreign` FOREIGN KEY (`inventory_item_id`) REFERENCES `inventory_items` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `inventory_alerts_resolved_by_foreign` FOREIGN KEY (`resolved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `inventory_items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `inventory_items` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `product_id` bigint unsigned NOT NULL,
+  `sku` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `quantity_available` int NOT NULL DEFAULT '0',
+  `quantity_reserved` int NOT NULL DEFAULT '0',
+  `quantity_damaged` int NOT NULL DEFAULT '0',
+  `reorder_point` int DEFAULT NULL,
+  `reorder_quantity` int DEFAULT NULL,
+  `warehouse_location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `track_inventory` tinyint(1) NOT NULL DEFAULT '1',
+  `allow_backorder` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `inventory_items_sku_unique` (`sku`),
+  KEY `inventory_items_product_id_foreign` (`product_id`),
+  KEY `inventory_items_quantity_available_index` (`quantity_available`),
+  CONSTRAINT `inventory_items_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `inventory_reservations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `inventory_reservations` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `inventory_item_id` bigint unsigned NOT NULL,
+  `order_id` bigint unsigned DEFAULT NULL,
+  `quantity` int NOT NULL,
+  `status` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `fulfilled_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `inventory_reservations_inventory_item_id_foreign` (`inventory_item_id`),
+  KEY `inventory_reservations_order_id_foreign` (`order_id`),
+  KEY `inventory_reservations_status_index` (`status`),
+  CONSTRAINT `inventory_reservations_inventory_item_id_foreign` FOREIGN KEY (`inventory_item_id`) REFERENCES `inventory_items` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `inventory_reservations_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `inventory_transactions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `inventory_transactions` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `inventory_item_id` bigint unsigned NOT NULL,
+  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `quantity` int NOT NULL,
+  `quantity_before` int NOT NULL,
+  `quantity_after` int NOT NULL,
+  `reference_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `reference_id` bigint unsigned DEFAULT NULL,
+  `reason` text COLLATE utf8mb4_unicode_ci,
+  `notes` text COLLATE utf8mb4_unicode_ci,
+  `created_by` bigint unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `inventory_transactions_inventory_item_id_foreign` (`inventory_item_id`),
+  KEY `inventory_transactions_created_by_foreign` (`created_by`),
+  KEY `inventory_transactions_type_index` (`type`),
+  KEY `inventory_transactions_reference_type_reference_id_index` (`reference_type`,`reference_id`),
+  CONSTRAINT `inventory_transactions_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `inventory_transactions_inventory_item_id_foreign` FOREIGN KEY (`inventory_item_id`) REFERENCES `inventory_items` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `invoices`;
@@ -921,6 +1016,7 @@ CREATE TABLE `prices` (
   `metadata` json DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `is_visible` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `product_prices_product_id_is_active_index` (`product_id`,`is_active`),
   KEY `product_prices_stripe_price_id_index` (`external_price_id`),
@@ -1370,7 +1466,7 @@ CREATE TABLE `users_integrations` (
   `provider_email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `provider_avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `access_token` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `refresh_token` text COLLATE utf8mb4_unicode_ci,
+  `refresh_token` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `expires_at` timestamp NULL DEFAULT NULL,
   `last_synced_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -1476,12 +1572,12 @@ DROP TABLE IF EXISTS `whitelist`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `whitelist` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `content` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `filter` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'string',
+  `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `filter` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'string',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `resource_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `resource_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `resource_id` bigint unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `whitelist_resource_type_resource_id_index` (`resource_type`,`resource_id`)
@@ -1626,12 +1722,18 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (170,'2025_11_21_17
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (174,'2025_11_26_065517_add_meter_id_to_subscription_items_table',60);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (176,'2025_11_26_065518_add_meter_event_name_to_subscription_items_table',61);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (177,'2025_11_26_065811_update_user_agent_column_in_fingerprints_table',62);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (178,'2025_09_28_202015_create_email_settings',63);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (179,'2025_09_28_202053_create_general_settings',63);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (180,'2025_11_25_191628_registration_settings',63);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (181,'2025_11_26_224810_add_filter_to_blacklist_table',63);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (182,'2025_11_26_225200_create_whitelist_table',63);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (183,'2025_11_27_050547_remove_ban_from_fingerprints_table',63);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (184,'2025_11_27_051532_add_resource_to_blacklist_table',63);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (185,'2025_11_27_213428_add_suspect_score_to_fingerprints_table',64);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (187,'2025_11_27_222646_add_refresh_token_to_users_integrations_table',65);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (188,'2025_09_28_202015_create_email_settings',66);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (189,'2025_09_28_202053_create_general_settings',66);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (190,'2025_11_25_191628_registration_settings',66);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (191,'2025_11_30_214637_create_inventory_items_table',66);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (192,'2025_11_30_214640_create_inventory_transactions_table',66);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (193,'2025_11_30_214642_create_inventory_alerts_table',66);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (194,'2025_11_30_214644_create_inventory_reservations_table',66);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (195,'2025_12_02_052557_add_style_fields_to_groups_table',67);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (196,'2025_12_02_234139_add_visible_column_to_prices_table',68);
