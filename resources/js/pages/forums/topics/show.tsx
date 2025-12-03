@@ -16,7 +16,7 @@ import type { BreadcrumbItem } from '@/types';
 import { stripCharacters } from '@/utils/truncate';
 import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
-import { AlertTriangle, ArrowDown, ArrowLeft, Clock, Eye, EyeOff, MessageSquare, Reply, ThumbsDown, User } from 'lucide-react';
+import { AlertTriangle, ArrowDown, ArrowLeft, ArrowUp, Clock, Eye, EyeOff, MessageSquare, Reply, ThumbsDown, User } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { route } from 'ziggy-js';
 
@@ -87,6 +87,10 @@ export default function ForumTopicShow({ forum, topic, posts, categories, recent
                 }, 100);
             },
         });
+    };
+
+    const goToTheTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleQuotePost = (postContent: string, authorName: string) => {
@@ -308,14 +312,17 @@ export default function ForumTopicShow({ forum, topic, posts, categories, recent
                     />
                 )}
 
-                <div className="flex justify-start py-4">
-                    <Link
-                        href={route('forums.show', { forum: forum.slug })}
-                        className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                        <ArrowLeft className="size-4" />
-                        Back to {forum.name}
-                    </Link>
+                <div className="flex justify-between py-4">
+                    <Button variant="ghost" className="text-muted-foreground" asChild>
+                        <Link href={route('forums.show', { forum: forum.slug })}>
+                            <ArrowLeft className="size-4" />
+                            Back to {forum.name}
+                        </Link>
+                    </Button>
+                    <Button variant="ghost" className="text-muted-foreground" onClick={goToTheTop}>
+                        <ArrowUp className="size-4" />
+                        Back to the top
+                    </Button>
                 </div>
             </div>
         </AppLayout>
