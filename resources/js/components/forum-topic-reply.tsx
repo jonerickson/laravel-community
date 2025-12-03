@@ -22,7 +22,7 @@ export default function ForumTopicReply({ forumSlug, topicSlug, onCancel, onSucc
 
     useEffect(() => {
         if (quotedContent && quotedAuthor) {
-            const quotedText = `<blockquote><strong>${quotedAuthor} wrote:</strong><br>${quotedContent}</blockquote><br><br>`;
+            const quotedText = `<blockquote><strong>${quotedAuthor} wrote:</strong><br>${quotedContent}</blockquote>`;
             setData('content', quotedText);
         }
     }, [quotedContent, quotedAuthor, setData]);

@@ -111,6 +111,8 @@ export default function ForumTopicShow({ forum, topic, posts, forums, recentView
 
     const handleReplySubmitted = () => {
         router.reload({ only: ['posts'] });
+        setQuotedContent('');
+        setQuotedAuthor('');
     };
 
     const structuredData = {
