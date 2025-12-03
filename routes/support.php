@@ -7,7 +7,8 @@ use App\Http\Controllers\SupportTickets\CommentController;
 use App\Http\Controllers\SupportTickets\SupportTicketController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/support/tickets', [SupportTicketController::class, 'index'])->name('support.index');
+// Route::get('/support/tickets', [SupportTicketController::class, 'index'])->name('support.index');
+Route::redirect('/support/tickets', 'https://support.reactstudios.com')->name('support.index');
 
 Route::group(['middleware' => ['auth', 'verified']], function (): void {
     Route::get('/support/tickets/create', [SupportTicketController::class, 'create'])->name('support.create');
