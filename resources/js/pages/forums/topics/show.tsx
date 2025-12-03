@@ -24,11 +24,11 @@ interface TopicShowProps {
     forum: App.Data.ForumData;
     topic: App.Data.TopicData;
     posts: App.Data.PaginatedData<App.Data.PostData>;
-    forums: App.Data.ForumData[];
+    categories: App.Data.ForumCategoryData[];
     recentViewers: App.Data.RecentViewerData[];
 }
 
-export default function ForumTopicShow({ forum, topic, posts, forums, recentViewers }: TopicShowProps) {
+export default function ForumTopicShow({ forum, topic, posts, categories, recentViewers }: TopicShowProps) {
     const { can } = usePermissions();
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const [quotedContent, setQuotedContent] = useState<string>('');
@@ -221,8 +221,8 @@ export default function ForumTopicShow({ forum, topic, posts, forums, recentView
                             </div>
                         </div>
 
-                        <Deferred fallback={<></>} data={'forums'}>
-                            <ForumTopicModerationMenu topic={topic} forum={forum} forums={forums} />
+                        <Deferred fallback={<></>} data={'categories'}>
+                            <ForumTopicModerationMenu topic={topic} forum={forum} categories={categories} />
                         </Deferred>
                     </div>
                     <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row sm:items-center">

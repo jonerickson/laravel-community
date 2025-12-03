@@ -182,6 +182,7 @@ declare namespace App.Data {
         latestTopic: App.Data.TopicData | null;
         category: App.Data.ForumCategoryData | null;
         parent: App.Data.ForumData | null;
+        children: Array<App.Data.ForumData> | null;
         groups: Array<App.Data.GroupData> | null;
         createdAt: string | null;
         updatedAt: string | null;

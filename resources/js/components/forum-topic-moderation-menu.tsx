@@ -10,10 +10,10 @@ import { useState } from 'react';
 interface ForumTopicModerationMenuProps {
     topic: App.Data.TopicData;
     forum: App.Data.ForumData;
-    forums: App.Data.ForumData[];
+    categories: App.Data.ForumCategoryData[];
 }
 
-export default function ForumTopicModerationMenu({ topic, forum, forums }: ForumTopicModerationMenuProps) {
+export default function ForumTopicModerationMenu({ topic, forum, categories }: ForumTopicModerationMenuProps) {
     const { can, hasAnyPermission } = usePermissions();
     const { delete: deleteTopic } = useForm();
     const { execute: pinTopic, loading: pinLoading } = useApiRequest();
@@ -165,7 +165,7 @@ export default function ForumTopicModerationMenu({ topic, forum, forums }: Forum
             </DropdownMenu>
 
             <ForumSelectionDialog
-                forums={forums}
+                categories={categories}
                 isOpen={showMoveDialog}
                 onClose={() => setShowMoveDialog(false)}
                 onSelect={handleMoveTopic}

@@ -78,6 +78,13 @@ class CacheService
                     ->active()
                     ->ordered()
                     ->with(['groups'])
+                    ->with(['children' => function (HasMany|Forum $query): void {
+                        $query->ordered()->withCount(['topics', 'posts'])->with(['children' => function (HasMany|Forum $query): void {
+                            $query->ordered()->withCount(['topics', 'posts'])->with(['children' => function (HasMany|Forum $query): void {
+                                $query->ordered()->withCount(['topics', 'posts']);
+                            }]);
+                        }]);
+                    }])
                     ->with(['latestTopics' => function (HasMany|Topic $subQuery): void {
                         $subQuery
                             ->withCount('posts')

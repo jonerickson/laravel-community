@@ -2,11 +2,11 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageSquare, Search } from 'lucide-react';
+import { ChevronRight, MessageSquare, Search } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 interface ForumSelectionDialogProps {
-    forums: App.Data.ForumData[];
+    categories: App.Data.ForumCategoryData[];
     isOpen: boolean;
     onClose: () => void;
     onSelect: (forum: App.Data.ForumData) => void;
@@ -14,7 +14,13 @@ interface ForumSelectionDialogProps {
     description: string;
 }
 
-export default function ForumSelectionDialog({ forums, isOpen, onClose, onSelect, title, description }: ForumSelectionDialogProps) {
+interface FlattenedItem {
+    forum: App.Data.ForumData;
+    depth: number;
+    path: string[];
+}
+
+export default function ForumSelectionDialog({ categories, isOpen, onClose, onSelect, title, description }: ForumSelectionDialogProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedIndex, setSelectedIndex] = useState(0);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -25,10 +31,43 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose, onSelect
         onSelect(forum);
     };
 
-    const filteredForums = forums.filter(
-        (forum) =>
-            forum.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (forum.description?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false),
+    // Flatten the category/forum/subforum hierarchy into a searchable list
+    const flattenForums = (categories: App.Data.ForumCategoryData[]): FlattenedItem[] => {
+        const items: FlattenedItem[] = [];
+
+        const processForums = (forums: App.Data.ForumData[] | undefined, path: string[], depth: number) => {
+            if (!forums) return;
+
+            forums.forEach((forum) => {
+                items.push({
+                    forum,
+                    depth,
+                    path: [...path],
+                });
+
+                // Recursively process sub-forums
+                if (forum.children && forum.children.length > 0) {
+                    processForums(forum.children, [...path, forum.name], depth + 1);
+                }
+            });
+        };
+
+        categories.forEach((category) => {
+            if (category.forums && category.forums.length > 0) {
+                processForums(category.forums, [category.name], 0);
+            }
+        });
+
+        return items;
+    };
+
+    const allForums = flattenForums(categories);
+
+    const filteredForums = allForums.filter(
+        (item) =>
+            item.forum.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (item.forum.description?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
+            item.path.some((p) => p.toLowerCase().includes(searchTerm.toLowerCase())),
     );
 
     useEffect(() => {
@@ -65,7 +104,7 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose, onSelect
             case 'Enter':
                 e.preventDefault();
                 if (filteredForums[selectedIndex]) {
-                    handleForumSelect(filteredForums[selectedIndex]);
+                    handleForumSelect(filteredForums[selectedIndex].forum);
                 }
                 break;
             case 'Escape':
@@ -101,51 +140,60 @@ export default function ForumSelectionDialog({ forums, isOpen, onClose, onSelect
                     />
                 </div>
                 <ScrollArea className="max-h-[400px]">
-                    <div className="space-y-2">
-                        {filteredForums
-                            .sort((a, b) => a.name.localeCompare(b.name))
-                            .map((forum, index) => (
-                                <Button
-                                    key={forum.id}
-                                    ref={(el) => {
-                                        buttonRefs.current[index] = el;
-                                    }}
-                                    variant="ghost"
-                                    className={`h-auto w-full justify-start p-4 text-left ${selectedIndex === index ? 'bg-accent' : ''}`}
-                                    onClick={() => handleForumSelect(forum)}
-                                    onMouseEnter={() => setSelectedIndex(index)}
-                                >
-                                    <div className="flex w-full items-start gap-3">
-                                        <div
-                                            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg text-white"
-                                            style={{ backgroundColor: forum.color }}
-                                        >
-                                            <MessageSquare className="size-5" />
-                                        </div>
-                                        <div className="flex min-w-0 flex-1 flex-col items-start">
-                                            <div className="text-sm font-medium">{forum.name}</div>
-                                            {forum.description && (
-                                                <div className="text-left text-xs text-wrap break-words text-muted-foreground">
-                                                    {forum.description}
-                                                </div>
-                                            )}
-                                            <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-                                                <span>{forum.topicsCount || 0} topics</span>
-                                                <span>{forum.postsCount || 0} posts</span>
+                    <div className="space-y-1">
+                        {filteredForums.map((item, index) => (
+                            <Button
+                                key={item.forum.id}
+                                ref={(el) => {
+                                    buttonRefs.current[index] = el;
+                                }}
+                                variant="ghost"
+                                className={`h-auto w-full justify-start text-left ${selectedIndex === index ? 'bg-accent' : ''}`}
+                                onClick={() => handleForumSelect(item.forum)}
+                                onMouseEnter={() => setSelectedIndex(index)}
+                                style={{ paddingLeft: `${1 + item.depth * 1.5}rem` }}
+                            >
+                                <div className="flex w-full items-start gap-3 py-3">
+                                    <div
+                                        className="flex size-8 shrink-0 items-center justify-center rounded-lg text-white"
+                                        style={{ backgroundColor: item.forum.color }}
+                                    >
+                                        <MessageSquare className="size-4" />
+                                    </div>
+                                    <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
+                                        {item.path.length > 0 && (
+                                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                {item.path.map((pathItem, pathIndex) => (
+                                                    <div key={pathIndex} className="flex items-center gap-1">
+                                                        <span>{pathItem}</span>
+                                                        {pathIndex < item.path.length - 1 && <ChevronRight className="size-3" />}
+                                                    </div>
+                                                ))}
                                             </div>
+                                        )}
+                                        <div className="text-sm font-medium">{item.forum.name}</div>
+                                        {item.forum.description && (
+                                            <div className="text-left text-xs text-wrap break-words text-muted-foreground">
+                                                {item.forum.description}
+                                            </div>
+                                        )}
+                                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                            <span>{item.forum.topicsCount || 0} topics</span>
+                                            <span>{item.forum.postsCount || 0} posts</span>
                                         </div>
                                     </div>
-                                </Button>
-                            ))}
+                                </div>
+                            </Button>
+                        ))}
                     </div>
                 </ScrollArea>
-                {filteredForums.length === 0 && forums.length > 0 && (
+                {filteredForums.length === 0 && allForums.length > 0 && (
                     <div className="py-6 text-center text-muted-foreground">
                         <Search className="mx-auto mb-3 size-8 text-muted-foreground/50" />
                         <p className="text-sm">No forums found matching "{searchTerm}"</p>
                     </div>
                 )}
-                {forums.length === 0 && (
+                {allForums.length === 0 && (
                     <div className="py-6 text-center text-muted-foreground">
                         <MessageSquare className="mx-auto mb-3 size-8 text-muted-foreground/50" />
                         <p className="text-sm">No forums available</p>

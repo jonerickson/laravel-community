@@ -53,6 +53,9 @@ class ForumData extends Data
 
     public ?ForumData $parent = null;
 
+    /** @var ForumData[] */
+    public ?array $children = null;
+
     /** @var GroupData[] */
     public ?array $groups = null;
 

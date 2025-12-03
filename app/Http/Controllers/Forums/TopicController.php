@@ -17,12 +17,12 @@ use App\Models\Forum;
 use App\Models\Group;
 use App\Models\Post;
 use App\Models\Topic;
+use App\Services\CacheService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -33,6 +33,12 @@ use Throwable;
 class TopicController extends Controller
 {
     use AuthorizesRequests;
+
+    public function __construct(
+        private readonly CacheService $cacheService,
+    ) {
+        //
+    }
 
     /**
      * @throws AuthorizationException
@@ -115,19 +121,11 @@ class TopicController extends Controller
             );
         }
 
-        $forums = Forum::query()
-            ->active()
-            ->ordered()
-            ->withCount(['topics', 'posts'])
-            ->get()
-            ->filter(fn (Forum $forum) => Gate::check('view', $forum))
-            ->values();
-
         return Inertia::render('forums/topics/show', [
             'forum' => ForumData::from($forum),
             'topic' => TopicData::from($topic),
             'posts' => Inertia::defer(fn (): PaginatedData => PaginatedData::from(PostData::collect($posts->setCollection($filteredPosts), PaginatedDataCollection::class)->items()), 'posts'),
-            'forums' => Inertia::defer(fn (): Collection => ForumData::collect($forums), 'forums'),
+            'categories' => Inertia::defer(fn (): ?array => $this->cacheService->getByKey('forums.categories.index'), 'categories'),
             'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($topic->getRecentViewers()), 'recentViewers'),
         ]);
     }

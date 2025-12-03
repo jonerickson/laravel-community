@@ -19,8 +19,6 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-    const allForums = categories.flatMap((category) => category.forums || []);
-
     const structuredData = {
         '@context': 'https://schema.org',
         '@type': 'CollectionPage',
@@ -99,7 +97,7 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                 )}
 
                 <ForumSelectionDialog
-                    forums={allForums}
+                    categories={categories}
                     isOpen={isDialogOpen}
                     onClose={() => setIsDialogOpen(false)}
                     onSelect={(forum) => router.get(route('forums.topics.create', { forum: forum.slug }))}
