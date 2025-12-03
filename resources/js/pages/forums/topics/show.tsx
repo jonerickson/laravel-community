@@ -79,7 +79,11 @@ export default function ForumTopicShow({ forum, topic, posts, forums, recentView
             only: ['posts'],
             onSuccess: () => {
                 setTimeout(() => {
-                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                    const postElements = document.querySelectorAll('article[itemtype="https://schema.org/Comment"]');
+                    const lastPostElement = postElements[postElements.length - 1];
+                    if (lastPostElement) {
+                        lastPostElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
                 }, 100);
             },
         });
