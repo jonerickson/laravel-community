@@ -170,24 +170,6 @@ class SubscriptionsTable
                             $data['trial_ends_at_until'],
                             fn (Builder $query, $date): Builder => $query->whereDate('trial_ends_at', '<=', $date),
                         )),
-                Filter::make('trial_ends_at')
-                    ->columnSpanFull()
-                    ->columns()
-                    ->schema([
-                        DatePicker::make('trial_ends_at_from')
-                            ->label('Trial Ends At After'),
-                        DatePicker::make('trial_ends_at_until')
-                            ->label('Trial Ends At Before'),
-                    ])
-                    ->query(fn (Builder $query, array $data): Builder => $query
-                        ->when(
-                            $data['trial_ends_at_from'],
-                            fn (Builder $query, $date): Builder => $query->whereDate('trial_ends_at_from', '>=', $date),
-                        )
-                        ->when(
-                            $data['trial_ends_at_until'],
-                            fn (Builder $query, $date): Builder => $query->whereDate('trial_ends_at_until', '<=', $date),
-                        )),
             ])
             ->filtersFormWidth(Width::ExtraLarge)
             ->groups([
