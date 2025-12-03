@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
+import { truncate } from '@/utils/truncate';
 import { Deferred, Head, Link, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { LibraryBig, MessageSquare, Users } from 'lucide-react';
@@ -160,7 +161,7 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                                                                     })}
                                                                     className="font-medium text-wrap break-words hover:underline"
                                                                 >
-                                                                    {forum.latestTopic.title}
+                                                                    {truncate(forum.latestTopic.title, 25)}
                                                                 </Link>
                                                             </div>
                                                             <div className="flex items-center justify-end gap-2 text-xs text-muted-foreground">

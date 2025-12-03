@@ -2,6 +2,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { useLayout } from '@/hooks';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
+import { truncate } from '@/utils/truncate';
 import { Link } from '@inertiajs/react';
 import { Fragment } from 'react';
 
@@ -24,10 +25,10 @@ export function Breadcrumbs({ breadcrumbs }: { breadcrumbs: BreadcrumbItemType[]
                                 <Fragment key={index}>
                                     <BreadcrumbItem>
                                         {isLast ? (
-                                            <BreadcrumbPage title={item.title}>{item.title}</BreadcrumbPage>
+                                            <BreadcrumbPage title={item.title}>{truncate(item.title)}</BreadcrumbPage>
                                         ) : (
                                             <BreadcrumbLink asChild>
-                                                <Link href={item.href}>{item.title}</Link>
+                                                <Link href={item.href}>{truncate(item.title)}</Link>
                                             </BreadcrumbLink>
                                         )}
                                     </BreadcrumbItem>

@@ -15,7 +15,7 @@ import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
-import { stripCharacters } from '@/utils/truncate';
+import { stripCharacters, truncate } from '@/utils/truncate';
 import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, Circle, Eye, EyeOff, LibraryBig, Lock, MessageSquare, Pin, Plus, ThumbsDown, Trash2 } from 'lucide-react';
@@ -420,7 +420,7 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
                                                                     'font-medium text-foreground': !topic.isReadByUser,
                                                                 })}
                                                             >
-                                                                {topic.title}
+                                                                {truncate(topic.title)}
                                                             </Link>
                                                         </div>
                                                         <div className="text-xs text-muted-foreground">

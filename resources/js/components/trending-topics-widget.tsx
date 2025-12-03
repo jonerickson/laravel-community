@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import usePermissions from '@/hooks/use-permissions';
+import { truncate } from '@/utils/truncate';
 import { Link } from '@inertiajs/react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, Eye, EyeOff, Lock, MessageSquare, Pin, ThumbsDown, TrendingUp } from 'lucide-react';
@@ -59,7 +60,7 @@ export default function TrendingTopicsWidget({ topics = [] }: TrendingTopicsWidg
                                             {can('report_posts') && topic.hasReportedContent && <AlertTriangle className="size-3 text-destructive" />}
                                             {can('publish_posts') && topic.hasUnpublishedContent && <EyeOff className="size-3 text-warning" />}
                                             {can('approve_posts') && topic.hasUnapprovedContent && <ThumbsDown className="size-3 text-warning" />}
-                                            <span className="line-clamp-1 text-sm font-medium">{topic.title}</span>
+                                            <span className="line-clamp-1 text-sm font-medium">{truncate(topic.title)}</span>
                                         </div>
                                         <div className="text-xs text-muted-foreground">
                                             in <span className="font-medium">{topic.forum?.name}</span> by{' '}
