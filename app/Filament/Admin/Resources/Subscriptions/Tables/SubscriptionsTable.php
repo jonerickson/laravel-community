@@ -7,15 +7,13 @@ namespace App\Filament\Admin\Resources\Subscriptions\Tables;
 use App\Enums\ProductType;
 use App\Enums\SubscriptionInterval;
 use App\Enums\SubscriptionStatus;
-use App\Filament\Admin\Resources\Subscriptions\Actions\CancelAction;
-use App\Filament\Admin\Resources\Subscriptions\Actions\ContinueAction;
-use App\Filament\Admin\Resources\Subscriptions\Actions\NewAction;
-use App\Filament\Admin\Resources\Subscriptions\Actions\SwapAction;
+use App\Filament\Admin\Resources\Products\Pages\EditProduct;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Livewire\Subscriptions\ListSubscriptions;
 use App\Models\Price;
 use App\Models\Subscription;
 use App\Models\User;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Support\Enums\Width;
@@ -33,13 +31,14 @@ class SubscriptionsTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->placeholder('Unknown Product'),
+                    ->placeholder('Unknown Product')
+                    ->url(fn (Subscription $record): ?string => $record->price?->product ? EditProduct::getUrl(['record' => $record->price->product]) : null),
                 TextColumn::make('user.name')
                     ->sortable()
                     ->label('Customer')
                     ->searchable()
                     ->hiddenOn(ListSubscriptions::class)
-                    ->url(fn (Subscription $record): ?string => data_get($record, 'user') ? EditUser::getUrl(['record' => data_get($record, 'user.id')]) : null)
+                    ->url(fn (Subscription $record): ?string => $record->user ? EditUser::getUrl(['record' => $record->user]) : null)
                     ->toggleable(),
                 TextColumn::make('stripe_status')
                     ->sortable()
@@ -197,15 +196,9 @@ class SubscriptionsTable
                     ->titlePrefixedWithLabel(false)
                     ->getTitleFromRecordUsing(fn (Subscription $record): string => sprintf('%s: %s', $record->price?->product?->getLabel(), $record->price?->getLabel())),
             ])
-            ->headerActions([
-                //                SwapAction::make()
-                //                    ->user(fn($record) => data_get($record, 'user')),
-                //                NewAction::make()
-                //                    ->user(fn($record) => data_get($record, 'user')),
-            ])
             ->recordActions([
-                //                CancelAction::make(),
-                //                ContinueAction::make(),
+                ViewAction::make('view')
+                    ->url(fn (Subscription $record): string => EditUser::getUrl(['record' => $record, 'tab' => 'subscriptions::data::tab']), shouldOpenInNewTab: true),
             ])
             ->defaultGroup('stripe_price')
             ->defaultSort('created_at', 'desc');
