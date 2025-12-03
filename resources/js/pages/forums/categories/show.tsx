@@ -4,6 +4,7 @@ import Loading from '@/components/loading';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { abbreviateNumber } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { truncate } from '@/utils/truncate';
 import { Deferred, Head, Link, usePage } from '@inertiajs/react';
@@ -141,13 +142,13 @@ export default function ForumCategoryShow({ category, forums }: CategoryShowProp
                                                 <TableCell className="hidden p-4 text-center md:table-cell">
                                                     <div className="flex items-center justify-center gap-1">
                                                         <MessageSquare className="size-4" />
-                                                        <span>{forum.topicsCount || 0}</span>
+                                                        <span>{abbreviateNumber(forum.topicsCount || 0)}</span>
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="hidden p-4 text-center md:table-cell">
                                                     <div className="flex items-center justify-center gap-1">
                                                         <Users className="size-4" />
-                                                        <span>{forum.postsCount || 0}</span>
+                                                        <span>{abbreviateNumber(forum.postsCount || 0)}</span>
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="hidden p-4 text-right md:table-cell">

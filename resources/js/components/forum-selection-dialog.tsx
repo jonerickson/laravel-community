@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { abbreviateNumber, pluralize } from '@/lib/utils';
 import { ChevronRight, MessageSquare, Search } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -178,8 +179,12 @@ export default function ForumSelectionDialog({ categories, isOpen, onClose, onSe
                                             </div>
                                         )}
                                         <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                            <span>{item.forum.topicsCount || 0} topics</span>
-                                            <span>{item.forum.postsCount || 0} posts</span>
+                                            <span>
+                                                {abbreviateNumber(item.forum.topicsCount || 0)} {pluralize('topic', item.forum.topicsCount || 0)}
+                                            </span>
+                                            <span>
+                                                {abbreviateNumber(item.forum.postsCount || 0)} {pluralize('post', item.forum.postsCount || 0)}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>

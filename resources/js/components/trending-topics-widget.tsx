@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import usePermissions from '@/hooks/use-permissions';
+import { abbreviateNumber } from '@/lib/utils';
 import { truncate } from '@/utils/truncate';
 import { Link } from '@inertiajs/react';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -77,13 +78,13 @@ export default function TrendingTopicsWidget({ topics = [] }: TrendingTopicsWidg
                                 <td className="px-4 py-3 text-center">
                                     <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
                                         <Eye className="size-3" />
-                                        <span>{topic.viewsCount}</span>
+                                        <span>{abbreviateNumber(topic.viewsCount)}</span>
                                     </div>
                                 </td>
                                 <td className="px-4 py-3 text-center">
                                     <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
                                         <MessageSquare className="size-3" />
-                                        <span>{topic.postsCount}</span>
+                                        <span>{abbreviateNumber(topic.postsCount)}</span>
                                     </div>
                                 </td>
                                 <td className="px-4 py-3">

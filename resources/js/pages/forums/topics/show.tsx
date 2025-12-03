@@ -11,7 +11,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
-import { pluralize } from '@/lib/utils';
+import { abbreviateNumber, pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { stripCharacters } from '@/utils/truncate';
 import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
@@ -257,13 +257,13 @@ export default function ForumTopicShow({ forum, topic, posts, categories, recent
                     <div className="flex items-center gap-1">
                         <Eye className="size-4" />
                         <span>
-                            {topic.viewsCount} {pluralize('view', topic.viewsCount)}
+                            {abbreviateNumber(topic.viewsCount)} {pluralize('view', topic.viewsCount)}
                         </span>
                     </div>
                     <div className="flex items-center gap-1">
                         <MessageSquare className="size-4" />
                         <span>
-                            {topic.postsCount} {pluralize('reply', topic.postsCount)}
+                            {abbreviateNumber(topic.postsCount)} {pluralize('reply', topic.postsCount)}
                         </span>
                     </div>
                     <div className="flex items-center gap-1">

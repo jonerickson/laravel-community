@@ -9,7 +9,7 @@ import { UserInfo } from '@/components/user-info';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
-import { pluralize } from '@/lib/utils';
+import { abbreviateNumber, pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { Deferred, Head, usePage } from '@inertiajs/react';
 import { Calendar, Clock, Eye, MessageSquare } from 'lucide-react';
@@ -150,7 +150,7 @@ export default function BlogShow({ post, comments, recentViewers }: BlogShowProp
                             <div className="flex items-center gap-1">
                                 <Eye className="size-4" aria-hidden="true" />
                                 <span aria-label={`Total views: ${post.viewsCount} views`}>
-                                    {post.viewsCount} {pluralize('view', post.viewsCount)}
+                                    {abbreviateNumber(post.viewsCount || 0)} {pluralize('view', post.viewsCount)}
                                 </span>
                             </div>
 
@@ -158,7 +158,7 @@ export default function BlogShow({ post, comments, recentViewers }: BlogShowProp
                                 <div className="flex items-center gap-1">
                                     <MessageSquare className="size-4" aria-hidden="true" />
                                     <span aria-label={`Total comments: ${post.commentsCount} comments`}>
-                                        {post.commentsCount} {pluralize('comment', post.commentsCount)}
+                                        {abbreviateNumber(post.commentsCount)} {pluralize('comment', post.commentsCount)}
                                     </span>
                                 </div>
                             )}

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { cn, currency, pluralize } from '@/lib/utils';
+import { abbreviateNumber, cn, currency, pluralize } from '@/lib/utils';
 import { Head, InfiniteScroll, router, useForm, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowLeft, LoaderCircle, MessageSquare, Star } from 'lucide-react';
@@ -79,7 +79,7 @@ export default function Reviews({ subscription, reviews }: ReviewsPageProps) {
                             <div className="flex flex-col items-start gap-2 md:items-end">
                                 <StarRating rating={subscription.averageRating || 0} showValue={true} size="lg" />
                                 <span className="text-sm text-muted-foreground">
-                                    {subscription.reviewsCount} {pluralize('review', subscription.reviewsCount)}
+                                    {abbreviateNumber(subscription.reviewsCount)} {pluralize('review', subscription.reviewsCount)}
                                 </span>
                             </div>
                         </div>

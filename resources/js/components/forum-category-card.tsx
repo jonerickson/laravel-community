@@ -3,7 +3,7 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import usePermissions from '@/hooks/use-permissions';
-import { cn, pluralize } from '@/lib/utils';
+import { abbreviateNumber, cn, pluralize } from '@/lib/utils';
 import { truncate } from '@/utils/truncate';
 import { Link, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
@@ -50,7 +50,7 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
                                         </div>
                                     )}
                                     <div className="text-sm text-muted-foreground">
-                                        {category.postsCount} {pluralize('post', category.postsCount)}
+                                        {abbreviateNumber(category.postsCount)} {pluralize('post', category.postsCount)}
                                     </div>
                                 </div>
                             </Link>
@@ -128,7 +128,7 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
                                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                             <div className="flex items-center gap-1">
                                                 <MessageSquare className="size-3" />
-                                                <span>{topic.postsCount}</span>
+                                                <span>{abbreviateNumber(topic.postsCount)}</span>
                                             </div>
                                         </div>
                                     </div>

@@ -1,7 +1,7 @@
 import { StoreProductRating } from '@/components/store-product-rating';
 import { StoreProductReviewsList } from '@/components/store-product-reviews-list';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { pluralize } from '@/lib/utils';
+import { abbreviateNumber, pluralize } from '@/lib/utils';
 import { router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import SharedData = App.Data.SharedData;
@@ -30,7 +30,9 @@ export function StoreProductRatingDialog({ product, reviews, scrollProp = 'revie
         <Dialog open={isRatingModalOpen} onOpenChange={setIsRatingModalOpen}>
             <DialogTrigger asChild>
                 <button className="text-sm text-primary hover:underline">
-                    {product.reviewsCount === 0 ? 'Write a review' : `See all ${product.reviewsCount} ${pluralize('review', product.reviewsCount)}`}
+                    {product.reviewsCount === 0
+                        ? 'Write a review'
+                        : `See all ${abbreviateNumber(product.reviewsCount)} ${pluralize('review', product.reviewsCount)}`}
                 </button>
             </DialogTrigger>
             <DialogContent className="max-h-[80vh] min-w-[90vh] overflow-y-auto">

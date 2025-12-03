@@ -1,7 +1,7 @@
 import HeadingSmall from '@/components/heading-small';
 import { Badge } from '@/components/ui/badge';
 import { UserInfo } from '@/components/user-info';
-import { pluralize } from '@/lib/utils';
+import { abbreviateNumber, pluralize } from '@/lib/utils';
 import { stripCharacters, truncate } from '@/utils/truncate';
 import { Link, usePage } from '@inertiajs/react';
 import { Clock, Eye, ImageIcon, MessageCircle } from 'lucide-react';
@@ -58,7 +58,7 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                             <div className="flex items-center gap-1 text-muted-foreground">
                                 <Eye className="size-3" />
                                 <span>
-                                    {post.viewsCount} {pluralize('view', post.viewsCount)}
+                                    {abbreviateNumber(post.viewsCount)} {pluralize('view', post.viewsCount)}
                                 </span>
                             </div>
 
@@ -66,7 +66,7 @@ export default function BlogIndexItem({ post }: BlogIndexItemProps) {
                                 <div className="flex items-center gap-1 text-muted-foreground">
                                     <MessageCircle className="size-3" />
                                     <span>
-                                        {post.commentsCount} {pluralize('comment', post.commentsCount)}
+                                        {abbreviateNumber(post.commentsCount)} {pluralize('comment', post.commentsCount)}
                                     </span>
                                 </div>
                             )}

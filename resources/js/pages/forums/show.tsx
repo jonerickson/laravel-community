@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useApiRequest } from '@/hooks/use-api-request';
 import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
-import { cn } from '@/lib/utils';
+import { abbreviateNumber, cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { stripCharacters, truncate } from '@/utils/truncate';
 import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
@@ -292,13 +292,13 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
                                             <TableCell className="hidden p-4 text-center md:table-cell">
                                                 <div className="flex items-center justify-center gap-1">
                                                     <MessageSquare className="size-4" />
-                                                    <span>{subforum.topicsCount || 0}</span>
+                                                    <span>{abbreviateNumber(subforum.topicsCount || 0)}</span>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="hidden p-4 text-center md:table-cell">
                                                 <div className="flex items-center justify-center gap-1">
                                                     <MessageSquare className="size-4" />
-                                                    <span>{subforum.postsCount || 0}</span>
+                                                    <span>{abbreviateNumber(subforum.postsCount || 0)}</span>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="hidden p-4 text-right md:table-cell">
@@ -435,13 +435,13 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
                                             <TableCell className="p-4 text-center">
                                                 <div className="flex items-center justify-center gap-1">
                                                     <MessageSquare className="size-4" />
-                                                    <span>{topic.postsCount}</span>
+                                                    <span>{abbreviateNumber(topic.postsCount)}</span>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="p-4 text-center">
                                                 <div className="flex items-center justify-center gap-1">
                                                     <Eye className="size-4" />
-                                                    <span>{topic.viewsCount}</span>
+                                                    <span>{abbreviateNumber(topic.viewsCount)}</span>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="p-4 text-right">
