@@ -18,7 +18,7 @@ class ClearPendingOrders implements ShouldQueue
         Order::query()
             ->where('status', OrderStatus::Pending)
             ->whereDoesntHave('items')
-            ->wherePast(now()->subDay())
+            ->where('created_at', '<', now()->subDay())
             ->delete();
     }
 }
