@@ -38,6 +38,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Override;
@@ -84,7 +85,43 @@ class ForumResource extends Resource
                                     ->relationship('category', 'name'),
                                 Select::make('parent_id')
                                     ->label('Parent Forum')
-                                    ->relationship('parent', 'name')
+                                    ->options(function () {
+                                        $forums = Forum::query()
+                                            ->whereNull('parent_id')
+                                            ->ordered()
+                                            ->with(['children' => function (HasMany|Forum $query) {
+                                                $query->ordered()->with(['children' => function (HasMany|Forum $subQuery) {
+                                                    $subQuery->ordered()->with(['children' => function (HasMany|Forum $subQuery) {
+                                                        $subQuery->ordered();
+                                                    }]);
+                                                }]);
+                                            }])
+                                            ->get();
+
+                                        $options = [];
+
+                                        foreach ($forums as $forum) {
+                                            $groupOptions = [];
+
+                                            foreach ($forum->children as $child) {
+                                                $groupOptions[$child->id] = $child->name;
+
+                                                foreach ($child->children as $grandchild) {
+                                                    $groupOptions[$grandchild->id] = '→ '.$grandchild->name;
+
+                                                    foreach ($grandchild->children as $greatGrandchild) {
+                                                        $groupOptions[$greatGrandchild->id] = '→ → '.$greatGrandchild->name;
+                                                    }
+                                                }
+                                            }
+
+                                            if (! empty($groupOptions)) {
+                                                $options[$forum->name] = $groupOptions;
+                                            }
+                                        }
+
+                                        return $options;
+                                    })
                                     ->columnSpanFull()
                                     ->nullable()
                                     ->preload()
