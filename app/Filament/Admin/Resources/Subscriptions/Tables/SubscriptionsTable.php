@@ -198,7 +198,8 @@ class SubscriptionsTable
             ])
             ->recordActions([
                 ViewAction::make('view')
-                    ->url(fn (Subscription $record): string => EditUser::getUrl(['record' => $record, 'tab' => 'subscriptions::data::tab']), shouldOpenInNewTab: true),
+                    ->visible(fn (Subscription $record): bool => filled($record->user))
+                    ->url(fn (Subscription $record): string => EditUser::getUrl(['record' => $record->user, 'tab' => 'subscriptions::data::tab']), shouldOpenInNewTab: true),
             ])
             ->defaultGroup('stripe_price')
             ->defaultSort('created_at', 'desc');
