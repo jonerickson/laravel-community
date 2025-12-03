@@ -3,10 +3,11 @@ import { cn } from '@/lib/utils';
 interface StyledUserNameProps {
     user: App.Data.UserData;
     className?: string;
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
     showIcon?: boolean;
 }
 
-export function StyledUserName({ user, className, showIcon = true }: StyledUserNameProps) {
+export function StyledUserName({ user, className, size = 'sm', showIcon = true }: StyledUserNameProps) {
     if (!user.displayStyle) {
         return <span className={className}>{user.name}</span>;
     }
@@ -51,7 +52,19 @@ export function StyledUserName({ user, className, showIcon = true }: StyledUserN
             <span style={getStyle()} className="leading-none font-medium text-nowrap">
                 {user.name}
             </span>
-            {icon && showIcon && <img className="mt-[0.2rem] h-[0.5em] w-auto object-contain" src={icon} alt={user.name} />}
+            {icon && showIcon && (
+                <img
+                    className={cn('w-auto object-contain', {
+                        'h-[0.5rem]': size === 'xs',
+                        'h-[1rem]': size === 'sm',
+                        'h-[1.5rem]': size === 'md',
+                        'h-[2.0rem]': size === 'lg',
+                        'h-[2.5rem]': size === 'xl',
+                    })}
+                    src={icon}
+                    alt={user.name}
+                />
+            )}
         </span>
     );
 }

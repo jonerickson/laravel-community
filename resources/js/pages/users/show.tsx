@@ -46,7 +46,7 @@ export default function Show({ user }: UserProfilePageProps) {
                             <div className="flex-1 space-y-4 text-center sm:text-left">
                                 <div>
                                     <h1 className="text-3xl font-bold">
-                                        <StyledUserName user={user} />
+                                        <StyledUserName user={user} size="xl" />
                                     </h1>
                                     {user.groups.length > 0 && (
                                         <div className="mt-2 flex flex-wrap justify-center gap-2 sm:justify-start">
