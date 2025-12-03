@@ -208,6 +208,7 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
                                 id={forum.id}
                                 isFollowing={forum.isFollowedByUser ?? false}
                                 followersCount={forum.followersCount ?? 0}
+                                onSuccess={() => router.reload({ only: ['forum'] })}
                             />
                             {can('delete_topics') && (
                                 <>

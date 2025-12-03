@@ -231,6 +231,7 @@ export default function ForumTopicShow({ forum, topic, posts, forums, recentView
                             id={topic.id}
                             isFollowing={topic.isFollowedByUser ?? false}
                             followersCount={topic.followersCount ?? 0}
+                            onSuccess={() => router.reload({ only: ['topic'] })}
                         />
                         <Button onClick={goToLatestPost} variant="outline">
                             <ArrowDown />
