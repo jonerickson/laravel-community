@@ -41,6 +41,7 @@ class HandleInertiaRequests extends Middleware
      * URL does not change and therefor a new version is not detected. Revert to
      * using a hash of the build manifest.
      */
+    #[Override]
     public function version(Request $request): ?string
     {
         if (file_exists($manifest = public_path('build/manifest.json'))) {

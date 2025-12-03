@@ -85,7 +85,7 @@ class ForumResource extends Resource
                                     ->relationship('category', 'name'),
                                 Select::make('parent_id')
                                     ->label('Parent Forum')
-                                    ->options(function () {
+                                    ->options(function (): array {
                                         $cacheService = app(CacheService::class);
                                         $categories = $cacheService->getByKey('forums.categories.index');
 
@@ -118,7 +118,7 @@ class ForumResource extends Resource
                                                 }
                                             }
 
-                                            if (! empty($groupOptions)) {
+                                            if ($groupOptions !== []) {
                                                 $options[$category['name']] = $groupOptions;
                                             }
                                         }
