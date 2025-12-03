@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Subscriptions;
 
 use App\Enums\SubscriptionInterval;
+use App\Enums\SubscriptionStatus;
 use App\Filament\Admin\Resources\Subscriptions\Actions\CancelAction;
 use App\Filament\Admin\Resources\Subscriptions\Actions\ContinueAction;
 use App\Filament\Admin\Resources\Subscriptions\Actions\NewAction;
@@ -62,7 +63,7 @@ class ListSubscriptions extends Component implements HasActions, HasSchemas, Has
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => ucfirst(str_replace('_', ' ', $state)))
+                    ->formatStateUsing(fn (string $state): string => SubscriptionStatus::tryFrom($state)->getLabel())
                     ->color(fn (string $state): string => match ($state) {
                         'active' => 'success',
                         'trialing' => 'info',

@@ -44,7 +44,7 @@ class SubscriptionsTable
                     ->sortable()
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => ucfirst(str_replace('_', ' ', $state)))
+                    ->formatStateUsing(fn (string $state): string => SubscriptionStatus::tryFrom($state)->getLabel())
                     ->color(fn (string $state): string => match ($state) {
                         'active' => 'success',
                         'trialing' => 'info',
