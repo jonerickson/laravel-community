@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Store;
 use App\Data\CommentData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
+use App\Enums\ProrationBehavior;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Store\SubscriptionCancelRequest;
 use App\Http\Requests\Store\SubscriptionCheckoutRequest;
@@ -90,6 +91,7 @@ class SubscriptionsController extends Controller
         $result = $this->paymentManager->swapSubscription(
             user: $this->user,
             price: $price,
+            prorationBehavior: ProrationBehavior::AlwaysInvoice,
         );
 
         if (! $result) {

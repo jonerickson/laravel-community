@@ -597,7 +597,7 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                                     <p>
                                         <strong>End of billing cycle:</strong>
                                     </p>
-                                    <p>Keep access until your current billing period ends</p>
+                                    <p>Keep access until your current billing cycle ends</p>
                                 </div>
                                 <div className="flex flex-col space-y-1">
                                     <p>
@@ -648,7 +648,7 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                             <div className="space-y-2 rounded-md bg-info-foreground p-3">
                                 <p className="text-xs text-info">
                                     Your billing will be prorated based on the time remaining in your current billing cycle. The change will take
-                                    effect immediately and the updated charges, if any, will be available on the next invoice.
+                                    effect immediately and you will be immediately billed any prorated charges.
                                 </p>
                                 <p className="text-xs text-info">
                                     <span className="font-bold">NOTE:</span> If you are currently on a trial, you will be charged the full amount of
