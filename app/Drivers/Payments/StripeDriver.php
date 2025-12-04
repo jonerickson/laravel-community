@@ -11,6 +11,7 @@ use App\Data\PaymentMethodData;
 use App\Data\PriceData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
+use App\Enums\DiscountValueType;
 use App\Enums\OrderRefundReason;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentBehavior;
@@ -547,7 +548,7 @@ class StripeDriver implements PaymentProcessor
                         'origin_context' => 'web',
                         'success_url' => URL::signedRoute('store.checkout.success', [
                             'order' => $order->reference_id,
-                            'redirect' => $successUrl ?? route('store.subscriptions'),
+                            'redirect' => $successUrl ?? route('store.subscriptions', ['complete' => 'true']),
                         ]),
                         'cancel_url' => URL::signedRoute('store.checkout.cancel', [
                             'order' => $order->reference_id,
@@ -603,9 +604,9 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
-    public function cancelSubscription(User $user, bool $cancelNow = false): bool
+    public function cancelSubscription(User $user, bool $cancelNow = false, ?string $reason = null): bool
     {
-        return $this->executeWithErrorHandling('cancelSubscription', function () use ($user, $cancelNow): bool {
+        return $this->executeWithErrorHandling('cancelSubscription', function () use ($user, $cancelNow, $reason): bool {
             $subscription = $user->subscription();
 
             if (blank($subscription)) {
@@ -620,6 +621,12 @@ class StripeDriver implements PaymentProcessor
                 $subscription->cancelNow();
             } else {
                 $subscription->cancel();
+            }
+
+            if (! is_null($reason)) {
+                $subscription->forceFill([
+                    'cancellation_reason' => $reason,
+                ])->save();
             }
 
             return true;
@@ -643,6 +650,25 @@ class StripeDriver implements PaymentProcessor
 
             return true;
         }, false);
+    }
+
+    public function updateSubscription(User $user, array $options): ?SubscriptionData
+    {
+        return $this->executeWithErrorHandling('updateSubscription', function () use ($user, $options): ?SubscriptionData {
+            $subscription = $user->subscription();
+
+            if (blank($subscription)) {
+                return null;
+            }
+
+            $result = $subscription->updateStripeSubscription($options);
+
+            if (! $result) {
+                return null;
+            }
+
+            return $this->currentSubscription($user);
+        });
     }
 
     public function currentSubscription(User $user): ?SubscriptionData
@@ -746,7 +772,7 @@ class StripeDriver implements PaymentProcessor
                         ],
                     ];
 
-                    if ($discount->discount_type->value === 'percentage') {
+                    if ($discount->discount_type === DiscountValueType::Percentage) {
                         $couponParams['percent_off'] = $discount->value;
                     } else {
                         $couponParams['amount_off'] = $discount->pivot->getRawOriginal('amount_applied');

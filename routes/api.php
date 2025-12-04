@@ -37,6 +37,7 @@ Route::group(['domain' => config('app.url'), 'middleware' => [EnsureFrontendRequ
         Route::delete('/approve', [ApproveController::class, 'destroy'])->name('approve.destroy');
         Route::post('/checkout', CheckoutController::class)->name('checkout');
         Route::post('/comments', [ReviewController::class, 'store'])->middleware('throttle:comment')->name('comments.store');
+        Route::post('/discount/create', [DiscountController::class, 'create'])->name('discount.create');
         Route::post('/file', [FileController::class, 'store'])->name('file.store');
         Route::delete('/file', [FileController::class, 'destroy'])->name('file.destroy');
         Route::post('/follow', [FollowController::class, 'store'])->name('follow.store');

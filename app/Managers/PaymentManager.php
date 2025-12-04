@@ -138,14 +138,19 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->swapSubscription($user, $price, $prorationBehavior, $paymentBehavior);
     }
 
-    public function cancelSubscription(User $user, bool $cancelNow = false): bool
+    public function cancelSubscription(User $user, bool $cancelNow = false, ?string $reason = null): bool
     {
-        return $this->driver()->cancelSubscription($user, $cancelNow);
+        return $this->driver()->cancelSubscription($user, $cancelNow, $reason);
     }
 
     public function continueSubscription(User $user): bool
     {
         return $this->driver()->continueSubscription($user);
+    }
+
+    public function updateSubscription(User $user, array $options): ?SubscriptionData
+    {
+        return $this->driver()->updateSubscription($user, $options);
     }
 
     public function currentSubscription(User $user): ?SubscriptionData

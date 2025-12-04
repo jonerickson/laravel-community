@@ -73,6 +73,11 @@ class SubscriptionsTable
                     ->dateTimeTooltip()
                     ->placeholder('No Trial')
                     ->toggleable(),
+                TextColumn::make('cancellation_reason')
+                    ->wrap()
+                    ->placeholder('No Reason Provided')
+                    ->label('Cancellation Reason')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('ends_at')
                     ->sortable()
                     ->label('Ends At')

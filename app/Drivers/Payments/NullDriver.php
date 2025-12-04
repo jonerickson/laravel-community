@@ -129,7 +129,7 @@ class NullDriver implements PaymentProcessor
         return false;
     }
 
-    public function cancelSubscription(User $user, bool $cancelNow = false): bool
+    public function cancelSubscription(User $user, bool $cancelNow = false, ?string $reason = null): bool
     {
         return false;
     }
@@ -137,6 +137,11 @@ class NullDriver implements PaymentProcessor
     public function continueSubscription(User $user): bool
     {
         return false;
+    }
+
+    public function updateSubscription(User $user, array $options): ?SubscriptionData
+    {
+        return null;
     }
 
     public function currentSubscription(User $user): ?SubscriptionData

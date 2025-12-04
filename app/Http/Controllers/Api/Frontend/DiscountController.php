@@ -7,11 +7,14 @@ namespace App\Http\Controllers\Api\Frontend;
 use App\Enums\DiscountValueType;
 use App\Http\Requests\Api\Frontend\ApplyDiscountRequest;
 use App\Http\Requests\Api\Frontend\RemoveDiscountRequest;
+use App\Http\Requests\Api\GenerateDiscountRequest;
 use App\Http\Resources\ApiResource;
 use App\Models\Discount;
 use App\Models\Order;
+use App\Models\User;
 use App\Services\DiscountService;
 use App\Services\ShoppingCartService;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Number;
 use Throwable;
 
@@ -19,8 +22,26 @@ class DiscountController
 {
     public function __construct(
         private readonly DiscountService $discountService,
-        private readonly ShoppingCartService $cartService
+        private readonly ShoppingCartService $cartService,
+        #[CurrentUser]
+        private readonly ?User $user = null
     ) {}
+
+    public function create(GenerateDiscountRequest $request)
+    {
+        $discount = $this->discountService->createPromoCode(
+            maxUses: 1,
+            expiresAt: now()->addHours(48),
+            user: $this->user,
+        );
+
+        return ApiResource::success(
+            resource: [
+                'discount_id' => $discount->id,
+            ],
+            message: 'Your discount has been generated successfully.'
+        );
+    }
 
     public function store(ApplyDiscountRequest $request): ApiResource
     {

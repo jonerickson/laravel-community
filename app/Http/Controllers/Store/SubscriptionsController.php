@@ -105,17 +105,31 @@ class SubscriptionsController extends Controller
 
     public function update(SubscriptionUpdateRequest $request): RedirectResponse
     {
-        $price = $request->getPrice();
+        /** @var RedirectResponse $response */
+        $response = value(match ($request->validated('action')) {
+            'continue' => function () use ($request) {
+                $price = $request->getPrice();
 
-        $this->authorize('view', $price->product);
+                $this->authorize('view', $price->product);
 
-        $success = $this->paymentManager->continueSubscription($this->user);
+                $success = $this->paymentManager->continueSubscription($this->user);
 
-        if ($success) {
-            return back()->with('message', 'Your subscription has resumed successfully.');
-        }
+                if ($success) {
+                    return back()->with('message', 'Your subscription has resumed successfully.');
+                }
 
-        return back()->with('message', 'We were unable to resume your subscription. Please try again later.');
+                return back()->with('message', 'We were unable to resume your subscription. Please try again later.');
+            },
+            'offer' => function () {
+                $subscription = $this->paymentManager->updateSubscription($this->user, [
+
+                ]);
+
+                return back()->with('message', 'Your offer has been successfully applied.');
+            }
+        });
+
+        return $response;
     }
 
     public function destroy(SubscriptionCancelRequest $request): RedirectResponse
@@ -128,7 +142,8 @@ class SubscriptionsController extends Controller
 
         $success = $this->paymentManager->cancelSubscription(
             user: $this->user,
-            cancelNow: $immediate
+            cancelNow: $immediate,
+            reason: $request->validated('reason'),
         );
 
         if (! $success) {

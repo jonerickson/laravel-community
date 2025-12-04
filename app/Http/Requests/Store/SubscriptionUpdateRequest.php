@@ -22,7 +22,8 @@ class SubscriptionUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'price_id' => ['required', 'integer', 'exists:prices,id'],
+            'action' => ['required', 'in:continue,offer'],
+            'price_id' => ['required_if:action,continue', 'integer', 'exists:prices,id'],
         ];
     }
 

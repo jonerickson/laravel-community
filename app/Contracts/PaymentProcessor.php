@@ -74,9 +74,11 @@ interface PaymentProcessor
 
     public function swapSubscription(User $user, Price $price, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete): bool|SubscriptionData;
 
-    public function cancelSubscription(User $user, bool $cancelNow = false): bool;
+    public function cancelSubscription(User $user, bool $cancelNow = false, ?string $reason = null): bool;
 
     public function continueSubscription(User $user): bool;
+
+    public function updateSubscription(User $user, array $options): ?SubscriptionData;
 
     public function currentSubscription(User $user): ?SubscriptionData;
 

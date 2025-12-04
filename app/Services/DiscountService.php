@@ -8,6 +8,7 @@ use App\Enums\DiscountType;
 use App\Enums\DiscountValueType;
 use App\Models\Discount;
 use App\Models\Order;
+use App\Models\User;
 use DateTime;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -117,16 +118,17 @@ class DiscountService
         ]);
     }
 
-    public function createPromoCode(string $code, int $value, DiscountValueType $discountType, ?int $maxUses = null, ?int $minOrderAmount = null, ?DateTime $expiresAt = null): Discount
+    public function createPromoCode(?string $code = null, int $value = 100, DiscountValueType $discountType = DiscountValueType::Percentage, ?int $maxUses = null, ?int $minOrderAmount = null, ?DateTime $expiresAt = null, ?User $user = null): Discount
     {
         return Discount::create([
-            'code' => Str::upper($code),
+            'code' => $code ? Str::upper($code) : $this->generateUniqueCode(DiscountType::PromoCode),
             'type' => DiscountType::PromoCode,
             'discount_type' => $discountType,
             'value' => $value,
             'max_uses' => $maxUses,
             'min_order_amount' => $minOrderAmount,
             'expires_at' => $expiresAt,
+            'user_id' => $user?->id,
         ]);
     }
 
