@@ -1,10 +1,6 @@
-import { type BreadcrumbItem } from '@/types';
-import { Transition } from '@headlessui/react';
-import { Head, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
-
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
+import Loading from '@/components/loading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,7 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { type BreadcrumbItem } from '@/types';
+import { Transition } from '@headlessui/react';
+import { Deferred, Head, useForm } from '@inertiajs/react';
 import { ExternalLink, LoaderCircle } from 'lucide-react';
+import { FormEventHandler } from 'react';
 import { route } from 'ziggy-js';
 
 interface BillingProps {
@@ -95,14 +95,16 @@ export default function Billing({ user, portalUrl }: BillingProps) {
                             title="Billing information"
                             description="Update your account billing information for invoices and tax purposes"
                         />
-                        {portalUrl && (
-                            <Button variant="outline" asChild>
-                                <a href={portalUrl} target="_blank" rel="noopener noreferrer">
-                                    <ExternalLink />
-                                    Billing Portal
-                                </a>
-                            </Button>
-                        )}
+                        <Deferred fallback={<Loading variant="button" />} data="portalUrl">
+                            {portalUrl && (
+                                <Button variant="outline" asChild>
+                                    <a href={portalUrl} target="_blank" rel="noopener noreferrer">
+                                        <ExternalLink />
+                                        Billing Portal
+                                    </a>
+                                </Button>
+                            )}
+                        </Deferred>
                     </div>
 
                     <form onSubmit={submit} className="space-y-6">

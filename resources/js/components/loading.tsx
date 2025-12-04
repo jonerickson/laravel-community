@@ -1,14 +1,25 @@
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { LoaderCircle } from 'lucide-react';
 
 interface LoadingProps {
     className?: string;
-    variant?: 'default' | 'grid' | 'masonry' | 'forum-post' | 'table';
+    variant?: 'default' | 'grid' | 'masonry' | 'forum-post' | 'table' | 'button';
     cols?: number;
     count?: number;
     rows?: number;
 }
 
 export default function Loading({ className, variant = 'default', cols = 4, count = 1, rows = 5 }: LoadingProps) {
+    if (variant === 'button') {
+        return (
+            <Button variant="secondary">
+                <LoaderCircle className="animate-spin" />
+                <div className="h-[1rem] w-[4rem] rounded-md bg-muted-foreground/10" />
+            </Button>
+        );
+    }
+
     if (variant === 'table') {
         return (
             <div className={cn('overflow-hidden rounded-xl bg-muted/50 dark:bg-muted/30', className)}>

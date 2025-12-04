@@ -31,7 +31,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
@@ -940,9 +939,9 @@ class StripeDriver implements PaymentProcessor
             return null;
         }
 
-        return Cache::remember('billing_portal:'.$user->id, 3600, fn (): mixed => $this->executeWithErrorHandling('getBillingPortalUrl', fn (): string => $user->billingPortalUrl(
+        return $this->executeWithErrorHandling('getBillingPortalUrl', fn (): string => $user->billingPortalUrl(
             returnUrl: route('settings.billing'),
-        )));
+        ));
     }
 
     private function executeWithErrorHandling(string $method, callable $callback, mixed $defaultValue = null): mixed
