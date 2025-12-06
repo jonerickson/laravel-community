@@ -464,7 +464,12 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
 
     const handleReasonSubmit = () => {
         setShowCancelReasonDialog(false);
-        setShowExclusiveOfferDialog(true);
+
+        if (currentSubscription?.status && ['active', 'past_due'].includes(currentSubscription.status)) {
+            setShowExclusiveOfferDialog(true);
+        } else {
+            setShowCancelDialog(true);
+        }
     };
 
     const handleAcceptOffer = async () => {
@@ -654,17 +659,18 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <Textarea
-                            placeholder="Tell us why you're cancelling (optional)..."
+                            placeholder="Tell us why you're cancelling..."
                             value={cancellationReason}
                             onChange={(e) => setCancellationReason(e.target.value)}
                             className="min-h-[100px]"
                             maxLength={500}
+                            required
                         />
                         <p className="text-right text-xs text-muted-foreground">{cancellationReason.length}/500</p>
                     </div>
                     <DialogFooter>
                         <div className="flex w-full flex-col gap-2">
-                            <Button onClick={handleReasonSubmit} className="w-full">
+                            <Button onClick={handleReasonSubmit} className="w-full" disabled={!cancellationReason.trim()}>
                                 Continue
                             </Button>
                             <Button variant="ghost" onClick={() => setShowCancelReasonDialog(false)} className="w-full">
