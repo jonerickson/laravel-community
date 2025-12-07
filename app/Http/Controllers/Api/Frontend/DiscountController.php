@@ -27,7 +27,7 @@ class DiscountController
         private readonly ?User $user = null
     ) {}
 
-    public function create(GenerateDiscountRequest $request)
+    public function create(GenerateDiscountRequest $request): ApiResource
     {
         $discount = $this->discountService->createPromoCode(
             maxUses: 1,

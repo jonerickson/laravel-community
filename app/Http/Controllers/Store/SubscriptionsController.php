@@ -14,9 +14,11 @@ use App\Http\Requests\Store\SubscriptionCancelRequest;
 use App\Http\Requests\Store\SubscriptionCheckoutRequest;
 use App\Http\Requests\Store\SubscriptionUpdateRequest;
 use App\Managers\PaymentManager;
+use App\Models\Discount;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\CacheService;
+use App\Services\DiscountService;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
@@ -33,6 +35,7 @@ class SubscriptionsController extends Controller
     public function __construct(
         private readonly PaymentManager $paymentManager,
         private readonly CacheService $cache,
+        private readonly DiscountService $discountService,
         #[CurrentUser]
         private readonly ?User $user = null,
     ) {
@@ -121,8 +124,35 @@ class SubscriptionsController extends Controller
                 return back()->with('message', 'We were unable to resume your subscription. Please try again later.');
             },
             'offer' => function () {
-                $subscription = $this->paymentManager->updateSubscription($this->user, [
+                $expiration = now()->addHour();
 
+                $discount = tap($this->discountService->createPromoCode(
+                    code: $this->discountService->generateUniqueCode(prefix: 'CANCELLATION-OFFER'),
+                    expiresAt: $expiration
+                ), function (Discount $discount) use ($expiration): void {
+                    $coupon = $this->paymentManager->createDiscount([
+                        'name' => $discount->code,
+                        'percent_off' => 100,
+                        'duration' => 'once',
+                        'max_redemptions' => 1,
+                        'redeem_by' => $expiration->getTimestamp(),
+                    ]);
+
+                    $discount->update([
+                        'external_discount_id' => $coupon->externalDiscountId,
+                    ]);
+                });
+
+                if (! $discount instanceof Discount) {
+                    return back()->with('message', 'We were unable to apply your exclusive offer. Please try again later.');
+                }
+
+                $this->paymentManager->updateSubscription($this->user, [
+                    'discounts' => [
+                        ['coupon' => $discount->external_discount_id],
+                    ],
+                    'payment_behavior' => 'default_incomplete',
+                    'proration_behavior' => 'always_invoice',
                 ]);
 
                 return back()->with('message', 'Your offer has been successfully applied.');

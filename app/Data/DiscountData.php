@@ -50,6 +50,8 @@ class DiscountData extends Data
 
     public ?float $balanceAfter = null;
 
+    public ?string $externalDiscountId = null;
+
     public ?CarbonImmutable $createdAt = null;
 
     public ?CarbonImmutable $updatedAt = null;

@@ -132,10 +132,10 @@ class DiscountService
         ]);
     }
 
-    public function generateUniqueCode(DiscountType $type, int $attempts = 5): string
+    public function generateUniqueCode(DiscountType $type = DiscountType::PromoCode, int $attempts = 5, ?string $prefix = null): string
     {
         for ($i = 0; $i < $attempts; $i++) {
-            $prefix = match ($type) {
+            $prefix ??= match ($type) {
                 DiscountType::GiftCard => 'GIFT',
                 DiscountType::PromoCode => 'PROMO',
                 DiscountType::Manual => 'MANUAL',

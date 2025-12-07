@@ -6,11 +6,13 @@ namespace App\Drivers\Payments;
 
 use App\Contracts\PaymentProcessor;
 use App\Data\CustomerData;
+use App\Data\DiscountData;
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\PriceData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
+use App\Enums\DiscountType;
 use App\Enums\DiscountValueType;
 use App\Enums\OrderRefundReason;
 use App\Enums\OrderStatus;
@@ -41,6 +43,7 @@ use Laravel\Cashier\PaymentMethod;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\SubscriptionBuilder;
 use Stripe\Checkout\Session;
+use Stripe\Coupon;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Exception\RateLimitException;
 use Stripe\Stripe;
@@ -455,6 +458,30 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
+    /**
+     * @param  array<array<string, mixed>, mixed>  $options
+     */
+    public function createDiscount(array $options): ?DiscountData
+    {
+        return $this->executeWithErrorHandling('createDiscount', function () use ($options): ?DiscountData {
+            $coupon = $this->stripe->coupons->create($options);
+
+            if (! $coupon instanceof Coupon) {
+                return null;
+            }
+
+            return DiscountData::from([
+                'id' => 0,
+                'type' => DiscountType::PromoCode,
+                'discountType' => array_key_exists('percent_off', $options) ? DiscountValueType::Percentage : DiscountValueType::Fixed,
+                'value' => ($coupon->percent_off ?? (float) $coupon->amount_off ?? 0) / 100,
+                'code' => $coupon->name,
+                'externalDiscountId' => $coupon->id,
+                'maxUses' => $coupon->max_redemptions,
+            ]);
+        });
+    }
+
     public function startSubscription(
         Order $order,
         bool $chargeNow = true,
@@ -772,6 +799,14 @@ class StripeDriver implements PaymentProcessor
                         ],
                     ];
 
+                    if ($discount->max_uses > 0) {
+                        $couponParams['max_redemptions'] = $discount->max_uses;
+                    }
+
+                    if (! is_null($discount->expires_at)) {
+                        $couponParams['redeem_by'] = $discount->expires_at->getTimestamp();
+                    }
+
                     if ($discount->discount_type === DiscountValueType::Percentage) {
                         $couponParams['percent_off'] = $discount->value;
                     } else {
@@ -779,9 +814,17 @@ class StripeDriver implements PaymentProcessor
                         $couponParams['currency'] = 'usd';
                     }
 
-                    $stripeCoupon = $this->stripe->coupons->create($couponParams);
+                    $discount = $this->createDiscount($couponParams);
 
-                    $discounts[] = ['coupon' => $stripeCoupon->id];
+                    if (! $discount instanceof DiscountData) {
+                        continue;
+                    }
+
+                    if (! $externalDiscountId = $discount->externalDiscountId) {
+                        continue;
+                    }
+
+                    $discounts[] = ['coupon' => $externalDiscountId];
                 }
             }
 
