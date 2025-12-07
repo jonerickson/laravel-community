@@ -76,7 +76,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
                             productData
                                 ? (() => {
                                       const selectedPrice = productData.prices?.find((p) => p.id === selectedPriceId) || productData.defaultPrice;
-                                      return selectedPrice?.amount
+                                      return selectedPrice?.amount && selectedPrice.amount !== 0
                                           ? `${currency(selectedPrice.amount)} ${selectedPrice.interval ? ` / ${selectedPrice.interval}` : ''}`
                                           : 'Price TBD';
                                   })()
