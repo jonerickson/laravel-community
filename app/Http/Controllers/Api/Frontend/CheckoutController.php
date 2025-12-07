@@ -104,7 +104,7 @@ class CheckoutController
             if (! $selectedPrice || ! $selectedPrice->externalPriceId) {
                 return ApiResource::error(
                     message: sprintf('No prices are configured for %s.', $item->name),
-                    errors: ['price' => [sprintf('Price not configured for %s.', $item->name)]],
+                    errors: ['price' => [sprintf('No prices are configured for %s.', $item->name)]],
                     status: 400
                 );
             }

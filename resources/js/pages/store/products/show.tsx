@@ -2,6 +2,7 @@ import Product from '@/components/store-product';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
+import { stripCharacters } from '@/utils/truncate';
 
 interface ProductPageProps {
     product: App.Data.ProductData;
@@ -24,9 +25,9 @@ export default function StoreProductShow({ product, reviews }: ProductPageProps)
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${product.name} - Store`}>
-                <meta name="description" content={product.description || ''} />
+                <meta name="description" content={stripCharacters(product.description || '')} />
                 <meta property="og:title" content={`${product.name} - Store - ${siteName}`} />
-                <meta property="og:description" content={product.description || ''} />
+                <meta property="og:description" content={stripCharacters(product.description || '')} />
                 <meta property="og:type" content="website" />
                 <meta property="og:image" content={logoUrl} />
             </Head>

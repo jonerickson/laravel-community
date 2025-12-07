@@ -10,6 +10,7 @@ import { useCartOperations } from '@/hooks/use-cart-operations';
 import AppLayout from '@/layouts/app-layout';
 import { currency } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
+import { stripCharacters } from '@/utils/truncate';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { Check, ImageIcon, LoaderCircle, ShoppingCart as ShoppingCartIcon, Ticket, Trash2, XIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -195,7 +196,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                 </div>
 
                 {items.length > 0 ? (
-                    <form className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16">
+                    <form className="grid gap-6 lg:grid-cols-12 lg:items-start lg:gap-8">
                         <section aria-labelledby="cart-heading" className="lg:col-span-7">
                             <div className="sr-only" id="cart-heading">
                                 <HeadingSmall title="Items in your shopping cart" />
@@ -204,7 +205,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                             <ul role="list" className="divide-y divide-border overflow-hidden rounded-xl">
                                 {items.map((item) => (
                                     <li key={item.productId} className="relative flex flex-col items-start gap-4 bg-card p-6 sm:flex-row sm:gap-6">
-                                        <div className="shrink-0">
+                                        <div className="hidden shrink-0 sm:block">
                                             {item.product?.featuredImageUrl ? (
                                                 <img
                                                     alt={item.name}
@@ -218,8 +219,8 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                             )}
                                         </div>
 
-                                        <div className="flex flex-1 flex-col">
-                                            <div className="relative flex h-full flex-col pr-9 sm:pr-0">
+                                        <div className="flex w-full flex-1 flex-col">
+                                            <div className="relative flex h-full flex-row justify-between sm:flex-col sm:pr-0">
                                                 <div className="flex flex-1 flex-col gap-3">
                                                     <div className="flex-grow">
                                                         <div className="flex justify-between">
@@ -232,17 +233,19 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                                                 </Link>
                                                             </h3>
                                                         </div>
-                                                        <div className="mt-1 flex text-sm">
-                                                            <p
-                                                                className="max-w-[90%] break-words text-muted-foreground sm:max-w-[85%]"
-                                                                dangerouslySetInnerHTML={{
-                                                                    __html:
-                                                                        (item.product?.description || '').length > 200
-                                                                            ? `${item.product?.description?.substring(0, 200)}...`
-                                                                            : item.product?.description || '',
-                                                                }}
-                                                            ></p>
-                                                        </div>
+                                                        {item.product?.description && stripCharacters(item.product.description).length > 0 && (
+                                                            <div className="mt-1 flex text-sm">
+                                                                <p
+                                                                    className="max-w-[90%] break-words text-muted-foreground sm:max-w-[85%]"
+                                                                    dangerouslySetInnerHTML={{
+                                                                        __html:
+                                                                            (item.product?.description || '').length > 200
+                                                                                ? `${item.product?.description?.substring(0, 200)}...`
+                                                                                : item.product?.description || '',
+                                                                    }}
+                                                                ></p>
+                                                            </div>
+                                                        )}
                                                         <p className="mt-3 text-sm font-medium text-foreground">
                                                             {item.selectedPrice
                                                                 ? `${currency(item.selectedPrice.amount)} ${item.selectedPrice.interval ? ` / ${item.selectedPrice.interval}` : ''}`
@@ -255,7 +258,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                                     <div className="mt-auto space-y-3">
                                                         {item.availablePrices && item.availablePrices.length > 1 && (
                                                             <div>
-                                                                <label className="mb-1 block text-xs font-medium text-foreground">Price:</label>
+                                                                <label className="mb-2 block text-sm font-medium text-foreground">Price:</label>
                                                                 <Select
                                                                     value={
                                                                         item.selectedPrice?.id?.toString() ||
@@ -283,7 +286,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                                         )}
 
                                                         <div className="w-full max-w-24">
-                                                            <label className="mb-1 block text-xs font-medium text-foreground">Quantity:</label>
+                                                            <label className="mb-2 block text-sm font-medium text-foreground">Quantity:</label>
                                                             <Select
                                                                 value={item.quantity.toString()}
                                                                 onValueChange={(value) =>
@@ -306,7 +309,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                                     </div>
                                                 </div>
 
-                                                <div className="absolute top-0 right-0">
+                                                <div className="sm:absolute sm:top-0 sm:right-0">
                                                     <button
                                                         type="button"
                                                         onClick={() => handleRemoveItem(item.productId, item.priceId)}
@@ -324,10 +327,10 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                             </ul>
                         </section>
 
-                        <section aria-labelledby="summary-heading" className="relative mt-16 rounded-lg bg-card p-4 sm:p-6 lg:col-span-5 lg:mt-0">
+                        <section aria-labelledby="summary-heading" className="relative rounded-lg bg-card p-4 sm:p-6 lg:col-span-5">
                             <HeadingSmall title="Order summary" />
 
-                            <dl className="divide-shadow-muted mt-6 divide-y">
+                            <dl className="divide-shadow-muted divide-y">
                                 <div className="flex items-center justify-between py-3">
                                     <dt className="text-sm text-muted-foreground">Subtotal</dt>
                                     <dd className="text-sm font-medium text-primary">{currency(subtotal)}</dd>

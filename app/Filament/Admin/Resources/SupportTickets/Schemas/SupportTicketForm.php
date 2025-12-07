@@ -51,7 +51,6 @@ class SupportTicketForm
                             ->preload()
                             ->placeholder('No related order'),
                     ]),
-
                 Section::make('Details')
                     ->columnSpanFull()
                     ->schema([
@@ -63,7 +62,6 @@ class SupportTicketForm
                             ->required()
                             ->columnSpanFull(),
                     ]),
-
                 Section::make('Status & Priority')
                     ->columnSpanFull()
                     ->schema([
@@ -80,7 +78,6 @@ class SupportTicketForm
                                     ->native(false),
                             ]),
                     ]),
-
                 Section::make('External Integration')
                     ->columns()
                     ->visible(fn ($record) => $record?->isExternal())

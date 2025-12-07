@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { currency } from '@/lib/utils';
+import { stripCharacters } from '@/utils/truncate';
 import { Deferred, useForm } from '@inertiajs/react';
 import { AlertTriangle, ImageIcon, LoaderCircle, Package } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -76,7 +77,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
                             productData
                                 ? (() => {
                                       const selectedPrice = productData.prices?.find((p) => p.id === selectedPriceId) || productData.defaultPrice;
-                                      return selectedPrice?.amount && selectedPrice.amount !== 0
+                                      return selectedPrice
                                           ? `${currency(selectedPrice.amount)} ${selectedPrice.interval ? ` / ${selectedPrice.interval}` : ''}`
                                           : 'Price TBD';
                                   })()
@@ -147,7 +148,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
                 </div>
 
                 <div className="lg:col-span-5 lg:flex lg:h-full lg:flex-col">
-                    {productData?.description && (
+                    {productData?.description && stripCharacters(productData.description).length > 0 && (
                         <div className="mt-6">
                             <HeadingSmall title="Description" />
                             <RichEditorContent className="text-sm text-muted-foreground" content={productData.description} />
