@@ -51,11 +51,11 @@ class InventoryService
      */
     public function reserveInventory(Order $order): InventoryReservation
     {
-        $order->loadMissing('prices.product.inventoryItem');
+        $order->loadMissing(['items.price.product.inventoryItem']);
 
         return DB::transaction(function () use ($order) {
             foreach ($order->items as $item) {
-                $inventoryItem = $item->price->product->inventoryItem;
+                $inventoryItem = $item->price?->product?->inventoryItem;
 
                 if (! $inventoryItem) {
                     throw new Exception('Item not configured to track inventory');
@@ -98,11 +98,11 @@ class InventoryService
      */
     public function fulfillReservations(Order $order): void
     {
-        $order->loadMissing(['prices.product.inventoryItem.reservations']);
+        $order->loadMissing(['items.price.product.inventoryItem.reservations']);
 
         DB::transaction(function () use ($order): void {
             foreach ($order->items as $item) {
-                $inventoryItem = $item->price->product->inventoryItem;
+                $inventoryItem = $item->price?->product?->inventoryItem;
 
                 if (! $inventoryItem) {
                     continue;
@@ -141,11 +141,11 @@ class InventoryService
      */
     public function releaseReservations(Order $order): void
     {
-        $order->loadMissing(['prices.product.inventoryItem.reservations']);
+        $order->loadMissing(['items.price.product.inventoryItem.reservations']);
 
         DB::transaction(function () use ($order): void {
             foreach ($order->items as $item) {
-                $inventoryItem = $item->price->product->inventoryItem;
+                $inventoryItem = $item->price?->product?->inventoryItem;
 
                 if (! $inventoryItem) {
                     continue;
