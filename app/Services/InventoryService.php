@@ -108,7 +108,10 @@ class InventoryService
                     continue;
                 }
 
-                foreach ($inventoryItem->reservations->filter(fn (InventoryReservation $reservation): bool => $reservation->status === InventoryReservationStatus::Active) as $reservation) {
+                foreach ($inventoryItem->reservations
+                    ->filter(fn (InventoryReservation $reservation): bool => $reservation->order_id === $order->getKey())
+                    ->filter(fn (InventoryReservation $reservation): bool => $reservation->status === InventoryReservationStatus::Active) as $reservation
+                ) {
                     $quantityBefore = $inventoryItem->quantity_on_hand;
 
                     $inventoryItem->decrement('quantity_reserved', $reservation->quantity);
@@ -151,7 +154,10 @@ class InventoryService
                     continue;
                 }
 
-                foreach ($inventoryItem->reservations->filter(fn (InventoryReservation $reservation): bool => $reservation->status === InventoryReservationStatus::Active) as $reservation) {
+                foreach ($inventoryItem->reservations
+                    ->filter(fn (InventoryReservation $reservation): bool => $reservation->order_id === $order->getKey())
+                    ->filter(fn (InventoryReservation $reservation): bool => $reservation->status === InventoryReservationStatus::Active) as $reservation
+                ) {
                     $quantityBefore = $inventoryItem->quantity_available;
 
                     $inventoryItem->increment('quantity_available', $reservation->quantity);
