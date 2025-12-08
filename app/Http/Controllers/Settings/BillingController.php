@@ -37,7 +37,7 @@ class BillingController extends Controller
                 'vat_id',
                 'extra_billing_information',
             ]),
-            'portalUrl' => Inertia::defer(fn () => $this->paymentManager->getBillingPortalUrl($this->user)),
+            'portalUrl' => Inertia::defer(fn (): ?string => $this->paymentManager->getBillingPortalUrl($this->user)),
         ]);
     }
 
