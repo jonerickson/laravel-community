@@ -14,6 +14,8 @@ use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\LogApiRequest;
 use App\Http\Middleware\LogApiResponse;
+use App\Jobs\Api\ClearActivity;
+use App\Jobs\Api\ClearLogs;
 use App\Jobs\Store\ClearPendingOrders;
 use App\Jobs\Store\ReleaseExpiredInventoryReservations;
 use App\Models\Fingerprint;
@@ -43,7 +45,15 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     )
     ->withSchedule(function (Schedule $schedule): void {
+        $schedule->command('cache:prune-stale-tags')->hourly();
+        $schedule->command('horizon:snapshot')->everyFiveMinutes();
+        $schedule->command('queue:prune-failed --hours=96')->dailyAt('06:00');
+        $schedule->command('queue:prune-batches --hours=96')->dailyAt('06:15');
+        $schedule->command('telescope:prune --hours=96')->dailyAt('06:30');
+
         $schedule->job(ClearPendingOrders::class)->daily();
+        $schedule->job(ClearLogs::class)->hourly();
+        $schedule->job(ClearActivity::class)->hourly();
         $schedule->job(ReleaseExpiredInventoryReservations::class)->hourly();
     })
     ->withMiddleware(function (Middleware $middleware): void {
