@@ -27,7 +27,9 @@ class WhitelistsTable
                     ->sortable()
                     ->badge(),
                 TextColumn::make('content')
+                    ->placeholder('No Entry')
                     ->label('Entry')
+                    ->copyable()
                     ->getStateUsing(fn (Whitelist $record): string => match ($record->filter) {
                         FilterType::Fingerprint => $record->resource instanceof Fingerprint ? $record->resource->fingerprint_id : null,
                         FilterType::User => $record->resource instanceof User ? $record->resource->name : null,
