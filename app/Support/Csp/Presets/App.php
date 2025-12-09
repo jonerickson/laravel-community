@@ -50,6 +50,8 @@ class App implements Preset
             'admin/*',
             'horizon',
             'horizon/*',
+            'marketplace',
+            'marketplace/*',
             'telescope',
             'telescope/*',
         ];
