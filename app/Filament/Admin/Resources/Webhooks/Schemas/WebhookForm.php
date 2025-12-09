@@ -10,16 +10,27 @@ use App\Events\OrderCancelled;
 use App\Events\OrderCreated;
 use App\Events\OrderRefunded;
 use App\Events\PaymentSucceeded;
+use App\Events\PostCreated;
+use App\Events\PostDeleted;
+use App\Events\PostUpdated;
 use App\Events\SubscriptionCreated;
 use App\Events\SubscriptionDeleted;
 use App\Events\SubscriptionUpdated;
+use App\Events\TopicCreated;
+use App\Events\TopicDeleted;
+use App\Events\TopicUpdated;
 use App\Events\UserCreated;
 use App\Events\UserDeleted;
+use App\Events\UserIntegrationCreated;
+use App\Events\UserIntegrationDeleted;
 use App\Events\UserUpdated;
 use App\Facades\ExpressionLanguage;
 use App\Models\Order;
+use App\Models\Post;
 use App\Models\Product;
+use App\Models\Topic;
 use App\Models\User;
+use App\Models\UserIntegration;
 use App\Models\Webhook;
 use Closure;
 use Filament\Actions\Action;
@@ -233,8 +244,11 @@ class WebhookForm
     {
         return match ($event) {
             OrderCreated::class, OrderCancelled::class, OrderRefunded::class, PaymentSucceeded::class => ['order' => Order::query()->with(['items.price.product', 'discounts', 'user.integrations'])->findOrFail($modelId)],
+            PostCreated::class, PostUpdated::class, PostDeleted::class => ['post' => Post::query()->findOrFail($modelId)],
             SubscriptionCreated::class, SubscriptionUpdated::class, SubscriptionDeleted::class => ['user' => Auth::user(), 'product' => Product::query()->findOrFail($modelId)],
             UserCreated::class, UserUpdated::class, UserDeleted::class => ['user' => User::query()->with(['integrations', 'pendingReports'])->findOrFail($modelId)],
+            TopicCreated::class, TopicUpdated::class, TopicDeleted::class => ['topic' => Topic::query()->findOrFail($modelId)],
+            UserIntegrationCreated::class, UserIntegrationDeleted::class => ['integration' => UserIntegration::query()->with(['user'])->findOrFail($modelId)],
         };
     }
 
@@ -245,7 +259,10 @@ class WebhookForm
             OrderCancelled::class => Order::query()->cancelled()->latest()->limit(50)->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
             OrderRefunded::class, => Order::query()->refunded()->latest()->limit(50)->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
             SubscriptionCreated::class, SubscriptionUpdated::class, SubscriptionDeleted::class => Product::query()->subscriptions()->orderBy('name')->limit(50)->get()->mapWithKeys(fn (Product $product): array => [$product->getKey() => $product->name])->toArray(),
-            UserCreated::class, UserUpdated::class, UserDeleted::class => User::query()->orderBy('name')->limit(50)->get()->mapWithKeys(fn (User $user): array => [$user->getKey() => $user->name])->toArray()
+            PostCreated::class, PostUpdated::class, PostDeleted::class => Post::query()->orderBy('title')->limit(50)->get()->mapWithKeys(fn (Post $post): array => [$post->getKey() => $post->title])->toArray(),
+            TopicCreated::class, TopicUpdated::class, TopicDeleted::class => Topic::query()->orderBy('title')->limit(50)->get()->mapWithKeys(fn (Topic $topic): array => [$topic->getKey() => $topic->title])->toArray(),
+            UserCreated::class, UserUpdated::class, UserDeleted::class => User::query()->orderBy('name')->limit(50)->get()->mapWithKeys(fn (User $user): array => [$user->getKey() => $user->name])->toArray(),
+            UserIntegrationCreated::class, UserIntegrationDeleted::class => UserIntegration::query()->orderBy('provider_name')->limit(50)->get()->mapWithKeys(fn (UserIntegration $integration): array => [$integration->getKey() => sprintf('%s: %s (%s)', Str::title($integration->provider), $integration->provider_name, $integration->provider_id)])->toArray(),
         };
     }
 
@@ -256,12 +273,20 @@ class WebhookForm
             OrderCancelled::class => 'Order Cancelled',
             OrderRefunded::class => 'Order Refunded',
             PaymentSucceeded::class => 'Payment Succeeded',
+            PostCreated::class => 'Post Created',
+            PostUpdated::class => 'Post Updated',
+            PostDeleted::class => 'Post Deleted',
             SubscriptionCreated::class => 'Subscription Created',
             SubscriptionUpdated::class => 'Subscription Updated',
             SubscriptionDeleted::class => 'Subscription Deleted',
+            TopicCreated::class => 'Topic Created',
+            TopicUpdated::class => 'Topic Updated',
+            TopicDeleted::class => 'Topic Deleted',
             UserCreated::class => 'User Created',
             UserUpdated::class => 'User Updated',
             UserDeleted::class => 'User Deleted',
+            UserIntegrationCreated::class => 'User Integration Created',
+            UserIntegrationDeleted::class => 'User Integration Deleted',
         ];
     }
 }
