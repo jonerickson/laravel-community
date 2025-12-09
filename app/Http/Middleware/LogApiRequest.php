@@ -51,7 +51,7 @@ class LogApiRequest
 
     private function isFirstParty(Request $request): bool
     {
-        return $request->host() === Uri::of(config('app.url'))->host();
+        return Uri::of($request->headers->get('origin') ?? '')->host() === Uri::of(config('app.url'))->host();
     }
 
     /**
