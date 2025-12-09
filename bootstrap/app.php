@@ -18,6 +18,7 @@ use App\Jobs\Api\ClearActivity;
 use App\Jobs\Api\ClearLogs;
 use App\Jobs\Store\ClearPendingOrders;
 use App\Jobs\Store\ReleaseExpiredInventoryReservations;
+use App\Jobs\Users\RemoveInactiveUsers;
 use App\Models\Fingerprint;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Console\Scheduling\Schedule;
@@ -51,9 +52,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('queue:prune-batches --hours=96')->dailyAt('06:15');
         $schedule->command('telescope:prune --hours=96')->dailyAt('06:30');
 
-        $schedule->job(ClearPendingOrders::class)->daily();
+        $schedule->job(ClearPendingOrders::class)->dailyAt('07:00');
         $schedule->job(ClearLogs::class)->hourly();
         $schedule->job(ClearActivity::class)->hourly();
+        $schedule->job(RemoveInactiveUsers::class)->dailyAt('07:30');
         $schedule->job(ReleaseExpiredInventoryReservations::class)->hourly();
     })
     ->withMiddleware(function (Middleware $middleware): void {
