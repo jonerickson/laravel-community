@@ -25089,6 +25089,10 @@ namespace App\Http\Requests\Settings {
      */
     class UpdatePaymentMethodRequest extends \Illuminate\Foundation\Http\FormRequest {
             }
+    /**
+     */
+    class TwoFactorAuthenticationRequest extends \Illuminate\Foundation\Http\FormRequest {
+            }
     }
 
 namespace App\Http\Requests\SupportTickets {
@@ -33351,11 +33355,6 @@ namespace  {
 }
 
 
-namespace Facades\Livewire\Features\SupportFileUploads {
-    /**
-     * @mixin \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl     */
-    class GenerateSignedUploadUrl extends \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl {}
-}
 
 
 

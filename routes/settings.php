@@ -11,6 +11,7 @@ use App\Http\Controllers\Settings\OrderController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\PaymentMethodController;
 use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\Settings\TwoFactorAuthenticationController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => ['auth', 'email', 'password', 'verified', 'onboarded']], function (): void {
@@ -29,6 +30,8 @@ Route::group(['middleware' => ['auth', 'email', 'password', 'verified', 'onboard
 
     Route::get('settings/billing', BillingController::class)->name('settings.billing');
     Route::post('settings/billing', [BillingController::class, 'update'])->name('settings.billing.update');
+
+    Route::get('settings/two-factor', TwoFactorAuthenticationController::class)->name('two-factor');
 
     Route::get('settings/orders', OrderController::class)->name('settings.orders');
     Route::get('settings/discounts', DiscountController::class)->name('settings.discounts');

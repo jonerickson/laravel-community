@@ -11,6 +11,18 @@ use App\Models\User;
  */
 trait HasMultiFactorAuthentication
 {
+    public function hasEnabledTwoFactorAuthentication(): bool
+    {
+        return ! is_null($this->getAppAuthenticationSecret())
+            && ! is_null($this->app_authentication_confirmed_at);
+    }
+
+    public function disableTwoFactorAuthentication(): void
+    {
+        $this->app_authentication_secret = null;
+        $this->save();
+    }
+
     public function getAppAuthenticationSecret(): ?string
     {
         return $this->app_authentication_secret;
@@ -40,14 +52,22 @@ trait HasMultiFactorAuthentication
 
     protected function initializeHasMultiFactorAuthentication(): void
     {
-        $this->setHidden(array_merge($this->getHidden(), [
+        $this->mergeHidden([
             'app_authentication_secret',
             'app_authentication_recovery_codes',
-        ]));
+            'app_authentication_confirmed_at',
+        ]);
 
         $this->mergeCasts([
             'app_authentication_secret' => 'encrypted',
             'app_authentication_recovery_codes' => 'encrypted:array',
+            'app_authentication_confirmed_at' => 'datetime',
+        ]);
+
+        $this->mergeFillable([
+            'app_authentication_secret',
+            'app_authentication_recovery_codes',
+            'app_authentication_confirmed_at',
         ]);
     }
 }

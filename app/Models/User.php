@@ -64,6 +64,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property string|null $remember_token
  * @property string|null $app_authentication_secret
  * @property array<array-key, mixed>|null $app_authentication_recovery_codes
+ * @property Carbon|null $app_authentication_confirmed_at
  * @property bool $has_email_authentication
  * @property string|null $avatar
  * @property string|null $stripe_id
@@ -148,6 +149,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @method static Builder<static>|User permission($permissions, $without = false)
  * @method static Builder<static>|User query()
  * @method static Builder<static>|User role($roles, $guard = null, $without = false)
+ * @method static Builder<static>|User whereAppAuthenticationConfirmedAt($value)
  * @method static Builder<static>|User whereAppAuthenticationRecoveryCodes($value)
  * @method static Builder<static>|User whereAppAuthenticationSecret($value)
  * @method static Builder<static>|User whereAvatar($value)
@@ -233,6 +235,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         'has_email_authentication',
         'app_authentication_recovery_codes',
         'app_authentication_secret',
+        'app_authentication_confirmed_at',
     ];
 
     protected $dispatchesEvents = [

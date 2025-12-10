@@ -1,8 +1,8 @@
 import Product from '@/components/store-product';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
 import { stripCharacters } from '@/utils/truncate';
+import { Head, usePage } from '@inertiajs/react';
 
 interface ProductPageProps {
     product: App.Data.ProductData;

@@ -38,6 +38,7 @@ use Illuminate\Support\Str;
  * @property-read string|null $featured_image_url
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Forum> $forums
  * @property-read int|null $forums_count
+ * @property-read ForumCategoryGroup|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Group> $groups
  * @property-read int|null $groups_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Topic> $topics
