@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\PriceType;
+use App\Enums\SubscriptionInterval;
 use App\Models\Group;
 use App\Models\Price;
 use App\Models\Product;
@@ -82,13 +84,19 @@ class ProductSeeder extends Seeder
                 ])
                 ->has(Price::factory()
                     ->count(2)
-                    ->monthly()
                     ->active()
-                    ->recurring()
                     ->state(new Sequence(
                         fn (Sequence $sequence) => [
                             'is_default' => $sequence->index === 0,
                             'external_price_id' => env(sprintf('STRIPE_SUBSCRIPTION_%s_PRICE_%s', $index, $sequence->index)),
+                            'type' => PriceType::Recurring,
+                            'interval' => $sequence->index === 0 ? SubscriptionInterval::Monthly : SubscriptionInterval::Yearly,
+                            'interval_count' => 1,
+                            'amount' => match ($index) {
+                                0 => $sequence->index === 0 ? 10 : 100,
+                                1 => $sequence->index === 0 ? 20 : 200,
+                                2 => $sequence->index === 0 ? 30 : 300,
+                            },
                         ]
                     ))
                 )

@@ -594,7 +594,7 @@ class StripeDriver implements PaymentProcessor
             };
 
             if ($subscription->onTrial()) {
-                $subscription->noProrate()->endTrial();
+                $subscription->endTrial();
             }
 
             $subscription->swap($price->external_price_id);
