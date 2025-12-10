@@ -30,6 +30,8 @@ class ProductData extends Data
 
     public ProductType $type;
 
+    public int $order;
+
     public ?ProductTaxCode $taxCode = null;
 
     public bool $isFeatured;

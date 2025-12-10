@@ -36,7 +36,7 @@ class OrderInfolist
                             ->since()
                             ->dateTimeTooltip(),
                         TextEntry::make('user.name')
-                            ->url(fn (Order $record): string => UserResource::getUrl('edit', ['record' => $record]))
+                            ->url(fn (Order $record): string => UserResource::getUrl('edit', ['record' => $record->user_id]))
                             ->label('User'),
                         TextEntry::make('status')
                             ->badge(),

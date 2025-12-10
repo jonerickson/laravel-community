@@ -42,11 +42,15 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read File|null $file
  * @property-read Collection<int, File> $files
  * @property-read int|null $files_count
+ * @property-read UserGroup|ForumGroup|ForumCategoryGroup|null $pivot
+ * @property-read Collection<int, ForumCategory> $forumCategories
+ * @property-read int|null $forum_categories_count
+ * @property-read Collection<int, Forum> $forums
+ * @property-read int|null $forums_count
  * @property-read Collection<int, \App\Models\Permission> $permissions
  * @property-read int|null $permissions_count
  * @property-read Collection<int, Role> $roles
  * @property-read int|null $roles_count
- * @property-read UserGroup|null $pivot
  * @property-read Collection<int, User> $users
  * @property-read int|null $users_count
  *

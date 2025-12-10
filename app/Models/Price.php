@@ -47,6 +47,8 @@ use Illuminate\Support\Stringable;
  * @property bool $is_visible
  * @property-read bool $is_one_time
  * @property-read bool $is_recurring
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $orderItems
+ * @property-read int|null $order_items_count
  * @property-read Product $product
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Subscription> $subscriptions
  * @property-read int|null $subscriptions_count
@@ -125,6 +127,11 @@ class Price extends Model implements HasLabel
         'deleting' => PriceDeleted::class,
     ];
 
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
@@ -132,7 +139,7 @@ class Price extends Model implements HasLabel
 
     public function subscriptions(): HasMany
     {
-        return $this->hasMany(Subscription::class, 'stripe_price', 'external_price_id')->active();
+        return $this->hasMany(Subscription::class, 'stripe_price', 'external_price_id');
     }
 
     public function scopeDefault(Builder $query): void

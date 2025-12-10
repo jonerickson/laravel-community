@@ -20,6 +20,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Number;
 use Override;
+use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
+use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 /**
  * @property int $id
@@ -59,6 +61,8 @@ use Override;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Price> $prices
  * @property-read int|null $prices_count
  * @property-read User $user
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Subscription> $subscriptions
+ * @property-read int|null $subscriptions_count
  *
  * @method static Builder<static>|Order cancelled()
  * @method static Builder<static>|Order completed()
@@ -95,6 +99,7 @@ class Order extends Model implements HasLabel
     use HasFactory;
     use HasNotes;
     use HasReferenceId;
+    use HasRelationships;
 
     protected $attributes = [
         'status' => OrderStatus::Pending,
@@ -160,6 +165,15 @@ class Order extends Model implements HasLabel
             ->withPivot('amount_applied', 'balance_before', 'balance_after')
             ->withTimestamps()
             ->using(OrderDiscount::class);
+    }
+
+    public function subscriptions(): HasManyDeep
+    {
+        return $this->hasManyDeepFromRelations(
+            $this->items(),
+            (new OrderItem)->price(),
+            (new Price)->subscriptions()
+        );
     }
 
     public function amount(): Attribute

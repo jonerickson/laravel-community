@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Store;
 use App\Data\CommentData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
+use App\Enums\PaymentBehavior;
 use App\Enums\ProrationBehavior;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Store\SubscriptionCancelRequest;
@@ -92,10 +93,11 @@ class SubscriptionsController extends Controller
             user: $this->user,
             price: $price,
             prorationBehavior: ProrationBehavior::AlwaysInvoice,
+            paymentBehavior: PaymentBehavior::ErrorIfIncomplete,
         );
 
         if (! $result) {
-            return back()->with('message', 'We were unable to change your subscription. Please try again later.');
+            return back()->with('message', 'We were unable to update your subscription. Please make sure you have a valid payment method on file and try again.');
         }
 
         return back()->with('message', 'Your subscription was successfully updated.');

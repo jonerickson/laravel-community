@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 /**
  * @property int $category_id
  * @property int $group_id
+ * @property int $read
+ * @property int $write
+ * @property int $delete
  * @property-read ForumCategory|null $category
  * @property-read Group $group
  *
@@ -17,7 +20,10 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategoryGroup newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategoryGroup query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategoryGroup whereCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategoryGroup whereDelete($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategoryGroup whereGroupId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategoryGroup whereRead($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ForumCategoryGroup whereWrite($value)
  *
  * @mixin \Eloquent
  */

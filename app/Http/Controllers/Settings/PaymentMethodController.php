@@ -47,18 +47,19 @@ class PaymentMethodController extends Controller
             ]);
         }
 
-        $created = $this->paymentManager->createPaymentMethod(
+        $paymentMethod = $this->paymentManager->createPaymentMethod(
             user: $this->user,
             paymentMethodId: $request->validated('method'),
         );
 
-        if (blank($created)) {
+        if (blank($paymentMethod)) {
             return back()->with([
                 'message' => 'The payment method creation failed. Please try again later.',
                 'messageVariant' => 'error',
             ]);
         }
 
+        $this->user->updateDefaultPaymentMethod($paymentMethod->id);
         $this->user->updateDefaultPaymentMethodFromStripe();
 
         return redirect()->route('settings.payment-methods')->with([

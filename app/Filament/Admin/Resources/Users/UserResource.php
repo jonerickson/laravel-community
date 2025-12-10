@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Users;
 
 use App\Enums\ProductType;
+use App\Enums\SubscriptionStatus;
 use App\Filament\Admin\Resources\Users\Actions\BlacklistAction;
 use App\Filament\Admin\Resources\Users\Actions\BulkBlacklistUsersAction;
 use App\Filament\Admin\Resources\Users\Actions\BulkSwapSubscriptionsAction;
@@ -446,47 +447,14 @@ class UserResource extends Resource
                     ->schema([
                         Select::make('subscription_status')
                             ->label('Subscription Status')
-                            ->multiple()
                             ->searchable()
                             ->preload()
-                            ->options([
-                                'active' => 'Active',
-                                'cancelled' => 'Cancelled',
-                                'ended' => 'Ended',
-                                'expired_trial' => 'Expired Trial',
-                                'grace_period' => 'On Grace Period',
-                                'trialing' => 'On Trial',
-                                'past_due' => 'Past Due',
-                            ]),
+                            ->options(SubscriptionStatus::class),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query
                         ->when(
-                            in_array('active', $data['subscription_status']),
-                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->active()),
-                        )
-                        ->when(
-                            in_array('cancelled', $data['subscription_status']),
-                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->canceled()),
-                        )
-                        ->when(
-                            in_array('ended', $data['subscription_status']),
-                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->ended()),
-                        )
-                        ->when(
-                            in_array('expired_trial', $data['subscription_status']),
-                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->expiredTrial()),
-                        )
-                        ->when(
-                            in_array('grace_period', $data['subscription_status']),
-                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->onGracePeriod()),
-                        )
-                        ->when(
-                            in_array('trialing', $data['subscription_status']),
-                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->onTrial()),
-                        )
-                        ->when(
-                            in_array('past_due', $data['subscription_status']),
-                            fn (Builder $query, $date): Builder => $query->whereHas('subscriptions', fn (Builder|Subscription $query) => $query->pastDue()),
+                            $data['subscription_status'],
+                            fn (Builder $query, $date): Builder => $query->whereRelation('subscriptions', 'stripe_status', $data['subscription_status']),
                         )
                     ),
                 Filter::make('has_no_subscription')

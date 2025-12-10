@@ -375,6 +375,7 @@ declare namespace App.Data {
         usage: string;
     };
     export type PermissionData = {
+        canCreate: boolean;
         canUpdate: boolean;
         canDelete: boolean;
     };
@@ -467,6 +468,7 @@ declare namespace App.Data {
         slug: string;
         description: string | null;
         type: App.Enums.ProductType;
+        order: number;
         taxCode: App.Enums.ProductTaxCode | null;
         isFeatured: boolean;
         isSubscriptionOnly: boolean;

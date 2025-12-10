@@ -47,6 +47,7 @@ use Override;
  * @property-read int|null $followers_count
  * @property-read Collection<int, Follow> $follows
  * @property-read int|null $follows_count
+ * @property-read ForumGroup|null $pivot
  * @property-read Collection<int, Group> $groups
  * @property-read int|null $groups_count
  * @property-read bool $is_followed_by_user
