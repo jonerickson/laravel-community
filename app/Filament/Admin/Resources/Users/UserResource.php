@@ -431,7 +431,7 @@ class UserResource extends Resource
                 Filter::make('subscription')
                     ->schema([
                         Select::make('subscription')
-                            ->label('Subscription Package')
+                            ->label('Subscription Packages')
                             ->multiple()
                             ->searchable()
                             ->preload()

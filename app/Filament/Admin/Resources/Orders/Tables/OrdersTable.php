@@ -23,6 +23,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -105,7 +106,7 @@ class OrdersTable
                     ->label('Order Status')
                     ->default(OrderStatus::Succeeded)
                     ->options(OrderStatus::class),
-                SelectFilter::make('product')
+                SelectFilter::make('products')
                     ->relationship('items.price.product', 'name')
                     ->preload()
                     ->searchable()
@@ -113,7 +114,7 @@ class OrdersTable
                 Filter::make('subscription')
                     ->schema([
                         Select::make('subscription')
-                            ->label('Subscription Package')
+                            ->label('Subscription Packages')
                             ->multiple()
                             ->searchable()
                             ->preload()
@@ -139,6 +140,86 @@ class OrdersTable
                             fn (Builder $query, $date): Builder => $query->whereRelation('subscriptions', 'stripe_status', $data['subscription_status']),
                         )
                     ),
+                Filter::make('amount_due')
+                    ->columnSpanFull()
+                    ->columns()
+                    ->schema([
+                        TextInput::make('amount_due_from')
+                            ->numeric()
+                            ->label('Amount Due Greater Than'),
+                        TextInput::make('amount_due_after')
+                            ->numeric()
+                            ->label('Amount Due Less Than'),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when(
+                            $data['amount_due_from'],
+                            fn (Builder $query, $date): Builder => $query->where('amount_due', '>=', $date * 100),
+                        )
+                        ->when(
+                            $data['amount_due_after'],
+                            fn (Builder $query, $date): Builder => $query->where('amount_due', '<=', $date * 100),
+                        )),
+                Filter::make('amount_overpaid')
+                    ->columnSpanFull()
+                    ->columns()
+                    ->schema([
+                        TextInput::make('amount_overpaid_from')
+                            ->numeric()
+                            ->label('Amount Overpaid Greater Than'),
+                        TextInput::make('amount_overpaid_after')
+                            ->numeric()
+                            ->label('Amount Overpaid Less Than'),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when(
+                            $data['amount_overpaid_from'],
+                            fn (Builder $query, $date): Builder => $query->where('amount_overpaid', '>=', $date * 100),
+                        )
+                        ->when(
+                            $data['amount_overpaid_after'],
+                            fn (Builder $query, $date): Builder => $query->where('amount_overpaid', '<=', $date * 100),
+                        )),
+                Filter::make('amount_paid')
+                    ->columnSpanFull()
+                    ->columns()
+                    ->schema([
+                        TextInput::make('amount_paid_from')
+                            ->numeric()
+                            ->label('Amount Paid Greater Than'),
+                        TextInput::make('amount_paid_after')
+                            ->numeric()
+                            ->label('Amount Paid Less Than'),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when(
+                            $data['amount_paid_from'],
+                            fn (Builder $query, $date): Builder => $query->where('amount_paid', '>=', $date * 100),
+                        )
+                        ->when(
+                            $data['amount_paid_after'],
+                            fn (Builder $query, $date): Builder => $query->where('amount_paid', '<=', $date * 100),
+                        )),
+                Filter::make('amount_remaining')
+                    ->columnSpanFull()
+                    ->columns()
+                    ->schema([
+                        TextInput::make('amount_remaining_from')
+                            ->numeric()
+                            ->label('Amount Remaining Greater Than'),
+                        TextInput::make('amount_remaining_after')
+                            ->numeric()
+                            ->label('Amount Remaining Less Than'),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when(
+                            $data['amount_remaining_from'],
+                            fn (Builder $query, $date): Builder => $query->where('amount_remaining', '>=', $date * 100),
+                        )
+                        ->when(
+                            $data['amount_remaining_after'],
+                            fn (Builder $query, $date): Builder => $query->where('amount_remaining', '<=', $date * 100),
+                        )),
                 Filter::make('created_at')
                     ->columnSpanFull()
                     ->columns()
@@ -158,7 +239,9 @@ class OrdersTable
                             fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                         )),
             ])
-            ->filtersFormWidth(Width::ExtraLarge)
+            ->filtersFormColumns(2)
+            ->filtersLayout(FiltersLayout::Modal)
+            ->filtersFormWidth(Width::FiveExtraLarge)
             ->recordActions([
                 CheckoutAction::make(),
                 ViewAction::make(),
