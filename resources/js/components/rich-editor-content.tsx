@@ -26,6 +26,12 @@ export default function RichEditorContent({ content, className, ...props }: Rich
 
                 "[&_ul]:list-disc [&_ul]:ml-6 [&_ul]:my-2",
                 "[&_ol]:list-decimal [&_ol]:ml-6 [&_ol]:my-4",
+
+                "[&_hr]:my-4 [&_hr]:border-border",
+
+                "[&_table]:my-4 [&_table]:w-full [&_table]:border-collapse [&_table]:overflow-hidden [&_table]:rounded-md [&_table]:border [&_table]:border-border",
+                "[&_th]:border [&_th]:border-border [&_th]:bg-muted [&_th]:px-4 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold",
+                "[&_td]:border [&_td]:border-border [&_td]:px-4 [&_td]:py-2",
                 className
             )}
             dangerouslySetInnerHTML={{ __html: content }}
