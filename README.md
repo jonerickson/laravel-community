@@ -4,7 +4,7 @@
 
 # 🚀 Laravel Community
 
-> A modern, full-featured marketplace platform built for communities
+#### A modern, full-featured marketplace platform built for communities
 
 Laravel Community is an open-source platform that combines the power of an e-commerce store, user marketplace, community forums, and content management into one seamless experience. Built with modern technologies and designed for scalability, it's perfect for communities looking to create their own digital ecosystem.
 
