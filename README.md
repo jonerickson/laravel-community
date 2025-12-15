@@ -1,264 +1,188 @@
-# Mountain Interactive
+# 🚀 Laravel Community
 
-A modern Laravel + React marketplace application built with Inertia.js, featuring user authentication, storeProduct management, subscription billing, and administrative tools.
+> A modern, full-featured marketplace platform built for communities
 
-## Features
+Laravel Community is an open-source platform that combines the power of an e-commerce store, user marketplace, community forums, and content management into one seamless experience. Built with modern technologies and designed for scalability, it's perfect for communities looking to create their own digital ecosystem.
 
-- **User Management**: Registration, authentication, email verification, and extensible social login providers
-- **E-Commerce Store**: Product catalog with categories, user-generated content, and file attachments
-- **User Marketplace**: User-provided products for customers to purchase with management dashboard
-- **Blog System**: Content management with posts and categories
-- **Forum Platform**: Community discussions with topics, posts, and categories
-- **Policy System**: Terms of service, privacy policies, and other legal documents with categorization
-- **Social Integrations**: Extensible OAuth authentication system with custom provider support
-- **Subscription Billing**: Modular payment system with Stripe as default (custom payment processors supported)
-- **Admin Panel**: Filament-powered admin interface for managing products, categories, users, posts and subscriptions
-- **Role-Based Access**: Permission system using Spatie Laravel Permission
-- **Modern Frontend**: React 19 with TypeScript, Tailwind CSS, and shadcn/ui components
+## ✨ What Makes It Special
 
-## Tech Stack
+### 🛍️ **Dual Commerce System**
+Run your own official store while empowering your community to sell their creations. Our platform features both a managed e-commerce store and a user marketplace where creators can list and sell their products, complete with automated payouts and revenue sharing.
 
-- **Backend**: Laravel 12, PHP 8.2+
-- **Frontend**: React 19, TypeScript, Inertia.js
-- **Styling**: Tailwind CSS v4, shadcn/ui, Lucide React
-- **Database**: SQLite (development), MySQL/PostgreSQL (production)
-- **Payment Processing**: Modular payment processor system (default: Stripe, supports custom drivers)
-- **Support Tickets**: Modular ticket system (default: database, supports external services)
-- **Admin Interface**: Filament v4
-- **User Marketplace Interface**: Filament v4
-- **Build Tools**: Vite
-- **Code Quality**: Laravel Pint, PHPStan, Rector, ESLint, Prettier
-- **Testing**: Pest
+### 💬 **Community Hub**
+Keep your community engaged with built-in forums for discussions, a blog system for announcements and content, and real-time notifications. Everything your community needs to connect and grow, all in one place.
 
-## Getting Started
+### 🎯 **User Dashboard**
+Every user gets their own personalized dashboard where they can manage purchases, track orders, handle subscriptions, submit support tickets, and if they're a seller, manage their marketplace listings and view earnings.
+
+### 💳 **Flexible Payment System**
+Accept payments through multiple processors with our modular architecture. Stripe comes ready out of the box, but you can easily plug in any payment provider. Handle one-time purchases, recurring subscriptions, and marketplace payouts seamlessly.
+
+### 🛡️ **Advanced Security**
+Protect your platform with built-in fraud detection, threat monitoring, and comprehensive security features. Role-based permissions, OAuth authentication, and extensible security integrations keep your community safe.
+
+### 📊 **Powerful Admin Tools**
+Manage everything from a beautiful, intuitive admin panel. Handle users, products, orders, content, and marketplace submissions with ease. Built-in analytics and reporting help you make data-driven decisions.
+
+### 🎫 **Support System**
+Keep your users happy with an integrated support ticket system. Whether you want to handle tickets in-house or connect to external services like Zendesk, the modular architecture makes it simple.
+
+### 🚀 **Deploy Anywhere**
+Ready for production with Docker and Kubernetes support. Scale from a small community to enterprise-level with confidence. Deploy on your own infrastructure or use cloud providers—the choice is yours.
+
+## 🎨 Key Features
+
+- 🔐 **Flexible Authentication** - Email, password, and social login with support for custom OAuth providers
+- 🏪 **Official Store** - Full-featured e-commerce with products, categories, and file attachments
+- 🤝 **User Marketplace** - Let your community members become sellers with their own dashboard
+- 💰 **Subscription Management** - Recurring billing, invoice generation, and payment method handling
+- 📝 **Content Management** - Blog system with posts, categories, and rich text editing
+- 💭 **Community Forums** - Topics, discussions, and moderated conversations
+- 📄 **Policy System** - Terms of service, privacy policies, and legal document management
+- 👥 **Role-Based Access** - Granular permissions for users, sellers, moderators, and admins
+- 🌐 **API Platform** - RESTful APIs for integrations and mobile apps
+- 📱 **Modern Interface** - Responsive design that works beautifully on any device
+- 🔔 **Real-time Updates** - Keep users informed with notifications and live data
+- 🎨 **Customizable** - Themes, branding, and extensible architecture
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- PHP 8.2+
-- Node.js 22+
+- PHP 8.2 or higher
+- Node.js 22 or higher
 - Composer
-- SQLite (for development)
+- A database (SQLite for local, MySQL/PostgreSQL for production)
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd mi
-   ```
+```bash
+# Clone the repository
+git clone https://github.com/jonerickson/laravel-community
+cd laravel-community
 
-2. **Install PHP dependencies**
-   ```bash
-   composer install
-   ```
+# One-command setup
+composer setup
+```
 
-3. **Install JavaScript dependencies**
-   ```bash
-   npm install
-   ```
+That's it! The setup command handles installation, configuration, and database seeding automatically.
 
-4. **Environment setup**
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
-
-5. **Database setup**
-   ```bash
-   touch database/database.sqlite
-   php artisan migrate --seed
-   ```
-
-6. **Install git hooks** (recommended)
-   ```bash
-   composer install-hooks
-   ```
-
-### Development
-
-Start the development environment:
+### Running Locally
 
 ```bash
-# Start all development services (queue, logs, frontend)
+# Start the full development environment
 composer dev
-
-# Or start services individually:
-php artisan serve          # Laravel server
-npm run dev               # Vite development server
-php artisan horizon       # Queue worker
-php artisan pail          # Real-time logs
 ```
 
-### Building for Production
+This starts the web server, queue workers, log viewer, and frontend build tools all at once.
+
+## 🏗️ Architecture Highlights
+
+Built with a modular, extensible architecture:
+
+- **Modular Payment Processing** - Swap payment providers without changing your code
+- **Extensible Support System** - Connect to external ticketing services or use the built-in system
+- **Driver-Based Design** - Easy to extend with new integrations and features
+- **Event-Driven** - React to platform events with custom listeners and integrations
+- **API-First** - Full API support for mobile apps and external integrations
+- **Type-Safe** - TypeScript on the frontend, strict typing throughout
+
+## 🐳 Deployment
+
+### Docker
+
+Ready to containerize with included Docker configuration:
 
 ```bash
-npm run build
+docker compose up
 ```
 
-## Development Workflow
+### Kubernetes
+
+Production-ready Kubernetes manifests included for scalable deployments. Perfect for handling growth from small communities to large-scale platforms.
+
+## 🛠️ Development
 
 ### Code Quality
 
-This project includes automated code quality tools:
+We take code quality seriously with automated tools:
 
-- **PHP**: Laravel Pint for code formatting, PHPStan for static analysis
-- **JavaScript/TypeScript**: ESLint for linting, Prettier for formatting
-- **Git Hooks**: Pre-push hooks automatically format code and run quality checks
+- 🔍 **Static Analysis** - Catch bugs before they happen
+- ✨ **Auto-formatting** - Consistent code style across the project
+- 🧪 **Comprehensive Testing** - Test coverage for peace of mind
+- 🪝 **Git Hooks** - Automated quality checks on every commit
 
-### Available Commands
-
-**PHP/Laravel:**
-- `composer test` - Run PHPUnit tests
-- `composer cs-fix` - Fix code style with Pint
-- `composer analyze` - Run PHPStan analysis
-- `composer ide` - Generate IDE helper files
-- `composer facades` - Generate Facade documentation
-
-**JavaScript/TypeScript:**
-- `npm run lint` - Run ESLint
-- `npm run format` - Format with Prettier
-- `npm run types` - TypeScript type checking
-- `composer types` - Generate typescript definitions
-
-**Testing:**
-- `composer test` - Run all tests
-- `composer tf` - Run tests with coverage
-- `composer tc` - Run test suite with type coverage
-
-## Webhooks
-
-When using the default Stripe payment processor, you can listen for webhooks locally with:
+### Useful Commands
 
 ```bash
-stripe listen --forward-to=https://mi.test/stripe/webhook --events="customer.subscription.created,customer.subscription.updated,customer.subscription.deleted,customer.updated,customer.deleted,payment_method.automatically_updated,invoice.payment_action_required,invoice.payment_succeeded,refund.created"
+# Testing
+composer test              # Run the test suite
+composer test-coverage     # Generate coverage reports
+
+# Code Quality
+composer lint              # Format PHP code
+composer analyze           # Run static analysis
+npm run lint              # Check JavaScript/TypeScript
+npm run format            # Format frontend code
+
+# Development
+composer types            # Generate TypeScript types from models
+composer ide             # Update IDE autocomplete
 ```
 
-## Project Structure
+## 🤝 Contributing
 
-```
-app/
-├── Actions/               # Action classes
-├── Contracts/             # Interface contracts
-├── Data/                  # Data transfer objects
-├── Drivers/               # Driver implementations (Payments, SupportTickets)
-├── Enums/                 # Application enumerations
-├── Events/                # Event classes
-├── Exceptions/            # Custom exception classes
-├── Facades/               # Application facades
-├── Filament/              # Filament admin and marketplace resources
-├── Http/                  # Controllers, middleware, requests, resources
-├── Listeners/             # Event listeners
-├── Managers/              # Service managers (Payment, SupportTicket)
-├── Models/                # Eloquent models
-├── Policies/              # Authorization policies
-├── Providers/             # Service providers
-├── Services/              # Business logic services
-└── Traits/                # Reusable traits
+We welcome contributions from the community! Whether it's bug fixes, new features, or documentation improvements, here's how to get started:
 
-resources/
-├── css/
-│   └── filament/
-│       ├── admin/        # Admin panel styles
-│       └── marketplace/  # Marketplace panel styles
-├── js/
-│   ├── components/
-│   │   └── ui/           # shadcn/ui component library
-│   ├── hooks/            # Custom React hooks
-│   ├── layouts/
-│   │   ├── app/          # Main application layout
-│   │   ├── auth/         # Authentication layout
-│   │   └── settings/     # Settings layout
-│   ├── lib/              # Utility libraries
-│   ├── pages/            # Inertia.js pages
-│   │   ├── auth/         # Authentication pages
-│   │   ├── blog/         # Blog pages
-│   │   ├── forums/       # Forum pages
-│   │   │   ├── categories/
-│   │   │   ├── posts/
-│   │   │   └── topics/
-│   │   ├── oauth/        # OAuth callback pages
-│   │   ├── policies/     # Policy pages
-│   │   ├── settings/     # User settings pages
-│   │   ├── store/        # Store pages
-│   │   │   ├── categories/
-│   │   │   └── products/
-│   │   └── support/      # Support ticket pages
-│   ├── services/         # Service classes
-│   ├── types/            # TypeScript type definitions
-│   └── utils/            # Utility functions
-└── views/
-    ├── errors/           # Error page templates
-    └── filament/
-        ├── admin/
-        │   ├── pages/    # Custom admin pages
-        │   └── reports/  # Report templates
-        └── components/   # Custom Filament components
+1. 🍴 Fork the repository
+2. 🌿 Create a feature branch
+3. 🔧 Make your changes
+4. ✅ Run tests and quality checks
+5. 📬 Submit a pull request
 
-routes/
-├── web.php               # Main web routes
-├── api.php               # API routes
-├── auth.php              # Authentication routes
-├── blog.php              # Blog routes
-├── console.php           # Console commands
-├── forums.php            # Forum routes
-├── policies.php          # Policy routes
-├── settings.php          # User settings routes
-├── store.php             # Store routes
-└── support.php           # Support ticket routes
-```
+Check out our [Contributing Guide](CONTRIBUTING.md) for detailed guidelines.
 
-## Key Features
+## 📖 Documentation
 
-### Authentication
-- Email/password registration and login
-- Email verification
-- Extensible social authentication providers
-- Password reset functionality
+- **CLAUDE.md** - Development guidelines and architecture overview
+- **Code of Conduct** - Community standards and expectations
+- **License** - MIT License for open source freedom
 
-### Store & User Marketplace
-- Product catalog with categories and search/filtering
-- File uploads and attachments for products
-- User marketplace where third-party sellers can submit products for sale
-- Automated seller payouts using extensible payout system (default: Stripe Connect)
-- Marketplace management dashboard for sellers
-- Revenue sharing and commission tracking
+## 🔒 Security
 
-### Billing & Subscriptions
-- Modular payment processing (default: Stripe, custom processors supported)
-- Subscription management
-- Invoice generation
-- Payment method management
+Security is a top priority. We implement:
 
-### Administration
-- Filament admin panel at `/admin`
-- User and role management
-- Product and category administration
-- Permission-based access control
+- Advanced fraud detection algorithms
+- Threat monitoring and prevention
+- Secure OAuth authentication flows
+- Role-based access control
+- Input validation and sanitization
+- Protection against common vulnerabilities
 
-### Payment Processing
-- Modular payment processor architecture using the Manager pattern
-- Default Stripe driver implementation
-- Any payment processor can be implemented by creating a driver that implements the `PaymentProcessor` contract
-- Supports product/price management, payment methods, subscriptions, and checkout flows
-- Configure payment driver in `config/payment.default`
+Found a security issue? Please report it responsibly by contacting the maintainers directly.
 
-### Support Ticket Management
-- Modular support ticket system using the Manager pattern
-- Default database driver for local ticket storage
-- External service integration (Zendesk, etc.) through custom drivers
-- Any support service can be integrated by implementing the `SupportTicketProvider` contract
-- Features include ticket CRUD, comments, assignments, status management, and file attachments
-- Configure support driver in `config/support-tickets.default`
+## 📝 License
 
-## Contributing
+Laravel Community is open source software licensed under the [MIT License](LICENSE.md).
 
-1. Fork the repository
-2. Create a feature branch
-3. Install git hooks: `composer install-hooks`
-4. Make your changes
-5. Run tests: `composer test`
-6. Submit a pull request
+## 💙 Built With
 
-## License
+Modern technologies for a modern platform:
 
-This project is licensed under the MIT License.
+- **Backend** - Laravel 12 with PHP 8.4
+- **Frontend** - React 19 with TypeScript
+- **Styling** - Tailwind CSS v4 with beautiful UI components
+- **Admin** - Filament v4 for powerful dashboards
+- **Real-time** - Queue processing with Horizon
+- **Testing** - Pest for elegant tests
+- **Quality** - PHPStan, Pint, ESLint, Prettier
+
+---
+
+<div align="center">
+
+**[Documentation](CLAUDE.md)** • **[Contributing](CONTRIBUTING.md)** • **[License](LICENSE.md)**
+
+Made with ❤️ by the Laravel Community
+
+</div>
