@@ -1,0 +1,281 @@
+# Default values for Mountain Interactive
+# This is a YAML-formatted file.
+
+# Global settings
+global:
+  imagePullPolicy: IfNotPresent
+  storageClass: ""
+
+# Application image
+image:
+  repository: ghcr.io/jonerickson/mi
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Image pull secrets for private registry
+imagePullSecrets: []
+
+# Application name
+nameOverride: ""
+fullnameOverride: ""
+
+# Environment (local, staging, production)
+environment: local
+
+# Laravel application configuration
+app:
+  name: "Mountain Interactive"
+  key: "" # Set via secret
+  debug: false
+  url: "http://localhost"
+  env: production
+  timezone: UTC
+  locale: en
+
+# Web/FPM deployment
+web:
+  enabled: true
+  replicaCount: 2
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# Caddy reverse proxy
+caddy:
+  enabled: true
+  replicaCount: 2
+
+  image:
+    repository: caddy
+    tag: "2-alpine"
+    pullPolicy: IfNotPresent
+
+  email: admin@example.com # Email for Let's Encrypt notifications
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+  service:
+    type: LoadBalancer
+    annotations: {}
+      # Add cloud provider specific annotations here
+      # Example for AWS:
+      # service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: ""
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# Horizon worker deployment
+horizon:
+  enabled: true
+  replicaCount: 2
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# Scheduler CronJob
+scheduler:
+  enabled: true
+  schedule: "* * * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# MySQL Configuration
+mysql:
+  enabled: true
+  image:
+    repository: mysql
+    tag: "8.0"
+
+  auth:
+    rootPassword: "" # Set via secret
+    database: app
+    username: app
+    password: "" # Set via secret
+
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: ""
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+  service:
+    port: 3306
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# Redis Configuration
+redis:
+  enabled: true
+  image:
+    repository: redis
+    tag: "7-alpine"
+
+  auth:
+    password: "" # Set via secret
+
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClass: ""
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  service:
+    port: 6379
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# Persistent storage for logs
+logs:
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: ""
+    accessMode: ReadWriteMany
+
+# Persistent storage for file storage
+files:
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: ""
+    accessMode: ReadWriteMany
+
+# Laravel configuration
+laravel:
+  database:
+    connection: mysql
+    host: "" # Will be set to mysql service name
+    port: 3306
+    database: app
+    username: app
+    password: "" # Set via secret
+
+  broadcast:
+    driver: log
+
+  cache:
+    driver: redis
+    host: "" # Will be set to redis service name
+    port: 6379
+    password: "" # Set via secret
+
+  logs:
+    channel: stack
+    level: debug
+
+  queue:
+    connection: redis
+
+  scout:
+    driver: database
+    prefix: ""
+
+  session:
+    driver: redis
+
+  mail:
+    mailer: smtp
+    host: mailhog
+    port: 1025
+    username: ""
+    password: ""
+    encryption: null
+    fromAddress: hello@example.com
+    fromName: "Mountain Interactive"
+
+# Service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 33
+
+# Container security context
+securityContext: {}

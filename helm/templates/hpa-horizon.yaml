@@ -1,0 +1,33 @@
+{{- if and .Values.horizon.enabled .Values.horizon.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "app.fullname" . }}-horizon
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: horizon
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "app.fullname" . }}-horizon
+  minReplicas: {{ .Values.horizon.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.horizon.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.horizon.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.horizon.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.horizon.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.horizon.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

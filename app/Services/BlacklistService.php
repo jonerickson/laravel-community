@@ -174,7 +174,7 @@ class BlacklistService
         $items = array_map(trim(...), explode(',', $content));
         $lowerValue = strtolower($value);
 
-        return array_any($items, fn ($item): bool => str_contains($lowerValue, strtolower($item)));
+        return array_any($items, fn ($item): bool => str_contains($lowerValue, strtolower((string) $item)));
     }
 
     protected function isUserWhitelisted(User $user): bool

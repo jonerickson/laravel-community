@@ -1,0 +1,80 @@
+# Staging environment overrides
+environment: staging
+
+app:
+  debug: true
+  url: "https://staging.mountaininteractive.com"
+  env: staging
+
+web:
+  replicaCount: 2
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+
+caddy:
+  enabled: true
+  replicaCount: 2
+  email: ssl-admin@staging.mountaininteractive.com
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+
+  service:
+    type: LoadBalancer
+
+  persistence:
+    enabled: true
+    size: 1Gi
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+horizon:
+  replicaCount: 2
+
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+
+mysql:
+  persistence:
+    size: 50Gi
+
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+    requests:
+      cpu: 1000m
+      memory: 2Gi
+
+redis:
+  persistence:
+    size: 10Gi
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+logs:
+  persistence:
+    size: 20Gi
+
+files:
+  persistence:
+    size: 10Gi

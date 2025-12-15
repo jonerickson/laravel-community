@@ -1,0 +1,21 @@
+{{- if .Values.files.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "app.fullname" . }}-files
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.files.persistence.accessMode | default "ReadWriteMany" }}
+  {{- if .Values.files.persistence.storageClass }}
+  {{- if (eq "-" .Values.files.persistence.storageClass) }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: {{ .Values.files.persistence.storageClass | quote }}
+  {{- end }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.files.persistence.size | quote }}
+{{- end }}

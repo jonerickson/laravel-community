@@ -1,0 +1,89 @@
+{{- if .Values.horizon.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "app.fullname" . }}-horizon
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: horizon
+spec:
+  {{- if not .Values.horizon.autoscaling.enabled }}
+  replicas: {{ .Values.horizon.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "app.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: horizon
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "app.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: horizon
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "app.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: wait-for-web
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for web service to be ready..."
+              until nc -z {{ include "app.fullname" . }}-web 8080; do
+                echo "Web service not ready yet. Waiting..."
+                sleep 2
+              done
+              echo "Web service is ready!"
+      containers:
+        - name: horizon
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - php
+            - artisan
+            - horizon
+          envFrom:
+            - configMapRef:
+                name: {{ include "app.fullname" . }}
+            - secretRef:
+                name: {{ include "app.fullname" . }}
+          resources:
+            {{- toYaml .Values.horizon.resources | nindent 12 }}
+          volumeMounts:
+            {{- if .Values.logs.persistence.enabled }}
+            - name: logs
+              mountPath: /var/www/html/storage/logs
+            {{- end }}
+      volumes:
+        {{- if .Values.logs.persistence.enabled }}
+        - name: logs
+          persistentVolumeClaim:
+            claimName: {{ include "app.fullname" . }}-logs
+        {{- end }}
+      {{- with .Values.horizon.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.horizon.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.horizon.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

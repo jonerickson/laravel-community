@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "app.fullname" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+data:
+  AUTORUN_ENABLED: "true"
+  AUTORUN_LARAVEL_MIGRATION: "true"
+  AUTORUN_LARAVEL_MIGRATION_FORCE: "true"
+
+  APP_NAME: {{ .Values.app.name | quote }}
+  APP_ENV: {{ .Values.app.env | quote }}
+  APP_DEBUG: {{ .Values.app.debug | quote }}
+  APP_URL: {{ .Values.app.url | quote }}
+  APP_TIMEZONE: {{ .Values.app.timezone | quote }}
+  APP_LOCALE: {{ .Values.app.locale | quote }}
+
+  LOG_CHANNEL: {{ .Values.laravel.logs.channel | quote }}
+  LOG_LEVEL: {{ .Values.laravel.logs.level | quote }}
+
+  DB_CONNECTION: {{ .Values.laravel.database.connection | quote }}
+  DB_HOST: {{ include "app.mysql.host" . | quote }}
+  DB_PORT: {{ .Values.mysql.service.port | quote }}
+  DB_DATABASE: {{ .Values.mysql.auth.database | quote }}
+  DB_USERNAME: {{ .Values.mysql.auth.username | quote }}
+
+  BROADCAST_DRIVER: {{ .Values.laravel.broadcast.driver | quote }}
+  CACHE_DRIVER: {{ .Values.laravel.cache.driver | quote }}
+  QUEUE_CONNECTION: {{ .Values.laravel.queue.connection | quote }}
+  SESSION_DRIVER: {{ .Values.laravel.session.driver | quote }}
+  SESSION_LIFETIME: "120"
+
+  REDIS_HOST: {{ include "app.redis.host" . | quote }}
+  REDIS_PORT: {{ .Values.redis.service.port | quote }}
+
+  MAIL_MAILER: {{ .Values.laravel.mail.mailer | quote }}
+  MAIL_HOST: {{ .Values.laravel.mail.host | quote }}
+  MAIL_PORT: {{ .Values.laravel.mail.port | quote }}
+  MAIL_ENCRYPTION: {{ .Values.laravel.mail.encryption | quote }}
+  MAIL_FROM_ADDRESS: {{ .Values.laravel.mail.fromAddress | quote }}
+  MAIL_FROM_NAME: {{ .Values.laravel.mail.fromName | quote }}
+
+  SCOUT_DRIVER: {{ .Values.laravel.scout.driver | quote }}
+  SCOUT_PREFIX: {{ .Values.laravel.scout.prefix | quote }}
+
+  HORIZON_MEMORY_LIMIT: "256"
+  HORIZON_BALANCE: "auto"
+  HORIZON_MAX_PROCESSES: "10"
+  HORIZON_BALANCE_MAX_SHIFT: "1"
+  HORIZON_BALANCE_COOLDOWN: "3"

@@ -1,0 +1,80 @@
+# Local environment overrides
+environment: local
+
+app:
+  debug: true
+  url: "http://localhost"
+  env: local
+
+web:
+  replicaCount: 1
+
+  autoscaling:
+    enabled: false
+
+caddy:
+  enabled: true
+  replicaCount: 1
+
+  autoscaling:
+    enabled: false
+
+  service:
+    type: NodePort
+
+  persistence:
+    enabled: false
+
+  resources:
+    limits:
+      cpu: 250m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+horizon:
+  replicaCount: 1
+
+  autoscaling:
+    enabled: false
+
+mysql:
+  auth:
+    username: "root"
+    rootPassword: ""
+    password: ""
+
+  persistence:
+    size: 5Gi
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+redis:
+  auth:
+    password: ""
+
+  persistence:
+    size: 1Gi
+
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+logs:
+  persistence:
+    size: 2Gi
+
+files:
+  persistence:
+    size: 1Gi
