@@ -21,14 +21,14 @@ Thank you for your interest in contributing! We welcome contributions from the c
 
 ### Fork the Repository
 
-To contribute to this project, you'll need to fork the repository to your own GitHub account. Click the "Fork" button on the top-right corner of the repository page.
+To contribute to this project, you'll need to fork the repository to your own GitHub account. Click the "Fork" button on the top-right corner of the [repository](https://github.com/jonerickson/laravel-community) page.
 
 ### Clone Your Fork
 
 After forking, clone your forked repository to your local machine:
 
 ```shell
-git clone https://github.com...
+git clone https://github.com/jonerickson/laravel-community
 ```
 
 ### Set Up the Development Environment
@@ -63,7 +63,7 @@ Once your changes are ready, push your branch to your forked repository on GitHu
 git push origin feature/your-feature-name
 ```
 
-Then, navigate to the original repository and create a pull request against the `develop` branch. Provide a clear title and description of your changes.
+Then, navigate to the [original repository](https://github.com/jonerickson/laravel-community) and create a pull request against the `develop` branch. Provide a clear title and description of your changes.
 
 ### Pull Request Checklist
 
@@ -75,8 +75,8 @@ Before submitting your pull request, please make sure you have done the followin
 
 ## Community and Communication
 
-Join the [Discussions](../discussions) to stay connected with other contributors and maintainers. We appreciate your feedback and involvement!
+Join the [Discussions](https://github.com/jonerickson/laravel-community) to stay connected with other contributors and maintainers. We appreciate your feedback and involvement!
 
 ## License
 
-By contributing to this project, you agree that your contributions will be licensed under the [project's license](../LICENSE.md).
+By contributing to this project, you agree that your contributions will be licensed under the [project's license](https://github.com/jonerickson/laravel-community?tab=License-1-ov-file#readme).
