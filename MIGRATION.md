@@ -1,13 +1,34 @@
 # Migration System Guide
 
-This guide explains how to use the migration system to import data from external sources into Mountain Interactive.
+This guide explains how to use the migration system to import data from external sources into Laravel Community.
 
 ## Overview
 
 The migration system is a sophisticated, extensible data migration framework with built-in support for:
 - **Invision Community** - Complete suite migration including forums, blogs, commerce, and users
 
-Key features:
+### Available Entities
+
+The following entities can be migrated from Invision Community:
+- `groups` - User groups and roles
+- `users` - User accounts and profiles
+- `blogs` - Blog entries
+- `blog_comments` - Blog post comments
+- `products` - Store products
+- `subscriptions` - Subscription plans
+- `user_subscriptions` - User subscription purchases
+- `forums` - Forum categories
+- `topics` - Forum topics/threads
+- `posts` - Forum posts/replies
+- `orders` - Purchase orders
+
+### Requirements
+
+- **Cache Driver**: Must support tags (redis, memcached, or dynamodb)
+- **Database**: MySQL or PostgreSQL
+- **SSH**: Key-based authentication only (for SSH tunnels)
+
+### Key Features
 - Parallel processing with concurrent workers
 - Automatic dependency resolution
 - SSH tunnel support for secure remote connections
@@ -28,14 +49,16 @@ Add a database connection in `config/database.php`:
 
 ```php
 'invision_community' => [
-    'driver' => 'mysql',
-    'host' => env('IC_DB_HOST', '127.0.0.1'),
-    'port' => env('IC_DB_PORT', 3306),
-    'database' => env('IC_DB_DATABASE'),
-    'username' => env('IC_DB_USERNAME'),
-    'password' => env('IC_DB_PASSWORD'),
-    'charset' => 'utf8mb4',
-    'collation' => 'utf8mb4_unicode_ci',
+    'driver' => env('MIGRATION_IC_DRIVER', 'mysql'),
+    'host' => env('MIGRATION_IC_HOST', '127.0.0.1'),
+    'port' => env('MIGRATION_IC_PORT', env('MIGRATION_IC_DRIVER', 'mysql') === 'pgsql' ? '5432' : '3306'),
+    'database' => env('MIGRATION_IC_DATABASE'),
+    'username' => env('MIGRATION_IC_USERNAME'),
+    'password' => env('MIGRATION_IC_PASSWORD'),
+    'charset' => env('MIGRATION_IC_CHARSET', env('MIGRATION_IC_DRIVER', 'mysql') === 'pgsql' ? 'utf8' : 'utf8mb4'),
+    'collation' => env('MIGRATION_IC_COLLATION', env('MIGRATION_IC_DRIVER', 'mysql') === 'pgsql' ? null : 'utf8mb4_unicode_ci'),
+    'prefix' => env('MIGRATION_IC_PREFIX', ''),
+    'strict' => false,
 ],
 ```
 
@@ -43,11 +66,12 @@ Add the corresponding environment variables to your `.env` file:
 
 ```env
 # Invision Community Database
-IC_DB_HOST=127.0.0.1
-IC_DB_PORT=3306
-IC_DB_DATABASE=invision
-IC_DB_USERNAME=root
-IC_DB_PASSWORD=
+MIGRATION_IC_DRIVER=mysql
+MIGRATION_IC_HOST=127.0.0.1
+MIGRATION_IC_PORT=3306
+MIGRATION_IC_DATABASE=invision
+MIGRATION_IC_USERNAME=root
+MIGRATION_IC_PASSWORD=
 ```
 
 #### SSH Tunnel (Optional)
@@ -57,12 +81,11 @@ For secure remote database access, configure SSH tunneling in `config/migration.
 ```php
 'sources' => [
     'invision_community' => [
-        'base_url' => env('IC_BASE_URL'),
         'ssh' => [
-            'host' => env('IC_SSH_HOST'),      // SSH server address
-            'user' => env('IC_SSH_USER'),      // SSH username
-            'port' => env('IC_SSH_PORT', 22),  // SSH port
-            'key' => env('IC_SSH_KEY'),        // Path to private key
+            'host' => env('MIGRATION_IC_SSH_HOST'),
+            'user' => env('MIGRATION_IC_SSH_USER'),
+            'port' => env('MIGRATION_IC_SSH_PORT', 22),
+            'key' => env('MIGRATION_IC_SSH_KEY'),
         ],
     ],
 ],
@@ -72,13 +95,10 @@ Add these environment variables:
 
 ```env
 # SSH Tunnel Configuration
-IC_SSH_HOST=your-server.com
-IC_SSH_USER=your-username
-IC_SSH_PORT=22
-IC_SSH_KEY=/path/to/private/key
-
-# Base URL for Media Downloads
-IC_BASE_URL=https://community.example.com
+MIGRATION_IC_SSH_HOST=your-server.com
+MIGRATION_IC_SSH_USER=your-username
+MIGRATION_IC_SSH_PORT=22
+MIGRATION_IC_SSH_KEY=/path/to/private/key
 ```
 
 #### Media Downloads
@@ -169,7 +189,7 @@ php artisan app:migrate invision-community \
 ```
 
 Options:
-- `--max-processes`: Maximum concurrent workers (default: 4)
+- `--max-processes`: Maximum concurrent workers (default: 8)
 - `--max-records-per-process`: Records per worker (default: 1000)
 
 #### SSH Tunnel
@@ -180,12 +200,50 @@ Use SSH tunnel for remote database access:
 php artisan app:migrate invision-community --ssh
 ```
 
+#### Check Database Connection
+
+Verify database connection without starting migration:
+
+```bash
+php artisan app:migrate invision-community --check
+```
+
+#### View Migration Status
+
+Display record counts for each entity before migrating:
+
+```bash
+php artisan app:migrate invision-community --status
+```
+
+For a specific entity:
+
+```bash
+php artisan app:migrate invision-community --entity=users --status
+```
+
+#### Exclude Entities
+
+Exclude specific entities from migration:
+
+```bash
+php artisan app:migrate invision-community --excluded=blog_comments,orders
+```
+
 #### Disable Media Downloads
 
 Skip downloading media files:
 
 ```bash
-php artisan app:migrate invision-community --no-download-media
+php artisan app:migrate invision-community --media=0
+```
+
+#### Disable Cleanup
+
+Prevent automatic cleanup after migration:
+
+```bash
+php artisan app:migrate invision-community --cleanup=0
 ```
 
 ### Interactive Mode
@@ -232,9 +290,9 @@ Advanced parallel processing manager for high-performance migrations.
 - Graceful termination handling
 
 **Configuration:**
-- `maxProcesses` - Maximum concurrent workers (default: 4)
+- `maxProcesses` - Maximum concurrent workers (default: 8)
 - `maxRecordsPerProcess` - Records per worker (default: 1000)
-- `workerMemoryLimit` - Memory limit per worker (optional)
+- `workerMemoryLimit` - Memory limit per worker (auto-calculated)
 
 **Worker Management:**
 - Spawns: `php artisan app:migrate [source] --entity=X --offset=Y --limit=Z --worker`
@@ -248,7 +306,7 @@ Advanced parallel processing manager for high-performance migrations.
 Configuration value object for migration operations.
 
 **Available Options:**
-- `entity` - Specific entity to migrate
+- `entities` - Array of entities to migrate
 - `batchSize` - Records per batch (default: 1000)
 - `limit` - Total records limit
 - `offset` - Starting offset
@@ -259,8 +317,9 @@ Configuration value object for migration operations.
 - `baseUrl` - Source base URL for media
 - `parallel` - Enable parallel processing (default: false)
 - `maxRecordsPerProcess` - Records per worker (default: 1000)
-- `maxProcesses` - Concurrent workers (default: 4)
-- `memoryLimit` - Worker memory limit
+- `maxProcesses` - Concurrent workers (default: 8)
+- `memoryLimit` - Worker memory limit (auto-calculated)
+- `excluded` - Array of entities to exclude
 
 ---
 
