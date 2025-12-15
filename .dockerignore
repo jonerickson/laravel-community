@@ -17,7 +17,7 @@ boost.json
 CLAUDE.md
 components.json
 eslint.config.js
-MIGRATION_GUIDE.md
+MIGRATION.md
 phpstan.neon
 phpunit.xml
 pint.json
