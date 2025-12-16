@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\BillingReason;
 use App\Enums\OrderStatus;
 use App\Events\OrderSaved;
 use App\Managers\PaymentManager;
@@ -108,6 +109,7 @@ class Order extends Model implements HasLabel
     protected $fillable = [
         'user_id',
         'status',
+        'billing_reason',
         'amount_due',
         'amount_overpaid',
         'amount_paid',
@@ -162,7 +164,7 @@ class Order extends Model implements HasLabel
     public function discounts(): BelongsToMany
     {
         return $this->belongsToMany(Discount::class, 'orders_discounts')
-            ->withPivot('amount_applied', 'balance_before', 'balance_after')
+            ->withPivot('amount_applied', 'balance_before', 'balance_after', 'external_discount_id')
             ->withTimestamps()
             ->using(OrderDiscount::class);
     }
@@ -297,6 +299,7 @@ class Order extends Model implements HasLabel
     {
         return [
             'status' => OrderStatus::class,
+            'billing_reason' => BillingReason::class,
             'amount_due' => 'integer',
             'amount_overpaid' => 'integer',
             'amount_paid' => 'integer',

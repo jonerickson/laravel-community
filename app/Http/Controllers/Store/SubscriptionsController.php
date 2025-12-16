@@ -124,11 +124,8 @@ class SubscriptionsController extends Controller
                 return back()->with('message', 'We were unable to resume your subscription. Please try again later.');
             },
             'offer' => function () {
-                $expiration = now()->addDay();
-
                 $discount = tap($this->discountService->createCancellationOffer(
                     user: $this->user,
-                    expiresAt: $expiration
                 ), function (Discount $discount): void {
                     $coupon = $this->paymentManager->createCoupon($discount);
 

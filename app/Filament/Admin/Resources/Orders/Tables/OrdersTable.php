@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Orders\Tables;
 
+use App\Enums\BillingReason;
 use App\Enums\OrderStatus;
 use App\Enums\ProductType;
 use App\Enums\SubscriptionStatus;
 use App\Filament\Admin\Resources\Orders\Actions\CancelAction;
 use App\Filament\Admin\Resources\Orders\Actions\CheckoutAction;
 use App\Filament\Admin\Resources\Orders\Actions\RefundAction;
+use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Filament\Admin\Resources\Users\RelationManagers\OrdersRelationManager;
 use App\Models\Order;
 use App\Models\Price;
@@ -18,6 +20,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -36,6 +39,8 @@ class OrdersTable
     {
         return $table
             ->columns([
+                IconColumn::make('billing_reason')
+                    ->label(''),
                 TextColumn::make('reference_id')
                     ->label('Order Number')
                     ->copyable()
@@ -48,9 +53,13 @@ class OrdersTable
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('user.name')
+                    ->label('Customer')
+                    ->sortable()
                     ->hiddenOn(OrdersRelationManager::class)
+                    ->url(fn (Order $record): ?string => $record->user ? EditUser::getUrl(['record' => $record->user]) : null)
                     ->searchable(),
                 TextColumn::make('status')
+                    ->sortable()
                     ->badge()
                     ->searchable(),
                 TextColumn::make('amount')
@@ -69,7 +78,12 @@ class OrdersTable
                     ->default(0)
                     ->sortable(),
                 TextColumn::make('items.name')
+                    ->placeholder('N/A')
                     ->searchable(),
+                TextColumn::make('items_count')
+                    ->label('Items')
+                    ->counts('items')
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Created')
                     ->since()
@@ -82,6 +96,11 @@ class OrdersTable
                     ->sortable(),
             ])
             ->filters([
+                SelectFilter::make('billing_reason')
+                    ->multiple()
+                    ->searchable()
+                    ->label('Billing Reason')
+                    ->options(BillingReason::class),
                 SelectFilter::make('user')
                     ->label('Customer')
                     ->relationship('user', 'name')

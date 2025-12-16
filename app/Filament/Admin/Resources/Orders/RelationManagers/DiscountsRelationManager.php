@@ -69,6 +69,11 @@ class DiscountsRelationManager extends RelationManager
                     ->dateTime()
                     ->sortable()
                     ->toggleable(),
+                TextColumn::make('external_discount_id')
+                    ->label('External Discount ID')
+                    ->copyable()
+                    ->searchable()
+                    ->sortable(),
             ]);
     }
 }

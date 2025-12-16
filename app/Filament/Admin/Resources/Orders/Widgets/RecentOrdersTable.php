@@ -8,6 +8,7 @@ use App\Filament\Admin\Resources\Orders\Pages\ViewOrder;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Models\Order;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
@@ -33,21 +34,24 @@ class RecentOrdersTable extends TableWidget
             ->defaultSort('created_at', 'desc')
             ->deferLoading()
             ->columns([
+                IconColumn::make('billing_reason')
+                    ->label(''),
                 TextColumn::make('reference_id')
+                    ->sortable()
                     ->copyable()
                     ->label('Order #')
                     ->url(fn (Order $record): string => ViewOrder::getUrl(['record' => $record])),
                 TextColumn::make('invoice_number')
+                    ->sortable()
                     ->label('Invoice')
                     ->url(fn (Order $record): ?string => $record->invoice_url, shouldOpenInNewTab: true)
                     ->placeholder('N/A'),
-                TextColumn::make('items.price.product.name')
-                    ->placeholder('N/A')
-                    ->label('Product(s)'),
                 TextColumn::make('user.name')
                     ->label('Customer')
+                    ->sortable()
                     ->url(fn (Order $record): ?string => $record->user ? EditUser::getUrl(['record' => $record->user]) : null),
                 TextColumn::make('status')
+                    ->sortable()
                     ->badge(),
                 TextColumn::make('amount')
                     ->label('Amount')
@@ -64,6 +68,9 @@ class RecentOrdersTable extends TableWidget
                     ->color('success')
                     ->default(0)
                     ->sortable(),
+                TextColumn::make('items.name')
+                    ->placeholder('N/A')
+                    ->label('Items'),
                 TextColumn::make('items_count')
                     ->label('Items')
                     ->counts('items')

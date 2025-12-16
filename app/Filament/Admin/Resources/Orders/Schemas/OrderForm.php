@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Orders\Schemas;
 
+use App\Enums\BillingReason;
 use App\Enums\OrderStatus;
 use App\Models\Order;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
@@ -35,6 +37,10 @@ class OrderForm
                             ->default(OrderStatus::Pending)
                             ->searchable()
                             ->options(OrderStatus::class)
+                            ->required(),
+                        Radio::make('billing_reason')
+                            ->label('Billing Reason')
+                            ->options(BillingReason::class)
                             ->required(),
                     ]),
                 Section::make('Payment Information')

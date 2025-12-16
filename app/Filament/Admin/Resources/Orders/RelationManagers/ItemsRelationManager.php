@@ -96,6 +96,11 @@ class ItemsRelationManager extends RelationManager
                     ->label('Total')
                     ->money()
                     ->sortable(),
+                TextColumn::make('external_item_id')
+                    ->label('External Item ID')
+                    ->copyable()
+                    ->searchable()
+                    ->sortable(),
             ])
             ->headerActions([
                 CreateAction::make()

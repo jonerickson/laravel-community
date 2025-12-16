@@ -108,6 +108,7 @@ class HandleWebhook implements ShouldQueue
             'reference_id' => $orderId,
         ], [
             'user_id' => $this->user->getKey(),
+            'billing_reason' => BillingReason::tryFrom(data_get($this->payload, 'data.object.billing_reason')) ?? BillingReason::Manual,
             'amount_due' => ((int) data_get($this->payload, 'data.object.amount_due') ?? 0) / 100,
             'amount_overpaid' => ((int) data_get($this->payload, 'data.object.amount_overpaid') ?? 0) / 100,
             'amount_paid' => ((int) data_get($this->payload, 'data.object.amount_paid') ?? 0) / 100,
@@ -172,9 +173,8 @@ class HandleWebhook implements ShouldQueue
             if ($invoice instanceof InvoiceData && filled($invoice->discounts)) {
                 foreach ($invoice->discounts as $discount) {
                     $object = Discount::firstOrCreate([
-                        'external_coupon_id' => $discount->externalCouponId,
-                    ], [
                         'code' => $discount->code,
+                    ], [
                         'type' => $discount->type,
                         'discount_type' => $discount->discountType,
                         'value' => $discount->value,
@@ -184,8 +184,8 @@ class HandleWebhook implements ShouldQueue
                         'activated_at' => $discount->activatedAt,
                     ]);
 
-                    $order->discounts()->sync($object, [
-                        'amount_applied' => $discount->amountApplied,
+                    $order->discounts()->syncWithPivotValues($object, [
+                        'external_discount_id' => $discount->externalDiscountId,
                     ]);
                 }
             }
