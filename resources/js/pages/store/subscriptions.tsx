@@ -16,6 +16,7 @@ import { AlertCircle, Check, ChevronDown, Crown, LoaderCircle, Package, RefreshC
 import { useEffect, useState } from 'react';
 import ReactConfetti from 'react-confetti';
 import SharedData = App.Data.SharedData;
+import InputError from '@/components/input-error';
 
 interface SubscriptionsProps {
     subscriptionProducts: App.Data.ProductData[];
@@ -401,7 +402,7 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
         price_id: 0,
     });
 
-    const { put: acceptCancellationOffer, processing: offerProcessing } = useForm({
+    const { put: acceptCancellationOffer, processing: offerProcessing, errors: offerErrors } = useForm({
         action: 'offer',
     });
 
@@ -666,7 +667,12 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                             maxLength={500}
                             required
                         />
-                        <p className="text-right text-xs text-muted-foreground">{cancellationReason.length}/500</p>
+                        <div className='flex items-center justify-between'>
+                            <div>
+                                <InputError message={offerErrors.reason} />
+                            </div>
+                            <p className="text-right text-xs text-muted-foreground">{cancellationReason.length}/500</p>
+                        </div>
                     </div>
                     <DialogFooter>
                         <div className="flex w-full flex-col gap-2">
@@ -689,23 +695,27 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="rounded-lg border-2 border-success bg-success/10 p-6 text-center">
-                            <h3 className="mb-2 text-2xl font-bold text-success">Get 1 Month Free!</h3>
+                            <h3 className="mb-2 text-2xl font-bold text-success">Get 20% Off!</h3>
                             <p className="text-sm text-muted-foreground">
-                                As a valued customer, we want to give you one month completely free. No strings attached.
+                                As a valued customer, we want to give you 20% off your next renewal. No strings attached.
                             </p>
                         </div>
                         <div className="space-y-2 text-sm text-muted-foreground">
                             <div className="flex items-start gap-2">
                                 <Check className="mt-0.5 size-4 flex-shrink-0 text-success" />
-                                <span>Your next billing cycle will be 100% free</span>
+                                <span>Your next billing cycle will be 20% off</span>
                             </div>
                             <div className="flex items-start gap-2">
                                 <Check className="mt-0.5 size-4 flex-shrink-0 text-success" />
-                                <span>No payment required for the next month</span>
+                                <span>Your card on file will be charged</span>
                             </div>
                             <div className="flex items-start gap-2">
                                 <Check className="mt-0.5 size-4 flex-shrink-0 text-success" />
                                 <span>Cancel anytime if you're still not satisfied</span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                                <Check className="mt-0.5 size-4 flex-shrink-0 text-success" />
+                                <span>This offer is only valid now</span>
                             </div>
                         </div>
                     </div>
@@ -718,7 +728,7 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                                         Applying offer...
                                     </>
                                 ) : (
-                                    <>Claim my free month</>
+                                    <>Claim my offer</>
                                 )}
                             </Button>
                             <Button variant="ghost" onClick={handleRejectOffer} disabled={offerProcessing} className="w-full">

@@ -34,9 +34,6 @@ export default defineConfig(({ mode }) => {
                 ]
                 : []),
         ],
-        esbuild: {
-            jsx: 'automatic',
-        },
         resolve: {
             alias: {
                 'ziggy-js': resolve(__dirname, 'vendor/tightenco/ziggy'),
@@ -45,6 +42,18 @@ export default defineConfig(({ mode }) => {
         build: {
             cssCodeSplit: true,
             sourcemap: 'hidden',
+            rollupOptions: {
+                output: {
+                    manualChunks(id) {
+                        if (id.includes('node_modules/@tiptap/')) {
+                            return 'tiptap';
+                        }
+                        if (id.includes('node_modules/@sentry/')) {
+                            return 'sentry';
+                        }
+                    },
+                }
+            }
         },
     }
 });

@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 
 /**
@@ -50,6 +51,7 @@ use Illuminate\Support\Str;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Order> $orders
  * @property-read int|null $orders_count
  * @property-read Product|null $product
+ * @property-read mixed $value_label
  *
  * @method static Builder<static>|Discount active()
  * @method static Builder<static>|Discount byCode(string $code)
@@ -238,6 +240,16 @@ class Discount extends Model
     public function setValueAttribute($value): void
     {
         $this->attributes['value'] = (int) $value * 100;
+    }
+
+    public function valueLabel(): Attribute
+    {
+        return Attribute::get(function () {
+            return match ($this->discount_type) {
+                DiscountValueType::Percentage => Number::percentage($this->value),
+                DiscountValueType::Fixed => Number::currency($this->value),
+            };
+        });
     }
 
     public function currentBalance(): Attribute

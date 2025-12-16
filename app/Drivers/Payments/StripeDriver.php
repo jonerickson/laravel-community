@@ -22,6 +22,7 @@ use App\Enums\ProductType;
 use App\Enums\ProrationBehavior;
 use App\Enums\SubscriptionInterval;
 use App\Jobs\Stripe\UpdateCustomerInformation;
+use App\Models\Discount;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Price;
@@ -310,13 +311,9 @@ class StripeDriver implements PaymentProcessor
         }, collect());
     }
 
-    public function findInvoice(Order $order): ?InvoiceData
+    public function findInvoice(string $invoiceId): ?InvoiceData
     {
-        return $this->executeWithErrorHandling('findInvoice', function () use ($order): ?InvoiceData {
-            if (blank($invoiceId = $order->external_invoice_id)) {
-                return null;
-            }
-
+        return $this->executeWithErrorHandling('findInvoice', function () use ($invoiceId): ?InvoiceData {
             $invoice = $this->stripe->invoices->retrieve($invoiceId);
 
             return InvoiceData::from([
@@ -458,12 +455,39 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
-    /**
-     * @param  array<array<string, mixed>, mixed>  $options
-     */
-    public function createDiscount(array $options): ?DiscountData
+    public function createDiscount(Discount $discount): ?DiscountData
     {
-        return $this->executeWithErrorHandling('createDiscount', function () use ($options): ?DiscountData {
+        return $this->executeWithErrorHandling('createDiscount', function () use ($discount): ?DiscountData {
+            $options = [
+                'name' => $discount->code,
+                'metadata' => [
+                    'discount_id' => $discount->reference_id,
+                ],
+            ];
+
+            if ($discount->discount_type === DiscountValueType::Fixed) {
+                $options['currency'] = 'usd';
+                $options['amount_off'] = $discount->pivot
+                    ? $discount->pivot->getRawOriginal('amount_applied')
+                    : $discount->value;
+            }
+
+            if ($discount->discount_type === DiscountValueType::Percentage) {
+                $options['percent_off'] = $discount->value;
+            }
+
+            if ($discount->type === DiscountType::Cancellation) {
+                $options['duration'] = 'once';
+            }
+
+            if ($discount->max_uses > 0) {
+                $options['max_redemptions'] = $discount->max_uses;
+            }
+
+            if (! is_null($discount->expires_at)) {
+                $options['redeem_by'] = $discount->expires_at->getTimestamp();
+            }
+
             $coupon = $this->stripe->coupons->create($options);
 
             if (! $coupon instanceof Coupon) {
@@ -472,8 +496,25 @@ class StripeDriver implements PaymentProcessor
 
             return DiscountData::from([
                 'id' => 0,
-                'type' => DiscountType::PromoCode,
-                'discountType' => array_key_exists('percent_off', $options) ? DiscountValueType::Percentage : DiscountValueType::Fixed,
+                'type' => DiscountType::Manual,
+                'discountType' => $coupon->percent_off ? DiscountValueType::Percentage : DiscountValueType::Fixed,
+                'value' => ($coupon->percent_off ?? (float) $coupon->amount_off ?? 0) / 100,
+                'code' => $coupon->name,
+                'externalDiscountId' => $coupon->id,
+                'maxUses' => $coupon->max_redemptions,
+            ]);
+        });
+    }
+
+    public function findDiscount(string $discountId): ?DiscountData
+    {
+        return $this->executeWithErrorHandling('findDiscount', function () use ($discountId): ?DiscountData {
+            $coupon = $this->stripe->coupons->retrieve($discountId);
+
+            return DiscountData::from([
+                'id' => 0,
+                'type' => DiscountType::Manual,
+                'discountType' => $coupon->percent_off ? DiscountValueType::Percentage : DiscountValueType::Fixed,
                 'value' => ($coupon->percent_off ?? (float) $coupon->amount_off ?? 0) / 100,
                 'code' => $coupon->name,
                 'externalDiscountId' => $coupon->id,
@@ -524,6 +565,7 @@ class StripeDriver implements PaymentProcessor
 
             $metadata = array_merge([
                 'order_id' => $order->reference_id,
+                'discount_ids' => $order->discounts->pluck('reference_id')->implode(', '),
             ], ...$order->items->map(fn (OrderItem $orderItem) => data_get($orderItem->price->product->metadata, 'metadata', []))->toArray());
 
             /** @var Subscription|Session $result */
@@ -784,6 +826,7 @@ class StripeDriver implements PaymentProcessor
 
             $metadata = array_merge([
                 'order_id' => $order->reference_id,
+                'discount_ids' => $order->discounts->pluck('reference_id')->implode(', '),
             ], ...$order->items
                 ->map(fn (OrderItem $orderItem) => data_get($orderItem->price->product->metadata, 'metadata', []))
                 ->toArray());
@@ -791,30 +834,7 @@ class StripeDriver implements PaymentProcessor
             $discounts = [];
             if (! $disallowDiscountCodes && $order->discounts->isNotEmpty()) {
                 foreach ($order->discounts as $discount) {
-                    $couponParams = [
-                        'name' => $discount->code,
-                        'metadata' => [
-                            'order_id' => $order->reference_id,
-                            'discount_id' => $discount->id,
-                        ],
-                    ];
-
-                    if ($discount->max_uses > 0) {
-                        $couponParams['max_redemptions'] = $discount->max_uses;
-                    }
-
-                    if (! is_null($discount->expires_at)) {
-                        $couponParams['redeem_by'] = $discount->expires_at->getTimestamp();
-                    }
-
-                    if ($discount->discount_type === DiscountValueType::Percentage) {
-                        $couponParams['percent_off'] = $discount->value;
-                    } else {
-                        $couponParams['amount_off'] = $discount->pivot->getRawOriginal('amount_applied');
-                        $couponParams['currency'] = 'usd';
-                    }
-
-                    $discount = $this->createDiscount($couponParams);
+                    $discount = $this->createDiscount($discount);
 
                     if (! $discount instanceof DiscountData) {
                         continue;

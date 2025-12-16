@@ -24,7 +24,9 @@ class OrderSucceeded extends Mailable implements ShouldQueue
 
     public function __construct(public Order $order)
     {
-        $this->invoice = app(PaymentManager::class)->findInvoice($order);
+        if ($invoiceId = $this->order->external_invoice_id) {
+            $this->invoice = app(PaymentManager::class)->findInvoice($invoiceId);
+        }
     }
 
     public function envelope(): Envelope

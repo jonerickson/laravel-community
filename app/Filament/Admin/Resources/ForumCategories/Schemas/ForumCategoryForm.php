@@ -76,6 +76,7 @@ class ForumCategoryForm
                 Group::make()
                     ->schema([
                         Section::make('Details')
+                            ->visibleOn('edit')
                             ->components([
                                 TextEntry::make('created_at')
                                     ->label('Created')

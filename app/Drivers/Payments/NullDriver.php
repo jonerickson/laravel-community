@@ -15,6 +15,7 @@ use App\Data\SubscriptionData;
 use App\Enums\OrderRefundReason;
 use App\Enums\PaymentBehavior;
 use App\Enums\ProrationBehavior;
+use App\Models\Discount;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
@@ -75,7 +76,7 @@ class NullDriver implements PaymentProcessor
         return collect();
     }
 
-    public function findInvoice(Order $order): ?InvoiceData
+    public function findInvoice(string $invoiceId): ?InvoiceData
     {
         return null;
     }
@@ -120,7 +121,12 @@ class NullDriver implements PaymentProcessor
         return false;
     }
 
-    public function createDiscount(array $options): ?DiscountData
+    public function createDiscount(Discount $discount): ?DiscountData
+    {
+        return null;
+    }
+
+    public function findDiscount(string $discountId): ?DiscountData
     {
         return null;
     }

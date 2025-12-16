@@ -132,10 +132,24 @@ class DiscountService
         ]);
     }
 
+    public function createCancellationOffer(User $user, ?DateTime $expiresAt = null): Discount
+    {
+        return Discount::create([
+            'code' => $this->generateUniqueCode(DiscountType::Cancellation),
+            'type' => DiscountType::Cancellation,
+            'discount_type' => DiscountValueType::Percentage,
+            'value' => 20,
+            'max_uses' => 1,
+            'expires_at' => $expiresAt,
+            'user_id' => $user->id,
+        ]);
+    }
+
     public function generateUniqueCode(DiscountType $type = DiscountType::PromoCode, int $attempts = 5, ?string $prefix = null): string
     {
         for ($i = 0; $i < $attempts; $i++) {
             $prefix ??= match ($type) {
+                DiscountType::Cancellation => 'CANCELLATION-OFFER',
                 DiscountType::GiftCard => 'GIFT',
                 DiscountType::PromoCode => 'PROMO',
                 DiscountType::Manual => 'MANUAL',

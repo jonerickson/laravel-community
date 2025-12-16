@@ -124,19 +124,13 @@ class SubscriptionsController extends Controller
                 return back()->with('message', 'We were unable to resume your subscription. Please try again later.');
             },
             'offer' => function () {
-                $expiration = now()->addHour();
+                $expiration = now()->addDay();
 
-                $discount = tap($this->discountService->createPromoCode(
-                    code: $this->discountService->generateUniqueCode(prefix: 'CANCELLATION-OFFER'),
+                $discount = tap($this->discountService->createCancellationOffer(
+                    user: $this->user,
                     expiresAt: $expiration
-                ), function (Discount $discount) use ($expiration): void {
-                    $coupon = $this->paymentManager->createDiscount([
-                        'name' => $discount->code,
-                        'percent_off' => 100,
-                        'duration' => 'once',
-                        'max_redemptions' => 1,
-                        'redeem_by' => $expiration->getTimestamp(),
-                    ]);
+                ), function (Discount $discount): void {
+                    $coupon = $this->paymentManager->createDiscount($discount);
 
                     $discount->update([
                         'external_discount_id' => $coupon->externalDiscountId,
@@ -151,11 +145,10 @@ class SubscriptionsController extends Controller
                     'discounts' => [
                         ['coupon' => $discount->external_discount_id],
                     ],
-                    'payment_behavior' => 'default_incomplete',
-                    'proration_behavior' => 'always_invoice',
+                    'proration_behavior' => ProrationBehavior::None->value,
                 ]);
 
-                return back()->with('message', 'Your offer has been successfully applied.');
+                return back()->with('message', 'Your offer has been successfully applied. Any open invoices will be automatically charged at the normal billing cycle date.');
             }
         });
 

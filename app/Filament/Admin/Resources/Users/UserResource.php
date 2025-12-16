@@ -162,6 +162,7 @@ class UserResource extends Resource
                                 Group::make()
                                     ->components([
                                         Section::make('Details')
+                                            ->visibleOn('edit')
                                             ->components([
                                                 TextEntry::make('created_at')
                                                     ->label('Created')

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Listeners\Stripe;
 
+use App\Data\DiscountData;
 use App\Enums\BillingReason;
 use App\Enums\OrderRefundReason;
 use App\Enums\SubscriptionStatus;
@@ -162,6 +163,16 @@ class HandleWebhook implements ShouldQueue
             }
         }
 
+        if (filled(data_get($this->payload, 'data.object.discounts'))) {
+            foreach (data_get($this->payload, 'data.object.discounts') as $discountId) {
+                $discount = $this->paymentManager->findDiscount($discountId);
+
+                if ($discount instanceof DiscountData) {
+
+                }
+            }
+        }
+
         return $order;
     }
 
@@ -242,7 +253,11 @@ class HandleWebhook implements ShouldQueue
 
     private function resolvePaymentConfirmationUrl(Order $order): ?string
     {
-        if (blank($invoice = $this->paymentManager->findInvoice($order))) {
+        if (blank($invoiceId = $order->external_invoice_id)) {
+            return null;
+        }
+
+        if (blank($invoice = $this->paymentManager->findInvoice($invoiceId))) {
             return null;
         }
 
