@@ -51,7 +51,7 @@ interface PaymentProcessor
      */
     public function listPrices(Product $product, array $filters = []): mixed;
 
-    public function findInvoice(string $invoiceId): ?InvoiceData;
+    public function findInvoice(string $invoiceId, array $params = []): ?InvoiceData;
 
     public function createPaymentMethod(User $user, string $paymentMethodId): ?PaymentMethodData;
 
@@ -72,9 +72,7 @@ interface PaymentProcessor
 
     public function deleteCustomer(User $user): bool;
 
-    public function createDiscount(Discount $discount): ?DiscountData;
-
-    public function findDiscount(string $discountId): ?DiscountData;
+    public function createCoupon(Discount $discount): ?DiscountData;
 
     public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete, CarbonInterface|int|null $backdateStartDate = null, CarbonInterface|int|null $billingCycleAnchor = null, ?string $successUrl = null, ?string $cancelUrl = null, array $customerOptions = [], array $subscriptionOptions = []): bool|string|SubscriptionData;
 

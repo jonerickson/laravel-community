@@ -51,7 +51,7 @@ class DiscountForm
                                     ->columnSpanFull()
                                     ->options(DiscountType::class)
                                     ->default(DiscountType::PromoCode)
-                                    ->afterStateUpdated(fn (Set $set, $state) => $set('code', app(DiscountService::class)->generateUniqueCode($state))),
+                                    ->afterStateUpdated(fn (Set $set, DiscountType $state): mixed => $set('code', app(DiscountService::class)->generateUniqueCode($state))),
                                 Radio::make('discount_type')
                                     ->live()
                                     ->label('Discount Type')

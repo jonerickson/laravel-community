@@ -76,7 +76,7 @@ class NullDriver implements PaymentProcessor
         return collect();
     }
 
-    public function findInvoice(string $invoiceId): ?InvoiceData
+    public function findInvoice(string $invoiceId, array $params = []): ?InvoiceData
     {
         return null;
     }
@@ -121,12 +121,7 @@ class NullDriver implements PaymentProcessor
         return false;
     }
 
-    public function createDiscount(Discount $discount): ?DiscountData
-    {
-        return null;
-    }
-
-    public function findDiscount(string $discountId): ?DiscountData
+    public function createCoupon(Discount $discount): ?DiscountData
     {
         return null;
     }

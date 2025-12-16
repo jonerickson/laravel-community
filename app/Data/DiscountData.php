@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use App\Data\Normalizers\Stripe\CouponNormalizer;
+use App\Data\Normalizers\Stripe\DiscountNormalizer;
 use App\Enums\DiscountType;
 use App\Enums\DiscountValueType;
 use Carbon\CarbonImmutable;
@@ -52,7 +54,18 @@ class DiscountData extends Data
 
     public ?string $externalDiscountId = null;
 
+    public ?string $externalCouponId = null;
+
     public ?CarbonImmutable $createdAt = null;
 
     public ?CarbonImmutable $updatedAt = null;
+
+    public static function normalizers(): array
+    {
+        return [
+            DiscountNormalizer::class,
+            CouponNormalizer::class,
+            ...config('data.normalizers'),
+        ];
+    }
 }

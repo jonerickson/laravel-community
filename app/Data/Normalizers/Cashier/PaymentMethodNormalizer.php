@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Data\Normalizers\Stripe;
+namespace App\Data\Normalizers\Cashier;
 
 use App\Models\User;
 use Laravel\Cashier\PaymentMethod;

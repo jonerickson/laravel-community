@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Data\Normalizers\Stripe;
+namespace App\Data\Normalizers\Cashier;
 
 use App\Data\PriceData;
 use App\Data\ProductData;

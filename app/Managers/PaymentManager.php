@@ -60,9 +60,9 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->listProducts($filters);
     }
 
-    public function findInvoice(string $invoiceId): ?InvoiceData
+    public function findInvoice(string $invoiceId, array $params = []): ?InvoiceData
     {
-        return $this->driver()->findInvoice($invoiceId);
+        return $this->driver()->findInvoice($invoiceId, $params);
     }
 
     public function createPrice(Price $price): ?PriceData
@@ -130,14 +130,9 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deleteCustomer($user);
     }
 
-    public function createDiscount(Discount $discount): ?DiscountData
+    public function createCoupon(Discount $discount): ?DiscountData
     {
-        return $this->driver()->createDiscount($options);
-    }
-
-    public function findDiscount(string $discountId): ?DiscountData
-    {
-        return $this->driver()->findDiscount($discountId);
+        return $this->driver()->createCoupon($discount);
     }
 
     public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete, CarbonInterface|int|null $backdateStartDate = null, CarbonInterface|int|null $billingCycleAnchor = null, ?string $successUrl = null, ?string $cancelUrl = null, array $customerOptions = [], array $subscriptionOptions = []): bool|string|SubscriptionData

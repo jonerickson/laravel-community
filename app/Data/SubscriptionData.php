@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use App\Data\Normalizers\Cashier\SubscriptionNormalizer;
 use App\Enums\SubscriptionStatus;
 use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\MapInputName;
@@ -42,4 +43,12 @@ class SubscriptionData extends Data
     public bool $doesNotExpire;
 
     public ?int $quantity = null;
+
+    public static function normalizers(): array
+    {
+        return [
+            SubscriptionNormalizer::class,
+            ...config('data.normalizers'),
+        ];
+    }
 }

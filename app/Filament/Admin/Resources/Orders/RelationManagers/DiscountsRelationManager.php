@@ -53,11 +53,13 @@ class DiscountsRelationManager extends RelationManager
                     ->money()
                     ->sortable(),
                 TextColumn::make('pivot.balance_before')
+                    ->placeholder('No Balance')
                     ->label('Balance Before')
                     ->money()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('pivot.balance_after')
+                    ->placeholder('No Balance')
                     ->label('Balance After')
                     ->money()
                     ->sortable()

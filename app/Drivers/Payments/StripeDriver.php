@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
@@ -47,6 +48,7 @@ use Stripe\Checkout\Session;
 use Stripe\Coupon;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Exception\RateLimitException;
+use Stripe\Invoice;
 use Stripe\Stripe;
 use Stripe\StripeClient;
 
@@ -311,18 +313,16 @@ class StripeDriver implements PaymentProcessor
         }, collect());
     }
 
-    public function findInvoice(string $invoiceId): ?InvoiceData
+    public function findInvoice(string $invoiceId, array $params = []): ?InvoiceData
     {
-        return $this->executeWithErrorHandling('findInvoice', function () use ($invoiceId): ?InvoiceData {
-            $invoice = $this->stripe->invoices->retrieve($invoiceId);
+        return $this->executeWithErrorHandling('findInvoice', function () use ($invoiceId, $params): ?InvoiceData {
+            $invoice = $this->stripe->invoices->retrieve($invoiceId, $params);
 
-            return InvoiceData::from([
-                'id' => $invoice->id,
-                'amount' => $invoice->total,
-                'invoice_url' => $invoice->hosted_invoice_url,
-                'invoice_pdf_url' => $invoice->invoice_pdf,
-                'external_payment_id' => $invoice->payments->data[0]->id ?? null,
-            ]);
+            if (! $invoice instanceof Invoice) {
+                return null;
+            }
+
+            return InvoiceData::from($invoice);
         });
     }
 
@@ -384,14 +384,7 @@ class StripeDriver implements PaymentProcessor
                 return null;
             }
 
-            return CustomerData::from([
-                'id' => $customer->id,
-                'email' => $customer->email,
-                'name' => $customer->name,
-                'phone' => $customer->phone,
-                'currency' => $customer->currency,
-                'metadata' => $customer->metadata->toArray(),
-            ]);
+            return CustomerData::from($customer);
         });
     }
 
@@ -427,14 +420,7 @@ class StripeDriver implements PaymentProcessor
                 return null;
             }
 
-            return CustomerData::from([
-                'id' => $customer->id,
-                'email' => $customer->email,
-                'name' => $customer->name,
-                'phone' => $customer->phone,
-                'currency' => $customer->currency,
-                'metadata' => $customer->metadata->toArray(),
-            ]);
+            return CustomerData::from($customer);
         });
     }
 
@@ -455,9 +441,9 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
-    public function createDiscount(Discount $discount): ?DiscountData
+    public function createCoupon(Discount $discount): ?DiscountData
     {
-        return $this->executeWithErrorHandling('createDiscount', function () use ($discount): ?DiscountData {
+        return $this->executeWithErrorHandling('createCoupon', function () use ($discount): ?DiscountData {
             $options = [
                 'name' => $discount->code,
                 'metadata' => [
@@ -494,32 +480,7 @@ class StripeDriver implements PaymentProcessor
                 return null;
             }
 
-            return DiscountData::from([
-                'id' => 0,
-                'type' => DiscountType::Manual,
-                'discountType' => $coupon->percent_off ? DiscountValueType::Percentage : DiscountValueType::Fixed,
-                'value' => ($coupon->percent_off ?? (float) $coupon->amount_off ?? 0) / 100,
-                'code' => $coupon->name,
-                'externalDiscountId' => $coupon->id,
-                'maxUses' => $coupon->max_redemptions,
-            ]);
-        });
-    }
-
-    public function findDiscount(string $discountId): ?DiscountData
-    {
-        return $this->executeWithErrorHandling('findDiscount', function () use ($discountId): ?DiscountData {
-            $coupon = $this->stripe->coupons->retrieve($discountId);
-
-            return DiscountData::from([
-                'id' => 0,
-                'type' => DiscountType::Manual,
-                'discountType' => $coupon->percent_off ? DiscountValueType::Percentage : DiscountValueType::Fixed,
-                'value' => ($coupon->percent_off ?? (float) $coupon->amount_off ?? 0) / 100,
-                'code' => $coupon->name,
-                'externalDiscountId' => $coupon->id,
-                'maxUses' => $coupon->max_redemptions,
-            ]);
+            return DiscountData::from($coupon);
         });
     }
 
@@ -760,7 +721,7 @@ class StripeDriver implements PaymentProcessor
      */
     public function listSubscriptions(?User $user = null, array $filters = []): mixed
     {
-        return $this->executeWithErrorHandling('listSubscriptions', function () use ($user, $filters): array|\Illuminate\Contracts\Pagination\CursorPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Support\Enumerable|\Spatie\LaravelData\CursorPaginatedDataCollection|\Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection {
+        return $this->executeWithErrorHandling('listSubscriptions', function () use ($user, $filters): SupportCollection {
             $subscriptions = $user instanceof User ? $user->subscriptions() : SubscriptionModel::query()
                 ->with('user')
                 ->latest();
@@ -834,17 +795,17 @@ class StripeDriver implements PaymentProcessor
             $discounts = [];
             if (! $disallowDiscountCodes && $order->discounts->isNotEmpty()) {
                 foreach ($order->discounts as $discount) {
-                    $discount = $this->createDiscount($discount);
+                    $coupon = $this->createCoupon($discount);
 
-                    if (! $discount instanceof DiscountData) {
+                    if (! $coupon instanceof DiscountData) {
                         continue;
                     }
 
-                    if (! $externalDiscountId = $discount->externalDiscountId) {
+                    if (! $externalCouponId = $coupon->externalCouponId) {
                         continue;
                     }
 
-                    $discounts[] = ['coupon' => $externalDiscountId];
+                    $discounts[] = ['coupon' => $externalCouponId];
                 }
             }
 

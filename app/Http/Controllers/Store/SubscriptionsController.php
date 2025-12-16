@@ -130,10 +130,10 @@ class SubscriptionsController extends Controller
                     user: $this->user,
                     expiresAt: $expiration
                 ), function (Discount $discount): void {
-                    $coupon = $this->paymentManager->createDiscount($discount);
+                    $coupon = $this->paymentManager->createCoupon($discount);
 
                     $discount->update([
-                        'external_discount_id' => $coupon->externalDiscountId,
+                        'external_coupon_id' => $coupon->externalCouponId,
                     ]);
                 });
 
@@ -143,7 +143,7 @@ class SubscriptionsController extends Controller
 
                 $this->paymentManager->updateSubscription($this->user, [
                     'discounts' => [
-                        ['coupon' => $discount->external_discount_id],
+                        ['coupon' => $discount->external_coupon_id],
                     ],
                     'proration_behavior' => ProrationBehavior::None->value,
                 ]);

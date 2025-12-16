@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('discounts', function (Blueprint $table) {
-            $table->string('external_coupon_id')->after('min_order_amount')->nullable();
+        Schema::table('orders_discounts', function (Blueprint $table) {
+            $table->string('external_discount_id')->after('balance_after')->nullable();
         });
     }
 

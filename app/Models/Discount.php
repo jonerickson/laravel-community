@@ -33,7 +33,7 @@ use Illuminate\Support\Str;
  * @property int|null $max_uses
  * @property int $times_used
  * @property float|null $min_order_amount
- * @property string|null $external_discount_id
+ * @property string|null $external_coupon_id
  * @property array<array-key, mixed>|null $metadata
  * @property \Illuminate\Support\Carbon|null $expires_at
  * @property \Illuminate\Support\Carbon|null $activated_at
@@ -69,7 +69,7 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|Discount whereCurrentBalance($value)
  * @method static Builder<static>|Discount whereDiscountType($value)
  * @method static Builder<static>|Discount whereExpiresAt($value)
- * @method static Builder<static>|Discount whereExternalDiscountId($value)
+ * @method static Builder<static>|Discount whereExternalCouponId($value)
  * @method static Builder<static>|Discount whereId($value)
  * @method static Builder<static>|Discount whereMaxUses($value)
  * @method static Builder<static>|Discount whereMetadata($value)
@@ -105,7 +105,7 @@ class Discount extends Model
         'max_uses',
         'times_used',
         'min_order_amount',
-        'external_discount_id',
+        'external_coupon_id',
         'expires_at',
         'activated_at',
     ];
@@ -244,11 +244,9 @@ class Discount extends Model
 
     public function valueLabel(): Attribute
     {
-        return Attribute::get(function () {
-            return match ($this->discount_type) {
-                DiscountValueType::Percentage => Number::percentage($this->value),
-                DiscountValueType::Fixed => Number::currency($this->value),
-            };
+        return Attribute::get(fn () => match ($this->discount_type) {
+            DiscountValueType::Percentage => Number::percentage($this->value),
+            DiscountValueType::Fixed => Number::currency($this->value),
         });
     }
 

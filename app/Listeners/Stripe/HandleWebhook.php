@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Listeners\Stripe;
 
-use App\Data\DiscountData;
+use App\Data\InvoiceData;
 use App\Enums\BillingReason;
 use App\Enums\OrderRefundReason;
 use App\Enums\SubscriptionStatus;
@@ -17,6 +17,7 @@ use App\Events\SubscriptionCreated;
 use App\Events\SubscriptionDeleted;
 use App\Events\SubscriptionUpdated;
 use App\Managers\PaymentManager;
+use App\Models\Discount;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
@@ -164,11 +165,28 @@ class HandleWebhook implements ShouldQueue
         }
 
         if (filled(data_get($this->payload, 'data.object.discounts'))) {
-            foreach (data_get($this->payload, 'data.object.discounts') as $discountId) {
-                $discount = $this->paymentManager->findDiscount($discountId);
+            $invoice = $this->paymentManager->findInvoice(data_get($this->payload, 'data.object.id'), [
+                'expand' => ['discounts'],
+            ]);
 
-                if ($discount instanceof DiscountData) {
+            if ($invoice instanceof InvoiceData && filled($invoice->discounts)) {
+                foreach ($invoice->discounts as $discount) {
+                    $object = Discount::firstOrCreate([
+                        'external_coupon_id' => $discount->externalCouponId,
+                    ], [
+                        'code' => $discount->code,
+                        'type' => $discount->type,
+                        'discount_type' => $discount->discountType,
+                        'value' => $discount->value,
+                        'max_uses' => $discount->maxUses,
+                        'times_used' => $discount->timesUsed,
+                        'expires_at' => $discount->expiresAt,
+                        'activated_at' => $discount->activatedAt,
+                    ]);
 
+                    $order->discounts()->sync($object, [
+                        'amount_applied' => $discount->amountApplied,
+                    ]);
                 }
             }
         }

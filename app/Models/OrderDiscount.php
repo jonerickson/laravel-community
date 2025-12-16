@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @property float $amount_applied
  * @property float|null $balance_before
  * @property float|null $balance_after
+ * @property string|null $external_discount_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
@@ -25,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderDiscount whereBalanceBefore($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderDiscount whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderDiscount whereDiscountId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderDiscount whereExternalDiscountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderDiscount whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderDiscount whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderDiscount whereUpdatedAt($value)
@@ -35,12 +37,17 @@ class OrderDiscount extends Pivot
 {
     protected $table = 'orders_discounts';
 
+    protected $attributes = [
+        'amount_applied' => 0,
+    ];
+
     protected $fillable = [
         'order_id',
         'discount_id',
         'amount_applied',
         'balance_before',
         'balance_after',
+        'external_discount_id',
     ];
 
     public function amountApplied(): Attribute
