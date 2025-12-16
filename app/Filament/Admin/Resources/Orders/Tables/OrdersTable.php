@@ -20,11 +20,11 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Support\Enums\Width;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
@@ -126,6 +126,7 @@ class OrdersTable
                     ->default(OrderStatus::Succeeded)
                     ->options(OrderStatus::class),
                 SelectFilter::make('products')
+                    ->columnSpanFull()
                     ->relationship('items.price.product', 'name')
                     ->preload()
                     ->searchable()
