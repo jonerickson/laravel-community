@@ -69,6 +69,7 @@ class SubscriptionsController extends Controller
             'portalUrl' => $this->user instanceof User
                 ? $this->paymentManager->getBillingPortalUrl($this->user)
                 : null,
+            'offerAvailable' => $this->user instanceof User && $this->discountService->cancellationOfferIsAvailable($this->user),
         ]);
     }
 

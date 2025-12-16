@@ -145,6 +145,11 @@ class DiscountService
         ]);
     }
 
+    public function cancellationOfferIsAvailable(User $user): bool
+    {
+        return true;
+    }
+
     public function generateUniqueCode(DiscountType $type = DiscountType::PromoCode, int $attempts = 5, ?string $prefix = null): string
     {
         for ($i = 0; $i < $attempts; $i++) {

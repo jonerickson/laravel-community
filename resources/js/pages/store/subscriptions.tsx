@@ -1,6 +1,5 @@
 import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
-import InputError from '@/components/input-error';
 import RichEditorContent from '@/components/rich-editor-content';
 import { StarRating } from '@/components/star-rating';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +22,7 @@ interface SubscriptionsProps {
     subscriptionReviews: Record<number, App.Data.CommentData[]>;
     currentSubscription: App.Data.SubscriptionData | null;
     portalUrl?: string | null;
+    offerAvailable: boolean;
 }
 
 const getIconForPlan = (plan: App.Data.ProductData): React.ElementType => {
@@ -341,7 +341,13 @@ function PricingCard({
     );
 }
 
-export default function Subscriptions({ subscriptionProducts, subscriptionReviews, currentSubscription, portalUrl }: SubscriptionsProps) {
+export default function Subscriptions({
+    subscriptionProducts,
+    subscriptionReviews,
+    currentSubscription,
+    portalUrl,
+    offerAvailable,
+}: SubscriptionsProps) {
     const { name: siteName, logoUrl } = usePage<SharedData>().props;
     const [billingCycle, setBillingCycle] = useState<App.Enums.SubscriptionInterval>('month');
     const [showConfetti, setShowConfetti] = useState(false);
@@ -402,15 +408,11 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
         price_id: 0,
     });
 
-    const {
-        put: acceptCancellationOffer,
-        processing: offerProcessing,
-        errors: offerErrors,
-    } = useForm({
+    const { put: acceptCancellationOffer, processing: offerProcessing } = useForm({
         action: 'offer',
     });
 
-    const availableIntervals = Object.values(['day', 'week', 'month', 'year']).filter((cycle) => {
+    const availableIntervals = (['day', 'week', 'month', 'year'] as const).filter((cycle) => {
         return subscriptionProducts.some((plan) => plan.prices.some((price: App.Data.PriceData) => price.interval === cycle));
     });
 
@@ -470,7 +472,7 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
     const handleReasonSubmit = () => {
         setShowCancelReasonDialog(false);
 
-        if (currentSubscription?.status && ['active', 'past_due'].includes(currentSubscription.status)) {
+        if (offerAvailable && currentSubscription?.status && ['active', 'past_due'].includes(currentSubscription.status)) {
             setShowExclusiveOfferDialog(true);
         } else {
             setShowCancelDialog(true);
@@ -556,7 +558,14 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                     {availableIntervals.length > 1 && (
                         <div className="flex justify-center pb-4">
                             <Tabs value={billingCycle} onValueChange={(value) => setBillingCycle(value as App.Enums.SubscriptionInterval)}>
-                                <TabsList className={`grid w-full max-w-2xl grid-cols-${availableIntervals.length}`}>
+                                <TabsList
+                                    className={cn(
+                                        'grid w-full max-w-2xl',
+                                        availableIntervals.length === 2 && 'grid-cols-2',
+                                        availableIntervals.length === 3 && 'grid-cols-3',
+                                        availableIntervals.length === 4 && 'grid-cols-4',
+                                    )}
+                                >
                                     {availableIntervals.map((interval) => (
                                         <TabsTrigger key={interval} value={interval} className="relative">
                                             {interval.charAt(0).toUpperCase() + interval.slice(1)}
@@ -671,12 +680,7 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                             maxLength={500}
                             required
                         />
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <InputError message={offerErrors.reason} />
-                            </div>
-                            <p className="text-right text-xs text-muted-foreground">{cancellationReason.length}/500</p>
-                        </div>
+                        <p className="text-right text-xs text-muted-foreground">{cancellationReason.length}/500</p>
                     </div>
                     <DialogFooter>
                         <div className="flex w-full flex-col gap-2">
