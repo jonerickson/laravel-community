@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \App\Data\ProductData|null updateProduct(\App\Models\Product $product)
  * @method static bool deleteProduct(\App\Models\Product $product)
  * @method static mixed listProducts(array $filters = [])
- * @method static \App\Data\InvoiceData|null findInvoice(string $invoiceId)
+ * @method static \App\Data\InvoiceData|null findInvoice(string $invoiceId, array $params = [])
  * @method static \App\Data\PriceData|null createPrice(\App\Models\Price $price)
  * @method static \App\Data\PriceData|null updatePrice(\App\Models\Price $price)
  * @method static \App\Data\PriceData|null changePrice(\App\Models\Price $price)
