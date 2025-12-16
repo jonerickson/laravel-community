@@ -1,5 +1,6 @@
 import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
+import InputError from '@/components/input-error';
 import RichEditorContent from '@/components/rich-editor-content';
 import { StarRating } from '@/components/star-rating';
 import { Badge } from '@/components/ui/badge';
@@ -16,7 +17,6 @@ import { AlertCircle, Check, ChevronDown, Crown, LoaderCircle, Package, RefreshC
 import { useEffect, useState } from 'react';
 import ReactConfetti from 'react-confetti';
 import SharedData = App.Data.SharedData;
-import InputError from '@/components/input-error';
 
 interface SubscriptionsProps {
     subscriptionProducts: App.Data.ProductData[];
@@ -402,7 +402,11 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
         price_id: 0,
     });
 
-    const { put: acceptCancellationOffer, processing: offerProcessing, errors: offerErrors } = useForm({
+    const {
+        put: acceptCancellationOffer,
+        processing: offerProcessing,
+        errors: offerErrors,
+    } = useForm({
         action: 'offer',
     });
 
@@ -667,7 +671,7 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                             maxLength={500}
                             required
                         />
-                        <div className='flex items-center justify-between'>
+                        <div className="flex items-center justify-between">
                             <div>
                                 <InputError message={offerErrors.reason} />
                             </div>
