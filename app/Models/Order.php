@@ -29,6 +29,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property string $reference_id
  * @property int $user_id
  * @property OrderStatus $status
+ * @property BillingReason|null $billing_reason
  * @property float|null $amount_due
  * @property float|null $amount_overpaid
  * @property float|null $amount_paid
@@ -77,6 +78,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @method static Builder<static>|Order whereAmountOverpaid($value)
  * @method static Builder<static>|Order whereAmountPaid($value)
  * @method static Builder<static>|Order whereAmountRemaining($value)
+ * @method static Builder<static>|Order whereBillingReason($value)
  * @method static Builder<static>|Order whereCreatedAt($value)
  * @method static Builder<static>|Order whereExternalCheckoutId($value)
  * @method static Builder<static>|Order whereExternalEventId($value)
