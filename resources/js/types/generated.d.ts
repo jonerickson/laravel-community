@@ -296,6 +296,7 @@ declare namespace App.Data {
         refundNotes: string | null;
         amount: number | null;
         amountDue: number | null;
+        amountPaid: number | null;
         isOneTime: boolean;
         isRecurring: boolean;
         checkoutUrl: string | null;

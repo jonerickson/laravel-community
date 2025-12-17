@@ -27,7 +27,11 @@ class OrderData extends Data
 
     public ?float $amount = null;
 
+    public ?float $amountSubtotal = null;
+
     public ?float $amountDue = null;
+
+    public ?float $amountPaid = null;
 
     public bool $isOneTime;
 

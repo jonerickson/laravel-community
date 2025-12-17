@@ -156,7 +156,7 @@ export default function Orders({ orders }: OrdersProps) {
             cell: ({ row }) => {
                 const order = row.original;
                 const status = row.getValue('status') as string;
-                const amount = status && status === 'succeeded' ? order.amount : order.amountDue;
+                const amount = status && status === 'succeeded' ? order.amountPaid : order.amountDue || order.amount;
                 const formattedAmount = currency(amount);
 
                 return <div className="text-right font-medium">{formattedAmount}</div>;
