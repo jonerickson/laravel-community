@@ -165,6 +165,7 @@ class SearchService
                 'id' => $policy->id,
                 'type' => 'policy',
                 'title' => $policy->title,
+                'description' => $policy->content,
                 'version' => $policy->version,
                 'url' => $policy->url,
                 'category_name' => $policy->category->name,
@@ -198,8 +199,6 @@ class SearchService
                     : route('store.subscriptions'),
                 'price' => $product->defaultPrice?->amount,
                 'category_name' => $product->categories->first()?->name,
-                'created_at' => $product->created_at,
-                'updated_at' => $product->updated_at,
             ]));
     }
 

@@ -1,6 +1,7 @@
 import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
+import RichEditorContent from '@/components/rich-editor-content';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -14,24 +15,6 @@ import { cn, currency } from '@/lib/utils';
 import { Head, useForm } from '@inertiajs/react';
 import { Calendar, FileText, LoaderCircle, MessageSquare, Search as SearchIcon, Shield, ShoppingBag, User } from 'lucide-react';
 import { FormEvent, useEffect } from 'react';
-
-interface SearchResult {
-    id: number;
-    type: 'policy' | 'product' | 'post' | 'topic' | 'user';
-    title: string;
-    description?: string;
-    excerpt?: string;
-    version?: string;
-    price?: string;
-    url: string;
-    forum_name?: string;
-    category_name?: string;
-    author_name?: string;
-    post_type?: string;
-    effective_at?: string;
-    created_at?: string;
-    updated_at?: string;
-}
 
 interface Filters {
     types: string[];
@@ -53,13 +36,13 @@ interface Counts {
 }
 
 interface Props {
-    results: App.Data.PaginatedData<SearchResult>;
+    results: App.Data.PaginatedData<App.Data.SearchResultData>;
     query: string;
     filters: Filters;
     counts: Counts;
 }
 
-const typeIcons: Record<SearchResult['type'], typeof MessageSquare> = {
+const typeIcons: Record<App.Data.SearchResultData['type'], typeof MessageSquare> = {
     topic: MessageSquare,
     post: FileText,
     policy: Shield,
@@ -67,7 +50,7 @@ const typeIcons: Record<SearchResult['type'], typeof MessageSquare> = {
     user: User,
 };
 
-const typeLabels: Record<SearchResult['type'], string> = {
+const typeLabels: Record<App.Data.SearchResultData['type'], string> = {
     topic: 'Topic',
     post: 'Post',
     policy: 'Policy',
@@ -339,7 +322,7 @@ export default function Search({ results, query: initialQuery, filters: initialF
                                 />
                             )}
 
-                            {results.data.map((result: SearchResult) => {
+                            {results.data.map((result: App.Data.SearchResultData) => {
                                 const Icon = typeIcons[result.type];
                                 return (
                                     <Card key={`${result.type}-${result.id}`} className="transition-shadow hover:shadow-md">
@@ -356,10 +339,19 @@ export default function Search({ results, query: initialQuery, filters: initialF
                                                             <a href={result.url} className="group">
                                                                 <HeadingSmall title={result.title} />
                                                             </a>
+                                                            <div className="text-sm text-muted-foreground">
+                                                                {result.forumName && <div>in {result.forumName}</div>}
+                                                                {result.categoryName && <div>in {result.categoryName}</div>}
+                                                            </div>
                                                         </div>
                                                     </div>
 
-                                                    {result.description && <p className="text-sm text-muted-foreground">{result.description}</p>}
+                                                    {result.description && (
+                                                        <RichEditorContent
+                                                            className="text-sm text-muted-foreground"
+                                                            content={(result.description || '').substring(0, 300)}
+                                                        />
+                                                    )}
 
                                                     {result.excerpt && <p className="text-sm text-muted-foreground">{result.excerpt}</p>}
 
@@ -368,23 +360,19 @@ export default function Search({ results, query: initialQuery, filters: initialF
                                                     )}
 
                                                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                                                        {result.author_name && (
+                                                        {result.version && <div>{result.version}</div>}
+
+                                                        {result.authorName && (
                                                             <div className="flex items-center gap-1">
                                                                 <User className="size-3" />
-                                                                {result.author_name}
+                                                                {result.authorName}
                                                             </div>
                                                         )}
 
-                                                        {result.forum_name && <div>in {result.forum_name}</div>}
-
-                                                        {result.category_name && <div>in {result.category_name}</div>}
-
-                                                        {result.version && <div>v{result.version}</div>}
-
-                                                        {(result.effective_at || result.created_at) && (
+                                                        {(result.effectiveAt || result.createdAt) && (
                                                             <div className="flex items-center gap-1">
                                                                 <Calendar className="size-3" />
-                                                                {formatDate(result.effective_at || result.created_at || '')}
+                                                                {formatDate(result.effectiveAt || result.createdAt || '')}
                                                             </div>
                                                         )}
                                                     </div>
