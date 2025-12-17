@@ -322,8 +322,6 @@ class StripeDriver implements PaymentProcessor
                 return null;
             }
 
-            dump($invoice);
-
             return InvoiceData::from($invoice);
         });
     }
