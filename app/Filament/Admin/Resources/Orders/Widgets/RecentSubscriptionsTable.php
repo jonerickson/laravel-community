@@ -21,7 +21,7 @@ class RecentSubscriptionsTable extends TableWidget
     {
         $listSubscriptions = new ListSubscriptions;
         $listSubscriptions->mount();
-        $listSubscriptions->records = app(PaymentManager::class)->listSubscriptions(filters: ['limit' => 15])->toArray();
+        $listSubscriptions->records = app(PaymentManager::class)->listSubscriptions(filters: ['limit' => 15])->toArray() ?? [];
 
         return $listSubscriptions->table($table)
             ->heading('Recent Subscriptions')

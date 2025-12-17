@@ -20,8 +20,8 @@ use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
 use Carbon\CarbonInterface;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 interface PaymentProcessor
 {
@@ -33,10 +33,7 @@ interface PaymentProcessor
 
     public function deleteProduct(Product $product): bool;
 
-    /**
-     * @return Collection<int, ProductData>
-     */
-    public function listProducts(array $filters = []): mixed;
+    public function listProducts(array $filters = []): ?Collection;
 
     public function createPrice(Price $price): ?PriceData;
 
@@ -46,19 +43,13 @@ interface PaymentProcessor
 
     public function deletePrice(Price $price): bool;
 
-    /**
-     * @return Collection<int, PriceData>
-     */
-    public function listPrices(Product $product, array $filters = []): mixed;
+    public function listPrices(Product $product, array $filters = []): ?Collection;
 
     public function findInvoice(string $invoiceId, array $params = []): ?InvoiceData;
 
     public function createPaymentMethod(User $user, string $paymentMethodId): ?PaymentMethodData;
 
-    /**
-     * @return Collection<int, PaymentMethodData>
-     */
-    public function listPaymentMethods(User $user): mixed;
+    public function listPaymentMethods(User $user): ?Collection;
 
     public function updatePaymentMethod(User $user, string $paymentMethodId, bool $isDefault): ?PaymentMethodData;
 
@@ -86,15 +77,9 @@ interface PaymentProcessor
 
     public function currentSubscription(User $user): ?SubscriptionData;
 
-    /**
-     * @return Collection<int, SubscriptionData>
-     */
-    public function listSubscriptions(User $user, array $filters = []): mixed;
+    public function listSubscriptions(User $user, array $filters = []): ?Collection;
 
-    /**
-     * @return Collection<int, CustomerData>
-     */
-    public function listSubscribers(?Price $price = null): mixed;
+    public function listSubscribers(?Price $price = null): ?Collection;
 
     public function getCheckoutUrl(Order $order): bool|string;
 

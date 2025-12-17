@@ -22,6 +22,8 @@ class InvoiceData extends Data
 
     public ?string $invoicePdfUrl = null;
 
+    public ?string $externalOrderId = null;
+
     public ?string $externalPaymentId = null;
 
     /** @var ?DiscountData[] */

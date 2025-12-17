@@ -47,7 +47,7 @@ class OrdersTable
                     ->label('Order Number')
                     ->copyable()
                     ->sortable()
-                    ->searchable(),
+                    ->searchable(['reference_id', 'external_invoice_id', 'external_checkout_id', 'external_order_id', 'external_payment_id', 'external_event_id']),
                 TextColumn::make('invoice_number')
                     ->default(new HtmlString('&mdash;'))
                     ->label('Invoice Number')

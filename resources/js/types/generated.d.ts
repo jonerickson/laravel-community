@@ -231,6 +231,7 @@ declare namespace App.Data {
         amount: number;
         invoiceUrl: string | null;
         invoicePdfUrl: string | null;
+        externalOrderId: string | null;
         externalPaymentId: string | null;
         discounts: Array<App.Data.DiscountData> | null;
     };
@@ -342,7 +343,7 @@ declare namespace App.Data {
         createdAt: string | null;
         updatedAt: string | null;
     };
-    export type PaginatedData<T = unknown> = {
+    export type PaginatedData = {
         data: Array<T>;
         currentPage: number;
         lastPage: number;

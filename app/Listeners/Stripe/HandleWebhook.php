@@ -165,30 +165,35 @@ class HandleWebhook implements ShouldQueue
             }
         }
 
-        if (filled(data_get($this->payload, 'data.object.discounts'))) {
-            $invoice = $this->paymentManager->findInvoice(data_get($this->payload, 'data.object.id'), [
-                'expand' => ['discounts'],
-            ]);
+        $invoice = $this->paymentManager->findInvoice(data_get($this->payload, 'data.object.id'), [
+            'expand' => ['discounts', 'payments.data.payment.payment_intent'],
+        ]);
 
-            if ($invoice instanceof InvoiceData && filled($invoice->discounts)) {
-                foreach ($invoice->discounts as $discount) {
-                    $object = Discount::firstOrCreate([
-                        'code' => $discount->code,
-                    ], [
-                        'type' => $discount->type,
-                        'discount_type' => $discount->discountType,
-                        'value' => $discount->value,
-                        'max_uses' => $discount->maxUses,
-                        'times_used' => $discount->timesUsed,
-                        'expires_at' => $discount->expiresAt,
-                        'activated_at' => $discount->activatedAt,
-                    ]);
+        if (filled(data_get($this->payload, 'data.object.discounts')) && ($invoice instanceof InvoiceData && filled($invoice->discounts))) {
+            foreach ($invoice->discounts as $discount) {
+                $object = Discount::firstOrCreate([
+                    'code' => $discount->code,
+                ], [
+                    'type' => $discount->type,
+                    'discount_type' => $discount->discountType,
+                    'value' => $discount->value,
+                    'max_uses' => $discount->maxUses,
+                    'times_used' => $discount->timesUsed,
+                    'expires_at' => $discount->expiresAt,
+                    'activated_at' => $discount->activatedAt,
+                ]);
 
-                    $order->discounts()->syncWithPivotValues($object, [
-                        'external_discount_id' => $discount->externalDiscountId,
-                    ]);
-                }
+                $order->discounts()->syncWithPivotValues($object, [
+                    'external_discount_id' => $discount->externalDiscountId,
+                ]);
             }
+        }
+
+        if ((blank($order->external_order_id) || blank($order->external_payment_id)) && $invoice instanceof InvoiceData) {
+            $order->updateQuietly([
+                'external_order_id' => $invoice->externalOrderId,
+                'external_payment_id' => $invoice->externalPaymentId,
+            ]);
         }
 
         return $order;

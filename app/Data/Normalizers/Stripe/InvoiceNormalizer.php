@@ -19,7 +19,8 @@ class InvoiceNormalizer implements Normalizer
                 'amount' => $value->total,
                 'invoice_url' => $value->hosted_invoice_url,
                 'invoice_pdf_url' => $value->invoice_pdf,
-                'external_payment_id' => $value->payments->data[0]->id ?? null,
+                'external_order_id' => data_get($value, 'payments.data.0.payment.payment_intent.id'),
+                'external_payment_id' => data_get($value, 'payments.data.0.payment.payment_intent.payment_method'),
                 'discounts' => DiscountData::collect($value->discounts),
             ];
         }

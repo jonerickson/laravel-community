@@ -23,8 +23,8 @@ use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
 use Carbon\CarbonInterface;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
 
@@ -55,7 +55,7 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deleteProduct($product);
     }
 
-    public function listProducts(array $filters = []): mixed
+    public function listProducts(array $filters = []): ?Collection
     {
         return $this->driver()->listProducts($filters);
     }
@@ -85,7 +85,7 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deletePrice($price);
     }
 
-    public function listPrices(Product $product, array $filters = []): mixed
+    public function listPrices(Product $product, array $filters = []): ?Collection
     {
         return $this->driver()->listPrices($product, $filters);
     }
@@ -95,7 +95,7 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->createPaymentMethod($user, $paymentMethodId);
     }
 
-    public function listPaymentMethods(User $user): mixed
+    public function listPaymentMethods(User $user): ?Collection
     {
         return $this->driver()->listPaymentMethods($user);
     }
@@ -170,7 +170,7 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->listSubscriptions($user, $filters);
     }
 
-    public function listSubscribers(?Price $price = null): mixed
+    public function listSubscribers(?Price $price = null): ?Collection
     {
         return $this->driver()->listSubscribers($price);
     }

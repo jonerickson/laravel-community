@@ -31,10 +31,13 @@ class ListPaymentMethods extends Component implements HasActions, HasSchemas, Ha
 
     public array $records = [];
 
-    public function mount(User $record): void
+    public function mount(?User $record = null): void
     {
         $this->user = $record;
-        $this->records = app(PaymentManager::class)->listPaymentMethods($this->user)->toArray();
+
+        if ($this->user instanceof User) {
+            $this->records = app(PaymentManager::class)->listPaymentMethods($this->user)->toArray() ?? [];
+        }
     }
 
     public function table(Table $table): Table

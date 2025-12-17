@@ -32,10 +32,9 @@ use App\Models\User;
 use Carbon\CarbonInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
@@ -141,12 +140,9 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
-    /**
-     * @return Collection<int, ProductData>
-     */
-    public function listProducts(array $filters = []): mixed
+    public function listProducts(array $filters = []): ?Collection
     {
-        return $this->executeWithErrorHandling('listProducts', function () use ($filters): array|\Illuminate\Contracts\Pagination\CursorPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Support\Enumerable|\Spatie\LaravelData\CursorPaginatedDataCollection|\Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection {
+        return $this->executeWithErrorHandling('listProducts', function () use ($filters): Collection {
             $query = Product::query()->whereNotNull('external_product_id');
 
             if (isset($filters['limit'])) {
@@ -154,7 +150,7 @@ class StripeDriver implements PaymentProcessor
             }
 
             return ProductData::collect($query->get());
-        }, collect());
+        });
     }
 
     public function createPrice(Price $price): ?PriceData
@@ -250,10 +246,7 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
-    /**
-     * @return Collection<int, PriceData>
-     */
-    public function listPrices(Product $product, array $filters = []): mixed
+    public function listPrices(Product $product, array $filters = []): ?Collection
     {
         return $this->executeWithErrorHandling('listPrices', function () use ($product, $filters): Collection {
             if (! $product->external_product_id) {
@@ -310,7 +303,7 @@ class StripeDriver implements PaymentProcessor
             });
 
             return new Collection($prices->all());
-        }, collect());
+        });
     }
 
     public function findInvoice(string $invoiceId, array $params = []): ?InvoiceData
@@ -331,17 +324,14 @@ class StripeDriver implements PaymentProcessor
         return $this->executeWithErrorHandling('createPaymentMethod', fn (): PaymentMethodData => PaymentMethodData::from($user->addPaymentMethod($paymentMethodId)));
     }
 
-    /**
-     * @return Collection<int, PaymentMethodData>
-     */
-    public function listPaymentMethods(User $user): mixed
+    public function listPaymentMethods(User $user): ?Collection
     {
-        return $this->executeWithErrorHandling('listPaymentMethods', fn (): array|\Illuminate\Contracts\Pagination\CursorPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Support\Enumerable|\Spatie\LaravelData\CursorPaginatedDataCollection|\Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection => PaymentMethodData::collect($user->paymentMethods()), collect());
+        return $this->executeWithErrorHandling('listPaymentMethods', fn (): Collection => PaymentMethodData::collect($user->paymentMethods()));
     }
 
     public function updatePaymentMethod(User $user, string $paymentMethodId, bool $isDefault): ?PaymentMethodData
     {
-        return $this->executeWithErrorHandling('updatePaymentMethod', function () use ($user, $paymentMethodId, $isDefault): ?\App\Data\PaymentMethodData {
+        return $this->executeWithErrorHandling('updatePaymentMethod', function () use ($user, $paymentMethodId, $isDefault): ?PaymentMethodData {
             if (! ($paymentMethod = $user->findPaymentMethod($paymentMethodId)) instanceof PaymentMethod) {
                 return null;
             }
@@ -716,12 +706,9 @@ class StripeDriver implements PaymentProcessor
         });
     }
 
-    /**
-     * @return Collection<int, SubscriptionData>
-     */
-    public function listSubscriptions(?User $user = null, array $filters = []): mixed
+    public function listSubscriptions(?User $user = null, array $filters = []): ?Collection
     {
-        return $this->executeWithErrorHandling('listSubscriptions', function () use ($user, $filters): SupportCollection {
+        return $this->executeWithErrorHandling('listSubscriptions', function () use ($user, $filters): Collection {
             $subscriptions = $user instanceof User ? $user->subscriptions() : SubscriptionModel::query()
                 ->with('user')
                 ->latest();
@@ -735,13 +722,10 @@ class StripeDriver implements PaymentProcessor
             }
 
             return SubscriptionData::collect($subscriptions->get());
-        }, collect());
+        });
     }
 
-    /**
-     * @return Collection<int, CustomerData>
-     */
-    public function listSubscribers(?Price $price = null): mixed
+    public function listSubscribers(?Price $price = null): ?Collection
     {
         return $this->executeWithErrorHandling('listSubscribers', fn (): mixed => User::whereHas('subscriptions')
             ->when($price && filled($price->external_price_id), fn (Builder $query) => $query->whereRelation('subscriptions', 'stripe_price', '=', $price->external_price_id))

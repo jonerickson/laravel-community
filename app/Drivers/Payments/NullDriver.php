@@ -21,8 +21,8 @@ use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
 use Carbon\CarbonInterface;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class NullDriver implements PaymentProcessor
 {
@@ -46,7 +46,7 @@ class NullDriver implements PaymentProcessor
         return false;
     }
 
-    public function listProducts(array $filters = []): mixed
+    public function listProducts(array $filters = []): ?Collection
     {
         return collect();
     }
@@ -71,7 +71,7 @@ class NullDriver implements PaymentProcessor
         return false;
     }
 
-    public function listPrices(Product $product, array $filters = []): mixed
+    public function listPrices(Product $product, array $filters = []): ?Collection
     {
         return collect();
     }
@@ -86,7 +86,7 @@ class NullDriver implements PaymentProcessor
         return null;
     }
 
-    public function listPaymentMethods(User $user): mixed
+    public function listPaymentMethods(User $user): ?Collection
     {
         return collect();
     }
@@ -156,15 +156,12 @@ class NullDriver implements PaymentProcessor
         return null;
     }
 
-    public function listSubscriptions(User $user, array $filters = []): mixed
+    public function listSubscriptions(User $user, array $filters = []): ?Collection
     {
         return collect();
     }
 
-    /**
-     * @return Collection<int, CustomerData>
-     */
-    public function listSubscribers(?Price $price = null): mixed
+    public function listSubscribers(?Price $price = null): ?Collection
     {
         return collect();
     }
