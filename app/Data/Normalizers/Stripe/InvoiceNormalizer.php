@@ -17,10 +17,10 @@ class InvoiceNormalizer implements Normalizer
             return [
                 'id' => $value->id,
                 'amount' => $value->total,
-                'invoice_url' => $value->hosted_invoice_url,
-                'invoice_pdf_url' => $value->invoice_pdf,
-                'external_order_id' => data_get($value, 'payments.data.0.payment.payment_intent.id'),
-                'external_payment_id' => data_get($value, 'payments.data.0.payment.payment_intent.payment_method'),
+                'invoiceUrl' => $value->hosted_invoice_url,
+                'invoicePdfUrl' => $value->invoice_pdf,
+                'externalOrderId' => data_get($value, 'payments.data.0.payment.payment_intent.id'),
+                'externalPaymentId' => data_get($value, 'payments.data.0.payment.payment_intent.payment_method'),
                 'discounts' => DiscountData::collect($value->discounts),
             ];
         }
