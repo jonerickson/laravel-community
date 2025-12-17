@@ -26,7 +26,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -100,9 +99,7 @@ class HandleWebhook implements ShouldQueue
 
     protected function handlePaymentEvent(): ?Order
     {
-        if (blank($orderId = $this->resolveOrderId())) {
-            $orderId = Str::uuid()->toString();
-        }
+        $orderId = $this->resolveOrderId() ?? Str::uuid()->toString();
 
         $order = Order::updateOrCreate([
             'reference_id' => $orderId,
@@ -119,47 +116,47 @@ class HandleWebhook implements ShouldQueue
             'external_event_id' => data_get($this->payload, 'id'),
         ]);
 
-        $lineItems = Arr::wrap(data_get($this->payload, 'data.object.lines.data'));
+        $lineItems = collect(data_get($this->payload, 'data.object.lines.data', []));
+
+        $prices = Price::whereIn(
+            'external_price_id',
+            $lineItems->pluck('pricing.price_details.price')->filter()->unique()
+        )->get()->keyBy('external_price_id');
 
         foreach ($lineItems as $lineItem) {
-            $price = Price::firstWhere([
-                'external_price_id' => data_get($lineItem, 'pricing.price_details.price'),
-            ]);
+            $externalItemId = data_get($lineItem, 'id');
+            $externalPriceId = data_get($lineItem, 'pricing.price_details.price');
+
+            $price = $prices->get($externalPriceId);
+            $priceId = $price?->getKey();
 
             $item = [
                 'description' => data_get($lineItem, 'description'),
                 'quantity' => data_get($lineItem, 'quantity') ?? 1,
                 'amount' => ((int) data_get($lineItem, 'amount') ?? 0) / 100,
-                'external_item_id' => $itemId = data_get($lineItem, 'id'),
+                'external_item_id' => $externalItemId,
+                'price_id' => $priceId,
             ];
 
             if ($order->wasRecentlyCreated) {
-                if ($price) {
-                    $item['price_id'] = $price->getKey();
-                }
-
                 $order->items()->create($item);
             } else {
                 $orderItem = $order->items()
-                    ->where(function (Builder $query) use ($itemId): void {
-                        $query->where('external_item_id', $itemId)
+                    ->where(function (Builder $query) use ($externalItemId): void {
+                        $query->where('external_item_id', $externalItemId)
                             ->orWhereNull('external_item_id');
                     })
-                    ->when($price, fn ($query) => $query->where('price_id', $price->getKey()))
+                    ->when($priceId, fn ($query) => $query->where('price_id', $priceId))
                     ->first();
 
                 if (! $orderItem) {
-                    if ($price) {
-                        $item['price_id'] = $price->getKey();
-                    }
-
                     $order->items()->create($item);
                 } else {
                     $orderItem->update([
                         'description' => data_get($lineItem, 'description'),
                         'amount' => ((int) data_get($lineItem, 'amount') ?? 0) / 100,
                         'quantity' => data_get($lineItem, 'quantity') ?? 1,
-                        'external_item_id' => $itemId,
+                        'external_item_id' => $externalItemId,
                     ]);
                 }
             }
@@ -170,6 +167,10 @@ class HandleWebhook implements ShouldQueue
         ]);
 
         if (filled(data_get($this->payload, 'data.object.discounts')) && ($invoice instanceof InvoiceData && filled($invoice->discounts))) {
+            $lineItemDiscounts = $lineItems
+                ->flatMap(fn (array $item) => Collection::make(data_get($item, 'discount_amounts', [])))
+                ->keyBy('discount');
+
             foreach ($invoice->discounts as $discount) {
                 $object = Discount::firstOrCreate([
                     'code' => $discount->code,
@@ -183,8 +184,11 @@ class HandleWebhook implements ShouldQueue
                     'activated_at' => $discount->activatedAt,
                 ]);
 
+                $amountApplied = $lineItemDiscounts->get($discount->externalDiscountId)['amount'] ?? 0;
+
                 $order->discounts()->syncWithPivotValues($object, [
                     'external_discount_id' => $discount->externalDiscountId,
+                    'amount_applied' => ((int) $amountApplied) / 100,
                 ]);
             }
         }

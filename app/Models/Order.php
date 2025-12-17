@@ -180,20 +180,6 @@ class Order extends Model implements HasLabel
         );
     }
 
-    public function amount(): Attribute
-    {
-        return Attribute::get(function ($value, array $attributes): int|float {
-            if (isset($attributes['amount_paid'])) {
-                return $attributes['amount_paid'] / 100;
-            }
-
-            $subtotal = $this->amount_subtotal;
-            $discountAmount = $this->discounts->sum('pivot.amount_applied');
-
-            return $subtotal - $discountAmount;
-        })->shouldCache();
-    }
-
     public function checkoutUrl(): Attribute
     {
         return Attribute::get(function () {
@@ -223,6 +209,20 @@ class Order extends Model implements HasLabel
     {
         return Attribute::get(fn (): float => (float) $this->items->sum('commission_amount'))
             ->shouldCache();
+    }
+
+    public function amount(): Attribute
+    {
+        return Attribute::get(function ($value, array $attributes): int|float {
+            if (isset($attributes['amount_paid'])) {
+                return $attributes['amount_paid'] / 100;
+            }
+
+            $subtotal = $this->amount_subtotal;
+            $discountAmount = $this->discounts->sum('pivot.amount_applied');
+
+            return $subtotal - $discountAmount;
+        })->shouldCache();
     }
 
     public function amountSubtotal(): Attribute
