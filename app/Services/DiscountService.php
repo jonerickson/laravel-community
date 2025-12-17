@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Data\SubscriptionData;
+use App\Enums\BillingReason;
 use App\Enums\DiscountType;
 use App\Enums\DiscountValueType;
 use App\Models\Discount;
@@ -13,6 +15,7 @@ use DateTime;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Random\RandomException;
 use RuntimeException;
 use Throwable;
 
@@ -145,9 +148,36 @@ class DiscountService
         ]);
     }
 
-    public function cancellationOfferIsAvailable(User $user): bool
+    /**
+     * @throws RandomException
+     */
+    public function cancellationOfferIsAvailable(User $user, SubscriptionData $subscription): bool
     {
-        return true;
+        $previousOfferHasBeenUsed = $user
+            ->orders()
+            ->whereRelation('discounts', 'type', DiscountType::Cancellation)
+            ->exists();
+
+        if ($previousOfferHasBeenUsed) {
+            return false;
+        }
+
+        $userRenewals = $user
+            ->orders()
+            ->where('billing_reason', BillingReason::SubscriptionCycle)
+            ->whereRelation('items', 'price_id', $subscription->price?->id)
+            ->whereDoesntHaveRelation('discounts', 'type', DiscountType::Cancellation)
+            ->count();
+
+        if ($userRenewals <= 0) {
+            return false;
+        }
+
+        if ($userRenewals > 3) {
+            return true;
+        }
+
+        return (bool) random_int(0, 1);
     }
 
     public function generateUniqueCode(DiscountType $type = DiscountType::PromoCode, int $attempts = 5, ?string $prefix = null): string

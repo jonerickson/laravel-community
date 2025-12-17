@@ -60,16 +60,18 @@ class SubscriptionsController extends Controller
             return [$product['id'] => $reviews->items()];
         });
 
+        $currentSubscription = $this->user instanceof User
+            ? $this->paymentManager->currentSubscription($this->user)
+            : null;
+
         return Inertia::render('store/subscriptions', [
             'subscriptionProducts' => $subscriptions,
             'subscriptionReviews' => $subscriptionReviews,
-            'currentSubscription' => $this->user instanceof User
-                ? $this->paymentManager->currentSubscription($this->user)
-                : null,
+            'currentSubscription' => $currentSubscription,
             'portalUrl' => $this->user instanceof User
                 ? $this->paymentManager->getBillingPortalUrl($this->user)
                 : null,
-            'offerAvailable' => $this->user instanceof User && $this->discountService->cancellationOfferIsAvailable($this->user),
+            'offerAvailable' => $this->user instanceof User && $currentSubscription instanceof SubscriptionData && $this->discountService->cancellationOfferIsAvailable($this->user, $currentSubscription),
         ]);
     }
 
