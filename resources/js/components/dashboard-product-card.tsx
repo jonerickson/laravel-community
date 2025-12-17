@@ -86,6 +86,7 @@ export default function DashboardProductCard({ product, type, className }: Dashb
                                 Featured
                             </Badge>
                         )}
+                        {product.inventoryItem && product.inventoryItem.isLowStock && <Badge variant="warning">Low Stock</Badge>}
                         {product.isMarketplaceProduct && <Badge variant="secondary">Community Provided</Badge>}
                     </div>
 

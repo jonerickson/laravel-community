@@ -84,7 +84,8 @@ export default function Product({ product: productData, reviews }: ProductProps)
                                 : '$0.00'
                         }
                     />
-                    <div className="flex items-center gap-4">
+
+                    <div className="-mt-2 flex items-center gap-4">
                         <StarRating rating={productData.averageRating || 0} showValue={true} />
                         <Deferred fallback={<div className="text-sm text-primary">Loading reviews...</div>} data="reviews">
                             <StoreProductRatingDialog product={productData} reviews={reviews} />
@@ -92,7 +93,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
                     </div>
 
                     {productData.inventoryItem?.trackInventory && (
-                        <div className="mt-4 flex items-center gap-2">
+                        <div className="mt-2 flex items-center gap-2">
                             <Package className="h-4 w-4 text-muted-foreground" />
                             {!productData.inventoryItem.isOutOfStock && productData.inventoryItem.quantityAvailable > 0 ? (
                                 <Badge variant="outline" className="border-success text-success">

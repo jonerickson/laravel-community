@@ -1,4 +1,4 @@
-import DashboardBlogGrid from '@/components/dashboard-blog-grid';
+import BlogIndexItem from '@/components/blog-index-item';
 import DashboardProductGrid from '@/components/dashboard-product-grid';
 import { EmptyState } from '@/components/empty-state';
 import Loading from '@/components/loading';
@@ -89,7 +89,11 @@ export default function Dashboard({
 
                         <Deferred fallback={<Loading variant="grid" cols={4} />} data={'latestBlogPosts'}>
                             {latestBlogPosts && latestBlogPosts.length > 0 ? (
-                                <DashboardBlogGrid posts={latestBlogPosts} />
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                                    {latestBlogPosts.map((post) => (
+                                        <BlogIndexItem key={post.id} post={post} />
+                                    ))}
+                                </div>
                             ) : (
                                 <EmptyState
                                     title="No recent blog posts"

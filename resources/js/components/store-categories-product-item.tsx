@@ -52,9 +52,22 @@ export default function StoreCategoriesProductItem({ product }: { product: App.D
                     <Button className="w-full" variant="outline" asChild>
                         <Link href={route('store.products.show', { product: product.slug })}>View</Link>
                     </Button>
-                    <Button className="w-full" onClick={handleAddToCart} disabled={loading === product.id}>
+                    <Button
+                        className="w-full"
+                        onClick={handleAddToCart}
+                        disabled={
+                            loading === product.id ||
+                            (product.inventoryItem?.trackInventory && product.inventoryItem.isOutOfStock && !product.inventoryItem.allowBackorder)
+                        }
+                    >
                         {loading && <LoaderCircle className="animate-spin" />}
-                        {loading === product.id ? 'Adding...' : product.defaultPrice ? 'Add to cart' : 'Select options'}
+                        {loading === product.id
+                            ? 'Adding...'
+                            : product.defaultPrice
+                              ? product.inventoryItem?.trackInventory && product.inventoryItem.isOutOfStock && !product.inventoryItem.allowBackorder
+                                  ? 'Out of stock'
+                                  : 'Add to cart'
+                              : 'Select options'}
                     </Button>
                 </div>
             </div>
