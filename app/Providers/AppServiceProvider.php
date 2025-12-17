@@ -96,7 +96,7 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
-        if (rescue(fn () => DB::connection()->getPdo()) && Schema::hasTable('permissions')) {
+        if (rescue(fn () => DB::connection()->getPdo(), report: false) && Schema::hasTable('permissions')) {
             Permission::all()->each(function (Permission $permission): void {
                 Gate::define($permission->name, fn (?User $user = null): bool => PermissionService::hasPermissionTo($permission->name, $user));
             });
