@@ -101,6 +101,8 @@ declare namespace App.Data {
         amountApplied: number | null;
         balanceBefore: number | null;
         balanceAfter: number | null;
+        externalDiscountId: string | null;
+        externalCouponId: string | null;
         createdAt: string | null;
         updatedAt: string | null;
     };
@@ -230,6 +232,7 @@ declare namespace App.Data {
         invoiceUrl: string | null;
         invoicePdfUrl: string | null;
         externalPaymentId: string | null;
+        discounts: Array<App.Data.DiscountData> | null;
     };
     export type KnowledgeBaseArticleData = {
         id: number;
@@ -659,7 +662,7 @@ declare namespace App.Data {
 declare namespace App.Enums {
     export type AnnouncementType = 'info' | 'success' | 'warning' | 'error';
     export type BillingReason = 'manual' | 'subscription_create' | 'subscription_cycle' | 'subscription_threshold' | 'subscription_update';
-    export type DiscountType = 'gift_card' | 'promo_code' | 'manual';
+    export type DiscountType = 'cancellation' | 'gift_card' | 'promo_code' | 'manual';
     export type DiscountValueType = 'fixed' | 'percentage';
     export type FieldType = 'checkbox' | 'date' | 'datetime' | 'number' | 'radio' | 'rich_text' | 'select' | 'text' | 'textarea';
     export type FileVisibility = 'public' | 'private';
