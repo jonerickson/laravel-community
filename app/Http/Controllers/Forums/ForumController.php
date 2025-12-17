@@ -32,30 +32,30 @@ class ForumController extends Controller
         $forum->loadMissing(['category', 'parent']);
         $forum->loadCount(['followers']);
 
-        $children = $forum
-            ->children()
-            ->with(['latestTopic.author', 'latestTopic.lastPost'])
-            ->withCount(['topics', 'posts'])
-            ->get()
-            ->filter(fn (Forum $forum) => Gate::check('view', $forum))
-            ->values();
-
-        $topics = $forum
-            ->topics()
-            ->latestActivity()
-            ->with(['author', 'lastPost.author'])
-            ->withCount(['posts', 'views'])
-            ->paginate();
-
-        $filteredTopics = $topics
-            ->collect()
-            ->filter(fn (Topic $topic) => Gate::check('view', $topic))
-            ->values();
-
         return Inertia::render('forums/show', [
             'forum' => ForumData::from($forum),
-            'children' => Inertia::defer(fn (): Collection => ForumData::collect($children), 'children'),
-            'topics' => Inertia::defer(fn (): PaginatedData => PaginatedData::from(TopicData::collect($topics->setCollection($filteredTopics), PaginatedDataCollection::class)->items()), 'topics'),
+            'children' => Inertia::defer(fn (): Collection => ForumData::collect($forum
+                ->children()
+                ->with(['latestTopic.author', 'latestTopic.lastPost'])
+                ->withCount(['topics', 'posts'])
+                ->get()
+                ->filter(fn (Forum $forum) => Gate::check('view', $forum))
+                ->values()), 'children'),
+            'topics' => Inertia::defer(function () use ($forum): PaginatedData {
+                $topics = $forum
+                    ->topics()
+                    ->latestActivity()
+                    ->with(['author', 'lastPost.author'])
+                    ->withCount(['posts', 'views'])
+                    ->paginate();
+
+                $filteredTopics = $topics
+                    ->collect()
+                    ->filter(fn (Topic $topic) => Gate::check('view', $topic))
+                    ->values();
+
+                return PaginatedData::from(TopicData::collect($topics->setCollection($filteredTopics), PaginatedDataCollection::class)->items());
+            }, 'topics'),
         ]);
     }
 }

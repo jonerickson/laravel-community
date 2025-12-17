@@ -6,6 +6,7 @@ namespace App\Drivers\Payments;
 
 use App\Contracts\PaymentProcessor;
 use App\Data\CustomerData;
+use App\Data\DiscountData;
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\PriceData;
@@ -14,13 +15,14 @@ use App\Data\SubscriptionData;
 use App\Enums\OrderRefundReason;
 use App\Enums\PaymentBehavior;
 use App\Enums\ProrationBehavior;
+use App\Models\Discount;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
 use Carbon\CarbonInterface;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class NullDriver implements PaymentProcessor
 {
@@ -44,7 +46,7 @@ class NullDriver implements PaymentProcessor
         return false;
     }
 
-    public function listProducts(array $filters = []): mixed
+    public function listProducts(array $filters = []): ?Collection
     {
         return collect();
     }
@@ -69,12 +71,12 @@ class NullDriver implements PaymentProcessor
         return false;
     }
 
-    public function listPrices(Product $product, array $filters = []): mixed
+    public function listPrices(Product $product, array $filters = []): ?Collection
     {
         return collect();
     }
 
-    public function findInvoice(Order $order): ?InvoiceData
+    public function findInvoice(string $invoiceId, array $params = []): ?InvoiceData
     {
         return null;
     }
@@ -84,7 +86,7 @@ class NullDriver implements PaymentProcessor
         return null;
     }
 
-    public function listPaymentMethods(User $user): mixed
+    public function listPaymentMethods(User $user): ?Collection
     {
         return collect();
     }
@@ -119,6 +121,11 @@ class NullDriver implements PaymentProcessor
         return false;
     }
 
+    public function createCoupon(Discount $discount): ?DiscountData
+    {
+        return null;
+    }
+
     public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete, CarbonInterface|int|null $backdateStartDate = null, CarbonInterface|int|null $billingCycleAnchor = null, ?string $successUrl = null, ?string $cancelUrl = null, array $customerOptions = [], array $subscriptionOptions = []): bool|string|SubscriptionData
     {
         return false;
@@ -129,7 +136,7 @@ class NullDriver implements PaymentProcessor
         return false;
     }
 
-    public function cancelSubscription(User $user, bool $cancelNow = false): bool
+    public function cancelSubscription(User $user, bool $cancelNow = false, ?string $reason = null): bool
     {
         return false;
     }
@@ -139,20 +146,22 @@ class NullDriver implements PaymentProcessor
         return false;
     }
 
+    public function updateSubscription(User $user, array $options): ?SubscriptionData
+    {
+        return null;
+    }
+
     public function currentSubscription(User $user): ?SubscriptionData
     {
         return null;
     }
 
-    public function listSubscriptions(User $user, array $filters = []): mixed
+    public function listSubscriptions(User $user, array $filters = []): ?Collection
     {
         return collect();
     }
 
-    /**
-     * @return Collection<int, CustomerData>
-     */
-    public function listSubscribers(?Price $price = null): mixed
+    public function listSubscribers(?Price $price = null): ?Collection
     {
         return collect();
     }

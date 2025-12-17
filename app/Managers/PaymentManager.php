@@ -6,6 +6,7 @@ namespace App\Managers;
 
 use App\Contracts\PaymentProcessor;
 use App\Data\CustomerData;
+use App\Data\DiscountData;
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\PriceData;
@@ -16,13 +17,14 @@ use App\Drivers\Payments\StripeDriver;
 use App\Enums\OrderRefundReason;
 use App\Enums\PaymentBehavior;
 use App\Enums\ProrationBehavior;
+use App\Models\Discount;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
 use Carbon\CarbonInterface;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
 
@@ -53,14 +55,14 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deleteProduct($product);
     }
 
-    public function listProducts(array $filters = []): mixed
+    public function listProducts(array $filters = []): ?Collection
     {
         return $this->driver()->listProducts($filters);
     }
 
-    public function findInvoice(Order $order): ?InvoiceData
+    public function findInvoice(string $invoiceId, array $params = []): ?InvoiceData
     {
-        return $this->driver()->findInvoice($order);
+        return $this->driver()->findInvoice($invoiceId, $params);
     }
 
     public function createPrice(Price $price): ?PriceData
@@ -83,7 +85,7 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deletePrice($price);
     }
 
-    public function listPrices(Product $product, array $filters = []): mixed
+    public function listPrices(Product $product, array $filters = []): ?Collection
     {
         return $this->driver()->listPrices($product, $filters);
     }
@@ -93,7 +95,7 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->createPaymentMethod($user, $paymentMethodId);
     }
 
-    public function listPaymentMethods(User $user): mixed
+    public function listPaymentMethods(User $user): ?Collection
     {
         return $this->driver()->listPaymentMethods($user);
     }
@@ -128,6 +130,11 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->deleteCustomer($user);
     }
 
+    public function createCoupon(Discount $discount): ?DiscountData
+    {
+        return $this->driver()->createCoupon($discount);
+    }
+
     public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete, CarbonInterface|int|null $backdateStartDate = null, CarbonInterface|int|null $billingCycleAnchor = null, ?string $successUrl = null, ?string $cancelUrl = null, array $customerOptions = [], array $subscriptionOptions = []): bool|string|SubscriptionData
     {
         return $this->driver()->startSubscription($order, $chargeNow, $firstParty, $prorationBehavior, $paymentBehavior, $backdateStartDate, $billingCycleAnchor, $successUrl, $cancelUrl, $customerOptions, $subscriptionOptions);
@@ -138,14 +145,19 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->swapSubscription($user, $price, $prorationBehavior, $paymentBehavior);
     }
 
-    public function cancelSubscription(User $user, bool $cancelNow = false): bool
+    public function cancelSubscription(User $user, bool $cancelNow = false, ?string $reason = null): bool
     {
-        return $this->driver()->cancelSubscription($user, $cancelNow);
+        return $this->driver()->cancelSubscription($user, $cancelNow, $reason);
     }
 
     public function continueSubscription(User $user): bool
     {
         return $this->driver()->continueSubscription($user);
+    }
+
+    public function updateSubscription(User $user, array $options): ?SubscriptionData
+    {
+        return $this->driver()->updateSubscription($user, $options);
     }
 
     public function currentSubscription(User $user): ?SubscriptionData
@@ -158,7 +170,7 @@ class PaymentManager extends Manager implements PaymentProcessor
         return $this->driver()->listSubscriptions($user, $filters);
     }
 
-    public function listSubscribers(?Price $price = null): mixed
+    public function listSubscribers(?Price $price = null): ?Collection
     {
         return $this->driver()->listSubscribers($price);
     }

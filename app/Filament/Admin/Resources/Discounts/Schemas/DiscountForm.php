@@ -7,6 +7,7 @@ namespace App\Filament\Admin\Resources\Discounts\Schemas;
 use App\Enums\DiscountType;
 use App\Enums\DiscountValueType;
 use App\Models\Discount;
+use App\Services\DiscountService;
 use Closure;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Radio;
@@ -16,6 +17,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\RawJs;
 
@@ -48,7 +50,8 @@ class DiscountForm
                                     ->required()
                                     ->columnSpanFull()
                                     ->options(DiscountType::class)
-                                    ->default(DiscountType::PromoCode),
+                                    ->default(DiscountType::PromoCode)
+                                    ->afterStateUpdated(fn (Set $set, DiscountType $state): mixed => $set('code', app(DiscountService::class)->generateUniqueCode($state))),
                                 Radio::make('discount_type')
                                     ->live()
                                     ->label('Discount Type')
@@ -114,6 +117,7 @@ class DiscountForm
                 Group::make()
                     ->components([
                         Section::make('Details')
+                            ->visibleOn('edit')
                             ->components([
                                 TextEntry::make('created_at')
                                     ->label('Created')

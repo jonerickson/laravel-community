@@ -6,11 +6,14 @@ namespace App\Drivers\Payments;
 
 use App\Contracts\PaymentProcessor;
 use App\Data\CustomerData;
+use App\Data\DiscountData;
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\PriceData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
+use App\Enums\DiscountType;
+use App\Enums\DiscountValueType;
 use App\Enums\OrderRefundReason;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentBehavior;
@@ -19,6 +22,7 @@ use App\Enums\ProductType;
 use App\Enums\ProrationBehavior;
 use App\Enums\SubscriptionInterval;
 use App\Jobs\Stripe\UpdateCustomerInformation;
+use App\Models\Discount;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Price;
@@ -28,9 +32,9 @@ use App\Models\User;
 use Carbon\CarbonInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
@@ -40,8 +44,10 @@ use Laravel\Cashier\PaymentMethod;
 use Laravel\Cashier\Subscription;
 use Laravel\Cashier\SubscriptionBuilder;
 use Stripe\Checkout\Session;
+use Stripe\Coupon;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Exception\RateLimitException;
+use Stripe\Invoice;
 use Stripe\Stripe;
 use Stripe\StripeClient;
 
@@ -134,12 +140,9 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
-    /**
-     * @return Collection<int, ProductData>
-     */
-    public function listProducts(array $filters = []): mixed
+    public function listProducts(array $filters = []): ?Collection
     {
-        return $this->executeWithErrorHandling('listProducts', function () use ($filters): array|\Illuminate\Contracts\Pagination\CursorPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Support\Enumerable|\Spatie\LaravelData\CursorPaginatedDataCollection|\Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection {
+        return $this->executeWithErrorHandling('listProducts', function () use ($filters): Collection {
             $query = Product::query()->whereNotNull('external_product_id');
 
             if (isset($filters['limit'])) {
@@ -147,7 +150,7 @@ class StripeDriver implements PaymentProcessor
             }
 
             return ProductData::collect($query->get());
-        }, collect());
+        });
     }
 
     public function createPrice(Price $price): ?PriceData
@@ -243,10 +246,7 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
-    /**
-     * @return Collection<int, PriceData>
-     */
-    public function listPrices(Product $product, array $filters = []): mixed
+    public function listPrices(Product $product, array $filters = []): ?Collection
     {
         return $this->executeWithErrorHandling('listPrices', function () use ($product, $filters): Collection {
             if (! $product->external_product_id) {
@@ -303,25 +303,19 @@ class StripeDriver implements PaymentProcessor
             });
 
             return new Collection($prices->all());
-        }, collect());
+        });
     }
 
-    public function findInvoice(Order $order): ?InvoiceData
+    public function findInvoice(string $invoiceId, array $params = []): ?InvoiceData
     {
-        return $this->executeWithErrorHandling('findInvoice', function () use ($order): ?InvoiceData {
-            if (blank($invoiceId = $order->external_invoice_id)) {
+        return $this->executeWithErrorHandling('findInvoice', function () use ($invoiceId, $params): ?InvoiceData {
+            $invoice = $this->stripe->invoices->retrieve($invoiceId, $params);
+
+            if (! $invoice instanceof Invoice) {
                 return null;
             }
 
-            $invoice = $this->stripe->invoices->retrieve($invoiceId);
-
-            return InvoiceData::from([
-                'id' => $invoice->id,
-                'amount' => $invoice->total,
-                'invoice_url' => $invoice->hosted_invoice_url,
-                'invoice_pdf_url' => $invoice->invoice_pdf,
-                'external_payment_id' => $invoice->payments->data[0]->id ?? null,
-            ]);
+            return InvoiceData::from($invoice);
         });
     }
 
@@ -330,17 +324,14 @@ class StripeDriver implements PaymentProcessor
         return $this->executeWithErrorHandling('createPaymentMethod', fn (): PaymentMethodData => PaymentMethodData::from($user->addPaymentMethod($paymentMethodId)));
     }
 
-    /**
-     * @return Collection<int, PaymentMethodData>
-     */
-    public function listPaymentMethods(User $user): mixed
+    public function listPaymentMethods(User $user): ?Collection
     {
-        return $this->executeWithErrorHandling('listPaymentMethods', fn (): array|\Illuminate\Contracts\Pagination\CursorPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Support\Enumerable|\Spatie\LaravelData\CursorPaginatedDataCollection|\Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection => PaymentMethodData::collect($user->paymentMethods()), collect());
+        return $this->executeWithErrorHandling('listPaymentMethods', fn (): Collection => PaymentMethodData::collect($user->paymentMethods()));
     }
 
     public function updatePaymentMethod(User $user, string $paymentMethodId, bool $isDefault): ?PaymentMethodData
     {
-        return $this->executeWithErrorHandling('updatePaymentMethod', function () use ($user, $paymentMethodId, $isDefault): ?\App\Data\PaymentMethodData {
+        return $this->executeWithErrorHandling('updatePaymentMethod', function () use ($user, $paymentMethodId, $isDefault): ?PaymentMethodData {
             if (! ($paymentMethod = $user->findPaymentMethod($paymentMethodId)) instanceof PaymentMethod) {
                 return null;
             }
@@ -383,14 +374,7 @@ class StripeDriver implements PaymentProcessor
                 return null;
             }
 
-            return CustomerData::from([
-                'id' => $customer->id,
-                'email' => $customer->email,
-                'name' => $customer->name,
-                'phone' => $customer->phone,
-                'currency' => $customer->currency,
-                'metadata' => $customer->metadata->toArray(),
-            ]);
+            return CustomerData::from($customer);
         });
     }
 
@@ -426,14 +410,7 @@ class StripeDriver implements PaymentProcessor
                 return null;
             }
 
-            return CustomerData::from([
-                'id' => $customer->id,
-                'email' => $customer->email,
-                'name' => $customer->name,
-                'phone' => $customer->phone,
-                'currency' => $customer->currency,
-                'metadata' => $customer->metadata->toArray(),
-            ]);
+            return CustomerData::from($customer);
         });
     }
 
@@ -452,6 +429,49 @@ class StripeDriver implements PaymentProcessor
 
             return true;
         }, false);
+    }
+
+    public function createCoupon(Discount $discount): ?DiscountData
+    {
+        return $this->executeWithErrorHandling('createCoupon', function () use ($discount): ?DiscountData {
+            $options = [
+                'name' => $discount->code,
+                'metadata' => [
+                    'discount_id' => $discount->reference_id,
+                ],
+            ];
+
+            if ($discount->discount_type === DiscountValueType::Fixed) {
+                $options['currency'] = 'usd';
+                $options['amount_off'] = $discount->pivot
+                    ? $discount->pivot->getRawOriginal('amount_applied')
+                    : $discount->value;
+            }
+
+            if ($discount->discount_type === DiscountValueType::Percentage) {
+                $options['percent_off'] = $discount->value;
+            }
+
+            if ($discount->type === DiscountType::Cancellation) {
+                $options['duration'] = 'once';
+            }
+
+            if ($discount->max_uses > 0) {
+                $options['max_redemptions'] = $discount->max_uses;
+            }
+
+            if (! is_null($discount->expires_at)) {
+                $options['redeem_by'] = $discount->expires_at->getTimestamp();
+            }
+
+            $coupon = $this->stripe->coupons->create($options);
+
+            if (! $coupon instanceof Coupon) {
+                return null;
+            }
+
+            return DiscountData::from($coupon);
+        });
     }
 
     public function startSubscription(
@@ -496,6 +516,7 @@ class StripeDriver implements PaymentProcessor
 
             $metadata = array_merge([
                 'order_id' => $order->reference_id,
+                'discount_ids' => $order->discounts->pluck('reference_id')->implode(', '),
             ], ...$order->items->map(fn (OrderItem $orderItem) => data_get($orderItem->price->product->metadata, 'metadata', []))->toArray());
 
             /** @var Subscription|Session $result */
@@ -547,7 +568,7 @@ class StripeDriver implements PaymentProcessor
                         'origin_context' => 'web',
                         'success_url' => URL::signedRoute('store.checkout.success', [
                             'order' => $order->reference_id,
-                            'redirect' => $successUrl ?? route('store.subscriptions'),
+                            'redirect' => $successUrl ?? route('store.subscriptions', ['complete' => 'true']),
                         ]),
                         'cancel_url' => URL::signedRoute('store.checkout.cancel', [
                             'order' => $order->reference_id,
@@ -603,9 +624,9 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
-    public function cancelSubscription(User $user, bool $cancelNow = false): bool
+    public function cancelSubscription(User $user, bool $cancelNow = false, ?string $reason = null): bool
     {
-        return $this->executeWithErrorHandling('cancelSubscription', function () use ($user, $cancelNow): bool {
+        return $this->executeWithErrorHandling('cancelSubscription', function () use ($user, $cancelNow, $reason): bool {
             $subscription = $user->subscription();
 
             if (blank($subscription)) {
@@ -620,6 +641,12 @@ class StripeDriver implements PaymentProcessor
                 $subscription->cancelNow();
             } else {
                 $subscription->cancel();
+            }
+
+            if (! is_null($reason)) {
+                $subscription->forceFill([
+                    'cancellation_reason' => $reason,
+                ])->save();
             }
 
             return true;
@@ -645,6 +672,25 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
+    public function updateSubscription(User $user, array $options): ?SubscriptionData
+    {
+        return $this->executeWithErrorHandling('updateSubscription', function () use ($user, $options): ?SubscriptionData {
+            $subscription = $user->subscription();
+
+            if (blank($subscription)) {
+                return null;
+            }
+
+            $result = $subscription->updateStripeSubscription($options);
+
+            if (! $result) {
+                return null;
+            }
+
+            return $this->currentSubscription($user);
+        });
+    }
+
     public function currentSubscription(User $user): ?SubscriptionData
     {
         return $this->executeWithErrorHandling('currentSubscription', function () use ($user): ?SubscriptionData {
@@ -660,12 +706,9 @@ class StripeDriver implements PaymentProcessor
         });
     }
 
-    /**
-     * @return Collection<int, SubscriptionData>
-     */
-    public function listSubscriptions(?User $user = null, array $filters = []): mixed
+    public function listSubscriptions(?User $user = null, array $filters = []): ?Collection
     {
-        return $this->executeWithErrorHandling('listSubscriptions', function () use ($user, $filters): array|\Illuminate\Contracts\Pagination\CursorPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Support\Enumerable|\Spatie\LaravelData\CursorPaginatedDataCollection|\Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection {
+        return $this->executeWithErrorHandling('listSubscriptions', function () use ($user, $filters): Collection {
             $subscriptions = $user instanceof User ? $user->subscriptions() : SubscriptionModel::query()
                 ->with('user')
                 ->latest();
@@ -679,13 +722,10 @@ class StripeDriver implements PaymentProcessor
             }
 
             return SubscriptionData::collect($subscriptions->get());
-        }, collect());
+        });
     }
 
-    /**
-     * @return Collection<int, CustomerData>
-     */
-    public function listSubscribers(?Price $price = null): mixed
+    public function listSubscribers(?Price $price = null): ?Collection
     {
         return $this->executeWithErrorHandling('listSubscribers', fn (): mixed => User::whereHas('subscriptions')
             ->when($price && filled($price->external_price_id), fn (Builder $query) => $query->whereRelation('subscriptions', 'stripe_price', '=', $price->external_price_id))
@@ -731,6 +771,7 @@ class StripeDriver implements PaymentProcessor
 
             $metadata = array_merge([
                 'order_id' => $order->reference_id,
+                'discount_ids' => $order->discounts->pluck('reference_id')->implode(', '),
             ], ...$order->items
                 ->map(fn (OrderItem $orderItem) => data_get($orderItem->price->product->metadata, 'metadata', []))
                 ->toArray());
@@ -738,24 +779,17 @@ class StripeDriver implements PaymentProcessor
             $discounts = [];
             if (! $disallowDiscountCodes && $order->discounts->isNotEmpty()) {
                 foreach ($order->discounts as $discount) {
-                    $couponParams = [
-                        'name' => $discount->code,
-                        'metadata' => [
-                            'order_id' => $order->reference_id,
-                            'discount_id' => $discount->id,
-                        ],
-                    ];
+                    $coupon = $this->createCoupon($discount);
 
-                    if ($discount->discount_type->value === 'percentage') {
-                        $couponParams['percent_off'] = $discount->value;
-                    } else {
-                        $couponParams['amount_off'] = $discount->pivot->getRawOriginal('amount_applied');
-                        $couponParams['currency'] = 'usd';
+                    if (! $coupon instanceof DiscountData) {
+                        continue;
                     }
 
-                    $stripeCoupon = $this->stripe->coupons->create($couponParams);
+                    if (! $externalCouponId = $coupon->externalCouponId) {
+                        continue;
+                    }
 
-                    $discounts[] = ['coupon' => $stripeCoupon->id];
+                    $discounts[] = ['coupon' => $externalCouponId];
                 }
             }
 

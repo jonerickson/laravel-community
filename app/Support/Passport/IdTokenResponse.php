@@ -24,7 +24,9 @@ class IdTokenResponse extends BearerTokenResponse
 
     public function __construct()
     {
-        $this->privateKey = new CryptKey('file://'.Passport::keyPath('oauth-private.key'), null, Passport::$validateKeyPermissions);
+        if (file_exists(Passport::keyPath('oauth-private.key'))) {
+            $this->privateKey = new CryptKey('file://'.Passport::keyPath('oauth-private.key'), null, Passport::$validateKeyPermissions);
+        }
     }
 
     #[Override]

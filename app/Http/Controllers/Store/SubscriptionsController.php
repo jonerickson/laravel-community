@@ -14,9 +14,11 @@ use App\Http\Requests\Store\SubscriptionCancelRequest;
 use App\Http\Requests\Store\SubscriptionCheckoutRequest;
 use App\Http\Requests\Store\SubscriptionUpdateRequest;
 use App\Managers\PaymentManager;
+use App\Models\Discount;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\CacheService;
+use App\Services\DiscountService;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
@@ -33,6 +35,7 @@ class SubscriptionsController extends Controller
     public function __construct(
         private readonly PaymentManager $paymentManager,
         private readonly CacheService $cache,
+        private readonly DiscountService $discountService,
         #[CurrentUser]
         private readonly ?User $user = null,
     ) {
@@ -57,15 +60,18 @@ class SubscriptionsController extends Controller
             return [$product['id'] => $reviews->items()];
         });
 
+        $currentSubscription = $this->user instanceof User
+            ? $this->paymentManager->currentSubscription($this->user)
+            : null;
+
         return Inertia::render('store/subscriptions', [
             'subscriptionProducts' => $subscriptions,
             'subscriptionReviews' => $subscriptionReviews,
-            'currentSubscription' => $this->user instanceof User
-                ? $this->paymentManager->currentSubscription($this->user)
-                : null,
+            'currentSubscription' => $currentSubscription,
             'portalUrl' => $this->user instanceof User
                 ? $this->paymentManager->getBillingPortalUrl($this->user)
                 : null,
+            'offerAvailable' => $this->user instanceof User && $currentSubscription instanceof SubscriptionData && $this->discountService->cancellationOfferIsAvailable($this->user, $currentSubscription),
         ]);
     }
 
@@ -105,17 +111,48 @@ class SubscriptionsController extends Controller
 
     public function update(SubscriptionUpdateRequest $request): RedirectResponse
     {
-        $price = $request->getPrice();
+        /** @var RedirectResponse $response */
+        $response = value(match ($request->validated('action')) {
+            'continue' => function () use ($request) {
+                $price = $request->getPrice();
 
-        $this->authorize('view', $price->product);
+                $this->authorize('view', $price->product);
 
-        $success = $this->paymentManager->continueSubscription($this->user);
+                $success = $this->paymentManager->continueSubscription($this->user);
 
-        if ($success) {
-            return back()->with('message', 'Your subscription has resumed successfully.');
-        }
+                if ($success) {
+                    return back()->with('message', 'Your subscription has resumed successfully.');
+                }
 
-        return back()->with('message', 'We were unable to resume your subscription. Please try again later.');
+                return back()->with('message', 'We were unable to resume your subscription. Please try again later.');
+            },
+            'offer' => function () {
+                $discount = tap($this->discountService->createCancellationOffer(
+                    user: $this->user,
+                ), function (Discount $discount): void {
+                    $coupon = $this->paymentManager->createCoupon($discount);
+
+                    $discount->update([
+                        'external_coupon_id' => $coupon->externalCouponId,
+                    ]);
+                });
+
+                if (! $discount instanceof Discount) {
+                    return back()->with('message', 'We were unable to apply your exclusive offer. Please try again later.');
+                }
+
+                $this->paymentManager->updateSubscription($this->user, [
+                    'discounts' => [
+                        ['coupon' => $discount->external_coupon_id],
+                    ],
+                    'proration_behavior' => ProrationBehavior::None->value,
+                ]);
+
+                return back()->with('message', 'Your offer has been successfully applied. Any open invoices will be automatically charged at the normal billing cycle date.');
+            }
+        });
+
+        return $response;
     }
 
     public function destroy(SubscriptionCancelRequest $request): RedirectResponse
@@ -128,7 +165,8 @@ class SubscriptionsController extends Controller
 
         $success = $this->paymentManager->cancelSubscription(
             user: $this->user,
-            cancelNow: $immediate
+            cancelNow: $immediate,
+            reason: $request->validated('reason'),
         );
 
         if (! $success) {

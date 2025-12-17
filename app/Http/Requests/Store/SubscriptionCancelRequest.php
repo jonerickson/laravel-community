@@ -24,6 +24,7 @@ class SubscriptionCancelRequest extends FormRequest
         return [
             'price_id' => ['required', 'integer', 'exists:prices,id'],
             'immediate' => ['boolean'],
+            'reason' => ['required', 'string', 'max:500'],
         ];
     }
 

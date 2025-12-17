@@ -8,7 +8,8 @@
         "format": "prettier --write resources/",
         "format:check": "prettier --check resources/",
         "lint": "eslint . --fix",
-        "types": "tsc --noEmit"
+        "types": "tsc --noEmit",
+        "types:version": "tsc --version"
     },
     "dependencies": {
         "react": "^19.0.0",
@@ -75,6 +76,7 @@
         "prettier-plugin-blade": "2.1.21",
         "prettier-plugin-organize-imports": "^4.1.0",
         "prettier-plugin-tailwindcss": "^0.6.11",
+        "react-confetti": "6.4.0",
         "sonner": "2.0.7",
         "tailwind-merge": "^3.0.1",
         "tailwindcss": "4.1.12",

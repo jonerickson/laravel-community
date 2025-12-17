@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Data\Normalizers\Stripe;
+namespace App\Data\Normalizers\Cashier;
 
 use App\Models\User;
 use Laravel\Cashier\PaymentMethod;
@@ -23,11 +23,11 @@ class PaymentMethodNormalizer implements Normalizer
                 'type' => $paymentMethod->type,
                 'brand' => $paymentMethod->card->brand ?? null,
                 'last4' => $paymentMethod->card->last4 ?? null,
-                'exp_month' => $paymentMethod->card->exp_month ?? null,
-                'exp_year' => $paymentMethod->card->exp_year ?? null,
-                'holder_name' => $paymentMethod->billing_details->name ?? null,
-                'email' => $value->billing_details->email ?? null,
-                'is_default' => $user?->defaultPaymentMethod()?->id === $paymentMethod->id,
+                'expMonth' => $paymentMethod->card->exp_month ?? null,
+                'expYear' => $paymentMethod->card->exp_year ?? null,
+                'holderName' => $paymentMethod->billing_details->name ?? null,
+                'holderEmail' => $paymentMethod->billing_details->email ?? null,
+                'isDefault' => $user?->defaultPaymentMethod()?->id === $paymentMethod->id,
             ];
         }
 

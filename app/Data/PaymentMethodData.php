@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use App\Data\Normalizers\Cashier\PaymentMethodNormalizer;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
@@ -37,5 +38,13 @@ class PaymentMethodData extends Data
         $this->last4 ??= '0000';
         $this->expMonth ??= '0';
         $this->expYear ??= '0';
+    }
+
+    public static function normalizers(): array
+    {
+        return [
+            PaymentMethodNormalizer::class,
+            ...config('data.normalizers'),
+        ];
     }
 }

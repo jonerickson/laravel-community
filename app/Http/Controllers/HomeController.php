@@ -18,18 +18,14 @@ class HomeController
     public function __invoke(): Response
     {
         return Inertia::render('home', [
-            'subscriptions' => Inertia::defer(fn (): Collection => ProductData::collect($this->getSubscriptions())),
+            'subscriptions' => Inertia::defer(fn (): Collection => ProductData::collect(Product::query()
+                ->visible()
+                ->subscriptions()
+                ->with(['prices' => fn (HasMany|Price $query) => $query->recurring()->active()->visible()])
+                ->ordered()
+                ->get()
+                ->filter(fn (Product $product) => Gate::check('view', $product))
+            )),
         ]);
-    }
-
-    protected function getSubscriptions()
-    {
-        return Product::query()
-            ->visible()
-            ->subscriptions()
-            ->with(['prices' => fn (HasMany|Price $query) => $query->recurring()->active()->visible()])
-            ->ordered()
-            ->get()
-            ->filter(fn (Product $product) => Gate::check('view', $product));
     }
 }

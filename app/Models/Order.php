@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\BillingReason;
 use App\Enums\OrderStatus;
 use App\Events\OrderSaved;
 use App\Managers\PaymentManager;
@@ -28,6 +29,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property string $reference_id
  * @property int $user_id
  * @property OrderStatus $status
+ * @property BillingReason|null $billing_reason
  * @property float|null $amount_due
  * @property float|null $amount_overpaid
  * @property float|null $amount_paid
@@ -76,6 +78,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @method static Builder<static>|Order whereAmountOverpaid($value)
  * @method static Builder<static>|Order whereAmountPaid($value)
  * @method static Builder<static>|Order whereAmountRemaining($value)
+ * @method static Builder<static>|Order whereBillingReason($value)
  * @method static Builder<static>|Order whereCreatedAt($value)
  * @method static Builder<static>|Order whereExternalCheckoutId($value)
  * @method static Builder<static>|Order whereExternalEventId($value)
@@ -108,6 +111,7 @@ class Order extends Model implements HasLabel
     protected $fillable = [
         'user_id',
         'status',
+        'billing_reason',
         'amount_due',
         'amount_overpaid',
         'amount_paid',
@@ -162,7 +166,7 @@ class Order extends Model implements HasLabel
     public function discounts(): BelongsToMany
     {
         return $this->belongsToMany(Discount::class, 'orders_discounts')
-            ->withPivot('amount_applied', 'balance_before', 'balance_after')
+            ->withPivot('amount_applied', 'balance_before', 'balance_after', 'external_discount_id')
             ->withTimestamps()
             ->using(OrderDiscount::class);
     }
@@ -174,20 +178,6 @@ class Order extends Model implements HasLabel
             (new OrderItem)->price(),
             (new Price)->subscriptions()
         );
-    }
-
-    public function amount(): Attribute
-    {
-        return Attribute::get(function ($value, array $attributes): int|float {
-            if (isset($attributes['amount_paid'])) {
-                return $attributes['amount_paid'] / 100;
-            }
-
-            $subtotal = $this->amount_subtotal;
-            $discountAmount = $this->discounts->sum('pivot.amount_applied');
-
-            return $subtotal - $discountAmount;
-        })->shouldCache();
     }
 
     public function checkoutUrl(): Attribute
@@ -219,6 +209,20 @@ class Order extends Model implements HasLabel
     {
         return Attribute::get(fn (): float => (float) $this->items->sum('commission_amount'))
             ->shouldCache();
+    }
+
+    public function amount(): Attribute
+    {
+        return Attribute::get(function ($value, array $attributes): int|float {
+            if (isset($attributes['amount_paid'])) {
+                return $attributes['amount_paid'] / 100;
+            }
+
+            $subtotal = $this->amount_subtotal;
+            $discountAmount = $this->discounts->sum('pivot.amount_applied');
+
+            return $subtotal - $discountAmount;
+        })->shouldCache();
     }
 
     public function amountSubtotal(): Attribute
@@ -297,6 +301,7 @@ class Order extends Model implements HasLabel
     {
         return [
             'status' => OrderStatus::class,
+            'billing_reason' => BillingReason::class,
             'amount_due' => 'integer',
             'amount_overpaid' => 'integer',
             'amount_paid' => 'integer',

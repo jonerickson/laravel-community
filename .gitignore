@@ -7,6 +7,7 @@
 /public/js
 /public/css
 /public/fonts
+/public/vendor
 /resources/js/actions
 /resources/js/routes
 /resources/js/wayfinder
@@ -26,6 +27,7 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
+.log
 /auth.json
 /.fleet
 /.idea

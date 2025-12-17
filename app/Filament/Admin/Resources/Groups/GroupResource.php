@@ -99,6 +99,7 @@ class GroupResource extends Resource
                 GroupSchema::make()
                     ->components([
                         Section::make('Details')
+                            ->visibleOn('edit')
                             ->components([
                                 TextEntry::make('created_at')
                                     ->label('Created')

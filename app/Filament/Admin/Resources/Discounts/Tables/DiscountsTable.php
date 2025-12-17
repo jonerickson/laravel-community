@@ -38,14 +38,7 @@ class DiscountsTable
                     ->badge()
                     ->sortable(),
                 TextColumn::make('value')
-                    ->formatStateUsing(function ($record): string {
-                        if ($record->discount_type === DiscountValueType::Percentage) {
-                            return $record->value.'%';
-                        }
-
-                        return Number::currency($record->value);
-                    })
-                    ->sortable(),
+                    ->formatStateUsing(fn (Discount $record) => $record->value_label),
                 TextColumn::make('current_balance')
                     ->placeholder('—')
                     ->label('Balance')

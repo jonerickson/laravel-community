@@ -57,6 +57,12 @@ class SwapAction extends Action
 
             $subscribers = $paymentManager->listSubscribers($record);
 
+            if (is_null($subscribers)) {
+                $action->failure();
+
+                return;
+            }
+
             if ($subscribers->isEmpty()) {
                 $action->failureNotificationTitle('There are no active subscriptions for the selected price.');
                 $action->failure();

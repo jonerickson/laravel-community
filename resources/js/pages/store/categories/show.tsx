@@ -93,7 +93,7 @@ export default function StoreCategoryShow({ category, products }: StoreCategoryS
                                 <Link key={subcategory.id} href={route('store.categories.show', { category: subcategory.slug })}>
                                     <Card>
                                         <CardContent className="p-4">
-                                            <div className="flex items-start gap-3">
+                                            <div className="flex items-center gap-3">
                                                 <div className="flex size-10 flex-shrink-0 items-center justify-center rounded-lg bg-muted">
                                                     {subcategory.featuredImageUrl ? (
                                                         <img

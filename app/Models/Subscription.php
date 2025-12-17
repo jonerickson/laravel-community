@@ -18,6 +18,7 @@ use Laravel\Cashier\Subscription as BaseSubscription;
  * @property int|null $quantity
  * @property \Illuminate\Support\Carbon|null $trial_ends_at
  * @property \Illuminate\Support\Carbon|null $ends_at
+ * @property string|null $cancellation_reason
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Cashier\SubscriptionItem> $items
@@ -43,6 +44,7 @@ use Laravel\Cashier\Subscription as BaseSubscription;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription pastDue()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription recurring()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereCancellationReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereEndsAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereId($value)

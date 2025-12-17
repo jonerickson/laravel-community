@@ -28,7 +28,7 @@ class EnsureDefaultPaymentMethod
         if (! $defaultPaymentMethod) {
             $paymentMethods = $this->paymentManager->listPaymentMethods($order->user);
 
-            if ($paymentMethods->isNotEmpty()) {
+            if (! is_null($paymentMethods) && $paymentMethods->isNotEmpty()) {
                 /** @var PaymentMethodData $paymentMethod */
                 $paymentMethod = $paymentMethods->first();
 

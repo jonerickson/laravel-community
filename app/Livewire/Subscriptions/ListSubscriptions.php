@@ -40,7 +40,7 @@ class ListSubscriptions extends Component implements HasActions, HasSchemas, Has
         $this->user = $record;
 
         if ($this->user instanceof User) {
-            $this->records = app(PaymentManager::class)->listSubscriptions($this->user)->toArray();
+            $this->records = app(PaymentManager::class)->listSubscriptions($this->user)->toArray() ?? [];
         }
     }
 

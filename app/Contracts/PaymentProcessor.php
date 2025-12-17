@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Contracts;
 
 use App\Data\CustomerData;
+use App\Data\DiscountData;
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\PriceData;
@@ -13,13 +14,14 @@ use App\Data\SubscriptionData;
 use App\Enums\OrderRefundReason;
 use App\Enums\PaymentBehavior;
 use App\Enums\ProrationBehavior;
+use App\Models\Discount;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
 use Carbon\CarbonInterface;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 interface PaymentProcessor
 {
@@ -31,10 +33,7 @@ interface PaymentProcessor
 
     public function deleteProduct(Product $product): bool;
 
-    /**
-     * @return Collection<int, ProductData>
-     */
-    public function listProducts(array $filters = []): mixed;
+    public function listProducts(array $filters = []): ?Collection;
 
     public function createPrice(Price $price): ?PriceData;
 
@@ -44,19 +43,13 @@ interface PaymentProcessor
 
     public function deletePrice(Price $price): bool;
 
-    /**
-     * @return Collection<int, PriceData>
-     */
-    public function listPrices(Product $product, array $filters = []): mixed;
+    public function listPrices(Product $product, array $filters = []): ?Collection;
 
-    public function findInvoice(Order $order): ?InvoiceData;
+    public function findInvoice(string $invoiceId, array $params = []): ?InvoiceData;
 
     public function createPaymentMethod(User $user, string $paymentMethodId): ?PaymentMethodData;
 
-    /**
-     * @return Collection<int, PaymentMethodData>
-     */
-    public function listPaymentMethods(User $user): mixed;
+    public function listPaymentMethods(User $user): ?Collection;
 
     public function updatePaymentMethod(User $user, string $paymentMethodId, bool $isDefault): ?PaymentMethodData;
 
@@ -70,25 +63,23 @@ interface PaymentProcessor
 
     public function deleteCustomer(User $user): bool;
 
+    public function createCoupon(Discount $discount): ?DiscountData;
+
     public function startSubscription(Order $order, bool $chargeNow = true, bool $firstParty = true, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete, CarbonInterface|int|null $backdateStartDate = null, CarbonInterface|int|null $billingCycleAnchor = null, ?string $successUrl = null, ?string $cancelUrl = null, array $customerOptions = [], array $subscriptionOptions = []): bool|string|SubscriptionData;
 
     public function swapSubscription(User $user, Price $price, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete): bool|SubscriptionData;
 
-    public function cancelSubscription(User $user, bool $cancelNow = false): bool;
+    public function cancelSubscription(User $user, bool $cancelNow = false, ?string $reason = null): bool;
 
     public function continueSubscription(User $user): bool;
 
+    public function updateSubscription(User $user, array $options): ?SubscriptionData;
+
     public function currentSubscription(User $user): ?SubscriptionData;
 
-    /**
-     * @return Collection<int, SubscriptionData>
-     */
-    public function listSubscriptions(User $user, array $filters = []): mixed;
+    public function listSubscriptions(User $user, array $filters = []): ?Collection;
 
-    /**
-     * @return Collection<int, CustomerData>
-     */
-    public function listSubscribers(?Price $price = null): mixed;
+    public function listSubscribers(?Price $price = null): ?Collection;
 
     public function getCheckoutUrl(Order $order): bool|string;
 

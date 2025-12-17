@@ -35,11 +35,15 @@ class OrderInfolist
                             ->label('Updated')
                             ->since()
                             ->dateTimeTooltip(),
-                        TextEntry::make('user.name')
-                            ->url(fn (Order $record): string => UserResource::getUrl('edit', ['record' => $record->user_id]))
-                            ->label('User'),
                         TextEntry::make('status')
                             ->badge(),
+                        TextEntry::make('billing_reason')
+                            ->label('Billing Reason')
+                            ->badge(),
+                        TextEntry::make('user.name')
+                            ->url(fn (Order $record): string => UserResource::getUrl('edit', ['record' => $record->user_id]))
+                            ->columnStart(1)
+                            ->label('User'),
                     ]),
                 Section::make('Totals')
                     ->columnSpanFull()

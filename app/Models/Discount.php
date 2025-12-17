@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 
 /**
@@ -32,6 +33,7 @@ use Illuminate\Support\Str;
  * @property int|null $max_uses
  * @property int $times_used
  * @property float|null $min_order_amount
+ * @property string|null $external_coupon_id
  * @property array<array-key, mixed>|null $metadata
  * @property \Illuminate\Support\Carbon|null $expires_at
  * @property \Illuminate\Support\Carbon|null $activated_at
@@ -49,6 +51,7 @@ use Illuminate\Support\Str;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Order> $orders
  * @property-read int|null $orders_count
  * @property-read Product|null $product
+ * @property-read mixed $value_label
  *
  * @method static Builder<static>|Discount active()
  * @method static Builder<static>|Discount byCode(string $code)
@@ -66,6 +69,7 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|Discount whereCurrentBalance($value)
  * @method static Builder<static>|Discount whereDiscountType($value)
  * @method static Builder<static>|Discount whereExpiresAt($value)
+ * @method static Builder<static>|Discount whereExternalCouponId($value)
  * @method static Builder<static>|Discount whereId($value)
  * @method static Builder<static>|Discount whereMaxUses($value)
  * @method static Builder<static>|Discount whereMetadata($value)
@@ -101,6 +105,7 @@ class Discount extends Model
         'max_uses',
         'times_used',
         'min_order_amount',
+        'external_coupon_id',
         'expires_at',
         'activated_at',
     ];
@@ -122,7 +127,7 @@ class Discount extends Model
     public function orders(): BelongsToMany
     {
         return $this->belongsToMany(Order::class, 'orders_discounts')
-            ->withPivot('amount_applied', 'balance_before', 'balance_after')
+            ->withPivot('amount_applied', 'balance_before', 'balance_after', 'external_discount_id')
             ->withTimestamps()
             ->using(OrderDiscount::class);
     }
@@ -163,28 +168,13 @@ class Discount extends Model
         return Attribute::get(fn (): bool => $this->is_valid);
     }
 
-    public function calculateDiscount(int $orderTotal): int
+    public function generateCode(?DiscountType $type = null): string
     {
-        if (! $this->is_valid) {
-            return 0;
-        }
-
-        if (filled($this->min_order_amount) && $orderTotal < $this->getRawOriginal('min_order_amount')) {
-            return 0;
-        }
-
-        return match ($this->discount_type) {
-            DiscountValueType::Fixed => $this->calculateFixedDiscount($orderTotal),
-            DiscountValueType::Percentage => $this->calculatePercentageDiscount($orderTotal),
-        };
-    }
-
-    public function generateCode(): string
-    {
-        $prefix = match ($this->type) {
+        $prefix = match ($type ?? $this->type) {
             DiscountType::GiftCard => 'GIFT',
             DiscountType::PromoCode => 'PROMO',
             DiscountType::Manual => 'MANUAL',
+            DiscountType::Cancellation => 'CANCELLATION-OFFER',
         };
 
         return Str::upper($prefix.'-'.Str::random(4).'-'.Str::random(4).'-'.Str::random(4).'-'.Str::random(4));
@@ -237,6 +227,14 @@ class Discount extends Model
         $this->attributes['value'] = (int) $value * 100;
     }
 
+    public function valueLabel(): Attribute
+    {
+        return Attribute::get(fn () => match ($this->discount_type) {
+            DiscountValueType::Percentage => Number::percentage($this->value),
+            DiscountValueType::Fixed => Number::currency($this->value),
+        });
+    }
+
     public function currentBalance(): Attribute
     {
         return Attribute::make(
@@ -251,22 +249,6 @@ class Discount extends Model
             get: fn (?int $value): ?float => filled($value) ? (float) $value / 100 : null,
             set: fn (?float $value): ?int => filled($value) ? (int) ($value * 100) : null,
         );
-    }
-
-    protected function calculateFixedDiscount(int $orderTotal): int
-    {
-        if ($this->type === DiscountType::GiftCard) {
-            return min($this->getRawOriginal('current_balance') ?? 0, $orderTotal);
-        }
-
-        return min($this->value, $orderTotal);
-    }
-
-    protected function calculatePercentageDiscount(int $orderTotal): int
-    {
-        $discount = (int) round($orderTotal * ($this->value / 100));
-
-        return min($discount, $orderTotal);
     }
 
     protected function casts(): array

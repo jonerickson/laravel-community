@@ -8,12 +8,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { cn, currency } from '@/lib/utils';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { AlertCircle, Check, ChevronDown, Crown, LoaderCircle, Package, RefreshCw, Rocket, Shield, Star, Users, X, Zap } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
+import ReactConfetti from 'react-confetti';
 import SharedData = App.Data.SharedData;
 
 interface SubscriptionsProps {
@@ -21,6 +22,7 @@ interface SubscriptionsProps {
     subscriptionReviews: Record<number, App.Data.CommentData[]>;
     currentSubscription: App.Data.SubscriptionData | null;
     portalUrl?: string | null;
+    offerAvailable: boolean;
 }
 
 const getIconForPlan = (plan: App.Data.ProductData): React.ElementType => {
@@ -339,18 +341,58 @@ function PricingCard({
     );
 }
 
-export default function Subscriptions({ subscriptionProducts, subscriptionReviews, currentSubscription, portalUrl }: SubscriptionsProps) {
+export default function Subscriptions({
+    subscriptionProducts,
+    subscriptionReviews,
+    currentSubscription,
+    portalUrl,
+    offerAvailable,
+}: SubscriptionsProps) {
     const { name: siteName, logoUrl } = usePage<SharedData>().props;
     const [billingCycle, setBillingCycle] = useState<App.Enums.SubscriptionInterval>('month');
+    const [showConfetti, setShowConfetti] = useState(false);
+    const [confettiPieces, setConfettiPieces] = useState(200);
     const [policiesAgreed, setPoliciesAgreed] = useState<Record<number, boolean>>({});
     const [expandedCards, setExpandedCards] = useState<Record<number, boolean>>({});
     const [processingPriceId, setProcessingPriceId] = useState<number | null>(null);
     const [cancellingPriceId, setCancellingPriceId] = useState<number | null>(null);
     const [continuingPriceId, setContinuingPriceId] = useState<number | null>(null);
+    const [showCancelReasonDialog, setShowCancelReasonDialog] = useState(false);
+    const [showExclusiveOfferDialog, setShowExclusiveOfferDialog] = useState(false);
     const [showCancelDialog, setShowCancelDialog] = useState(false);
     const [pendingCancelPriceId, setPendingCancelPriceId] = useState<number | null>(null);
+    const [cancellationReason, setCancellationReason] = useState('');
     const [showChangeDialog, setShowChangeDialog] = useState(false);
     const [pendingChangePlan, setPendingChangePlan] = useState<{ planId: number; priceId: number; planName: string } | null>(null);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('complete') === 'true') {
+            setShowConfetti(true);
+            setConfettiPieces(200);
+
+            const fadeTimer = setTimeout(() => {
+                setConfettiPieces(0);
+            }, 3500);
+
+            const cleanupTimer = setTimeout(() => {
+                setShowConfetti(false);
+                router.get(
+                    route('store.subscriptions'),
+                    {},
+                    {
+                        preserveState: true,
+                        preserveScroll: true,
+                    },
+                );
+            }, 7500);
+
+            return () => {
+                clearTimeout(fadeTimer);
+                clearTimeout(cleanupTimer);
+            };
+        }
+    }, []);
 
     const { post: subscribeToPrice, transform: transformSubscribe } = useForm({
         price_id: 0,
@@ -362,10 +404,15 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
     });
 
     const { put: continueSubscription, transform: transformContinue } = useForm({
+        action: 'continue',
         price_id: 0,
     });
 
-    const availableIntervals = Object.values(['day', 'week', 'month', 'year']).filter((cycle) => {
+    const { put: acceptCancellationOffer, processing: offerProcessing } = useForm({
+        action: 'offer',
+    });
+
+    const availableIntervals = (['day', 'week', 'month', 'year'] as const).filter((cycle) => {
         return subscriptionProducts.some((plan) => plan.prices.some((price: App.Data.PriceData) => price.interval === cycle));
     });
 
@@ -378,7 +425,6 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
 
     const handleSubscribe = (planId: number | null, priceId: number | null) => {
         if (!priceId || !planId) {
-            toast.error('No pricing available for this billing cycle.');
             return;
         }
 
@@ -419,6 +465,31 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
 
     const handleCancel = (priceId: number) => {
         setPendingCancelPriceId(priceId);
+        setCancellationReason('');
+        setShowCancelReasonDialog(true);
+    };
+
+    const handleReasonSubmit = () => {
+        setShowCancelReasonDialog(false);
+
+        if (offerAvailable && currentSubscription?.status && ['active', 'past_due'].includes(currentSubscription.status)) {
+            setShowExclusiveOfferDialog(true);
+        } else {
+            setShowCancelDialog(true);
+        }
+    };
+
+    const handleAcceptOffer = async () => {
+        acceptCancellationOffer(route('store.subscriptions.update'), {
+            onFinish: () => {
+                setShowExclusiveOfferDialog(false);
+                setShowCancelReasonDialog(false);
+            },
+        });
+    };
+
+    const handleRejectOffer = () => {
+        setShowExclusiveOfferDialog(false);
         setShowCancelDialog(true);
     };
 
@@ -432,12 +503,14 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
             ...data,
             price_id: pendingCancelPriceId,
             immediate,
+            reason: cancellationReason,
         }));
 
         cancelSubscription(route('store.subscriptions.destroy'), {
             onFinish: () => {
                 setCancellingPriceId(null);
                 setPendingCancelPriceId(null);
+                setCancellationReason('');
             },
         });
     };
@@ -478,12 +551,21 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                 <Heading title="Choose your plan" description="Select the perfect subscription plan for your needs. Upgrade or downgrade anytime." />
             </div>
 
+            <ReactConfetti run={showConfetti} numberOfPieces={confettiPieces} recycle={confettiPieces > 0} />
+
             {subscriptionProducts.length > 0 ? (
                 <div className="z-20 -mt-4 flex flex-col gap-6">
                     {availableIntervals.length > 1 && (
                         <div className="flex justify-center pb-4">
                             <Tabs value={billingCycle} onValueChange={(value) => setBillingCycle(value as App.Enums.SubscriptionInterval)}>
-                                <TabsList className={`grid w-full max-w-2xl grid-cols-${availableIntervals.length}`}>
+                                <TabsList
+                                    className={cn(
+                                        'grid w-full max-w-2xl',
+                                        availableIntervals.length === 2 && 'grid-cols-2',
+                                        availableIntervals.length === 3 && 'grid-cols-3',
+                                        availableIntervals.length === 4 && 'grid-cols-4',
+                                    )}
+                                >
                                     {availableIntervals.map((interval) => (
                                         <TabsTrigger key={interval} value={interval} className="relative">
                                             {interval.charAt(0).toUpperCase() + interval.slice(1)}
@@ -581,6 +663,90 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                 </div>
             )}
 
+            <Dialog open={showCancelReasonDialog} onOpenChange={setShowCancelReasonDialog}>
+                <DialogContent className="mx-4 max-w-lg">
+                    <DialogHeader>
+                        <DialogTitle>Before you go...</DialogTitle>
+                        <DialogDescription className="text-sm">
+                            We're sorry to see you go. Please help us improve by telling us why you're cancelling.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <Textarea
+                            placeholder="Tell us why you're cancelling..."
+                            value={cancellationReason}
+                            onChange={(e) => setCancellationReason(e.target.value)}
+                            className="min-h-[100px]"
+                            maxLength={500}
+                            required
+                        />
+                        <p className="text-right text-xs text-muted-foreground">{cancellationReason.length}/500</p>
+                    </div>
+                    <DialogFooter>
+                        <div className="flex w-full flex-col gap-2">
+                            <Button onClick={handleReasonSubmit} className="w-full" disabled={!cancellationReason.trim()}>
+                                Continue
+                            </Button>
+                            <Button variant="ghost" onClick={() => setShowCancelReasonDialog(false)} className="w-full">
+                                Keep subscription
+                            </Button>
+                        </div>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={showExclusiveOfferDialog} onOpenChange={setShowExclusiveOfferDialog}>
+                <DialogContent className="mx-4 max-w-lg">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">Exclusive offer just for you!</DialogTitle>
+                        <DialogDescription className="text-sm">Before you cancel, we'd like to offer you something special.</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="rounded-lg border-2 border-success bg-success/10 p-6 text-center">
+                            <h3 className="mb-2 text-2xl font-bold text-success">Get 20% Off!</h3>
+                            <p className="text-sm text-muted-foreground">
+                                As a valued customer, we want to give you 20% off your next renewal. No strings attached.
+                            </p>
+                        </div>
+                        <div className="space-y-2 text-sm text-muted-foreground">
+                            <div className="flex items-start gap-2">
+                                <Check className="mt-0.5 size-4 flex-shrink-0 text-success" />
+                                <span>Your next billing cycle will be 20% off</span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                                <Check className="mt-0.5 size-4 flex-shrink-0 text-success" />
+                                <span>Your card on file will be charged</span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                                <Check className="mt-0.5 size-4 flex-shrink-0 text-success" />
+                                <span>Cancel anytime if you're still not satisfied</span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                                <Check className="mt-0.5 size-4 flex-shrink-0 text-success" />
+                                <span>This offer is only valid now</span>
+                            </div>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <div className="flex w-full flex-col gap-2">
+                            <Button onClick={handleAcceptOffer} disabled={offerProcessing} className="w-full">
+                                {offerProcessing ? (
+                                    <>
+                                        <LoaderCircle className="animate-spin" />
+                                        Applying offer...
+                                    </>
+                                ) : (
+                                    <>Claim my offer</>
+                                )}
+                            </Button>
+                            <Button variant="ghost" onClick={handleRejectOffer} disabled={offerProcessing} className="w-full">
+                                No thanks, continue cancelling
+                            </Button>
+                        </div>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
             <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
                 <DialogContent className="mx-4 max-w-lg">
                     <DialogHeader>
@@ -610,14 +776,14 @@ export default function Subscriptions({ subscriptionProducts, subscriptionReview
                     </div>
                     <DialogFooter>
                         <div className="flex w-full flex-col gap-2">
-                            <Button variant="outline" onClick={() => setShowCancelDialog(false)} className="w-full">
-                                Keep subscription
-                            </Button>
                             <Button variant="secondary" onClick={() => confirmCancel(false)} className="w-full">
                                 Cancel at end of cycle
                             </Button>
                             <Button variant="destructive" onClick={() => confirmCancel(true)} className="w-full">
                                 Cancel immediately
+                            </Button>
+                            <Button variant="ghost" onClick={() => setShowCancelDialog(false)} className="w-full">
+                                Keep subscription
                             </Button>
                         </div>
                     </DialogFooter>
