@@ -38,7 +38,7 @@ class MarkDamagedAction extends Action
         ]);
         $this->action(function (InventoryItem $record, array $data, Action $action): void {
             $service = app(InventoryService::class);
-            $service->markDamaged($record, $data['quantity'], $data['reason']);
+            $service->markDamaged($record, (int) $data['quantity'], $data['reason']);
 
             $action->success();
         });
