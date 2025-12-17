@@ -30,6 +30,7 @@ use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
 
@@ -40,6 +41,7 @@ class OrdersTable
         return $table
             ->columns([
                 IconColumn::make('billing_reason')
+                    ->tooltip(fn (BillingReason $state): string|Htmlable|null => $state->getLabel())
                     ->label(''),
                 TextColumn::make('reference_id')
                     ->label('Order Number')

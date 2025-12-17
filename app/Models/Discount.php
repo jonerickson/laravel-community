@@ -168,28 +168,13 @@ class Discount extends Model
         return Attribute::get(fn (): bool => $this->is_valid);
     }
 
-    public function calculateDiscount(int $orderTotal): int
+    public function generateCode(?DiscountType $type = null): string
     {
-        if (! $this->is_valid) {
-            return 0;
-        }
-
-        if (filled($this->min_order_amount) && $orderTotal < $this->getRawOriginal('min_order_amount')) {
-            return 0;
-        }
-
-        return match ($this->discount_type) {
-            DiscountValueType::Fixed => $this->calculateFixedDiscount($orderTotal),
-            DiscountValueType::Percentage => $this->calculatePercentageDiscount($orderTotal),
-        };
-    }
-
-    public function generateCode(): string
-    {
-        $prefix = match ($this->type) {
+        $prefix = match ($type ?? $this->type) {
             DiscountType::GiftCard => 'GIFT',
             DiscountType::PromoCode => 'PROMO',
             DiscountType::Manual => 'MANUAL',
+            DiscountType::Cancellation => 'CANCELLATION-OFFER',
         };
 
         return Str::upper($prefix.'-'.Str::random(4).'-'.Str::random(4).'-'.Str::random(4).'-'.Str::random(4));
@@ -264,22 +249,6 @@ class Discount extends Model
             get: fn (?int $value): ?float => filled($value) ? (float) $value / 100 : null,
             set: fn (?float $value): ?int => filled($value) ? (int) ($value * 100) : null,
         );
-    }
-
-    protected function calculateFixedDiscount(int $orderTotal): int
-    {
-        if ($this->type === DiscountType::GiftCard) {
-            return min($this->getRawOriginal('current_balance') ?? 0, $orderTotal);
-        }
-
-        return min($this->value, $orderTotal);
-    }
-
-    protected function calculatePercentageDiscount(int $orderTotal): int
-    {
-        $discount = (int) round($orderTotal * ($this->value / 100));
-
-        return min($discount, $orderTotal);
     }
 
     protected function casts(): array

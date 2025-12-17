@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Settings;
 
 use App\Data\DiscountData;
+use App\Enums\DiscountType;
 use App\Http\Controllers\Controller;
 use App\Models\Discount;
 use App\Models\User;
@@ -27,6 +28,7 @@ class DiscountController extends Controller
         return Inertia::render('settings/discounts', [
             'discounts' => Inertia::defer(fn (): Collection => DiscountData::collect(Discount::query()
                 ->whereBelongsTo($this->user, 'customer')
+                ->where('type', '<>', DiscountType::Cancellation)
                 ->latest()
                 ->get())),
         ]);

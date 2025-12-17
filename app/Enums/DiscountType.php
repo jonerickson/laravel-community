@@ -55,4 +55,12 @@ enum DiscountType: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::Manual => 'A manual discount created by an administrator for a specific order.',
         };
     }
+
+    public function canBeUsedAtCheckout(): bool
+    {
+        return match ($this) {
+            self::Cancellation, self::Manual => false,
+            default => true,
+        };
+    }
 }

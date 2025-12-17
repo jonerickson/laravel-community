@@ -12,7 +12,6 @@ use App\Models\Discount;
 use App\Models\Order;
 use App\Models\User;
 use DateTime;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Random\RandomException;
@@ -40,58 +39,30 @@ class DiscountService
         return $discount;
     }
 
-    public function calculateOrderDiscounts(Order $order, array $discountCodes): Collection
-    {
-        $orderTotal = $order->amount;
-        $discounts = collect();
-        $remainingTotal = $orderTotal;
-
-        foreach ($discountCodes as $code) {
-            $discount = $this->validateDiscount($code);
-
-            if (blank($discount)) {
-                continue;
-            }
-
-            $discountAmount = $discount->calculateDiscount($remainingTotal);
-
-            if ($discountAmount > 0) {
-                $discounts->push([
-                    'discount' => $discount,
-                    'amount' => $discountAmount,
-                ]);
-
-                $remainingTotal -= $discountAmount;
-            }
-
-            if ($remainingTotal <= 0) {
-                break;
-            }
-        }
-
-        return $discounts;
-    }
-
     /**
      * @throws Throwable
      */
-    public function applyDiscountsToOrder(Order $order, array $discounts): int
+    public function applyDiscountsToOrder(Order $order, array $discounts): float
     {
-        return DB::transaction(function () use ($order, $discounts): int|float {
+        return DB::transaction(function () use ($order, $discounts): float {
             $order->load(['items', 'discounts']);
-            $orderTotal = (int) ($order->amount * 100);
+            $orderTotal = (int) ($order->amount_subtotal * 100);
             $remainingTotal = $orderTotal;
             $totalDiscount = 0;
 
             /** @var Discount $discount */
             foreach ($discounts as $discount) {
-                $discountAmount = $discount->calculateDiscount($remainingTotal);
+                $discountAmount = $this->calculateDiscount($order, $discount);
 
                 if ($discountAmount > 0) {
                     $order->discounts()->attach($discount->id, [
-                        'amount_applied' => $discountAmount / 100,
-                        'balance_before' => $discount->type === DiscountType::GiftCard ? $discount->getRawOriginal('current_balance') / 100 : null,
-                        'balance_after' => $discount->type === DiscountType::GiftCard ? (max(0, $discount->getRawOriginal('current_balance') - $discountAmount)) / 100 : null,
+                        'amount_applied' => $discountAmount,
+                        'balance_before' => $discount->type === DiscountType::GiftCard
+                            ? $discount->current_balance
+                            : null,
+                        'balance_after' => $discount->type === DiscountType::GiftCard
+                            ? max(0, $discount->current_balance - $discountAmount)
+                            : null,
                     ]);
 
                     $totalDiscount += $discountAmount;
@@ -103,7 +74,7 @@ class DiscountService
                 }
             }
 
-            return $totalDiscount;
+            return (float) $totalDiscount;
         });
     }
 
@@ -124,7 +95,7 @@ class DiscountService
     public function createPromoCode(?string $code = null, int $value = 100, DiscountValueType $discountType = DiscountValueType::Percentage, ?int $maxUses = null, ?int $minOrderAmount = null, ?DateTime $expiresAt = null, ?User $user = null): Discount
     {
         return Discount::create([
-            'code' => $code ? Str::upper($code) : $this->generateUniqueCode(DiscountType::PromoCode),
+            'code' => $code ? Str::upper($code) : $this->generateUniqueCode(),
             'type' => DiscountType::PromoCode,
             'discount_type' => $discountType,
             'value' => $value,
@@ -180,17 +151,10 @@ class DiscountService
         return (bool) random_int(0, 1);
     }
 
-    public function generateUniqueCode(DiscountType $type = DiscountType::PromoCode, int $attempts = 5, ?string $prefix = null): string
+    public function generateUniqueCode(DiscountType $type = DiscountType::PromoCode, int $attempts = 5): string
     {
         for ($i = 0; $i < $attempts; $i++) {
-            $prefix ??= match ($type) {
-                DiscountType::Cancellation => 'CANCELLATION-OFFER',
-                DiscountType::GiftCard => 'GIFT',
-                DiscountType::PromoCode => 'PROMO',
-                DiscountType::Manual => 'MANUAL',
-            };
-
-            $code = Str::upper($prefix.'-'.Str::random(4).'-'.Str::random(4).'-'.Str::random(4));
+            $code = new Discount()->generateCode($type);
 
             if (! Discount::query()->where('code', $code)->exists()) {
                 return $code;
@@ -200,13 +164,35 @@ class DiscountService
         throw new RuntimeException('Failed to generate unique discount code after '.$attempts.' attempts.');
     }
 
-    public function getDiscountsByUser(int $userId): Collection
+    public function calculateDiscount(Order $order, Discount $discount): float
     {
-        return Discount::query()
-            ->where('user_id', $userId)
-            ->active()
-            ->withBalance()
-            ->orderBy('created_at', 'desc')
-            ->get();
+        if (! $discount->is_valid) {
+            return 0;
+        }
+
+        if (filled($discount->min_order_amount) && $order->amount_subtotal < $discount->min_order_amount) {
+            return 0;
+        }
+
+        return match ($discount->discount_type) {
+            DiscountValueType::Fixed => $this->calculateFixedDiscount($discount, $order->amount_subtotal),
+            DiscountValueType::Percentage => $this->calculatePercentageDiscount($discount, $order->amount_subtotal),
+        };
+    }
+
+    protected function calculateFixedDiscount(Discount $discount, float $orderTotal): float
+    {
+        if ($discount->type === DiscountType::GiftCard) {
+            return min($discount->current_balance, $orderTotal);
+        }
+
+        return min($discount->value, $orderTotal);
+    }
+
+    protected function calculatePercentageDiscount(Discount $discount, float $orderTotal): float
+    {
+        $discount = round($orderTotal * ($discount->value / 100));
+
+        return min($discount, $orderTotal);
     }
 }

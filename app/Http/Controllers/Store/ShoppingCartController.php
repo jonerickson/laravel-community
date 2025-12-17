@@ -26,27 +26,27 @@ class ShoppingCartController extends Controller
         $cart = $this->cartService->getCart();
         $order = $this->cartService->getOrCreatePendingOrder();
 
-        if ($order instanceof Order) {
-            $discounts = $order->discounts->map(fn ($discount): array => array_merge(
-                DiscountData::from($discount)->toArray(),
-                [
-                    'amountApplied' => $discount->pivot->amount_applied,
-                    'balanceBefore' => $discount->pivot->balance_before,
-                    'balanceAfter' => $discount->pivot->balance_after,
-                ]
-            ))->toArray();
-
-            $orderArray = OrderData::from($order)->toArray();
-            $orderArray['discounts'] = $discounts;
-            $orderData = $orderArray;
-        } else {
-            $orderData = null;
-        }
-
         return Inertia::render('store/shopping-cart', [
             'cartItems' => $cart->cartItems,
             'cartCount' => $cart->cartCount,
-            'order' => $orderData,
+            'order' => Inertia::defer(function () use ($order): ?array {
+                if (! $order instanceof Order) {
+                    return null;
+                }
+
+                $discounts = $order->discounts->map(fn ($discount): array => array_merge(
+                    DiscountData::from($discount)->toArray(),
+                    [
+                        'amountApplied' => $discount->pivot->amount_applied,
+                        'balanceBefore' => $discount->pivot->balance_before,
+                        'balanceAfter' => $discount->pivot->balance_after,
+                    ]
+                ))->toArray();
+                $data = OrderData::from($order)->toArray();
+                $data['discounts'] = $discounts;
+
+                return $data;
+            }),
         ]);
     }
 

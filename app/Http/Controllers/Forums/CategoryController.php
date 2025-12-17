@@ -62,20 +62,18 @@ class CategoryController extends Controller
     {
         $this->authorize('view', $category);
 
-        $forums = $category
-            ->forums()
-            ->with(['latestTopic.author', 'latestTopic.lastPost'])
-            ->whereNull('parent_id')
-            ->active()
-            ->ordered()
-            ->withCount(['topics', 'posts'])
-            ->get()
-            ->filter(fn (Forum $forum) => Gate::check('view', $forum))
-            ->values();
-
         return Inertia::render('forums/categories/show', [
             'category' => ForumCategoryData::from($category),
-            'forums' => Inertia::defer(fn (): Collection => ForumData::collect($forums)),
+            'forums' => Inertia::defer(fn (): Collection => ForumData::collect($category
+                ->forums()
+                ->with(['latestTopic.author', 'latestTopic.lastPost'])
+                ->whereNull('parent_id')
+                ->active()
+                ->ordered()
+                ->withCount(['topics', 'posts'])
+                ->get()
+                ->filter(fn (Forum $forum) => Gate::check('view', $forum))
+                ->values())),
         ]);
     }
 }

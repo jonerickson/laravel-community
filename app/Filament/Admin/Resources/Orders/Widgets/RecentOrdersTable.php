@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Orders\Widgets;
 
+use App\Enums\BillingReason;
 use App\Filament\Admin\Resources\Orders\Pages\ViewOrder;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Models\Order;
@@ -12,6 +13,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
+use Illuminate\Contracts\Support\Htmlable;
 
 class RecentOrdersTable extends TableWidget
 {
@@ -35,6 +37,7 @@ class RecentOrdersTable extends TableWidget
             ->deferLoading()
             ->columns([
                 IconColumn::make('billing_reason')
+                    ->tooltip(fn (BillingReason $state): Htmlable|string|null => $state->getLabel())
                     ->label(''),
                 TextColumn::make('reference_id')
                     ->sortable()

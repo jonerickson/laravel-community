@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Number;
 use RuntimeException;
 use Throwable;
 
@@ -112,6 +113,29 @@ class ShoppingCartService
     {
         if ($order->discounts()->where('discount_id', $discount->id)->exists()) {
             throw new RuntimeException('This discount has already been applied to your order.');
+        }
+
+        if (! $discount->type->canBeUsedAtCheckout()) {
+            throw new RuntimeException('The discount provided cannot be used at checkout. Please provide another discount.');
+        }
+
+        if ($product = $order->items()->with('price.product')->get()->firstWhere('price.product.allow_discount_codes', false)) {
+            throw new RuntimeException($product->name.' does not allow the use of a discount code. Please remove it from your shopping cart to use the discount code.');
+        }
+
+        if ($discount->user_id && $order->user_id !== $discount->user_id) {
+            throw new RuntimeException('The discount you provided belongs to someone else. Please make sure to use a discount code assigned to your account.');
+        }
+
+        $discountAmount = $this->discountService->calculateDiscount($order, $discount);
+
+        if ($discountAmount <= 0) {
+            $minAmount = $discount->min_order_amount;
+            if ($minAmount > 0 && $order->amount_subtotal < $minAmount) {
+                throw new RuntimeException('The order subtotal must be at least '.Number::currency($discount->min_order_amount).' to use this discount.');
+            }
+
+            throw new RuntimeException('This discount cannot be applied to your order.');
         }
 
         $this->discountService->applyDiscountsToOrder($order, [$discount]);

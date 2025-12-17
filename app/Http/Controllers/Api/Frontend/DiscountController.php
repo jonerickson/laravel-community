@@ -46,7 +46,6 @@ class DiscountController
     public function store(ApplyDiscountRequest $request): ApiResource
     {
         $code = $request->validated('code');
-        $orderTotal = $request->integer('order_total');
 
         $order = $this->cartService->getOrCreatePendingOrder();
 
@@ -64,33 +63,6 @@ class DiscountController
             return ApiResource::error(
                 message: 'Invalid or expired discount code.',
                 errors: ['code' => ['The discount code is either invalid, has inadequate funds or has expired.']],
-                status: 422
-            );
-        }
-
-        if ($product = $order->items()->with('price.product')->get()->firstWhere('price.product.allow_discount_codes', false)) {
-            return ApiResource::error(
-                message: 'Invalid or expired discount code.',
-                errors: ['code' => [$product->name.' does not allow the use of a discount code.']],
-                status: 422
-            );
-        }
-
-        $discountAmount = $discount->calculateDiscount($orderTotal);
-
-        if ($discountAmount === 0) {
-            $minAmount = $discount->getRawOriginal('min_order_amount');
-            if ($minAmount && $orderTotal < $minAmount) {
-                return ApiResource::error(
-                    message: 'Order total does not meet minimum requirement.',
-                    errors: ['code' => ['Order must be at least '.Number::currency($discount->min_order_amount).' to use this discount.']],
-                    status: 422
-                );
-            }
-
-            return ApiResource::error(
-                message: 'Discount cannot be applied.',
-                errors: ['code' => ['This discount cannot be applied to your order.']],
                 status: 422
             );
         }
@@ -115,10 +87,6 @@ class DiscountController
                 'type' => $discount->type->value,
                 'discount_type' => $discount->discount_type->value,
                 'discount_value' => $discountValue,
-                'discount_amount' => $discountAmount / 100,
-                'discount_amount_formatted' => Number::currency($discountAmount / 100),
-                'new_total' => max(0, ($orderTotal - $discountAmount) / 100),
-                'new_total_formatted' => Number::currency(max(0, $orderTotal - $discountAmount) / 100),
             ],
             message: 'The discount code was applied successfully.',
         );

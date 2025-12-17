@@ -11,7 +11,7 @@ import AppLayout from '@/layouts/app-layout';
 import { currency } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { stripCharacters } from '@/utils/truncate';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Deferred, Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { Check, ImageIcon, LoaderCircle, ShoppingCart as ShoppingCartIcon, Ticket, Trash2, XIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -23,29 +23,19 @@ interface ShoppingCartProps {
     order?: App.Data.OrderData | null;
 }
 
-interface DiscountInfo {
-    id: number;
-    code: string;
-    type: string;
-    discount_type: string;
-    discount_value: string;
-    discount_amount: number;
-    discount_amount_formatted: string;
-    new_total: number;
-    new_total_formatted: string;
-}
-
 export default function ShoppingCart({ cartItems = [], order = null }: ShoppingCartProps) {
     const { auth } = usePage<App.Data.SharedData>().props;
     const { items, setItems, updateQuantity, removeItem, proceedToCheckout, calculateTotals, loading } = useCartOperations(cartItems);
     const [policiesAgreed, setPoliciesAgreed] = useState(false);
     const [discountCode, setDiscountCode] = useState('');
-    const [appliedDiscount, setAppliedDiscount] = useState<DiscountInfo | null>(null);
+    const [appliedDiscount, setAppliedDiscount] = useState<App.Data.DiscountData | null>(
+        order?.discounts && order.discounts.length > 0 ? order.discounts[0] : null,
+    );
     const { delete: clearCartForm, processing: clearCartProcessing } = useForm();
     const { subtotal, total } = calculateTotals();
-    const finalTotal = appliedDiscount ? appliedDiscount.new_total : total;
     const { loading: validatingDiscount, execute: validateDiscount } = useApiRequest();
     const { loading: removingDiscount, execute: removeDiscountRequest } = useApiRequest();
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Store',
@@ -58,29 +48,15 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
     ];
 
     useEffect(() => {
-        if (order && order.discounts && order.discounts.length > 0) {
-            const firstDiscount = order.discounts[0];
+        const orderDiscount = order?.discounts && order.discounts.length > 0 ? order.discounts[0] : null;
+        setAppliedDiscount(orderDiscount);
 
-            const discountValue = firstDiscount.discountType === 'percentage' ? `${firstDiscount.value}%` : currency(firstDiscount.value);
-            const orderAmount = order.amount ?? total;
-
-            setAppliedDiscount({
-                id: firstDiscount.id,
-                code: firstDiscount.code,
-                type: firstDiscount.type,
-                discount_type: firstDiscount.discountType,
-                discount_value: discountValue,
-                discount_amount: firstDiscount.amountApplied ?? 0,
-                discount_amount_formatted: currency(firstDiscount.amountApplied ?? 0),
-                new_total: orderAmount,
-                new_total_formatted: currency(orderAmount),
-            });
-            setDiscountCode(firstDiscount.code);
-        } else if (order && (!order.discounts || order.discounts.length === 0)) {
-            setAppliedDiscount(null);
+        if (orderDiscount) {
+            setDiscountCode(orderDiscount.code);
+        } else {
             setDiscountCode('');
         }
-    }, [order, total]);
+    }, [order]);
 
     const clearCart = () => {
         if (!window.confirm('Are you sure you want to empty your cart? This action cannot be undone.')) {
@@ -151,10 +127,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                 },
             },
             {
-                onSuccess: (data) => {
-                    setAppliedDiscount(data as DiscountInfo);
-                    router.reload({ only: ['order'] });
-                },
+                onSuccess: () => router.reload({ only: ['order'] }),
             },
         );
     };
@@ -162,19 +135,24 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
     const handleRemoveDiscount = async () => {
         if (!appliedDiscount) return;
 
+        const discountToRemove = appliedDiscount;
+
+        setAppliedDiscount(null);
+        setDiscountCode('');
+
         await removeDiscountRequest(
             {
                 url: route('api.discount.destroy'),
                 method: 'POST',
                 data: {
-                    discount_id: appliedDiscount.id,
+                    discount_id: discountToRemove.id,
                 },
             },
             {
-                onSuccess: () => {
-                    setAppliedDiscount(null);
-                    setDiscountCode('');
-                    router.reload({ only: ['order'] });
+                onSuccess: () => router.reload({ only: ['order'] }),
+                onError: () => {
+                    setAppliedDiscount(discountToRemove);
+                    setDiscountCode(discountToRemove.code);
                 },
             },
         );
@@ -347,7 +325,13 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                                 <div className="flex items-center gap-2">
                                                     <Check className="size-4 text-green-600 dark:text-green-400" />
                                                     <span className="font-mono text-sm font-medium">{appliedDiscount.code}</span>
-                                                    <span className="text-xs text-muted-foreground">({appliedDiscount.discount_value})</span>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        (
+                                                        {appliedDiscount.discountType === 'percentage'
+                                                            ? `${appliedDiscount.value}%`
+                                                            : currency(appliedDiscount.currentBalance)}
+                                                        )
+                                                    </span>
                                                 </div>
                                                 <Button
                                                     variant="ghost"
@@ -363,7 +347,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                             <div className="flex items-center justify-between text-sm">
                                                 <span className="text-green-600 dark:text-green-400">Discount</span>
                                                 <span className="font-medium text-green-600 dark:text-green-400">
-                                                    -{appliedDiscount.discount_amount_formatted}
+                                                    -{currency(appliedDiscount.amountApplied ?? 0)}
                                                 </span>
                                             </div>
                                         </dd>
@@ -397,7 +381,9 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
 
                                 <div className="flex items-center justify-between py-3">
                                     <dt className="text-base font-medium text-muted-foreground">Order total</dt>
-                                    <dd className="text-base font-medium text-primary">{currency(finalTotal)}</dd>
+                                    <Deferred fallback={<LoaderCircle className="size-4 animate-spin text-muted-foreground" />} data={'order'}>
+                                        <dd className="text-base font-medium text-primary">{currency(order?.amount)}</dd>
+                                    </Deferred>
                                 </div>
 
                                 {policies.length > 0 && (
