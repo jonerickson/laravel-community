@@ -590,9 +590,9 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
-    public function swapSubscription(User $user, Price $price, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete): bool|SubscriptionData
+    public function swapSubscription(User $user, Price $price, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete, array $options = []): bool|SubscriptionData
     {
-        return $this->executeWithErrorHandling('swapSubscription', function () use ($user, $price, $prorationBehavior, $paymentBehavior): bool {
+        return $this->executeWithErrorHandling('swapSubscription', function () use ($user, $price, $prorationBehavior, $paymentBehavior, $options): bool {
             if (! $price->external_price_id) {
                 return false;
             }
@@ -618,7 +618,12 @@ class StripeDriver implements PaymentProcessor
                 $subscription->endTrial();
             }
 
-            $subscription->swap($price->external_price_id);
+            if ($subscription->pastDue()) {
+                $subscription->noProrate();
+                $options['billing_cycle_anchor'] = 'now';
+            }
+
+            $subscription->swap($price->external_price_id, $options);
 
             return true;
         }, false);
