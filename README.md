@@ -96,6 +96,8 @@ composer dev
 docker compose up
 ```
 
+This starts the queue workers, log viewer, and frontend build tools all at once.
+
 ### Install
 
 Optional: These commands are run when running `composer setup` for the first time but may also be manually run to reset the app environment.
@@ -107,8 +109,6 @@ php artisan migrate:fresh
 # Install the necessary data to run the app
 php artisan app:install
 ```
-
-This starts the web server, queue workers, log viewer, and frontend build tools all at once.
 
 ## 🏗️ Architecture Highlights
 

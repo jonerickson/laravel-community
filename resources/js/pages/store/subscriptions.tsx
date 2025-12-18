@@ -813,12 +813,17 @@ export default function Subscriptions({
                             </div>
                             <div className="space-y-2 rounded-md bg-info-foreground p-3">
                                 <p className="text-xs text-info">
-                                    Your billing will be prorated based on the time remaining in your current billing cycle. The change will take
-                                    effect immediately and you will be immediately billed any prorated charges.
+                                    When you change your plan, the update happens right away. You’ll be charged only for the difference between your
+                                    current plan and the new plan, based on how much time is left in your current billing period.
                                 </p>
                                 <p className="text-xs text-info">
-                                    <span className="font-bold">NOTE:</span> If you are currently on a trial, you will be charged the full amount of
-                                    the new subscription price immediately.
+                                    <span className="font-bold">Note about trials:</span> If you’re currently on a free trial, the trial will end and
+                                    you’ll be charged the full price of the new plan immediately.
+                                </p>
+                                <p className="text-xs text-info">
+                                    <span className="font-bold">Note about past-due/open invoices:</span> If you have an unpaid or past-due invoice,
+                                    it will be canceled. A new billing cycle will start, and your plan will continue once payment for the new invoice
+                                    is successful.
                                 </p>
                             </div>
                         </div>

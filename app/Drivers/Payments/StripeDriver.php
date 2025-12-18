@@ -48,6 +48,7 @@ use Stripe\Coupon;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Exception\RateLimitException;
 use Stripe\Invoice;
+use Stripe\Refund;
 use Stripe\Stripe;
 use Stripe\StripeClient;
 
@@ -579,6 +580,10 @@ class StripeDriver implements PaymentProcessor
                 )->asStripeCheckoutSession());
 
             if ($result instanceof Session) {
+                if ($result->status !== Session::STATUS_OPEN) {
+                    return false;
+                }
+
                 $order->updateQuietly([
                     'external_checkout_id' => $result->id,
                 ]);
@@ -590,9 +595,9 @@ class StripeDriver implements PaymentProcessor
         }, false);
     }
 
-    public function swapSubscription(User $user, Price $price, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete): bool|SubscriptionData
+    public function swapSubscription(User $user, Price $price, ProrationBehavior $prorationBehavior = ProrationBehavior::CreateProrations, PaymentBehavior $paymentBehavior = PaymentBehavior::DefaultIncomplete, array $options = []): bool|SubscriptionData
     {
-        return $this->executeWithErrorHandling('swapSubscription', function () use ($user, $price, $prorationBehavior, $paymentBehavior): bool {
+        return $this->executeWithErrorHandling('swapSubscription', function () use ($user, $price, $prorationBehavior, $paymentBehavior, $options): bool {
             if (! $price->external_price_id) {
                 return false;
             }
@@ -618,7 +623,25 @@ class StripeDriver implements PaymentProcessor
                 $subscription->endTrial();
             }
 
-            $subscription->swap($price->external_price_id);
+            $pastDueInvoiceId = null;
+            if ($wasPastDue = $subscription->pastDue()) {
+                $subscription->noProrate()->errorIfPaymentFails();
+                $options['billing_cycle_anchor'] = 'now';
+
+                $stripeSubscription = $subscription->asStripeSubscription(
+                    expand: ['latest_invoice']
+                );
+
+                if ($stripeSubscription->latest_invoice?->status === Invoice::STATUS_OPEN) {
+                    $pastDueInvoiceId = $stripeSubscription->latest_invoice->id;
+                }
+            }
+
+            $updatedSubscription = $subscription->swap($price->external_price_id, $options);
+
+            if (! $updatedSubscription->pastDue() && $wasPastDue && ! is_null($pastDueInvoiceId)) {
+                $this->stripe->invoices->voidInvoice($pastDueInvoiceId);
+            }
 
             return true;
         }, false);
@@ -738,14 +761,14 @@ class StripeDriver implements PaymentProcessor
         return $this->executeWithErrorHandling('getCheckoutUrl', function () use ($order) {
             $lineItems = [];
 
-            $mode = 'payment';
+            $mode = Session::MODE_PAYMENT;
             foreach ($order->items as $orderItem) {
                 if (! $priceId = $orderItem->price?->external_price_id) {
                     continue;
                 }
 
-                if ($mode !== 'subscription' && $orderItem->price->product->type === ProductType::Subscription) {
-                    $mode = 'subscription';
+                if ($mode !== Session::MODE_SUBSCRIPTION && $orderItem->price->product->type === ProductType::Subscription) {
+                    $mode = Session::MODE_SUBSCRIPTION;
                 }
 
                 $lineItems[] = [
@@ -818,7 +841,7 @@ class StripeDriver implements PaymentProcessor
                 ],
             ];
 
-            if ($mode === 'payment') {
+            if ($mode === Session::MODE_PAYMENT) {
                 $checkoutParams['invoice_creation'] = [
                     'enabled' => true,
                     'invoice_data' => [
@@ -846,6 +869,10 @@ class StripeDriver implements PaymentProcessor
             }
 
             $checkoutSession = $this->stripe->checkout->sessions->create(array_filter($checkoutParams));
+
+            if ($checkoutSession->status !== Session::STATUS_OPEN) {
+                return false;
+            }
 
             $order->updateQuietly([
                 'external_checkout_id' => $checkoutSession->id,
@@ -931,7 +958,7 @@ class StripeDriver implements PaymentProcessor
                 'refund_notes' => $notes,
             ]);
 
-            return $refund->status === 'succeeded';
+            return $refund->status === Refund::STATUS_SUCCEEDED;
         }, false);
     }
 
@@ -949,7 +976,7 @@ class StripeDriver implements PaymentProcessor
             if (filled($order->external_checkout_id)) {
                 $session = $this->stripe->checkout->sessions->retrieve($order->external_checkout_id);
 
-                if ($session->status === 'open') {
+                if ($session->status === Session::STATUS_OPEN) {
                     $this->stripe->checkout->sessions->expire($order->external_checkout_id);
                 }
             }

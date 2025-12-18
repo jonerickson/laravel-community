@@ -35,6 +35,7 @@ class InstallCommand extends Command
 
     public function handle(): int
     {
+        /** @phpstan-ignore-next-line larastan.noEnvCallsOutsideOfConfig  */
         if (env('DEVCONTAINER_SETUP')) {
             $this->input->setInteractive(false);
         }
