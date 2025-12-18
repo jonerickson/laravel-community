@@ -18,7 +18,7 @@
     "features": {
         "ghcr.io/devcontainers/features/git:1": {}
     },
-    "forwardPorts": ["laravel-community:8080", "mysql:3306", "redis:6379"],
+    "forwardPorts": [8080, 3306, 6379],
     "portsAttributes": {
         "8080": {
             "label": "Web Server"
