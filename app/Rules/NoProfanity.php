@@ -27,24 +27,36 @@ class NoProfanity implements ValidationRule
 
         $value = $this->normalize($value);
 
-        try {
-            $response = Http::timeout(5)
-                ->get('https://www.purgomalum.com/service/containsprofanity', [
-                    'text' => $value,
-                ]);
+        $chunkSize = 10000;
+        $offset = 0;
+        $length = strlen($value);
 
-            if ($response->successful()) {
-                $containsProfanity = filter_var($response->body(), FILTER_VALIDATE_BOOLEAN);
+        while ($offset < $length) {
+            $chunk = substr($value, $offset, $chunkSize);
 
-                if ($containsProfanity) {
-                    $fail('The :attribute contains inappropriate language.');
+            try {
+                $response = Http::timeout(5)
+                    ->get('https://www.purgomalum.com/service/containsprofanity', [
+                        'text' => $chunk,
+                    ]);
+
+                if ($response->successful()) {
+                    $containsProfanity = filter_var($response->body(), FILTER_VALIDATE_BOOLEAN);
+
+                    if ($containsProfanity) {
+                        $fail('The :attribute contains inappropriate language.');
+
+                        return;
+                    }
                 }
+            } catch (Exception $exception) {
+                Log::warning('Profanity check failed', [
+                    'attribute' => $attribute,
+                    'error' => $exception->getMessage(),
+                ]);
             }
-        } catch (Exception $exception) {
-            Log::warning('Profanity check failed', [
-                'attribute' => $attribute,
-                'error' => $exception->getMessage(),
-            ]);
+
+            $offset += $chunkSize;
         }
     }
 }
