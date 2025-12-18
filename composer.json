@@ -109,9 +109,11 @@
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
-            "@php artisan migrate:fresh --force",
+            "@php artisan migrate --force",
             "@php artisan passport:keys --force",
             "@php artisan boost:install -n --ansi",
+            "@php artisan google-fonts:fetch",
+            "@php artisan storage:link",
             "npm install",
             "npm run build",
             "@php artisan app:install"

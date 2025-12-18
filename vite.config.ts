@@ -10,6 +10,22 @@ export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd())
 
     return {
+        build: {
+            cssCodeSplit: true,
+            sourcemap: 'hidden',
+            rollupOptions: {
+                output: {
+                    manualChunks(id) {
+                        if (id.includes('node_modules/@tiptap/')) {
+                            return 'tiptap';
+                        }
+                        if (id.includes('node_modules/@sentry/')) {
+                            return 'sentry';
+                        }
+                    },
+                },
+            },
+        },
         plugins: [
             laravel({
                 input: [
@@ -26,12 +42,12 @@ export default defineConfig(({ mode }) => {
             ViteImageOptimizer(),
             ...(env.VITE_SENTRY_AUTH_TOKEN
                 ? [
-                    sentryVitePlugin({
-                        org: env.VITE_SENTRY_ORG,
-                        project: env.VITE_SENTRY_REACT_PROJECT,
-                        authToken: env.VITE_SENTRY_AUTH_TOKEN,
-                    }),
-                ]
+                      sentryVitePlugin({
+                          org: env.VITE_SENTRY_ORG,
+                          project: env.VITE_SENTRY_REACT_PROJECT,
+                          authToken: env.VITE_SENTRY_AUTH_TOKEN,
+                      }),
+                  ]
                 : []),
         ],
         resolve: {
@@ -39,21 +55,15 @@ export default defineConfig(({ mode }) => {
                 'ziggy-js': resolve(__dirname, 'vendor/tightenco/ziggy'),
             },
         },
-        build: {
-            cssCodeSplit: true,
-            sourcemap: 'hidden',
-            rollupOptions: {
-                output: {
-                    manualChunks(id) {
-                        if (id.includes('node_modules/@tiptap/')) {
-                            return 'tiptap';
-                        }
-                        if (id.includes('node_modules/@sentry/')) {
-                            return 'sentry';
-                        }
-                    },
-                }
-            }
+        server: {
+            cors: true,
+            hmr: {
+                host: process.env.CODESPACES
+                    ? process.env['CODESPACE_NAME'] + '-5173.' + process.env['GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN']
+                    : undefined,
+                clientPort: process.env.CODESPACES ? 443 : undefined,
+                protocol: process.env.CODESPACES ? 'wss' : undefined,
+            },
         },
-    }
+    };
 });
