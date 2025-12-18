@@ -33,7 +33,7 @@ class UpdatePostRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'content.required' => 'Post content cannot be empty.',
+            'content.required' => 'The post content cannot be empty.',
         ];
     }
 

@@ -14,6 +14,7 @@
         "ext-fileinfo": "*",
         "ext-libxml": "*",
         "ext-pcntl": "*",
+        "ext-intl": "*",
         "api-platform/laravel": "^4.2",
         "fakerphp/faker": "^1.24",
         "filament/filament": "^4.1.9",

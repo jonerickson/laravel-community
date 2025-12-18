@@ -31,10 +31,10 @@ class AddToCartRequest extends FormRequest
     {
         return [
             'price_id.exists' => 'The selected price is invalid.',
-            'quantity.required' => 'Quantity is required.',
-            'quantity.integer' => 'Quantity must be a valid number.',
-            'quantity.min' => 'Quantity must be at least 1.',
-            'quantity.max' => 'Quantity cannot exceed 99.',
+            'quantity.required' => 'A quantity is required.',
+            'quantity.integer' => 'The quantity must be a valid number.',
+            'quantity.min' => 'The quantity must be at least 1.',
+            'quantity.max' => 'The quantity cannot exceed 99.',
         ];
     }
 }

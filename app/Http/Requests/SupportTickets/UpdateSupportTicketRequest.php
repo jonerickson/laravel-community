@@ -32,9 +32,9 @@ class UpdateSupportTicketRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'action.required' => 'Action is required.',
-            'action.string' => 'Action must be a valid string.',
-            'action.in' => 'Action must be one of: close, resolve, open.',
+            'action.required' => 'An action is required.',
+            'action.string' => 'The action must be a valid string.',
+            'action.in' => 'The action must be one of: close, resolve, open.',
         ];
     }
 }

@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 
 class NoProfanity implements ValidationRule
 {
+    use NormalizeStringHelpers;
+
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (empty($value) || ! is_string($value)) {
@@ -22,6 +24,8 @@ class NoProfanity implements ValidationRule
         if (! App::isProduction() || ! App::environment('staging')) {
             return;
         }
+
+        $value = $this->normalize($value);
 
         try {
             $response = Http::timeout(5)

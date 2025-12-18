@@ -22,7 +22,7 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'name' => ['required', 'string', 'max:255', new NoProfanity, new BlacklistRule],
+            'name' => ['required', 'string', 'min:2', 'max:32', new NoProfanity, new BlacklistRule],
             'email' => ['required', 'string', 'email', 'lowercase', 'max:255', 'unique:'.User::class, new NoProfanity, new BlacklistRule],
             'password' => ['required', 'confirmed', Password::defaults()],
         ];
@@ -40,6 +40,17 @@ class RegisterRequest extends FormRequest
      * @return array<string, string>
      */
     #[Override]
+    public function attributes(): array
+    {
+        return [
+            'name' => 'username',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    #[Override]
     public function messages(): array
     {
         return [
@@ -48,7 +59,7 @@ class RegisterRequest extends FormRequest
             'email.email' => 'Please enter a valid email address.',
             'email.unique' => 'This email is already registered.',
             'password.required' => 'Please create a password.',
-            'password.confirmed' => 'Password confirmation does not match.',
+            'password.confirmed' => 'The password confirmation does not match.',
             'policy.*.required' => 'You must agree to each policy to continue.',
         ];
     }

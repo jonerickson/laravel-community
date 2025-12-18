@@ -37,12 +37,12 @@ class StoreReviewRequest extends FormRequest
     {
         return [
             'content.required' => 'Please provide a review.',
-            'content.min' => 'Review must be at least 10 characters.',
-            'content.max' => 'Review cannot exceed 1000 characters.',
+            'content.min' => 'The review must be at least 10 characters.',
+            'content.max' => 'The review cannot exceed 1,000 characters.',
             'rating.required' => 'Please provide a rating.',
-            'rating.integer' => 'Rating must be a valid number.',
-            'rating.min' => 'Rating must be at least 1 star.',
-            'rating.max' => 'Rating cannot exceed 5 stars.',
+            'rating.integer' => 'The rating must be a valid number.',
+            'rating.min' => 'The rating must be at least 1 star.',
+            'rating.max' => 'The rating cannot exceed 5 stars.',
         ];
     }
 

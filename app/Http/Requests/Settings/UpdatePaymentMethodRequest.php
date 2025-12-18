@@ -33,10 +33,10 @@ class UpdatePaymentMethodRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'method.required' => 'Payment method is required.',
-            'method.string' => 'Payment method must be a valid string.',
-            'is_default.required' => 'Default status is required.',
-            'is_default.boolean' => 'Default status must be true or false.',
+            'method.required' => 'A payment method is required.',
+            'method.string' => 'The payment method must be a valid string.',
+            'is_default.required' => 'A default status is required.',
+            'is_default.boolean' => 'The default status must be true or false.',
         ];
     }
 }
