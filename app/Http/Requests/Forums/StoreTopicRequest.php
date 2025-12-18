@@ -23,8 +23,8 @@ class StoreTopicRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:255', new NoProfanity, new BlacklistRule],
-            'content' => ['required', 'string', new NoProfanity, new BlacklistRule],
+            'title' => ['required', 'string', 'min:2', 'max:255', new NoProfanity, new BlacklistRule],
+            'content' => ['required', 'string', 'min:2', 'max:10000', new NoProfanity, new BlacklistRule],
         ];
     }
 

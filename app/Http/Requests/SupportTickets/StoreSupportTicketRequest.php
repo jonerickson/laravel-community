@@ -21,8 +21,8 @@ class StoreSupportTicketRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'subject' => ['required', 'string', 'max:255', new NoProfanity, new BlacklistRule],
-            'description' => ['required', 'string', 'max:10000', new NoProfanity, new BlacklistRule],
+            'subject' => ['required', 'string', 'min:2', 'max:255', new NoProfanity, new BlacklistRule],
+            'description' => ['required', 'string', 'min:2', 'max:10000', new NoProfanity, new BlacklistRule],
             'support_ticket_category_id' => ['required', 'exists:support_tickets_categories,id'],
             'order_id' => ['nullable', 'exists:orders,id,user_id,'.Auth::id()],
         ];

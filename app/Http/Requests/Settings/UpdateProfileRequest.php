@@ -49,8 +49,7 @@ class UpdateProfileRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Please provide your name.',
-            'name.max' => 'Your name cannot be longer than 255 characters.',
+            'name.required' => 'Please provide your username.',
             'signature.max' => 'Your signature cannot be longer than 500 characters.',
             'avatar.image' => 'The avatar must be an image file.',
             'avatar.max' => 'The avatar file size cannot exceed 2MB.',
