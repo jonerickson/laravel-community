@@ -35,13 +35,21 @@ class InstallCommand extends Command
 
     public function handle(): int
     {
+        if (env('DEVCONTAINER_SETUP')) {
+            $this->input->setInteractive(false);
+        }
+
+        if (! $this->input->isInteractive()) {
+            $this->components->info('Running in non-interactive mode.');
+        }
+
         if (! $this->confirmToProceed()) {
             return self::SUCCESS;
         }
 
         $this->components->info('Installing application...');
 
-        if (confirm('Would you like to install all the required permissions? (Recommended)') || ! $this->input->isInteractive()) {
+        if (! $this->input->isInteractive() || confirm('Would you like to install all the required permissions? (Recommended)')) {
             Schema::disableForeignKeyConstraints();
             Permission::truncate();
             Role::truncate();
@@ -51,7 +59,7 @@ class InstallCommand extends Command
             $this->call('db:seed', ['--class' => PermissionSeeder::class]);
         }
 
-        if (confirm('Would you like to install all the default member groups? (Recommended)') || ! $this->input->isInteractive()) {
+        if (! $this->input->isInteractive() || confirm('Would you like to install all the default member groups? (Recommended)')) {
             Schema::disableForeignKeyConstraints();
             Group::truncate();
             Schema::enableForeignKeyConstraints();

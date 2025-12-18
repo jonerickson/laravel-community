@@ -358,14 +358,6 @@ protected function isAccessible(User $user, ?string $path = null): bool
 - That being said, keys in an Enum should follow existing application Enum conventions.
 
 
-=== herd rules ===
-
-## Laravel Herd
-
-- The application is served by Laravel Herd and will be available at: https?://[kebab-case-project-dir].test. Use the `get-absolute-url` tool to generate URLs for the user to ensure valid URLs.
-- You must not run any commands to make the site available via HTTP(s). It is _always_ available through Laravel Herd.
-
-
 === inertia-laravel/core rules ===
 
 ## Inertia Core
