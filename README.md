@@ -59,12 +59,19 @@ Ready for production with Docker and Kubernetes support. Scale from a small comm
 
 ### Prerequisites
 
-- PHP 8.2 or higher
+- PHP 8.4 or higher
 - Node.js 22 or higher
 - Composer
-- A database (SQLite for local, MySQL/PostgreSQL for production)
+- Database Service (SQLite for local, MySQL/PostgreSQL for production)
+- Cache Service (Redis, Memcached, DynamoDB, or Local (Database, File, In-Memory))
+- Mail Service (SMTP, Sendgrid, Mailgun, SES, Postmark, Resend)
+- File Storage (Local storage or S3 for production)
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=master&repo=1018219148)
 
 ### Installation
+
+Running the setup command will install all the necessary dependencies, build the frontend assets, and guide you through an installation process that will seed the required permissions, groups and optionally create a superuser account.
 
 ```bash
 # Clone the repository
@@ -79,9 +86,26 @@ That's it! The setup command handles installation, configuration, and database s
 
 ### Running Locally
 
+Laravel Community ships with support for Docker but may also be used if you have PHP and a database installed locally, such as with using **Laravel Herd**.
+
 ```bash
-# Start the full development environment
+# Laravel Herd/Local: Start the full development environment
 composer dev
+
+# Docker: See below if using Docker
+docker compose up
+```
+
+### Install
+
+Optional: These commands are run when running `composer setup` for the first time but may also be manually run to reset the app environment.
+
+```bash
+# Reset the database
+php artisan migrate:fresh
+
+# Install the necessary data to run the app
+php artisan app:install
 ```
 
 This starts the web server, queue workers, log viewer, and frontend build tools all at once.

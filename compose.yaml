@@ -1,0 +1,107 @@
+services:
+  laravel-community:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+      args:
+        USER_ID: "${UID:-33}"
+        GROUP_ID: "${GID:-33}"
+    depends_on:
+      - mysql
+      - redis
+    ports:
+      - 8080:8080
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    volumes:
+      - ./:/var/www/html
+    environment:
+      APP_URL: ''
+      DB_CONNECTION: '${DB_CONNECTION:-mysql}'
+      DB_DATABASE: '${DB_DATABASE:-laravel-community}'
+      DB_USERNAME: '${DB_USERNAME:-root}'
+      DB_HOST: "mysql"
+      REDIS_HOST: "redis"
+      PHP_UPLOAD_MAX_FILE_SIZE: "250M"
+      PHP_OPCACHE_ENABLE: "0"
+    networks:
+      - laravel-community
+
+  mysql:
+    image: 'mysql:8.4'
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: '${DB_DATABASE:-laravel-community}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      MYSQL_EXTRA_OPTIONS: '${MYSQL_EXTRA_OPTIONS:-}'
+    volumes:
+      - 'mysql:/var/lib/mysql'
+    networks:
+      - laravel-community
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
+      retries: 3
+      timeout: 5s
+
+  redis:
+    image: 'redis:alpine'
+    ports:
+      - 6379:6379
+    volumes:
+      - 'redis:/data'
+    environment:
+      DB_HOST: "mysql"
+      REDIS_HOST: "redis"
+    networks:
+      - laravel-community
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      retries: 3
+      timeout: 5s
+
+  horizon:
+    image: serversideup/php:8.4-cli
+    depends_on:
+      - laravel-community
+      - redis
+      - mysql
+    volumes:
+      - ./:/var/www/html
+    environment:
+      DB_HOST: "mysql"
+      REDIS_HOST: "redis"
+    command: [ "php", "/var/www/html/artisan", "horizon" ]
+    stop_signal: SIGTERM
+    networks:
+      - laravel-community
+    healthcheck:
+      test: [ "CMD", "healthcheck-horizon" ]
+      start_period: 10s
+
+  scheduler:
+    image: serversideup/php:8.4-cli
+    depends_on:
+      - laravel-community
+      - mysql
+    volumes:
+      - ./:/var/www/html
+    command: [ "php", "/var/www/html/artisan", "schedule:work" ]
+    stop_signal: SIGTERM
+    networks:
+      - laravel-community
+    healthcheck:
+      test: [ "CMD", "healthcheck-schedule" ]
+      start_period: 10s
+
+networks:
+  laravel-community:
+    driver: bridge
+
+volumes:
+  mysql:
+  redis:

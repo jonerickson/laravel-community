@@ -1,0 +1,25 @@
+// https://aka.ms/devcontainer.json
+{
+    "name": "Existing Docker Compose (Extend)",
+    "dockerComposeFile": ["../compose.yaml"],
+    "service": "laravel-community",
+    "workspaceFolder": "/var/www/html",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "mikestead.dotenv",
+                "amiralizadeh9480.laravel-extra-intellisense",
+                "ryannaddy.laravel-artisan",
+                "onecentlin.laravel-blade",
+                "onecentlin.laravel5-snippets"
+            ],
+            "settings": {}
+        }
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {}
+    },
+    "forwardPorts": [8080, 3306, 6379],
+    "postStartCommand": "/var/www/html/.devcontainer/bootstrap.sh",
+    "runServices": ["laravel-community", "mysql", "redis"]
+}
