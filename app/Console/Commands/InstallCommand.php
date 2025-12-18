@@ -41,7 +41,7 @@ class InstallCommand extends Command
 
         $this->components->info('Installing application...');
 
-        if (confirm('Would you like to install all the required permissions? (Recommended)')) {
+        if (confirm('Would you like to install all the required permissions? (Recommended)') || ! $this->input->isInteractive()) {
             Schema::disableForeignKeyConstraints();
             Permission::truncate();
             Role::truncate();
@@ -51,7 +51,7 @@ class InstallCommand extends Command
             $this->call('db:seed', ['--class' => PermissionSeeder::class]);
         }
 
-        if (confirm('Would you like to install all the default member groups? (Recommended)', true)) {
+        if (confirm('Would you like to install all the default member groups? (Recommended)') || ! $this->input->isInteractive()) {
             Schema::disableForeignKeyConstraints();
             Group::truncate();
             Schema::enableForeignKeyConstraints();
@@ -60,7 +60,7 @@ class InstallCommand extends Command
             $this->call('db:seed', ['--class' => GroupSeeder::class]);
         }
 
-        if (confirm('Would you like to create a new super admin account?', true)) {
+        if ($this->input->isInteractive() && confirm('Would you like to create a new super admin account?')) {
             $name = $this->option('name') ?? text('Name', 'What is the name?');
             $email = $this->option('email') ?? text('Email', 'What is the email?');
             $password = $this->option('password') ?? password('Password', 'What is the password?');

@@ -18,13 +18,16 @@ services:
       - ./:/var/www/html
     environment:
       APP_URL: ''
+      CACHE_STORE: 'redis'
       DB_CONNECTION: '${DB_CONNECTION:-mysql}'
       DB_DATABASE: '${DB_DATABASE:-laravel-community}'
       DB_USERNAME: '${DB_USERNAME:-root}'
-      DB_HOST: "mysql"
-      REDIS_HOST: "redis"
-      PHP_UPLOAD_MAX_FILE_SIZE: "250M"
-      PHP_OPCACHE_ENABLE: "0"
+      DB_HOST: 'mysql'
+      PHP_UPLOAD_MAX_FILE_SIZE: '250M'
+      PHP_OPCACHE_ENABLE: '0'
+      QUEUE_CONNECTION: 'redis'
+      REDIS_HOST: 'redis'
+      SESSION_DRIVER: 'redis'
     networks:
       - laravel-community
 
