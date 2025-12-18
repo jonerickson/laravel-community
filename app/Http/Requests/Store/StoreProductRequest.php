@@ -32,9 +32,9 @@ class StoreProductRequest extends FormRequest
         return [
             'price_id.required' => 'Please select a price option.',
             'price_id.exists' => 'The selected price is invalid.',
-            'quantity.integer' => 'Quantity must be a valid number.',
-            'quantity.min' => 'Quantity must be at least 1.',
-            'quantity.max' => 'Quantity cannot exceed 99.',
+            'quantity.integer' => 'The quantity must be a valid number.',
+            'quantity.min' => 'The quantity must be at least 1.',
+            'quantity.max' => 'The quantity cannot exceed 99.',
         ];
     }
 }

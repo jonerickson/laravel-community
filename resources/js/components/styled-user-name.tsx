@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { truncate } from '@/utils/truncate';
 
 interface StyledUserNameProps {
     user: App.Data.UserData;
@@ -50,7 +51,7 @@ export function StyledUserName({ user, className, size = 'sm', showIcon = true }
     return (
         <span className={cn('inline-flex items-center gap-2', className)}>
             <span style={getStyle()} className="leading-none font-medium text-nowrap">
-                {user.name}
+                {truncate(user.name, 32)}
             </span>
             {icon && showIcon && (
                 <img

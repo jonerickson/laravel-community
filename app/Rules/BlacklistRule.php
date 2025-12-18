@@ -11,13 +11,17 @@ use Illuminate\Contracts\Validation\ValidationRule;
 
 class BlacklistRule implements ValidationRule
 {
-    public $message;
+    use NormalizeStringHelpers;
+
+    public string $message;
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_string($value)) {
             return;
         }
+
+        $value = $this->normalize($value);
 
         $blacklistService = app(BlacklistService::class);
 

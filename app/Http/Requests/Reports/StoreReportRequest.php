@@ -39,7 +39,7 @@ class StoreReportRequest extends FormRequest
             'reportable_type.required' => 'The content type is required.',
             'reportable_id.required' => 'The content ID is required.',
             'reason.required' => 'Please select a reason for the report.',
-            'additional_info.max' => 'Additional information cannot exceed 1000 characters.',
+            'additional_info.max' => 'The additional information cannot exceed 1,000 characters.',
         ];
     }
 }

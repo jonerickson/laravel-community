@@ -42,7 +42,7 @@ class UpdateBillingRequest extends FormRequest
             'billing_country.size' => 'The billing country must be a valid 2-character country code.',
             'billing_postal_code.max' => 'The postal code may not be greater than 20 characters.',
             'vat_id.max' => 'The VAT ID may not be greater than 50 characters.',
-            'extra_billing_information.max' => 'The additional information may not be greater than 1000 characters.',
+            'extra_billing_information.max' => 'The additional information may not be greater than 1,000 characters.',
         ];
     }
 }

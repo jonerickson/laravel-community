@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 
 class NoProfanity implements ValidationRule
 {
+    use NormalizeStringHelpers;
+
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (empty($value) || ! is_string($value)) {
@@ -23,24 +25,38 @@ class NoProfanity implements ValidationRule
             return;
         }
 
-        try {
-            $response = Http::timeout(5)
-                ->get('https://www.purgomalum.com/service/containsprofanity', [
-                    'text' => $value,
-                ]);
+        $value = $this->normalize($value);
 
-            if ($response->successful()) {
-                $containsProfanity = filter_var($response->body(), FILTER_VALIDATE_BOOLEAN);
+        $chunkSize = 10000;
+        $offset = 0;
+        $length = strlen($value);
 
-                if ($containsProfanity) {
-                    $fail('The :attribute contains inappropriate language.');
+        while ($offset < $length) {
+            $chunk = substr($value, $offset, $chunkSize);
+
+            try {
+                $response = Http::timeout(5)
+                    ->get('https://www.purgomalum.com/service/containsprofanity', [
+                        'text' => $chunk,
+                    ]);
+
+                if ($response->successful()) {
+                    $containsProfanity = filter_var($response->body(), FILTER_VALIDATE_BOOLEAN);
+
+                    if ($containsProfanity) {
+                        $fail('The :attribute contains inappropriate language.');
+
+                        return;
+                    }
                 }
+            } catch (Exception $exception) {
+                Log::warning('Profanity check failed', [
+                    'attribute' => $attribute,
+                    'error' => $exception->getMessage(),
+                ]);
             }
-        } catch (Exception $exception) {
-            Log::warning('Profanity check failed', [
-                'attribute' => $attribute,
-                'error' => $exception->getMessage(),
-            ]);
+
+            $offset += $chunkSize;
         }
     }
 }

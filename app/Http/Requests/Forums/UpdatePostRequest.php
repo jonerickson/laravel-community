@@ -22,7 +22,7 @@ class UpdatePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => ['required', 'string', new NoProfanity, new BlacklistRule],
+            'content' => ['required', 'string', 'min:2', 'max:10000', new NoProfanity, new BlacklistRule],
         ];
     }
 
@@ -33,7 +33,7 @@ class UpdatePostRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'content.required' => 'Post content cannot be empty.',
+            'content.required' => 'The post content cannot be empty.',
         ];
     }
 

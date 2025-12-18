@@ -32,8 +32,8 @@ class DestroyPaymentMethodRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'method.required' => 'Payment method is required.',
-            'method.string' => 'Payment method must be a valid string.',
+            'method.required' => 'A payment method is required.',
+            'method.string' => 'The payment method must be a valid string.',
         ];
     }
 }
