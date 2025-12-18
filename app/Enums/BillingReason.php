@@ -56,8 +56,9 @@ enum BillingReason: string implements HasColor, HasDescription, HasIcon, HasLabe
         return match ($this) {
             BillingReason::Manual => Heroicon::OutlinedCreditCard,
             BillingReason::SubscriptionCreate => Heroicon::OutlinedCalendarDays,
-            BillingReason::SubscriptionUpdate, BillingReason::SubscriptionCycle => Heroicon::OutlinedArrowPath,
+            BillingReason::SubscriptionCycle => Heroicon::OutlinedArrowPath,
             BillingReason::SubscriptionThreshold => Heroicon::OutlinedExclamationTriangle,
+            BillingReason::SubscriptionUpdate => Heroicon::OutlinedArrowsRightLeft,
         };
     }
 }
