@@ -98,7 +98,7 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
                             </div>
                         )}
 
-                        {alternativeMethods.length > 0 ? (
+                        {alternativeMethods.length > 0 && (
                             <div className="space-y-4">
                                 <h3 className="text-lg font-semibold">Digital Wallets & Alternative Methods</h3>
                                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -111,7 +111,9 @@ export default function PaymentMethods({ paymentMethods: initialPaymentMethods }
                                     ))}
                                 </div>
                             </div>
-                        ) : (
+                        )}
+
+                        {cards.length === 0 && alternativeMethods.length === 0 && (
                             <EmptyState
                                 icon={<CreditCard />}
                                 title="No payment methods"
