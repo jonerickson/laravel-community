@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Spatie\Csp\Directive;
+
 return [
 
     /*
@@ -21,6 +23,13 @@ return [
      */
     'directives' => [
         //         [Directive::FONT, [Keyword::UNSAFE_INLINE]],
+    ],
+
+    /**
+     * Additional directives that can be defined by environment
+     */
+    'additional_directives' => [
+        Directive::IMG->value => env('CSP_IMG_SRC'),
     ],
 
     /*

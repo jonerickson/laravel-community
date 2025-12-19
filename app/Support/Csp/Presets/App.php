@@ -18,8 +18,7 @@ class App implements Preset
         $s3Url = Uri::of(config('filesystems.disks.s3.url') ?? '')->host();
         $fingerprintEndpoint = Uri::of(config('services.fingerprint.endpoint') ?? '')->host();
 
-        /** @phpstan-ignore-next-line */
-        $imgSrc = explode(',', env('CSP_IMG_SRC') ?? '');
+        $imgSrc = explode(',', config('csp.additional_directives.'.Directive::IMG->value) ?? '');
 
         $policy
             ->add(Directive::BASE, Keyword::SELF)
