@@ -9,7 +9,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['domain' => config('app.url')], function (): void {
+Route::group(['domain' => parse_url(config('app.url'), PHP_URL_HOST)], function (): void {
     Route::get('/', HomeController::class)->name('home');
     Route::get('maintenance', MaintenanceController::class)->name('maintenance');
     Route::get('search', SearchController::class)->name('search');

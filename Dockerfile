@@ -11,6 +11,8 @@ RUN apt-get update \
     && apt-get install -y curl gnupg default-mysql-client \
     && rm -rf /var/lib/apt/lists/*
 
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 RUN apt-get install -y nodejs
 
@@ -30,12 +32,31 @@ USER root
 # Update the image www-data UID/GID to match host UID/GID
 RUN if [ -n "$USER_ID" ] && [ -n "$GROUP_ID" ]; then \
         docker-php-serversideup-set-id www-data $USER_ID:$GROUP_ID && \
-        docker-php-serversideup-set-file-permissions --owner $USER_ID:$GROUP_ID; \
+        docker-php-serversideup-set-file-permissions --owner $USER_ID:$GROUP_ID \
     else \
         echo "⚠ USER_ID or GROUP_ID not set, skipping permissions setup"; \
     fi
 
 USER www-data
+
+############################################
+# Devcontainer Image
+############################################
+FROM base AS devcontainer
+
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+ARG USERNAME=vscode
+
+USER root
+
+RUN addgroup --gid $GROUP_ID $USERNAME || echo "Group exists" \
+    && adduser --uid $USER_ID --gid $GROUP_ID --disabled-password --gecos "" $USERNAME \
+    && usermod -aG www-data $USERNAME
+
+RUN docker-php-serversideup-set-file-permissions --owner $USER_ID:$GROUP_ID
+
+USER $USERNAME
 
 ############################################
 # Build Image
