@@ -42,6 +42,8 @@ class ProductData extends Data
 
     public ProductApprovalStatus $approvalStatus;
 
+    public bool $isActive;
+
     public bool $isVisible;
 
     public int $trialDays;

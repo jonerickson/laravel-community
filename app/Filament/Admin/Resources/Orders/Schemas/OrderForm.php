@@ -31,6 +31,7 @@ class OrderForm
                             ->relationship('user', 'name')
                             ->required(),
                         TextInput::make('invoice_number')
+                            ->label('Invoice Number')
                             ->maxLength(255)
                             ->nullable(),
                         Select::make('status')
@@ -39,6 +40,7 @@ class OrderForm
                             ->options(OrderStatus::class)
                             ->required(),
                         Radio::make('billing_reason')
+                            ->default(BillingReason::Manual)
                             ->label('Billing Reason')
                             ->options(BillingReason::class)
                             ->required(),

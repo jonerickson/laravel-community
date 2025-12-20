@@ -9,11 +9,13 @@ use App\Enums\PaymentBehavior;
 use App\Enums\ProductType;
 use App\Enums\ProrationBehavior;
 use App\Models\Price;
+use App\Models\Product;
 use Filament\Actions\BulkAction;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Override;
 
@@ -39,7 +41,13 @@ class BulkSwapSubscriptionsAction extends BulkAction
                 ->required()
                 ->preload()
                 ->searchable()
-                ->options(fn () => Price::query()->with('product')->active()->whereRelation('product', 'type', ProductType::Subscription)->get()->mapWithKeys(fn (Price $price): array => [$price->id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())])),
+                ->options(fn () => Price::query()
+                    ->active()
+                    ->with('product')
+                    ->whereRelation('product', 'type', ProductType::Subscription)
+                    ->whereHas('product', fn (Builder|Product $query) => $query->active())
+                    ->get()
+                    ->mapWithKeys(fn (Price $price): array => [$price->id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())])),
             Radio::make('proration_behavior')
                 ->required()
                 ->label('Proration Behavior')

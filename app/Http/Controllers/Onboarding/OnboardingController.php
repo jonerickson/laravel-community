@@ -69,6 +69,7 @@ class OnboardingController extends Controller
         $subscriptions = Product::query()
             ->subscriptions()
             ->visible()
+            ->active()
             ->with(['prices' => fn (HasMany|Price $query) => $query->recurring()->active()->visible()])
             ->ordered()
             ->get()

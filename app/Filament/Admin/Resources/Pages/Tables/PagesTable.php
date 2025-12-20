@@ -67,6 +67,7 @@ class PagesTable
             ])
             ->filters([
                 TernaryFilter::make('is_published')
+                    ->default(true)
                     ->label('Published'),
                 TernaryFilter::make('show_in_navigation')
                     ->label('In Navigation'),

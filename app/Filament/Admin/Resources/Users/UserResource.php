@@ -28,6 +28,7 @@ use App\Livewire\PaymentMethods\ListPaymentMethods;
 use App\Livewire\Subscriptions\ListSubscriptions;
 use App\Models\Permission;
 use App\Models\Price;
+use App\Models\Product;
 use App\Models\Role;
 use App\Models\Subscription;
 use App\Models\User;
@@ -436,7 +437,13 @@ class UserResource extends Resource
                             ->multiple()
                             ->searchable()
                             ->preload()
-                            ->options(Price::query()->with('product')->whereRelation('product', 'type', ProductType::Subscription)->get()->mapWithKeys(fn (Price $price): array => [$price->external_price_id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())])),
+                            ->options(Price::query()
+                                ->active()
+                                ->with('product')
+                                ->whereRelation('product', 'type', ProductType::Subscription)
+                                ->whereHas('product', fn (Builder|Product $query) => $query->active())
+                                ->get()
+                                ->mapWithKeys(fn (Price $price): array => [$price->external_price_id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())])),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query
                         ->when(

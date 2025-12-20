@@ -65,6 +65,7 @@ class ForumCategoriesTable
             ])
             ->filters([
                 TernaryFilter::make('is_active')
+                    ->default()
                     ->label('Active'),
                 SelectFilter::make('groups')
                     ->relationship('groups', 'name')

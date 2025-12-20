@@ -54,6 +54,7 @@ class KnowledgeBaseCategoriesTable
             ])
             ->filters([
                 TernaryFilter::make('is_active')
+                    ->default()
                     ->label('Active'),
             ])
             ->recordActions([

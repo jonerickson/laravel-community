@@ -288,6 +288,10 @@ class ProductResource extends Resource
                                     ->label('Subscription Only')
                                     ->helperText('Only show this product on the subscriptions page - not in the store.')
                                     ->columnSpanFull(),
+                                Toggle::make('is_active')
+                                    ->label('Active')
+                                    ->helperText('Allow the product to be purchased.')
+                                    ->default(true),
                                 Toggle::make('is_visible')
                                     ->label('Visible')
                                     ->helperText('Display the product for purchase. This does not prevent it from being directly accessed.')
@@ -397,6 +401,10 @@ class ProductResource extends Resource
                     ->label('Featured')
                     ->boolean()
                     ->sortable(),
+                IconColumn::make('is_active')
+                    ->label('Active')
+                    ->boolean()
+                    ->sortable(),
                 IconColumn::make('is_visible')
                     ->label('Visible')
                     ->boolean()
@@ -432,6 +440,9 @@ class ProductResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                TernaryFilter::make('is_active')
+                    ->default()
+                    ->label('Active'),
                 SelectFilter::make('approval_status')
                     ->label('Approval Status')
                     ->options(ProductApprovalStatus::class)
@@ -445,6 +456,7 @@ class ProductResource extends Resource
                     ->options(ProductType::class)
                     ->native(false),
                 TernaryFilter::make('is_visible')
+                    ->default()
                     ->label('Visible'),
                 Filter::make('marketplace')
                     ->label('Marketplace Products')

@@ -392,10 +392,10 @@ class OrderImporter extends AbstractImporter
     protected function findPriceForProduct(Product $product, float $amount, string $currency): ?Price
     {
         $price = Price::query()
-            ->where('product_id', $product->id)
+            ->whereBelongsTo($product)
             ->where('currency', strtoupper($currency))
             ->where('amount', $amount)
-            ->where('is_active', true)
+            ->active()
             ->first();
 
         if ($price instanceof Price) {
@@ -403,9 +403,9 @@ class OrderImporter extends AbstractImporter
         }
 
         return Price::query()
-            ->where('product_id', $product->id)
-            ->where('is_active', true)
-            ->where('is_default', true)
+            ->whereBelongsTo($product)
+            ->active()
+            ->default()
             ->first();
     }
 

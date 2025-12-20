@@ -32,12 +32,12 @@ class ProductPolicy
     {
         if ($product instanceof ProductData) {
             return ($product->approvalStatus === ProductApprovalStatus::Approved)
-                && $product->isVisible
+                && $product->isActive
                 && (blank($product->categories) || collect($product->categories)->some(fn (ProductCategoryData $category) => Gate::getPolicyFor(ProductCategory::class)->view($user, $category)));
         }
 
         return $product->approval_status === ProductApprovalStatus::Approved
-            && $product->is_visible
+            && $product->is_active
             && (blank($product->categories) || $product->categories->some(fn (ProductCategory $category) => Gate::forUser($user)->check('view', $category)));
     }
 }

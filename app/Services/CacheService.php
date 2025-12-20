@@ -57,6 +57,7 @@ class CacheService
         return Cache::flexible('subscriptions.index', [60 * 60 * 24, 60 * 60 * 48], fn () => ProductData::collect(Product::query()
             ->subscriptions()
             ->visible()
+            ->active()
             ->with(['approvedReviews' => fn (MorphMany|Comment $query) => $query->latest()])
             ->with(['prices' => fn (HasMany|Price $query) => $query->recurring()->active()->visible()])
             ->with(['categories', 'policies.category', 'defaultPrice'])

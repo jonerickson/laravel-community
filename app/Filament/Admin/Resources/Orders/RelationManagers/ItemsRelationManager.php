@@ -6,6 +6,7 @@ namespace App\Filament\Admin\Resources\Orders\RelationManagers;
 
 use App\Models\Order;
 use App\Models\Price;
+use App\Models\Product;
 use BackedEnum;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -20,6 +21,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
 use Override;
@@ -49,14 +51,21 @@ class ItemsRelationManager extends RelationManager
                     ->label('Product')
                     ->required()
                     ->getSearchResultsUsing(fn (string $search): array => Price::query()
+                        ->active()
                         ->with('product')
                         ->whereRelation('product', 'name', 'like', sprintf('%%%s%%', $search))
+                        ->whereHas('product', fn (Builder|Product $query) => $query->active())
                         ->orWhere('name', 'like', sprintf('%%%s%%', $search))
                         ->limit(50)
                         ->get()
                         ->mapWithKeys(fn (Price $price): array => [$price->id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())])
                         ->toArray())
-                    ->options(fn (Get $get) => Price::query()->with('product')->active()->get()->mapWithKeys(fn (Price $price): array => [$price->id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())]))
+                    ->options(fn (Get $get) => Price::query()
+                        ->active()
+                        ->with('product')
+                        ->whereHas('product', fn (Builder|Product $query) => $query->active())
+                        ->get()
+                        ->mapWithKeys(fn (Price $price): array => [$price->id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())]))
                     ->preload()
                     ->searchable(['prices.name', 'products.name']),
                 TextInput::make('quantity')

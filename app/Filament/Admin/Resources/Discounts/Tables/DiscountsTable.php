@@ -125,6 +125,7 @@ class DiscountsTable
                     ->label('Expired Discounts')
                     ->query(fn (Builder|Discount $query): Builder => $query->expired()),
                 Filter::make('active')
+                    ->default(true)
                     ->label('Active Discounts')
                     ->query(fn (Builder|Discount $query): Builder => $query->active()),
             ])

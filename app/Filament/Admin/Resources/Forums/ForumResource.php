@@ -223,11 +223,9 @@ class ForumResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TernaryFilter::make('forums.is_active')
-                    ->label('Active')
-                    ->trueLabel('Active forums only')
-                    ->falseLabel('Inactive forums only')
-                    ->native(false),
+                TernaryFilter::make('is_active')
+                    ->default()
+                    ->label('Active'),
                 SelectFilter::make('category.name')
                     ->relationship('category', 'name')
                     ->multiple()

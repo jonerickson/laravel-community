@@ -20,6 +20,7 @@ class HomeController
         return Inertia::render('home', [
             'subscriptions' => Inertia::defer(fn (): Collection => ProductData::collect(Product::query()
                 ->visible()
+                ->active()
                 ->subscriptions()
                 ->with(['prices' => fn (HasMany|Price $query) => $query->recurring()->active()->visible()])
                 ->ordered()

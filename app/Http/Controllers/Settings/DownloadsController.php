@@ -33,6 +33,7 @@ class DownloadsController extends Controller
         $downloads = collect();
 
         $products = Product::query()
+            ->active()
             ->whereHas('orderItems', function ($query) use ($completedOrderIds): void {
                 $query->whereIn('order_id', $completedOrderIds);
             })

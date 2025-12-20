@@ -80,6 +80,7 @@ class DashboardController
             ->products()
             ->approved()
             ->visible()
+            ->active()
             ->with(['defaultPrice', 'categories', 'inventoryItem'])
             ->with(['prices' => function (Price|HasMany $query): void {
                 $query->active()->visible();
@@ -102,6 +103,7 @@ class DashboardController
             ->products()
             ->approved()
             ->visible()
+            ->active()
             ->with(['defaultPrice', 'categories', 'approvedReviews', 'inventoryItem'])
             ->with(['prices' => function (Price|HasMany $query): void {
                 $query->active()->visible();
@@ -124,6 +126,7 @@ class DashboardController
             ->products()
             ->approved()
             ->visible()
+            ->active()
             ->featured()
             ->with(['defaultPrice', 'categories', 'inventoryItem'])
             ->with(['prices' => function (Price|HasMany $query): void {

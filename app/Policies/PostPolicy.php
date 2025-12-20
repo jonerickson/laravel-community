@@ -32,13 +32,15 @@ class PostPolicy
             return Gate::forUser($user)->check('view_posts')
                 && ($post->isApproved || ($user && $post->author->id === $user->id) || Gate::forUser($user)->check('approve', Post::find($post->id)))
                 && ($post->isPublished || ($user && $post->author->id === $user->id) || Gate::forUser($user)->check('publish', Post::find($post->id)))
-                && (! $post->isReported || ($user && $post->author->id === $user->id) || Gate::forUser($user)->check('report', Post::find($post->id)));
+                && (! $post->isReported || ($user && $post->author->id === $user->id) || Gate::forUser($user)->check('report', Post::find($post->id)))
+                && (! $post->publishedAt || ! $post->publishedAt->isFuture());
         }
 
         return Gate::forUser($user)->check('view_posts')
             && ($post->is_approved || ($user && $post->isAuthoredBy($user) || Gate::forUser($user)->check('approve', $post)))
             && ($post->is_published || ($user && $post->isAuthoredBy($user) || Gate::forUser($user)->check('publish', $post)))
-            && (! $post->is_reported || ($user && $post->isAuthoredBy($user) || Gate::forUser($user)->check('report', $post)));
+            && (! $post->is_reported || ($user && $post->isAuthoredBy($user) || Gate::forUser($user)->check('report', $post)))
+            && (! $post->published_at || ! $post->published_at->isFuture());
     }
 
     public function create(?User $user): bool

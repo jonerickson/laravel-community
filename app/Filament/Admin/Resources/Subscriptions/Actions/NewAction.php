@@ -9,11 +9,13 @@ use App\Enums\ProductType;
 use App\Managers\PaymentManager;
 use App\Models\Order;
 use App\Models\Price;
+use App\Models\Product;
 use App\Models\User;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Get;
+use Illuminate\Database\Eloquent\Builder;
 use Override;
 
 class NewAction extends Action
@@ -47,7 +49,13 @@ class NewAction extends Action
                 ->required()
                 ->preload()
                 ->searchable()
-                ->options(fn (Get $get) => Price::query()->with('product')->active()->whereRelation('product', 'type', ProductType::Subscription)->get()->mapWithKeys(fn (Price $price): array => [$price->id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())])),
+                ->options(fn (Get $get) => Price::query()
+                    ->active()
+                    ->with('product')
+                    ->whereRelation('product', 'type', ProductType::Subscription)
+                    ->whereHas('product', fn (Builder|Product $query) => $query->active())
+                    ->get()
+                    ->mapWithKeys(fn (Price $price): array => [$price->id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())])),
         ]);
 
         $this->action(function (NewAction $action, array $data): void {

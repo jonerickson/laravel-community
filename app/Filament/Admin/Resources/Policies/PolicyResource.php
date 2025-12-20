@@ -165,6 +165,7 @@ class PolicyResource extends Resource
             ])
             ->filters([
                 TernaryFilter::make('is_active')
+                    ->default()
                     ->label('Active'),
                 SelectFilter::make('category')
                     ->relationship('category', 'name')

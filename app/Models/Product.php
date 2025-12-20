@@ -11,6 +11,7 @@ use App\Enums\ProductType;
 use App\Events\ProductCreated;
 use App\Events\ProductDeleted;
 use App\Events\ProductUpdated;
+use App\Traits\Activateable;
 use App\Traits\Featureable;
 use App\Traits\HasFeaturedImage;
 use App\Traits\HasFiles;
@@ -54,6 +55,7 @@ use Illuminate\Support\Str;
  * @property string|null $rejection_reason
  * @property ProductTaxCode|null $tax_code
  * @property bool $is_featured
+ * @property bool $is_active
  * @property bool $is_visible
  * @property bool $is_subscription_only
  * @property int $trial_days
@@ -103,11 +105,13 @@ use Illuminate\Support\Str;
  * @property-read User|null $seller
  * @property-read float $trending_score
  *
+ * @method static Builder<static>|Product active()
  * @method static Builder<static>|Product approved()
  * @method static \Database\Factories\ProductFactory factory($count = null, $state = [])
  * @method static Builder<static>|Product featured()
  * @method static Builder<static>|Product hidden()
  * @method static Builder<static>|Product hotTopics(?int $limit = null)
+ * @method static Builder<static>|Product inactive()
  * @method static Builder<static>|Product marketplace()
  * @method static Builder<static>|Product newModelQuery()
  * @method static Builder<static>|Product newQuery()
@@ -133,6 +137,7 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|Product whereExternalProductId($value)
  * @method static Builder<static>|Product whereFeaturedImage($value)
  * @method static Builder<static>|Product whereId($value)
+ * @method static Builder<static>|Product whereIsActive($value)
  * @method static Builder<static>|Product whereIsFeatured($value)
  * @method static Builder<static>|Product whereIsSubscriptionOnly($value)
  * @method static Builder<static>|Product whereIsVisible($value)
@@ -154,6 +159,7 @@ use Illuminate\Support\Str;
  */
 class Product extends Model implements HasLabel, Sluggable
 {
+    use Activateable;
     use Featureable;
     use HasFactory;
     use HasFeaturedImage;

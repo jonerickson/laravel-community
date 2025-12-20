@@ -35,6 +35,7 @@ class StoreController extends Controller
                 ->products()
                 ->approved()
                 ->visible()
+                ->active()
                 ->featured()
                 ->with('categories')
                 ->with(['prices' => function (Price|HasMany $query): void {
@@ -49,6 +50,7 @@ class StoreController extends Controller
                 ->products()
                 ->marketplace()
                 ->visible()
+                ->active()
                 ->approved()
                 ->with('categories')
                 ->with(['prices' => function (Price|HasMany $query): void {

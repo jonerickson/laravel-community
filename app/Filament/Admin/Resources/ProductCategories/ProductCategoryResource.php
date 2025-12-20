@@ -179,8 +179,10 @@ class ProductCategoryResource extends Resource
             ])
             ->filters([
                 TernaryFilter::make('is_active')
+                    ->default()
                     ->label('Active'),
                 TernaryFilter::make('is_visible')
+                    ->default()
                     ->label('Visible'),
             ])
             ->reorderable('order')

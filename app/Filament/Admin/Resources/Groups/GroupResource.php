@@ -216,6 +216,7 @@ class GroupResource extends Resource
             ])
             ->filters([
                 TernaryFilter::make('is_active')
+                    ->default()
                     ->label('Active'),
                 TernaryFilter::make('is_visible')
                     ->label('Visible'),

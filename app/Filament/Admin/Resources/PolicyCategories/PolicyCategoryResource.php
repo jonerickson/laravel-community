@@ -125,6 +125,7 @@ class PolicyCategoryResource extends Resource
             ])
             ->filters([
                 TernaryFilter::make('is_active')
+                    ->default()
                     ->label('Active'),
             ])
             ->recordActions([
