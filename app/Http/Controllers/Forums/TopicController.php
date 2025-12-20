@@ -11,6 +11,7 @@ use App\Data\PostData;
 use App\Data\RecentViewerData;
 use App\Data\TopicData;
 use App\Enums\PostType;
+use App\Events\TopicCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Forums\StoreTopicRequest;
 use App\Models\Forum;
@@ -24,6 +25,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -63,7 +65,8 @@ class TopicController extends Controller
         $this->authorize('view', $forum);
         $this->authorize('create', Topic::class);
 
-        $topic = DB::transaction(function () use ($request, $forum) {
+        /** @phpstan-ignore-next-line staticMethod.void */
+        $topic = DB::transaction(fn () => Event::defer(function () use ($request, $forum): Topic {
             $topic = Topic::create([
                 'title' => $request->validated('title'),
                 'forum_id' => $forum->id,
@@ -76,7 +79,7 @@ class TopicController extends Controller
             ]);
 
             return $topic;
-        });
+        }, [TopicCreated::class]));
 
         return to_route('forums.topics.show', ['forum' => $forum, 'topic' => $topic])
             ->with([

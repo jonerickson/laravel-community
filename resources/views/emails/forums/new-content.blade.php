@@ -10,7 +10,7 @@
 
 Hello {{ $recipient->name }},
 
-{{ $content->author->name }} has posted a new {{ $isNewTopic ? 'topic' : 'reply' }} in the {{ $followableType }} you're following.
+{{ $content->author->name }} has posted a new {{ $isNewTopic ? 'topic' : 'reply' }} in a {{ $followableType }} you're following.
 
 **Author:** {{ $content->author->name }}<br>
 @if($isNewTopic)

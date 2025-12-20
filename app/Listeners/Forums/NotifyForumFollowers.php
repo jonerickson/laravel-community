@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Listeners\Forums;
 
 use App\Events\TopicCreated;
-use App\Models\Follow;
+use App\Models\Forum;
 use App\Notifications\Forums\NewContentNotification;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Notification;
 
@@ -25,14 +26,29 @@ class NotifyForumFollowers
             return;
         }
 
-        $followers = $forum->follows()
-            ->with('author')
-            ->get()
+        $forums = $this->getAllForumsInHierarchy($forum);
+
+        $followers = $forums
+            ->flatMap(fn ($forum) => $forum->follows()->with('author')->get())
             ->pluck('author')
-            ->filter(fn (Follow $follower): bool => $follower->id !== $content->created_by);
+            ->unique('id')
+            ->filter(fn ($follower): bool => $follower?->id !== $content->created_by);
 
         if ($followers->isNotEmpty()) {
             Notification::sendNow($followers, new NewContentNotification($content, $forum));
         }
+    }
+
+    private function getAllForumsInHierarchy(Forum $forum): Collection
+    {
+        $forums = collect([$forum]);
+        $currentForum = $forum;
+
+        while ($currentForum->parent_id !== null) {
+            $currentForum = $currentForum->parent;
+            $forums->push($currentForum);
+        }
+
+        return $forums;
     }
 }

@@ -23,7 +23,11 @@ class NewContentMail extends Mailable implements ShouldQueue
         public Model $content,
         public Model $followable,
         public User $recipient
-    ) {}
+    ) {
+        if ($this->content instanceof Topic) {
+            $this->content->loadMissing('posts');
+        }
+    }
 
     public function envelope(): Envelope
     {
