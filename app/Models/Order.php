@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Number;
 use Override;
+use Spatie\EventSourcing\StoredEvents\Models\EloquentStoredEvent;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
@@ -178,6 +179,11 @@ class Order extends Model implements HasLabel
             (new OrderItem)->price(),
             (new Price)->subscriptions()
         );
+    }
+
+    public function storedEvents(): HasMany
+    {
+        return $this->hasMany(EloquentStoredEvent::class, 'aggregate_uuid', 'id');
     }
 
     public function checkoutUrl(): Attribute

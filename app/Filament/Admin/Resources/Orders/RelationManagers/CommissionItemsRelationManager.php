@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Orders\RelationManagers;
 
+use BackedEnum;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +16,8 @@ use Override;
 class CommissionItemsRelationManager extends RelationManager
 {
     protected static string $relationship = 'commissionItems';
+
+    protected static string|BackedEnum|null $icon = Heroicon::OutlinedDocumentCurrencyDollar;
 
     protected static ?string $title = 'Commissions';
 

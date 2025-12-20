@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\Order;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,6 +17,7 @@ class OrderFactory extends Factory
     {
         return [
             'reference_id' => $this->faker->uuid(),
+            'user_id' => User::factory(),
         ];
     }
 }

@@ -11,6 +11,7 @@ use App\Filament\Admin\Resources\Orders\Pages\ListOrders;
 use App\Filament\Admin\Resources\Orders\Pages\ViewOrder;
 use App\Filament\Admin\Resources\Orders\RelationManagers\CommissionItemsRelationManager;
 use App\Filament\Admin\Resources\Orders\RelationManagers\DiscountsRelationManager;
+use App\Filament\Admin\Resources\Orders\RelationManagers\HistoryRelationManager;
 use App\Filament\Admin\Resources\Orders\RelationManagers\ItemsRelationManager;
 use App\Filament\Admin\Resources\Orders\Schemas\OrderForm;
 use App\Filament\Admin\Resources\Orders\Schemas\OrderInfolist;
@@ -56,9 +57,10 @@ class OrderResource extends Resource
     {
         return [
             ItemsRelationManager::make(),
-            DiscountsRelationManager::make(),
-            NotesRelationManager::make(),
             CommissionItemsRelationManager::make(),
+            DiscountsRelationManager::make(),
+            HistoryRelationManager::make(),
+            NotesRelationManager::make(),
         ];
     }
 
