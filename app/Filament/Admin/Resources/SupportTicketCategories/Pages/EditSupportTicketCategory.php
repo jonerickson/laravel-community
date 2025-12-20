@@ -9,6 +9,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
+use Override;
 
 class EditSupportTicketCategory extends EditRecord
 {

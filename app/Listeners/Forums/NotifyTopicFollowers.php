@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Listeners\Forums;
 
 use App\Events\PostCreated;
+use App\Models\Follow;
 use App\Notifications\Forums\NewContentNotification;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Notification;
@@ -28,7 +29,7 @@ class NotifyTopicFollowers
             ->with('author')
             ->get()
             ->pluck('author')
-            ->filter(fn ($follower): bool => $follower->id !== $post->created_by);
+            ->filter(fn (Follow $follower): bool => $follower->id !== $post->created_by);
 
         if ($followers->isNotEmpty()) {
             Notification::sendNow($followers, new NewContentNotification($post, $topic));
