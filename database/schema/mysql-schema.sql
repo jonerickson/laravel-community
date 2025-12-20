@@ -146,6 +146,7 @@ CREATE TABLE `discounts` (
   `max_uses` int unsigned DEFAULT NULL,
   `times_used` int unsigned NOT NULL DEFAULT '0',
   `min_order_amount` int unsigned DEFAULT NULL,
+  `external_coupon_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `metadata` json DEFAULT NULL,
   `expires_at` timestamp NULL DEFAULT NULL,
   `activated_at` timestamp NULL DEFAULT NULL,
@@ -308,6 +309,9 @@ DROP TABLE IF EXISTS `forums_categories_groups`;
 CREATE TABLE `forums_categories_groups` (
   `category_id` bigint unsigned NOT NULL,
   `group_id` bigint unsigned NOT NULL,
+  `read` tinyint(1) NOT NULL DEFAULT '1',
+  `write` tinyint(1) NOT NULL DEFAULT '1',
+  `delete` tinyint(1) NOT NULL DEFAULT '1',
   KEY `forums_categories_groups_category_id_foreign` (`category_id`),
   KEY `forums_categories_groups_group_id_foreign` (`group_id`),
   CONSTRAINT `forums_categories_groups_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `forums_categories` (`id`) ON DELETE CASCADE,
@@ -320,6 +324,9 @@ DROP TABLE IF EXISTS `forums_groups`;
 CREATE TABLE `forums_groups` (
   `forum_id` bigint unsigned NOT NULL,
   `group_id` bigint unsigned NOT NULL,
+  `read` tinyint(1) NOT NULL DEFAULT '1',
+  `write` tinyint(1) NOT NULL DEFAULT '1',
+  `delete` tinyint(1) NOT NULL DEFAULT '1',
   KEY `forums_groups_forum_id_foreign` (`forum_id`),
   KEY `forums_groups_group_id_foreign` (`group_id`),
   CONSTRAINT `forums_groups_forum_id_foreign` FOREIGN KEY (`forum_id`) REFERENCES `forums` (`id`) ON DELETE CASCADE,
@@ -335,10 +342,11 @@ CREATE TABLE `groups` (
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `color` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#6b7280',
-  `style` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'solid',
-  `icon` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `style` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'solid',
+  `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `order` int NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `is_visible` tinyint(1) NOT NULL DEFAULT '1',
   `is_default_guest` tinyint(1) NOT NULL DEFAULT '0',
   `is_default_member` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -381,7 +389,7 @@ DROP TABLE IF EXISTS `inventory_alerts`;
 CREATE TABLE `inventory_alerts` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `inventory_item_id` bigint unsigned NOT NULL,
-  `alert_type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `alert_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `threshold_value` int DEFAULT NULL,
   `current_value` int DEFAULT NULL,
   `is_resolved` tinyint(1) NOT NULL DEFAULT '0',
@@ -403,13 +411,13 @@ DROP TABLE IF EXISTS `inventory_items`;
 CREATE TABLE `inventory_items` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `product_id` bigint unsigned NOT NULL,
-  `sku` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sku` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `quantity_available` int NOT NULL DEFAULT '0',
   `quantity_reserved` int NOT NULL DEFAULT '0',
   `quantity_damaged` int NOT NULL DEFAULT '0',
   `reorder_point` int DEFAULT NULL,
   `reorder_quantity` int DEFAULT NULL,
-  `warehouse_location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `warehouse_location` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `track_inventory` tinyint(1) NOT NULL DEFAULT '1',
   `allow_backorder` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -429,7 +437,7 @@ CREATE TABLE `inventory_reservations` (
   `inventory_item_id` bigint unsigned NOT NULL,
   `order_id` bigint unsigned DEFAULT NULL,
   `quantity` int NOT NULL,
-  `status` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
   `expires_at` timestamp NULL DEFAULT NULL,
   `fulfilled_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -448,14 +456,14 @@ DROP TABLE IF EXISTS `inventory_transactions`;
 CREATE TABLE `inventory_transactions` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `inventory_item_id` bigint unsigned NOT NULL,
-  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `quantity` int NOT NULL,
   `quantity_before` int NOT NULL,
   `quantity_after` int NOT NULL,
-  `reference_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `reference_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `reference_id` bigint unsigned DEFAULT NULL,
-  `reason` text COLLATE utf8mb4_unicode_ci,
-  `notes` text COLLATE utf8mb4_unicode_ci,
+  `reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_by` bigint unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -756,6 +764,7 @@ CREATE TABLE `orders` (
   `reference_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint unsigned NOT NULL,
   `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `billing_reason` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT 'manual',
   `amount_due` bigint DEFAULT NULL,
   `amount_overpaid` bigint DEFAULT NULL,
   `amount_paid` bigint DEFAULT NULL,
@@ -787,6 +796,7 @@ CREATE TABLE `orders_discounts` (
   `amount_applied` int unsigned NOT NULL,
   `balance_before` int unsigned DEFAULT NULL,
   `balance_after` int unsigned DEFAULT NULL,
+  `external_discount_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -1038,6 +1048,7 @@ CREATE TABLE `products` (
   `rejection_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `tax_code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_featured` tinyint(1) NOT NULL DEFAULT '0',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `is_visible` tinyint(1) NOT NULL DEFAULT '1',
   `is_subscription_only` tinyint(1) NOT NULL DEFAULT '0',
   `trial_days` int NOT NULL DEFAULT '0',
@@ -1248,6 +1259,7 @@ CREATE TABLE `subscriptions` (
   `quantity` int DEFAULT NULL,
   `trial_ends_at` timestamp NULL DEFAULT NULL,
   `ends_at` timestamp NULL DEFAULT NULL,
+  `cancellation_reason` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -1728,12 +1740,20 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (183,'2025_11_27_05
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (184,'2025_11_27_051532_add_resource_to_blacklist_table',63);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (185,'2025_11_27_213428_add_suspect_score_to_fingerprints_table',64);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (187,'2025_11_27_222646_add_refresh_token_to_users_integrations_table',65);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (188,'2025_09_28_202015_create_email_settings',66);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (189,'2025_09_28_202053_create_general_settings',66);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (190,'2025_11_25_191628_registration_settings',66);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (191,'2025_11_30_214637_create_inventory_items_table',66);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (192,'2025_11_30_214640_create_inventory_transactions_table',66);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (193,'2025_11_30_214642_create_inventory_alerts_table',66);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (194,'2025_11_30_214644_create_inventory_reservations_table',66);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (195,'2025_12_02_052557_add_style_fields_to_groups_table',67);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (196,'2025_12_02_234139_add_visible_column_to_prices_table',68);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (197,'2025_09_28_202015_create_email_settings',69);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (198,'2025_09_28_202053_create_general_settings',69);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (199,'2025_11_25_191628_registration_settings',69);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (200,'2025_12_03_165641_add_is_visible_to_groups_table',69);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (201,'2025_12_03_190117_add_permissions_to_forums_categories_groups_table',69);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (202,'2025_12_03_190117_add_permissions_to_users_groups_table',69);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (203,'2025_12_04_000416_add_cancellation_reason_to_subscriptions_table',69);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (204,'2025_12_06_232522_add_external_id_to_discounts_table',69);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (205,'2025_12_06_232522_add_external_id_to_orders_discounts_table',69);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (206,'2025_12_16_231457_add_billing_reason_to_orders_table',69);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (207,'2025_12_20_050134_add_is_active_to_products_table',69);
