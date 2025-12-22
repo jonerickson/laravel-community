@@ -7,6 +7,7 @@ namespace App\Filament\Marketplace\Pages;
 use App\Filament\Marketplace\Widgets\CommissionStatsOverview;
 use App\Filament\Marketplace\Widgets\MarketplaceSalesTable;
 use App\Filament\Marketplace\Widgets\PayoutSetupWidget;
+use App\Filament\Marketplace\Widgets\PayoutStatsOverview;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Contracts\Support\Htmlable;
 use Override;
@@ -21,6 +22,7 @@ class Dashboard extends BaseDashboard
         return [
             PayoutSetupWidget::class,
             CommissionStatsOverview::class,
+            PayoutStatsOverview::class,
             MarketplaceSalesTable::class,
         ];
     }

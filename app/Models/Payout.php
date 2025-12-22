@@ -10,10 +10,11 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
- * @property int $user_id
+ * @property int $seller_id
  * @property float $amount
  * @property PayoutStatus $status
  * @property string|null $payout_method
@@ -24,6 +25,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $processed_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Commission> $commissions
+ * @property-read int|null $commissions_count
  * @property-read User|null $processor
  * @property-read User $user
  *
@@ -42,9 +45,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static Builder<static>|Payout wherePayoutMethod($value)
  * @method static Builder<static>|Payout whereProcessedAt($value)
  * @method static Builder<static>|Payout whereProcessedBy($value)
+ * @method static Builder<static>|Payout whereSellerId($value)
  * @method static Builder<static>|Payout whereStatus($value)
  * @method static Builder<static>|Payout whereUpdatedAt($value)
- * @method static Builder<static>|Payout whereUserId($value)
  *
  * @mixin \Eloquent
  */
@@ -64,9 +67,14 @@ class Payout extends Model
         'processed_by',
     ];
 
-    public function user(): BelongsTo
+    public function seller(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'seller_id');
+    }
+
+    public function commissions(): HasMany
+    {
+        return $this->hasMany(Commission::class);
     }
 
     public function processor(): BelongsTo
@@ -105,6 +113,7 @@ class Payout extends Model
     protected function casts(): array
     {
         return [
+            'amount' => 'float',
             'status' => PayoutStatus::class,
             'processed_at' => 'datetime',
         ];

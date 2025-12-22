@@ -4,35 +4,43 @@ declare(strict_types=1);
 
 namespace App\Actions\Payouts;
 
+use App\Actions\Action;
 use App\Enums\PayoutStatus;
 use App\Events\PayoutCancelled;
 use App\Exceptions\InvalidPayoutStatusException;
 use App\Models\Payout;
 
-class CancelPayoutAction
+class CancelPayoutAction extends Action
 {
+    public function __construct(
+        protected Payout $payout,
+        protected ?string $reason = null,
+    ) {
+        //
+    }
+
     /**
      * @throws InvalidPayoutStatusException
      */
-    public function execute(Payout $payout, ?string $reason = null): bool
+    public function __invoke(): bool
     {
-        if (! $payout->canCancel()) {
-            throw new InvalidPayoutStatusException('Payout cannot be cancelled. Only pending payouts can be cancelled. Current status: '.$payout->status->value);
+        if (! $this->payout->canCancel()) {
+            throw new InvalidPayoutStatusException('Payout cannot be cancelled. Only pending payouts can be cancelled. Current status: '.$this->payout->status->value);
         }
 
-        $notesUpdate = $payout->notes;
-        if ($reason) {
+        $notesUpdate = $this->payout->notes;
+        if ($this->reason) {
             $notesUpdate .= '
 
-Cancellation reason: '.$reason;
+Cancellation reason: '.$this->reason;
         }
 
-        $payout->update([
+        $this->payout->update([
             'status' => PayoutStatus::Cancelled,
             'notes' => $notesUpdate,
         ]);
 
-        event(new PayoutCancelled($payout, $reason));
+        event(new PayoutCancelled($this->payout, $this->reason));
 
         return true;
     }

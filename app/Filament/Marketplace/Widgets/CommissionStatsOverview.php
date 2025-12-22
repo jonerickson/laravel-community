@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Marketplace\Widgets;
 
-use App\Enums\OrderStatus;
 use App\Enums\ProductApprovalStatus;
-use App\Models\OrderItem;
+use App\Models\Commission;
 use App\Models\Product;
 use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\StatsOverviewWidget;
@@ -50,30 +49,26 @@ class CommissionStatsOverview extends StatsOverviewWidget
 
     protected function calculateTotalProducts(): int
     {
-        return Product::where('seller_id', Auth::id())->count();
+        return Product::whereBelongsTo(Auth::user(), 'seller')
+            ->count();
     }
 
     protected function calculateApprovedProducts(): int
     {
-        return Product::where('seller_id', Auth::id())
+        return Product::whereBelongsTo(Auth::user(), 'seller')
             ->where('approval_status', ProductApprovalStatus::Approved)
             ->count();
     }
 
     protected function calculateTotalSales(): int
     {
-        return OrderItem::whereHas('price.product', fn ($query) => $query->where('seller_id', Auth::id()))
-            ->whereHas('order', fn ($query) => $query->where('status', OrderStatus::Succeeded))
-            ->whereBelongsTo(Auth::user(), 'commissionRecipient')
+        return Commission::whereBelongsTo(Auth::user(), 'seller')
             ->count();
     }
 
     protected function calculateTotalCommission(): float
     {
-        return (float) OrderItem::whereHas('price.product', fn ($query) => $query->where('seller_id', Auth::id()))
-            ->whereHas('order', fn ($query) => $query->where('status', OrderStatus::Succeeded))
-            ->whereBelongsTo(Auth::user(), 'commissionRecipient')
-            ->get()
-            ->sum('commission_amount');
+        return (float) Commission::whereBelongsTo(Auth::user(), 'seller')
+            ->sum('amount') / 100;
     }
 }

@@ -103,6 +103,8 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read Blacklist|null $blacklist
  * @property-read Collection<int, \Laravel\Passport\Client> $clients
  * @property-read int|null $clients_count
+ * @property-read Collection<int, Commission> $commissions
+ * @property-read int|null $commissions_count
  * @property float $current_balance
  * @property-read SubscriptionData|null $current_subscription
  * @property-read \App\Data\GroupStyleData|null $display_style

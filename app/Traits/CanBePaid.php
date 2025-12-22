@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
+use App\Models\Commission;
 use App\Models\Payout;
 use App\Models\User;
 use Eloquent;
@@ -19,6 +20,11 @@ trait CanBePaid
     public function payouts(): HasMany
     {
         return $this->hasMany(Payout::class);
+    }
+
+    public function commissions(): HasMany
+    {
+        return $this->hasMany(Commission::class);
     }
 
     public function currentBalance(): Attribute

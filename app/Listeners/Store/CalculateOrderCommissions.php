@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Listeners\Store;
 
-use App\Actions\Payouts\UpdateSellerBalanceAction;
+use App\Actions\Commissions\RecordCommissionAction;
 use App\Events\OrderSucceeded;
 use App\Mail\Marketplace\ProductSold;
 use App\Models\OrderItem;
@@ -57,20 +57,14 @@ class CalculateOrderCommissions implements ShouldQueue
                 $seller = User::find($product->seller_id);
 
                 if ($seller) {
-                    $updateBalanceAction = app(UpdateSellerBalanceAction::class);
-                    $updateBalanceAction->execute(
-                        seller: $seller,
-                        amount: $commissionAmount,
-                        reason: 'Commission from order '.$order->reference_id
-                    );
+                    RecordCommissionAction::execute($seller, $order, $commissionAmount);
                 }
 
-                $sellerId = $product->seller_id;
-                if (! isset($sellerItems[$sellerId])) {
-                    $sellerItems[$sellerId] = [];
+                if (! isset($sellerItems[$seller->getKey()])) {
+                    $sellerItems[$seller->getKey()] = [];
                 }
 
-                $sellerItems[$sellerId][] = $item;
+                $sellerItems[$seller->getKey()][] = $item;
             }
         }
 

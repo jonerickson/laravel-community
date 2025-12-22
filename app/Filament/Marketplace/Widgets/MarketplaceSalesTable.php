@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Marketplace\Widgets;
 
-use App\Enums\OrderStatus;
-use App\Models\OrderItem;
+use App\Models\Commission;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Override;
 
@@ -24,10 +22,9 @@ class MarketplaceSalesTable extends TableWidget
     {
         return $table
             ->query(
-                OrderItem::query()
-                    ->with(['order.user', 'price.product'])
-                    ->whereHas('price.product', fn (Builder $query) => $query->where('seller_id', Auth::id()))
-                    ->whereHas('order', fn (Builder $query) => $query->where('status', OrderStatus::Succeeded))
+                Commission::query()
+                    ->whereBelongsTo(Auth::user(), 'seller')
+                    ->with(['order.items.price.product'])
                     ->latest()
                     ->limit(15)
             )
@@ -40,32 +37,45 @@ class MarketplaceSalesTable extends TableWidget
             ->columns([
                 TextColumn::make('order.reference_id')
                     ->copyable()
-                    ->label('Order #')
+                    ->label('Order Number')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('product.name')
-                    ->label('Product')
+                TextColumn::make('order.invoice_number')
+                    ->copyable()
+                    ->label('Invoice Number')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('order.user.name')
                     ->label('Customer')
                     ->searchable()
                     ->placeholder('N/A'),
-                TextColumn::make('order.status')
-                    ->badge()
-                    ->sortable(),
-                TextColumn::make('quantity')
-                    ->sortable(),
-                TextColumn::make('amount')
+                TextColumn::make('order.amount')
                     ->label('Sale Amount')
                     ->money()
                     ->sortable(),
-                TextColumn::make('commission_amount')
+                TextColumn::make('amount')
                     ->label('Commission')
                     ->money()
                     ->sortable(),
+                TextColumn::make('order.items.name')
+                    ->label('Items')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('order.status')
+                    ->label('Order Status')
+                    ->badge()
+                    ->sortable(),
+                TextColumn::make('status')
+                    ->label('Commission Status')
+                    ->badge()
+                    ->sortable(),
+                TextColumn::make('payout.status')
+                    ->placeholder('Not Initiated')
+                    ->label('Payout Status')
+                    ->badge()
+                    ->sortable(),
                 TextColumn::make('created_at')
-                    ->label('Date')
+                    ->label('Created')
                     ->dateTime()
                     ->since()
                     ->dateTimeTooltip()
