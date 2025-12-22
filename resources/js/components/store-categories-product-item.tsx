@@ -39,7 +39,7 @@ export default function StoreCategoriesProductItem({ product }: { product: App.D
                                 </Badge>
                             )}
                             {product.inventoryItem && product.inventoryItem.isLowStock && <Badge variant="warning">Low Stock</Badge>}
-                            {product.isMarketplaceProduct && <Badge variant="secondary">Community Provided Provided</Badge>}
+                            {product.isMarketplaceProduct && <Badge variant="secondary">Community Provided</Badge>}
                         </div>
                     )}
                     <HeadingSmall title={product.name} description={truncate(stripCharacters(product.description || ''))} />

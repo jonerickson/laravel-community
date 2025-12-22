@@ -55,6 +55,7 @@ class CalculateOrderCommissions implements ShouldQueue
                 ]);
 
                 $seller = User::find($product->seller_id);
+
                 if ($seller) {
                     $updateBalanceAction = app(UpdateSellerBalanceAction::class);
                     $updateBalanceAction->execute(
