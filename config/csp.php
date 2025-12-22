@@ -29,6 +29,7 @@ return [
      * Additional directives that can be defined by environment
      */
     'additional_directives' => [
+        Directive::CONNECT->value => env('CSP_CONNECT_SRC'),
         Directive::IMG->value => env('CSP_IMG_SRC'),
     ],
 

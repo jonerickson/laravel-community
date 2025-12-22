@@ -18,11 +18,12 @@ class App implements Preset
         $s3Url = Uri::of(config('filesystems.disks.s3.url') ?? '')->host();
         $fingerprintEndpoint = Uri::of(config('services.fingerprint.endpoint') ?? '')->host();
 
+        $connectSrc = explode(',', config('csp.additional_directives.'.Directive::CONNECT->value) ?? '');
         $imgSrc = explode(',', config('csp.additional_directives.'.Directive::IMG->value) ?? '');
 
         $policy
             ->add(Directive::BASE, Keyword::SELF)
-            ->add(Directive::CONNECT, array_filter([Keyword::SELF, 'api.fpjs.io', $s3Url, $fingerprintEndpoint]))
+            ->add(Directive::CONNECT, array_filter([Keyword::SELF, 'api.fpjs.io', $s3Url, $fingerprintEndpoint, ...$connectSrc]))
             ->add(Directive::DEFAULT, Keyword::SELF)
             ->add(Directive::FONT, array_filter([Keyword::SELF, $assetUrl, $s3Url]))
             ->add(Directive::FORM_ACTION, Keyword::SELF)
