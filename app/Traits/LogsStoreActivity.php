@@ -6,7 +6,7 @@ namespace App\Traits;
 
 use Illuminate\Support\Facades\Auth;
 
-trait LogsMarketplaceActivity
+trait LogsStoreActivity
 {
     protected function logMarketplaceActivity(string $description, ?array $properties = null): void
     {

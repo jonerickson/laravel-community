@@ -6,6 +6,7 @@ namespace App\Filament\Marketplace\Pages;
 
 use App\Filament\Marketplace\Widgets\CommissionStatsOverview;
 use App\Filament\Marketplace\Widgets\MarketplaceSalesTable;
+use App\Filament\Marketplace\Widgets\PayoutSetupWidget;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Contracts\Support\Htmlable;
 use Override;
@@ -18,6 +19,7 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
+            PayoutSetupWidget::class,
             CommissionStatsOverview::class,
             MarketplaceSalesTable::class,
         ];
@@ -26,8 +28,6 @@ class Dashboard extends BaseDashboard
     #[Override]
     public function getSubheading(): string|Htmlable|null
     {
-        $name = config('app.name');
-
-        return sprintf('Welcome to the %s marketplace. From here you can manage your products, payouts and customers.', $name);
+        return sprintf('Welcome to the %s marketplace. From here you can manage your products, payouts and customers.', config('app.name'));
     }
 }

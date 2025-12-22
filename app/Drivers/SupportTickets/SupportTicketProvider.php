@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Contracts;
+namespace App\Drivers\SupportTickets;
 
 use App\Enums\SupportTicketStatus;
 use App\Models\Comment;

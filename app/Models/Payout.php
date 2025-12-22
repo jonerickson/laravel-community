@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\PayoutStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $payout_method
  * @property string|null $external_payout_id
  * @property string|null $notes
+ * @property string|null $failure_reason
  * @property \Illuminate\Support\Carbon|null $processed_at
  * @property int|null $processed_by
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -25,21 +27,24 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read User|null $processor
  * @property-read User $user
  *
+ * @method static Builder<static>|Payout completed()
  * @method static \Database\Factories\PayoutFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereAmount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereExternalPayoutId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereNotes($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout wherePayoutMethod($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereProcessedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereProcessedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Payout whereUserId($value)
+ * @method static Builder<static>|Payout newModelQuery()
+ * @method static Builder<static>|Payout newQuery()
+ * @method static Builder<static>|Payout pending()
+ * @method static Builder<static>|Payout query()
+ * @method static Builder<static>|Payout whereAmount($value)
+ * @method static Builder<static>|Payout whereCreatedAt($value)
+ * @method static Builder<static>|Payout whereExternalPayoutId($value)
+ * @method static Builder<static>|Payout whereFailureReason($value)
+ * @method static Builder<static>|Payout whereId($value)
+ * @method static Builder<static>|Payout whereNotes($value)
+ * @method static Builder<static>|Payout wherePayoutMethod($value)
+ * @method static Builder<static>|Payout whereProcessedAt($value)
+ * @method static Builder<static>|Payout whereProcessedBy($value)
+ * @method static Builder<static>|Payout whereStatus($value)
+ * @method static Builder<static>|Payout whereUpdatedAt($value)
+ * @method static Builder<static>|Payout whereUserId($value)
  *
  * @mixin \Eloquent
  */
@@ -53,6 +58,7 @@ class Payout extends Model
         'status',
         'payout_method',
         'external_payout_id',
+        'failure_reason',
         'notes',
         'processed_at',
         'processed_by',
@@ -74,6 +80,26 @@ class Payout extends Model
             get: fn (int $value): float => (float) $value / 100,
             set: fn (float $value): int => (int) ($value * 100),
         );
+    }
+
+    public function canRetry(): bool
+    {
+        return $this->status === PayoutStatus::Failed;
+    }
+
+    public function canCancel(): bool
+    {
+        return $this->status === PayoutStatus::Pending;
+    }
+
+    public function scopePending(Builder $query): void
+    {
+        $query->where('status', PayoutStatus::Pending);
+    }
+
+    public function scopeCompleted(Builder $query): void
+    {
+        $query->where('status', PayoutStatus::Completed);
     }
 
     protected function casts(): array

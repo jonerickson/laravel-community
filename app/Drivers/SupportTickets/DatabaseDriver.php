@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Drivers\SupportTickets;
 
-use App\Contracts\SupportTicketProvider;
 use App\Enums\FileVisibility;
 use App\Enums\SupportTicketStatus;
 use App\Models\Comment;

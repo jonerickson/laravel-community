@@ -35,6 +35,8 @@ class MarketplaceSalesTable extends TableWidget
             ->description('Recent orders containing your products.')
             ->defaultSort('created_at', 'desc')
             ->deferLoading()
+            ->emptyStateHeading('No recent orders found')
+            ->emptyStateDescription('No recent orders found. Get started selling today!')
             ->columns([
                 TextColumn::make('order.reference_id')
                     ->copyable()
