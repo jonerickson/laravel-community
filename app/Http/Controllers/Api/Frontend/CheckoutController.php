@@ -69,6 +69,28 @@ class CheckoutController
             );
         }
 
+        foreach ($cart->cartItems as $item) {
+            if ($item->product->inventoryItem?->trackInventory) {
+                if ($item->product->inventoryItem->quantityAvailable <= 0 && ! $item->product->inventoryItem->allowBackorder) {
+                    return ApiResource::error(
+                        message: sprintf('There is not enough stock available for %s. Please adjust your quantity and try again.', $item->name),
+                        errors: ['inventory' => [sprintf('There is not enough stock available for %s. Please adjust your quantity and try again.', $item->name)]],
+                        status: 400
+                    );
+                }
+
+                try {
+                    $this->inventoryService->reserveInventory($order);
+                } catch (Throwable $e) {
+                    return ApiResource::error(
+                        message: sprintf('Failed to reserve inventory for %s: %s', $item->name, $e->getMessage()),
+                        errors: ['inventory' => [sprintf('Could not reserve %s.', $item->name)]],
+                        status: 400
+                    );
+                }
+            }
+        }
+
         if ($order->amount <= 0) {
             $order->update([
                 'status' => OrderStatus::Succeeded,
@@ -118,28 +140,6 @@ class CheckoutController
             return ApiResource::error(
                 message: 'Failed to create checkout session. Please try again.',
             );
-        }
-
-        foreach ($cart->cartItems as $item) {
-            if ($item->product->inventoryItem?->trackInventory) {
-                if ($item->product->inventoryItem->quantityAvailable <= 0 && ! $item->product->inventoryItem->allowBackorder) {
-                    return ApiResource::error(
-                        message: sprintf('There is not enough stock available for %s. Please adjust your quantity and try again.', $item->name),
-                        errors: ['inventory' => [sprintf('There is not enough stock available for %s. Please adjust your quantity and try again.', $item->name)]],
-                        status: 400
-                    );
-                }
-
-                try {
-                    $this->inventoryService->reserveInventory($order);
-                } catch (Throwable $e) {
-                    return ApiResource::error(
-                        message: sprintf('Failed to reserve inventory for %s: %s', $item->name, $e->getMessage()),
-                        errors: ['inventory' => [sprintf('Could not reserve %s.', $item->name)]],
-                        status: 400
-                    );
-                }
-            }
         }
 
         $checkoutData = CheckoutData::from([
