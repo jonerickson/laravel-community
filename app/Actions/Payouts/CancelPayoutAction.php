@@ -17,12 +17,14 @@ class CancelPayoutAction
     public function execute(Payout $payout, ?string $reason = null): bool
     {
         if (! $payout->canCancel()) {
-            throw new InvalidPayoutStatusException("Payout cannot be cancelled. Only pending payouts can be cancelled. Current status: {$payout->status->value}");
+            throw new InvalidPayoutStatusException('Payout cannot be cancelled. Only pending payouts can be cancelled. Current status: '.$payout->status->value);
         }
 
         $notesUpdate = $payout->notes;
         if ($reason) {
-            $notesUpdate .= "\n\nCancellation reason: {$reason}";
+            $notesUpdate .= '
+
+Cancellation reason: '.$reason;
         }
 
         $payout->update([

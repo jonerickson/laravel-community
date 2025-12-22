@@ -82,7 +82,7 @@ class StripeDriver implements PayoutProcessor
             return null;
         }
 
-        return $this->executeWithErrorHandling('getConnectedAccount', function () use ($user): ?ConnectedAccountData {
+        return $this->executeWithErrorHandling('getConnectedAccount', function () use ($user): ConnectedAccountData {
             $account = $this->stripe->accounts->retrieve($user->payoutAccountId());
 
             return ConnectedAccountData::from([
@@ -106,7 +106,7 @@ class StripeDriver implements PayoutProcessor
             return null;
         }
 
-        return $this->executeWithErrorHandling('updateConnectedAccount', function () use ($user, $options): ?ConnectedAccountData {
+        return $this->executeWithErrorHandling('updateConnectedAccount', function () use ($user, $options): ConnectedAccountData {
             $account = $this->stripe->accounts->update($user->payoutAccountId(), $options);
 
             return ConnectedAccountData::from([
@@ -195,7 +195,7 @@ class StripeDriver implements PayoutProcessor
             return null;
         }
 
-        return $this->executeWithErrorHandling('getBalance', function () use ($user): ?BalanceData {
+        return $this->executeWithErrorHandling('getBalance', function () use ($user): BalanceData {
             $balance = $this->stripe->balance->retrieve([], ['stripe_account' => $user->payoutAccountId()]);
 
             $available = 0.0;
@@ -223,7 +223,7 @@ class StripeDriver implements PayoutProcessor
 
     public function getPlatformBalance(): ?BalanceData
     {
-        return $this->executeWithErrorHandling('getPlatformBalance', function (): ?BalanceData {
+        return $this->executeWithErrorHandling('getPlatformBalance', function (): BalanceData {
             $balance = $this->stripe->balance->retrieve();
 
             $available = 0.0;
@@ -271,7 +271,7 @@ class StripeDriver implements PayoutProcessor
             return null;
         }
 
-        return $this->executeWithErrorHandling('createPayout', function () use ($payout, $user): ?PayoutData {
+        return $this->executeWithErrorHandling('createPayout', function () use ($payout, $user): PayoutData {
             $stripePayout = $this->stripe->payouts->create([
                 'amount' => (int) ($payout->amount * 100),
                 'currency' => 'usd',
@@ -308,7 +308,7 @@ class StripeDriver implements PayoutProcessor
             return null;
         }
 
-        return $this->executeWithErrorHandling('getPayout', function () use ($payout, $user): ?PayoutData {
+        return $this->executeWithErrorHandling('getPayout', function () use ($payout, $user): PayoutData {
             $stripePayout = $this->stripe->payouts->retrieve(
                 $payout->external_payout_id,
                 [],
@@ -376,7 +376,7 @@ class StripeDriver implements PayoutProcessor
                 ['stripe_account' => $user->payoutAccountId()]
             );
 
-            return collect($payouts->data)->map(fn ($stripePayout) => [
+            return collect($payouts->data)->map(fn ($stripePayout): array => [
                 'id' => $stripePayout->id,
                 'amount' => $stripePayout->amount / 100,
                 'currency' => $stripePayout->currency,
@@ -395,7 +395,7 @@ class StripeDriver implements PayoutProcessor
             return null;
         }
 
-        return $this->executeWithErrorHandling('createTransfer', function () use ($recipient, $amount, $metadata): ?TransferData {
+        return $this->executeWithErrorHandling('createTransfer', function () use ($recipient, $amount, $metadata): TransferData {
             $transfer = $this->stripe->transfers->create([
                 'amount' => (int) ($amount * 100),
                 'currency' => 'usd',
@@ -418,7 +418,7 @@ class StripeDriver implements PayoutProcessor
 
     public function getTransfer(string $transferId): ?TransferData
     {
-        return $this->executeWithErrorHandling('getTransfer', function () use ($transferId): ?TransferData {
+        return $this->executeWithErrorHandling('getTransfer', function () use ($transferId): TransferData {
             $transfer = $this->stripe->transfers->retrieve($transferId);
 
             return TransferData::from([
@@ -436,7 +436,7 @@ class StripeDriver implements PayoutProcessor
 
     public function reverseTransfer(string $transferId): ?TransferData
     {
-        return $this->executeWithErrorHandling('reverseTransfer', function () use ($transferId): ?TransferData {
+        return $this->executeWithErrorHandling('reverseTransfer', function () use ($transferId): TransferData {
             $reversal = $this->stripe->transfers->createReversal($transferId);
             $transfer = $this->stripe->transfers->retrieve($transferId);
 
@@ -465,7 +465,7 @@ class StripeDriver implements PayoutProcessor
                 $retryCount++;
 
                 if ($retryCount >= $maxRetries) {
-                    Log::error("Stripe payout rate limit exceeded for method {$method}", [
+                    Log::error('Stripe payout rate limit exceeded for method '.$method, [
                         'method' => $method,
                         'error' => $e->getMessage(),
                         'retry_count' => $retryCount,
@@ -474,10 +474,10 @@ class StripeDriver implements PayoutProcessor
                     return $defaultValue;
                 }
 
-                $waitTime = min(pow(2, $retryCount) * 100000, 1000000);
+                $waitTime = min(2 ** $retryCount * 100000, 1000000);
                 usleep($waitTime);
             } catch (ApiErrorException $e) {
-                Log::error("Stripe payout API error for method {$method}", [
+                Log::error('Stripe payout API error for method '.$method, [
                     'method' => $method,
                     'error' => $e->getMessage(),
                     'stripe_code' => $e->getStripeCode(),
@@ -485,7 +485,7 @@ class StripeDriver implements PayoutProcessor
 
                 return $defaultValue;
             } catch (Exception $e) {
-                Log::error("Stripe payout general error for method {$method}", [
+                Log::error('Stripe payout general error for method '.$method, [
                     'method' => $method,
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString(),

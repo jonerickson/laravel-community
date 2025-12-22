@@ -14,12 +14,16 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class CalculateOrderCommissions implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
 
+    /**
+     * @throws Throwable
+     */
     public function handle(OrderSucceeded $event): void
     {
         if (App::runningConsoleCommand('app:migrate')) {
@@ -56,7 +60,7 @@ class CalculateOrderCommissions implements ShouldQueue
                     $updateBalanceAction->execute(
                         seller: $seller,
                         amount: $commissionAmount,
-                        reason: "Commission from order {$order->reference_id}"
+                        reason: 'Commission from order '.$order->reference_id
                     );
                 }
 

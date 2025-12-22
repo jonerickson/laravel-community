@@ -21,7 +21,7 @@ class DeductPayoutFromBalanceAction
             $seller = User::where('id', $seller->id)->lockForUpdate()->first();
 
             if ($seller->current_balance < $amount) {
-                throw new InsufficientBalanceException("Seller balance (\${$seller->current_balance}) is less than payout amount (\${$amount})");
+                throw new InsufficientBalanceException(sprintf('Seller balance ($%s) is less than payout amount ($%s)', $seller->current_balance, $amount));
             }
 
             $newBalance = $seller->current_balance - $amount;

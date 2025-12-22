@@ -31,7 +31,7 @@ class CreatePayoutAction
         }
 
         if ($seller->current_balance < $amount) {
-            throw new InsufficientBalanceException("Insufficient balance. Current balance: \${$seller->current_balance}, Requested: \${$amount}");
+            throw new InsufficientBalanceException(sprintf('Insufficient balance. Current balance: $%s, Requested: $%s', $seller->current_balance, $amount));
         }
 
         if (config('payout.default') === 'stripe' && ! $seller->isPayoutAccountOnboardingComplete()) {

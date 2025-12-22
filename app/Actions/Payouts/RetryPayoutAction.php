@@ -16,7 +16,7 @@ class RetryPayoutAction
     public function execute(Payout $payout): bool
     {
         if (! $payout->canRetry()) {
-            throw new InvalidPayoutStatusException("Payout cannot be retried. Only failed payouts can be retried. Current status: {$payout->status->value}");
+            throw new InvalidPayoutStatusException('Payout cannot be retried. Only failed payouts can be retried. Current status: '.$payout->status->value);
         }
 
         $payout->update([

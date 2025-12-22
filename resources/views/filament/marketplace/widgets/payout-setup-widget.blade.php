@@ -7,20 +7,20 @@
                         <x-filament::icon icon="heroicon-o-check-circle" class="sie-4 text-success-500" />
                         <div class="text-xl font-bold">Payout Account Connected</div>
                     </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">Your Stripe Connect account is set up and ready to receive payouts!</div>
+                    <div class="fi-sc-text mt-1">Your {{ Str::title(config('payout.default')) }} account is set up and ready to receive payouts!</div>
                 </div>
                 @if ($hasAccount)
                     <div class="flex gap-2">
-                        <x-filament::button color="danger" wire:click="discountAccount">Disconnect Account</x-filament::button>
+                        <x-filament::button color="danger" wire:click="deactivateAccount">Deactivate Account</x-filament::button>
                     </div>
                 @endif
             </div>
         @else
             <div class="flex items-center justify-between gap-4">
                 <div class="flex-1">
-                    <div class="text-xl font-bold">Setup Your Payout Account</div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">
-                        {{ config('app.name') }} partners with Stripe Connect to deliver instant payouts for your product sales. Complete the setup
+                    <div class="text-xl font-bold">Setup Your Marketplace Account</div>
+                    <div class="fi-sc-text mt-1">
+                        {{ config('app.name') }} partners with {{ Str::title(config('payout.default')) }} to deliver instant payouts for your product sales. Complete the setup
                         to start receiving your earnings directly to your bank account!
                     </div>
                 </div>

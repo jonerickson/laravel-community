@@ -19,9 +19,13 @@ class PayoutSetupWidget extends Widget
 
     protected string $view = 'filament.marketplace.widgets.payout-setup-widget';
 
+    protected static bool $isLazy = true;
+
     public function mount(): void
     {
         $user = Auth::user();
+
+        PayoutProcessor::isAccountOnboardingComplete($user);
 
         $this->hasAccount = $user->hasPayoutAccount();
         $this->isOnboarded = $user->isPayoutAccountOnboardingComplete();
@@ -71,7 +75,7 @@ class PayoutSetupWidget extends Widget
         }
     }
 
-    public function discountAccount(): void
+    public function deactivateAccount(): void
     {
         $user = Auth::user();
 

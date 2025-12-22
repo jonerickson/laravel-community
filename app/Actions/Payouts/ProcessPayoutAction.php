@@ -25,19 +25,19 @@ class ProcessPayoutAction
     {
         return DB::transaction(function () use ($payout): bool {
             if ($payout->status !== PayoutStatus::Pending) {
-                throw new InvalidPayoutStatusException("Payout must be in Pending status to be processed. Current status: {$payout->status->value}");
+                throw new InvalidPayoutStatusException('Payout must be in Pending status to be processed. Current status: '.$payout->status->value);
             }
 
             try {
                 $deductAction = app(DeductPayoutFromBalanceAction::class);
                 $deductAction->execute($payout->user, $payout->amount);
-            } catch (InsufficientBalanceException $e) {
+            } catch (InsufficientBalanceException $insufficientBalanceException) {
                 $payout->update([
                     'status' => PayoutStatus::Failed,
-                    'failure_reason' => $e->getMessage(),
+                    'failure_reason' => $insufficientBalanceException->getMessage(),
                 ]);
 
-                event(new PayoutFailed($payout, $e->getMessage()));
+                event(new PayoutFailed($payout, $insufficientBalanceException->getMessage()));
 
                 return false;
             }
@@ -69,16 +69,16 @@ class ProcessPayoutAction
 
                 return false;
 
-            } catch (Exception $e) {
+            } catch (Exception $exception) {
                 $updateBalanceAction = app(UpdateSellerBalanceAction::class);
                 $updateBalanceAction->execute($payout->user, $payout->amount, 'payout_exception_refund');
 
                 $payout->update([
                     'status' => PayoutStatus::Failed,
-                    'failure_reason' => $e->getMessage(),
+                    'failure_reason' => $exception->getMessage(),
                 ]);
 
-                event(new PayoutFailed($payout, $e->getMessage()));
+                event(new PayoutFailed($payout, $exception->getMessage()));
 
                 return false;
             }

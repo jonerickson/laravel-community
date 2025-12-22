@@ -418,6 +418,9 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         return 'web';
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
