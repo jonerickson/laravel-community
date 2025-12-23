@@ -25,7 +25,7 @@ class CancelPayoutAction extends Action
     public function __invoke(): bool
     {
         if (! $this->payout->canCancel()) {
-            throw new InvalidPayoutStatusException('Payout cannot be cancelled. Only pending payouts can be cancelled. Current status: '.$this->payout->status->value);
+            throw new InvalidPayoutStatusException('The payout cannot be cancelled. Only pending payouts can be cancelled. Current status: '.$this->payout->status->value);
         }
 
         $notesUpdate = $this->payout->notes;

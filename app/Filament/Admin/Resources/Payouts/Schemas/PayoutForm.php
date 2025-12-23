@@ -71,7 +71,7 @@ class PayoutForm
                             ->label('Notes'),
                         TextInput::make('amount')
                             ->visibleOn('create')
-                            ->helperText('The total payout amount.')
+                            ->helperText('The total payout amount. This will be auto-calculated when selecting the commissions to pay out. You may also manually adjust this if needed.')
                             ->label('Total')
                             ->required()
                             ->numeric()

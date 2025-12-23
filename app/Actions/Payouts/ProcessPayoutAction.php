@@ -32,7 +32,7 @@ class ProcessPayoutAction extends Action
     {
         return DB::transaction(function (): bool {
             if ($this->payout->status !== PayoutStatus::Pending) {
-                throw new InvalidPayoutStatusException('Payout must be in Pending status to be processed. Current status: '.$this->payout->status->value);
+                throw new InvalidPayoutStatusException('A payout must be in pending status to be processed. Current status: '.$this->payout->status->value);
             }
 
             try {

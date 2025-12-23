@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Stripe\Account;
+
 return [
     'default' => env('PAYOUT_DRIVER', 'stripe'),
 
@@ -16,11 +18,11 @@ return [
     ],
 
     'stripe' => [
-        'connect_type' => env('STRIPE_CONNECT_TYPE', 'express'),
-        'onboarding_return_url' => env('STRIPE_ONBOARDING_RETURN_URL'),
-        'onboarding_refresh_url' => env('STRIPE_ONBOARDING_REFRESH_URL'),
+        'connect_type' => env('STRIPE_CONNECT_TYPE', Account::TYPE_EXPRESS),
     ],
 
-    'minimum_payout' => (float) env('MINIMUM_PAYOUT_AMOUNT', 10.00),
-    'maximum_payout' => (float) env('MAXIMUM_PAYOUT_AMOUNT', 10000.00),
+    'minimum_payout' => (float) env('PAYOUT_MINIMUM_AMOUNT', 10.00),
+    'maximum_payout' => (float) env('PAYOUT_MAXIMUM_AMOUNT', 10000.00),
+
+    'statement_descriptor' => env('PAYOUT_STATEMENT_DESCRIPTOR', env('APP_NAME')),
 ];

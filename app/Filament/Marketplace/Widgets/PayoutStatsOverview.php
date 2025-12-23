@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Marketplace\Widgets;
 
+use App\Data\BalanceData;
 use App\Enums\PayoutStatus;
+use App\Facades\PayoutProcessor;
 use App\Models\Payout;
 use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\StatsOverviewWidget;
@@ -15,6 +17,7 @@ use Override;
 
 class PayoutStatsOverview extends StatsOverviewWidget
 {
+    #[Override]
     public static function canView(): bool
     {
         return Auth::user()->payouts_enabled;
@@ -28,10 +31,6 @@ class PayoutStatsOverview extends StatsOverviewWidget
                 ->description('Payouts earned this month')
                 ->icon(Heroicon::OutlinedCurrencyDollar),
 
-            Stat::make('Payouts QTD', Number::currency($this->calculateQtd()))
-                ->description('Payouts earned this quarter')
-                ->icon(Heroicon::OutlinedCurrencyDollar),
-
             Stat::make('Payouts YTD', Number::currency($this->calculateYtd()))
                 ->description('Payouts earned this year')
                 ->icon(Heroicon::OutlinedCurrencyDollar),
@@ -39,6 +38,11 @@ class PayoutStatsOverview extends StatsOverviewWidget
             Stat::make('Lifetime Payouts', Number::currency($this->calculateLifetime()))
                 ->description('Lifetime payout earnings')
                 ->icon(Heroicon::OutlinedCurrencyDollar),
+
+            Stat::make('Current Account Balance', Number::currency($this->getBalance()))
+                ->description('Balance available for withdrawal')
+                ->icon(Heroicon::OutlinedCurrencyDollar)
+                ->color('success'),
         ];
     }
 
@@ -47,14 +51,6 @@ class PayoutStatsOverview extends StatsOverviewWidget
         return (float) Payout::whereBelongsTo(Auth::user(), 'seller')
             ->where('status', PayoutStatus::Completed)
             ->whereBetween('created_at', [today()->startOfMonth(), today()->endOfMonth()])
-            ->sum('amount') / 100;
-    }
-
-    protected function calculateQtd(): float
-    {
-        return (float) Payout::whereBelongsTo(Auth::user(), 'seller')
-            ->where('status', PayoutStatus::Completed)
-            ->whereBetween('created_at', [today()->startOfQuarter(), today()->endOfQuarter()])
             ->sum('amount') / 100;
     }
 
@@ -71,5 +67,16 @@ class PayoutStatsOverview extends StatsOverviewWidget
         return (float) Payout::whereBelongsTo(Auth::user(), 'seller')
             ->where('status', PayoutStatus::Completed)
             ->sum('amount') / 100;
+    }
+
+    protected function getBalance(): float
+    {
+        $balance = PayoutProcessor::getBalance(Auth::user());
+
+        if (! $balance instanceof BalanceData) {
+            return 0;
+        }
+
+        return $balance->available;
     }
 }

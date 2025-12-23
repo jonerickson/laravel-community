@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use App\Data\Normalizers\Stripe\TransferNormalizer;
 use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
@@ -31,4 +32,12 @@ class TransferData extends Data
     public bool $reversed;
 
     public ?CarbonImmutable $createdAt = null;
+
+    public static function normalizers(): array
+    {
+        return [
+            TransferNormalizer::class,
+            ...config('data.normalizers'),
+        ];
+    }
 }

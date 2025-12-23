@@ -37,4 +37,10 @@ class CreatePayout extends CreateRecord
 
         return $payout;
     }
+
+    #[Override]
+    protected function getRedirectUrl(): string
+    {
+        return ListPayouts::getUrl();
+    }
 }

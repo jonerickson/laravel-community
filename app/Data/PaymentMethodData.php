@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Data;
 
-use App\Data\Normalizers\Cashier\PaymentMethodNormalizer;
+use App\Data\Normalizers\Cashier\PaymentMethodNormalizer as CashierPaymentMethodNormalizer;
+use App\Data\Normalizers\Stripe\PaymentMethodNormalizer as StripePaymentMethodNormalizer;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
@@ -43,7 +44,8 @@ class PaymentMethodData extends Data
     public static function normalizers(): array
     {
         return [
-            PaymentMethodNormalizer::class,
+            CashierPaymentMethodNormalizer::class,
+            StripePaymentMethodNormalizer::class,
             ...config('data.normalizers'),
         ];
     }

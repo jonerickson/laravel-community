@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use App\Data\Normalizers\Stripe\PayoutNormalizer;
 use App\Enums\PayoutDriver;
 use App\Enums\PayoutStatus;
 use Carbon\CarbonImmutable;
@@ -39,4 +40,12 @@ class PayoutData extends Data
     public ?CarbonImmutable $createdAt = null;
 
     public ?CarbonImmutable $updatedAt = null;
+
+    public static function normalizers(): array
+    {
+        return [
+            PayoutNormalizer::class,
+            ...config('data.normalizers'),
+        ];
+    }
 }

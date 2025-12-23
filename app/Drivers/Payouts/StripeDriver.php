@@ -15,6 +15,8 @@ use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Stripe\Account;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Exception\RateLimitException;
 use Stripe\Stripe;
@@ -37,20 +39,31 @@ class StripeDriver implements PayoutProcessor
                 return $this->getConnectedAccount($user);
             }
 
-            $accountType = config('payout.stripe.connect_type', 'express');
+            $accountType = config('payout.stripe.connect_type', Account::TYPE_EXPRESS);
+            $businessType = $options['business_type'] ?? Account::BUSINESS_TYPE_INDIVIDUAL;
 
-            $account = $this->stripe->accounts->create([
+            $accountPayload = [
                 'type' => $accountType,
                 'email' => $user->email,
-                'business_type' => $options['business_type'] ?? 'individual',
+                'business_type' => $businessType,
                 'capabilities' => [
                     'transfers' => ['requested' => true],
                 ],
                 'metadata' => [
-                    'seller_id' => $user->id,
+                    'seller_id' => $user->reference_id,
                     'seller_email' => $user->email,
                 ],
-            ]);
+            ];
+
+            if ($businessType === Account::BUSINESS_TYPE_INDIVIDUAL) {
+                $accountPayload['individual'] = $user->name;
+            }
+
+            if (in_array($businessType, [Account::BUSINESS_TYPE_COMPANY, Account::BUSINESS_TYPE_GOVERNMENT_ENTITY, Account::BUSINESS_TYPE_NON_PROFIT]) && isset($options['company'])) {
+                $accountPayload['company'] = $options['company'];
+            }
+
+            $account = $this->stripe->accounts->create($accountPayload);
 
             DB::transaction(function () use ($user, $account): void {
                 $user->update([
@@ -61,18 +74,7 @@ class StripeDriver implements PayoutProcessor
                 ]);
             });
 
-            return ConnectedAccountData::from([
-                'id' => $account->id,
-                'email' => $account->email,
-                'business_name' => $account->business_profile?->name,
-                'charges_enabled' => $account->charges_enabled,
-                'payouts_enabled' => $account->payouts_enabled,
-                'details_submitted' => $account->details_submitted,
-                'capabilities' => $account->capabilities?->toArray(),
-                'requirements' => $account->requirements?->toArray(),
-                'country' => $account->country,
-                'default_currency' => $account->default_currency,
-            ]);
+            return ConnectedAccountData::from($account);
         });
     }
 
@@ -85,18 +87,7 @@ class StripeDriver implements PayoutProcessor
         return $this->executeWithErrorHandling('getConnectedAccount', function () use ($user): ConnectedAccountData {
             $account = $this->stripe->accounts->retrieve($user->payoutAccountId());
 
-            return ConnectedAccountData::from([
-                'id' => $account->id,
-                'email' => $account->email,
-                'business_name' => $account->business_profile?->name,
-                'charges_enabled' => $account->charges_enabled,
-                'payouts_enabled' => $account->payouts_enabled,
-                'details_submitted' => $account->details_submitted,
-                'capabilities' => $account->capabilities?->toArray(),
-                'requirements' => $account->requirements?->toArray(),
-                'country' => $account->country,
-                'default_currency' => $account->default_currency,
-            ]);
+            return ConnectedAccountData::from($account);
         });
     }
 
@@ -109,18 +100,7 @@ class StripeDriver implements PayoutProcessor
         return $this->executeWithErrorHandling('updateConnectedAccount', function () use ($user, $options): ConnectedAccountData {
             $account = $this->stripe->accounts->update($user->payoutAccountId(), $options);
 
-            return ConnectedAccountData::from([
-                'id' => $account->id,
-                'email' => $account->email,
-                'business_name' => $account->business_profile?->name,
-                'charges_enabled' => $account->charges_enabled,
-                'payouts_enabled' => $account->payouts_enabled,
-                'details_submitted' => $account->details_submitted,
-                'capabilities' => $account->capabilities?->toArray(),
-                'requirements' => $account->requirements?->toArray(),
-                'country' => $account->country,
-                'default_currency' => $account->default_currency,
-            ]);
+            return ConnectedAccountData::from($account);
         });
     }
 
@@ -155,8 +135,8 @@ class StripeDriver implements PayoutProcessor
         return $this->executeWithErrorHandling('getAccountOnboardingUrl', function () use ($user, $returnUrl, $refreshUrl): ?string {
             $accountLink = $this->stripe->accountLinks->create([
                 'account' => $user->payoutAccountId(),
-                'refresh_url' => $refreshUrl ?? config('payout.stripe.onboarding_refresh_url') ?? route('marketplace.stripe-connect.refresh'),
-                'return_url' => $returnUrl ?? config('payout.stripe.onboarding_return_url') ?? route('marketplace.stripe-connect.return'),
+                'refresh_url' => $refreshUrl ?? route('marketplace.stripe-connect.refresh'),
+                'return_url' => $returnUrl ?? route('marketplace.stripe-connect.return'),
                 'type' => 'account_onboarding',
             ]);
 
@@ -211,26 +191,7 @@ class StripeDriver implements PayoutProcessor
         return $this->executeWithErrorHandling('getBalance', function () use ($user): BalanceData {
             $balance = $this->stripe->balance->retrieve([], ['stripe_account' => $user->payoutAccountId()]);
 
-            $available = 0.0;
-            $pending = 0.0;
-
-            foreach ($balance->available as $item) {
-                $available += $item->amount / 100;
-            }
-
-            foreach ($balance->pending as $item) {
-                $pending += $item->amount / 100;
-            }
-
-            return BalanceData::from([
-                'available' => $available,
-                'pending' => $pending,
-                'currency' => $balance->available[0]->currency ?? 'usd',
-                'breakdown' => [
-                    'available' => $balance->available,
-                    'pending' => $balance->pending,
-                ],
-            ]);
+            return BalanceData::from($balance);
         });
     }
 
@@ -239,26 +200,7 @@ class StripeDriver implements PayoutProcessor
         return $this->executeWithErrorHandling('getPlatformBalance', function (): BalanceData {
             $balance = $this->stripe->balance->retrieve();
 
-            $available = 0.0;
-            $pending = 0.0;
-
-            foreach ($balance->available as $item) {
-                $available += $item->amount / 100;
-            }
-
-            foreach ($balance->pending as $item) {
-                $pending += $item->amount / 100;
-            }
-
-            return BalanceData::from([
-                'available' => $available,
-                'pending' => $pending,
-                'currency' => $balance->available[0]->currency ?? 'usd',
-                'breakdown' => [
-                    'available' => $balance->available,
-                    'pending' => $balance->pending,
-                ],
-            ]);
+            return BalanceData::from($balance);
         });
     }
 
@@ -288,9 +230,13 @@ class StripeDriver implements PayoutProcessor
             $stripePayout = $this->stripe->payouts->create([
                 'amount' => (int) ($payout->amount * 100),
                 'currency' => 'usd',
+                'statement_descriptor' => Str::of(config('payout.statement_descriptor'))
+                    ->upper()
+                    ->limit(22, '')
+                    ->toString(),
                 'metadata' => [
-                    'payout_id' => $payout->id,
-                    'seller_id' => $user->id,
+                    'payout_id' => $payout->reference_id,
+                    'seller_id' => $user->reference_id,
                 ],
             ], ['stripe_account' => $user->payoutAccountId()]);
 
@@ -389,16 +335,11 @@ class StripeDriver implements PayoutProcessor
                 ['stripe_account' => $user->payoutAccountId()]
             );
 
-            return collect($payouts->data)->map(fn ($stripePayout): array => [
-                'id' => $stripePayout->id,
-                'amount' => $stripePayout->amount / 100,
-                'currency' => $stripePayout->currency,
-                'status' => $stripePayout->status,
-                'arrival_date' => $stripePayout->arrival_date,
-                'created' => $stripePayout->created,
-                'method' => $stripePayout->method,
-                'description' => $stripePayout->description,
-            ]);
+            if (empty($payouts->data)) {
+                return collect();
+            }
+
+            return PayoutData::collect($payouts->data);
         }, collect());
     }
 
@@ -416,16 +357,7 @@ class StripeDriver implements PayoutProcessor
                 'metadata' => $metadata,
             ]);
 
-            return TransferData::from([
-                'id' => $transfer->id,
-                'amount' => $transfer->amount / 100,
-                'currency' => $transfer->currency,
-                'destination' => $transfer->destination,
-                'source_transaction' => $transfer->source_transaction,
-                'metadata' => $transfer->metadata?->toArray(),
-                'reversed' => $transfer->reversed,
-                'created_at' => $transfer->created ? now()->setTimestamp($transfer->created) : null,
-            ]);
+            return TransferData::from($transfer);
         });
     }
 
@@ -434,35 +366,17 @@ class StripeDriver implements PayoutProcessor
         return $this->executeWithErrorHandling('getTransfer', function () use ($transferId): TransferData {
             $transfer = $this->stripe->transfers->retrieve($transferId);
 
-            return TransferData::from([
-                'id' => $transfer->id,
-                'amount' => $transfer->amount / 100,
-                'currency' => $transfer->currency,
-                'destination' => $transfer->destination,
-                'source_transaction' => $transfer->source_transaction,
-                'metadata' => $transfer->metadata?->toArray(),
-                'reversed' => $transfer->reversed,
-                'created_at' => $transfer->created ? now()->setTimestamp($transfer->created) : null,
-            ]);
+            return TransferData::from($transfer);
         });
     }
 
     public function reverseTransfer(string $transferId): ?TransferData
     {
         return $this->executeWithErrorHandling('reverseTransfer', function () use ($transferId): TransferData {
-            $reversal = $this->stripe->transfers->createReversal($transferId);
+            $this->stripe->transfers->createReversal($transferId);
             $transfer = $this->stripe->transfers->retrieve($transferId);
 
-            return TransferData::from([
-                'id' => $transfer->id,
-                'amount' => $transfer->amount / 100,
-                'currency' => $transfer->currency,
-                'destination' => $transfer->destination,
-                'source_transaction' => $transfer->source_transaction,
-                'metadata' => $transfer->metadata?->toArray(),
-                'reversed' => $transfer->reversed,
-                'created_at' => $transfer->created ? now()->setTimestamp($transfer->created) : null,
-            ]);
+            return TransferData::from($transfer);
         });
     }
 

@@ -24,7 +24,7 @@ class RetryPayoutAction extends Action
     public function __invoke(): bool
     {
         if (! $this->payout->canRetry()) {
-            throw new InvalidPayoutStatusException('Payout cannot be retried. Only failed payouts can be retried. Current status: '.$this->payout->status->value);
+            throw new InvalidPayoutStatusException('The payout cannot be retried. Only failed payouts can be retried. Current status: '.$this->payout->status->value);
         }
 
         $this->payout->update([

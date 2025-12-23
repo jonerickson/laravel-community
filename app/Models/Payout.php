@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Enums\PayoutDriver;
 use App\Enums\PayoutStatus;
 use App\Traits\HasAuthor;
+use App\Traits\HasReferenceId;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
+ * @property string $reference_id
  * @property int $seller_id
  * @property float $amount
  * @property PayoutStatus $status
@@ -47,6 +49,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static Builder<static>|Payout whereId($value)
  * @method static Builder<static>|Payout whereNotes($value)
  * @method static Builder<static>|Payout wherePayoutMethod($value)
+ * @method static Builder<static>|Payout whereReferenceId($value)
  * @method static Builder<static>|Payout whereSellerId($value)
  * @method static Builder<static>|Payout whereStatus($value)
  * @method static Builder<static>|Payout whereUpdatedAt($value)
@@ -57,6 +60,7 @@ class Payout extends Model
 {
     use HasAuthor;
     use HasFactory;
+    use HasReferenceId;
 
     protected $attributes = [
         'status' => PayoutStatus::Pending,
