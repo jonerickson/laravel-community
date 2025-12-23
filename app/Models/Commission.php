@@ -42,6 +42,10 @@ class Commission extends Model
 {
     use HasFactory;
 
+    protected $attributes = [
+        'status' => CommissionStatus::Pending,
+    ];
+
     protected $fillable = [
         'seller_id',
         'order_id',

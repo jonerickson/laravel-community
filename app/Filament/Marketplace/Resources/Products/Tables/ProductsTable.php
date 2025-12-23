@@ -6,8 +6,10 @@ namespace App\Filament\Marketplace\Resources\Products\Tables;
 
 use App\Enums\ProductApprovalStatus;
 use App\Enums\ProductType;
+use App\Models\Product;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -32,6 +34,14 @@ class ProductsTable
                     ->suffix('%')
                     ->sortable()
                     ->formatStateUsing(fn ($state): int|float => $state * 100),
+                IconColumn::make('is_active')
+                    ->label('Active')
+                    ->boolean()
+                    ->sortable(),
+                IconColumn::make('is_visible')
+                    ->label('Visible')
+                    ->boolean()
+                    ->sortable(),
                 TextColumn::make('categories.name')
                     ->badge()
                     ->searchable()
@@ -46,6 +56,7 @@ class ProductsTable
             ])
             ->filters([
                 SelectFilter::make('approval_status')
+                    ->label('Approval Status')
                     ->options(ProductApprovalStatus::class)
                     ->native(false),
                 SelectFilter::make('type')
@@ -58,7 +69,8 @@ class ProductsTable
                     ->searchable(),
             ])
             ->recordActions([
-                ViewAction::make(),
+                ViewAction::make()
+                    ->url(fn (Product $record): string => route('store.products.show', $record->slug), shouldOpenInNewTab: true),
                 EditAction::make(),
             ]);
     }

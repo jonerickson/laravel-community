@@ -16,7 +16,7 @@ class PayoutsTable
     {
         return $table
             ->columns([
-                TextColumn::make('user.name')
+                TextColumn::make('seller.name')
                     ->label('Seller')
                     ->searchable()
                     ->sortable(),

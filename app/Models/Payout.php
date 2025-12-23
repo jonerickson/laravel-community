@@ -28,7 +28,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Commission> $commissions
  * @property-read int|null $commissions_count
  * @property-read User|null $processor
- * @property-read User $user
+ * @property-read User $seller
  *
  * @method static Builder<static>|Payout completed()
  * @method static \Database\Factories\PayoutFactory factory($count = null, $state = [])
@@ -56,7 +56,7 @@ class Payout extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
+        'seller_id',
         'amount',
         'status',
         'payout_method',
