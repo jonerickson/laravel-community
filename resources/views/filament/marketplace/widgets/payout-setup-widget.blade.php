@@ -7,7 +7,9 @@
                         <x-filament::icon icon="heroicon-o-check-circle" class="sie-4 text-success-500" />
                         <div class="text-xl font-bold">Payout Account Connected</div>
                     </div>
-                    <div class="fi-sc-text mt-1">Your {{ Str::title(config('payout.default')) }} account is set up and ready to receive payouts!</div>
+                    <div class="fi-sc-text mt-1">
+                        Your {{ Str::title(config('payout.default')) }} account is set up and ready to receive payouts!
+                    </div>
                 </div>
                 @if ($hasAccount)
                     <div class="flex gap-2">
@@ -20,8 +22,8 @@
                 <div class="flex-1">
                     <div class="text-xl font-bold">Setup Your Marketplace Account</div>
                     <div class="fi-sc-text mt-1">
-                        {{ config('app.name') }} partners with {{ Str::title(config('payout.default')) }} to deliver instant payouts for your product sales. Complete the setup
-                        to start receiving your earnings directly to your bank account!
+                        {{ config('app.name') }} partners with {{ Str::title(config('payout.default')) }} to deliver instant payouts for your
+                        product sales. Complete the setup to start receiving your earnings directly to your bank account!
                     </div>
                 </div>
                 <div class="flex gap-2">

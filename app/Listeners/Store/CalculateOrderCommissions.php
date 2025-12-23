@@ -49,11 +49,6 @@ class CalculateOrderCommissions implements ShouldQueue
             if ($commissionRate > 0) {
                 $commissionAmount = $item->amount * $commissionRate;
 
-                $item->update([
-                    'commission_amount' => $commissionAmount,
-                    'commission_recipient_id' => $product->seller_id,
-                ]);
-
                 $seller = User::find($product->seller_id);
 
                 if ($seller) {

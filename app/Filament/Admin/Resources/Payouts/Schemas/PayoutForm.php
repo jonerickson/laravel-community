@@ -44,11 +44,13 @@ class PayoutForm
                             ->options(fn (Get $get) => Commission::query()
                                 ->where('status', CommissionStatus::Pending)
                                 ->where('seller_id', $get('seller_id'))
+                                ->latest()
                                 ->get()
                                 ->mapWithKeys(fn (Commission $commission): array => [$commission->getKey() => Number::currency($commission->amount)]))
                             ->descriptions(fn (Get $get) => Commission::query()
                                 ->where('status', CommissionStatus::Pending)
                                 ->where('seller_id', $get('seller_id'))
+                                ->latest()
                                 ->get()
                                 ->mapWithKeys(fn (Commission $commission): array => [$commission->getKey() => new HtmlString(sprintf("<div>Commission on order <a href='%s' class='underline' target='_blank'>#%s</a> placed %s with %s totaling %s.</div>", ViewOrder::getUrl(['record' => $commission->order]), $commission->order->reference_id, $commission->created_at->diffForHumans(), $commission->order->items->pluck('name')->implode(', '), Number::currency($commission->order->amount)))])
                             ),

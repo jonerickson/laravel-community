@@ -11,10 +11,10 @@ Great news! Your product has been purchased in order **#{{ $order->reference_id 
 
 @if(count($items))
 <x-mail::table>
-| Product | Quantity | Sale Amount | Commission |
-|:--------|:--------:|-----------:|-----------:|
+| Product | Quantity | Sale Amount |
+|:--------|:--------:|-----------:|
 @foreach($items as $item)
-| {{ $item->price->product->name }} | {{ $item->quantity }} | {{ \Illuminate\Support\Number::currency($item->amount) }} | {{ \Illuminate\Support\Number::currency($item->commission_amount ?? 0) }} |
+| {{ $item->price->product->name }} | {{ $item->quantity }} | {{ \Illuminate\Support\Number::currency($item->amount) }}
 @endforeach
 </x-mail::table>
 
