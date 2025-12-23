@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use App\Enums\PayoutDriver;
 use App\Enums\PayoutStatus;
 use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\MapInputName;
@@ -23,7 +24,7 @@ class PayoutData extends Data
 
     public PayoutStatus $status;
 
-    public ?string $payoutMethod = null;
+    public ?PayoutDriver $paymentMethod = null;
 
     public ?string $externalPayoutId = null;
 

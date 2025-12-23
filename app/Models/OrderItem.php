@@ -23,6 +23,7 @@ use Override;
  * @property string|null $external_item_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property float|null $commission_amount
  * @property-read Order $order
  * @property-read Price|null $price
  *
@@ -31,8 +32,6 @@ use Override;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereAmount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereCommissionAmount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereCommissionRecipientId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereExternalItemId($value)

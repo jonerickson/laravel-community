@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Marketplace\Widgets;
 
+use App\Enums\PayoutStatus;
 use App\Models\Payout;
 use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\StatsOverviewWidget;
@@ -38,28 +39,32 @@ class PayoutStatsOverview extends StatsOverviewWidget
 
     protected function calculateMtd(): float
     {
-        return Payout::whereBelongsTo(Auth::user(), 'seller')
+        return (float) Payout::whereBelongsTo(Auth::user(), 'seller')
+            ->where('status', PayoutStatus::Completed)
             ->whereBetween('created_at', [today()->startOfMonth(), today()->endOfMonth()])
             ->sum('amount');
     }
 
     protected function calculateQtd(): float
     {
-        return Payout::whereBelongsTo(Auth::user(), 'seller')
+        return (float) Payout::whereBelongsTo(Auth::user(), 'seller')
+            ->where('status', PayoutStatus::Completed)
             ->whereBetween('created_at', [today()->startOfQuarter(), today()->endOfQuarter()])
             ->sum('amount');
     }
 
     protected function calculateYtd(): float
     {
-        return Payout::whereBelongsTo(Auth::user(), 'seller')
+        return (float) Payout::whereBelongsTo(Auth::user(), 'seller')
+            ->where('status', PayoutStatus::Completed)
             ->whereBetween('created_at', [today()->startOfYear(), today()->endOfYear()])
             ->sum('amount');
     }
 
     protected function calculateLifetime(): float
     {
-        return Payout::whereBelongsTo(Auth::user(), 'seller')
+        return (float) Payout::whereBelongsTo(Auth::user(), 'seller')
+            ->where('status', PayoutStatus::Completed)
             ->sum('amount');
     }
 }

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Payouts\Pages;
 
 use App\Filament\Admin\Resources\Payouts\PayoutResource;
+use App\Filament\Admin\Resources\Payouts\Widgets\PayoutOverview;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Override;
 
 class ListPayouts extends ListRecords
 {
@@ -18,6 +20,14 @@ class ListPayouts extends ListRecords
     {
         return [
             CreateAction::make(),
+        ];
+    }
+
+    #[Override]
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            PayoutOverview::make(),
         ];
     }
 }

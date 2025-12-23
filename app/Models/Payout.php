@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\PayoutDriver;
 use App\Enums\PayoutStatus;
+use App\Traits\HasAuthor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,17 +19,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $seller_id
  * @property float $amount
  * @property PayoutStatus $status
- * @property string|null $payout_method
+ * @property PayoutDriver|null $payout_method
  * @property string|null $external_payout_id
  * @property string|null $notes
  * @property string|null $failure_reason
- * @property \Illuminate\Support\Carbon|null $processed_at
- * @property int|null $processed_by
+ * @property int|null $created_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read User|null $author
+ * @property-read mixed $author_name
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Commission> $commissions
  * @property-read int|null $commissions_count
- * @property-read User|null $processor
+ * @property-read User|null $creator
  * @property-read User $seller
  *
  * @method static Builder<static>|Payout completed()
@@ -38,13 +41,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static Builder<static>|Payout query()
  * @method static Builder<static>|Payout whereAmount($value)
  * @method static Builder<static>|Payout whereCreatedAt($value)
+ * @method static Builder<static>|Payout whereCreatedBy($value)
  * @method static Builder<static>|Payout whereExternalPayoutId($value)
  * @method static Builder<static>|Payout whereFailureReason($value)
  * @method static Builder<static>|Payout whereId($value)
  * @method static Builder<static>|Payout whereNotes($value)
  * @method static Builder<static>|Payout wherePayoutMethod($value)
- * @method static Builder<static>|Payout whereProcessedAt($value)
- * @method static Builder<static>|Payout whereProcessedBy($value)
  * @method static Builder<static>|Payout whereSellerId($value)
  * @method static Builder<static>|Payout whereStatus($value)
  * @method static Builder<static>|Payout whereUpdatedAt($value)
@@ -53,7 +55,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Payout extends Model
 {
+    use HasAuthor;
     use HasFactory;
+
+    protected $attributes = [
+        'status' => PayoutStatus::Pending,
+    ];
 
     protected $fillable = [
         'seller_id',
@@ -63,8 +70,6 @@ class Payout extends Model
         'external_payout_id',
         'failure_reason',
         'notes',
-        'processed_at',
-        'processed_by',
     ];
 
     public function seller(): BelongsTo
@@ -75,11 +80,6 @@ class Payout extends Model
     public function commissions(): HasMany
     {
         return $this->hasMany(Commission::class);
-    }
-
-    public function processor(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'processed_by');
     }
 
     public function amount(): Attribute
@@ -114,6 +114,7 @@ class Payout extends Model
     {
         return [
             'amount' => 'float',
+            'payout_method' => PayoutDriver::class,
             'status' => PayoutStatus::class,
             'processed_at' => 'datetime',
         ];

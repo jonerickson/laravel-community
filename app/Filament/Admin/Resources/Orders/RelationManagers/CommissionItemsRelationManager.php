@@ -82,8 +82,24 @@ class CommissionItemsRelationManager extends RelationManager
                     ->money()
                     ->searchable(),
                 TextColumn::make('status')
+                    ->label('Commission Status')
                     ->sortable()
                     ->badge(),
+                TextColumn::make('payout.status')
+                    ->label('Payout Status')
+                    ->placeholder('No Payout Initialized')
+                    ->sortable()
+                    ->badge(),
+                TextColumn::make('payout.created_at')
+                    ->label('Payout Processed')
+                    ->placeholder('No Payout Initialized')
+                    ->since()
+                    ->sortable()
+                    ->dateTimeTooltip(),
+                TextColumn::make('payout.author.name')
+                    ->label('Payout Processed By')
+                    ->placeholder('No Payout Initialized')
+                    ->sortable(),
             ])
             ->headerActions([
                 CreateAction::make()

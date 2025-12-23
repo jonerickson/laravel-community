@@ -47,8 +47,8 @@ class StripeDriver implements PayoutProcessor
                     'transfers' => ['requested' => true],
                 ],
                 'metadata' => [
-                    'user_id' => $user->id,
-                    'user_email' => $user->email,
+                    'seller_id' => $user->id,
+                    'seller_email' => $user->email,
                 ],
             ]);
 
@@ -227,8 +227,8 @@ class StripeDriver implements PayoutProcessor
                 'pending' => $pending,
                 'currency' => $balance->available[0]->currency ?? 'usd',
                 'breakdown' => [
-                    'available' => $balance->available->toArray(),
-                    'pending' => $balance->pending->toArray(),
+                    'available' => $balance->available,
+                    'pending' => $balance->pending,
                 ],
             ]);
         });
@@ -255,8 +255,8 @@ class StripeDriver implements PayoutProcessor
                 'pending' => $pending,
                 'currency' => $balance->available[0]->currency ?? 'usd',
                 'breakdown' => [
-                    'available' => $balance->available->toArray(),
-                    'pending' => $balance->pending->toArray(),
+                    'available' => $balance->available,
+                    'pending' => $balance->pending,
                 ],
             ]);
         });
@@ -264,7 +264,7 @@ class StripeDriver implements PayoutProcessor
 
     public function createPayout(Payout $payout): ?PayoutData
     {
-        $user = $payout->user;
+        $user = $payout->seller;
 
         if (! $user->hasPayoutAccount()) {
             $payout->update([
@@ -290,7 +290,7 @@ class StripeDriver implements PayoutProcessor
                 'currency' => 'usd',
                 'metadata' => [
                     'payout_id' => $payout->id,
-                    'user_id' => $user->id,
+                    'seller_id' => $user->id,
                 ],
             ], ['stripe_account' => $user->payoutAccountId()]);
 
@@ -315,7 +315,7 @@ class StripeDriver implements PayoutProcessor
             return null;
         }
 
-        $user = $payout->user;
+        $user = $payout->seller;
 
         if (! $user->hasPayoutAccount()) {
             return null;
@@ -349,7 +349,7 @@ class StripeDriver implements PayoutProcessor
             return false;
         }
 
-        $user = $payout->user;
+        $user = $payout->seller;
 
         if (! $user->hasPayoutAccount()) {
             return false;

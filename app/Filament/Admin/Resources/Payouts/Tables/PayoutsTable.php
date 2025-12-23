@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Payouts\Tables;
 
+use App\Enums\PayoutDriver;
 use App\Enums\PayoutStatus;
+use App\Filament\Admin\Resources\Payouts\Actions\CancelAction;
+use App\Filament\Admin\Resources\Payouts\Actions\RetryAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -29,32 +32,21 @@ class PayoutsTable
                     ->sortable(),
                 TextColumn::make('payout_method')
                     ->label('Method')
+                    ->badge()
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
-                TextColumn::make('external_payout_id')
-                    ->label('External ID')
-                    ->searchable()
-                    ->toggleable()
-                    ->placeholder('N/A'),
-                TextColumn::make('processed_at')
-                    ->label('Processed')
-                    ->dateTime()
-                    ->since()
-                    ->dateTimeTooltip()
-                    ->sortable()
-                    ->toggleable(),
-                TextColumn::make('processor.name')
+                TextColumn::make('author.name')
                     ->label('Processed By')
                     ->searchable()
                     ->sortable()
                     ->toggleable()
                     ->placeholder('N/A'),
                 TextColumn::make('created_at')
-                    ->label('Created')
+                    ->label('Processed')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
                 TextColumn::make('updated_at')
                     ->label('Updated')
                     ->dateTime()
@@ -67,17 +59,13 @@ class PayoutsTable
                     ->native(false),
                 SelectFilter::make('payout_method')
                     ->label('Method')
-                    ->options([
-                        'PayPal' => 'PayPal',
-                        'Bank Transfer' => 'Bank Transfer',
-                        'Stripe' => 'Stripe Connect',
-                        'Check' => 'Check',
-                        'Other' => 'Other',
-                    ])
+                    ->options(PayoutDriver::class)
                     ->native(false),
             ])
             ->defaultSort('created_at', 'desc')
             ->recordActions([
+                RetryAction::make(),
+                CancelAction::make(),
                 EditAction::make(),
             ]);
     }

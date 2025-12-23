@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Actions\Payouts;
 
 use App\Actions\Action;
+use App\Data\PayoutData;
+use App\Data\TransferData;
 use App\Enums\PayoutStatus;
 use App\Events\PayoutFailed;
 use App\Events\PayoutProcessed;
@@ -12,7 +14,6 @@ use App\Exceptions\InvalidPayoutStatusException;
 use App\Facades\PayoutProcessor;
 use App\Models\Payout;
 use Exception;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -35,22 +36,21 @@ class ProcessPayoutAction extends Action
             }
 
             try {
-                $result = PayoutProcessor::createPayout($this->payout);
+                $transfer = PayoutProcessor::createTransfer($this->payout->seller, $this->payout->amount);
 
-                if ($result) {
-                    $this->payout->update([
-                        'status' => PayoutStatus::Completed,
-                        'processed_at' => now(),
-                        'processed_by' => Auth::id(),
-                    ]);
+                if ($transfer instanceof TransferData) {
+                    $result = PayoutProcessor::createPayout($this->payout);
 
-                    event(new PayoutProcessed($this->payout));
+                    if ($result instanceof PayoutData) {
+                        $this->payout->update([
+                            'status' => PayoutStatus::Completed,
+                        ]);
 
-                    return true;
+                        event(new PayoutProcessed($this->payout));
+
+                        return true;
+                    }
                 }
-
-                //                $updateBalanceAction = app(UpdateSellerBalanceAction::class);
-                //                $updateBalanceAction->execute($payout->user, $payout->amount, 'payout_failed_refund');
 
                 $this->payout->update([
                     'status' => PayoutStatus::Failed,
@@ -62,9 +62,6 @@ class ProcessPayoutAction extends Action
                 return false;
 
             } catch (Exception $exception) {
-                //                $updateBalanceAction = app(UpdateSellerBalanceAction::class);
-                //                $updateBalanceAction->execute($payout->user, $payout->amount, 'payout_exception_refund');
-
                 $this->payout->update([
                     'status' => PayoutStatus::Failed,
                     'failure_reason' => $exception->getMessage(),

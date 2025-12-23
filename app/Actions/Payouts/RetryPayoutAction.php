@@ -30,8 +30,7 @@ class RetryPayoutAction extends Action
         $this->payout->update([
             'status' => PayoutStatus::Pending,
             'failure_reason' => null,
-            'processed_at' => null,
-            'processed_by' => null,
+            'created_by' => null,
         ]);
 
         $processAction = app(ProcessPayoutAction::class);

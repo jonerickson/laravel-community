@@ -23,8 +23,7 @@ class PayoutFactory extends Factory
             'payout_method' => fake()->randomElement(['PayPal', 'Bank Transfer', 'Stripe', 'Check']),
             'external_payout_id' => fake()->optional()->uuid(),
             'notes' => fake()->optional()->sentence(),
-            'processed_at' => fake()->optional(0.7)->dateTimeBetween('-30 days', 'now'),
-            'processed_by' => fake()->optional(0.7)->randomElement(User::pluck('id')->toArray()),
+            'created_by' => fake()->optional(0.7)->randomElement(User::pluck('id')->toArray()),
         ];
     }
 
@@ -32,8 +31,7 @@ class PayoutFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => PayoutStatus::Pending,
-            'processed_at' => null,
-            'processed_by' => null,
+            'created_by' => null,
         ]);
     }
 
@@ -41,8 +39,7 @@ class PayoutFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => PayoutStatus::Completed,
-            'processed_at' => fake()->dateTimeBetween('-30 days', 'now'),
-            'processed_by' => User::factory(),
+            'created_by' => User::factory(),
         ]);
     }
 
@@ -50,8 +47,7 @@ class PayoutFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => PayoutStatus::Failed,
-            'processed_at' => fake()->dateTimeBetween('-30 days', 'now'),
-            'processed_by' => User::factory(),
+            'created_by' => User::factory(),
         ]);
     }
 
@@ -59,8 +55,7 @@ class PayoutFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => PayoutStatus::Cancelled,
-            'processed_at' => null,
-            'processed_by' => null,
+            'created_by' => null,
         ]);
     }
 }

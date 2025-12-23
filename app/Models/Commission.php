@@ -48,6 +48,7 @@ class Commission extends Model
 
     protected $fillable = [
         'seller_id',
+        'payout_id',
         'order_id',
         'payout',
         'amount',
