@@ -6,17 +6,14 @@ namespace App\Listeners\Store;
 
 use App\Actions\Commissions\RecordCommissionAction;
 use App\Events\OrderSucceeded;
-use App\Mail\Marketplace\ProductSold;
-use App\Models\OrderItem;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Mail;
 use Throwable;
 
-class CalculateOrderCommissions implements ShouldQueue
+class RecordOrderCommissions implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
@@ -31,7 +28,6 @@ class CalculateOrderCommissions implements ShouldQueue
         }
 
         $order = $event->order;
-        $sellerItems = [];
 
         foreach ($order->items as $item) {
             $product = $item->price->product;
@@ -51,26 +47,11 @@ class CalculateOrderCommissions implements ShouldQueue
 
                 $seller = User::find($product->seller_id);
 
-                if ($seller) {
-                    RecordCommissionAction::execute($seller, $order, $commissionAmount);
+                if (! $seller instanceof User) {
+                    continue;
                 }
 
-                if (! isset($sellerItems[$seller->getKey()])) {
-                    $sellerItems[$seller->getKey()] = [];
-                }
-
-                $sellerItems[$seller->getKey()][] = $item;
-            }
-        }
-
-        /** @var array<OrderItem> $items */
-        foreach ($sellerItems as $items) {
-            $seller = $items[0]->price->product->seller;
-
-            if ($seller && $seller->email) {
-                Mail::to($seller->email)->send(
-                    new ProductSold($order, $seller, collect($items))
-                );
+                RecordCommissionAction::execute($seller, $order, $commissionAmount);
             }
         }
     }

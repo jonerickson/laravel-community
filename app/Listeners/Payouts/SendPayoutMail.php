@@ -13,8 +13,12 @@ class SendPayoutMail
 {
     public function handle(PayoutProcessed $event): void
     {
-        if ($event->payout->status === PayoutStatus::Completed) {
-            Mail::to($event->payout->seller)->send(new NewPayout($event->payout));
+        if ($event->payout->status !== PayoutStatus::Completed) {
+            return;
         }
+
+        Mail::to($event->payout->seller->email)->send(new NewPayout(
+            payout: $event->payout
+        ));
     }
 }
