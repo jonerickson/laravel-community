@@ -42,7 +42,7 @@ class StripeDriver implements PayoutProcessor
             $accountType = config('payout.stripe.connect_type', Account::TYPE_EXPRESS);
             $businessType = $options['business_type'] ?? Account::BUSINESS_TYPE_INDIVIDUAL;
 
-            $accountPayload = [
+            $account = $this->stripe->accounts->create([
                 'type' => $accountType,
                 'email' => $user->email,
                 'business_type' => $businessType,
@@ -53,17 +53,7 @@ class StripeDriver implements PayoutProcessor
                     'seller_id' => $user->reference_id,
                     'seller_email' => $user->email,
                 ],
-            ];
-
-            if ($businessType === Account::BUSINESS_TYPE_INDIVIDUAL) {
-                $accountPayload['individual'] = $user->name;
-            }
-
-            if (in_array($businessType, [Account::BUSINESS_TYPE_COMPANY, Account::BUSINESS_TYPE_GOVERNMENT_ENTITY, Account::BUSINESS_TYPE_NON_PROFIT]) && isset($options['company'])) {
-                $accountPayload['company'] = $options['company'];
-            }
-
-            $account = $this->stripe->accounts->create($accountPayload);
+            ]);
 
             DB::transaction(function () use ($user, $account): void {
                 $user->update([
