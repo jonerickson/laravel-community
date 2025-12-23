@@ -14,6 +14,7 @@ use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
@@ -65,12 +66,12 @@ class PayoutForm
                             ->required()
                             ->helperText('Select the payout method that will be used.')
                             ->label('Payout Method')
-                            ->options(PayoutDriver::class),
+                            ->options(PayoutDriver::class)
+                            ->default(PayoutDriver::Stripe),
                         RichEditor::make('notes')
                             ->placeholder('Optional notes to add to the payout.')
                             ->label('Notes'),
                         TextInput::make('amount')
-                            ->visibleOn('create')
                             ->helperText('The total payout amount. This will be auto-calculated when selecting the commissions to pay out. You may also manually adjust this if needed.')
                             ->label('Total')
                             ->required()
@@ -80,7 +81,16 @@ class PayoutForm
                             ->prefix('$')
                             ->suffix('USD')
                             ->step(0.01)
-                            ->minValue(0),
+                            ->rules(['gt:0']),
+                    ]),
+                Section::make('Failure Details')
+                    ->visibleOn('view')
+                    ->columnSpanFull()
+                    ->schema([
+                        TextEntry::make('failure_message')
+                            ->hiddenLabel()
+                            ->placeholder('No Failure Message')
+                            ->html(),
                     ]),
             ]);
     }

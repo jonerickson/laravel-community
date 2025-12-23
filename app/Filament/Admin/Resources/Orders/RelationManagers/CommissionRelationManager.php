@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Override;
 
-class CommissionItemsRelationManager extends RelationManager
+class CommissionRelationManager extends RelationManager
 {
     protected static string $relationship = 'commissions';
 
