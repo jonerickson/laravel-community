@@ -15,6 +15,11 @@ use Override;
 
 class PayoutStatsOverview extends StatsOverviewWidget
 {
+    public static function canView(): bool
+    {
+        return Auth::user()->payouts_enabled;
+    }
+
     #[Override]
     protected function getStats(): array
     {
