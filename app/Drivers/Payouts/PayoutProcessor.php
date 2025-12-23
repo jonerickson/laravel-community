@@ -26,6 +26,8 @@ interface PayoutProcessor
 
     public function isAccountOnboardingComplete(User $user): bool;
 
+    public function getAccountDashboardUrl(User $user): ?string;
+
     public function getBalance(User $user): ?BalanceData;
 
     public function getPlatformBalance(): ?BalanceData;

@@ -54,6 +54,11 @@ class PayoutManager extends Manager implements PayoutProcessor
         return $this->driver()->isAccountOnboardingComplete($user);
     }
 
+    public function getAccountDashboardUrl(User $user): ?string
+    {
+        return $this->driver()->getAccountDashboardUrl($user);
+    }
+
     public function getBalance(User $user): ?BalanceData
     {
         return $this->driver()->getBalance($user);

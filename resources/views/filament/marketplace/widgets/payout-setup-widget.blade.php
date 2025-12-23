@@ -1,4 +1,4 @@
-<x-filament-widgets::widget>
+<x-filament-widgets::widget x-on:open-url-in-new-tab.window="window.open($event.detail.url, '_blank')">
     <x-filament::section>
         @if ($isOnboarded)
             <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -13,6 +13,7 @@
                 </div>
                 @if ($hasAccount)
                     <div class="flex gap-2">
+                        <x-filament::button color="primary" outlined wire:click="openDashboard">View Dashboard</x-filament::button>
                         <x-filament::button color="danger" wire:click="deactivateAccount">Deactivate Account</x-filament::button>
                     </div>
                 @endif

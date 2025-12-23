@@ -189,6 +189,19 @@ class StripeDriver implements PayoutProcessor
         }, false);
     }
 
+    public function getAccountDashboardUrl(User $user): ?string
+    {
+        if (! $user->hasPayoutAccount()) {
+            return null;
+        }
+
+        return $this->executeWithErrorHandling('getAccountDashboardUrl', function () use ($user): ?string {
+            $loginLink = $this->stripe->accounts->createLoginLink($user->payoutAccountId());
+
+            return $loginLink->url;
+        });
+    }
+
     public function getBalance(User $user): ?BalanceData
     {
         if (! $user->hasPayoutAccount() || ! $user->isPayoutAccountOnboardingComplete()) {

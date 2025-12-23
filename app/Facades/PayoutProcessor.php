@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool deleteConnectedAccount(\App\Models\User $user)
  * @method static string|null getAccountOnboardingUrl(\App\Models\User $user, string|null $returnUrl = null, string|null $refreshUrl = null)
  * @method static bool isAccountOnboardingComplete(\App\Models\User $user)
+ * @method static string|null getAccountDashboardUrl(\App\Models\User $user)
  * @method static \App\Data\BalanceData|null getBalance(\App\Models\User $user)
  * @method static \App\Data\BalanceData|null getPlatformBalance()
  * @method static \App\Data\PayoutData|null createPayout(\App\Models\Payout $payout)

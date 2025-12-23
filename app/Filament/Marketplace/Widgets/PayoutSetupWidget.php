@@ -89,4 +89,21 @@ class PayoutSetupWidget extends Widget
             ->success()
             ->send();
     }
+
+    public function openDashboard(): void
+    {
+        $user = Auth::user();
+
+        $dashboardUrl = PayoutProcessor::getAccountDashboardUrl($user);
+
+        if ($dashboardUrl) {
+            $this->dispatch('open-url-in-new-tab', url: $dashboardUrl);
+        } else {
+            Notification::make()
+                ->title('Unable to Access Dashboard')
+                ->body('Please ensure your payout account is set up correctly.')
+                ->danger()
+                ->send();
+        }
+    }
 }

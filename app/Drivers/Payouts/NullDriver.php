@@ -44,6 +44,11 @@ class NullDriver implements PayoutProcessor
         return false;
     }
 
+    public function getAccountDashboardUrl(User $user): ?string
+    {
+        return null;
+    }
+
     public function getBalance(User $user): ?BalanceData
     {
         return null;
