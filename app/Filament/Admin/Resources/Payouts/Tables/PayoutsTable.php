@@ -8,7 +8,8 @@ use App\Enums\PayoutDriver;
 use App\Enums\PayoutStatus;
 use App\Filament\Admin\Resources\Payouts\Actions\CancelAction;
 use App\Filament\Admin\Resources\Payouts\Actions\RetryAction;
-use Filament\Actions\EditAction;
+use App\Filament\Admin\Resources\Users\RelationManagers\PayoutsRelationManager;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -20,6 +21,7 @@ class PayoutsTable
         return $table
             ->columns([
                 TextColumn::make('seller.name')
+                    ->hiddenOn(PayoutsRelationManager::class)
                     ->label('Seller')
                     ->searchable()
                     ->sortable(),
@@ -66,7 +68,7 @@ class PayoutsTable
             ->recordActions([
                 RetryAction::make(),
                 CancelAction::make(),
-                EditAction::make(),
+                ViewAction::make(),
             ]);
     }
 }

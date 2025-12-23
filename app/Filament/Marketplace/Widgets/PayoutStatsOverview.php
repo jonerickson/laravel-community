@@ -42,7 +42,7 @@ class PayoutStatsOverview extends StatsOverviewWidget
         return (float) Payout::whereBelongsTo(Auth::user(), 'seller')
             ->where('status', PayoutStatus::Completed)
             ->whereBetween('created_at', [today()->startOfMonth(), today()->endOfMonth()])
-            ->sum('amount');
+            ->sum('amount') / 100;
     }
 
     protected function calculateQtd(): float
@@ -50,7 +50,7 @@ class PayoutStatsOverview extends StatsOverviewWidget
         return (float) Payout::whereBelongsTo(Auth::user(), 'seller')
             ->where('status', PayoutStatus::Completed)
             ->whereBetween('created_at', [today()->startOfQuarter(), today()->endOfQuarter()])
-            ->sum('amount');
+            ->sum('amount') / 100;
     }
 
     protected function calculateYtd(): float
@@ -58,13 +58,13 @@ class PayoutStatsOverview extends StatsOverviewWidget
         return (float) Payout::whereBelongsTo(Auth::user(), 'seller')
             ->where('status', PayoutStatus::Completed)
             ->whereBetween('created_at', [today()->startOfYear(), today()->endOfYear()])
-            ->sum('amount');
+            ->sum('amount') / 100;
     }
 
     protected function calculateLifetime(): float
     {
         return (float) Payout::whereBelongsTo(Auth::user(), 'seller')
             ->where('status', PayoutStatus::Completed)
-            ->sum('amount');
+            ->sum('amount') / 100;
     }
 }

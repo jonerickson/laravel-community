@@ -70,7 +70,7 @@ class MarketplaceSalesTable extends TableWidget
                     ->badge()
                     ->sortable(),
                 TextColumn::make('payout.status')
-                    ->placeholder('Not Initiated')
+                    ->placeholder('No Payout Initiated')
                     ->label('Payout Status')
                     ->badge()
                     ->sortable(),

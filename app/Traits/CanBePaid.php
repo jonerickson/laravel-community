@@ -19,7 +19,7 @@ trait CanBePaid
 {
     public function payouts(): HasMany
     {
-        return $this->hasMany(Payout::class);
+        return $this->hasMany(Payout::class, 'seller_id');
     }
 
     public function commissions(): HasMany

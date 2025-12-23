@@ -20,6 +20,7 @@ use App\Filament\Admin\Resources\Users\RelationManagers\FieldsRelationManager;
 use App\Filament\Admin\Resources\Users\RelationManagers\FingerprintsRelationManager;
 use App\Filament\Admin\Resources\Users\RelationManagers\IntegrationsRelationManager;
 use App\Filament\Admin\Resources\Users\RelationManagers\OrdersRelationManager;
+use App\Filament\Admin\Resources\Users\RelationManagers\PayoutsRelationManager;
 use App\Filament\Admin\Resources\Users\Widgets\RegistrationsTable;
 use App\Filament\Admin\Resources\Users\Widgets\UserStatsOverview;
 use App\Filament\Exports\UserExporter;
@@ -323,6 +324,15 @@ class UserResource extends Resource
                             ->schema([
                                 Livewire::make(ListPaymentMethods::class, fn (?User $record): array => [
                                     'record' => $record,
+                                ]),
+                            ]),
+                        Tabs\Tab::make('Payouts')
+                            ->icon(Heroicon::OutlinedBanknotes)
+                            ->visibleOn('edit')
+                            ->schema([
+                                Livewire::make(PayoutsRelationManager::class, fn (?User $record): array => [
+                                    'ownerRecord' => $record,
+                                    'pageClass' => EditUser::class,
                                 ]),
                             ]),
                         Tabs\Tab::make('Subscriptions')
