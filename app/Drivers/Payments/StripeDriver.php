@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Drivers\Payments;
 
-use App\Contracts\PaymentProcessor;
 use App\Data\CustomerData;
 use App\Data\DiscountData;
 use App\Data\InvoiceData;

@@ -29,8 +29,7 @@ enum PayoutStatus: string implements HasColor, HasLabel
         return match ($this) {
             self::Pending => 'warning',
             self::Completed => 'success',
-            self::Failed => 'danger',
-            self::Cancelled => 'gray',
+            self::Failed, self::Cancelled => 'danger',
         };
     }
 }

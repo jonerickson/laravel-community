@@ -33,17 +33,11 @@ return [
     'fingerprint' => [
         'endpoint' => env('FINGERPRINT_ENDPONT'),
         'api_key' => env('FINGERPRINT_API_KEY'),
-        'suspect_score_threshold' => env('FINGERPRINT_SUSPECT_THRESHOLD', 11),
+        'suspect_score_threshold' => env('FINGERPRINT_SUSPECT_THRESHOLD', 25),
     ],
 
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
-    ],
-
-    'ses' => [
-        'key' => env('AWS_ACCESS_KEY_ID'),
-        'secret' => env('AWS_SECRET_ACCESS_KEY'),
-        'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
     'resend' => [
@@ -59,9 +53,10 @@ return [
         'redirect' => env('ROBLOX_REDIRECT_URI'),
     ],
 
-    'stripe' => [
-        'key' => env('STRIPE_KEY'),
-        'secret' => env('STRIPE_SECRET'),
+    'ses' => [
+        'key' => env('AWS_ACCESS_KEY_ID'),
+        'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
     'slack' => [
@@ -69,6 +64,11 @@ return [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
+    ],
+
+    'stripe' => [
+        'key' => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
     ],
 
     'workos' => [

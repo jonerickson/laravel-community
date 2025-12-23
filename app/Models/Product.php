@@ -21,7 +21,7 @@ use App\Traits\HasLogging;
 use App\Traits\HasMetadata;
 use App\Traits\HasReferenceId;
 use App\Traits\HasSlug;
-use App\Traits\LogsMarketplaceActivity;
+use App\Traits\LogsStoreActivity;
 use App\Traits\Orderable;
 use App\Traits\Reviewable;
 use App\Traits\Searchable;
@@ -170,7 +170,7 @@ class Product extends Model implements HasLabel, Sluggable
     use HasMetadata;
     use HasReferenceId;
     use HasSlug;
-    use LogsMarketplaceActivity;
+    use LogsStoreActivity;
     use Orderable;
     use Reviewable;
     use Searchable;

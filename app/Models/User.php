@@ -15,6 +15,7 @@ use App\Events\UserUpdated;
 use App\Facades\PaymentProcessor;
 use App\Managers\PaymentManager;
 use App\Traits\Blacklistable;
+use App\Traits\CanBePaid;
 use App\Traits\HasAvatar;
 use App\Traits\HasEmailAuthentication;
 use App\Traits\HasGroups;
@@ -24,6 +25,7 @@ use App\Traits\HasPermissions;
 use App\Traits\HasReferenceId;
 use App\Traits\Integrations\DiscordUser;
 use App\Traits\LogsAuthActivity;
+use App\Traits\Payments\StripeCustomer;
 use App\Traits\Reportable;
 use App\Traits\Searchable;
 use Exception;
@@ -46,7 +48,6 @@ use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
-use Laravel\Cashier\Billable;
 use Laravel\Passport\Contracts\OAuthenticatable;
 use Laravel\Passport\HasApiTokens;
 use Override;
@@ -67,6 +68,10 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property bool $has_email_authentication
  * @property string|null $avatar
  * @property string|null $stripe_id
+ * @property bool $payouts_enabled
+ * @property string|null $external_payout_account_id
+ * @property Carbon|null $external_payout_account_onboarded_at
+ * @property array<array-key, mixed>|null $external_payout_account_capabilities
  * @property string|null $pm_type
  * @property string|null $pm_last_four
  * @property string|null $pm_expiration
@@ -98,8 +103,12 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read Blacklist|null $blacklist
  * @property-read Collection<int, \Laravel\Passport\Client> $clients
  * @property-read int|null $clients_count
+ * @property-read Collection<int, Commission> $commissions
+ * @property-read int|null $commissions_count
+ * @property float $current_balance
  * @property-read SubscriptionData|null $current_subscription
  * @property-read \App\Data\GroupStyleData|null $display_style
+ * @property-read bool $external_payout_account_onboarding_complete
  * @property-read Collection<int, Field> $fields
  * @property-read int|null $fields_count
  * @property-read Collection<int, Fingerprint> $fingerprints
@@ -160,6 +169,9 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @method static Builder<static>|User whereCreatedAt($value)
  * @method static Builder<static>|User whereEmail($value)
  * @method static Builder<static>|User whereEmailVerifiedAt($value)
+ * @method static Builder<static>|User whereExternalPayoutAccountCapabilities($value)
+ * @method static Builder<static>|User whereExternalPayoutAccountId($value)
+ * @method static Builder<static>|User whereExternalPayoutAccountOnboardedAt($value)
  * @method static Builder<static>|User whereExtraBillingInformation($value)
  * @method static Builder<static>|User whereHasEmailAuthentication($value)
  * @method static Builder<static>|User whereId($value)
@@ -168,6 +180,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @method static Builder<static>|User whereName($value)
  * @method static Builder<static>|User whereOnboardedAt($value)
  * @method static Builder<static>|User wherePassword($value)
+ * @method static Builder<static>|User wherePayoutsEnabled($value)
  * @method static Builder<static>|User wherePmExpiration($value)
  * @method static Builder<static>|User wherePmLastFour($value)
  * @method static Builder<static>|User wherePmType($value)
@@ -185,8 +198,8 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  */
 class User extends Authenticatable implements EmailAuthenticationContract, FilamentAvatar, FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery, HasName, MustVerifyEmail, OAuthenticatable
 {
-    use Billable;
     use Blacklistable;
+    use CanBePaid;
     use DiscordUser;
     use HasApiTokens;
     use HasAvatar;
@@ -202,6 +215,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     use Notifiable;
     use Reportable;
     use Searchable;
+    use StripeCustomer;
 
     protected $fillable = [
         'name',
@@ -210,6 +224,10 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         'signature',
         'password',
         'stripe_id',
+        'payouts_enabled',
+        'external_payout_account_id',
+        'external_payout_account_onboarded_at',
+        'external_payout_account_capabilities',
         'extra_billing_information',
         'billing_address',
         'billing_address_line_2',
@@ -294,11 +312,6 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
             ->orderBy('order');
     }
 
-    public function payouts(): HasMany
-    {
-        return $this->hasMany(Payout::class);
-    }
-
     public function userWarnings(): HasMany
     {
         return $this->hasMany(UserWarning::class);
@@ -344,32 +357,6 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     public function currentSubscription(): Attribute
     {
         return Attribute::get(fn (): ?SubscriptionData => PaymentProcessor::currentSubscription($this));
-    }
-
-    public function stripeName(): string
-    {
-        return $this->name;
-    }
-
-    public function stripeEmail(): string
-    {
-        return $this->email;
-    }
-
-    public function stripeAddress(): array
-    {
-        if (blank($this->billing_address)) {
-            return [];
-        }
-
-        return [
-            'city' => $this->billing_city,
-            'country' => $this->billing_country,
-            'line1' => $this->billing_address,
-            'line2' => $this->billing_address_line_2,
-            'postal_code' => $this->billing_postal_code,
-            'state' => $this->billing_state,
-        ];
     }
 
     /**
@@ -444,6 +431,9 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
             'trial_ends_at' => 'datetime',
             'last_seen_at' => 'datetime',
             'onboarded_at' => 'datetime',
+            'payouts_enabled' => 'boolean',
+            'external_payout_account_onboarded_at' => 'datetime',
+            'external_payout_account_capabilities' => 'array',
         ];
     }
 }

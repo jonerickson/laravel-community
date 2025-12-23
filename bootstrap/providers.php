@@ -10,6 +10,7 @@ $providers = [
     App\Providers\MacroServiceProvider::class,
     App\Providers\MigrationServiceProvider::class,
     App\Providers\PaymentServiceProvider::class,
+    App\Providers\PayoutServiceProvider::class,
     App\Providers\SupportTicketServiceProvider::class,
 ];
 

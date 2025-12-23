@@ -134,7 +134,7 @@
             "@cs-fix app/Models"
         ],
         "facades": [
-            "@php -f vendor/bin/facade.php --  \\\\App\\\\Facades\\\\ExpressionLanguage \\\\App\\\\Facades\\\\PaymentProcessor \\\\App\\\\Facades\\\\SupportTicket"
+            "@php -f vendor/bin/facade.php --  \\\\App\\\\Facades\\\\ExpressionLanguage \\\\App\\\\Facades\\\\PaymentProcessor \\\\App\\\\Facades\\\\PayoutProcessor \\\\App\\\\Facades\\\\SupportTicket"
         ],
         "ide": [
             "@php artisan ide-helper:generate",

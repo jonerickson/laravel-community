@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Contracts;
+namespace App\Drivers\Payments;
 
 use App\Data\CustomerData;
 use App\Data\DiscountData;

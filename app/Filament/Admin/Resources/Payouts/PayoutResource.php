@@ -7,6 +7,7 @@ namespace App\Filament\Admin\Resources\Payouts;
 use App\Filament\Admin\Resources\Payouts\Pages\CreatePayout;
 use App\Filament\Admin\Resources\Payouts\Pages\EditPayout;
 use App\Filament\Admin\Resources\Payouts\Pages\ListPayouts;
+use App\Filament\Admin\Resources\Payouts\Pages\ViewPayout;
 use App\Filament\Admin\Resources\Payouts\Schemas\PayoutForm;
 use App\Filament\Admin\Resources\Payouts\Tables\PayoutsTable;
 use App\Models\Payout;
@@ -41,6 +42,7 @@ class PayoutResource extends Resource
             'index' => ListPayouts::route('/'),
             'create' => CreatePayout::route('/create'),
             'edit' => EditPayout::route('/{record}/edit'),
+            'view' => ViewPayout::route('/{record}'),
         ];
     }
 }

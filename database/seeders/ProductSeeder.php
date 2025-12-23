@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Enums\PriceType;
+use App\Enums\ProductApprovalStatus;
 use App\Enums\SubscriptionInterval;
 use App\Models\Group;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Seeder;
@@ -35,12 +37,24 @@ class ProductSeeder extends Seeder
                 ->hasAttached($productCategory, relationship: 'categories')
                 ->hasAttached(Group::firstOrCreate(['name' => 'Customers']), relationship: 'groups')
                 ->product()
-                ->state([
-                    'name' => $name = "Product $index",
-                    'slug' => Str::slug($name),
-                    'featured_image' => "boilerplate/product-$index.jpg",
-                    'external_product_id' => env(sprintf('STRIPE_PRODUCT_%s', $index)),
-                ])
+                ->state(function () use ($index) {
+                    $state = [
+                        'name' => $name = "Product $index",
+                        'slug' => Str::slug($name),
+                        'featured_image' => "boilerplate/product-$index.jpg",
+                        'external_product_id' => env(sprintf('STRIPE_PRODUCT_%s', $index)),
+                    ];
+
+                    if ($index === 0) {
+                        $state['commission_rate'] = 0.20;
+                        $state['seller_id'] = User::first()?->getKey() ?? User::factory()->create()->getKey();
+                        $state['approval_status'] = ProductApprovalStatus::Approved;
+                        $state['approved_by'] = User::first()?->getKey() ?? User::factory()->create()->getKey();
+                        $state['approved_at'] = now();
+                    }
+
+                    return $state;
+                })
                 ->has(Price::factory()
                     ->count(2)
                     ->oneTime()

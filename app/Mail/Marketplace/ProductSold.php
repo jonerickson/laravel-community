@@ -17,12 +17,13 @@ class ProductSold extends Mailable implements ShouldQueue
 {
     use Queueable;
 
+    public Collection $items;
+
     public function __construct(
         public Order $order,
         public User $seller,
-        public Collection $items
     ) {
-        //
+        $this->items = $this->order->items()->whereRelation('price.product', 'seller_id', $this->seller->id)->get();
     }
 
     public function envelope(): Envelope

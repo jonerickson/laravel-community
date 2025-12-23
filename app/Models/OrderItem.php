@@ -19,13 +19,11 @@ use Override;
  * @property string|null $description
  * @property int|null $price_id
  * @property int|float $amount
- * @property float|null $commission_amount
- * @property int|null $commission_recipient_id
  * @property int|null $quantity
  * @property string|null $external_item_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read User|null $commissionRecipient
+ * @property float|null $commission_amount
  * @property-read Order $order
  * @property-read Price|null $price
  *
@@ -34,8 +32,6 @@ use Override;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereAmount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereCommissionAmount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereCommissionRecipientId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereExternalItemId($value)
@@ -65,8 +61,6 @@ class OrderItem extends Model implements HasLabel
         'name',
         'description',
         'amount',
-        'commission_amount',
-        'commission_recipient_id',
         'external_item_id',
     ];
 
@@ -78,11 +72,6 @@ class OrderItem extends Model implements HasLabel
     public function price(): BelongsTo
     {
         return $this->belongsTo(Price::class);
-    }
-
-    public function commissionRecipient(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'commission_recipient_id');
     }
 
     public function getLabel(): string|Htmlable|null
@@ -131,7 +120,6 @@ class OrderItem extends Model implements HasLabel
     {
         return [
             'quantity' => 'integer',
-            'commission_amount' => 'integer',
             'amount' => 'integer',
         ];
     }

@@ -4,20 +4,23 @@ declare(strict_types=1);
 
 namespace App\Listeners\Store;
 
+use App\Actions\Commissions\RecordCommissionAction;
 use App\Events\OrderSucceeded;
-use App\Mail\Marketplace\ProductSold;
-use App\Models\OrderItem;
+use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Mail;
+use Throwable;
 
-class CalculateOrderCommissions implements ShouldQueue
+class RecordOrderCommissions implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
 
+    /**
+     * @throws Throwable
+     */
     public function handle(OrderSucceeded $event): void
     {
         if (App::runningConsoleCommand('app:migrate')) {
@@ -25,7 +28,6 @@ class CalculateOrderCommissions implements ShouldQueue
         }
 
         $order = $event->order;
-        $sellerItems = [];
 
         foreach ($order->items as $item) {
             $product = $item->price->product;
@@ -43,28 +45,13 @@ class CalculateOrderCommissions implements ShouldQueue
             if ($commissionRate > 0) {
                 $commissionAmount = $item->amount * $commissionRate;
 
-                $item->update([
-                    'commission_amount' => $commissionAmount,
-                    'commission_recipient_id' => $product->seller_id,
-                ]);
+                $seller = User::find($product->seller_id);
 
-                $sellerId = $product->seller_id;
-                if (! isset($sellerItems[$sellerId])) {
-                    $sellerItems[$sellerId] = [];
+                if (! $seller instanceof User) {
+                    continue;
                 }
 
-                $sellerItems[$sellerId][] = $item;
-            }
-        }
-
-        /** @var array<OrderItem> $items */
-        foreach ($sellerItems as $items) {
-            $seller = $items[0]->price->product->seller;
-
-            if ($seller && $seller->email) {
-                Mail::to($seller->email)->send(
-                    new ProductSold($order, $seller, collect($items))
-                );
+                RecordCommissionAction::execute($seller, $order, $commissionAmount);
             }
         }
     }

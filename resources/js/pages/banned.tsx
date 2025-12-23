@@ -1,8 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { AlertTriangleIcon, ShieldXIcon } from 'lucide-react';
+import SharedData = App.Data.SharedData;
 
 interface UserFingerprint {
     id: number;
@@ -20,6 +21,8 @@ interface BannedProps {
 }
 
 export default function Banned({ user, fingerprint, banReason, bannedAt, bannedBy }: BannedProps) {
+    const { email } = usePage<SharedData>().props;
+
     const formatDate = (dateString?: string) => {
         if (!dateString) return 'Unknown';
         return new Date(dateString).toLocaleDateString('en-US', {
@@ -104,13 +107,11 @@ export default function Banned({ user, fingerprint, banReason, bannedAt, bannedB
                         </div>
 
                         <div className="flex flex-col gap-3 pt-4 sm:flex-row">
-                            <Button
-                                variant="outline"
-                                className="flex-1"
-                                onClick={() => window.open('mailto:support@mountaininteractive.com', '_blank')}
-                            >
-                                Contact support
-                            </Button>
+                            {email && (
+                                <Button variant="outline" className="flex-1" onClick={() => window.open(email, '_blank')}>
+                                    Contact support
+                                </Button>
+                            )}
                             <Button variant="outline" className="flex-1" asChild>
                                 <Link href={route('policies.index')}>View policies</Link>
                             </Button>

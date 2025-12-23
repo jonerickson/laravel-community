@@ -318,7 +318,6 @@ class OrderImporter extends AbstractImporter
             'name' => Str::trim($item['itemName'] ?? $product?->name ?? 'Order #'.$sourceOrder->i_id),
             'amount' => (float) ($item['cost'] ?? 0),
             'quantity' => $item['quantity'] ?? 1,
-            'commission_amount' => 0,
             'external_item_id' => $item['itemID'] ?? null,
         ]);
 

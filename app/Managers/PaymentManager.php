@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Managers;
 
-use App\Contracts\PaymentProcessor;
 use App\Data\CustomerData;
 use App\Data\DiscountData;
 use App\Data\InvoiceData;
@@ -13,6 +12,7 @@ use App\Data\PriceData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
 use App\Drivers\Payments\NullDriver;
+use App\Drivers\Payments\PaymentProcessor;
 use App\Drivers\Payments\StripeDriver;
 use App\Enums\OrderRefundReason;
 use App\Enums\PaymentBehavior;

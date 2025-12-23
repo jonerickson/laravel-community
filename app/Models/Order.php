@@ -49,8 +49,8 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read float $amount_subtotal
  * @property-read mixed $checkout_url
  * @property-read float $commission_amount
- * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $commissionItems
- * @property-read int|null $commission_items_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Commission> $commissions
+ * @property-read int|null $commissions_count
  * @property-read OrderDiscount|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Discount> $discounts
  * @property-read int|null $discounts_count
@@ -151,11 +151,9 @@ class Order extends Model implements HasLabel
         return $this->hasMany(OrderItem::class);
     }
 
-    public function commissionItems(): HasMany
+    public function commissions(): HasMany
     {
-        return $this->hasMany(OrderItem::class)
-            ->whereNotNull('commission_amount')
-            ->where('commission_amount', '>', 0);
+        return $this->hasMany(Commission::class);
     }
 
     public function prices(): HasManyThrough
@@ -207,7 +205,7 @@ class Order extends Model implements HasLabel
 
     public function commissionAmount(): Attribute
     {
-        return Attribute::get(fn (): float => (float) $this->items->sum('commission_amount'))
+        return Attribute::get(fn (): float => (float) $this->commissions->sum('amount'))
             ->shouldCache();
     }
 

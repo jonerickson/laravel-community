@@ -35,6 +35,12 @@ declare namespace App.Data {
         can: { [key: string]: boolean };
         roles: Array<string>;
     };
+    export type BalanceData = {
+        available: number;
+        pending: number;
+        currency: string;
+        breakdown: Array<string, unknown> | null;
+    };
     export type CartData = {
         cartCount: number;
         cartItems: Array<App.Data.CartItemData>;
@@ -74,6 +80,18 @@ declare namespace App.Data {
         createdAt: string | null;
         updatedAt: string | null;
         permissions: App.Data.PermissionData;
+    };
+    export type ConnectedAccountData = {
+        id: string;
+        email: string;
+        businessName: string | null;
+        chargesEnabled: boolean;
+        payoutsEnabled: boolean;
+        detailsSubmitted: boolean;
+        capabilities: Array<string, unknown> | null;
+        requirements: Array<string, unknown> | null;
+        country: string | null;
+        defaultCurrency: string | null;
     };
     export type CustomerData = {
         id: string;
@@ -295,6 +313,7 @@ declare namespace App.Data {
         refundReason: string | null;
         refundNotes: string | null;
         amount: number | null;
+        amountSubtotal: number | null;
         amountDue: number | null;
         amountPaid: number | null;
         isOneTime: boolean;
@@ -344,7 +363,7 @@ declare namespace App.Data {
         createdAt: string | null;
         updatedAt: string | null;
     };
-    export type PaginatedData<T = unknown> = {
+    export type PaginatedData = {
         data: Array<T>;
         currentPage: number;
         lastPage: number;
@@ -378,6 +397,20 @@ declare namespace App.Data {
         customer: string | null;
         paymentMethodTypes: Array<string>;
         usage: string;
+    };
+    export type PayoutData = {
+        id: number;
+        userId: number;
+        amount: number;
+        status: App.Enums.PayoutStatus;
+        paymentMethod: App.Enums.PayoutDriver | null;
+        externalPayoutId: string | null;
+        failureReason: string | null;
+        notes: string | null;
+        processedAt: string | null;
+        processedBy: number | null;
+        createdAt: string | null;
+        updatedAt: string | null;
     };
     export type PermissionData = {
         canCreate: boolean;
@@ -479,6 +512,7 @@ declare namespace App.Data {
         isSubscriptionOnly: boolean;
         isMarketplaceProduct: boolean;
         approvalStatus: App.Enums.ProductApprovalStatus;
+        isActive: boolean;
         isVisible: boolean;
         trialDays: number;
         allowPromotionCodes: boolean;
@@ -632,6 +666,16 @@ declare namespace App.Data {
         updatedAt: string | null;
         permissions: App.Data.PermissionData;
     };
+    export type TransferData = {
+        id: string;
+        amount: number;
+        currency: string;
+        destination: string;
+        sourceTransaction: string | null;
+        metadata: Array<string, unknown> | null;
+        reversed: boolean;
+        createdAt: string | null;
+    };
     export type UserData = {
         id: number;
         referenceId: string | null;
@@ -664,6 +708,7 @@ declare namespace App.Data {
 declare namespace App.Enums {
     export type AnnouncementType = 'info' | 'success' | 'warning' | 'error';
     export type BillingReason = 'manual' | 'subscription_create' | 'subscription_cycle' | 'subscription_threshold' | 'subscription_update';
+    export type CommissionStatus = 'paid' | 'pending' | 'rejected' | 'cancelled' | 'returned';
     export type DiscountType = 'cancellation' | 'gift_card' | 'promo_code' | 'manual';
     export type DiscountValueType = 'fixed' | 'percentage';
     export type FieldType = 'checkbox' | 'date' | 'datetime' | 'number' | 'radio' | 'rich_text' | 'select' | 'text' | 'textarea';
@@ -708,6 +753,7 @@ declare namespace App.Enums {
         | 'succeeded'
         | 'refunded';
     export type PaymentBehavior = 'allow_incomplete' | 'default_incomplete' | 'error_if_incomplete' | 'pending_if_incomplete';
+    export type PayoutDriver = 'stripe';
     export type PayoutStatus = 'pending' | 'completed' | 'failed' | 'cancelled';
     export type PostType = 'blog' | 'forum';
     export type PriceType = 'one_time' | 'recurring';
