@@ -177,6 +177,14 @@ class UserResource extends Resource
                                                 TextEntry::make('reference_id')
                                                     ->label('Reference ID')
                                                     ->copyable(),
+                                                TextEntry::make('url')
+                                                    ->label('URL')
+                                                    ->getStateUsing(fn (User $record): string => route('users.show', $record->reference_id))
+                                                    ->copyable()
+                                                    ->suffixAction(fn (User $record): Action => Action::make('open')
+                                                        ->url(route('users.show', $record->reference_id), shouldOpenInNewTab: true)
+                                                        ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
+                                                    ),
                                             ]),
                                         Section::make('Permissions')
                                             ->visible(fn () => Auth::user()->hasRole(\App\Enums\Role::Administrator))

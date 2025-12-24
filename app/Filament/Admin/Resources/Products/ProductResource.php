@@ -20,6 +20,7 @@ use App\Filament\Admin\Resources\Products\RelationManagers\ReviewsRelationManage
 use App\Filament\Admin\Resources\Products\RelationManagers\TransactionsRelationManager;
 use App\Models\Product;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -42,6 +43,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -276,6 +278,14 @@ class ProductResource extends Resource
                                 TextEntry::make('reference_id')
                                     ->label('Reference ID')
                                     ->copyable(),
+                                TextEntry::make('url')
+                                    ->label('URL')
+                                    ->getStateUsing(fn (Product $record): string => route('store.products.show', $record->slug))
+                                    ->copyable()
+                                    ->suffixAction(fn (Product $record): Action => Action::make('open')
+                                        ->url(route('store.products.show', $record->slug), shouldOpenInNewTab: true)
+                                        ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
+                                    ),
                             ]),
                         Section::make('Publishing')
                             ->components([

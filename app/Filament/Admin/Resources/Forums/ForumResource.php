@@ -12,6 +12,7 @@ use App\Filament\Admin\Resources\Forums\RelationManagers\TopicsRelationManager;
 use App\Models\Forum;
 use App\Services\CacheService;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -160,6 +161,14 @@ class ForumResource extends Resource
                                     ->label('Updated')
                                     ->since()
                                     ->dateTimeTooltip(),
+                                TextEntry::make('url')
+                                    ->label('URL')
+                                    ->getStateUsing(fn (Forum $record): string => route('forums.show', $record->slug))
+                                    ->copyable()
+                                    ->suffixAction(fn (Forum $record): Action => Action::make('open')
+                                        ->url(route('forums.show', $record->slug), shouldOpenInNewTab: true)
+                                        ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
+                                    ),
                             ]),
                         Section::make('Publishing')
                             ->schema([

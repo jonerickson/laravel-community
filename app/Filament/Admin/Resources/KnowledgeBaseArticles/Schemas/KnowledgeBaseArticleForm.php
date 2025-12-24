@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\KnowledgeBaseArticles\Schemas;
 
 use App\Enums\KnowledgeBaseArticleType;
+use App\Models\KnowledgeBaseArticle;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
@@ -15,10 +17,12 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -98,6 +102,26 @@ class KnowledgeBaseArticleForm
                     ]),
                 Group::make()
                     ->schema([
+                        Section::make('Details')
+                            ->visibleOn('edit')
+                            ->components([
+                                TextEntry::make('created_at')
+                                    ->label('Created')
+                                    ->since()
+                                    ->dateTimeTooltip(),
+                                TextEntry::make('updated_at')
+                                    ->label('Updated')
+                                    ->since()
+                                    ->dateTimeTooltip(),
+                                TextEntry::make('url')
+                                    ->label('URL')
+                                    ->getStateUsing(fn (KnowledgeBaseArticle $record): string => route('knowledge-base.show', $record->slug))
+                                    ->copyable()
+                                    ->suffixAction(fn (KnowledgeBaseArticle $record): Action => Action::make('open')
+                                        ->url(route('knowledge-base.show', $record->slug), shouldOpenInNewTab: true)
+                                        ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
+                                    ),
+                            ]),
                         Section::make('Publishing')
                             ->columns(1)
                             ->schema([

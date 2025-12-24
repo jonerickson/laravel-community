@@ -11,6 +11,7 @@ use App\Filament\Admin\Resources\Posts\Pages\ListPosts;
 use App\Filament\Admin\Resources\Posts\RelationManagers\CommentsRelationManager;
 use App\Models\Post;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -32,6 +33,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -130,6 +132,14 @@ class PostResource extends Resource
                                     ->label('Updated')
                                     ->since()
                                     ->dateTimeTooltip(),
+                                TextEntry::make('url')
+                                    ->label('URL')
+                                    ->getStateUsing(fn (Post $record): string => route('blog.show', $record->slug))
+                                    ->copyable()
+                                    ->suffixAction(fn (Post $record): Action => Action::make('open')
+                                        ->url(route('blog.show', $record->slug), shouldOpenInNewTab: true)
+                                        ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
+                                    ),
                             ]),
                         Section::make('Publishing')
                             ->columns(1)

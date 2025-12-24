@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Pages\Schemas;
 
 use App\Filament\Admin\Resources\Pages\PageResource;
+use App\Models\Page;
 use Filament\Actions\Action;
 use Filament\Forms\Components\CodeEditor;
 use Filament\Forms\Components\DateTimePicker;
@@ -17,6 +18,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Phiki\Grammar\Grammar;
@@ -110,6 +112,14 @@ class PageForm
                                     ->label('Updated')
                                     ->since()
                                     ->dateTimeTooltip(),
+                                TextEntry::make('url')
+                                    ->label('URL')
+                                    ->getStateUsing(fn (Page $record): string => route('pages.show', $record->slug))
+                                    ->copyable()
+                                    ->suffixAction(fn (Page $record): Action => Action::make('open')
+                                        ->url(route('pages.show', $record->slug), shouldOpenInNewTab: true)
+                                        ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
+                                    ),
                             ]),
                         Section::make('Publishing')
                             ->schema([

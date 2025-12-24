@@ -9,6 +9,7 @@ use App\Filament\Admin\Resources\Policies\Pages\EditPolicy;
 use App\Filament\Admin\Resources\Policies\Pages\ListPolicies;
 use App\Models\Policy;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -25,6 +26,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -94,6 +96,14 @@ class PolicyResource extends Resource
                                     ->label('Updated')
                                     ->since()
                                     ->dateTimeTooltip(),
+                                TextEntry::make('url')
+                                    ->label('URL')
+                                    ->getStateUsing(fn (Policy $record): string => route('policies.show', ['category' => $record->category->slug, 'policy' => $record->slug]))
+                                    ->copyable()
+                                    ->suffixAction(fn (Policy $record): Action => Action::make('open')
+                                        ->url(route('policies.show', ['category' => $record->category->slug, 'policy' => $record->slug]), shouldOpenInNewTab: true)
+                                        ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
+                                    ),
                             ]),
                         Section::make('Publishing')
                             ->schema([

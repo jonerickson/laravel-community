@@ -9,6 +9,7 @@ use App\Filament\Admin\Resources\Topics\Pages\EditTopic;
 use App\Filament\Admin\Resources\Topics\Pages\ListTopics;
 use App\Models\Topic;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -78,6 +79,14 @@ class TopicResource extends Resource
                                     ->label('Updated')
                                     ->since()
                                     ->dateTimeTooltip(),
+                                TextEntry::make('url')
+                                    ->label('URL')
+                                    ->getStateUsing(fn (Topic $record): string => route('forums.topics.show', ['forum' => $record->forum->slug, 'topic' => $record->slug]))
+                                    ->copyable()
+                                    ->suffixAction(fn (Topic $record): Action => Action::make('open')
+                                        ->url(route('forums.topics.show', ['forum' => $record->forum->slug, 'topic' => $record->slug]), shouldOpenInNewTab: true)
+                                        ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
+                                    ),
                             ]),
                         Section::make('Publishing')
                             ->columns(1)

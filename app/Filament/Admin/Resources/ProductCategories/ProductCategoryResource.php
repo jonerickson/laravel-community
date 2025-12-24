@@ -9,6 +9,7 @@ use App\Filament\Admin\Resources\ProductCategories\Pages\EditProductCategory;
 use App\Filament\Admin\Resources\ProductCategories\Pages\ListProductCategories;
 use App\Models\ProductCategory;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -112,6 +113,14 @@ class ProductCategoryResource extends Resource
                                     ->label('Updated')
                                     ->since()
                                     ->dateTimeTooltip(),
+                                TextEntry::make('url')
+                                    ->label('URL')
+                                    ->getStateUsing(fn (ProductCategory $record): string => route('store.categories.show', $record->slug))
+                                    ->copyable()
+                                    ->suffixAction(fn (ProductCategory $record): Action => Action::make('open')
+                                        ->url(route('store.categories.show', $record->slug), shouldOpenInNewTab: true)
+                                        ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
+                                    ),
                             ]),
                         Section::make('Publishing')
                             ->schema([
