@@ -30,9 +30,9 @@ export function StoreProductRatingDialog({ product, reviews, scrollProp = 'revie
         <Dialog open={isRatingModalOpen} onOpenChange={setIsRatingModalOpen}>
             <DialogTrigger asChild>
                 <button className="text-sm text-primary hover:underline">
-                    {product.reviewsCount === 0
+                    {reviews.data.length === 0
                         ? 'Write a review'
-                        : `See all ${abbreviateNumber(product.reviewsCount)} ${pluralize('review', product.reviewsCount)}`}
+                        : `See all ${abbreviateNumber(reviews.data.length)} ${pluralize('review', reviews.data.length)}`}
                 </button>
             </DialogTrigger>
             <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-5xl">

@@ -78,7 +78,7 @@ export default function Reviews({ subscription, reviews }: ReviewsPageProps) {
                             <div className="flex flex-col items-start gap-2 md:items-end">
                                 <StarRating rating={subscription.averageRating || 0} showValue={true} size="lg" />
                                 <span className="text-sm text-muted-foreground">
-                                    {abbreviateNumber(subscription.reviewsCount)} {pluralize('review', subscription.reviewsCount)}
+                                    {abbreviateNumber(reviews.data.length)} {pluralize('review', reviews.data.length)}
                                 </span>
                             </div>
                         </div>
