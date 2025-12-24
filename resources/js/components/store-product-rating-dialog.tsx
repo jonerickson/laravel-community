@@ -35,7 +35,7 @@ export function StoreProductRatingDialog({ product, reviews, scrollProp = 'revie
                         : `See all ${abbreviateNumber(product.reviewsCount)} ${pluralize('review', product.reviewsCount)}`}
                 </button>
             </DialogTrigger>
-            <DialogContent className="max-h-[80vh] min-w-[90vh] overflow-y-auto">
+            <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-5xl">
                 <DialogHeader>
                     <DialogTitle>Product reviews</DialogTitle>
                     <DialogDescription>View the latest product reviews and ratings.</DialogDescription>

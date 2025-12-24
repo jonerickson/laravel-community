@@ -363,7 +363,7 @@ declare namespace App.Data {
         createdAt: string | null;
         updatedAt: string | null;
     };
-    export type PaginatedData = {
+    export type PaginatedData<T = unknown> = {
         data: Array<T>;
         currentPage: number;
         lastPage: number;

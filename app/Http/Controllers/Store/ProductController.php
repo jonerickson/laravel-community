@@ -62,7 +62,10 @@ class ProductController extends Controller
 
         $reviews = CommentData::collect($product
             ->reviews()
-            ->with(['author.groups'])
+            ->with('author.groups')
+            ->with(['replies' => function (Comment|HasMany $query): void {
+                $query->approved()->with(['author.groups'])->oldest();
+            }])
             ->approved()
             ->latest()
             ->get()

@@ -4,18 +4,28 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Products\RelationManagers;
 
+use App\Filament\Admin\Resources\Comments\Actions\ReplyAction;
+use App\Models\Comment;
+use App\Models\Product;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\RichEditor;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Repeater\TableColumn;
+use Filament\Forms\Components\Textarea;
+use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Override;
 
 class ReviewsRelationManager extends RelationManager
 {
@@ -23,14 +33,57 @@ class ReviewsRelationManager extends RelationManager
 
     protected static string|null|BackedEnum $icon = Heroicon::OutlinedMegaphone;
 
+    protected static ?string $badgeColor = 'gray';
+
+    #[Override]
+    public static function getBadge(Model $ownerRecord, string $pageClass): ?string
+    {
+        /** @var Product $ownerRecord */
+        return (string) $ownerRecord->reviews->count();
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                RichEditor::make('content')
+                Textarea::make('content')
                     ->label('Comment')
                     ->required()
                     ->columnSpanFull(),
+            ]);
+    }
+
+    public function infolist(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                RepeatableEntry::make('replies')
+                    ->hiddenLabel()
+                    ->columnSpanFull()
+                    ->columns()
+                    ->placeholder('No Replies')
+                    ->table([
+                        TableColumn::make('Author'),
+                        TableColumn::make('Reply'),
+                        TableColumn::make('Replied'),
+                        TableColumn::make('Actions'),
+                    ])
+                    ->schema([
+                        TextEntry::make('author.name'),
+                        TextEntry::make('content'),
+                        TextEntry::make('created_at')
+                            ->since()
+                            ->dateTimeTooltip(),
+                        TextEntry::make('delete')
+                            ->state('Delete')
+                            ->suffixAction(Action::make('delete')
+                                ->requiresConfirmation()
+                                ->hiddenLabel()
+                                ->color('danger')
+                                ->icon(Heroicon::OutlinedTrash)
+                                ->action(fn (Comment $record) => $record->delete())
+                            ),
+                    ]),
             ]);
     }
 
@@ -52,6 +105,10 @@ class ReviewsRelationManager extends RelationManager
                     ->html()
                     ->wrap()
                     ->sortable(),
+                TextColumn::make('replies_count')
+                    ->sortable()
+                    ->label('Replies')
+                    ->counts('replies'),
                 IconColumn::make('is_approved')
                     ->sortable()
                     ->boolean()
@@ -66,6 +123,10 @@ class ReviewsRelationManager extends RelationManager
                     ->sortable(),
             ])
             ->recordActions([
+                ReplyAction::make(),
+                ViewAction::make()
+                    ->modalHeading('Replies')
+                    ->modalDescription('View the comment replies.'),
                 EditAction::make(),
                 DeleteAction::make(),
             ])

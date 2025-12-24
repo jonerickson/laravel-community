@@ -310,13 +310,13 @@ class ProductResource extends Resource
                         Section::make('Purchasing')
                             ->components([
                                 Toggle::make('allow_promotion_codes')
-                                    ->afterStateUpdated(fn (Set $set) => $set('allow_discount_codes', false))
+                                    ->afterStateUpdated(fn (Set $set): mixed => $set('allow_discount_codes', false))
                                     ->live()
                                     ->label('Allow Promotion Codes')
                                     ->helperText('Allow customers to use promotion codes when purchasing this product that were generated from your payment processor. You may only use promotion codes or discount codes. You may not use both.')
                                     ->columnSpanFull(),
                                 Toggle::make('allow_discount_codes')
-                                    ->afterStateUpdated(fn (Set $set) => $set('allow_promotion_codes', false))
+                                    ->afterStateUpdated(fn (Set $set): mixed => $set('allow_promotion_codes', false))
                                     ->live()
                                     ->label('Allow Discount Codes')
                                     ->default(true)

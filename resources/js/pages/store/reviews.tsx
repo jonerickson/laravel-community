@@ -2,14 +2,13 @@ import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
 import RichEditorContent from '@/components/rich-editor-content';
 import { StarRating } from '@/components/star-rating';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { StoreProductReviewsList } from '@/components/store-product-reviews-list';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { abbreviateNumber, cn, currency, pluralize } from '@/lib/utils';
-import { Head, InfiniteScroll, router, useForm, usePage } from '@inertiajs/react';
-import { formatDistanceToNow } from 'date-fns';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, LoaderCircle, MessageSquare, Star } from 'lucide-react';
 import { useState } from 'react';
 import SharedData = App.Data.SharedData;
@@ -126,7 +125,7 @@ export default function Reviews({ subscription, reviews }: ReviewsPageProps) {
                                         })}
                                         {rating > 0 && (
                                             <span className="ml-2 text-sm text-muted-foreground">
-                                                {rating} star{rating !== 1 ? 's' : ''}
+                                                {rating} {pluralize('star', rating)}
                                             </span>
                                         )}
                                     </div>
@@ -143,7 +142,9 @@ export default function Reviews({ subscription, reviews }: ReviewsPageProps) {
                                         onChange={(e) => setData('content', e.target.value)}
                                         placeholder="Share your thoughts about this subscription..."
                                         rows={4}
-                                        className={errors.content ? 'border-destructive' : ''}
+                                        className={cn('mt-1', {
+                                            'border-destructive': errors.content,
+                                        })}
                                     />
                                     {errors.content && <p className="text-sm text-destructive">{errors.content}</p>}
                                 </div>
@@ -163,36 +164,7 @@ export default function Reviews({ subscription, reviews }: ReviewsPageProps) {
                     </CardHeader>
                     <CardContent>
                         {reviews && reviews.data.length > 0 ? (
-                            <InfiniteScroll data="reviews">
-                                <div className="divide-y divide-muted">
-                                    {reviews.data.map((review) => (
-                                        <div key={review.id} className="py-6 first:pt-0 last:pb-0">
-                                            <div className="flex items-start gap-3">
-                                                {review.author && (
-                                                    <Avatar className="h-10 w-10">
-                                                        {review.author.avatarUrl && <AvatarImage src={review.author.avatarUrl} />}
-                                                        <AvatarFallback>{review.author.name.charAt(0).toUpperCase()}</AvatarFallback>
-                                                    </Avatar>
-                                                )}
-                                                <div className="min-w-0 flex-1">
-                                                    <div className="mb-1 flex items-center gap-2">
-                                                        <h4 className="text-sm font-medium">
-                                                            {review.author?.name || review.user?.name || 'Anonymous'}
-                                                        </h4>
-                                                        {review.rating && <StarRating rating={review.rating} size="sm" />}
-                                                    </div>
-                                                    <p className="mb-2 text-xs text-muted-foreground">
-                                                        {review.createdAt
-                                                            ? formatDistanceToNow(new Date(review.createdAt), { addSuffix: true })
-                                                            : 'N/A'}
-                                                    </p>
-                                                    <RichEditorContent content={review.content} className="leading-relaxed" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </InfiniteScroll>
+                            <StoreProductReviewsList reviews={reviews} scrollProp="reviews" />
                         ) : (
                             <EmptyState icon={<MessageSquare />} title="No reviews yet" description="Be the first to review this subscription!" />
                         )}

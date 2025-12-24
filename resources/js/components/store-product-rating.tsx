@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useApiRequest } from '@/hooks/use-api-request';
-import { cn } from '@/lib/utils';
+import { cn, pluralize } from '@/lib/utils';
 import { LoaderCircle, Star } from 'lucide-react';
 import { useState } from 'react';
 
@@ -70,7 +70,7 @@ export function StoreProductRating({ product, onRatingAdded }: ProductRatingProp
                         })}
                         {rating > 0 && (
                             <span className="ml-2 text-sm text-muted-foreground">
-                                {rating} star{rating !== 1 ? 's' : ''}
+                                {rating} {pluralize('star', rating)}
                             </span>
                         )}
                     </div>

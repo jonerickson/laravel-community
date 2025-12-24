@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Store\StoreReviewRequest;
 use App\Models\Comment;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
@@ -29,7 +30,10 @@ class ReviewController extends Controller
 
         $reviews = CommentData::collect($subscription
             ->reviews()
-            ->with('author')
+            ->with('author.groups')
+            ->with(['replies' => function (Comment|HasMany $query): void {
+                $query->approved()->with(['author.groups'])->oldest();
+            }])
             ->approved()
             ->latest()
             ->get()
