@@ -141,6 +141,8 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read int|null $roles_count
  * @property-read Collection<int, Subscription> $subscriptions
  * @property-read int|null $subscriptions_count
+ * @property-read Collection<int, SupportTicket> $tickets
+ * @property-read int|null $tickets_count
  * @property-read Collection<int, \Laravel\Passport\Token> $tokens
  * @property-read int|null $tokens_count
  * @property-read Collection<int, UserWarning> $userWarnings
@@ -310,6 +312,11 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
             ->withPivot('value')
             ->withTimestamps()
             ->orderBy('order');
+    }
+
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(SupportTicket::class, 'created_by');
     }
 
     public function userWarnings(): HasMany

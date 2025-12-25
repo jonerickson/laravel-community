@@ -13,6 +13,9 @@ Hello! The status of support ticket **{{ $supportTicket->ticket_number }}** has 
 **Previous Status:** {{ $oldStatus->getLabel() }}<br />
 **New Status:** {{ $newStatus->getLabel() }}<br />
 **Priority:** {{ $supportTicket->priority->getLabel() }}<br />
+**Category:** {{ $supportTicket->category->name ?? 'Not specified' }}<br />
+**Author:** {{ $supportTicket->author->name }}<br />
+**Created At:** {{ $supportTicket->created_at->format('M j, Y \a\t g:i A') }}<br />
 
 Your support ticket has been moved from **{{ $oldStatus->getLabel() }}** to **{{ $newStatus->getLabel() }}**.
 

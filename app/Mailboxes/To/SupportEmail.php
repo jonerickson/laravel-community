@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Mailboxes\To;
 
 use App\Mail\SupportTickets\SupportTicketNotFound;
+use App\Managers\SupportTicketManager;
 use App\Models\SupportTicket;
+use App\Models\SupportTicketCategory;
 use App\Models\User;
 use BeyondCode\Mailbox\InboundEmail;
 use Illuminate\Support\Facades\Mail;
@@ -46,6 +48,8 @@ class SupportEmail
         'video/x-ms-wmv',
     ];
 
+    public function __construct(private readonly SupportTicketManager $ticketManager) {}
+
     public function __invoke(InboundEmail $inboundEmail): void
     {
         $rateLimitKey = 'support-email:'.Str::lower($inboundEmail->from());
@@ -56,6 +60,30 @@ class SupportEmail
 
         RateLimiter::hit($rateLimitKey);
 
+        match (true) {
+            Str::isMatch('/ST-[A-Z0-9]+/', $inboundEmail->subject()) => $this->createTicketReply($inboundEmail),
+            default => $this->createNewTicket($inboundEmail),
+        };
+    }
+
+    private function createNewTicket(InboundEmail $inboundEmail): void
+    {
+        if (! ($author = $this->findAuthor($inboundEmail)) instanceof User) {
+            return;
+        }
+
+        $ticket = $this->ticketManager->createTicket([
+            'subject' => $inboundEmail->subject(),
+            'description' => $inboundEmail->text(),
+            'support_ticket_category_id' => SupportTicketCategory::firstOrCreate(['name' => 'Uncategorized'])->id,
+            'created_by' => $author->id,
+        ]);
+
+        $this->attachFiles($ticket, $inboundEmail);
+    }
+
+    private function createTicketReply(InboundEmail $inboundEmail): void
+    {
         $ticketNumber = Str::of($inboundEmail->subject())
             ->after('ST-')
             ->prepend('ST-')
@@ -69,9 +97,7 @@ class SupportEmail
             return;
         }
 
-        $author = User::query()->where('email', $inboundEmail->from())->first();
-
-        if (! $author instanceof User) {
+        if (! ($author = $this->findAuthor($inboundEmail)) instanceof User) {
             return;
         }
 
@@ -80,11 +106,22 @@ class SupportEmail
             ->trim()
             ->toString();
 
-        $ticket->comments()->create([
-            'content' => $reply,
-            'created_by' => $author->id,
-        ]);
+        $this->ticketManager->addComment(
+            ticket: $ticket,
+            content: $reply,
+            userId: $author->id,
+        );
 
+        $this->attachFiles($ticket, $inboundEmail);
+    }
+
+    private function findAuthor(InboundEmail $inboundEmail): ?User
+    {
+        return User::query()->where('email', $inboundEmail->from())->first();
+    }
+
+    private function attachFiles(SupportTicket $ticket, InboundEmail $inboundEmail): void
+    {
         /** @var MimePart $attachment */
         foreach ($inboundEmail->attachments() as $attachment) {
             $mimeType = $attachment->getContentType();

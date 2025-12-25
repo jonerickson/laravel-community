@@ -12,8 +12,10 @@ Hello! A new comment has been added to support ticket **{{ $supportTicket->ticke
 **Subject:** {{ $supportTicket->subject }}<br />
 **Status:** {{ $supportTicket->status->getLabel() }}<br />
 **Priority:** {{ $supportTicket->priority->getLabel() }}<br />
+**Category:** {{ $supportTicket->category->name ?? 'Not specified' }}<br />
 **From:** {{ $comment->author->name }}<br />
-**Posted:** {{ $comment->created_at->format('M j, Y \a\t g:i A') }}<br />
+**Author:** {{ $supportTicket->author->name }}<br />
+**Comment Added:** {{ $supportTicket->created_at->format('M j, Y \a\t g:i A') }}<br />
 
 <x-mail::panel>
 {!! $comment->content !!}
