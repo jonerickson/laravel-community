@@ -10,12 +10,41 @@ use App\Models\User;
 use BeyondCode\Mailbox\InboundEmail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use ZBateson\MailMimeParser\Message\MimePart;
 
 class SupportEmail
 {
     public const string REPLY_LINE = 'Please reply above this line.
 ----------------------------------';
+
+    private const array ALLOWED_MIME_TYPES = [
+        // Documents
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-powerpoint',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'text/plain',
+        'text/csv',
+        // Images
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+        'image/svg+xml',
+        'image/bmp',
+        // Videos
+        'video/mp4',
+        'video/mpeg',
+        'video/quicktime',
+        'video/x-msvideo',
+        'video/webm',
+        'video/x-ms-wmv',
+    ];
 
     public function __invoke(InboundEmail $inboundEmail): void
     {
@@ -32,7 +61,7 @@ class SupportEmail
             ->prepend('ST-')
             ->toString();
 
-        $ticket = SupportTicket::query()->where('ticket_number', $ticketNumber)->firstOr(function () use ($inboundEmail, $ticketNumber) {
+        $ticket = SupportTicket::query()->where('ticket_number', $ticketNumber)->firstOr(function () use ($inboundEmail, $ticketNumber): void {
             Mail::to($inboundEmail->from())->send(new SupportTicketNotFound($ticketNumber));
         });
 
@@ -55,5 +84,28 @@ class SupportEmail
             'content' => $reply,
             'created_by' => $author->id,
         ]);
+
+        /** @var MimePart $attachment */
+        foreach ($inboundEmail->attachments() as $attachment) {
+            $mimeType = $attachment->getContentType();
+
+            if (! in_array($mimeType, self::ALLOWED_MIME_TYPES, true)) {
+                continue;
+            }
+
+            $filename = $attachment->getFilename();
+            $uniqueFilename = Str::uuid().'-'.$filename;
+            $path = 'support/'.$uniqueFilename;
+            $content = $attachment->getContent();
+
+            if (Storage::put($path, $content)) {
+                $ticket->files()->create([
+                    'name' => $filename,
+                    'filename' => $filename,
+                    'path' => $path,
+                    'mime' => $mimeType,
+                ]);
+            }
+        }
     }
 }

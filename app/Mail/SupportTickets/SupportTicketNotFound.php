@@ -16,7 +16,9 @@ class SupportTicketNotFound extends Mailable implements ShouldQueue
 
     public function __construct(public string $ticketNumber)
     {
-        //
+        if ($inboundMailbox = config('mailbox.mailboxes.support')) {
+            $this->replyTo($inboundMailbox);
+        }
     }
 
     public function envelope(): Envelope

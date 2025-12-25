@@ -20,7 +20,9 @@ class SupportTicketCommentAdded extends Mailable implements ShouldQueue
         public SupportTicket $supportTicket,
         public Comment $comment
     ) {
-        //
+        if ($inboundMailbox = config('mailbox.mailboxes.support')) {
+            $this->replyTo($inboundMailbox);
+        }
     }
 
     public function envelope(): Envelope

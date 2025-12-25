@@ -17,7 +17,9 @@ class SupportTicketCreated extends Mailable implements ShouldQueue
 
     public function __construct(public SupportTicket $supportTicket)
     {
-        //
+        if ($inboundMailbox = config('mailbox.mailboxes.support')) {
+            $this->replyTo($inboundMailbox);
+        }
     }
 
     public function envelope(): Envelope
