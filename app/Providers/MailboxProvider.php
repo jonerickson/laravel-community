@@ -12,6 +12,8 @@ class MailboxProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        Mailbox::to(config('mailbox.mailboxes.support'), SupportEmail::class);
+        if ($supportEmail = config('mailbox.mailboxes.support')) {
+            Mailbox::to($supportEmail, SupportEmail::class);
+        }
     }
 }
