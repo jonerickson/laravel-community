@@ -1,8 +1,8 @@
 import Heading from '@/components/heading';
 import RichEditorContent from '@/components/rich-editor-content';
+import { StyledUserName } from '@/components/styled-user-name';
 import SupportTicketAttachmentForm from '@/components/support-ticket-attachment-form';
 import SupportTicketCommentForm from '@/components/support-ticket-comment-form';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,7 +14,6 @@ import { Head, router, useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Calendar, CheckCircle, Clock, FileText, Flag, Lock, LockOpen, MessageCircle, Paperclip, Tag, Ticket, Trash2, User } from 'lucide-react';
 import { useState } from 'react';
-import { StyledUserName } from '@/components/styled-user-name';
 
 interface SupportTicketShowProps {
     ticket: App.Data.SupportTicketData;
