@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use App\Models\Forum;
 use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
@@ -59,7 +60,18 @@ class ForumData extends Data
     /** @var GroupData[] */
     public ?array $groups = null;
 
+    public ?GroupPermissionsData $groupPermissions = null;
+
     public ?CarbonImmutable $createdAt = null;
 
     public ?CarbonImmutable $updatedAt = null;
+
+    public function with(): array
+    {
+        return [
+            'groupPermissions' => GroupPermissionsData::from(
+                Forum::find($this->id)->getGroupPermissions(),
+            ),
+        ];
+    }
 }
