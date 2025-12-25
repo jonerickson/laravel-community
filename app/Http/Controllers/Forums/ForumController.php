@@ -29,8 +29,10 @@ class ForumController extends Controller
     {
         $this->authorize('view', $forum);
 
-        $forum->loadMissing(['category', 'parent']);
+        $forum->loadMissing(['category', 'parent', 'groups']);
         $forum->loadCount(['followers']);
+
+        dd(ForumData::from($forum)->toArray());
 
         return Inertia::render('forums/show', [
             'forum' => ForumData::from($forum),

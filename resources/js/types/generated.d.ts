@@ -204,6 +204,7 @@ declare namespace App.Data {
         parent: App.Data.ForumData | null;
         children: Array<App.Data.ForumData> | null;
         groups: Array<App.Data.GroupData> | null;
+        groupPermissions: App.Data.GroupPermissionsData | null;
         createdAt: string | null;
         updatedAt: string | null;
     };
@@ -213,6 +214,11 @@ declare namespace App.Data {
         color: string;
         style: App.Enums.GroupStyleType;
         icon: string | null;
+    };
+    export type GroupPermissionsData = {
+        canRead: boolean;
+        canWrite: boolean;
+        canDelete: boolean;
     };
     export type GroupStyleData = {
         color: string;

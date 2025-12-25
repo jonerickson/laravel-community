@@ -10,6 +10,7 @@ use App\Events\ForumDeleted;
 use App\Events\ForumUpdated;
 use App\Traits\Activateable;
 use App\Traits\Followable;
+use App\Traits\HasGroupPermissions;
 use App\Traits\HasGroups;
 use App\Traits\HasSlug;
 use App\Traits\Orderable;
@@ -88,6 +89,7 @@ class Forum extends Model implements Sluggable
     use Activateable;
     use Followable;
     use HasFactory;
+    use HasGroupPermissions;
     use HasGroups;
     use HasSlug;
     use Orderable;
