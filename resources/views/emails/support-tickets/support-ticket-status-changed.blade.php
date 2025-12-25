@@ -1,3 +1,9 @@
+Please reply above this line.<br>
+----------------------------------<br>
+<br>
+The status of your support ticket has been updated. Please see below for more details.<br>
+<br>
+<br>
 <x-mail::message>
 # Support Ticket Status Updated
 

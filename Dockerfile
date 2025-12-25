@@ -5,7 +5,7 @@ FROM serversideup/php:8.4-fpm-nginx as base
 
 USER root
 
-RUN install-php-extensions curl intl bcmath soap gd sockets gmp
+RUN install-php-extensions intl bcmath soap gd sockets gmp imap
 
 RUN apt-get update \
     && apt-get install -y curl gnupg default-mysql-client \

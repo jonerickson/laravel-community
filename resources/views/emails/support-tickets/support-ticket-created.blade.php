@@ -1,3 +1,9 @@
+Please reply above this line.<br>
+----------------------------------<br>
+<br>
+A new support ticket has been created. Please see below for more details.<br>
+<br>
+<br>
 <x-mail::message>
 # New Support Ticket Created
 
