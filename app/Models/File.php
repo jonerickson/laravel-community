@@ -85,7 +85,7 @@ class File extends Model
     public function url(): Attribute
     {
         return Attribute::get(fn (): ?string => $this->path
-            ? ($this->visibility === FileVisibility::Public
+            ? ($this->visibility === FileVisibility::Public || ! Storage::providesTemporaryUrls()
                 ? Storage::url($this->path)
                 : Storage::temporaryUrl($this->path, now()->addHour())
             ) : null

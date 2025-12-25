@@ -4,22 +4,18 @@ declare(strict_types=1);
 
 namespace App\Mail\SupportTickets;
 
-use App\Models\Comment;
-use App\Models\SupportTicket;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
-class SupportTicketCommentAdded extends Mailable implements ShouldQueue
+class SupportTicketNotFound extends Mailable implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(
-        public SupportTicket $supportTicket,
-        public Comment $comment
-    ) {
+    public function __construct(public string $ticketNumber)
+    {
         if ($inboundMailbox = config('mailbox.mailboxes.support')) {
             $this->replyTo($inboundMailbox);
         }
@@ -28,17 +24,16 @@ class SupportTicketCommentAdded extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Comment on Support Ticket: '.$this->supportTicket->ticket_number,
+            subject: 'Support Ticket Not Found: '.$this->ticketNumber,
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.support-tickets.support-ticket-comment-added',
+            markdown: 'emails.support-tickets.support-ticket-not-found',
             with: [
-                'supportTicket' => $this->supportTicket,
-                'comment' => $this->comment,
+                'ticketNumber' => $this->ticketNumber,
             ],
         );
     }

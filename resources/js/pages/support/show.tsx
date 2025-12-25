@@ -1,8 +1,8 @@
 import Heading from '@/components/heading';
 import RichEditorContent from '@/components/rich-editor-content';
+import { StyledUserName } from '@/components/styled-user-name';
 import SupportTicketAttachmentForm from '@/components/support-ticket-attachment-form';
 import SupportTicketCommentForm from '@/components/support-ticket-comment-form';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -129,17 +129,9 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                         {ticket.comments.map((comment: App.Data.CommentData, index: number) => (
                                             <div key={comment.id}>
                                                 <div className="flex items-start gap-3">
-                                                    {comment.author && (
-                                                        <Avatar className="size-8">
-                                                            {comment.author.avatarUrl && (
-                                                                <AvatarImage src={comment.author.avatarUrl} alt={comment.author.name} />
-                                                            )}
-                                                            <AvatarFallback>{comment.author.name.charAt(0)?.toUpperCase()}</AvatarFallback>
-                                                        </Avatar>
-                                                    )}
                                                     <div className="flex-1 space-y-2">
                                                         <div className="flex items-center gap-2 text-sm">
-                                                            <span className="font-medium">{comment.author?.name}</span>
+                                                            {comment.author && <StyledUserName user={comment.author} />}
                                                             <span className="text-muted-foreground">
                                                                 {comment.createdAt ? format(new Date(comment.createdAt), 'PPp') : 'N/A'}
                                                             </span>

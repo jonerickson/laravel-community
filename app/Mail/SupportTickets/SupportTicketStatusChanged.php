@@ -21,7 +21,9 @@ class SupportTicketStatusChanged extends Mailable implements ShouldQueue
         public SupportTicketStatus $oldStatus,
         public SupportTicketStatus $newStatus
     ) {
-        //
+        if ($inboundMailbox = config('mailbox.mailboxes.support')) {
+            $this->replyTo($inboundMailbox);
+        }
     }
 
     public function envelope(): Envelope
