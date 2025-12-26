@@ -48,6 +48,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withSchedule(function (Schedule $schedule): void {
         $schedule->command('cache:prune-stale-tags')->hourly();
         $schedule->command('horizon:snapshot')->everyFiveMinutes();
+        $schedule->command('mailbox:clean')->dailyAt('08:00');
         $schedule->command('queue:prune-failed --hours=96')->dailyAt('06:00');
         $schedule->command('queue:prune-batches --hours=96')->dailyAt('06:15');
         $schedule->command('telescope:prune --hours=96')->dailyAt('06:30');

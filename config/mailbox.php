@@ -25,7 +25,7 @@ return [
      *
      * For example: /laravel-mailbox/sendgrid/
      */
-    'path' => 'laravel-mailbox',
+    'path' => 'mailbox',
 
     /*
      * The amount of days that incoming emails should be stored in your
@@ -40,7 +40,7 @@ return [
      * when they match one of your mailboxes. To store all incoming
      * messages, modify this value.
      */
-    'only_store_matching_emails' => true,
+    'only_store_matching_emails' => (bool) env('MAILBOX_ONLY_STORE_MATCHING', true),
 
     /*
      * Some services do not have their own authentication methods to
