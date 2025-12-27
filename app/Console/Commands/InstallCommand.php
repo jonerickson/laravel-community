@@ -29,7 +29,8 @@ class InstallCommand extends Command
                             {--name= : The super admin\'s name}
                             {--email= : The super admin\'s email}
                             {--password= : The super admin\'s password}
-                            {--seed : Seed some demo data}';
+                            {--seed : Seed some demo data}
+                            {--force : Force the operation to run when in production}';
 
     protected $description = 'Install and configure the application for use.';
 
