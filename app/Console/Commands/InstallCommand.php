@@ -58,7 +58,10 @@ class InstallCommand extends Command
             Schema::enableForeignKeyConstraints();
 
             $this->components->info('Installing permissions...');
-            $this->call('db:seed', ['--class' => PermissionSeeder::class]);
+            $this->call('db:seed', [
+                '--class' => PermissionSeeder::class,
+                '--force' => $this->option('force'),
+            ]);
         }
 
         if (! $this->input->isInteractive() || confirm('Would you like to install all the default member groups? (Recommended)')) {
@@ -67,7 +70,10 @@ class InstallCommand extends Command
             Schema::enableForeignKeyConstraints();
 
             $this->components->info('Installing groups...');
-            $this->call('db:seed', ['--class' => GroupSeeder::class]);
+            $this->call('db:seed', [
+                '--class' => GroupSeeder::class,
+                '--force' => $this->option('force'),
+            ]);
         }
 
         if ($this->input->isInteractive() && confirm('Would you like to create a new super admin account?')) {
@@ -83,7 +89,10 @@ class InstallCommand extends Command
 
             if (Role::count() === 0 || Permission::count() === 0) {
                 $this->components->info('Installing permissions...');
-                $this->call('db:seed', ['--class' => PermissionSeeder::class]);
+                $this->call('db:seed', [
+                    '--class' => PermissionSeeder::class,
+                    '--force' => $this->option('force'),
+                ]);
             }
 
             $user = User::updateOrCreate([
@@ -102,6 +111,7 @@ class InstallCommand extends Command
         if ($this->option('seed')) {
             $this->call('db:seed', [
                 '--class' => DemoSeeder::class,
+                '--force' => $this->option('force'),
             ]);
         }
 
