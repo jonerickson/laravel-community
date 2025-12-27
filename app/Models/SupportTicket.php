@@ -168,20 +168,20 @@ class SupportTicket extends Model implements HasLabel
     public function scopeActive(Builder $query): void
     {
         $query->whereIn('status', [
-            SupportTicketStatus::New->value,
-            SupportTicketStatus::Open->value,
-            SupportTicketStatus::InProgress->value,
+            SupportTicketStatus::New,
+            SupportTicketStatus::Open,
+            SupportTicketStatus::InProgress,
         ]);
     }
 
     public function scopeByStatus(Builder $query, SupportTicketStatus $status): void
     {
-        $query->where('status', $status->value);
+        $query->where('status', $status);
     }
 
     public function scopeByPriority(Builder $query, SupportTicketPriority $priority): void
     {
-        $query->where('priority', $priority->value);
+        $query->where('priority', $priority);
     }
 
     public function scopeAssignedTo(Builder $query, User $user): void

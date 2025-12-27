@@ -152,8 +152,9 @@ class SupportTicketsTable
                             ->native(false),
                     ])
                     ->action(function (Collection $records, array $data): void {
-                        $status = SupportTicketStatus::from($data['status']);
-                        $records->each(function (SupportTicket $record) use ($status): void {
+                        $records->each(function (SupportTicket $record) use ($data): void {
+                            $status = data_get($data, 'status');
+
                             if ($record->canTransitionTo($status)) {
                                 $record->updateStatus($status);
 

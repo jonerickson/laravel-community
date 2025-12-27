@@ -20,7 +20,7 @@ class CloseAction extends Action
         $this->icon('heroicon-o-x-circle');
         $this->color('danger');
         $this->requiresConfirmation();
-        $this->visible(fn (SupportTicket $record): bool => $record->status !== SupportTicketStatus::Closed);
+        $this->visible(fn (SupportTicket $record): bool => $record->canTransitionTo(SupportTicketStatus::Closed));
         $this->successNotificationTitle('The ticket has been closed.');
         $this->action(function (SupportTicket $record, SupportTicketManager $supportTicketManager): void {
             $supportTicketManager->closeTicket($record);

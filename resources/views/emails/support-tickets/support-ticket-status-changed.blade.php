@@ -1,8 +1,6 @@
-Please reply above this line.<br>
+{{ \App\Services\EmailParserService::DELIMITER }}<br>
 ----------------------------------<br>
-<br>
 The status of your support ticket has been updated. Please see below for more details.<br>
-<br>
 <br>
 <x-mail::message>
 # Support Ticket Status Updated
@@ -10,12 +8,9 @@ The status of your support ticket has been updated. Please see below for more de
 Hello! The status of support ticket **{{ $supportTicket->ticket_number }}** has been updated.
 
 **Subject:** {{ $supportTicket->subject }}<br />
-**Previous Status:** {{ $oldStatus->getLabel() }}<br />
-**New Status:** {{ $newStatus->getLabel() }}<br />
+**Status:** {{ $newStatus->getLabel() }}<br />
 **Priority:** {{ $supportTicket->priority->getLabel() }}<br />
 **Category:** {{ $supportTicket->category->name ?? 'Not specified' }}<br />
-**Author:** {{ $supportTicket->author->name }}<br />
-**Created At:** {{ $supportTicket->created_at->format('M j, Y \a\t g:i A') }}<br />
 
 Your support ticket has been moved from **{{ $oldStatus->getLabel() }}** to **{{ $newStatus->getLabel() }}**.
 

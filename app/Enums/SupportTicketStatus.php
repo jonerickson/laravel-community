@@ -12,6 +12,7 @@ enum SupportTicketStatus: string implements HasColor, HasLabel
     case New = 'new';
     case Open = 'open';
     case InProgress = 'in_progress';
+    case WaitingOnCustomer = 'waiting_on_customer';
     case Resolved = 'resolved';
     case Closed = 'closed';
 
@@ -21,6 +22,7 @@ enum SupportTicketStatus: string implements HasColor, HasLabel
             self::New => 'New',
             self::Open => 'Open',
             self::InProgress => 'In Progress',
+            self::WaitingOnCustomer => 'Waiting on Customer',
             self::Resolved => 'Resolved',
             self::Closed => 'Closed',
         };
@@ -30,7 +32,7 @@ enum SupportTicketStatus: string implements HasColor, HasLabel
     {
         return match ($this) {
             self::New => 'danger',
-            self::Open => 'info',
+            self::Open, self::WaitingOnCustomer => 'info',
             self::InProgress => 'warning',
             self::Resolved, self::Closed => 'success',
         };
@@ -39,11 +41,33 @@ enum SupportTicketStatus: string implements HasColor, HasLabel
     public function canTransitionTo(self $status): bool
     {
         return match ($this) {
-            self::New => in_array($status, [self::Open, self::InProgress, self::Closed, self::Resolved]),
-            self::Open => in_array($status, [self::InProgress, self::Resolved, self::Closed]),
-            self::InProgress => in_array($status, [self::Open, self::Resolved, self::Closed]),
-            self::Resolved => in_array($status, [self::Open, self::Closed]),
-            self::Closed => $status === self::Open,
+            self::New => in_array($status, [
+                self::Open,
+                self::Resolved,
+            ]),
+
+            self::Open => in_array($status, [
+                self::InProgress,
+                self::WaitingOnCustomer,
+                self::Resolved,
+            ]),
+
+            self::InProgress => in_array($status, [
+                self::WaitingOnCustomer,
+                self::Resolved,
+            ]),
+
+            self::WaitingOnCustomer => in_array($status, [
+                self::Open,
+                self::Resolved,
+            ]),
+
+            self::Resolved => in_array($status, [
+                self::Open,
+                self::Closed,
+            ]),
+
+            self::Closed => false,
         };
     }
 

@@ -9,6 +9,7 @@ use App\Managers\SupportTicketManager;
 use App\Models\SupportTicket;
 use App\Models\SupportTicketCategory;
 use App\Models\User;
+use App\Services\EmailParserService;
 use BeyondCode\Mailbox\InboundEmail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
@@ -18,9 +19,6 @@ use ZBateson\MailMimeParser\Message\MimePart;
 
 class SupportEmail
 {
-    public const string REPLY_LINE = 'Please reply above this line.
-----------------------------------';
-
     private const array ALLOWED_MIME_TYPES = [
         // Documents
         'application/pdf',
@@ -55,7 +53,7 @@ class SupportEmail
         $rateLimitKey = 'support-email:'.Str::lower($inboundEmail->from());
 
         if (RateLimiter::tooManyAttempts($rateLimitKey, 5)) {
-            abort(429);
+            // abort(429);
         }
 
         RateLimiter::hit($rateLimitKey);
@@ -68,13 +66,13 @@ class SupportEmail
 
     private function createNewTicket(InboundEmail $inboundEmail): void
     {
-        if (! ($author = $this->findAuthor($inboundEmail)) instanceof User) {
+        if (! ($author = $this->findOrCreateAuthor($inboundEmail)) instanceof User) {
             return;
         }
 
         $ticket = $this->ticketManager->createTicket([
             'subject' => $inboundEmail->subject(),
-            'description' => $inboundEmail->text(),
+            'description' => EmailParserService::parse($inboundEmail->text()),
             'support_ticket_category_id' => SupportTicketCategory::firstOrCreate(['name' => 'Uncategorized'])->id,
             'created_by' => $author->id,
         ]);
@@ -97,27 +95,25 @@ class SupportEmail
             return;
         }
 
-        if (! ($author = $this->findAuthor($inboundEmail)) instanceof User) {
+        if (! ($author = $this->findOrCreateAuthor($inboundEmail)) instanceof User) {
             return;
         }
 
-        $reply = Str::of($inboundEmail->text())
-            ->before(static::REPLY_LINE)
-            ->trim()
-            ->toString();
-
         $this->ticketManager->addComment(
             ticket: $ticket,
-            content: $reply,
+            content: EmailParserService::parse($inboundEmail->text()),
             userId: $author->id,
         );
 
         $this->attachFiles($ticket, $inboundEmail);
     }
 
-    private function findAuthor(InboundEmail $inboundEmail): ?User
+    private function findOrCreateAuthor(InboundEmail $inboundEmail): ?User
     {
-        return User::query()->where('email', $inboundEmail->from())->first();
+        return User::query()->where('email', $inboundEmail->from())->firstOrCreate([
+            'name' => $inboundEmail->fromName(),
+            'email' => $inboundEmail->from(),
+        ]);
     }
 
     private function attachFiles(SupportTicket $ticket, InboundEmail $inboundEmail): void

@@ -83,10 +83,25 @@ class DatabaseDriver implements SupportTicketProvider
 
     public function addComment(SupportTicket $ticket, string $content, ?int $userId = null): bool
     {
+        if (! $ticket->status->isActive()) {
+            $this->openTicket($ticket);
+        }
+
+        if ($userId === $ticket->created_by && $ticket->status !== SupportTicketStatus::Open && $ticket->canTransitionTo(SupportTicketStatus::Open)) {
+            $ticket->updateStatus(SupportTicketStatus::Open);
+        } elseif ($userId !== $ticket->created_by && $ticket->status !== SupportTicketStatus::WaitingOnCustomer && $ticket->canTransitionTo(SupportTicketStatus::WaitingOnCustomer)) {
+            $ticket->updateStatus(SupportTicketStatus::WaitingOnCustomer);
+        }
+
+        if (is_null($ticket->assigned_to)) {
+            $ticket->assignedTo()->associate($userId)->save();
+        }
+
         $comment = Comment::create([
             'commentable_type' => SupportTicket::class,
             'commentable_id' => $ticket->id,
             'content' => $content,
+            'created_by' => $userId,
         ]);
 
         return $comment->exists;
@@ -113,7 +128,7 @@ class DatabaseDriver implements SupportTicketProvider
 
     public function openTicket(SupportTicket $ticket): bool
     {
-        if ($ticket->updateStatus(SupportTicketStatus::Open)) {
+        if ($ticket->canTransitionTo(SupportTicketStatus::Open) && $ticket->updateStatus(SupportTicketStatus::Open)) {
             $ticket->update([
                 'resolved_at' => null,
                 'closed_at' => null,

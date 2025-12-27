@@ -1,8 +1,6 @@
-Please reply above this line.<br>
+{{ \App\Services\EmailParserService::DELIMITER }}<br>
 ----------------------------------<br>
-<br>
 A new comment has been added to your support ticket. Please see below for more details.<br>
-<br>
 <br>
 <x-mail::message>
 # New Comment Added
@@ -13,11 +11,9 @@ Hello! A new comment has been added to support ticket **{{ $supportTicket->ticke
 **Status:** {{ $supportTicket->status->getLabel() }}<br />
 **Priority:** {{ $supportTicket->priority->getLabel() }}<br />
 **Category:** {{ $supportTicket->category->name ?? 'Not specified' }}<br />
-**From:** {{ $comment->author->name }}<br />
-**Author:** {{ $supportTicket->author->name }}<br />
-**Comment Added:** {{ $supportTicket->created_at->format('M j, Y \a\t g:i A') }}<br />
 
 <x-mail::panel>
+**{{ $comment->author->name }}** at {{ $comment->created_at->format('M j, Y \a\t g:i A') }}:<br />
 {!! $comment->content !!}
 </x-mail::panel>
 

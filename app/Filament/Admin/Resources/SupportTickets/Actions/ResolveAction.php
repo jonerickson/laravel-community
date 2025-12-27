@@ -21,7 +21,7 @@ class ResolveAction extends Action
         $this->icon('heroicon-o-check-circle');
         $this->color('success');
         $this->requiresConfirmation();
-        $this->visible(fn (SupportTicket $record): bool => $record->status !== SupportTicketStatus::Resolved && $record->status !== SupportTicketStatus::Closed);
+        $this->visible(fn (SupportTicket $record): bool => $record->canTransitionTo(SupportTicketStatus::Resolved));
         $this->successNotificationTitle('The ticket has been resolved.');
         $this->action(function (SupportTicket $record, SupportTicketManager $supportTicketManager): void {
             $supportTicketManager->resolveTicket($record);

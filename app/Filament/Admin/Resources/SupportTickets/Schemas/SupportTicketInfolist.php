@@ -8,6 +8,8 @@ use App\Filament\Admin\Resources\Notes\RelationManagers\NotesRelationManager;
 use App\Filament\Admin\Resources\Orders\Schemas\OrderInfolist;
 use App\Filament\Admin\Resources\SupportTickets\Pages\ViewSupportTicket;
 use App\Filament\Admin\Resources\SupportTickets\RelationManagers\CommentsRelationManager;
+use App\Filament\Admin\Resources\SupportTickets\RelationManagers\FilesRelationManager;
+use App\Filament\Admin\Resources\Users\UserResource;
 use App\Models\SupportTicket;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Livewire;
@@ -28,6 +30,8 @@ class SupportTicketInfolist
                     ->persistTabInQueryString()
                     ->tabs([
                         Tabs\Tab::make('Ticket Information')
+                            ->badgeColor(fn (SupportTicket $ticket) => $ticket->status->getColor())
+                            ->badge(fn (SupportTicket $ticket) => $ticket->status->getLabel())
                             ->icon(Heroicon::OutlinedLifebuoy)
                             ->schema([
                                 Section::make('Ticket Information')
@@ -47,6 +51,7 @@ class SupportTicketInfolist
                                             ->badge()
                                             ->color(fn ($record) => $record->category?->color ?? 'gray'),
                                         TextEntry::make('author.name')
+                                            ->url(fn (SupportTicket $record): string => UserResource::getUrl('edit', ['record' => $record->created_by]), shouldOpenInNewTab: true)
                                             ->label('Submitted By'),
                                         TextEntry::make('author.email')
                                             ->label('Email')
@@ -111,13 +116,6 @@ class SupportTicketInfolist
                                     ]),
                             ]),
 
-                        Tabs\Tab::make('Order Information')
-                            ->icon(Heroicon::OutlinedCurrencyDollar)
-                            ->visible(fn ($record): bool => $record->order_id !== null)
-                            ->schema(fn (SupportTicket $record): array => [
-                                ...OrderInfolist::configure(Schema::make()->record($record->order))->getComponents(),
-                            ]),
-
                         Tabs\Tab::make('Replies')
                             ->icon(Heroicon::OutlinedChatBubbleLeftRight)
                             ->badge(fn (SupportTicket $record): string => (string) $record->comments->count())
@@ -127,6 +125,24 @@ class SupportTicketInfolist
                                     'ownerRecord' => $record,
                                     'pageClass' => ViewSupportTicket::class,
                                 ]),
+                            ]),
+
+                        Tabs\Tab::make('Attachments')
+                            ->icon(Heroicon::OutlinedPhoto)
+                            ->badge(fn (SupportTicket $record): string => (string) $record->notes->count())
+                            ->badgeColor('gray')
+                            ->schema([
+                                Livewire::make(FilesRelationManager::class, fn (SupportTicket $record): array => [
+                                    'ownerRecord' => $record,
+                                    'pageClass' => ViewSupportTicket::class,
+                                ]),
+                            ]),
+
+                        Tabs\Tab::make('Order Information')
+                            ->icon(Heroicon::OutlinedCurrencyDollar)
+                            ->visible(fn ($record): bool => $record->order_id !== null)
+                            ->schema(fn (SupportTicket $record): array => [
+                                ...OrderInfolist::configure(Schema::make()->record($record->order))->getComponents(),
                             ]),
 
                         Tabs\Tab::make('Notes')

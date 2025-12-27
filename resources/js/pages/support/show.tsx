@@ -289,27 +289,36 @@ export default function SupportTicketShow({ ticket }: SupportTicketShowProps) {
                                             variant="outline"
                                             size="sm"
                                             className="w-full justify-start"
-                                            onClick={() => handleTicketAction('close')}
-                                        >
-                                            <Lock className="size-4" />
-                                            {updateForm.processing ? 'Closing...' : 'Close ticket'}
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            className="w-full justify-start"
                                             onClick={() => handleTicketAction('resolve')}
                                         >
                                             <CheckCircle className="size-4" />
                                             {updateForm.processing ? 'Resolving...' : 'Resolve ticket'}
                                         </Button>
                                     </>
-                                ) : (
-                                    <Button variant="outline" size="sm" className="w-full justify-start" onClick={() => handleTicketAction('open')}>
-                                        <LockOpen className="size-4" />
-                                        {updateForm.processing ? 'Opening...' : 'Re-open ticket'}
-                                    </Button>
-                                )}
+                                ) : ticket.status === 'resolved' ? (
+                                    <>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="w-full justify-start"
+                                            onClick={() => handleTicketAction('open')}
+                                        >
+                                            <LockOpen className="size-4" />
+                                            {updateForm.processing ? 'Opening...' : 'Re-open ticket'}
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="w-full justify-start"
+                                            onClick={() => handleTicketAction('close')}
+                                        >
+                                            <Lock className="size-4" />
+                                            {updateForm.processing ? 'Closing...' : 'Close ticket'}
+                                        </Button>
+                                    </>
+                                ) : ticket.status === 'closed' ? (
+                                    <p className="text-sm text-muted-foreground">This ticket is closed and cannot be re-opened.</p>
+                                ) : null}
                             </CardContent>
                         </Card>
                     </div>

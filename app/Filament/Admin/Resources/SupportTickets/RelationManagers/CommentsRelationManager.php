@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\SupportTickets\RelationManagers;
 
+use App\Managers\SupportTicketManager;
+use App\Models\Comment;
+use App\Models\SupportTicket;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 use Override;
 
 class CommentsRelationManager extends RelationManager
@@ -50,7 +55,22 @@ class CommentsRelationManager extends RelationManager
             ->emptyStateDescription('No replies yet.')
             ->defaultSort('created_at', 'desc')
             ->columns([
+                Tables\Columns\TextColumn::make('author')
+                    ->grow(false)
+                    ->width(1)
+                    ->alignCenter()
+                    ->label('')
+                    ->badge()
+                    ->getStateUsing(function (Comment $record): string {
+                        /** @var SupportTicket $ticket */
+                        $ticket = $this->getOwnerRecord();
+
+                        return $record->created_by === $ticket->created_by
+                            ? 'Customer'
+                            : 'Agent';
+                    }),
                 Tables\Columns\TextColumn::make('content')
+                    ->limit()
                     ->label('Reply')
                     ->html()
                     ->searchable(),
@@ -75,11 +95,25 @@ class CommentsRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->modalHeading('Add Reply')
-                    ->modalDescription('Add a new reply to this support ticket.'),
+                    ->modalDescription('Add a new reply to this support ticket.')
+                    ->using(function (array $data) {
+                        /** @var SupportTicket $ticket */
+                        $ticket = $this->getOwnerRecord();
+
+                        return app(SupportTicketManager::class)->addComment(
+                            ticket: $ticket,
+                            content: data_get($data, 'content'),
+                            userId: Auth::id(),
+                        );
+                    }),
             ])
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+                ViewAction::make()
+                    ->modalHeading('View Comment'),
+                EditAction::make()
+                    ->modalHeading('Edit Comment'),
+                DeleteAction::make()
+                    ->modalHeading('Delete Comment'),
             ]);
     }
 }

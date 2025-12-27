@@ -41,7 +41,7 @@ class OrderInfolist
                             ->label('Billing Reason')
                             ->badge(),
                         TextEntry::make('user.name')
-                            ->url(fn (Order $record): string => UserResource::getUrl('edit', ['record' => $record->user_id]))
+                            ->url(fn (Order $record): string => UserResource::getUrl('edit', ['record' => $record->user_id]), shouldOpenInNewTab: true)
                             ->columnStart(1)
                             ->label('User'),
                     ]),

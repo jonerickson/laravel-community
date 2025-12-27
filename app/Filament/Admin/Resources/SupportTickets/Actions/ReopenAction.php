@@ -20,7 +20,7 @@ class ReopenAction extends Action
         $this->icon('heroicon-o-arrow-path');
         $this->color('warning');
         $this->requiresConfirmation();
-        $this->visible(fn (SupportTicket $record): bool => $record->status === SupportTicketStatus::Closed);
+        $this->visible(fn (SupportTicket $record): bool => $record->canTransitionTo(SupportTicketStatus::Open));
         $this->successNotificationTitle('The ticket has been reopened.');
         $this->action(function (SupportTicket $record, SupportTicketManager $supportTicketManager): void {
             $supportTicketManager->openTicket($record);

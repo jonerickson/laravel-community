@@ -7,8 +7,8 @@ namespace App\Filament\Admin\Resources\SupportTickets\Schemas;
 use App\Enums\Role;
 use App\Enums\SupportTicketPriority;
 use App\Enums\SupportTicketStatus;
+use App\Models\User;
 use Filament\Forms;
-use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
@@ -26,12 +26,12 @@ class SupportTicketForm
                         Forms\Components\TextInput::make('ticket_number')
                             ->label('Ticket Number')
                             ->disabled(),
-                        Forms\Components\TextInput::make('author.name')
-                            ->label('Submitted By')
-                            ->disabled(),
-                        Forms\Components\TextInput::make('author.email')
-                            ->label('Email')
-                            ->disabled(),
+                        Forms\Components\Select::make('created_by')
+                            ->searchable()
+                            ->required()
+                            ->preload()
+                            ->relationship('author', 'name')
+                            ->label('Submitted By'),
                         Forms\Components\Select::make('support_ticket_category_id')
                             ->label('Category')
                             ->relationship('category', 'name')
@@ -40,16 +40,10 @@ class SupportTicketForm
                             ->searchable(),
                         Forms\Components\Select::make('assigned_to')
                             ->label('Assigned Agent')
-                            ->relationship('assignedTo', 'name', fn (Builder $query) => $query->role([Role::Administrator, Role::SupportAgent]))
+                            ->relationship('assignedTo', 'name', fn (Builder|User $query) => $query->role([Role::Administrator, Role::SupportAgent]))
                             ->searchable()
                             ->preload()
                             ->placeholder('Unassigned'),
-                        Forms\Components\Select::make('order_id')
-                            ->label('Related Order')
-                            ->relationship('order', 'reference_id')
-                            ->searchable()
-                            ->preload()
-                            ->placeholder('No related order'),
                     ]),
                 Section::make('Details')
                     ->columnSpanFull()
@@ -64,19 +58,16 @@ class SupportTicketForm
                     ]),
                 Section::make('Status & Priority')
                     ->columnSpanFull()
+                    ->columns()
                     ->schema([
-                        Fieldset::make('Current State')
-                            ->columns()
-                            ->schema([
-                                Forms\Components\Select::make('status')
-                                    ->options(SupportTicketStatus::class)
-                                    ->required()
-                                    ->native(false),
-                                Forms\Components\Select::make('priority')
-                                    ->options(SupportTicketPriority::class)
-                                    ->required()
-                                    ->native(false),
-                            ]),
+                        Forms\Components\Select::make('status')
+                            ->options(SupportTicketStatus::class)
+                            ->required()
+                            ->native(false),
+                        Forms\Components\Select::make('priority')
+                            ->options(SupportTicketPriority::class)
+                            ->required()
+                            ->native(false),
                     ]),
                 Section::make('External Integration')
                     ->columns()
