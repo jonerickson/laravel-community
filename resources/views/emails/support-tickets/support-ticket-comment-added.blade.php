@@ -1,11 +1,11 @@
 {{ \App\Services\EmailParserService::DELIMITER }}<br>
 ----------------------------------<br>
-A new comment has been added to your support ticket. Please see below for more details.<br>
+A new reply has been added to your support ticket. Please see below for more details.<br>
 <br>
 <x-mail::message>
 # New Comment Added
 
-Hello! A new comment has been added to support ticket **{{ $supportTicket->ticket_number }}**.
+Hello! A new reply has been added to support ticket **{{ $supportTicket->ticket_number }}**.
 
 **Subject:** {{ $supportTicket->subject }}<br />
 **Status:** {{ $supportTicket->status->getLabel() }}<br />

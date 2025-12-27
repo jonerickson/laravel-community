@@ -28,7 +28,7 @@ class SupportTicketCommentAdded extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Comment on Support Ticket: '.$this->supportTicket->ticket_number,
+            subject: 'New Reply on Support Ticket: '.$this->supportTicket->ticket_number,
         );
     }
 

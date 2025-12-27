@@ -96,7 +96,7 @@ class File extends Model
     protected static function booted(): void
     {
         static::creating(function (File $model): void {
-            if ($model->path) {
+            if ($model->path && Storage::exists($model->path)) {
                 $model->forceFill([
                     'size' => Storage::fileSize($model->path),
                     'mime' => Storage::mimeType($model->path),

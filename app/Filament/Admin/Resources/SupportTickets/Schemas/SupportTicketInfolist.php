@@ -98,11 +98,11 @@ class SupportTicketInfolist
                                     ->collapsible()
                                     ->schema([
                                         TextEntry::make('created_at')
-                                            ->label('Created At')
+                                            ->label('Opened At')
                                             ->dateTime()
                                             ->since(),
                                         TextEntry::make('updated_at')
-                                            ->label('Last Updated')
+                                            ->label('Last Updated At')
                                             ->dateTime()
                                             ->since(),
                                         TextEntry::make('resolved_at')
@@ -129,7 +129,7 @@ class SupportTicketInfolist
 
                         Tabs\Tab::make('Attachments')
                             ->icon(Heroicon::OutlinedPhoto)
-                            ->badge(fn (SupportTicket $record): string => (string) $record->notes->count())
+                            ->badge(fn (SupportTicket $record): string => (string) $record->files->count())
                             ->badgeColor('gray')
                             ->schema([
                                 Livewire::make(FilesRelationManager::class, fn (SupportTicket $record): array => [

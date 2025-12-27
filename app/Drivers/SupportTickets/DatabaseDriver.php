@@ -87,7 +87,7 @@ class DatabaseDriver implements SupportTicketProvider
             $this->openTicket($ticket);
         }
 
-        if ($userId === $ticket->created_by && $ticket->status !== SupportTicketStatus::Open && $ticket->canTransitionTo(SupportTicketStatus::Open)) {
+        if ($userId === $ticket->created_by && ! in_array($ticket->status, [SupportTicketStatus::Open, SupportTicketStatus::New]) && $ticket->canTransitionTo(SupportTicketStatus::Open)) {
             $ticket->updateStatus(SupportTicketStatus::Open);
         } elseif ($userId !== $ticket->created_by && $ticket->status !== SupportTicketStatus::WaitingOnCustomer && $ticket->canTransitionTo(SupportTicketStatus::WaitingOnCustomer)) {
             $ticket->updateStatus(SupportTicketStatus::WaitingOnCustomer);

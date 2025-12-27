@@ -16,8 +16,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $seller_id
  * @property int|null $order_id
  * @property int|null $payout_id
- * @property CommissionStatus $status
  * @property float $amount
+ * @property CommissionStatus $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Order|null $order

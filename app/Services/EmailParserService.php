@@ -21,6 +21,7 @@ class EmailParserService
         $text = self::stripReplyHeaders($text);
         $text = self::stripQuotedText($text);
         $text = self::stripSignatures($text);
+        $text = self::convertLineBreaks($text);
 
         return trim($text);
     }
@@ -77,5 +78,10 @@ class EmailParserService
         $parts = preg_split('/\n--\s*\n/', $text);
 
         return $parts[0];
+    }
+
+    protected static function convertLineBreaks(string $text): string
+    {
+        return str_replace("\n", '<br>', $text);
     }
 }

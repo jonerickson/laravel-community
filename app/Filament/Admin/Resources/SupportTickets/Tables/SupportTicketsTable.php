@@ -67,6 +67,14 @@ class SupportTicketsTable
                     ->label('Replies')
                     ->counts('comments')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('files_count')
+                    ->label('Attachments')
+                    ->counts('files')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('notes_count')
+                    ->label('Notes')
+                    ->counts('notes')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime()

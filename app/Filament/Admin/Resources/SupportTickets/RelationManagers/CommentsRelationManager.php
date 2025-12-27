@@ -43,7 +43,10 @@ class CommentsRelationManager extends RelationManager
                     ->label('Reply')
                     ->hiddenLabel()
                     ->maxLength(65535)
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->helperText(fn (?Comment $record) => is_null($record)
+                        ? null
+                        : sprintf('%s replied %s', $record->author->name, $record->created_at->format('M j, Y \a\t g:i A'))),
             ]);
     }
 
@@ -52,7 +55,8 @@ class CommentsRelationManager extends RelationManager
     {
         return $table
             ->description('The replies belonging to this support ticket.')
-            ->emptyStateDescription('No replies yet.')
+            ->emptyStateHeading('No replies')
+            ->emptyStateDescription('No replies yet added for this support ticket.')
             ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('author')
@@ -83,7 +87,7 @@ class CommentsRelationManager extends RelationManager
                     ->dateTime()
                     ->sortable()
                     ->since()
-                    ->tooltip(fn ($record) => $record->created_at->format('M d, Y g:i A')),
+                    ->tooltip(fn (Comment $record) => $record->created_at->format('M d, Y g:i A')),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('author')
@@ -94,6 +98,7 @@ class CommentsRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
+                    ->label('New reply')
                     ->modalHeading('Add Reply')
                     ->modalDescription('Add a new reply to this support ticket.')
                     ->using(function (array $data) {
@@ -109,11 +114,11 @@ class CommentsRelationManager extends RelationManager
             ])
             ->recordActions([
                 ViewAction::make()
-                    ->modalHeading('View Comment'),
+                    ->modalHeading('View Reply'),
                 EditAction::make()
-                    ->modalHeading('Edit Comment'),
+                    ->modalHeading('Edit Reply'),
                 DeleteAction::make()
-                    ->modalHeading('Delete Comment'),
+                    ->modalHeading('Delete Reply'),
             ]);
     }
 }
