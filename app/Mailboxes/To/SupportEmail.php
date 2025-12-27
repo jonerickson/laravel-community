@@ -111,8 +111,9 @@ class SupportEmail
     private function findOrCreateAuthor(InboundEmail $inboundEmail): ?User
     {
         return User::query()->where('email', $inboundEmail->from())->firstOrCreate([
-            'name' => $inboundEmail->fromName(),
             'email' => $inboundEmail->from(),
+        ], [
+            'name' => $inboundEmail->fromName(),
         ]);
     }
 
