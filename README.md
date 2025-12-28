@@ -55,6 +55,17 @@ Ready for production with Docker and Kubernetes support. Scale from a small comm
 - 🔔 **Real-time Updates** - Keep users informed with notifications and live data
 - 🎨 **Customizable** - Themes, branding, and extensible architecture
 
+## 🏗️ Architecture Highlights
+
+Built with a modular, extensible architecture:
+
+- **Modular Payment Processing** - Swap payment providers without changing your code
+- **Extensible Support System** - Connect to external ticketing services or use the built-in system
+- **Driver-Based Design** - Easy to extend with new integrations and features
+- **Event-Driven** - React to platform events with custom listeners and integrations
+- **API-First** - Full API support for mobile apps and external integrations
+- **Type-Safe** - TypeScript on the frontend, strict typing throughout
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -98,7 +109,7 @@ docker compose up
 
 This starts the queue workers, log viewer, and frontend build tools all at once.
 
-### Install
+### First Time Install
 
 Optional: These commands are run when running `composer setup` for the first time but may also be manually run to reset the app environment.
 
@@ -109,31 +120,6 @@ php artisan migrate:fresh
 # Install the necessary data to run the app
 php artisan app:install
 ```
-
-## 🏗️ Architecture Highlights
-
-Built with a modular, extensible architecture:
-
-- **Modular Payment Processing** - Swap payment providers without changing your code
-- **Extensible Support System** - Connect to external ticketing services or use the built-in system
-- **Driver-Based Design** - Easy to extend with new integrations and features
-- **Event-Driven** - React to platform events with custom listeners and integrations
-- **API-First** - Full API support for mobile apps and external integrations
-- **Type-Safe** - TypeScript on the frontend, strict typing throughout
-
-## 🐳 Deployment
-
-### Docker
-
-Ready to containerize with included Docker configuration:
-
-```bash
-docker compose up
-```
-
-### Kubernetes
-
-Production-ready Kubernetes manifests included for scalable deployments. Perfect for handling growth from small communities to large-scale platforms.
 
 ## 🛠️ Development
 
@@ -163,6 +149,27 @@ npm run format            # Format frontend code
 composer types            # Generate TypeScript types from models
 composer ide             # Update IDE autocomplete
 ```
+
+## 🐳 Deployment
+
+### Docker
+
+Ready to containerize with included Docker configuration. Requires [Docker Compose](https://docs.docker.com/compose/).
+
+```bash
+docker compose up
+```
+
+### Kubernetes
+
+Production-ready Kubernetes manifests included for scalable deployments. Perfect for handling growth from small communities to large-scale platforms.
+
+### Platforms
+
+We are working on one-click deployment solutions across a range of cloud platforms. Use the links below to launch production-ready instances of Laravel Community.
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/MeUHy_?referralCode=O-oe8s&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
 
 ## 🤝 Contributing
 
