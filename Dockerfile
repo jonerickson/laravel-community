@@ -11,7 +11,9 @@ RUN apt-get update \
     && apt-get install -y curl gnupg default-mysql-client \
     && rm -rf /var/lib/apt/lists/*
 
-RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+RUN mkdir -p /etc/mysql && \
+    echo "[client]" > /etc/mysql/my.cnf && \
+    echo "ssl-mode=DISABLED" >> /etc/mysql/my.cnf
 
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 RUN apt-get install -y nodejs
