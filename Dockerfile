@@ -12,8 +12,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /etc/mysql && \
-    echo "[client]" > /etc/mysql/my.cnf && \
-    echo "ssl-mode=DISABLED" >> /etc/mysql/my.cnf
+    echo "[client]" > /etc/my.cnf && \
+    echo "skip-ssl=true" >> /etc/my.cnf
 
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 RUN apt-get install -y nodejs
