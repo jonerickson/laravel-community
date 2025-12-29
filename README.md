@@ -74,7 +74,7 @@ Built with a modular, extensible architecture:
 - Node.js 22 or higher
 - Composer
 - Database Service (SQLite for local, MySQL/PostgreSQL for production)
-- Cache Service (Redis, Memcached, DynamoDB, or Local (Database, File, In-Memory))
+- Cache Service (Redis required for production, or Local cache options for development)
 - Mail Service (SMTP, Sendgrid, Mailgun, SES, Postmark, Resend)
 - File Storage (Local storage or S3 for production)
 
@@ -170,6 +170,7 @@ We are working on one-click deployment solutions across a range of cloud platfor
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/MeUHy_?referralCode=O-oe8s&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
+See [RAILWAY.md](./RAILWAY.md) for more information on hosting with Railway.
 
 ## 🤝 Contributing
 

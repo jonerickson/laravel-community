@@ -169,21 +169,16 @@ class InstallCommand extends Command
             return true;
         }
 
-        return (bool) Group::exists();
+        return Group::exists();
     }
 
     protected function resetApplication(): void
     {
         $this->components->info('Truncating all data...');
 
-        Schema::disableForeignKeyConstraints();
-
-        User::truncate();
-        Role::truncate();
-        Permission::truncate();
-        Group::truncate();
-
-        Schema::enableForeignKeyConstraints();
+        $this->call('migrate:fresh', [
+            '--force' => $this->option('force'),
+        ]);
 
         $this->components->success('Application reset complete.');
     }
