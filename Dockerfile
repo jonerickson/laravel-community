@@ -27,6 +27,9 @@ USER root
 
 RUN install-php-extensions intl bcmath soap gd sockets gmp imap
 
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+RUN apt-get install -y nodejs
+
 COPY . /var/www/html
 
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
