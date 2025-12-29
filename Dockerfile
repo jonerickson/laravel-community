@@ -27,11 +27,9 @@ USER root
 
 COPY . /var/www/html
 
-RUN --mount=type=cache,target=/root/.composer/cache \
-    composer install --no-interaction --prefer-dist --optimize-autoloader
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-RUN --mount=type=cache,target=/root/.npm \
-    npm install && \
+RUN npm install && \
     npm run build && \
     rm -rf node_modules
 
