@@ -78,7 +78,7 @@ const features = [
 
 export default function Home({ subscriptions = [] }: HomeProps) {
     const page = usePage<App.Data.SharedData>();
-    const { name, auth, memberCount, postCount, discordCount, robloxCount, slogan, logoUrl } = page.props;
+    const { name, auth, memberCount, postCount, discordCount, discordOnlineCount, robloxCount, slogan, logoUrl } = page.props;
 
     return (
         <div className="min-h-screen bg-background text-foreground">
@@ -105,12 +105,16 @@ export default function Home({ subscriptions = [] }: HomeProps) {
                                     <Rocket className="text-gaming-blue mr-2 h-4 w-4" />
                                     Now powering {abbreviateNumber(memberCount)}+ members
                                 </div>
-                                <div className="inline-flex items-center rounded-full border border-border/40 bg-background px-3 py-1 text-sm text-muted-foreground">
-                                    <DiscordOnlineCount />
-                                </div>
-                                <div className="inline-flex items-center rounded-full border border-border/40 bg-background px-3 py-1 text-sm text-muted-foreground">
-                                    <RobloxMemberCount />
-                                </div>
+                                {!!discordOnlineCount && (
+                                    <div className="inline-flex items-center rounded-full border border-border/40 bg-background px-3 py-1 text-sm text-muted-foreground">
+                                        <DiscordOnlineCount />
+                                    </div>
+                                )}
+                                {!!robloxCount && (
+                                    <div className="inline-flex items-center rounded-full border border-border/40 bg-background px-3 py-1 text-sm text-muted-foreground">
+                                        <RobloxMemberCount />
+                                    </div>
+                                )}
                             </div>
 
                             <h1 className="mb-6 text-4xl font-bold tracking-tight text-balance md:text-6xl lg:text-7xl">
