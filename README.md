@@ -168,7 +168,7 @@ Production-ready Kubernetes manifests included for scalable deployments. Perfect
 
 We are working on one-click deployment solutions across a range of cloud platforms. Use the links below to launch production-ready instances of Laravel Community.
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/MeUHy_?referralCode=O-oe8s&utm_medium=integration&utm_source=template&utm_campaign=generic)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/laravel-community?referralCode=O-oe8s&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
 See [RAILWAY.md](./RAILWAY.md) for more information on hosting with Railway.
 
