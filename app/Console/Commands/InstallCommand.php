@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Schema;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\password;
+use function Laravel\Prompts\table;
 use function Laravel\Prompts\text;
 
 class InstallCommand extends Command
@@ -45,8 +46,20 @@ class InstallCommand extends Command
             $this->components->info('Running in non-interactive mode.');
         }
 
-        if (! $this->confirmToProceed()) {
-            return self::SUCCESS;
+        if ($this->isInstalled()) {
+            if (! $this->option('force')) {
+                $this->components->info('Application is already installed.');
+                $this->components->info('Use --force to reinstall.');
+
+                return self::SUCCESS;
+            }
+
+            if (! $this->confirmToProceed('Application is already installed. This will RESET all data!')) {
+                return self::SUCCESS;
+            }
+
+            $this->components->warn('Resetting application...');
+            $this->resetApplication();
         }
 
         $this->components->info('Installing application...');
@@ -76,11 +89,29 @@ class InstallCommand extends Command
             ]);
         }
 
-        if ($this->input->isInteractive() && confirm('Would you like to create a new super admin account?')) {
-            $name = $this->option('name') ?? text('Name', 'What is the name?');
-            $email = $this->option('email') ?? text('Email', 'What is the email?');
-            $password = $this->option('password') ?? password('Password', 'What is the password?');
+        $shouldCreateUser = false;
+        $name = null;
+        $email = null;
+        $password = null;
 
+        if ($this->input->isInteractive()) {
+            if (confirm('Would you like to create a new super admin account?')) {
+                $shouldCreateUser = true;
+                $name = $this->option('name') ?? text('Name', 'What is the name?');
+                $email = $this->option('email') ?? text('Email', 'What is the email?');
+                $password = $this->option('password') ?? password('Password', 'What is the password?');
+            }
+        } else {
+            $name = $this->option('name');
+            $email = $this->option('email');
+            $password = $this->option('password');
+
+            if (filled($name) && filled($email) && filled($password)) {
+                $shouldCreateUser = true;
+            }
+        }
+
+        if ($shouldCreateUser) {
             if (blank($name) || blank($email) || blank($password)) {
                 $this->components->error('Please provide a name, email and password when creating a new account.');
 
@@ -115,8 +146,45 @@ class InstallCommand extends Command
             ]);
         }
 
+        if (count($users = User::all()) > 0) {
+            $this->components->info('Available user accounts:');
+
+            table(['ID', 'Name', 'Email', 'Roles', 'Password'], $users->map(fn (User $user): array => [$user->id, $user->name, $user->email, $user->roles->map->name->implode(', '), '---']));
+        }
+
         $this->components->success('Application installed successfully.');
 
         return self::SUCCESS;
+    }
+
+    protected function isInstalled(): bool
+    {
+        if (User::exists()) {
+            return true;
+        }
+        if (Role::exists()) {
+            return true;
+        }
+        if (Permission::exists()) {
+            return true;
+        }
+
+        return (bool) Group::exists();
+    }
+
+    protected function resetApplication(): void
+    {
+        $this->components->info('Truncating all data...');
+
+        Schema::disableForeignKeyConstraints();
+
+        User::truncate();
+        Role::truncate();
+        Permission::truncate();
+        Group::truncate();
+
+        Schema::enableForeignKeyConstraints();
+
+        $this->components->success('Application reset complete.');
     }
 }

@@ -138,6 +138,7 @@ FROM build AS production
 
 USER root
 
+COPY --chmod=755 ./docker/etc/entrypoint.d/ /etc/entrypoint.d/
 COPY --from=build --chown=www-data:www-data /var/www/html /var/www/html
 
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev

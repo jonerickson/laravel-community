@@ -44,7 +44,7 @@ class CommentsRelationManager extends RelationManager
                     ->hiddenLabel()
                     ->maxLength(65535)
                     ->columnSpanFull()
-                    ->helperText(fn (?Comment $record) => is_null($record)
+                    ->helperText(fn (?Comment $record): ?string => is_null($record)
                         ? null
                         : sprintf('%s replied %s', $record->author->name, $record->created_at->format('M j, Y \a\t g:i A'))),
             ]);
