@@ -8,15 +8,12 @@ USER root
 RUN install-php-extensions intl bcmath soap gd sockets gmp imap
 
 RUN apt-get update \
-    && apt-get install -y curl gnupg default-mysql-client \
+    && apt-get install -y gnupg default-mysql-client \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
+    && mkdir -p /etc/mysql \
+    && echo "[client]\nskip-ssl=true" > /etc/my.cnf \
     && rm -rf /var/lib/apt/lists/*
-
-RUN mkdir -p /etc/mysql && \
-    echo "[client]" > /etc/my.cnf && \
-    echo "skip-ssl=true" >> /etc/my.cnf
-
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-RUN apt-get install -y nodejs
 
 ############################################
 # CLI Image
@@ -27,18 +24,16 @@ USER root
 
 RUN install-php-extensions intl bcmath soap gd sockets gmp imap
 
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-RUN apt-get install -y nodejs
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY . /var/www/html
+COPY --chown=www-data:www-data . /var/www/html
 
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
-
-RUN npm install && \
-    npm run build && \
-    rm -rf node_modules
-
-RUN chown -R www-data:www-data /var/www/html
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader \
+    && npm install \
+    && npm run build \
+    && rm -rf node_modules
 
 USER www-data
 
@@ -147,7 +142,6 @@ USER root
 
 COPY --from=build --chown=www-data:www-data /var/www/html /var/www/html
 
-RUN --mount=type=cache,target=/root/.composer/cache \
-    composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
 USER www-data
