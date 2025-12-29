@@ -19,6 +19,27 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 RUN apt-get install -y nodejs
 
 ############################################
+# CLI Image
+############################################
+FROM serversideup/php:8.4-cli as cli
+
+USER root
+
+COPY . /var/www/html
+
+RUN --mount=type=cache,target=/root/.composer/cache \
+    composer install --no-interaction --prefer-dist --optimize-autoloader
+
+RUN --mount=type=cache,target=/root/.npm \
+    npm install && \
+    npm run build && \
+    rm -rf node_modules
+
+RUN chown -R www-data:www-data /var/www/html
+
+USER www-data
+
+############################################
 # Development Image
 ############################################
 FROM base AS development
@@ -95,11 +116,13 @@ ENV VITE_SSR_PORT=${VITE_SSR_PORT}
 
 COPY . /var/www/html
 
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+RUN --mount=type=cache,target=/root/.composer/cache \
+    composer install --no-interaction --prefer-dist --optimize-autoloader
 
-RUN npm install
-RUN npm run build
-RUN rm -rf node_modules
+RUN --mount=type=cache,target=/root/.npm \
+    npm install && \
+    npm run build && \
+    rm -rf node_modules
 
 USER www-data
 
@@ -108,7 +131,6 @@ USER www-data
 ############################################
 FROM build AS ci
 
-# Sometimes CI images need to run as root
 USER root
 
 COPY --from=build --chown=www-data:www-data /var/www/html /var/www/html
@@ -122,6 +144,7 @@ USER root
 
 COPY --from=build --chown=www-data:www-data /var/www/html /var/www/html
 
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+RUN --mount=type=cache,target=/root/.composer/cache \
+    composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
 USER www-data
