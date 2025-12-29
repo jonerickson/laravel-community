@@ -34,16 +34,22 @@ createInertiaApp({
             }),
         });
 
+        const app = <App {...props} />;
+
         root.render(
-            <FpjsProvider
-                loadOptions={{
-                    apiKey: fingerprintApiKey,
-                    endpoint: [fingerprintEndpoint],
-                    scriptUrlPattern: [fingerprintScriptUrlPattern],
-                }}
-            >
-                <App {...props} />
-            </FpjsProvider>,
+            fingerprintApiKey ? (
+                <FpjsProvider
+                    loadOptions={{
+                        apiKey: fingerprintApiKey,
+                        endpoint: [fingerprintEndpoint],
+                        scriptUrlPattern: [fingerprintScriptUrlPattern],
+                    }}
+                >
+                    {app}
+                </FpjsProvider>
+            ) : (
+                app
+            ),
         );
     },
     progress: {
