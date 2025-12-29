@@ -25,6 +25,8 @@ FROM serversideup/php:8.4-cli as cli
 
 USER root
 
+RUN install-php-extensions intl bcmath soap gd sockets gmp imap
+
 COPY . /var/www/html
 
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
