@@ -73,7 +73,7 @@ class InstallCommand extends Command
             $this->components->info('Installing permissions...');
             $this->call('db:seed', [
                 '--class' => PermissionSeeder::class,
-                '--force' => $this->option('force'),
+                '--force' => true,
             ]);
         }
 
@@ -85,7 +85,7 @@ class InstallCommand extends Command
             $this->components->info('Installing groups...');
             $this->call('db:seed', [
                 '--class' => GroupSeeder::class,
-                '--force' => $this->option('force'),
+                '--force' => true,
             ]);
         }
 
@@ -122,7 +122,7 @@ class InstallCommand extends Command
                 $this->components->info('Installing permissions...');
                 $this->call('db:seed', [
                     '--class' => PermissionSeeder::class,
-                    '--force' => $this->option('force'),
+                    '--force' => true,
                 ]);
             }
 
@@ -142,7 +142,7 @@ class InstallCommand extends Command
         if ($this->option('seed')) {
             $this->call('db:seed', [
                 '--class' => DemoSeeder::class,
-                '--force' => $this->option('force'),
+                '--force' => true,
             ]);
         }
 
@@ -162,9 +162,11 @@ class InstallCommand extends Command
         if (User::exists()) {
             return true;
         }
+
         if (Role::exists()) {
             return true;
         }
+
         if (Permission::exists()) {
             return true;
         }
