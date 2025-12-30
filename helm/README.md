@@ -8,20 +8,12 @@ The deployment consists of the following components:
 
 ### Application Tier
 - **Web (PHP-FPM + Nginx)**: Laravel application serving HTTP on port 8080
-- **Caddy**: Reverse proxy handling SSL termination and automatic Let's Encrypt certificates
 - **Horizon**: Laravel queue worker processing background jobs
 - **Scheduler**: CronJob running Laravel scheduler every minute
 
 ### Data Tier
-- **MySQL 8.0**: Primary database with persistent storage
+- **MySQL 8.4**: Primary database with persistent storage
 - **Redis 7**: Cache, sessions, and queue backend with persistent storage
-
-### Traffic Flow
-```
-Internet → LoadBalancer (Caddy) → ClusterIP (Web Service) → Web Pods (port 8080)
-                ↓ (HTTPS/SSL)              ↓ (HTTP)
-         Automatic Let's Encrypt     Laravel Application
-```
 
 ## Prerequisites
 
@@ -41,19 +33,20 @@ Internet → LoadBalancer (Caddy) → ClusterIP (Web Service) → Web Pods (port
    ```
 
 4. **Container Registry Access**
-   - Images are hosted at `ghcr.io/jonerickson/mi`
+   - Images are hosted at `ghcr.io/jonerickson/laravel-community`
    - For private registries, configure image pull secrets
+   - For local deployment, images are not pulled. They should be built before deploying.
 
 ## Quick Start
 
-### 1. Build and Push Docker Image
+### 1. Build Docker Images
 
 ```bash
 # Build the production image
-docker build --target production -t ghcr.io/jonerickson/mi:latest .
+docker build --target production -t laravel-community:latest .
 
-# Push to GitHub Container Registry
-docker push ghcr.io/jonerickson/mi:latest
+# Build the CLI image
+docker build --target cli -t laravel-community-cli:latest .
 ```
 
 ### 2. Deploy to Local Environment
@@ -66,124 +59,17 @@ helm install app ./helm -f ./helm/values-local.yaml
 kubectl get pods
 kubectl get services
 
-# Access the application (if using NodePort)
-kubectl get svc app-caddy -o jsonpath='{.spec.ports[0].nodePort}'
-# Visit http://localhost:<nodePort>
-
-# Or forward to a different port
-kubectl port-forward svc/app-caddy 8080:80
+# Forward the port to access locally
+kubectl port-forward svc/app-laravel-community-web 8080:8080
 # Visit http://localhost:8080
-```
-
-### 3. Deploy to Staging
-
-```bash
-# Update staging values with your domain and email
-# Edit helm/values-staging.yaml:
-#   app.url: "https://staging.yourdomain.com"
-#   caddy.email: "admin@yourdomain.com"
-
-# Install or upgrade
-helm upgrade --install app ./helm -f ./helm/values-staging.yaml
-
-# Get LoadBalancer IP
-kubectl get svc app-caddy
-```
-
-### 4. Deploy to Production
-
-```bash
-# Update production values
-# Edit helm/values-production.yaml:
-#   app.url: "https://yourdomain.com"
-
-# Install or upgrade
-helm upgrade --install app ./helm -f ./helm/values-production.yaml
-```
-
-## Configuration
-
-### Environment-Specific Values
-
-The chart includes three environment configurations:
-
-- **`values-local.yaml`**: Development environment
-  - NodePort service
-  - Minimal resources
-  - No SSL (HTTP only)
-  - Single replicas
-  - Autoscaling disabled
-
-- **`values-staging.yaml`**: Staging environment
-  - LoadBalancer service
-  - Moderate resources
-  - Automatic HTTPS via Caddy
-  - 2-5 replicas with autoscaling
-
-- **`values-production.yaml`**: Production environment
-  - LoadBalancer service
-  - High resources
-  - Automatic HTTPS via Caddy
-  - 3-20 replicas with autoscaling
-  - Pod anti-affinity for high availability
-
-### Required Secrets
-
-Before deploying, you need to set the following secrets:
-
-```bash
-# Generate Laravel application key
-php artisan key:generate --show
-
-# Create a secrets file (do NOT commit this)
-cat > helm-secrets.yaml <<EOF
-app:
-  key: "base64:YOUR_GENERATED_KEY_HERE"
-
-mysql:
-  auth:
-    rootPassword: "your-secure-root-password"
-    password: "your-secure-db-password"
-
-redis:
-  auth:
-    password: "your-secure-redis-password"  # or leave empty for no auth
-
-laravel:
-  mail:
-    username: "your-smtp-username"
-    password: "your-smtp-password"
-EOF
-
-# Deploy with secrets
-helm upgrade --install app ./helm \
-  -f ./helm/values-production.yaml \
-  -f ./helm-secrets.yaml
-```
-
-### SSL/TLS Configuration
-
-SSL is automatically handled by Caddy:
-
-1. **Local Environment**: SSL is disabled (HTTP only)
-2. **Staging/Production**: Caddy automatically obtains Let's Encrypt certificates
-
-**Important**: Ensure your domain's DNS points to the LoadBalancer IP before deploying staging/production, otherwise Let's Encrypt certificate issuance will fail.
-
-```bash
-# Get LoadBalancer IP
-kubectl get svc app-caddy
-
-# Point your DNS A record to this IP
-# Example: staging.yourdomain.com → LoadBalancer IP
 ```
 
 ### Database Migrations
 
-Migrations run automatically during web pod initialization via an init container. To manually run migrations:
+Migrations run automatically during web pod initialization. To manually run migrations:
 
 ```bash
-kubectl exec -it deployment/app-web -- php artisan migrate --force
+kubectl exec -it deployment/app-laravel-community-web -- php artisan migrate --force
 ```
 
 ### Customization
@@ -213,16 +99,13 @@ helm upgrade --install app ./helm \
 
 ```bash
 # Web application logs
-kubectl logs -f deployment/app-web
+kubectl logs -f deployment/app-laravel-community-web
 
 # Horizon worker logs
-kubectl logs -f deployment/app-horizon
+kubectl logs -f deployment/app-laravel-community-horizon
 
 # Scheduler logs
 kubectl logs -l app.kubernetes.io/component=scheduler
-
-# Caddy logs
-kubectl logs -f deployment/app-caddy
 ```
 
 ### Check Pod Status
@@ -239,21 +122,20 @@ kubectl get pods -l app.kubernetes.io/component=web
 
 ```bash
 # Access web pod shell
-kubectl exec -it deployment/app-web -- /bin/bash
+kubectl exec -it deployment/app-laravel-community-web -- /bin/bash
 
 # Run artisan commands
-kubectl exec -it deployment/app-web -- php artisan cache:clear
-kubectl exec -it deployment/app-web -- php artisan config:cache
-kubectl exec -it deployment/app-web -- php artisan queue:work --once
+kubectl exec -it deployment/app-laravel-community-web -- php artisan cache:clear
+kubectl exec -it deployment/app-laravel-community-web -- php artisan config:cache
+kubectl exec -it deployment/app-laravel-community-web -- php artisan queue:work --once
 ```
 
 ### Access Services
 
 ```bash
 # Port forward to access services locally
-kubectl port-forward svc/app-caddy 8080:80
-kubectl port-forward svc/app-mysql 3306:3306
-kubectl port-forward svc/app-redis 6379:6379
+kubectl port-forward svc/app-laravel-community-mysql 3306:3306
+kubectl port-forward svc/app-laravel-community-redis 6379:6379
 ```
 
 ## Scaling
@@ -262,13 +144,10 @@ kubectl port-forward svc/app-redis 6379:6379
 
 ```bash
 # Scale web pods
-kubectl scale deployment app-web --replicas=5
+kubectl scale deployment app-laravel-community-web --replicas=5
 
 # Scale Horizon workers
-kubectl scale deployment app-horizon --replicas=3
-
-# Scale Caddy reverse proxy
-kubectl scale deployment app-caddy --replicas=4
+kubectl scale deployment app-laravel-community-horizon --replicas=3
 ```
 
 ### Autoscaling
@@ -280,9 +159,8 @@ Horizontal Pod Autoscaling (HPA) is configured by default for production:
 kubectl get hpa
 
 # View detailed HPA info
-kubectl describe hpa app-web
-kubectl describe hpa app-horizon
-kubectl describe hpa app-caddy
+kubectl describe hpa app-laravel-community-web
+kubectl describe hpa app-laravel-community-horizon
 ```
 
 ## Backup and Restore
@@ -291,11 +169,11 @@ kubectl describe hpa app-caddy
 
 ```bash
 # Backup MySQL database
-kubectl exec -it statefulset/app-mysql -- \
+kubectl exec -it statefulset/app-laravel-community-mysql -- \
   mysqldump -u root -p app > backup-$(date +%Y%m%d).sql
 
 # Restore from backup
-kubectl exec -i statefulset/app-mysql -- \
+kubectl exec -i statefulset/app-laravel-community-mysql -- \
   mysql -u root -p app < backup-20250101.sql
 ```
 
@@ -309,8 +187,8 @@ Use your cloud provider's volume snapshot feature or tools like Velero for compl
 
 ```bash
 # Build and push new image with tag
-docker build --target production -t ghcr.io/jonerickson/mi:v1.2.3 .
-docker push ghcr.io/jonerickson/mi:v1.2.3
+docker build --target production -t laravel-community:v1.2.3 .
+docker push laravel-community:v1.2.3
 
 # Update image tag and upgrade
 helm upgrade app ./helm \
@@ -318,8 +196,8 @@ helm upgrade app ./helm \
   --set image.tag=v1.2.3
 
 # Monitor rollout
-kubectl rollout status deployment/app-web
-kubectl rollout status deployment/app-horizon
+kubectl rollout status deployment/app-laravel-community-web
+kubectl rollout status deployment/app-laravel-community-horizon
 ```
 
 ### Rollback
@@ -342,7 +220,7 @@ helm rollback app 3
 helm uninstall app
 
 # Delete persistent volumes (CAUTION: This deletes all data)
-kubectl delete pvc -l app.kubernetes.io/instance=mi
+kubectl delete pvc -l app.kubernetes.io/instance=app
 ```
 
 ## Troubleshooting
@@ -367,25 +245,11 @@ kubectl logs <pod-name> -c init-migrations
 kubectl get pods -l app.kubernetes.io/component=mysql
 
 # Check MySQL logs
-kubectl logs statefulset/app-mysql
+kubectl logs statefulset/app-laravel-community-mysql
 
 # Test connection from web pod
-kubectl exec -it deployment/app-web -- \
-  mysql -h app-mysql -u app -p
-```
-
-### SSL Certificate Issues
-
-```bash
-# Check Caddy logs for Let's Encrypt errors
-kubectl logs deployment/app-caddy
-
-# Verify DNS is pointing to LoadBalancer
-kubectl get svc app-caddy
-nslookup yourdomain.com
-
-# Caddy stores certificates in /data - check PVC
-kubectl exec -it deployment/app-caddy -- ls -la /data/caddy/certificates
+kubectl exec -it deployment/app-laravel-community-web -- \
+  mysql -h app-laravel-community-mysql -u root -p
 ```
 
 ### Scheduler Not Running
