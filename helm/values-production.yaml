@@ -3,7 +3,7 @@ environment: production
 
 app:
   debug: false
-  url: "https://mountaininteractive.com"
+  url: "https://laravel-community.com"
   env: production
 
 web:
@@ -24,7 +24,6 @@ web:
     targetCPUUtilizationPercentage: 70
     targetMemoryUtilizationPercentage: 75
 
-  # Production affinity to spread pods across nodes
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
@@ -36,47 +35,6 @@ web:
                   operator: In
                   values:
                     - web
-            topologyKey: kubernetes.io/hostname
-
-caddy:
-  enabled: true
-  replicaCount: 3
-  email: ssl-admin@mountaininteractive.com
-
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 512Mi
-    requests:
-      cpu: 200m
-      memory: 256Mi
-
-  autoscaling:
-    enabled: true
-    minReplicas: 3
-    maxReplicas: 15
-    targetCPUUtilizationPercentage: 70
-    targetMemoryUtilizationPercentage: 75
-
-  service:
-    type: LoadBalancer
-
-  persistence:
-    enabled: true
-    size: 2Gi
-
-  # Production affinity to spread pods across nodes
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 100
-          podAffinityTerm:
-            labelSelector:
-              matchExpressions:
-                - key: app.kubernetes.io/component
-                  operator: In
-                  values:
-                    - caddy
             topologyKey: kubernetes.io/hostname
 
 horizon:
@@ -97,7 +55,6 @@ horizon:
     targetCPUUtilizationPercentage: 70
     targetMemoryUtilizationPercentage: 75
 
-  # Production affinity to spread pods across nodes
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
@@ -134,11 +91,3 @@ redis:
     requests:
       cpu: 500m
       memory: 512Mi
-
-logs:
-  persistence:
-    size: 50Gi
-
-files:
-  persistence:
-    size: 100Gi

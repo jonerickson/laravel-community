@@ -65,7 +65,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
 
       - name: Build and Push Docker Image (CLI)
         uses: docker/build-push-action@v6
@@ -77,4 +77,4 @@ jobs:
           labels: ${{ steps.meta-cli.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64

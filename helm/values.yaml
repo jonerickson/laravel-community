@@ -1,6 +1,3 @@
-# Default values for Mountain Interactive
-# This is a YAML-formatted file.
-
 # Global settings
 global:
   imagePullPolicy: IfNotPresent
@@ -8,7 +5,13 @@ global:
 
 # Application image
 image:
-  repository: ghcr.io/jonerickson/mi
+  repository: ghcr.io/jonerickson/laravel-community
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# CLI image (for Horizon, scheduler, etc.)
+cli:
+  repository: ghcr.io/jonerickson/laravel-community-cli
   tag: latest
   pullPolicy: IfNotPresent
 
@@ -22,10 +25,10 @@ fullnameOverride: ""
 # Environment (local, staging, production)
 environment: local
 
-# Laravel application configuration
+# Application configuration
 app:
-  name: "Mountain Interactive"
-  key: "" # Set via secret
+  name: "Laravel Community"
+  key: ""
   debug: false
   url: "http://localhost"
   env: production
@@ -51,49 +54,6 @@ web:
     maxReplicas: 10
     targetCPUUtilizationPercentage: 80
     targetMemoryUtilizationPercentage: 80
-
-  nodeSelector: {}
-  tolerations: []
-  affinity: {}
-
-# Caddy reverse proxy
-caddy:
-  enabled: true
-  replicaCount: 2
-
-  image:
-    repository: caddy
-    tag: "2-alpine"
-    pullPolicy: IfNotPresent
-
-  email: admin@example.com # Email for Let's Encrypt notifications
-
-  resources:
-    limits:
-      cpu: 500m
-      memory: 256Mi
-    requests:
-      cpu: 100m
-      memory: 128Mi
-
-  autoscaling:
-    enabled: true
-    minReplicas: 2
-    maxReplicas: 10
-    targetCPUUtilizationPercentage: 80
-    targetMemoryUtilizationPercentage: 80
-
-  service:
-    type: LoadBalancer
-    annotations: {}
-      # Add cloud provider specific annotations here
-      # Example for AWS:
-      # service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
-
-  persistence:
-    enabled: true
-    size: 1Gi
-    storageClass: ""
 
   nodeSelector: {}
   tolerations: []
@@ -142,18 +102,17 @@ scheduler:
   tolerations: []
   affinity: {}
 
-# MySQL Configuration
+# MySQL configuration
 mysql:
   enabled: true
   image:
     repository: mysql
-    tag: "8.0"
+    tag: "8.4"
 
   auth:
-    rootPassword: "" # Set via secret
-    database: app
-    username: app
-    password: "" # Set via secret
+    database: laravel-community
+    password: ""
+    username: root
 
   persistence:
     enabled: true
@@ -175,7 +134,7 @@ mysql:
   tolerations: []
   affinity: {}
 
-# Redis Configuration
+# Redis configuration
 redis:
   enabled: true
   image:
@@ -183,7 +142,8 @@ redis:
     tag: "7-alpine"
 
   auth:
-    password: "" # Set via secret
+    username: ""
+    password: ""
 
   persistence:
     enabled: true
@@ -205,44 +165,51 @@ redis:
   tolerations: []
   affinity: {}
 
-# Persistent storage for logs
-logs:
-  persistence:
-    enabled: true
-    size: 10Gi
-    storageClass: ""
-    accessMode: ReadWriteMany
+# Payment processor
+payments:
+  driver: null
 
-# Persistent storage for file storage
-files:
-  persistence:
-    enabled: true
-    size: 10Gi
-    storageClass: ""
-    accessMode: ReadWriteMany
+# Payout processor
+payouts:
+  driver: null
+  minAmount: 10.00
+  maxAmount: 10000.00
+  statementDescriptor: Laravel Community
 
 # Laravel configuration
 laravel:
-  database:
-    connection: mysql
-    host: "" # Will be set to mysql service name
-    port: 3306
-    database: app
-    username: app
-    password: "" # Set via secret
-
   broadcast:
-    driver: log
+    connection: log
 
   cache:
-    driver: redis
-    host: "" # Will be set to redis service name
-    port: 6379
-    password: "" # Set via secret
+    store: redis
+
+  cashier:
+    currency: USD
+    locale: en
+
+  csp:
+    enabled: false
+
+  database:
+    connection: mysql
+
+  filesystems:
+    disk: s3
 
   logs:
-    channel: stack
+    channel: stderr
     level: debug
+
+  mail:
+    mailer: smtp
+    host: 127.0.0.1
+    port: 1025
+    username: ""
+    password: ""
+    encryption: null
+    fromAddress: hello@example.com
+    fromName: "Laravel Community"
 
   queue:
     connection: redis
@@ -252,17 +219,11 @@ laravel:
     prefix: ""
 
   session:
+    domain: null
     driver: redis
-
-  mail:
-    mailer: smtp
-    host: mailhog
-    port: 1025
-    username: ""
-    password: ""
-    encryption: null
-    fromAddress: hello@example.com
-    fromName: "Mountain Interactive"
+    encrypt: false
+    lifetime: 120
+    path: /
 
 # Service account
 serviceAccount:

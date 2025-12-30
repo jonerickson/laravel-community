@@ -27,7 +27,6 @@ spec:
             - name: redis
               containerPort: {{ .Values.redis.service.port }}
               protocol: TCP
-          {{- if .Values.redis.auth.password }}
           command:
             - redis-server
             - --requirepass
@@ -38,7 +37,6 @@ spec:
                 secretKeyRef:
                   name: {{ include "app.fullname" . }}
                   key: REDIS_PASSWORD
-          {{- end }}
           livenessProbe:
             exec:
               command:

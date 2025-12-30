@@ -3,7 +3,7 @@ environment: staging
 
 app:
   debug: true
-  url: "https://staging.mountaininteractive.com"
+  url: "https://staging.laravel-community.com"
   env: staging
 
 web:
@@ -13,31 +13,6 @@ web:
     enabled: true
     minReplicas: 2
     maxReplicas: 5
-
-caddy:
-  enabled: true
-  replicaCount: 2
-  email: ssl-admin@staging.mountaininteractive.com
-
-  autoscaling:
-    enabled: true
-    minReplicas: 2
-    maxReplicas: 5
-
-  service:
-    type: LoadBalancer
-
-  persistence:
-    enabled: true
-    size: 1Gi
-
-  resources:
-    limits:
-      cpu: 500m
-      memory: 256Mi
-    requests:
-      cpu: 100m
-      memory: 128Mi
 
 horizon:
   replicaCount: 2
@@ -70,11 +45,3 @@ redis:
     requests:
       cpu: 250m
       memory: 256Mi
-
-logs:
-  persistence:
-    size: 20Gi
-
-files:
-  persistence:
-    size: 10Gi

@@ -50,8 +50,8 @@ spec:
         - name: horizon
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.cli.repository }}:{{ .Values.cli.tag }}"
+          imagePullPolicy: {{ .Values.cli.pullPolicy }}
           command:
             - php
             - artisan
@@ -63,17 +63,6 @@ spec:
                 name: {{ include "app.fullname" . }}
           resources:
             {{- toYaml .Values.horizon.resources | nindent 12 }}
-          volumeMounts:
-            {{- if .Values.logs.persistence.enabled }}
-            - name: logs
-              mountPath: /var/www/html/storage/logs
-            {{- end }}
-      volumes:
-        {{- if .Values.logs.persistence.enabled }}
-        - name: logs
-          persistentVolumeClaim:
-            claimName: {{ include "app.fullname" . }}-logs
-        {{- end }}
       {{- with .Values.horizon.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

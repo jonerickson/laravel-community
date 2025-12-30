@@ -96,7 +96,6 @@ kubectl get svc app-caddy
 # Update production values
 # Edit helm/values-production.yaml:
 #   app.url: "https://yourdomain.com"
-#   caddy.email: "admin@yourdomain.com"
 
 # Install or upgrade
 helm upgrade --install app ./helm -f ./helm/values-production.yaml

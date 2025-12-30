@@ -1,6 +1,16 @@
 # Local environment overrides
 environment: local
 
+image:
+  repository: laravel-community
+  tag: latest
+  pullPolicy: Never
+
+cli:
+  repository: laravel-community-cli
+  tag: latest
+  pullPolicy: Never
+
 app:
   debug: true
   url: "http://localhost"
@@ -12,27 +22,6 @@ web:
   autoscaling:
     enabled: false
 
-caddy:
-  enabled: true
-  replicaCount: 1
-
-  autoscaling:
-    enabled: false
-
-  service:
-    type: NodePort
-
-  persistence:
-    enabled: false
-
-  resources:
-    limits:
-      cpu: 250m
-      memory: 128Mi
-    requests:
-      cpu: 50m
-      memory: 64Mi
-
 horizon:
   replicaCount: 1
 
@@ -40,11 +29,6 @@ horizon:
     enabled: false
 
 mysql:
-  auth:
-    username: "root"
-    rootPassword: ""
-    password: ""
-
   persistence:
     size: 5Gi
 
@@ -70,11 +54,3 @@ redis:
     requests:
       cpu: 50m
       memory: 64Mi
-
-logs:
-  persistence:
-    size: 2Gi
-
-files:
-  persistence:
-    size: 1Gi

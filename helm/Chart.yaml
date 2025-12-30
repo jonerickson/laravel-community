@@ -1,6 +1,6 @@
 apiVersion: v2
 name: app
-description: Mountain Interactive Laravel Application
+description: Laravel Community
 type: application
 version: 1.0.0
 appVersion: "1.0.0"

@@ -28,14 +28,8 @@ spec:
               containerPort: {{ .Values.mysql.service.port }}
               protocol: TCP
           env:
-            {{- if eq .Values.environment "local" }}
-            - name: MYSQL_ALLOW_EMPTY_PASSWORD
-              value: "1"
             - name: MYSQL_ROOT_HOST
               value: "%"
-            - name: MYSQL_DATABASE
-              value: {{ .Values.mysql.auth.database | quote }}
-            {{- else }}
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -43,14 +37,11 @@ spec:
                   key: DB_PASSWORD
             - name: MYSQL_DATABASE
               value: {{ .Values.mysql.auth.database | quote }}
-            - name: MYSQL_USER
-              value: {{ .Values.mysql.auth.username | quote }}
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ include "app.fullname" . }}
                   key: DB_PASSWORD
-            {{- end }}
           livenessProbe:
             exec:
               command:
