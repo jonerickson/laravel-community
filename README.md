@@ -170,7 +170,7 @@ We are working on one-click deployment solutions across a range of cloud platfor
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/laravel-community?referralCode=O-oe8s&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
-See [RAILWAY.md](./RAILWAY.md) for more information on hosting with Railway.
+See [RAILWAY.md](RAILWAY.md) for more information on hosting with Railway.
 
 ## 🤝 Contributing
 
@@ -182,13 +182,13 @@ We welcome contributions from the community! Whether it's bug fixes, new feature
 4. ✅ Run tests and quality checks
 5. 📬 Submit a pull request
 
-Check out our [Contributing Guide](CONTRIBUTING.md) for detailed guidelines.
+Check out our [Contributing Guide](.github/CONTRIBUTING.md) for detailed guidelines.
 
 ## 📖 Documentation
 
-- **CLAUDE.md** - Development guidelines and architecture overview
-- **Code of Conduct** - Community standards and expectations
-- **License** - MIT License for open source freedom
+- [**CLAUDE.md**](CLAUDE.md) - Development guidelines and architecture overview
+- [**Code of Conduct**](.github/CODE_OF_CONDUCT.md) - Community standards and expectations
+- [**License**](LICENSE.md) - O'Saasy License for open source freedom
 
 ## 🔒 Security
 
@@ -205,7 +205,7 @@ Found a security issue? Please report it responsibly by contacting the maintaine
 
 ## 📝 License
 
-Laravel Community is open source software licensed under the [MIT License](LICENSE.md).
+Laravel Community is open source software licensed under the [O'Saasy License](LICENSE.md).
 
 ## 💙 Built With
 
@@ -223,7 +223,7 @@ Modern technologies for a modern platform:
 
 <div align="center">
 
-**[Documentation](CLAUDE.md)** • **[Contributing](CONTRIBUTING.md)** • **[License](LICENSE.md)**
+**[Documentation](CLAUDE.md)** • **[Contributing](.github/CONTRIBUTING.md)** • **[License](LICENSE.md)**
 
 Made with ❤️ by the Laravel Community
 
