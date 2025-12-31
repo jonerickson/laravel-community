@@ -162,7 +162,13 @@ docker compose up
 
 ### Kubernetes
 
-Production-ready Kubernetes manifests included for scalable deployments. Perfect for handling growth from small communities to large-scale platforms.
+Production-ready Helm charts included for scalable deployments. Perfect for handling growth from small communities to large-scale platforms.
+
+**Deploy with:**
+- [DigitalOcean Kubernetes (DOKS)](docs/DIGITALOCEAN.md) - Complete setup guide for DOKS deployment
+- [Amazon EKS](docs/AWS.md) - Complete setup guide for AWS EKS deployment
+
+See [helm/README.md](helm/README.md) for detailed Kubernetes deployment documentation.
 
 ### Platforms
 
@@ -170,7 +176,7 @@ We are working on one-click deployment solutions across a range of cloud platfor
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/laravel-community?referralCode=O-oe8s&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
-See [RAILWAY.md](docs/RAILWAY.md) for more information on hosting with Railway.
+See [docs/RAILWAY.md](docs/RAILWAY.md) for more information on hosting with Railway.
 
 ## 🤝 Contributing
 
