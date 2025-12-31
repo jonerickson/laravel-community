@@ -64,8 +64,8 @@ The deployment consists of the following components:
 ### 1. Build Docker Images
 
 ```bash
-# Build the production images.
-# If you are deploying to the cloud, you will need to push the image to a public repository and update the Helm values to pull the correct image.
+# Build the production images
+# If you are deploying to the cloud, you will need to push the images to a public repository and update the Helm values to pull the correct image.
 docker build --target production -t laravel-community:latest .
 docker build --target cli -t laravel-community-cli:latest .
 ```
@@ -92,9 +92,8 @@ helm install app ./helm -f ./helm/values-production.yaml
 ```
 
 3. Install the [Ingress Controller](#ingress-controller). Make sure to update the values in `values-production.yaml` to match the domains you intend to point to the app.
-   * If you plan to access the site via SSL (https), make cure to follow the steps to install `cert-manager`.
+   * If you plan to access the site via SSL (https), make sure to follow the steps to install `cert-manager`.
    * Follow the instructions to update your domain's DNS records to point to the Load Balancer.
-
 
 ### Database Migrations
 
@@ -328,7 +327,7 @@ minikube addons enable ingress
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 
 # For Docker Desktop
-    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
 ```
 
 **Add local DNS entry:**
