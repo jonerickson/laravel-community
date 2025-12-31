@@ -88,6 +88,24 @@ Redis host
 {{- end }}
 
 {{/*
+Init containers that wait for the web service to be ready
+*/}}
+{{- define "app.initContainers.waitForWebService" -}}
+- name: wait-for-web
+  image: busybox:1.36
+  command:
+    - sh
+    - -c
+    - |
+      echo "Waiting for web service to be ready..."
+      until nc -z {{ include "app.fullname" . }}-web 8080; do
+        echo "Web service not ready yet. Waiting..."
+        sleep 2
+      done
+      echo "Web service is ready!"
+{{- end }}
+
+{{/*
 Init containers that wait for MySQL and Redis to be ready
 */}}
 {{- define "app.initContainers.waitForDependencies" -}}
@@ -100,7 +118,7 @@ Init containers that wait for MySQL and Redis to be ready
     - |
       echo "Waiting for MySQL to be ready..."
       until nc -z {{ include "app.mysql.fullname" . }} {{ .Values.mysql.service.port }}; do
-        echo "MySQL is unavailable - sleeping"
+        echo "MySQL not ready yet. Waiting..."
         sleep 2
       done
       echo "MySQL is ready!"
@@ -114,7 +132,7 @@ Init containers that wait for MySQL and Redis to be ready
     - |
       echo "Waiting for Redis to be ready..."
       until nc -z {{ include "app.redis.fullname" . }} {{ .Values.redis.service.port }}; do
-        echo "Redis is unavailable - sleeping"
+        echo "Redis not ready yet. Waiting..."
         sleep 2
       done
       echo "Redis is ready!"

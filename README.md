@@ -167,6 +167,7 @@ Production-ready Helm charts included for scalable deployments. Perfect for hand
 **Deploy with:**
 - [DigitalOcean Kubernetes (DOKS)](docs/DIGITALOCEAN.md) - Complete setup guide for DOKS deployment
 - [Amazon EKS](docs/AWS.md) - Complete setup guide for AWS EKS deployment
+- [Google Kubernetes Engine (GKE)](docs/GCP.md) - Complete setup guide for GKE deployment
 
 See [helm/README.md](helm/README.md) for detailed Kubernetes deployment documentation.
 

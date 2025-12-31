@@ -29,18 +29,7 @@ spec:
           restartPolicy: OnFailure
           initContainers:
             {{- include "app.initContainers.waitForDependencies" . | nindent 12 }}
-            - name: wait-for-web
-              image: busybox:1.36
-              command:
-                - sh
-                - -c
-                - |
-                  echo "Waiting for web service to be ready..."
-                  until nc -z {{ include "app.fullname" . }}-web 8080; do
-                    echo "Web service not ready yet. Waiting..."
-                    sleep 2
-                  done
-                  echo "Web service is ready!"
+            {{- include "app.initContainers.waitForWebService" . | nindent 12 }}
           containers:
             - name: scheduler
               securityContext:
