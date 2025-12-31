@@ -17,22 +17,44 @@ The deployment consists of the following components:
 
 ## Prerequisites
 
-1. **Kubernetes Cluster** (v1.24+)
+1. Kubernetes cluster (v1.24+):
    - Local: Minikube, Kind, Docker Desktop
-   - Cloud: EKS, GKE, AKS, or any managed Kubernetes
+   - Cloud: [EKS](../docs/AWS.md), [DOKS](../docs/DIGITALOCEAN.md), GKE, AKS, or any managed Kubernetes
 
-2. **Helm** (v3.0+)
-   ```bash
-   # Install Helm
-   curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-   ```
+2. Cluster requirements:
 
-3. **kubectl** configured to access your cluster
+   Minimum cluster requirements vary by environment:
+
+   **Local (Development)**
+   - CPU: 1.5 vCPUs
+   - Memory: 3Gi
+   - Storage: 6Gi
+   - Autoscaling: Disabled
+
+   **Staging**
+   - CPU: 2 vCPUs (4+ recommended for autoscaling)
+   - Memory: 5Gi (10Gi+ recommended for autoscaling)
+   - Storage: 30Gi
+   - Autoscaling: Enabled
+
+   **Production**
+   - CPU: 2.5 vCPUs (5+ recommended for autoscaling)
+   - Memory: 6Gi (12Gi+ recommended for autoscaling)
+   - Storage: 60Gi
+   - Autoscaling: Enabled
+
+   **Note:** These are base resource requests. Autoscaling requires additional headroom.
+   Consider cluster overhead (system pods, networking, kubernetes dashboard, ingress controller, etc.) when sizing nodes.
+
+3. [Helm v3+](https://helm.sh/docs/intro/install/)
+
+4. [kubectl](https://kubernetes.io/docs/tasks/tools) configured to access your cluster:
    ```bash
+   # Verify connection to cluster, either local or cloud
    kubectl cluster-info
    ```
 
-4. **Container Registry Access**
+5. Container registry access:
    - Images are hosted at `ghcr.io/jonerickson/laravel-community`
    - For private registries, configure image pull secrets
    - For local deployment, images are not pulled. They should be built before deploying.
@@ -42,10 +64,9 @@ The deployment consists of the following components:
 ### 1. Build Docker Images
 
 ```bash
-# Build the production image
+# Build the production images.
+# If you are deploying to the cloud, you will need to push the image to a public repository and update the Helm values to pull the correct image.
 docker build --target production -t laravel-community:latest .
-
-# Build the CLI image
 docker build --target cli -t laravel-community-cli:latest .
 ```
 
@@ -55,14 +76,25 @@ docker build --target cli -t laravel-community-cli:latest .
 # Install the chart
 helm install app ./helm -f ./helm/values-local.yaml
 
-# Check deployment status
-kubectl get pods
-kubectl get services
-
 # Forward the port to access locally
 kubectl port-forward svc/app-laravel-community-web 8080:8080
 # Visit http://localhost:8080
 ```
+
+### 3. Deploy to Cloud Environment
+
+1. Install [Kubernetes Dashboard](#kubernetes-dashboard). This is optional but provides a UI for managing the cluster.
+
+2. Install the Helm Chart.
+```bash
+# Install the chart
+helm install app ./helm -f ./helm/values-production.yaml
+```
+
+3. Install the [Ingress Controller](#ingress-controller). Make sure to update the values in `values-production.yaml` to match the domains you intend to point to the app.
+   * If you plan to access the site via SSL (https), make cure to follow the steps to install `cert-manager`.
+   * Follow the instructions to update your domain's DNS records to point to the Load Balancer.
+
 
 ### Database Migrations
 
@@ -279,6 +311,367 @@ Before going to production, ensure:
 - [ ] Monitoring and alerting are configured
 - [ ] Backup strategy is in place
 - [ ] Rollback procedure is tested
+
+## Ingress Controller
+
+The application uses an Ingress controller to route external traffic to your Laravel application. Setup varies by environment.
+
+### Local Development (Minikube, Kind, Docker Desktop)
+
+**Install NGINX Ingress Controller:**
+
+```bash
+# For Minikube
+minikube addons enable ingress
+
+# For Kind
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+
+# For Docker Desktop
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+```
+
+**Add local DNS entry:**
+
+```bash
+# Add to /etc/hosts (macOS/Linux)
+echo "127.0.0.1 laravel-community.local" | sudo tee -a /etc/hosts
+
+# For Minikube, use the cluster IP instead
+echo "$(minikube ip) laravel-community.local" | sudo tee -a /etc/hosts
+```
+
+**Access the application:**
+
+```bash
+# Visit http://laravel-community.local
+# For Minikube, you may need to run: minikube tunnel
+```
+
+### Cloud Deployments (DigitalOcean, AWS)
+
+#### DigitalOcean Kubernetes (DOKS)
+
+**1. Install NGINX Ingress Controller:**
+
+```bash
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+
+helm install ingress-nginx ingress-nginx/ingress-nginx \
+  --namespace ingress-nginx \
+  --create-namespace \
+  --set controller.service.type=LoadBalancer
+```
+
+**2. Get the LoadBalancer IP:**
+
+```bash
+kubectl get svc -n ingress-nginx ingress-nginx-controller
+
+# Wait for EXTERNAL-IP to be assigned (may take 2-3 minutes)
+# Example output:
+# NAME                       TYPE           EXTERNAL-IP       PORT(S)
+# ingress-nginx-controller   LoadBalancer   64.225.123.45     80:31234/TCP,443:32123/TCP
+```
+
+**3. Configure DNS:**
+
+- Go to your DNS provider (Cloudflare, Route53, etc.)
+- Create an A record pointing to the LoadBalancer IP:
+  - `laravel-community.com` → `64.225.123.45`
+  - `staging.laravel-community.com` → `64.225.123.45`
+
+**4. Install cert-manager for SSL (Optional but recommended):**
+
+```bash
+# Install cert-manager
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.0/cert-manager.yaml
+
+# Create Let's Encrypt ClusterIssuer
+cat <<EOF | kubectl apply -f -
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: admin@laravel-community.com
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+EOF
+```
+
+**5. Deploy:**
+
+```bash
+helm upgrade --install app ./helm -f ./helm/values-production.yaml
+
+# Check the status of the ingress controller
+kubectl describe ingress app-laravel-community
+```
+
+**How it works on DigitalOcean:**
+- NGINX Ingress creates a DigitalOcean Load Balancer
+- Traffic flows: Internet → DO Load Balancer → Ingress Controller → Service → Pods
+- Load Balancer costs ~$12/month
+- Supports multiple applications on same LoadBalancer using different hostnames
+
+#### Amazon EKS (AWS)
+
+**Option 1: AWS Load Balancer Controller (Recommended)**
+
+**1. Install AWS Load Balancer Controller:**
+
+```bash
+# Create IAM policy
+curl -o iam_policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json
+
+aws iam create-policy \
+  --policy-name AWSLoadBalancerControllerIAMPolicy \
+  --policy-document file://iam_policy.json
+  
+# Create OAuth provider for service account
+eksctl utils associate-iam-oidc-provider \
+  --cluster=laravel-community \
+  --approve
+
+# Create IAM role and service account (replace with your account ID)
+eksctl create iamserviceaccount \
+  --cluster=laravel-community \
+  --namespace=kube-system \
+  --name=aws-load-balancer-controller \
+  --attach-policy-arn=arn:aws:iam::111122223333:policy/AWSLoadBalancerControllerIAMPolicy \
+  --approve
+
+# Install controller
+helm repo add eks https://aws.github.io/eks-charts
+helm repo update
+
+helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
+  -n kube-system \
+  --set clusterName=laravel-community \
+  --set serviceAccount.create=false \
+  --set serviceAccount.name=aws-load-balancer-controller
+```
+
+**2. Update ingress configuration:**
+
+```yaml
+# In values-production.yaml
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:123456789:certificate/abc123
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+```
+
+**Option 2: NGINX Ingress Controller**
+
+**1. Install NGINX Ingress Controller:**
+
+```bash
+# Install NGINX
+helm install ingress-nginx ingress-nginx/ingress-nginx \
+  --namespace ingress-nginx \
+  --create-namespace \
+  --set controller.service.type=LoadBalancer \
+  --set controller.service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-type"="nlb"
+```
+
+**2. Get the LoadBalancer URL:**
+
+```bash
+# Get LoadBalancer DNS name
+kubectl get svc -n ingress-nginx ingress-nginx-controller
+
+# Wait for EXTERNAL-IP to be assigned (may take 2-3 minutes)
+# Example output:
+# NAME                       TYPE           EXTERNAL-IP                                                                       PORT(S)
+# ingress-nginx-controller   LoadBalancer   a06324f2e7f5e4b7ea887679d943a3a0-6a1510ced48982cf.elb.us-east-1.amazonaws.com     80:31234/TCP,443:32123/TCP
+```
+
+**3. Configure DNS:**
+
+- Go to your DNS provider (Cloudflare, Route53, etc.)
+- Create a CNAME record pointing to the LoadBalancer URL:
+    - `laravel-community.com` → `a06324f2e7f5e4b7ea887679d943a3a0-6a1510ced48982cf.elb.us-east-1.amazonaws.com`
+    - `staging.laravel-community.com` → `a06324f2e7f5e4b7ea887679d943a3a0-6a1510ced48982cf.elb.us-east-1.amazonaws.com`
+
+**4. Install cert-manager for SSL (Optional but recommended):**
+
+```bash
+# Install cert-manager
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.0/cert-manager.yaml
+
+# Create Let's Encrypt ClusterIssuer
+cat <<EOF | kubectl apply -f -
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: admin@laravel-community.com
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+EOF
+```
+
+**5. Deploy:**
+
+```bash
+helm upgrade --install app ./helm -f ./helm/values-production.yaml
+
+# Check the status of the ingress controller
+kubectl describe ingress app-laravel-community
+```
+
+**How it works on AWS:**
+- **ALB (Application Load Balancer)**: Layer 7, integrates with ACM for SSL, costs based on usage
+- **NLB (Network Load Balancer)**: Layer 4, faster, costs ~$16/month + data transfer
+- Traffic flows: Internet → ALB/NLB → Ingress → Service → Pods
+- ALB can route multiple applications using host-based routing
+
+### Ingress Configuration Options
+
+**Basic HTTP:**
+
+```yaml
+ingress:
+  enabled: true
+  hosts:
+    - host: myapp.com
+      paths:
+        - path: /
+          pathType: Prefix
+```
+
+**With SSL/TLS:**
+
+```yaml
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: myapp.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: myapp-tls
+      hosts:
+        - myapp.com
+```
+
+**Multiple domains:**
+
+```yaml
+ingress:
+  enabled: true
+  hosts:
+    - host: laravel-community.com
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: www.laravel-community.com
+      paths:
+        - path: /
+          pathType: Prefix
+```
+
+## Kubernetes Dashboard
+
+Deploy the Kubernetes Dashboard to monitor and manage your cluster through a web UI.
+
+### Install Dashboard
+
+```bash
+# Add the official Kubernetes Dashboard Helm repository
+helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+helm repo update
+
+# Install the dashboard
+helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard \
+  --create-namespace \
+  --namespace kubernetes-dashboard
+```
+
+### Create Admin User
+
+Create a ServiceAccount and ClusterRoleBinding for admin access:
+
+```bash
+# Create admin user manifest
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin-user
+  namespace: kubernetes-dashboard
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: admin-user
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: admin-user
+  namespace: kubernetes-dashboard
+EOF
+```
+
+### Access Dashboard
+
+```bash
+# Start proxy to access dashboard
+kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
+
+# Visit: https://localhost:8443
+```
+
+### Get Login Token
+
+```bash
+# Generate a bearer token for login
+kubectl -n kubernetes-dashboard create token admin-user
+
+# Copy the token output and paste into the dashboard login screen
+```
+
+**Note:** Token login only works over HTTPS.
+
+### Cleanup Dashboard
+
+```bash
+# Remove the dashboard
+helm uninstall kubernetes-dashboard -n kubernetes-dashboard
+
+# Remove admin user
+kubectl -n kubernetes-dashboard delete serviceaccount admin-user
+kubectl -n kubernetes-dashboard delete clusterrolebinding admin-user
+
+# Delete namespace
+kubectl delete namespace kubernetes-dashboard
+```
 
 ## Support
 

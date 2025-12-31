@@ -6,42 +6,73 @@ app:
   url: "https://staging.laravel-community.com"
   env: staging
 
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: staging.laravel-community.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: staging-laravel-community-tls
+      hosts:
+        - staging.laravel-community.com
+
 web:
-  replicaCount: 2
+  replicaCount: 1
 
-  autoscaling:
-    enabled: true
-    minReplicas: 2
-    maxReplicas: 5
-
-horizon:
-  replicaCount: 2
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
 
   autoscaling:
     enabled: true
     minReplicas: 1
-    maxReplicas: 5
+    maxReplicas: 3
 
-mysql:
-  persistence:
-    size: 50Gi
+horizon:
+  replicaCount: 1
 
   resources:
     limits:
-      cpu: 2000m
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+
+mysql:
+  persistence:
+    size: 25Gi
+
+  resources:
+    limits:
+      cpu: 1000m
       memory: 4Gi
     requests:
-      cpu: 1000m
+      cpu: 500m
       memory: 2Gi
 
 redis:
   persistence:
-    size: 10Gi
+    size: 5Gi
 
   resources:
     limits:
-      cpu: 1000m
+      cpu: 500m
       memory: 1Gi
     requests:
       cpu: 250m
-      memory: 256Mi
+      memory: 512Mi

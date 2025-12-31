@@ -35,18 +35,40 @@ app:
   timezone: UTC
   locale: en
 
+# Ingress configuration
+ingress:
+  enabled: false
+  className: nginx
+  annotations:
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "32"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "64k"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "5"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+  hosts:
+    - host: laravel-community.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: laravel-community-tls
+  #    hosts:
+  #      - laravel-community.com
+
 # Web/FPM deployment
 web:
   enabled: true
-  replicaCount: 2
+  replicaCount: 1
 
   resources:
     limits:
       cpu: 1000m
-      memory: 1Gi
+      memory: 2Gi
     requests:
       cpu: 500m
-      memory: 512Mi
+      memory: 1Gi
 
   autoscaling:
     enabled: true
@@ -62,15 +84,15 @@ web:
 # Horizon worker deployment
 horizon:
   enabled: true
-  replicaCount: 2
+  replicaCount: 1
 
   resources:
     limits:
       cpu: 1000m
-      memory: 1Gi
+      memory: 2Gi
     requests:
       cpu: 500m
-      memory: 512Mi
+      memory: 1Gi
 
   autoscaling:
     enabled: true
@@ -95,8 +117,8 @@ scheduler:
       cpu: 500m
       memory: 512Mi
     requests:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 250m
+      memory: 512Mi
 
   nodeSelector: {}
   tolerations: []
@@ -116,16 +138,16 @@ mysql:
 
   persistence:
     enabled: true
-    size: 20Gi
+    size: 10Gi
     storageClass: ""
 
   resources:
     limits:
       cpu: 1000m
-      memory: 2Gi
+      memory: 4Gi
     requests:
       cpu: 500m
-      memory: 1Gi
+      memory: 2Gi
 
   service:
     port: 3306
@@ -147,7 +169,7 @@ redis:
 
   persistence:
     enabled: true
-    size: 5Gi
+    size: 1Gi
     storageClass: ""
 
   resources:

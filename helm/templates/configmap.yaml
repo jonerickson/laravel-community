@@ -6,6 +6,7 @@ metadata:
     {{- include "app.labels" . | nindent 4 }}
 data:
   AUTORUN_ENABLED: "true"
+  AUTORUN_LARAVEL_MIGRATION_ISOLATION: "true"
 
   API_NAME: {{ .Values.app.name | quote }}
 

@@ -3,24 +3,39 @@ environment: production
 
 app:
   debug: false
-  url: "https://laravel-community.com"
+  url: "https://community.deschutesdesigngroup.com"
   env: production
 
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: community.deschutesdesigngroup.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: laravel-community-tls
+      hosts:
+        - community.deschutesdesigngroup.com
+
 web:
-  replicaCount: 3
+  replicaCount: 2
 
   resources:
     limits:
-      cpu: 2000m
+      cpu: 1000m
       memory: 2Gi
     requests:
-      cpu: 1000m
+      cpu: 500m
       memory: 1Gi
 
   autoscaling:
     enabled: true
-    minReplicas: 3
-    maxReplicas: 20
+    minReplicas: 2
+    maxReplicas: 4
     targetCPUUtilizationPercentage: 70
     targetMemoryUtilizationPercentage: 75
 
@@ -38,20 +53,20 @@ web:
             topologyKey: kubernetes.io/hostname
 
 horizon:
-  replicaCount: 3
+  replicaCount: 1
 
   resources:
     limits:
-      cpu: 2000m
+      cpu: 1000m
       memory: 2Gi
     requests:
-      cpu: 1000m
+      cpu: 500m
       memory: 1Gi
 
   autoscaling:
     enabled: true
-    minReplicas: 3
-    maxReplicas: 15
+    minReplicas: 1
+    maxReplicas: 4
     targetCPUUtilizationPercentage: 70
     targetMemoryUtilizationPercentage: 75
 
@@ -70,24 +85,24 @@ horizon:
 
 mysql:
   persistence:
-    size: 100Gi
+    size: 50Gi
 
   resources:
     limits:
-      cpu: 4000m
-      memory: 8Gi
-    requests:
-      cpu: 2000m
+      cpu: 1000m
       memory: 4Gi
+    requests:
+      cpu: 500m
+      memory: 2Gi
 
 redis:
   persistence:
-    size: 20Gi
+    size: 10Gi
 
   resources:
     limits:
-      cpu: 2000m
-      memory: 2Gi
-    requests:
       cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
       memory: 512Mi

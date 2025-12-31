@@ -86,3 +86,37 @@ Redis host
 {{- define "app.redis.host" -}}
 {{- printf "%s.%s.svc.cluster.local" (include "app.redis.fullname" .) .Release.Namespace }}
 {{- end }}
+
+{{/*
+Init containers that wait for MySQL and Redis to be ready
+*/}}
+{{- define "app.initContainers.waitForDependencies" -}}
+{{- if .Values.mysql.enabled }}
+- name: wait-for-mysql
+  image: busybox:1.36
+  command:
+    - sh
+    - -c
+    - |
+      echo "Waiting for MySQL to be ready..."
+      until nc -z {{ include "app.mysql.fullname" . }} {{ .Values.mysql.service.port }}; do
+        echo "MySQL is unavailable - sleeping"
+        sleep 2
+      done
+      echo "MySQL is ready!"
+{{- end }}
+{{- if .Values.redis.enabled }}
+- name: wait-for-redis
+  image: busybox:1.36
+  command:
+    - sh
+    - -c
+    - |
+      echo "Waiting for Redis to be ready..."
+      until nc -z {{ include "app.redis.fullname" . }} {{ .Values.redis.service.port }}; do
+        echo "Redis is unavailable - sleeping"
+        sleep 2
+      done
+      echo "Redis is ready!"
+{{- end }}
+{{- end }}

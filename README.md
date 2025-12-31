@@ -170,7 +170,7 @@ We are working on one-click deployment solutions across a range of cloud platfor
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/laravel-community?referralCode=O-oe8s&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
-See [RAILWAY.md](RAILWAY.md) for more information on hosting with Railway.
+See [RAILWAY.md](docs/RAILWAY.md) for more information on hosting with Railway.
 
 ## 🤝 Contributing
 

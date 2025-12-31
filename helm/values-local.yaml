@@ -13,8 +13,16 @@ cli:
 
 app:
   debug: true
-  url: "http://localhost"
+  url: "http://laravel-community.local"
   env: local
+
+ingress:
+  enabled: true
+  hosts:
+    - host: laravel-community.local
+      paths:
+        - path: /
+          pathType: Prefix
 
 web:
   replicaCount: 1
