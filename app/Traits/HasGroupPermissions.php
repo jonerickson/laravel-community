@@ -15,7 +15,7 @@ trait HasGroupPermissions
 {
     public function getGroupPermissions(?User $user = null): array
     {
-        $user = $user ?? Auth::user();
+        $user ??= Auth::user();
 
         if (! $user instanceof User) {
             return [
@@ -40,9 +40,9 @@ trait HasGroupPermissions
         }
 
         return [
-            'canRead' => $resourceGroups->some(fn ($group) => (bool) $group->pivot->read),
-            'canWrite' => $resourceGroups->some(fn ($group) => (bool) $group->pivot->write),
-            'canDelete' => $resourceGroups->some(fn ($group) => (bool) $group->pivot->delete),
+            'canRead' => $resourceGroups->some(fn ($group): bool => (bool) $group->pivot->read),
+            'canWrite' => $resourceGroups->some(fn ($group): bool => (bool) $group->pivot->write),
+            'canDelete' => $resourceGroups->some(fn ($group): bool => (bool) $group->pivot->delete),
         ];
     }
 
@@ -63,7 +63,7 @@ trait HasGroupPermissions
 
     public function scopeReadableByUser($query, ?User $user = null)
     {
-        $user = $user ?? Auth::user();
+        $user ??= Auth::user();
 
         if (! $user instanceof User) {
             return $query->whereRaw('1 = 0');
@@ -71,7 +71,7 @@ trait HasGroupPermissions
 
         $userGroupIds = $user->groups->pluck('id');
 
-        return $query->whereHas('groups', function ($q) use ($userGroupIds) {
+        return $query->whereHas('groups', function ($q) use ($userGroupIds): void {
             $q->whereIn('groups.id', $userGroupIds)
                 ->where('read', true);
         });

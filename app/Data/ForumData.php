@@ -66,6 +66,9 @@ class ForumData extends Data
 
     public ?CarbonImmutable $updatedAt = null;
 
+    /**
+     * @return GroupPermissionsData[]
+     */
     public function with(): array
     {
         return [

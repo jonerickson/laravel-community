@@ -34,7 +34,7 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
     const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
     const { loading: isDeleting, execute: executeBulkDelete } = useApiRequest();
 
-    console.log(forum)
+    console.log(forum);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
