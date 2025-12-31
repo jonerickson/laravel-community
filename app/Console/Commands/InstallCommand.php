@@ -153,6 +153,7 @@ class InstallCommand extends Command
         }
 
         $this->components->success('Application installed successfully.');
+        $this->components->info('You may visit the application at: '.route('home'));
 
         return self::SUCCESS;
     }

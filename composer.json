@@ -119,7 +119,7 @@
             "@php artisan storage:link",
             "npm install",
             "npm run build",
-            "@php artisan app:install"
+            "@php artisan app:install --name=\"Test User\" --email=\"test@test.com\" --password=\"password\" -n"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",

@@ -49,7 +49,7 @@ After deployment, the container will automatically run the necessary commands to
 At any time, you may reinstall the application using the following command:
 
 ```bash
-railway ssh -- php artisan app:install --name="Admin Name" --email="admin@example.com" --password="secure-password" -n --force
+railway ssh -- php artisan app:install --name="Test User" --email="test@test.com" --password="password" -n --force
 ```
 
 This command will:
