@@ -79,6 +79,8 @@ helm install app ./helm -f ./helm/values-local.yaml
 # Forward the port to access locally
 kubectl port-forward svc/app-laravel-community-web 8080:8080
 # Visit http://localhost:8080
+
+# You can optionally install the Ingress Controller as well, but it is not needed
 ```
 
 ### 3. Deploy to Cloud Environment
