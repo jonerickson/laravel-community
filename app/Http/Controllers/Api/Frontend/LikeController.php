@@ -39,8 +39,6 @@ class LikeController extends Controller
             );
         }
 
-        $this->authorize('like', $likeable);
-
         $likeable->toggleLike($request->validated('emoji'), $this->user->id);
 
         $likeSummaryData = LikeSummaryData::from([

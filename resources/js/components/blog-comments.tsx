@@ -159,40 +159,38 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                             <RichEditorContent content={comment.content} />
                         </div>
 
-                        {(comment.policyPermissions.canUpdate || comment.policyPermissions.canDelete) && (
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center">
-                                    <Button variant="ghost" size="sm" onClick={() => onReply(comment.id)} className="h-auto p-1 text-xs">
-                                        <Reply className="mr-1 size-3" />
-                                        Reply
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                                <Button variant="ghost" size="sm" onClick={() => onReply(comment.id)} className="h-auto p-1 text-xs">
+                                    <Reply className="mr-1 size-3" />
+                                    Reply
+                                </Button>
+                                {comment.policyPermissions.canUpdate && (
+                                    <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="h-auto p-1 text-xs">
+                                        <Edit className="mr-1 size-3" />
+                                        Edit
                                     </Button>
-                                    {comment.policyPermissions.canUpdate && (
-                                        <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="h-auto p-1 text-xs">
-                                            <Edit className="mr-1 size-3" />
-                                            Edit
-                                        </Button>
-                                    )}
-                                    {comment.policyPermissions.canDelete && (
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={handleDelete}
-                                            disabled={deleting}
-                                            className="h-auto p-1 text-xs text-destructive hover:text-destructive"
-                                        >
-                                            <Trash className="mr-1 size-3" />
-                                            {deleting ? 'Deleting...' : 'Delete'}
-                                        </Button>
-                                    )}
-                                </div>
-                                <EmojiReactions
-                                    comment={comment}
-                                    initialReactions={comment.likesSummary}
-                                    userReactions={comment.userReactions}
-                                    className="ml-auto"
-                                />
+                                )}
+                                {comment.policyPermissions.canDelete && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={handleDelete}
+                                        disabled={deleting}
+                                        className="h-auto p-1 text-xs text-destructive hover:text-destructive"
+                                    >
+                                        <Trash className="mr-1 size-3" />
+                                        {deleting ? 'Deleting...' : 'Delete'}
+                                    </Button>
+                                )}
                             </div>
-                        )}
+                            <EmojiReactions
+                                comment={comment}
+                                initialReactions={comment.likesSummary}
+                                userReactions={comment.userReactions}
+                                className="ml-auto"
+                            />
+                        </div>
                     </>
                 )}
 
