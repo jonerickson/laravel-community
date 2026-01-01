@@ -124,9 +124,9 @@ class GroupsRelationManager extends RelationManager
                                 Toggle::make('moderate')->default(false)->required(),
                                 Toggle::make('reply')->default(true)->required(),
                                 Toggle::make('report')->default(true)->required(),
-                                Toggle::make('pin')->default(true)->required(),
-                                Toggle::make('lock')->default(true)->required(),
-                                Toggle::make('move')->default(true)->required(),
+                                Toggle::make('pin')->default(false)->required(),
+                                Toggle::make('lock')->default(false)->required(),
+                                Toggle::make('move')->default(false)->required(),
                             ]),
                     ]),
             ])

@@ -101,41 +101,32 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
 
                             <RichEditorContent itemProp="text" content={post.content} />
 
-                            {(forum.forumPermissions.canReply || hasSignature) && (
-                                <div
-                                    className={cn('pt-2', {
-                                        'mt-4 border-t border-muted': hasSignature,
-                                    })}
-                                >
-                                    {hasSignature && (
-                                        <div className="mt-2 text-xs text-muted-foreground">
-                                            <RichEditorContent content={post.author.signature || ''} />
-                                        </div>
-                                    )}
+                            <div
+                                className={cn('pt-2', {
+                                    'mt-4 border-t border-muted': hasSignature,
+                                })}
+                            >
+                                {hasSignature && (
+                                    <div className="mt-2 text-xs text-muted-foreground">
+                                        <RichEditorContent content={post.author.signature || ''} />
+                                    </div>
+                                )}
 
-                                    {(forum.forumPermissions.canReply || forum.forumPermissions.canReport) && !topic.isLocked && (
-                                        <div className="mt-4 flex items-start justify-between rounded-sm bg-muted p-2">
-                                            <div className="flex gap-2">
-                                                {forum.forumPermissions.canReport && (
-                                                    <ReportDialog reportableType="App\Models\Post" reportableId={post.id} />
-                                                )}
-                                                {forum.forumPermissions.canReply && (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-8 px-3 text-muted-foreground"
-                                                        onClick={handleQuote}
-                                                    >
-                                                        <Quote className="mr-1 size-3" />
-                                                        Quote
-                                                    </Button>
-                                                )}
-                                            </div>
-                                            <EmojiReactions post={post} initialReactions={post.likesSummary} userReactions={post.userReactions} />
-                                        </div>
-                                    )}
+                                <div className="mt-4 flex items-start justify-between rounded-sm bg-muted p-2">
+                                    <div className="flex gap-2">
+                                        {forum.forumPermissions.canReport && !post.isReported && (
+                                            <ReportDialog reportableType="App\Models\Post" reportableId={post.id} />
+                                        )}
+                                        {forum.forumPermissions.canReply && (
+                                            <Button variant="ghost" size="sm" className="h-8 px-3 text-muted-foreground" onClick={handleQuote}>
+                                                <Quote className="mr-1 size-3" />
+                                                Quote
+                                            </Button>
+                                        )}
+                                    </div>
+                                    <EmojiReactions post={post} initialReactions={post.likesSummary} userReactions={post.userReactions} />
                                 </div>
-                            )}
+                            </div>
 
                             {post.comments && post.comments.length > 0 && (
                                 <div className="mt-6 border-t pt-4">
