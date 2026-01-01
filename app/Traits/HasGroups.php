@@ -33,13 +33,13 @@ trait HasGroups
 
         if (static::class === Forum::class) {
             return $relation
-                ->withPivot(['read', 'write', 'delete'])
+                ->withPivot(['create', 'read', 'update', 'delete', 'moderate', 'reply', 'report', 'pin', 'lock', 'move'])
                 ->using(ForumGroup::class);
         }
 
         if (static::class === ForumCategory::class) {
             return $relation
-                ->withPivot(['read', 'write', 'delete'])
+                ->withPivot(['create', 'read', 'update', 'delete', 'moderate', 'reply', 'report', 'pin', 'lock', 'move'])
                 ->using(ForumCategoryGroup::class);
         }
 

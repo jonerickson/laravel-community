@@ -53,7 +53,7 @@ public function index()
 {
     $forums = Forum::query()
         ->with('groups')
-        ->readableByUser() // Use the scope from HasGroupPermissions
+        ->readableByUser() // Use the scope from HasForumPermissions
         ->get()
         ->map(function (Forum $forum) {
             return ForumData::from($forum)->additional([

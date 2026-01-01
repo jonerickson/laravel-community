@@ -14,15 +14,6 @@ use Illuminate\Support\Facades\Gate;
 
 class ProductPolicy
 {
-    public function before(?User $user): ?bool
-    {
-        if (! $this->viewAny($user)) {
-            return false;
-        }
-
-        return null;
-    }
-
     public function viewAny(?User $user): bool
     {
         return true;

@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
-import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
 import { abbreviateNumber, pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
@@ -29,7 +28,6 @@ interface TopicShowProps {
 }
 
 export default function ForumTopicShow({ forum, topic, posts, categories, recentViewers }: TopicShowProps) {
-    const { can } = usePermissions();
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const [quotedContent, setQuotedContent] = useState<string>('');
     const [quotedAuthor, setQuotedAuthor] = useState<string>('');
@@ -111,11 +109,9 @@ export default function ForumTopicShow({ forum, topic, posts, categories, recent
         return (
             topic.isPinned ||
             topic.isLocked ||
-            (can('report_posts') && topic.hasReportedContent) ||
-            (can('publish_posts') && topic.hasUnpublishedContent) ||
-            (can('approve_posts') && topic.hasUnapprovedContent)
+            (forum.forumPermissions.canModerate && (topic.hasReportedContent || topic.hasUnpublishedContent || topic.hasUnapprovedContent))
         );
-    }, [topic, can]);
+    }, [topic, forum]);
 
     const handleReplySubmitted = () => {
         router.reload({ only: ['posts'] });
@@ -212,9 +208,13 @@ export default function ForumTopicShow({ forum, topic, posts, categories, recent
                         <div className="mb-2 flex flex-col gap-2 lg:flex-row lg:items-center">
                             {shouldShowBadges && (
                                 <div className="flex items-center gap-2">
-                                    {can('report_posts') && topic.hasReportedContent && <AlertTriangle className="size-4 text-destructive" />}
-                                    {can('publish_posts') && topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
-                                    {can('approve_posts') && topic.hasUnapprovedContent && <ThumbsDown className="size-4 text-warning" />}
+                                    {forum.forumPermissions.canModerate && (
+                                        <>
+                                            {topic.hasReportedContent && <AlertTriangle className="size-4 text-destructive" />}
+                                            {topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
+                                            {topic.hasUnapprovedContent && <ThumbsDown className="size-4 text-warning" />}
+                                        </>
+                                    )}
                                     {topic.isPinned && <Badge variant="info">Pinned</Badge>}
                                     {topic.isLocked && <Badge>Locked</Badge>}
                                 </div>
@@ -241,7 +241,7 @@ export default function ForumTopicShow({ forum, topic, posts, categories, recent
                             <ArrowDown />
                             Latest
                         </Button>
-                        {can('reply_topics') && !topic.isLocked && (
+                        {forum.forumPermissions.canReply && !topic.isLocked && (
                             <Button
                                 onClick={() => document.querySelector('[data-reply-form]')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                                 variant="outline"
@@ -302,7 +302,7 @@ export default function ForumTopicShow({ forum, topic, posts, categories, recent
                     <RecentViewers viewers={recentViewers} />
                 </Deferred>
 
-                {can('reply_topics') && !topic.isLocked && posts && posts.data.length > 0 && (
+                {forum.forumPermissions.canReply && !topic.isLocked && posts && posts.data.length > 0 && (
                     <ForumTopicReply
                         forumSlug={forum.slug}
                         topicSlug={topic.slug}

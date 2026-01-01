@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data;
 
-use App\Data\Traits\HasDataPermissions;
+use App\Data\Traits\AddsPolicyPermissions;
 use App\Enums\PostType;
 use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\MapInputName;
@@ -17,7 +17,7 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 #[MapInputName(SnakeCaseMapper::class)]
 class PostData extends Data
 {
-    use HasDataPermissions;
+    use AddsPolicyPermissions;
 
     public int $id;
 
@@ -53,7 +53,7 @@ class PostData extends Data
     /** @var string[] */
     public array $userReactions;
 
-    public ?int $topicId = null;
+    // public ?TopicData $topic = null;
 
     public ?string $featuredImage = null;
 
@@ -76,14 +76,14 @@ class PostData extends Data
     #[LiteralTypeScriptType('Array<string, unknown> | null')]
     public ?array $metadata = null;
 
-    public ?CarbonImmutable $createdAt = null;
-
-    public ?CarbonImmutable $updatedAt = null;
-
     /** @var CommentData[] */
     public ?array $comments = null;
 
     public ?bool $isReported = null;
 
     public ?int $reportCount = null;
+
+    public ?CarbonImmutable $createdAt = null;
+
+    public ?CarbonImmutable $updatedAt = null;
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Enums\WarningConsequenceType;
+use App\Models\Forum;
 use App\Models\Post;
 use App\Models\Topic;
 use App\Models\User;
@@ -12,37 +12,24 @@ use Illuminate\Support\Facades\Gate;
 
 class TopicPolicy
 {
-    public function before(?User $user): ?bool
-    {
-        if (! $this->viewAny($user)) {
-            return false;
-        }
-
-        return null;
-    }
-
     public function viewAny(?User $user): bool
     {
-        return Gate::forUser($user)->check('view_any_topics');
+        return true;
     }
 
     public function view(?User $user, Topic $topic): bool
     {
-        return Gate::forUser($user)->check('view_topics')
+        return (blank($topic->forum) || Gate::forUser($user)->check('view', $topic->forum))
             && ($topic->posts->some(fn (Post $post) => Gate::forUser($user)->check('view', $post)));
     }
 
-    public function create(?User $user): bool
+    public function create(?User $user, ?Forum $forum = null): bool
     {
         if (! $user instanceof User) {
             return false;
         }
 
-        if ($user->active_consequence?->type === WarningConsequenceType::PostRestriction || $user->active_consequence?->type === WarningConsequenceType::Ban) {
-            return false;
-        }
-
-        return Gate::forUser($user)->check('create_topics');
+        return blank($forum) || Gate::forUser($user)->check('create', [$forum, $forum->category]);
     }
 
     public function update(?User $user, Topic $topic): bool
@@ -51,12 +38,9 @@ class TopicPolicy
             return false;
         }
 
-        if (Gate::forUser($user)->check('update_topics')) {
-            return true;
-        }
-
-        return $topic->isAuthoredBy($user)
-            && ! $topic->is_locked;
+        return $this->view($user, $topic)
+            && ! $topic->is_locked
+            && ((blank($topic->forum) || Gate::forUser($user)->check('update', $topic->forum)) || $topic->isAuthoredBy($user));
     }
 
     public function delete(?User $user, Topic $topic): bool
@@ -65,64 +49,8 @@ class TopicPolicy
             return false;
         }
 
-        if (Gate::forUser($user)->check('delete_topics')) {
-            return true;
-        }
-
-        return $topic->isAuthoredBy($user);
-    }
-
-    public function reply(?User $user, Topic $topic): bool
-    {
-        if (! $user instanceof User) {
-            return false;
-        }
-
-        if ($user->active_consequence?->type === WarningConsequenceType::PostRestriction || $user->active_consequence?->type === WarningConsequenceType::Ban) {
-            return false;
-        }
-
-        return Gate::forUser($user)->check('reply_topics')
-            && ! $this->view($user, $topic);
-    }
-
-    public function report(?User $user, Topic $topic): bool
-    {
-        if (! $user instanceof User) {
-            return false;
-        }
-
-        return Gate::forUser($user)->check('report_topics')
-            && $this->view($user, $topic);
-    }
-
-    public function pin(?User $user, Topic $topic): bool
-    {
-        if (! $user instanceof User) {
-            return false;
-        }
-
-        return Gate::forUser($user)->check('pin_topics')
-            && $this->view($user, $topic);
-    }
-
-    public function lock(?User $user, Topic $topic): bool
-    {
-        if (! $user instanceof User) {
-            return false;
-        }
-
-        return Gate::forUser($user)->check('lock_topics')
-            && $this->view($user, $topic);
-    }
-
-    public function move(?User $user, Topic $topic): bool
-    {
-        if (! $user instanceof User) {
-            return false;
-        }
-
-        return Gate::forUser($user)->check('move_topics')
-            && $this->view($user, $topic);
+        return $this->view($user, $topic)
+            && ! $topic->is_locked
+            && ((blank($topic->forum) || Gate::forUser($user)->check('delete', $topic->forum)) || $topic->isAuthoredBy($user));
     }
 }

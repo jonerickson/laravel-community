@@ -11,6 +11,7 @@ use App\Events\ForumCategoryUpdated;
 use App\Traits\Activateable;
 use App\Traits\HasColor;
 use App\Traits\HasFeaturedImage;
+use App\Traits\HasForumPermissions;
 use App\Traits\HasGroups;
 use App\Traits\HasIcon;
 use App\Traits\HasSlug;
@@ -51,6 +52,7 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|ForumCategory newQuery()
  * @method static Builder<static>|ForumCategory ordered()
  * @method static Builder<static>|ForumCategory query()
+ * @method static Builder<static>|ForumCategory readableByUser(?\App\Models\User $user = null)
  * @method static Builder<static>|ForumCategory whereColor($value)
  * @method static Builder<static>|ForumCategory whereCreatedAt($value)
  * @method static Builder<static>|ForumCategory whereDescription($value)
@@ -71,6 +73,7 @@ class ForumCategory extends Model implements Sluggable
     use HasColor;
     use HasFactory;
     use HasFeaturedImage;
+    use HasForumPermissions;
     use HasGroups;
     use HasIcon;
     use HasSlug;

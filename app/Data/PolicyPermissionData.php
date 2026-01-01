@@ -11,11 +11,12 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 #[TypeScript]
 #[MapInputName(SnakeCaseMapper::class)]
-class GroupPermissionsData extends Data
+class PolicyPermissionData extends Data
 {
     public function __construct(
+        public bool $canCreate = false,
         public bool $canRead = false,
-        public bool $canWrite = false,
+        public bool $canUpdate = false,
         public bool $canDelete = false,
     ) {
         //

@@ -11,7 +11,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Pagination } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useApiRequest } from '@/hooks/use-api-request';
-import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
 import { abbreviateNumber, cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
@@ -29,12 +28,9 @@ interface ForumShowProps {
 }
 
 export default function ForumShow({ forum, children, topics }: ForumShowProps) {
-    const { can } = usePermissions();
     const { name: siteName, auth, logoUrl } = usePage<App.Data.SharedData>().props;
     const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
     const { loading: isDeleting, execute: executeBulkDelete } = useApiRequest();
-
-    console.log(forum);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -212,7 +208,7 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
                                 followersCount={forum.followersCount ?? 0}
                                 onSuccess={() => router.reload({ only: ['forum'] })}
                             />
-                            {can('delete_topics') && (
+                            {forum.forumPermissions.canDelete && (
                                 <>
                                     {selectedTopics.length > 0 && (
                                         <>
@@ -232,7 +228,7 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
                                     )}
                                 </>
                             )}
-                            {can('create_topics') && (
+                            {forum.forumPermissions.canCreate && (
                                 <Button asChild>
                                     <Link href={route('forums.topics.create', { forum: forum.slug })}>
                                         <Plus />
@@ -368,7 +364,7 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
                                         >
                                             <TableCell className="p-4">
                                                 <div className="flex items-start gap-3">
-                                                    {can('delete_topics') ? (
+                                                    {forum.forumPermissions.canDelete ? (
                                                         <button
                                                             onClick={(e) => {
                                                                 e.preventDefault();
@@ -406,14 +402,14 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
                                                             {topic.isHot && <span className="text-sm">🔥</span>}
                                                             {topic.isPinned && <Pin className="size-4 text-info" />}
                                                             {topic.isLocked && <Lock className="size-4 text-muted-foreground" />}
-                                                            {can('report_posts') && topic.hasReportedContent && (
-                                                                <AlertTriangle className="size-4 text-destructive" />
-                                                            )}
-                                                            {can('publish_posts') && topic.hasUnpublishedContent && (
-                                                                <EyeOff className="size-4 text-warning" />
-                                                            )}
-                                                            {can('approve_posts') && topic.hasUnapprovedContent && (
-                                                                <ThumbsDown className="size-4 text-warning" />
+                                                            {forum.forumPermissions.canModerate && (
+                                                                <>
+                                                                    {topic.hasReportedContent && (
+                                                                        <AlertTriangle className="size-4 text-destructive" />
+                                                                    )}
+                                                                    {topic.hasUnpublishedContent && <EyeOff className="size-4 text-warning" />}
+                                                                    {topic.hasUnapprovedContent && <ThumbsDown className="size-4 text-warning" />}
+                                                                </>
                                                             )}
                                                             <Link
                                                                 href={route('forums.topics.show', { forum: forum.slug, topic: topic.slug })}

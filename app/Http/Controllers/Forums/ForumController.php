@@ -32,8 +32,6 @@ class ForumController extends Controller
         $forum->loadMissing(['category', 'parent', 'groups']);
         $forum->loadCount(['followers']);
 
-        dd(ForumData::from($forum)->toArray());
-
         return Inertia::render('forums/show', [
             'forum' => ForumData::from($forum),
             'children' => Inertia::defer(fn (): Collection => ForumData::collect($forum

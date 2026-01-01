@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApiRequest } from '@/hooks/use-api-request';
-import usePermissions from '@/hooks/use-permissions';
 import { Link, router, useForm } from '@inertiajs/react';
 import { Edit, Eye, EyeOff, MoreHorizontal, Pin, PinOff, ThumbsDown, ThumbsUp, Trash } from 'lucide-react';
 
@@ -12,7 +11,6 @@ interface ForumTopicPostModerationMenuProps {
 }
 
 export default function ForumTopicPostModerationMenu({ post, forum, topic }: ForumTopicPostModerationMenuProps) {
-    const { can, hasAnyPermission } = usePermissions();
     const { delete: deletePost } = useForm({
         is_published: post.isPublished,
     });
@@ -20,12 +18,18 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
     const { execute: publishPost } = useApiRequest();
     const { execute: approvePost } = useApiRequest();
 
-    if (!hasAnyPermission(['publish_posts', 'pin_posts', 'approve_posts']) && !post.permissions.canDelete && !post.permissions.canUpdate) {
+    if (
+        !forum.forumPermissions.canModerate &&
+        !forum.forumPermissions.canUpdate &&
+        !forum.forumPermissions.canDelete &&
+        !post.policyPermissions.canUpdate &&
+        !post.policyPermissions.canDelete
+    ) {
         return null;
     }
 
     const handleDeletePost = () => {
-        if (!post.permissions.canDelete) {
+        if (!post.policyPermissions.canDelete) {
             return;
         }
 
@@ -121,7 +125,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                {post.permissions.canUpdate && (
+                {post.policyPermissions.canUpdate && (
                     <DropdownMenuItem asChild>
                         <Link
                             href={route('forums.posts.edit', {
@@ -136,7 +140,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                     </DropdownMenuItem>
                 )}
 
-                {can('approve_posts') && (
+                {forum.forumPermissions.canModerate && (
                     <DropdownMenuItem onClick={handleToggleApprove}>
                         {post.isApproved ? (
                             <>
@@ -152,7 +156,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                     </DropdownMenuItem>
                 )}
 
-                {can('pin_posts') && (
+                {forum.forumPermissions.canPin && (
                     <DropdownMenuItem onClick={handleTogglePin} disabled={pinLoading}>
                         {post.isPinned ? (
                             <>
@@ -168,7 +172,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                     </DropdownMenuItem>
                 )}
 
-                {can('publish_posts') && (
+                {forum.forumPermissions.canModerate && (
                     <DropdownMenuItem onClick={handleTogglePublish}>
                         {post.isPublished ? (
                             <>
@@ -184,7 +188,7 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                     </DropdownMenuItem>
                 )}
 
-                {post.permissions.canDelete && (
+                {post.policyPermissions.canDelete && (
                     <DropdownMenuItem onClick={handleDeletePost} className="text-destructive focus:text-destructive">
                         <Trash className="text-destructive" />
                         Delete Post

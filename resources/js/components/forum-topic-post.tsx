@@ -7,7 +7,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import usePermissions from '@/hooks/use-permissions';
 import { cn } from '@/lib/utils';
 import { stripCharacters } from '@/utils/truncate';
 import { formatDistanceToNow } from 'date-fns';
@@ -22,10 +21,7 @@ interface ForumTopicPostProps {
 }
 
 export default function ForumTopicPost({ post, index, forum, topic, onQuote }: ForumTopicPostProps) {
-    const { can, hasAnyPermission, hasAllPermissions } = usePermissions();
-
-    const isHiddenForUser =
-        (post.isReported || !post.isPublished || !post.isApproved) && !hasAllPermissions(['report_posts', 'publish_posts', 'approve_posts']);
+    const isHiddenForUser = (post.isReported || !post.isPublished || !post.isApproved) && !forum.forumPermissions.canModerate;
 
     if (isHiddenForUser) {
         return null;
@@ -105,7 +101,7 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
 
                             <RichEditorContent itemProp="text" content={post.content} />
 
-                            {(hasAnyPermission(['like_posts', 'reply_topics']) || hasSignature) && (
+                            {(forum.forumPermissions.canReply || hasSignature) && (
                                 <div
                                     className={cn('pt-2', {
                                         'mt-4 border-t border-muted': hasSignature,
@@ -117,11 +113,13 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                                         </div>
                                     )}
 
-                                    {hasAnyPermission(['like_posts', 'reply_topics']) && !topic.isLocked && (
+                                    {(forum.forumPermissions.canReply || forum.forumPermissions.canReport) && !topic.isLocked && (
                                         <div className="mt-4 flex items-start justify-between rounded-sm bg-muted p-2">
                                             <div className="flex gap-2">
-                                                {can('report_posts') && <ReportDialog reportableType="App\Models\Post" reportableId={post.id} />}
-                                                {can('reply_topics') && (
+                                                {forum.forumPermissions.canReport && (
+                                                    <ReportDialog reportableType="App\Models\Post" reportableId={post.id} />
+                                                )}
+                                                {forum.forumPermissions.canReply && (
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
@@ -133,9 +131,7 @@ export default function ForumTopicPost({ post, index, forum, topic, onQuote }: F
                                                     </Button>
                                                 )}
                                             </div>
-                                            {can('like_posts') && (
-                                                <EmojiReactions post={post} initialReactions={post.likesSummary} userReactions={post.userReactions} />
-                                            )}
+                                            <EmojiReactions post={post} initialReactions={post.likesSummary} userReactions={post.userReactions} />
                                         </div>
                                     )}
                                 </div>

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Events\ForumGroupCreated;
+use App\Events\ForumGroupDeleted;
+use App\Events\ForumGroupUpdated;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
@@ -30,6 +33,12 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 class ForumGroup extends Pivot
 {
     protected $table = 'forums_groups';
+
+    protected $dispatchesEvents = [
+        'created' => ForumGroupCreated::class,
+        'updated' => ForumGroupUpdated::class,
+        'deleting' => ForumGroupDeleted::class,
+    ];
 
     public function forum(): BelongsTo
     {

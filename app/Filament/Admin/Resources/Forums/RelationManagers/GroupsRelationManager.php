@@ -31,13 +31,78 @@ class GroupsRelationManager extends RelationManager
             ->description('The groups that have access to the forums.')
             ->columns([
                 TextColumn::make('name')
+                    ->label('Group')
                     ->sortable(),
+                ToggleColumn::make('create')
+                    ->onIcon(Heroicon::OutlinedLockOpen)
+                    ->offIcon(Heroicon::OutlinedLockClosed)
+                    ->onColor('success')
+                    ->offColor('danger')
+                    ->headerTooltip('Can create a new topic in the forum.')
+                    ->label('Can Create'),
                 ToggleColumn::make('read')
+                    ->onIcon(Heroicon::OutlinedLockOpen)
+                    ->offIcon(Heroicon::OutlinedLockClosed)
+                    ->onColor('success')
+                    ->offColor('danger')
+                    ->headerTooltip('Can view the forum.')
                     ->label('Can Read'),
-                ToggleColumn::make('write')
-                    ->label('Can Write'),
+                ToggleColumn::make('update')
+                    ->onIcon(Heroicon::OutlinedLockOpen)
+                    ->offIcon(Heroicon::OutlinedLockClosed)
+                    ->onColor('success')
+                    ->offColor('danger')
+                    ->headerTooltip('Can update topics/posts in the forum. Authors will be able to update their own topics/posts.')
+                    ->label('Can Update'),
                 ToggleColumn::make('delete')
+                    ->onIcon(Heroicon::OutlinedLockOpen)
+                    ->offIcon(Heroicon::OutlinedLockClosed)
+                    ->onColor('success')
+                    ->offColor('danger')
+                    ->headerTooltip('Can delete topics/posts in the forum. Authors will be able to delete their own topics/posts.')
                     ->label('Can Delete'),
+                ToggleColumn::make('moderate')
+                    ->onIcon(Heroicon::OutlinedLockOpen)
+                    ->offIcon(Heroicon::OutlinedLockClosed)
+                    ->onColor('success')
+                    ->offColor('danger')
+                    ->headerTooltip('Can moderate topics/posts in the forum.')
+                    ->label('Can Moderate'),
+                ToggleColumn::make('reply')
+                    ->onIcon(Heroicon::OutlinedLockOpen)
+                    ->offIcon(Heroicon::OutlinedLockClosed)
+                    ->onColor('success')
+                    ->offColor('danger')
+                    ->headerTooltip('Can reply to topics in the forum.')
+                    ->label('Can Reply'),
+                ToggleColumn::make('report')
+                    ->onIcon(Heroicon::OutlinedLockOpen)
+                    ->offIcon(Heroicon::OutlinedLockClosed)
+                    ->onColor('success')
+                    ->offColor('danger')
+                    ->headerTooltip('Can report topics/posts in the forum.')
+                    ->label('Can Report'),
+                ToggleColumn::make('pin')
+                    ->onIcon(Heroicon::OutlinedLockOpen)
+                    ->offIcon(Heroicon::OutlinedLockClosed)
+                    ->onColor('success')
+                    ->offColor('danger')
+                    ->headerTooltip('Can pin topics/posts in the forum.')
+                    ->label('Can Pin'),
+                ToggleColumn::make('lock')
+                    ->onIcon(Heroicon::OutlinedLockOpen)
+                    ->offIcon(Heroicon::OutlinedLockClosed)
+                    ->onColor('success')
+                    ->offColor('danger')
+                    ->headerTooltip('Can lock topics in the forum.')
+                    ->label('Can Lock'),
+                ToggleColumn::make('move')
+                    ->onIcon(Heroicon::OutlinedLockOpen)
+                    ->offIcon(Heroicon::OutlinedLockClosed)
+                    ->onColor('success')
+                    ->offColor('danger')
+                    ->headerTooltip('Can move topics/posts in the forum.')
+                    ->label('Can Move'),
             ])
             ->headerActions([
                 AttachAction::make()
@@ -52,9 +117,16 @@ class GroupsRelationManager extends RelationManager
                             ->contained(false)
                             ->columns(3)
                             ->schema([
-                                Toggle::make('read')->required(),
-                                Toggle::make('write')->required(),
-                                Toggle::make('delete')->required(),
+                                Toggle::make('create')->default(true)->required(),
+                                Toggle::make('read')->default(true)->required(),
+                                Toggle::make('update')->default(false)->required(),
+                                Toggle::make('delete')->default(false)->required(),
+                                Toggle::make('moderate')->default(false)->required(),
+                                Toggle::make('reply')->default(true)->required(),
+                                Toggle::make('report')->default(false)->required(),
+                                Toggle::make('pin')->default(false)->required(),
+                                Toggle::make('lock')->default(false)->required(),
+                                Toggle::make('move')->default(false)->required(),
                             ]),
                     ]),
             ])

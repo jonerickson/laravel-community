@@ -72,7 +72,6 @@ class CategoryController extends Controller
                 ->ordered()
                 ->withCount(['topics', 'posts'])
                 ->get()
-                ->filter(fn (Forum $forum) => Gate::check('view', $forum))
                 ->values())),
         ]);
     }

@@ -48,7 +48,7 @@ class TopicController extends Controller
     public function create(Forum $forum): Response
     {
         $this->authorize('view', $forum);
-        $this->authorize('create', Topic::class);
+        $this->authorize('create', [Topic::class, $forum]);
 
         $forum->loadMissing(['category', 'parent']);
 
@@ -63,7 +63,7 @@ class TopicController extends Controller
     public function store(StoreTopicRequest $request, Forum $forum): RedirectResponse
     {
         $this->authorize('view', $forum);
-        $this->authorize('create', Topic::class);
+        $this->authorize('create', [Topic::class, $forum]);
 
         /** @phpstan-ignore-next-line staticMethod.void */
         $topic = DB::transaction(fn () => Event::defer(function () use ($request, $forum): Topic {
@@ -99,7 +99,7 @@ class TopicController extends Controller
         $forum->loadMissing(['parent', 'category']);
 
         $topic->incrementViews();
-        $topic->loadMissing(['author.groups']);
+        $topic->loadMissing(['author.groups', 'forum.category']);
         $topic->loadCount(['posts', 'views', 'followers']);
 
         $posts = $topic
@@ -123,6 +123,8 @@ class TopicController extends Controller
                 request()->fullUrlWithQuery(['page' => $posts->lastPage()])
             );
         }
+
+        // dd(TopicData::from($topic)->toArray());
 
         return Inertia::render('forums/topics/show', [
             'forum' => ForumData::from($forum),
