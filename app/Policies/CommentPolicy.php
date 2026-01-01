@@ -27,11 +27,7 @@ class CommentPolicy
             return false;
         }
 
-        if ($user->active_consequence?->type === WarningConsequenceType::PostRestriction || $user->active_consequence?->type === WarningConsequenceType::Ban) {
-            return false;
-        }
-
-        return true;
+        return $user->active_consequence?->type !== WarningConsequenceType::PostRestriction && $user->active_consequence?->type !== WarningConsequenceType::Ban;
     }
 
     public function update(?User $user, Comment $comment): bool

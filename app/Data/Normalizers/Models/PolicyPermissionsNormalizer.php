@@ -17,7 +17,7 @@ class PolicyPermissionsNormalizer extends ModelNormalizer
     {
         if ($value instanceof Model) {
             $value->setAttribute('policy_permissions', [
-                'canCreate' => Gate::check('create', get_class($value)),
+                'canCreate' => Gate::check('create', $value::class),
                 'canRead' => Gate::check('view', $value),
                 'canUpdate' => Gate::check('update', $value),
                 'canDelete' => Gate::check('delete', $value),

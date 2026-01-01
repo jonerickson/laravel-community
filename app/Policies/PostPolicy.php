@@ -39,11 +39,7 @@ class PostPolicy
             return false;
         }
 
-        if ($user->active_consequence?->type === WarningConsequenceType::PostRestriction || $user->active_consequence?->type === WarningConsequenceType::Ban) {
-            return false;
-        }
-
-        return true;
+        return $user->active_consequence?->type !== WarningConsequenceType::PostRestriction && $user->active_consequence?->type !== WarningConsequenceType::Ban;
     }
 
     public function update(?User $user, Post $post): bool
@@ -51,8 +47,11 @@ class PostPolicy
         if (! $user instanceof User) {
             return false;
         }
+        if ($post->isAuthoredBy($user)) {
+            return true;
+        }
 
-        return $post->isAuthoredBy($user) || (blank($post->topic?->forum) || Gate::forUser($user)->check('update', $post->topic->forum));
+        return blank($post->topic?->forum) || Gate::forUser($user)->check('update', $post->topic->forum);
     }
 
     public function delete(?User $user, Post $post): bool
@@ -60,7 +59,10 @@ class PostPolicy
         if (! $user instanceof User) {
             return false;
         }
+        if ($post->isAuthoredBy($user)) {
+            return true;
+        }
 
-        return $post->isAuthoredBy($user) || (blank($post->topic?->forum) || Gate::forUser($user)->check('delete', $post->topic->forum));
+        return blank($post->topic?->forum) || Gate::forUser($user)->check('delete', $post->topic->forum);
     }
 }
