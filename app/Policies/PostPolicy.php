@@ -47,6 +47,7 @@ class PostPolicy
         if (! $user instanceof User) {
             return false;
         }
+
         if ($post->isAuthoredBy($user)) {
             return true;
         }
@@ -59,6 +60,7 @@ class PostPolicy
         if (! $user instanceof User) {
             return false;
         }
+
         if ($post->isAuthoredBy($user)) {
             return true;
         }
