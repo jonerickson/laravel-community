@@ -33,12 +33,6 @@ class LikeController extends Controller
     {
         $likeable = $request->resolveLikeable();
 
-        if ($likeable === null) {
-            return ApiResource::error(
-                message: 'Unable to find an item to like/unlike.'
-            );
-        }
-
         $likeable->toggleLike($request->validated('emoji'), $this->user->id);
 
         $likeSummaryData = LikeSummaryData::from([

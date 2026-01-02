@@ -64,7 +64,8 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                 url,
                 method,
                 data: {
-                    post_id: post.id,
+                    type: 'post',
+                    id: post.id,
                 },
             },
             {
@@ -105,7 +106,8 @@ export default function ForumTopicPostModerationMenu({ post, forum, topic }: For
                 url,
                 method,
                 data: {
-                    post_id: post.id,
+                    type: 'post',
+                    id: post.id,
                 },
             },
             {

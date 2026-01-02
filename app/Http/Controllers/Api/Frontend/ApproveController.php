@@ -22,14 +22,6 @@ class ApproveController extends Controller
     {
         $approvable = $request->resolveApprovable();
 
-        if ($approvable === null) {
-            return ApiResource::error(
-                message: 'The specified item could not be found.'
-            );
-        }
-
-        $this->authorize('approve', $approvable);
-
         $approvable->approve();
 
         return ApiResource::success(
@@ -44,14 +36,6 @@ class ApproveController extends Controller
     public function destroy(StoreApproveRequest $request): JsonResource
     {
         $approvable = $request->resolveApprovable();
-
-        if ($approvable === null) {
-            return ApiResource::error(
-                message: 'The specified item could not be found.'
-            );
-        }
-
-        $this->authorize('approve', $approvable);
 
         $approvable->unapprove();
 

@@ -29,14 +29,13 @@ class StoreReadRequest extends FormRequest
         ];
     }
 
-    public function resolveReadable(): Topic|Post|Forum|Announcement|null
+    public function resolveReadable(): Topic|Post|Forum|Announcement
     {
         return match ($this->input('type')) {
-            'topic' => Topic::find($this->integer('id')),
-            'post' => Post::find($this->integer('id')),
-            'forum' => Forum::find($this->integer('id')),
-            'announcement' => Announcement::find($this->integer('id')),
-            default => null,
+            'topic' => Topic::findOrFail($this->integer('id')),
+            'post' => Post::findOrFail($this->integer('id')),
+            'forum' => Forum::findOrFail($this->integer('id')),
+            'announcement' => Announcement::findOrFail($this->integer('id')),
         };
     }
 }

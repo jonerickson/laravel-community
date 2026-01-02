@@ -124,8 +124,6 @@ class TopicController extends Controller
             );
         }
 
-        // dd(TopicData::from($topic)->toArray());
-
         return Inertia::render('forums/topics/show', [
             'forum' => ForumData::from($forum),
             'topic' => TopicData::from($topic),

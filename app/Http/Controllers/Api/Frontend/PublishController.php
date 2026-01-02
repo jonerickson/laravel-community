@@ -22,13 +22,11 @@ class PublishController extends Controller
     {
         $publishable = $request->resolvePublishable();
 
-        $this->authorize('publish', $publishable);
-
         $publishable->publish();
 
         return ApiResource::success(
             resource: $publishable->fresh(),
-            message: 'The item has been successfully published.'
+            message: sprintf('The %s has been successfully published.', $request->validated('type'))
         );
     }
 
@@ -39,13 +37,11 @@ class PublishController extends Controller
     {
         $publishable = $request->resolvePublishable();
 
-        $this->authorize('publish', $publishable);
-
         $publishable->unpublish();
 
         return ApiResource::success(
             resource: $publishable->fresh(),
-            message: 'The item has been successfully unpublished.'
+            message: sprintf('The %s has been successfully unpublished.', $request->validated('type'))
         );
     }
 }

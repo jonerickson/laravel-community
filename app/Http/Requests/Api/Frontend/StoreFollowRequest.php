@@ -27,12 +27,11 @@ class StoreFollowRequest extends FormRequest
         ];
     }
 
-    public function resolveFollowable(): Forum|Topic|null
+    public function resolveFollowable(): Forum|Topic
     {
         return match ($this->input('type')) {
-            'forum' => Forum::find($this->integer('id')),
-            'topic' => Topic::find($this->integer('id')),
-            default => null,
+            'forum' => Forum::findOrFail($this->integer('id')),
+            'topic' => Topic::findOrFail($this->integer('id')),
         };
     }
 }

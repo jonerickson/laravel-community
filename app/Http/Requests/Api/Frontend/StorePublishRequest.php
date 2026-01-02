@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Api\Frontend;
 
+use App\Models\Forum;
 use App\Models\Post;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -12,7 +13,7 @@ class StorePublishRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->can('publish', $this->resolvePublishable());
+        return Auth::check() && Auth::user()->can('moderate', $this->resolveAuthorizable());
     }
 
     /**
@@ -21,12 +22,25 @@ class StorePublishRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'post_id' => ['required', 'exists:posts,id'],
+            'type' => ['required', 'string', 'in:post'],
+            'id' => ['required', 'integer'],
         ];
     }
 
     public function resolvePublishable(): Post
     {
-        return Post::findOrFail($this->integer('post_id'));
+        return match ($this->input('type')) {
+            'post' => Post::findOrFail($this->integer('id')),
+        };
+    }
+
+    private function resolveAuthorizable(): ?Forum
+    {
+        $publishable = $this->resolvePublishable();
+
+        return match (true) {
+            $publishable instanceof Post => $publishable->topic?->forum,
+            default => null,
+        };
     }
 }

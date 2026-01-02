@@ -30,12 +30,11 @@ class StoreLikeRequest extends FormRequest
         ];
     }
 
-    public function resolveLikeable(): Post|Comment|null
+    public function resolveLikeable(): Post|Comment
     {
         return match ($this->input('type')) {
-            'post' => Post::find($this->integer('id')),
-            'comment' => Comment::find($this->integer('id')),
-            default => null,
+            'post' => Post::findOrFail($this->integer('id')),
+            'comment' => Comment::findOrFail($this->integer('id')),
         };
     }
 

@@ -22,13 +22,11 @@ class LockController extends Controller
     {
         $lockable = $request->resolveLockable();
 
-        $this->authorize('lock', $lockable);
-
         $lockable->lock();
 
         return ApiResource::success(
             resource: $lockable,
-            message: 'The item has been successfully locked.'
+            message: sprintf('The %s has been successfully locked.', $request->validated('type')),
         );
     }
 
@@ -39,13 +37,11 @@ class LockController extends Controller
     {
         $lockable = $request->resolveLockable();
 
-        $this->authorize('lock', $lockable);
-
         $lockable->unlock();
 
         return ApiResource::success(
             resource: $lockable,
-            message: 'The item has been successfully unlocked.'
+            message: sprintf('The %s has been successfully unlocked.', $request->validated('type')),
         );
     }
 }

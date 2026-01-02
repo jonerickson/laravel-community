@@ -53,7 +53,7 @@ class PostData extends Data
     /** @var string[] */
     public array $userReactions;
 
-    // public ?TopicData $topic = null;
+    public ?TopicData $topic = null;
 
     public ?string $featuredImage = null;
 
