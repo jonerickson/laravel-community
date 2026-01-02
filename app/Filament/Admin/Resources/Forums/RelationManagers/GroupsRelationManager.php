@@ -7,9 +7,7 @@ namespace App\Filament\Admin\Resources\Forums\RelationManagers;
 use BackedEnum;
 use Filament\Actions\AttachAction;
 use Filament\Actions\DetachAction;
-use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Components\Section;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -111,24 +109,7 @@ class GroupsRelationManager extends RelationManager
                     ->modalHeading('Add Group')
                     ->modalDescription('Add a group to this forum.')
                     ->modalSubmitActionLabel('Add')
-                    ->schema(fn (AttachAction $action): array => [
-                        $action->getRecordSelect()->preload()->searchable(),
-                        Section::make('Permissions')
-                            ->contained(false)
-                            ->columns(3)
-                            ->schema([
-                                Toggle::make('create')->default(true)->required(),
-                                Toggle::make('read')->default(true)->required(),
-                                Toggle::make('update')->default(false)->required(),
-                                Toggle::make('delete')->default(false)->required(),
-                                Toggle::make('moderate')->default(false)->required(),
-                                Toggle::make('reply')->default(true)->required(),
-                                Toggle::make('report')->default(true)->required(),
-                                Toggle::make('pin')->default(false)->required(),
-                                Toggle::make('lock')->default(false)->required(),
-                                Toggle::make('move')->default(false)->required(),
-                            ]),
-                    ]),
+                    ->preloadRecordSelect(),
             ])
             ->recordActions([
                 DetachAction::make()
