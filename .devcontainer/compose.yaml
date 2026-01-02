@@ -18,6 +18,7 @@ services:
     volumes:
       - ../:/var/www/html
     environment:
+      BROADCAST_CONNECTION: 'redis'
       CACHE_STORE: 'redis'
       DB_CONNECTION: '${DB_CONNECTION:-mysql}'
       DB_DATABASE: '${DB_DATABASE:-laravel-community}'

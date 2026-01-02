@@ -7,6 +7,7 @@ namespace App\Providers\Filament;
 use App\Filament\Admin\Pages\Dashboard;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Auth\MultiFactor\Email\EmailAuthentication;
+use Filament\Enums\DatabaseNotificationsPosition;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -72,22 +73,9 @@ class AdminPanelProvider extends PanelProvider
             ->font('Instrument Sans')
             ->maxContentWidth(Width::Full)
             ->sidebarCollapsibleOnDesktop()
+            ->databaseNotifications(position: DatabaseNotificationsPosition::Topbar)
             ->darkMode()
             ->viteTheme('resources/css/filament/admin/theme.css')
-            ->renderHook(PanelsRenderHook::HEAD_END, fn (): string => <<<'HTML'
-<script>
-    window.addEventListener('copy-to-clipboard', event => {
-        navigator.clipboard.writeText(event.detail.text)
-            .then(() => {
-                new FilamentNotification()
-                    .success()
-                    .title('The item has been successfully copied.')
-                    .send()
-            })
-            .catch(err => console.error('Clipboard error:', err));
-    });
-</script>
-HTML
-            );
+            ->renderHook(PanelsRenderHook::HEAD_END, fn (): Factory|View => view('filament.render-hooks.copy-to-clipboard'));
     }
 }
