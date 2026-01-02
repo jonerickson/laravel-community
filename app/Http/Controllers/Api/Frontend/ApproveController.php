@@ -20,6 +20,8 @@ class ApproveController extends Controller
      */
     public function store(StoreApproveRequest $request): JsonResource
     {
+        $this->authorize('moderate', $request->resolveAuthorizable());
+
         $approvable = $request->resolveApprovable();
 
         $approvable->approve();
@@ -35,6 +37,8 @@ class ApproveController extends Controller
      */
     public function destroy(StoreApproveRequest $request): JsonResource
     {
+        $this->authorize('moderate', $request->resolveAuthorizable());
+
         $approvable = $request->resolveApprovable();
 
         $approvable->unapprove();

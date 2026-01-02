@@ -20,6 +20,8 @@ class LockController extends Controller
      */
     public function store(StoreLockRequest $request): JsonResource
     {
+        $this->authorize('lock', $request->resolveAuthorizable());
+
         $lockable = $request->resolveLockable();
 
         $lockable->lock();
@@ -35,6 +37,8 @@ class LockController extends Controller
      */
     public function destroy(StoreLockRequest $request): JsonResource
     {
+        $this->authorize('lock', $request->resolveAuthorizable());
+
         $lockable = $request->resolveLockable();
 
         $lockable->unlock();

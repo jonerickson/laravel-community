@@ -14,7 +14,7 @@ class StoreApproveRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->can('moderate', $this->resolveAuthorizable());
+        return Auth::check();
     }
 
     /**
@@ -36,7 +36,7 @@ class StoreApproveRequest extends FormRequest
         };
     }
 
-    private function resolveAuthorizable(): ?Forum
+    public function resolveAuthorizable(): ?Forum
     {
         $approvable = $this->resolveApprovable();
 

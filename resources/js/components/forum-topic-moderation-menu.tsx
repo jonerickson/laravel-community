@@ -55,7 +55,8 @@ export default function ForumTopicModerationMenu({ topic, forum, categories }: F
                 url,
                 method,
                 data: {
-                    topic_id: topic.id,
+                    type: 'topic',
+                    id: topic.id,
                 },
             },
             {

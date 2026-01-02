@@ -13,7 +13,7 @@ class StoreLockRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->can('lock', $this->resolveAuthorizable());
+        return Auth::check();
     }
 
     /**
@@ -34,7 +34,7 @@ class StoreLockRequest extends FormRequest
         };
     }
 
-    private function resolveAuthorizable(): ?Forum
+    public function resolveAuthorizable(): ?Forum
     {
         $lockable = $this->resolveLockable();
 

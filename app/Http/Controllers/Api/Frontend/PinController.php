@@ -20,6 +20,8 @@ class PinController extends Controller
      */
     public function store(StorePinRequest $request): JsonResource
     {
+        $this->authorize('pin', $request->resolveAuthorizable());
+
         $pinnable = $request->resolvePinnable();
 
         $pinnable->pin();
@@ -35,6 +37,8 @@ class PinController extends Controller
      */
     public function destroy(StorePinRequest $request): JsonResource
     {
+        $this->authorize('pin', $request->resolveAuthorizable());
+
         $pinnable = $request->resolvePinnable();
 
         $pinnable->unpin();

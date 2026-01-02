@@ -20,6 +20,8 @@ class PublishController extends Controller
      */
     public function store(StorePublishRequest $request): JsonResource
     {
+        $this->authorize('moderate', $request->resolveAuthorizable());
+
         $publishable = $request->resolvePublishable();
 
         $publishable->publish();
@@ -35,6 +37,8 @@ class PublishController extends Controller
      */
     public function destroy(StorePublishRequest $request): JsonResource
     {
+        $this->authorize('moderate', $request->resolveAuthorizable());
+
         $publishable = $request->resolvePublishable();
 
         $publishable->unpublish();

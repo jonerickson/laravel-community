@@ -13,7 +13,7 @@ class StorePublishRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->can('moderate', $this->resolveAuthorizable());
+        return Auth::check();
     }
 
     /**
@@ -34,7 +34,7 @@ class StorePublishRequest extends FormRequest
         };
     }
 
-    private function resolveAuthorizable(): ?Forum
+    public function resolveAuthorizable(): ?Forum
     {
         $publishable = $this->resolvePublishable();
 

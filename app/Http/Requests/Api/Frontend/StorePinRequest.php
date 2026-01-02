@@ -14,7 +14,7 @@ class StorePinRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->can('pin', $this->resolveAuthorizable());
+        return Auth::check();
     }
 
     /**
@@ -36,7 +36,7 @@ class StorePinRequest extends FormRequest
         };
     }
 
-    private function resolveAuthorizable(): ?Forum
+    public function resolveAuthorizable(): ?Forum
     {
         $pinnable = $this->resolvePinnable();
 

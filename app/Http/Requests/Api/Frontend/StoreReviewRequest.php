@@ -18,7 +18,7 @@ class StoreReviewRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->can('create', Comment::class);
+        return Auth::check();
     }
 
     public function rules(): array
