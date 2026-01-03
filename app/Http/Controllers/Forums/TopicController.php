@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Forums;
 
 use App\Actions\Forums\DeleteTopicAction;
+use App\Data\ForumCategoryData;
 use App\Data\ForumData;
 use App\Data\PaginatedData;
 use App\Data\PostData;
@@ -15,10 +16,12 @@ use App\Events\TopicCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Forums\StoreTopicRequest;
 use App\Models\Forum;
+use App\Models\ForumCategory;
 use App\Models\Group;
 use App\Models\Post;
 use App\Models\Topic;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -116,7 +119,7 @@ class TopicController extends Controller
             'forum' => ForumData::from($forum),
             'topic' => TopicData::from($topic),
             'posts' => Inertia::defer(fn (): PaginatedData => PaginatedData::from(PostData::collect($posts->setCollection($filteredPosts), PaginatedDataCollection::class)->items()), 'posts'),
-            'categories' => Inertia::defer(fn (): Collection => collect(), 'categories'),
+            'categories' => Inertia::defer(fn (): Collection => ForumCategoryData::collect(ForumCategoryData::collect(ForumCategory::query()->with(['forums' => fn (HasMany|Forum $query) => $query->whereNull('parent_id')->recursiveChildren()])->get())), 'categories'),
             'recentViewers' => Inertia::defer(fn (): array => RecentViewerData::collect($topic->getRecentViewers()), 'recentViewers'),
         ]);
     }

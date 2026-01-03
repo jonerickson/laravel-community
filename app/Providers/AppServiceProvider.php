@@ -104,7 +104,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Model::automaticallyEagerLoadRelationships();
-        Model::shouldBeStrict();
+        Model::shouldBeStrict(false);
 
         Passport::useAuthorizationServerResponseType(app(IdTokenResponse::class));
         Passport::tokensCan([

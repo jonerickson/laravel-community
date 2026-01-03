@@ -33,12 +33,14 @@ class CategoryController extends Controller
             ->with(['forums' => function (HasMany|Forum $query): void {
                 $query
                     ->whereNull('parent_id')
+                    ->withCount(['topics', 'posts'])
                     ->active()
                     ->ordered()
+                    ->with(['groups'])
                     ->with(['latestTopics' => function (HasMany|Topic $subQuery): void {
                         $subQuery
                             ->withCount('posts')
-                            ->with(['author.groups', 'lastPost.pendingReports', 'reads', 'views', 'posts.likes', 'posts.pendingReports', 'follows'])
+                            ->with(['author.groups', 'lastPost.pendingReports', 'reads', 'views', 'posts.likes', 'posts.pendingReports', 'follows', 'forum.groups', 'forum.category', 'forum.follows'])
                             ->limit(3);
                     }]);
             }])
@@ -52,7 +54,7 @@ class CategoryController extends Controller
             ])
             ->filter(fn (ForumCategory $category) => Gate::check('view', $category))
             ->map(function (ForumCategory $category): ForumCategory {
-                $category->setAttribute('forums', $category->forums
+                $category->setRelation('forums', $category->forums
                     ->filter(fn (Forum $forum) => Gate::check('view', $forum))
                     ->values());
 

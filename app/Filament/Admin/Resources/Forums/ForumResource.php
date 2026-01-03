@@ -40,7 +40,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Override;
@@ -88,8 +88,9 @@ class ForumResource extends Resource
                                 Select::make('parent_id')
                                     ->label('Parent Forum')
                                     ->options(function (): array {
-                                        /** @var Collection<int, ForumCategory> $categories */
-                                        $categories = ForumCategory::query()->get();
+                                        $categories = ForumCategory::query()
+                                            ->with(['forums' => fn (HasMany|Forum $query) => $query->whereNull('parent_id')->recursiveChildren()])
+                                            ->get();
 
                                         if ($categories->isEmpty()) {
                                             return [];

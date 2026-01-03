@@ -14,7 +14,6 @@ use App\Traits\HasForumPermissions;
 use App\Traits\HasGroups;
 use App\Traits\HasSlug;
 use App\Traits\Orderable;
-use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -70,7 +69,7 @@ use Override;
  * @method static Builder<static>|Forum ordered()
  * @method static Builder<static>|Forum query()
  * @method static Builder<static>|Forum readableByUser(?\App\Models\User $user = null)
- * @method static Builder<static>|Forum scopeRecursiveChildren(int $maxDepth = 3)
+ * @method static Builder<static>|Forum recursiveChildren(int $maxDepth = 3)
  * @method static Builder<static>|Forum whereCategoryId($value)
  * @method static Builder<static>|Forum whereColor($value)
  * @method static Builder<static>|Forum whereCreatedAt($value)
@@ -118,7 +117,6 @@ class Forum extends Model implements Sluggable
         return Str::slug($this->name);
     }
 
-    #[Scope]
     public function scopeRecursiveChildren(Builder $query, int $maxDepth = 3): void
     {
         $query->with(['children' => function (HasMany|Forum $query): void {
