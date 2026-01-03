@@ -46,12 +46,22 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
         });
     }
 
-    if (forum.parent) {
-        breadcrumbs.push({
-            title: forum.parent.name,
-            href: route('forums.show', { forum: forum.parent.slug }),
-        });
-    }
+    const buildParentBreadcrumbs = (currentForum: App.Data.ForumData): BreadcrumbItem[] => {
+        const parents: BreadcrumbItem[] = [];
+        let parent = currentForum.parent;
+
+        while (parent) {
+            parents.unshift({
+                title: parent.name,
+                href: route('forums.show', { forum: parent.slug }),
+            });
+            parent = parent.parent;
+        }
+
+        return parents;
+    };
+
+    breadcrumbs.push(...buildParentBreadcrumbs(forum));
 
     breadcrumbs.push({
         title: forum.name,

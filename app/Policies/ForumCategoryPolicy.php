@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Data\ForumCategoryData;
 use App\Enums\WarningConsequenceType;
 use App\Models\ForumCategory;
 use App\Models\User;
@@ -16,13 +15,8 @@ class ForumCategoryPolicy
         return true;
     }
 
-    public function view(?User $user, ForumCategoryData|ForumCategory $category): bool
+    public function view(?User $user, ForumCategory $category): bool
     {
-        if ($category instanceof ForumCategoryData) {
-            return $category->isActive
-                && blank($category->forumPermissions) || $category->forumPermissions->canRead;
-        }
-
         return $category->is_active
             && (data_get($category->getForumPermissions($user), 'canRead') ?? false);
     }

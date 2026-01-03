@@ -1,0 +1,15 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Events;
+
+use App\Models\Comment;
+
+class CommentUpdated
+{
+    public function __construct(public Comment $comment)
+    {
+        //
+    }
+}

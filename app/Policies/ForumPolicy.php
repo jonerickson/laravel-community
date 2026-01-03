@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Data\ForumData;
 use App\Enums\WarningConsequenceType;
 use App\Models\Forum;
 use App\Models\ForumCategory;
@@ -18,15 +17,8 @@ class ForumPolicy
         return true;
     }
 
-    public function view(?User $user, ForumData|Forum $forum): bool
+    public function view(?User $user, Forum $forum): bool
     {
-        if ($forum instanceof ForumData) {
-            return $forum->isActive
-                && (blank($forum->category) || Gate::getPolicyFor(ForumCategory::class)->view($user, $forum->category))
-                && (blank($forum->forumPermissions) || $forum->forumPermissions->canRead)
-                && (blank($forum->category?->forumPermissions) || $forum->category->forumPermissions->canRead);
-        }
-
         return $forum->is_active
             && (blank($forum->category) || Gate::forUser($user)->check('view', $forum->category))
             && (data_get($forum->getForumPermissions($user), 'canRead') ?? false)

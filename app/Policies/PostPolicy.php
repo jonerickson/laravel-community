@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Data\PostData;
 use App\Enums\WarningConsequenceType;
-use App\Models\Forum;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
@@ -18,15 +16,8 @@ class PostPolicy
         return true;
     }
 
-    public function view(?User $user, PostData|Post $post): bool
+    public function view(?User $user, Post $post): bool
     {
-        if ($post instanceof PostData) {
-            return ($post->isApproved || ($user && $post->author->id === $user->id) || Gate::forUser($user)->check('moderate', Forum::find($post->topic?->forumId)))
-                && ($post->isPublished || ($user && $post->author->id === $user->id) || Gate::forUser($user)->check('moderate', Forum::find($post->topic?->forumId)))
-                && (! $post->isReported || ($user && $post->author->id === $user->id) || Gate::forUser($user)->check('moderate', Forum::find($post->topic?->forumId)))
-                && (! $post->publishedAt || ! $post->publishedAt->isFuture());
-        }
-
         return ($post->is_approved || ($user && $post->isAuthoredBy($user) || Gate::forUser($user)->check('moderate', $post->topic?->forum)))
             && ($post->is_published || ($user && $post->isAuthoredBy($user) || Gate::forUser($user)->check('moderate', $post->topic?->forum)))
             && (! $post->is_reported || ($user && $post->isAuthoredBy($user) || Gate::forUser($user)->check('moderate', $post->topic?->forum)))
