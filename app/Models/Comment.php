@@ -6,6 +6,8 @@ namespace App\Models;
 
 use App\Enums\WarningConsequenceType;
 use App\Events\CommentCreated;
+use App\Events\CommentDeleted;
+use App\Events\CommentUpdated;
 use App\Traits\Approvable;
 use App\Traits\HasAuthor;
 use App\Traits\HasReferenceId;
@@ -78,10 +80,6 @@ class Comment extends Model
     use HasReferenceId;
     use Likeable;
 
-    protected $dispatchesEvents = [
-        'created' => CommentCreated::class,
-    ];
-
     protected $fillable = [
         'commentable_type',
         'commentable_id',
@@ -92,6 +90,12 @@ class Comment extends Model
 
     protected $touches = [
         'commentable',
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => CommentCreated::class,
+        'updated' => CommentUpdated::class,
+        'deleting' => CommentDeleted::class,
     ];
 
     public function commentable(): MorphTo

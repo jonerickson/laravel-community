@@ -163,23 +163,39 @@ class Topic extends Model implements Sluggable
     public function hasReportedContent(): Attribute
     {
         return Attribute::make(
-            get: fn (): bool => $this
-                ->whereHas('posts', fn (Builder|Post $query) => $query->whereHas('pendingReports'))
-                ->exists()
+            get: function (): bool {
+                if (! $this->relationLoaded('posts')) {
+                    return false;
+                }
+
+                return $this->posts->contains(fn (Post $post) => $post->pendingReports->isNotEmpty());
+            }
         )->shouldCache();
     }
 
     public function hasUnpublishedContent(): Attribute
     {
         return Attribute::make(
-            get: fn (): bool => $this->posts()->where('is_published', false)->exists()
+            get: function (): bool {
+                if (! $this->relationLoaded('posts')) {
+                    return false;
+                }
+
+                return $this->posts->where('is_published', false)->isNotEmpty();
+            }
         )->shouldCache();
     }
 
     public function hasUnapprovedContent(): Attribute
     {
         return Attribute::make(
-            get: fn (): bool => $this->posts()->where('is_approved', false)->exists()
+            get: function (): bool {
+                if (! $this->relationLoaded('posts')) {
+                    return false;
+                }
+
+                return $this->posts->where('is_approved', false)->isNotEmpty();
+            }
         )->shouldCache();
     }
 
@@ -192,10 +208,12 @@ class Topic extends Model implements Sluggable
                     return false;
                 }
 
+                if (! $this->relationLoaded('posts')) {
+                    return false;
+                }
+
                 $dayAgo = now()->subDay();
-                $recentPosts = $this->posts()
-                    ->where('created_at', '>=', $dayAgo)
-                    ->get();
+                $recentPosts = $this->posts->where('created_at', '>=', $dayAgo);
 
                 $postsInLast24h = $recentPosts->count();
                 $postingScore = $postsInLast24h * 2;

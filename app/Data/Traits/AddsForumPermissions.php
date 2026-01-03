@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\Data\Traits;
 
-use App\Data\Normalizers\ModelPermissionNormalizer;
-use App\Data\PermissionData;
+use App\Data\ForumPermissionData;
+use App\Data\Normalizers\Forums\ForumPermissionsNormalizer;
 use Spatie\LaravelData\Data;
 
 /**
  * @mixin Data
  */
-trait HasDataPermissions
+trait AddsForumPermissions
 {
-    public PermissionData $permissions;
+    public ForumPermissionData $forumPermissions;
 
     public static function normalizers(): array
     {
         return [
-            ModelPermissionNormalizer::class,
+            ForumPermissionsNormalizer::class,
             ...config('data.normalizers'),
         ];
     }

@@ -2,7 +2,6 @@ import ForumSelectionDialog from '@/components/forum-selection-dialog';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApiRequest } from '@/hooks/use-api-request';
-import usePermissions from '@/hooks/use-permissions';
 import { router, useForm } from '@inertiajs/react';
 import { ArrowLeftRight, Lock, LockOpen, MoreHorizontal, Pin, PinOff, Trash } from 'lucide-react';
 import { useState } from 'react';
@@ -14,14 +13,19 @@ interface ForumTopicModerationMenuProps {
 }
 
 export default function ForumTopicModerationMenu({ topic, forum, categories }: ForumTopicModerationMenuProps) {
-    const { can, hasAnyPermission } = usePermissions();
     const { delete: deleteTopic } = useForm();
     const { execute: pinTopic, loading: pinLoading } = useApiRequest();
     const { execute: lockTopic, loading: lockLoading } = useApiRequest();
     const { execute: moveTopic, loading: moveLoading } = useApiRequest();
     const [showMoveDialog, setShowMoveDialog] = useState(false);
 
-    if (!hasAnyPermission(['move_topics', 'delete_topics', 'pin_topics', 'lock_topics'])) {
+    if (
+        !forum.forumPermissions.canPin &&
+        !forum.forumPermissions.canLock &&
+        !forum.forumPermissions.canMove &&
+        !forum.forumPermissions.canDelete &&
+        !topic.policyPermissions.canDelete
+    ) {
         return null;
     }
 
@@ -51,7 +55,8 @@ export default function ForumTopicModerationMenu({ topic, forum, categories }: F
                 url,
                 method,
                 data: {
-                    topic_id: topic.id,
+                    type: 'topic',
+                    id: topic.id,
                 },
             },
             {
@@ -72,7 +77,8 @@ export default function ForumTopicModerationMenu({ topic, forum, categories }: F
                 url,
                 method,
                 data: {
-                    topic_id: topic.id,
+                    type: 'topic',
+                    id: topic.id,
                 },
             },
             {
@@ -116,7 +122,7 @@ export default function ForumTopicModerationMenu({ topic, forum, categories }: F
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                    {can('pin_topics') && (
+                    {forum.forumPermissions.canPin && (
                         <DropdownMenuItem onClick={handleTogglePin} disabled={pinLoading}>
                             {topic.isPinned ? (
                                 <>
@@ -132,7 +138,7 @@ export default function ForumTopicModerationMenu({ topic, forum, categories }: F
                         </DropdownMenuItem>
                     )}
 
-                    {can('lock_topics') && (
+                    {forum.forumPermissions.canLock && (
                         <DropdownMenuItem onClick={handleToggleLock} disabled={lockLoading}>
                             {topic.isLocked ? (
                                 <>
@@ -148,14 +154,14 @@ export default function ForumTopicModerationMenu({ topic, forum, categories }: F
                         </DropdownMenuItem>
                     )}
 
-                    {can('move_topics') && (
+                    {forum.forumPermissions.canMove && (
                         <DropdownMenuItem onClick={handleOpenMoveDialog} disabled={moveLoading}>
                             <ArrowLeftRight />
                             Move Topic
                         </DropdownMenuItem>
                     )}
 
-                    {topic.permissions.canDelete && (
+                    {(forum.forumPermissions.canDelete || topic.policyPermissions.canDelete) && (
                         <DropdownMenuItem onClick={handleDeleteTopic} className="text-destructive focus:text-destructive">
                             <Trash className="text-destructive" />
                             Delete Topic

@@ -14,12 +14,6 @@ class FollowController extends Controller
     {
         $followable = $request->resolveFollowable();
 
-        if ($followable === null) {
-            return ApiResource::error(
-                message: 'The specified item could not be found.'
-            );
-        }
-
         $followable->follow();
 
         return ApiResource::success(
@@ -30,12 +24,6 @@ class FollowController extends Controller
     public function destroy(StoreFollowRequest $request): ApiResource
     {
         $followable = $request->resolveFollowable();
-
-        if ($followable === null) {
-            return ApiResource::error(
-                message: 'The specified item could not be found.'
-            );
-        }
 
         $followable->unfollow();
 

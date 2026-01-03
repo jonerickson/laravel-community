@@ -9,7 +9,6 @@ use App\Http\Requests\Reports\StoreReportRequest;
 use App\Http\Resources\ApiResource;
 use App\Models\Report;
 use App\Models\User;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -24,9 +23,6 @@ class ReportController extends Controller
         //
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function store(StoreReportRequest $request): ApiResource
     {
         $existingReport = Report::query()

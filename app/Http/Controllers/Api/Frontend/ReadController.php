@@ -24,12 +24,6 @@ class ReadController extends Controller
     {
         $readable = $request->resolveReadable();
 
-        if ($readable === null) {
-            return ApiResource::error(
-                message: 'The specified item could not be found.'
-            );
-        }
-
         $result = $readable->markAsRead($this->user);
 
         $readData = ReadData::from([

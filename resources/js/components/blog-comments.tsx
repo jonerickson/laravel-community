@@ -6,7 +6,6 @@ import RichEditorContent from '@/components/rich-editor-content';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { UserInfo } from '@/components/user-info';
-import usePermissions from '@/hooks/use-permissions';
 import { cn } from '@/lib/utils';
 import { InfiniteScroll, useForm } from '@inertiajs/react';
 import { Edit, LoaderCircle, MessageCircle, Reply, Trash } from 'lucide-react';
@@ -25,7 +24,6 @@ interface CommentItemProps {
 }
 
 function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
-    const { can, hasAnyPermission } = usePermissions();
     const [isEditing, setIsEditing] = useState(false);
     const commentDate = new Date(comment.createdAt || 'today');
     const formattedDate = commentDate.toLocaleDateString('en-US', {
@@ -73,7 +71,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
     };
 
     const handleDelete = () => {
-        if (!comment.permissions.canDelete) {
+        if (!comment.policyPermissions.canDelete) {
             return;
         }
 
@@ -89,7 +87,7 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
     const handleEditSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!comment.permissions.canUpdate) {
+        if (!comment.policyPermissions.canUpdate) {
             return;
         }
 
@@ -161,42 +159,38 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
                             <RichEditorContent content={comment.content} />
                         </div>
 
-                        {hasAnyPermission(['create_comments', 'update_permissions', 'like_comments']) && (
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center">
-                                    <Button variant="ghost" size="sm" onClick={() => onReply(comment.id)} className="h-auto p-1 text-xs">
-                                        <Reply className="mr-1 size-3" />
-                                        Reply
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                                <Button variant="ghost" size="sm" onClick={() => onReply(comment.id)} className="h-auto p-1 text-xs">
+                                    <Reply className="mr-1 size-3" />
+                                    Reply
+                                </Button>
+                                {comment.policyPermissions.canUpdate && (
+                                    <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="h-auto p-1 text-xs">
+                                        <Edit className="mr-1 size-3" />
+                                        Edit
                                     </Button>
-                                    {comment.permissions.canUpdate && (
-                                        <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="h-auto p-1 text-xs">
-                                            <Edit className="mr-1 size-3" />
-                                            Edit
-                                        </Button>
-                                    )}
-                                    {comment.permissions.canDelete && (
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={handleDelete}
-                                            disabled={deleting}
-                                            className="h-auto p-1 text-xs text-destructive hover:text-destructive"
-                                        >
-                                            <Trash className="mr-1 size-3" />
-                                            {deleting ? 'Deleting...' : 'Delete'}
-                                        </Button>
-                                    )}
-                                </div>
-                                {can('like_comments') && (
-                                    <EmojiReactions
-                                        comment={comment}
-                                        initialReactions={comment.likesSummary}
-                                        userReactions={comment.userReactions}
-                                        className="ml-auto"
-                                    />
+                                )}
+                                {comment.policyPermissions.canDelete && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={handleDelete}
+                                        disabled={deleting}
+                                        className="h-auto p-1 text-xs text-destructive hover:text-destructive"
+                                    >
+                                        <Trash className="mr-1 size-3" />
+                                        {deleting ? 'Deleting...' : 'Delete'}
+                                    </Button>
                                 )}
                             </div>
-                        )}
+                            <EmojiReactions
+                                comment={comment}
+                                initialReactions={comment.likesSummary}
+                                userReactions={comment.userReactions}
+                                className="ml-auto"
+                            />
+                        </div>
                     </>
                 )}
 
@@ -237,7 +231,6 @@ function CommentItem({ post, comment, onReply, replyingTo }: CommentItemProps) {
 }
 
 export default function BlogComments({ post, comments }: BlogCommentsProps) {
-    const { can } = usePermissions();
     const [replyingTo, setReplyingTo] = useState<number | null>(null);
     const {
         data,
@@ -285,24 +278,22 @@ export default function BlogComments({ post, comments }: BlogCommentsProps) {
                 <HeadingSmall title={`Comments (${comments.data.length || 0})`} />
             </div>
 
-            {can('create_comments') && (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid gap-2">
-                        <Textarea
-                            value={data.content}
-                            onChange={(e) => setData('content', e.target.value)}
-                            placeholder="Share your thoughts..."
-                            className="min-h-[120px]"
-                            required
-                        />
-                        <InputError message={errors.content} />
-                    </div>
-                    <Button type="submit" disabled={processing}>
-                        {processing && <LoaderCircle className="animate-spin" />}
-                        {processing ? 'Posting...' : 'Post comment'}
-                    </Button>
-                </form>
-            )}
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid gap-2">
+                    <Textarea
+                        value={data.content}
+                        onChange={(e) => setData('content', e.target.value)}
+                        placeholder="Share your thoughts..."
+                        className="min-h-[120px]"
+                        required
+                    />
+                    <InputError message={errors.content} />
+                </div>
+                <Button type="submit" disabled={processing}>
+                    {processing && <LoaderCircle className="animate-spin" />}
+                    {processing ? 'Posting...' : 'Post comment'}
+                </Button>
+            </form>
 
             {topLevelComments.length > 0 ? (
                 <InfiniteScroll data="comments">

@@ -14,7 +14,6 @@ use App\Http\Requests\Forums\UpdatePostRequest;
 use App\Models\Forum;
 use App\Models\Post;
 use App\Models\Topic;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Uri;
@@ -25,9 +24,6 @@ class PostController extends Controller
 {
     use AuthorizesRequests;
 
-    /**
-     * @throws AuthorizationException
-     */
     public function store(StorePostRequest $request, Forum $forum, Topic $topic): RedirectResponse
     {
         $this->authorize('view', $forum);
@@ -55,14 +51,13 @@ class PostController extends Controller
             ->with('message', 'Your reply was successfully added.')->withFragment((string) $post->id);
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function edit(Forum $forum, Topic $topic, Post $post): Response
     {
         $this->authorize('view', $forum);
         $this->authorize('view', $topic);
         $this->authorize('update', $post);
+
+        $forum->loadMissing(['category', 'parent.parent.parent']);
 
         return Inertia::render('forums/posts/edit', [
             'forum' => ForumData::from($forum),
@@ -71,9 +66,6 @@ class PostController extends Controller
         ]);
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function update(UpdatePostRequest $request, Forum $forum, Topic $topic, Post $post): RedirectResponse
     {
         $this->authorize('view', $forum);
@@ -88,9 +80,6 @@ class PostController extends Controller
             ->with('message', 'The post was successfully updated.');
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function destroy(Forum $forum, Topic $topic, Post $post): RedirectResponse
     {
         $this->authorize('view', $forum);

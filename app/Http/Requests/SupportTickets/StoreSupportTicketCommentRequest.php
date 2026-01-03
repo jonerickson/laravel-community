@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\SupportTickets;
 
-use App\Models\Comment;
 use App\Rules\BlacklistRule;
 use App\Rules\NoProfanity;
 use Illuminate\Foundation\Http\FormRequest;
@@ -15,7 +14,7 @@ class StoreSupportTicketCommentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->can('create', Comment::class);
+        return Auth::check();
     }
 
     public function rules(): array

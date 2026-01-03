@@ -7,62 +7,38 @@ namespace App\Http\Controllers\Api\Frontend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Frontend\StorePinRequest;
 use App\Http\Resources\ApiResource;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Str;
 
 class PinController extends Controller
 {
     use AuthorizesRequests;
 
-    /**
-     * @throws AuthorizationException
-     */
     public function store(StorePinRequest $request): JsonResource
     {
+        $this->authorize('pin', $request->resolveAuthorizable());
+
         $pinnable = $request->resolvePinnable();
-
-        if ($pinnable === null) {
-            return ApiResource::error(
-                message: 'Please select either a topic or post to pin.'
-            );
-        }
-
-        $this->authorize('pin', $pinnable);
 
         $pinnable->pin();
 
-        $class = Str::of($pinnable::class)->classBasename()->lower()->toString();
-
         return ApiResource::success(
             resource: $pinnable,
-            message: sprintf('The %s has been successfully pinned.', $class)
+            message: sprintf('The %s has been successfully pinned.', $request->validated('type'))
         );
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function destroy(StorePinRequest $request): JsonResource
     {
+        $this->authorize('pin', $request->resolveAuthorizable());
+
         $pinnable = $request->resolvePinnable();
-
-        if ($pinnable === null) {
-            return ApiResource::error(
-                message: 'Please select either a topic or post to unpin.'
-            );
-        }
-
-        $this->authorize('pin', $pinnable);
 
         $pinnable->unpin();
 
-        $class = Str::of($pinnable::class)->classBasename()->lower()->toString();
-
         return ApiResource::success(
             resource: $pinnable,
-            message: sprintf('The %s has been successfully unpinned.', $class)
+            message: sprintf('The %s has been successfully unpinned.', $request->validated('type'))
         );
     }
 }

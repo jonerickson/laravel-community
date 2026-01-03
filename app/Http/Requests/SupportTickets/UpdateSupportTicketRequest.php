@@ -12,7 +12,7 @@ class UpdateSupportTicketRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->can('update', $this->route('ticket'));
+        return Auth::check();
     }
 
     /**

@@ -7,7 +7,6 @@ import RichEditorContent from '@/components/rich-editor-content';
 import { Badge } from '@/components/ui/badge';
 import { UserInfo } from '@/components/user-info';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
-import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
 import { abbreviateNumber, pluralize } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
@@ -24,7 +23,6 @@ interface BlogShowProps {
 export default function BlogShow({ post, comments, recentViewers }: BlogShowProps) {
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const pageDescription = post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, '') + '...';
-    const { can } = usePermissions();
     const publishedDate = new Date(post.publishedAt || post.createdAt || new Date());
     const formattedDate = publishedDate.toLocaleDateString('en-US', {
         year: 'numeric',
@@ -194,16 +192,9 @@ export default function BlogShow({ post, comments, recentViewers }: BlogShowProp
                     <RichEditorContent itemProp="articleBody" role="main" aria-label="Article content" content={post.content} />
 
                     <footer className="mt-4">
-                        {can('like_posts') && (
-                            <section aria-label="Post reactions">
-                                <EmojiReactions
-                                    post={post}
-                                    initialReactions={post.likesSummary}
-                                    userReactions={post.userReactions}
-                                    className="mb-4"
-                                />
-                            </section>
-                        )}
+                        <section aria-label="Post reactions">
+                            <EmojiReactions post={post} initialReactions={post.likesSummary} userReactions={post.userReactions} className="mb-4" />
+                        </section>
 
                         <Deferred fallback={<Loading />} data="recentViewers">
                             <div className="mt-6">

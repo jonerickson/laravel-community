@@ -15,7 +15,7 @@ class UpdateCommentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->can('update', $this->route('comment'));
+        return Auth::check();
     }
 
     public function rules(): array

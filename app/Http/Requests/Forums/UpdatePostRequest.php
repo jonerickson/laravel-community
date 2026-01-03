@@ -16,7 +16,7 @@ class UpdatePostRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->can('update', $this->route('post'));
+        return Auth::check();
     }
 
     public function rules(): array

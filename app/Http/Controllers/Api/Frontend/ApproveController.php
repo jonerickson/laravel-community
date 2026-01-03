@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Api\Frontend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Frontend\StoreApproveRequest;
 use App\Http\Resources\ApiResource;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,20 +14,11 @@ class ApproveController extends Controller
 {
     use AuthorizesRequests;
 
-    /**
-     * @throws AuthorizationException
-     */
     public function store(StoreApproveRequest $request): JsonResource
     {
+        $this->authorize('moderate', $request->resolveAuthorizable());
+
         $approvable = $request->resolveApprovable();
-
-        if ($approvable === null) {
-            return ApiResource::error(
-                message: 'The specified item could not be found.'
-            );
-        }
-
-        $this->authorize('approve', $approvable);
 
         $approvable->approve();
 
@@ -38,20 +28,11 @@ class ApproveController extends Controller
         );
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function destroy(StoreApproveRequest $request): JsonResource
     {
+        $this->authorize('moderate', $request->resolveAuthorizable());
+
         $approvable = $request->resolveApprovable();
-
-        if ($approvable === null) {
-            return ApiResource::error(
-                message: 'The specified item could not be found.'
-            );
-        }
-
-        $this->authorize('approve', $approvable);
 
         $approvable->unapprove();
 

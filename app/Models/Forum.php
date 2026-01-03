@@ -10,6 +10,7 @@ use App\Events\ForumDeleted;
 use App\Events\ForumUpdated;
 use App\Traits\Activateable;
 use App\Traits\Followable;
+use App\Traits\HasForumPermissions;
 use App\Traits\HasGroups;
 use App\Traits\HasSlug;
 use App\Traits\Orderable;
@@ -67,6 +68,8 @@ use Override;
  * @method static Builder<static>|Forum newQuery()
  * @method static Builder<static>|Forum ordered()
  * @method static Builder<static>|Forum query()
+ * @method static Builder<static>|Forum readableByUser(?\App\Models\User $user = null)
+ * @method static Builder<static>|Forum recursiveChildren(int $maxDepth = 3)
  * @method static Builder<static>|Forum whereCategoryId($value)
  * @method static Builder<static>|Forum whereColor($value)
  * @method static Builder<static>|Forum whereCreatedAt($value)
@@ -88,6 +91,7 @@ class Forum extends Model implements Sluggable
     use Activateable;
     use Followable;
     use HasFactory;
+    use HasForumPermissions;
     use HasGroups;
     use HasSlug;
     use Orderable;
@@ -111,6 +115,17 @@ class Forum extends Model implements Sluggable
     public function generateSlug(): ?string
     {
         return Str::slug($this->name);
+    }
+
+    public function scopeRecursiveChildren(Builder $query, int $maxDepth = 3): void
+    {
+        $query->with(['children' => function (HasMany|Forum $query): void {
+            $query->ordered()->withCount(['topics', 'posts'])->with(['children' => function (HasMany|Forum $query): void {
+                $query->ordered()->withCount(['topics', 'posts'])->with(['children' => function (HasMany|Forum $query): void {
+                    $query->ordered()->withCount(['topics', 'posts']);
+                }]);
+            }]);
+        }]);
     }
 
     public function category(): BelongsTo

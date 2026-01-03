@@ -11,10 +11,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\Group;
 use App\Models\Post;
-use App\Models\User;
-use App\Services\CacheService;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Gate;
@@ -26,23 +22,18 @@ class BlogController extends Controller
 {
     use AuthorizesRequests;
 
-    public function __construct(
-        protected readonly CacheService $cache,
-        #[CurrentUser]
-        protected readonly ?User $user = null,
-    ) {
-        //
-    }
-
-    /**
-     * @throws AuthorizationException
-     */
     public function index(): Response
     {
         $this->authorize('viewAny', Post::class);
 
-        $posts = PostData::collect(collect($this->cache->getByKey('blog.index'))
-            ->filter(fn (array $post) => Gate::getPolicyFor(Post::class)->view($this->user, PostData::from($post)))
+        $posts = PostData::collect(Post::query()
+            ->blog()
+            ->with(['comments.likes', 'author.groups', 'reads', 'likes', 'pendingReports'])
+            ->withCount(['views', 'comments'])
+            ->published()
+            ->latest()
+            ->get()
+            ->filter(fn (Post $post) => Gate::check('view', $post))
             ->values()
             ->all(), PaginatedDataCollection::class);
 
@@ -51,9 +42,6 @@ class BlogController extends Controller
         ]);
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function show(Post $post): Response
     {
         $this->authorize('view', $post);

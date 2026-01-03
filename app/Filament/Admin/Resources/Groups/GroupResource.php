@@ -9,7 +9,6 @@ use App\Filament\Admin\Resources\Groups\Pages\CreateGroup;
 use App\Filament\Admin\Resources\Groups\Pages\EditGroup;
 use App\Filament\Admin\Resources\Groups\Pages\ListGroups;
 use App\Models\Group;
-use App\Models\Permission;
 use App\Models\Role;
 use App\Services\Integrations\DiscordService;
 use BackedEnum;
@@ -133,13 +132,6 @@ class GroupResource extends Resource
                                     ->preload()
                                     ->getOptionLabelUsing(fn (Role $role) => Str::of($role->name)->replace('_', ' ')->title()->toString())
                                     ->helperText('The roles that are assigned to the group.'),
-                                Select::make('permissions')
-                                    ->relationship('permissions', 'name')
-                                    ->multiple()
-                                    ->searchable()
-                                    ->preload()
-                                    ->getOptionLabelUsing(fn (Permission $permission) => Str::of($permission->name)->replace('_', ' ')->title()->toString())
-                                    ->helperText('The permissions that are assigned to the group. These are in addition to the permissions already inherited by any assigned roles.'),
                             ]),
                         Section::make('Discord')
                             ->collapsible()

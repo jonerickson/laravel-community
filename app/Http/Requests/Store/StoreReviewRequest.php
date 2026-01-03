@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Requests\Store;
 
 use App\Enums\WarningConsequenceType;
-use App\Models\Comment;
 use App\Models\Product;
 use App\Rules\BlacklistRule;
 use App\Rules\NoProfanity;
@@ -18,7 +17,7 @@ class StoreReviewRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->can('create', Comment::class);
+        return Auth::check();
     }
 
     public function rules(): array

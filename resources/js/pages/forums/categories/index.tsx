@@ -3,7 +3,6 @@ import ForumCategoryCard from '@/components/forum-category-card';
 import ForumSelectionDialog from '@/components/forum-selection-dialog';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
-import usePermissions from '@/hooks/use-permissions';
 import AppLayout from '@/layouts/app-layout';
 import { Head, router, usePage } from '@inertiajs/react';
 import { MessageSquare, Plus } from 'lucide-react';
@@ -15,9 +14,10 @@ interface ForumsIndexProps {
 }
 
 export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
-    const { can } = usePermissions();
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    const canStartNewTopic = categories.some((category) => category.forumPermissions.canCreate);
 
     const structuredData = {
         '@context': 'https://schema.org',
@@ -76,7 +76,7 @@ export default function ForumCategoryIndex({ categories }: ForumsIndexProps) {
                             <Heading title="Forums" description="Connect with our community and get support" />
                         </div>
                     </div>
-                    {can('create_topics') && (
+                    {canStartNewTopic && (
                         <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row sm:items-center">
                             <Button onClick={() => setIsDialogOpen(true)}>
                                 <Plus />

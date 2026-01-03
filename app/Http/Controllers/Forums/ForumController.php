@@ -10,7 +10,6 @@ use App\Data\TopicData;
 use App\Http\Controllers\Controller;
 use App\Models\Forum;
 use App\Models\Topic;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -22,14 +21,11 @@ class ForumController extends Controller
 {
     use AuthorizesRequests;
 
-    /**
-     * @throws AuthorizationException
-     */
     public function show(Forum $forum): Response
     {
         $this->authorize('view', $forum);
 
-        $forum->loadMissing(['category', 'parent']);
+        $forum->loadMissing(['category', 'parent.parent.parent', 'groups']);
         $forum->loadCount(['followers']);
 
         return Inertia::render('forums/show', [

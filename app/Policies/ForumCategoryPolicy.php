@@ -4,40 +4,114 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Data\ForumCategoryData;
+use App\Enums\WarningConsequenceType;
 use App\Models\ForumCategory;
-use App\Models\Group;
 use App\Models\User;
-use Illuminate\Support\Facades\Gate;
 
 class ForumCategoryPolicy
 {
-    public function before(?User $user): ?bool
+    public function viewAny(?User $user): bool
     {
-        if (! $this->viewAny($user)) {
+        return true;
+    }
+
+    public function view(?User $user, ForumCategory $category): bool
+    {
+        return $category->is_active
+            && (data_get($category->getForumPermissions($user), 'canRead') ?? false);
+    }
+
+    public function create(?User $user, ?ForumCategory $category = null): bool
+    {
+        if (! $user instanceof User) {
             return false;
         }
 
-        return null;
+        return (blank($category) || $this->view($user, $category))
+            && (blank($category) || (data_get($category->getForumPermissions($user), 'canCreate') ?? false));
     }
 
-    public function viewAny(?User $user): bool
+    public function update(?User $user, ForumCategory $category): bool
     {
-        return Gate::forUser($user)->check('view_any_forums_categories');
-    }
-
-    public function view(?User $user, ForumCategoryData|ForumCategory $category): bool
-    {
-        $groups = $user instanceof User ? $user->groups : collect([Group::defaultGuestGroup()]);
-
-        if ($category instanceof ForumCategoryData) {
-            return Gate::forUser($user)->check('view_forums_category')
-                && $category->isActive
-                && ($groups->pluck('id')->intersect(collect($category->groups)->pluck('id'))->isNotEmpty() ?? false);
+        if (! $user instanceof User) {
+            return false;
         }
 
-        return Gate::forUser($user)->check('view_forums_category')
-            && $category->is_active
-            && ($groups->pluck('id')->intersect($category->groups->pluck('id'))->isNotEmpty() ?? false);
+        return $this->view($user, $category)
+            && (data_get($category->getForumPermissions($user), 'canUpdate') ?? false);
+    }
+
+    public function delete(?User $user, ForumCategory $category): bool
+    {
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        return $this->view($user, $category)
+            && (data_get($category->getForumPermissions($user), 'canDelete') ?? false);
+    }
+
+    public function moderate(?User $user, ForumCategory $category): bool
+    {
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        return $this->view($user, $category)
+            && (data_get($category->getForumPermissions($user), 'canModerate') ?? false);
+    }
+
+    public function reply(?User $user, ForumCategory $category): bool
+    {
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        if ($user->active_consequence?->type === WarningConsequenceType::PostRestriction || $user->active_consequence?->type === WarningConsequenceType::Ban) {
+            return false;
+        }
+
+        return $this->view($user, $category)
+            && (data_get($category->getForumPermissions($user), 'canReply') ?? false);
+    }
+
+    public function report(?User $user, ForumCategory $category): bool
+    {
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        return $this->view($user, $category)
+            && (data_get($category->getForumPermissions($user), 'canReport') ?? false);
+    }
+
+    public function pin(?User $user, ForumCategory $category): bool
+    {
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        return $this->view($user, $category)
+            && (data_get($category->getForumPermissions($user), 'canPin') ?? false);
+    }
+
+    public function lock(?User $user, ForumCategory $category): bool
+    {
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        return $this->view($user, $category)
+            && (data_get($category->getForumPermissions($user), 'canLock') ?? false);
+    }
+
+    public function move(?User $user, ForumCategory $category): bool
+    {
+        if (! $user instanceof User) {
+            return false;
+        }
+
+        return $this->view($user, $category)
+            && (data_get($category->getForumPermissions($user), 'canMove') ?? false);
     }
 }

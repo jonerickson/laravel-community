@@ -27,7 +27,8 @@ class TopicController extends Controller
         $topic = Topic::findOrFail($request->validated('topic_id'));
         $targetForum = Forum::findOrFail($request->validated('target_forum_id'));
 
-        $this->authorize('move', $topic);
+        $this->authorize('move', $topic->forum);
+        $this->authorize('move', $targetForum);
 
         MoveTopicAction::execute($topic, $targetForum);
 

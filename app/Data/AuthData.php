@@ -18,10 +18,4 @@ class AuthData extends Data
     public bool $isAdmin;
 
     public bool $mustVerifyEmail;
-
-    /** @var array<string, bool> */
-    public array $can;
-
-    /** @var string[] */
-    public array $roles;
 }

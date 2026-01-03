@@ -13,7 +13,6 @@ use App\Data\UserData;
 use App\Enums\Role;
 use App\Models\Announcement;
 use App\Models\Page;
-use App\Models\Permission;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\Integrations\DiscordService;
@@ -21,7 +20,6 @@ use App\Services\Integrations\RobloxService;
 use App\Services\ShoppingCartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Gate;
 use Inertia\Middleware;
 use Override;
 use Tighten\Ziggy\Ziggy;
@@ -68,8 +66,6 @@ class HandleInertiaRequests extends Middleware
             'auth' => AuthData::from([
                 'user' => $user ? UserData::from($user) : null,
                 'isAdmin' => $user?->hasAnyRole(Role::Administrator, Role::SupportAgent) ?? false,
-                'roles' => $user?->roles?->pluck('name')->toArray() ?? [],
-                'can' => Permission::all()->mapWithKeys(fn (Permission $permission): array => [$permission->name => Gate::forUser($user)->check($permission->name)])->toArray(),
                 'mustVerifyEmail' => $user && ! $user->hasVerifiedEmail(),
             ]),
             'announcements' => AnnouncementData::collect(Announcement::query()
