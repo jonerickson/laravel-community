@@ -470,6 +470,7 @@ declare namespace App.Data {
         likesSummary: Array<App.Data.LikeData>;
         userReaction: string | null;
         userReactions: Array<string>;
+        topic: App.Data.TopicData | null;
         featuredImage: string | null;
         featuredImageUrl: string | null;
         readingTime: number | null;
