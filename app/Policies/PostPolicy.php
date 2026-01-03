@@ -43,7 +43,8 @@ class PostPolicy
             return true;
         }
 
-        return blank($post->topic?->forum) || Gate::forUser($user)->check('update', $post->topic->forum);
+        return $this->view($user, $post)
+            && (blank($post->topic?->forum) || Gate::forUser($user)->check('delete', $post->topic->forum));
     }
 
     public function delete(?User $user, Post $post): bool
@@ -56,6 +57,7 @@ class PostPolicy
             return true;
         }
 
-        return blank($post->topic?->forum) || Gate::forUser($user)->check('delete', $post->topic->forum);
+        return $this->view($user, $post)
+            && (blank($post->topic?->forum) || Gate::forUser($user)->check('delete', $post->topic->forum));
     }
 }

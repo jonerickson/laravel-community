@@ -34,7 +34,7 @@ class SupportTicketPolicy
             return false;
         }
 
-        return $ticket->isAuthoredBy($user)
-            && $this->view($user, $ticket);
+        return $this->view($user, $ticket)
+            && $ticket->isAuthoredBy($user);
     }
 }
