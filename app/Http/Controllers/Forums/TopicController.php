@@ -18,7 +18,6 @@ use App\Models\Forum;
 use App\Models\Group;
 use App\Models\Post;
 use App\Models\Topic;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
@@ -36,9 +35,6 @@ class TopicController extends Controller
 {
     use AuthorizesRequests;
 
-    /**
-     * @throws AuthorizationException
-     */
     public function create(Forum $forum): Response
     {
         $this->authorize('view', $forum);
@@ -82,9 +78,6 @@ class TopicController extends Controller
             ]);
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function show(Request $request, Forum $forum, Topic $topic): Response|RedirectResponse
     {
         $this->authorize('view', $forum);

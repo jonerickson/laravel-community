@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
+import { buildTopicBreadcrumbs } from '@/utils/breadcrumbs';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { route } from 'ziggy-js';
@@ -21,42 +21,13 @@ export default function ForumPostEdit({ forum, topic, post }: EditPostProps) {
         content: post.content,
     });
 
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Forums',
-            href: route('forums.index'),
-        },
-        ...(forum.category
-            ? [
-                  {
-                      title: forum.category.name,
-                      href: route('forums.categories.show', { category: forum.category.slug }),
-                  },
-              ]
-            : []),
-    ];
-
-    if (forum.parent) {
-        breadcrumbs.push({
-            title: forum.parent.name,
-            href: route('forums.show', { forum: forum.parent.slug }),
-        });
-    }
-
-    breadcrumbs.push(
-        {
-            title: forum.name,
-            href: route('forums.show', { forum: forum.slug }),
-        },
-        {
-            title: topic.title,
-            href: route('forums.topics.show', { forum: forum.slug, topic: topic.slug }),
-        },
+    const breadcrumbs = [
+        ...buildTopicBreadcrumbs(forum, topic),
         {
             title: 'Edit Post',
             href: route('forums.posts.update', { forum: forum.slug, topic: topic.slug, post: post.slug }),
         },
-    );
+    ];
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

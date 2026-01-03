@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Api\Frontend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Frontend\StorePublishRequest;
 use App\Http\Resources\ApiResource;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,9 +14,6 @@ class PublishController extends Controller
 {
     use AuthorizesRequests;
 
-    /**
-     * @throws AuthorizationException
-     */
     public function store(StorePublishRequest $request): JsonResource
     {
         $this->authorize('moderate', $request->resolveAuthorizable());
@@ -32,9 +28,6 @@ class PublishController extends Controller
         );
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function destroy(StorePublishRequest $request): JsonResource
     {
         $this->authorize('moderate', $request->resolveAuthorizable());

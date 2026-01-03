@@ -11,7 +11,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { useMarkAsRead } from '@/hooks/use-mark-as-read';
 import AppLayout from '@/layouts/app-layout';
 import { abbreviateNumber, pluralize } from '@/lib/utils';
-import type { BreadcrumbItem } from '@/types';
+import { buildTopicBreadcrumbs } from '@/utils/breadcrumbs';
 import { stripCharacters } from '@/utils/truncate';
 import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
@@ -32,48 +32,7 @@ export default function ForumTopicShow({ forum, topic, posts, categories, recent
     const [quotedContent, setQuotedContent] = useState<string>('');
     const [quotedAuthor, setQuotedAuthor] = useState<string>('');
 
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Forums',
-            href: route('forums.index'),
-        },
-        ...(forum.category
-            ? [
-                  {
-                      title: forum.category.name,
-                      href: route('forums.categories.show', { category: forum.category.slug }),
-                  },
-              ]
-            : []),
-    ];
-
-    const buildParentBreadcrumbs = (currentForum: App.Data.ForumData): BreadcrumbItem[] => {
-        const parents: BreadcrumbItem[] = [];
-        let parent = currentForum.parent;
-
-        while (parent) {
-            parents.unshift({
-                title: parent.name,
-                href: route('forums.show', { forum: parent.slug }),
-            });
-            parent = parent.parent;
-        }
-
-        return parents;
-    };
-
-    breadcrumbs.push(...buildParentBreadcrumbs(forum));
-
-    breadcrumbs.push(
-        {
-            title: forum.name,
-            href: route('forums.show', { forum: forum.slug }),
-        },
-        {
-            title: topic.title,
-            href: route('forums.topics.show', { forum: forum.slug, topic: topic.slug }),
-        },
-    );
+    const breadcrumbs = buildTopicBreadcrumbs(forum, topic);
 
     useMarkAsRead({
         id: topic.id,

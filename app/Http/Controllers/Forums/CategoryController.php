@@ -10,7 +10,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Forum;
 use App\Models\ForumCategory;
 use App\Models\Topic;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -23,9 +22,6 @@ class CategoryController extends Controller
 {
     use AuthorizesRequests;
 
-    /**
-     * @throws AuthorizationException
-     */
     public function index(): Response
     {
         $this->authorize('viewAny', ForumCategory::class);
@@ -69,9 +65,6 @@ class CategoryController extends Controller
         ]);
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function show(ForumCategory $category): Response
     {
         $this->authorize('view', $category);

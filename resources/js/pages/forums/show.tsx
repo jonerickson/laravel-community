@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useApiRequest } from '@/hooks/use-api-request';
 import AppLayout from '@/layouts/app-layout';
 import { abbreviateNumber, cn } from '@/lib/utils';
-import type { BreadcrumbItem } from '@/types';
+import { buildForumBreadcrumbs } from '@/utils/breadcrumbs';
 import { stripCharacters, truncate } from '@/utils/truncate';
 import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
@@ -32,41 +32,7 @@ export default function ForumShow({ forum, children, topics }: ForumShowProps) {
     const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
     const { loading: isDeleting, execute: executeBulkDelete } = useApiRequest();
 
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Forums',
-            href: route('forums.index'),
-        },
-    ];
-
-    if (forum.category) {
-        breadcrumbs.push({
-            title: forum.category.name,
-            href: route('forums.categories.show', { category: forum.category.slug }),
-        });
-    }
-
-    const buildParentBreadcrumbs = (currentForum: App.Data.ForumData): BreadcrumbItem[] => {
-        const parents: BreadcrumbItem[] = [];
-        let parent = currentForum.parent;
-
-        while (parent) {
-            parents.unshift({
-                title: parent.name,
-                href: route('forums.show', { forum: parent.slug }),
-            });
-            parent = parent.parent;
-        }
-
-        return parents;
-    };
-
-    breadcrumbs.push(...buildParentBreadcrumbs(forum));
-
-    breadcrumbs.push({
-        title: forum.name,
-        href: route('forums.show', { forum: forum.slug }),
-    });
+    const breadcrumbs = buildForumBreadcrumbs(forum);
 
     const structuredData = {
         '@context': 'https://schema.org',

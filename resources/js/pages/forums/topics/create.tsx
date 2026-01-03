@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
+import { buildForumBreadcrumbs } from '@/utils/breadcrumbs';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { route } from 'ziggy-js';
@@ -22,47 +22,13 @@ export default function ForumTopicCreate({ forum }: CreateTopicProps) {
         content: '',
     });
 
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Forums',
-            href: route('forums.index'),
-        },
-    ];
-
-    if (forum.category) {
-        breadcrumbs.push({
-            title: forum.category.name,
-            href: route('forums.categories.show', { category: forum.category.slug }),
-        });
-    }
-
-    const buildParentBreadcrumbs = (currentForum: App.Data.ForumData): BreadcrumbItem[] => {
-        const parents: BreadcrumbItem[] = [];
-        let parent = currentForum.parent;
-
-        while (parent) {
-            parents.unshift({
-                title: parent.name,
-                href: route('forums.show', { forum: parent.slug }),
-            });
-            parent = parent.parent;
-        }
-
-        return parents;
-    };
-
-    breadcrumbs.push(...buildParentBreadcrumbs(forum));
-
-    breadcrumbs.push(
-        {
-            title: forum.name,
-            href: route('forums.show', { forum: forum.slug }),
-        },
+    const breadcrumbs = [
+        ...buildForumBreadcrumbs(forum),
         {
             title: 'Create Topic',
             href: route('forums.topics.create', { forum: forum.slug }),
         },
-    );
+    ];
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

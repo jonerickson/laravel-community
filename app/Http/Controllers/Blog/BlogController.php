@@ -11,7 +11,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\Group;
 use App\Models\Post;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Gate;
@@ -23,9 +22,6 @@ class BlogController extends Controller
 {
     use AuthorizesRequests;
 
-    /**
-     * @throws AuthorizationException
-     */
     public function index(): Response
     {
         $this->authorize('viewAny', Post::class);
@@ -46,9 +42,6 @@ class BlogController extends Controller
         ]);
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function show(Post $post): Response
     {
         $this->authorize('view', $post);

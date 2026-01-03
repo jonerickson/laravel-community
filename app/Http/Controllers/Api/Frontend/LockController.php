@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Api\Frontend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Frontend\StoreLockRequest;
 use App\Http\Resources\ApiResource;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,9 +14,6 @@ class LockController extends Controller
 {
     use AuthorizesRequests;
 
-    /**
-     * @throws AuthorizationException
-     */
     public function store(StoreLockRequest $request): JsonResource
     {
         $this->authorize('lock', $request->resolveAuthorizable());
@@ -32,9 +28,6 @@ class LockController extends Controller
         );
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function destroy(StoreLockRequest $request): JsonResource
     {
         $this->authorize('lock', $request->resolveAuthorizable());
