@@ -19,7 +19,7 @@ return new class extends Migration
             $table->after('delete', function (Blueprint $table) {
                 $table->boolean('moderate')->default(false);
                 $table->boolean('reply')->default(true);
-                $table->boolean('report')->default(false);
+                $table->boolean('report')->default(true);
                 $table->boolean('pin')->default(false);
                 $table->boolean('lock')->default(false);
                 $table->boolean('move')->default(false);
