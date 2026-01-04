@@ -32,8 +32,6 @@ declare namespace App.Data {
         user: App.Data.UserData | null;
         isAdmin: boolean;
         mustVerifyEmail: boolean;
-        can: { [key: string]: boolean };
-        roles: Array<string>;
     };
     export type BalanceData = {
         available: number;
@@ -79,7 +77,7 @@ declare namespace App.Data {
         replies: Array<App.Data.CommentData> | null;
         createdAt: string | null;
         updatedAt: string | null;
-        permissions: App.Data.PermissionData;
+        policyPermissions: App.Data.PolicyPermissionData;
     };
     export type ConnectedAccountData = {
         id: string;
@@ -181,6 +179,7 @@ declare namespace App.Data {
         groups: Array<App.Data.GroupData> | null;
         createdAt: string | null;
         updatedAt: string | null;
+        forumPermissions: App.Data.ForumPermissionData;
     };
     export type ForumData = {
         id: number;
@@ -206,6 +205,19 @@ declare namespace App.Data {
         groups: Array<App.Data.GroupData> | null;
         createdAt: string | null;
         updatedAt: string | null;
+        forumPermissions: App.Data.ForumPermissionData;
+    };
+    export type ForumPermissionData = {
+        canCreate: boolean;
+        canRead: boolean;
+        canUpdate: boolean;
+        canDelete: boolean;
+        canModerate: boolean;
+        canReply: boolean;
+        canReport: boolean;
+        canPin: boolean;
+        canLock: boolean;
+        canMove: boolean;
     };
     export type GroupData = {
         id: number;
@@ -412,11 +424,6 @@ declare namespace App.Data {
         createdAt: string | null;
         updatedAt: string | null;
     };
-    export type PermissionData = {
-        canCreate: boolean;
-        canUpdate: boolean;
-        canDelete: boolean;
-    };
     export type PolicyCategoryData = {
         id: number;
         name: string;
@@ -440,6 +447,12 @@ declare namespace App.Data {
         createdAt: string | null;
         updatedAt: string | null;
     };
+    export type PolicyPermissionData = {
+        canCreate: boolean;
+        canRead: boolean;
+        canUpdate: boolean;
+        canDelete: boolean;
+    };
     export type PostData = {
         id: number;
         type: App.Enums.PostType;
@@ -457,7 +470,7 @@ declare namespace App.Data {
         likesSummary: Array<App.Data.LikeData>;
         userReaction: string | null;
         userReactions: Array<string>;
-        topicId: number | null;
+        topic: App.Data.TopicData | null;
         featuredImage: string | null;
         featuredImageUrl: string | null;
         readingTime: number | null;
@@ -468,12 +481,12 @@ declare namespace App.Data {
         readsCount: number;
         author: App.Data.UserData;
         metadata: Array<string, unknown> | null;
-        createdAt: string | null;
-        updatedAt: string | null;
         comments: Array<App.Data.CommentData> | null;
         isReported: boolean | null;
         reportCount: number | null;
-        permissions: App.Data.PermissionData;
+        createdAt: string | null;
+        updatedAt: string | null;
+        policyPermissions: App.Data.PolicyPermissionData;
     };
     export type PriceData = {
         id: number;
@@ -661,10 +674,9 @@ declare namespace App.Data {
         forum: App.Data.ForumData | null;
         author: App.Data.UserData;
         lastPost: App.Data.PostData | null;
-        posts: Array<App.Data.PostData> | null;
         createdAt: string | null;
         updatedAt: string | null;
-        permissions: App.Data.PermissionData;
+        policyPermissions: App.Data.PolicyPermissionData;
     };
     export type TransferData = {
         id: string;
@@ -801,7 +813,7 @@ declare namespace App.Enums {
         | 'incomplete'
         | 'incomplete_expired';
     export type SupportTicketPriority = 'low' | 'medium' | 'high' | 'critical';
-    export type SupportTicketStatus = 'new' | 'open' | 'in_progress' | 'resolved' | 'closed';
+    export type SupportTicketStatus = 'new' | 'open' | 'in_progress' | 'waiting_on_customer' | 'resolved' | 'closed';
     export type WarningConsequenceType = 'none' | 'moderate_content' | 'post_restriction' | 'ban';
 }
 declare namespace App.Services.Migration {

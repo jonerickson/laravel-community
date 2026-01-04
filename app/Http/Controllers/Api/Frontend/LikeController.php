@@ -9,10 +9,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Frontend\StoreLikeRequest;
 use App\Http\Resources\ApiResource;
 use App\Models\User;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Validation\ValidationException;
 
 class LikeController extends Controller
 {
@@ -25,21 +23,9 @@ class LikeController extends Controller
         //
     }
 
-    /**
-     * @throws AuthorizationException
-     * @throws ValidationException
-     */
     public function __invoke(StoreLikeRequest $request): ApiResource
     {
         $likeable = $request->resolveLikeable();
-
-        if ($likeable === null) {
-            return ApiResource::error(
-                message: 'Unable to find an item to like/unlike.'
-            );
-        }
-
-        $this->authorize('like', $likeable);
 
         $likeable->toggleLike($request->validated('emoji'), $this->user->id);
 

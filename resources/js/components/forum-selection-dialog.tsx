@@ -32,21 +32,33 @@ export default function ForumSelectionDialog({ categories, isOpen, onClose, onSe
         onSelect(forum);
     };
 
-    // Flatten the category/forum/subforum hierarchy into a searchable list
     const flattenForums = (categories: App.Data.ForumCategoryData[]): FlattenedItem[] => {
+        const hasForumWriteAccess = (forum: App.Data.ForumData): boolean => {
+            if (forum.forumPermissions?.canCreate) return true;
+            return forum.children?.some((child) => hasForumWriteAccess(child)) ?? false;
+        };
+
+        const hasAnyWriteAccess = categories.some((category) => {
+            if (!category.forumPermissions?.canCreate) return false;
+            return category.forums?.some((forum) => hasForumWriteAccess(forum)) ?? false;
+        });
+
+        if (!hasAnyWriteAccess) return [];
+
         const items: FlattenedItem[] = [];
 
         const processForums = (forums: App.Data.ForumData[] | undefined, path: string[], depth: number) => {
             if (!forums) return;
 
             forums.forEach((forum) => {
+                if (!forum.forumPermissions?.canCreate) return;
+
                 items.push({
                     forum,
                     depth,
                     path: [...path],
                 });
 
-                // Recursively process sub-forums
                 if (forum.children && forum.children.length > 0) {
                     processForums(forum.children, [...path, forum.name], depth + 1);
                 }
@@ -54,7 +66,7 @@ export default function ForumSelectionDialog({ categories, isOpen, onClose, onSe
         };
 
         categories.forEach((category) => {
-            if (category.forums && category.forums.length > 0) {
+            if (category.forumPermissions?.canCreate && category.forums && category.forums.length > 0) {
                 processForums(category.forums, [category.name], 0);
             }
         });

@@ -9,7 +9,6 @@ use App\Http\Requests\Blog\StoreCommentRequest;
 use App\Http\Requests\Blog\UpdateCommentRequest;
 use App\Models\Comment;
 use App\Models\Post;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 
@@ -17,9 +16,6 @@ class CommentController extends Controller
 {
     use AuthorizesRequests;
 
-    /**
-     * @throws AuthorizationException
-     */
     public function store(StoreCommentRequest $request, Post $post): RedirectResponse
     {
         $this->authorize('view', $post);
@@ -33,9 +29,6 @@ class CommentController extends Controller
         return back()->with('message', 'Your comment was successfully added.');
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function update(UpdateCommentRequest $request, Post $post, Comment $comment): RedirectResponse
     {
         $this->authorize('view', $post);
@@ -46,9 +39,6 @@ class CommentController extends Controller
         return back()->with('message', 'The comment has been successfully updated.');
     }
 
-    /**
-     * @throws AuthorizationException
-     */
     public function destroy(Post $post, Comment $comment): RedirectResponse
     {
         $this->authorize('view', $comment);

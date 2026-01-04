@@ -9,13 +9,12 @@ use App\Rules\NoProfanity;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Override;
-use PHPUnit\Framework\Attributes\Ticket;
 
 class StoreSupportTicketRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->can('create', Ticket::class);
+        return Auth::check();
     }
 
     public function rules(): array

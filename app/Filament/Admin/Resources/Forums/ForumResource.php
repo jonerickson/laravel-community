@@ -10,7 +10,7 @@ use App\Filament\Admin\Resources\Forums\Pages\ListForums;
 use App\Filament\Admin\Resources\Forums\RelationManagers\GroupsRelationManager;
 use App\Filament\Admin\Resources\Forums\RelationManagers\TopicsRelationManager;
 use App\Models\Forum;
-use App\Services\CacheService;
+use App\Models\ForumCategory;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -40,6 +40,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Override;
@@ -87,10 +88,11 @@ class ForumResource extends Resource
                                 Select::make('parent_id')
                                     ->label('Parent Forum')
                                     ->options(function (): array {
-                                        $cacheService = app(CacheService::class);
-                                        $categories = $cacheService->getByKey('forums.categories.index');
+                                        $categories = ForumCategory::query()
+                                            ->with(['forums' => fn (HasMany|Forum $query) => $query->whereNull('parent_id')->recursiveChildren()])
+                                            ->get();
 
-                                        if (! $categories) {
+                                        if ($categories->isEmpty()) {
                                             return [];
                                         }
 
@@ -99,20 +101,20 @@ class ForumResource extends Resource
                                         foreach ($categories as $category) {
                                             $groupOptions = [];
 
-                                            if (! isset($category['forums'])) {
+                                            if (! isset($category->forums)) {
                                                 continue;
                                             }
 
-                                            foreach ($category['forums'] as $forum) {
-                                                $groupOptions[$forum['id']] = $forum['name'];
+                                            foreach ($category->forums as $forum) {
+                                                $groupOptions[$forum->getKey()] = $forum->name;
 
-                                                if (isset($forum['children'])) {
-                                                    foreach ($forum['children'] as $child) {
-                                                        $groupOptions[$child['id']] = '→ '.$child['name'];
+                                                if (isset($forum->children)) {
+                                                    foreach ($forum->children as $child) {
+                                                        $groupOptions[$child->getKey()] = '→ '.$child->name;
 
-                                                        if (isset($child['children'])) {
-                                                            foreach ($child['children'] as $grandchild) {
-                                                                $groupOptions[$grandchild['id']] = '→ → '.$grandchild['name'];
+                                                        if (isset($child->children)) {
+                                                            foreach ($child->children as $grandchild) {
+                                                                $groupOptions[$grandchild->getKey()] = '→ → '.$grandchild->name;
                                                             }
                                                         }
                                                     }
@@ -120,7 +122,7 @@ class ForumResource extends Resource
                                             }
 
                                             if ($groupOptions !== []) {
-                                                $options[$category['name']] = $groupOptions;
+                                                $options[$category->name] = $groupOptions;
                                             }
                                         }
 

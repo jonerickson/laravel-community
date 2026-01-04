@@ -1,5 +1,4 @@
 import { Badge } from '@/components/ui/badge';
-import usePermissions from '@/hooks/use-permissions';
 import { abbreviateNumber } from '@/lib/utils';
 import { truncate } from '@/utils/truncate';
 import { Link } from '@inertiajs/react';
@@ -11,8 +10,6 @@ interface TrendingTopicsWidgetProps {
 }
 
 export default function TrendingTopicsWidget({ topics = [] }: TrendingTopicsWidgetProps) {
-    const { can } = usePermissions();
-
     const formatTrendingScore = (score: number): string => {
         if (score >= 1000) {
             return `${(score / 1000).toFixed(1)}k`;
@@ -58,9 +55,13 @@ export default function TrendingTopicsWidget({ topics = [] }: TrendingTopicsWidg
                                             {topic.isHot && <span className="text-sm">🔥</span>}
                                             {topic.isPinned && <Pin className="size-3 text-info" />}
                                             {topic.isLocked && <Lock className="size-3 text-muted-foreground" />}
-                                            {can('report_posts') && topic.hasReportedContent && <AlertTriangle className="size-3 text-destructive" />}
-                                            {can('publish_posts') && topic.hasUnpublishedContent && <EyeOff className="size-3 text-warning" />}
-                                            {can('approve_posts') && topic.hasUnapprovedContent && <ThumbsDown className="size-3 text-warning" />}
+                                            {topic.forum?.forumPermissions.canModerate && (
+                                                <>
+                                                    {topic.hasReportedContent && <AlertTriangle className="size-3 text-destructive" />}
+                                                    {topic.hasUnpublishedContent && <EyeOff className="size-3 text-warning" />}
+                                                    {topic.hasUnapprovedContent && <ThumbsDown className="size-3 text-warning" />}
+                                                </>
+                                            )}
                                             <span className="line-clamp-1 text-sm font-medium">{truncate(topic.title)}</span>
                                         </div>
                                         <div className="text-xs text-muted-foreground">

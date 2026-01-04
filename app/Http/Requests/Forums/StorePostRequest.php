@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Requests\Forums;
 
 use App\Enums\WarningConsequenceType;
-use App\Models\Post;
 use App\Rules\BlacklistRule;
 use App\Rules\NoProfanity;
 use Illuminate\Foundation\Http\FormRequest;
@@ -17,7 +16,7 @@ class StorePostRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->can('create', Post::class);
+        return Auth::check();
     }
 
     public function rules(): array

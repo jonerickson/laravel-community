@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Api\Frontend;
 
+use App\Models\Forum;
 use App\Models\Post;
 use App\Models\Topic;
 use Illuminate\Foundation\Http\FormRequest;
@@ -13,7 +14,7 @@ class StorePinRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->can('pin', $this->resolvePinnable());
+        return Auth::check();
     }
 
     /**
@@ -22,16 +23,26 @@ class StorePinRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'topic_id' => ['sometimes', 'required', 'exists:topics,id'],
-            'post_id' => ['sometimes', 'required', 'exists:posts,id'],
+            'type' => ['required', 'string', 'in:post,topic'],
+            'id' => ['required', 'integer'],
         ];
     }
 
-    public function resolvePinnable(): Topic|Post|null
+    public function resolvePinnable(): Topic|Post
     {
+        return match ($this->input('type')) {
+            'post' => Post::findOrFail($this->integer('id')),
+            'topic' => Topic::findOrFail($this->integer('id')),
+        };
+    }
+
+    public function resolveAuthorizable(): ?Forum
+    {
+        $pinnable = $this->resolvePinnable();
+
         return match (true) {
-            $this->has('topic_id') => Topic::findOrFail($this->integer('topic_id')),
-            $this->has('post_id') => Post::findOrFail($this->integer('post_id')),
+            $pinnable instanceof Post => $pinnable->topic?->forum,
+            $pinnable instanceof Topic => $pinnable->forum,
             default => null,
         };
     }

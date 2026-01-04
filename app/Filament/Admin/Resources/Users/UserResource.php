@@ -27,7 +27,6 @@ use App\Filament\Exports\UserExporter;
 use App\Jobs\Discord\SyncRoles;
 use App\Livewire\PaymentMethods\ListPaymentMethods;
 use App\Livewire\Subscriptions\ListSubscriptions;
-use App\Models\Permission;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\Role;
@@ -198,13 +197,6 @@ class UserResource extends Resource
                                                     ->preload()
                                                     ->getOptionLabelUsing(fn (Role $role) => Str::of($role->name)->replace('_', ' ')->title()->toString())
                                                     ->helperText('The roles that are assigned to the user.'),
-                                                Select::make('permissions')
-                                                    ->relationship('permissions', 'name')
-                                                    ->multiple()
-                                                    ->searchable()
-                                                    ->preload()
-                                                    ->getOptionLabelUsing(fn (Permission $permission) => Str::of($permission->name)->replace('_', ' ')->title()->toString())
-                                                    ->helperText('The permissions that are assigned to the user. These are in addition to the permissions already inherited by any assigned roles.'),
                                             ]),
                                         Section::make('Activity')
                                             ->collapsible()

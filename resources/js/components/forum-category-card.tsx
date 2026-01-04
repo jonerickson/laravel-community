@@ -2,7 +2,6 @@ import { EmptyState } from '@/components/empty-state';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import usePermissions from '@/hooks/use-permissions';
 import { abbreviateNumber, cn, pluralize } from '@/lib/utils';
 import { truncate } from '@/utils/truncate';
 import { Link, usePage } from '@inertiajs/react';
@@ -16,7 +15,6 @@ interface ForumCategoryCardProps {
 
 export default function ForumCategoryCard({ category }: ForumCategoryCardProps) {
     const { auth } = usePage<App.Data.SharedData>().props;
-    const { can } = usePermissions();
 
     const allTopics = (category.forums || [])
         .flatMap((forum) =>
@@ -96,14 +94,12 @@ export default function ForumCategoryCard({ category }: ForumCategoryCardProps) 
                                             {topic.isHot && <span className="shrink-0 text-sm">🔥</span>}
                                             {topic.isPinned && <Pin className="size-4 shrink-0 text-info" />}
                                             {topic.isLocked && <Lock className="size-4 shrink-0 text-muted-foreground" />}
-                                            {can('report_posts') && topic.hasReportedContent && (
-                                                <AlertTriangle className="size-4 shrink-0 text-destructive" />
-                                            )}
-                                            {can('publish_posts') && topic.hasUnpublishedContent && (
-                                                <EyeOff className="size-4 shrink-0 text-warning" />
-                                            )}
-                                            {can('approve_posts') && topic.hasUnapprovedContent && (
-                                                <ThumbsDown className="size-4 shrink-0 text-warning" />
+                                            {topic.forum.forumPermissions.canModerate && (
+                                                <>
+                                                    {topic.hasReportedContent && <AlertTriangle className="size-4 shrink-0 text-destructive" />}
+                                                    {topic.hasUnpublishedContent && <EyeOff className="size-4 shrink-0 text-warning" />}
+                                                    {topic.hasUnapprovedContent && <ThumbsDown className="size-4 shrink-0 text-warning" />}
+                                                </>
                                             )}
                                             <span
                                                 className={cn('text-sm text-pretty sm:text-base', {

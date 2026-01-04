@@ -10,5 +10,4 @@ export { useMarkAsRead } from './use-mark-as-read';
 export { useIsMobile } from './use-mobile';
 export { useMobileNavigation } from './use-mobile-navigation';
 export { usePaymentMethods } from './use-payment-methods';
-export { usePermissions } from './use-permissions';
 export { useReport } from './use-report';

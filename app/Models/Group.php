@@ -135,7 +135,7 @@ class Group extends Model
 
     public function forumCategories(): BelongsToMany
     {
-        return $this->belongsToMany(ForumCategory::class, 'forums_categories_groups')
+        return $this->belongsToMany(ForumCategory::class, 'forums_categories_groups', 'group_id', 'category_id')
             ->withPivot(['read', 'write', 'delete'])
             ->using(ForumCategoryGroup::class);
     }
