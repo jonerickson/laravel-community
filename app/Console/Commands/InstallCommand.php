@@ -64,6 +64,10 @@ class InstallCommand extends Command
 
         $this->components->info('Installing application...');
 
+        $this->call('migrate', [
+            '--force' => true,
+        ]);
+
         if (! $this->input->isInteractive() || confirm('Would you like to install all the required permissions? (Recommended)')) {
             Schema::disableForeignKeyConstraints();
             Permission::truncate();
@@ -160,7 +164,8 @@ class InstallCommand extends Command
 
     protected function isInstalled(): bool
     {
-        return count(Schema::getTables()) > 0;
+        return (Schema::hasTable('users') && User::exists())
+            || (Schema::hasTable('groups') && Group::exists());
     }
 
     protected function resetApplication(): void
@@ -168,7 +173,7 @@ class InstallCommand extends Command
         $this->components->info('Truncating all data...');
 
         $this->call('migrate:fresh', [
-            '--force' => $this->option('force'),
+            '--force' => true,
         ]);
 
         $this->components->success('Application reset complete.');

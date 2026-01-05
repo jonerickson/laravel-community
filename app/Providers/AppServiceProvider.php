@@ -65,7 +65,7 @@ class AppServiceProvider extends ServiceProvider
 
         Context::add('request_id', Str::uuid()->toString());
 
-        DB::prohibitDestructiveCommands(App::isProduction());
+        DB::prohibitDestructiveCommands(App::isProduction() && ! App::runningConsoleCommand('app:install'));
 
         FilamentColor::register([
             'primary' => Color::Zinc,
