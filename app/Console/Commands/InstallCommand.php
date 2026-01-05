@@ -160,19 +160,7 @@ class InstallCommand extends Command
 
     protected function isInstalled(): bool
     {
-        if (User::exists()) {
-            return true;
-        }
-
-        if (Role::exists()) {
-            return true;
-        }
-
-        if (Permission::exists()) {
-            return true;
-        }
-
-        return Group::exists();
+        return count(Schema::getTables()) > 0;
     }
 
     protected function resetApplication(): void

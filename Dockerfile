@@ -114,11 +114,10 @@ ENV VITE_SSR_PORT=${VITE_SSR_PORT}
 
 COPY . /var/www/html
 
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
-
-RUN npm install && \
-    npm run build && \
-    rm -rf node_modules
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader \
+    && npm install \
+    && npm run build \
+    && rm -rf node_modules
 
 USER www-data
 
