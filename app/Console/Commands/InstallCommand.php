@@ -164,8 +164,11 @@ class InstallCommand extends Command
 
     protected function isInstalled(): bool
     {
-        return (Schema::hasTable('users') && User::exists())
-            || (Schema::hasTable('groups') && Group::exists());
+        if (Schema::hasTable('users') && User::exists()) {
+            return true;
+        }
+
+        return Schema::hasTable('groups') && Group::exists();
     }
 
     protected function resetApplication(): void

@@ -16,6 +16,7 @@ use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 class SearchService
@@ -135,6 +136,7 @@ class SearchService
             ->get()
             ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection): Collection => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
             ->when($limit, fn ($collection) => $collection->take($limit))
+            ->filter(fn (Post $post) => Gate::check('view', $post))
             ->map(fn (Post $post): SearchResultData => SearchResultData::from([
                 'id' => $post->id,
                 'type' => 'post',
@@ -161,6 +163,7 @@ class SearchService
             ->get()
             ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection): Collection => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
             ->when($limit, fn ($collection) => $collection->take($limit))
+            ->filter(fn (Policy $policy) => Gate::check('view', $policy))
             ->map(fn (Policy $policy): SearchResultData => SearchResultData::from([
                 'id' => $policy->id,
                 'type' => 'policy',
@@ -189,6 +192,7 @@ class SearchService
             ->get()
             ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection): Collection => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
             ->when($limit, fn ($collection) => $collection->take($limit))
+            ->filter(fn (Product $product) => Gate::check('view', $product))
             ->map(fn (Product $product): SearchResultData => SearchResultData::from([
                 'id' => $product->id,
                 'type' => 'product',
@@ -215,6 +219,7 @@ class SearchService
             ->get()
             ->when($createdAfter || $createdBefore || $updatedAfter || $updatedBefore, fn (Collection $collection): Collection => $this->applyDateFiltersToCollection($collection, $createdAfter, $createdBefore, $updatedAfter, $updatedBefore))
             ->when($limit, fn ($collection) => $collection->take($limit))
+            ->filter(fn (Topic $topic) => Gate::check('view', $topic))
             ->map(fn (Topic $topic): SearchResultData => SearchResultData::from([
                 'id' => $topic->id,
                 'type' => 'topic',
