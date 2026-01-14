@@ -12,6 +12,7 @@ use App\Filament\Admin\Resources\Users\Actions\BulkSwapSubscriptionsAction;
 use App\Filament\Admin\Resources\Users\Actions\BulkSyncGroupsAction;
 use App\Filament\Admin\Resources\Users\Actions\BulkUnblacklistUsersAction;
 use App\Filament\Admin\Resources\Users\Actions\ChangePasswordAction;
+use App\Filament\Admin\Resources\Users\Actions\ImpersonateAction;
 use App\Filament\Admin\Resources\Users\Actions\UnblacklistAction;
 use App\Filament\Admin\Resources\Users\Pages\CreateUser;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
@@ -35,6 +36,7 @@ use App\Models\User;
 use App\Services\Integrations\DiscordService;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -485,10 +487,13 @@ class UserResource extends Resource
             ])
             ->groups(['groups.name'])
             ->recordActions([
-                BlacklistAction::make(),
-                UnblacklistAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
+                ActionGroup::make([
+                    ImpersonateAction::make(),
+                    BlacklistAction::make(),
+                    UnblacklistAction::make(),
+                ]),
             ])
             ->toolbarActions([
                 ExportBulkAction::make()

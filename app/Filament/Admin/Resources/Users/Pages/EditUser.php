@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Users\Pages;
 
 use App\Filament\Admin\Resources\Users\Actions\BlacklistAction;
+use App\Filament\Admin\Resources\Users\Actions\ImpersonateAction;
 use App\Filament\Admin\Resources\Users\Actions\SyncGroupsAction;
 use App\Filament\Admin\Resources\Users\Actions\UnblacklistAction;
 use App\Filament\Admin\Resources\Users\UserResource;
@@ -36,6 +37,7 @@ class EditUser extends EditRecord
                 ->url(fn (User $record): string => route('users.show', $record), shouldOpenInNewTab: true),
             DeleteAction::make(),
             ActionGroup::make([
+                ImpersonateAction::make(),
                 BlacklistAction::make(),
                 UnblacklistAction::make(),
                 SyncGroupsAction::make()

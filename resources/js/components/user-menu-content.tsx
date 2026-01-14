@@ -2,14 +2,14 @@ import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSep
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { Link, router, usePage } from '@inertiajs/react';
-import { BookOpen, CircleDollarSign, CircleUser, CreditCard, DollarSign, LogOut, Settings, ShieldIcon, TowerControl } from 'lucide-react';
+import { BookOpen, CircleDollarSign, CircleUser, CreditCard, DollarSign, EyeOff, LogOut, Settings, ShieldIcon, TowerControl } from 'lucide-react';
 
 interface UserMenuContentProps {
     user: App.Data.UserData;
 }
 
 export function UserMenuContent({ user }: UserMenuContentProps) {
-    const { isAdmin } = usePage<App.Data.SharedData>().props.auth;
+    const { isAdmin, isImpersonating } = usePage<App.Data.SharedData>().props.auth;
     const cleanup = useMobileNavigation();
 
     const handleLogout = () => {
@@ -24,6 +24,19 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                     <UserInfo user={user} showEmail={true} />
                 </div>
             </DropdownMenuLabel>
+            {isImpersonating && (
+                <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                        <DropdownMenuItem asChild>
+                            <Link className="block w-full" href={route('impersonate.leave')} as="button">
+                                <EyeOff className="mr-2" />
+                                Stop Impersonating
+                            </Link>
+                        </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                </>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
                 <DropdownMenuItem asChild>

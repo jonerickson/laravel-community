@@ -66,6 +66,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => AuthData::from([
                 'user' => $user ? UserData::from($user) : null,
                 'isAdmin' => $user?->hasAnyRole(Role::Administrator, Role::SupportAgent) ?? false,
+                'isImpersonating' => app('impersonate')->isImpersonating(),
                 'mustVerifyEmail' => $user && ! $user->hasVerifiedEmail(),
             ]),
             'announcements' => AnnouncementData::collect(Announcement::query()

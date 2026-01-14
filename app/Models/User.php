@@ -48,6 +48,7 @@ use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Lab404\Impersonate\Models\Impersonate;
 use Laravel\Passport\Contracts\OAuthenticatable;
 use Laravel\Passport\HasApiTokens;
 use Override;
@@ -213,6 +214,7 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
     use HasPermissions;
     use HasReferenceId;
     use HasRelationships;
+    use Impersonate;
     use LogsAuthActivity;
     use Notifiable;
     use Reportable;
@@ -271,6 +273,11 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
         }
 
         return $panel->getId() === 'marketplace';
+    }
+
+    public function canImpersonate(): bool
+    {
+        return $this->hasRole(Role::Administrator);
     }
 
     public function getFilamentName(): string
