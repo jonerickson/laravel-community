@@ -22,6 +22,7 @@
         "filament/filament": "^4.1.9",
         "filament/spatie-laravel-settings-plugin": "^4.1.9",
         "inertiajs/inertia-laravel": "^2.0.10",
+        "lab404/laravel-impersonate": "^1.7",
         "laravel/cashier": "^v16.0.5",
         "laravel/framework": "^12.34.0",
         "laravel/horizon": "^5.39",

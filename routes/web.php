@@ -17,6 +17,7 @@ Route::group(['domain' => parse_url((string) config('app.url'), PHP_URL_HOST)], 
 
     Route::group(['middleware' => ['auth', 'email', 'password', 'verified', 'onboarded']], function (): void {
         Route::get('dashboard', DashboardController::class)->name('dashboard');
+        Route::impersonate();
     });
 
     require __DIR__.'/admin.php';

@@ -17,5 +17,7 @@ class AuthData extends Data
 
     public bool $isAdmin;
 
+    public bool $isImpersonating;
+
     public bool $mustVerifyEmail;
 }

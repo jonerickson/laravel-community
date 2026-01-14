@@ -1,10 +1,12 @@
 import { StyledUserName } from '@/components/styled-user-name';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useInitials } from '@/hooks/use-initials';
-import { Link } from '@inertiajs/react';
+import { cn } from '@/lib/utils';
+import { Link, usePage } from '@inertiajs/react';
 
 export function UserInfo({ user, showEmail = false, showGroups = false }: { user: App.Data.UserData; showEmail?: boolean; showGroups?: boolean }) {
     const getInitials = useInitials();
+    const { isImpersonating } = usePage<App.Data.SharedData>().props.auth;
 
     if (!user) {
         return null;
@@ -12,7 +14,12 @@ export function UserInfo({ user, showEmail = false, showGroups = false }: { user
 
     const content = (
         <>
-            <Avatar className="h-8 w-8 overflow-hidden rounded-full">
+            <Avatar
+                className={cn(
+                    'size-8 overflow-hidden rounded-full',
+                    isImpersonating && 'mr-1 size-7 ring-2 ring-destructive ring-offset-2 ring-offset-background',
+                )}
+            >
                 {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name} />}
                 <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                     {getInitials(user.name)}

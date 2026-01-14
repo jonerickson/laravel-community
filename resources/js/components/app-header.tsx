@@ -26,6 +26,7 @@ interface AppHeaderProps {
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const page = usePage<App.Data.SharedData>();
     const { auth, navigationPages } = page.props;
+    const { isImpersonating } = auth;
     const getInitials = useInitials();
 
     const mainNavItems: NavItem[] = [
@@ -239,7 +240,12 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" className="size-10 rounded-full p-1">
-                                        <Avatar className="size-8 overflow-hidden rounded-full">
+                                        <Avatar
+                                            className={cn(
+                                                'size-8 overflow-hidden rounded-full',
+                                                isImpersonating && 'mr-1 size-7 ring-2 ring-destructive ring-offset-2 ring-offset-background',
+                                            )}
+                                        >
                                             {auth.user.avatarUrl && <AvatarImage src={auth.user.avatarUrl} alt={auth.user.name} />}
                                             <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                                                 {getInitials(auth.user.name)}

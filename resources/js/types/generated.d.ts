@@ -31,6 +31,7 @@ declare namespace App.Data {
     export type AuthData = {
         user: App.Data.UserData | null;
         isAdmin: boolean;
+        isImpersonating: boolean;
         mustVerifyEmail: boolean;
     };
     export type BalanceData = {
