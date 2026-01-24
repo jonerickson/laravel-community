@@ -20,9 +20,7 @@ test('magic link can be requested', function (): void {
 
     $response = $this->post('/magic-link', ['email' => $user->email]);
 
-    Mail::assertQueued(MagicLinkMail::class, function (MagicLinkMail $mail) use ($user) {
-        return $mail->hasTo($user->email) && $mail->user->id === $user->id;
-    });
+    Mail::assertQueued(MagicLinkMail::class, fn (MagicLinkMail $mail): bool => $mail->hasTo($user->email) && $mail->user->id === $user->id);
     $response->assertRedirect();
     $response->assertSessionHas('status', 'If an account exists with that email address, a magic link has been sent.');
 });
@@ -152,8 +150,6 @@ test('magic link mail contains correct signed url', function (): void {
 
     $this->post('/magic-link', ['email' => $user->email]);
 
-    Mail::assertQueued(MagicLinkMail::class, function (MagicLinkMail $mail) use ($user) {
-        return str_contains($mail->url, 'magic-link/login/'.$user->reference_id)
-            && str_contains($mail->url, 'signature=');
-    });
+    Mail::assertQueued(MagicLinkMail::class, fn (MagicLinkMail $mail): bool => str_contains($mail->url, 'magic-link/login/'.$user->reference_id)
+        && str_contains($mail->url, 'signature='));
 });

@@ -33,7 +33,7 @@ test('email can be verified with valid signed url', function (): void {
     $verificationUrl = URL::temporarySignedRoute(
         'verification.verify',
         now()->addMinutes(60),
-        ['id' => $user->id, 'hash' => sha1($user->email)]
+        ['id' => $user->id, 'hash' => sha1((string) $user->email)]
     );
 
     $response = $this->actingAs($user)->get($verificationUrl);
@@ -50,14 +50,12 @@ test('verified event is dispatched when email is verified', function (): void {
     $verificationUrl = URL::temporarySignedRoute(
         'verification.verify',
         now()->addMinutes(60),
-        ['id' => $user->id, 'hash' => sha1($user->email)]
+        ['id' => $user->id, 'hash' => sha1((string) $user->email)]
     );
 
     $this->actingAs($user)->get($verificationUrl);
 
-    Event::assertDispatched(Verified::class, function (Verified $event) use ($user) {
-        return $event->user->id === $user->id;
-    });
+    Event::assertDispatched(Verified::class, fn (Verified $event): bool => $event->user->id === $user->id);
 });
 
 test('email verification fails with invalid signature', function (): void {
@@ -65,12 +63,13 @@ test('email verification fails with invalid signature', function (): void {
 
     $verificationUrl = route('verification.verify', [
         'id' => $user->id,
-        'hash' => sha1($user->email),
+        'hash' => sha1((string) $user->email),
     ]);
 
     $response = $this->actingAs($user)->get($verificationUrl);
 
     $response->assertForbidden();
+
     expect($user->fresh()->hasVerifiedEmail())->toBeFalse();
 });
 
@@ -86,6 +85,7 @@ test('email verification fails with invalid hash', function (): void {
     $response = $this->actingAs($user)->get($verificationUrl);
 
     $response->assertForbidden();
+
     expect($user->fresh()->hasVerifiedEmail())->toBeFalse();
 });
 
@@ -124,12 +124,13 @@ test('guests cannot verify email', function (): void {
     $verificationUrl = URL::temporarySignedRoute(
         'verification.verify',
         now()->addMinutes(60),
-        ['id' => $user->id, 'hash' => sha1($user->email)]
+        ['id' => $user->id, 'hash' => sha1((string) $user->email)]
     );
 
     $response = $this->get($verificationUrl);
 
     $response->assertRedirect('/login');
+
     expect($user->fresh()->hasVerifiedEmail())->toBeFalse();
 });
 
@@ -147,7 +148,7 @@ test('already verified users are redirected with verified query param', function
     $verificationUrl = URL::temporarySignedRoute(
         'verification.verify',
         now()->addMinutes(60),
-        ['id' => $user->id, 'hash' => sha1($user->email)]
+        ['id' => $user->id, 'hash' => sha1((string) $user->email)]
     );
 
     $response = $this->actingAs($user)->get($verificationUrl);
