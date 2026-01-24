@@ -2,28 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Models\Group;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Auth\Notifications\VerifyEmail;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
-
-beforeEach(function (): void {
-    Cache::flush();
-
-    $reflection = new ReflectionClass(Group::class);
-
-    $defaultMemberGroupProperty = $reflection->getProperty('defaultMemberGroup');
-    $defaultMemberGroupProperty->setValue(null, null);
-
-    $defaultGuestGroupProperty = $reflection->getProperty('defaultGuestGroup');
-    $defaultGuestGroupProperty->setValue(null, null);
-
-    Group::factory()->asDefaultMemberGroup()->create();
-});
 
 test('verification notice page is displayed for unverified users', function (): void {
     $user = User::factory()->unverified()->create();

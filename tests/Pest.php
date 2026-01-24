@@ -14,11 +14,8 @@ declare(strict_types=1);
 */
 
 use App\Models\Group;
-use Database\Seeders\PermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 
 pest()->extend(Tests\TestCase::class)
     ->use(RefreshDatabase::class)
@@ -26,17 +23,6 @@ pest()->extend(Tests\TestCase::class)
         Cache::flush();
         Group::resetDefaultGroupCache();
         Group::factory()->asDefaultMemberGroup()->create();
-        Artisan::call('db:seed', [
-            '--class' => PermissionSeeder::class,
-            '--force' => true,
-        ]);
-        Http::preventStrayRequests();
-        Http::fake([
-            'discord.com/*' => Http::response(),
-            'roblox.com/*' => Http::response(),
-            'groups.roblox.com/*' => Http::response(),
-            'fonts.googleapis.com/*' => Http::response(),
-        ]);
     })
     ->in('Unit', 'Feature');
 
