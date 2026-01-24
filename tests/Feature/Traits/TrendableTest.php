@@ -9,10 +9,7 @@ use App\Models\Read;
 use App\Models\Topic;
 use App\Models\User;
 use App\Models\View;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     $this->user = User::factory()->create();
@@ -26,8 +23,8 @@ beforeEach(function (): void {
 describe('trending score calculations', function (): void {
     it('calculates trending score with default weights', function (): void {
         // Create engagement metrics
-        View::factory()->count(10)->create(['viewable' => $this->topic, 'created_by' => $this->user->id]);
-        Read::factory()->count(5)->create(['readable' => $this->topic, 'created_by' => $this->user->id]);
+        View::factory()->count(10)->create(['viewable_type' => Topic::class, 'viewable_id' => $this->topic->id]);
+        Read::factory()->count(5)->create(['readable_type' => Topic::class, 'readable_id' => $this->topic->id, 'created_by' => $this->user->id]);
 
         $posts = Post::factory()->count(3)->create([
             'topic_id' => $this->topic->id,
@@ -35,10 +32,10 @@ describe('trending score calculations', function (): void {
         ]);
 
         $posts->each(function (Post $post): void {
-            Like::factory()->count(2)->create(['likeable' => $post]);
+            Like::factory()->count(2)->create(['likeable_type' => Post::class, 'likeable_id' => $post->id]);
         });
 
-        $score = $this->topic->trendingScore();
+        $score = $this->topic->getTrendingScore();
 
         expect($score)->toBeGreaterThan(0);
         expect($score)->toBeFloat();
@@ -58,11 +55,11 @@ describe('trending score calculations', function (): void {
         ]);
 
         // Add same engagement to both
-        View::factory()->count(5)->create(['viewable' => $newTopic, 'created_by' => $this->user->id]);
-        View::factory()->count(5)->create(['viewable' => $oldTopic, 'created_by' => $this->user->id]);
+        View::factory()->count(5)->create(['viewable_type' => Topic::class, 'viewable_id' => $newTopic->id]);
+        View::factory()->count(5)->create(['viewable_type' => Topic::class, 'viewable_id' => $oldTopic->id]);
 
-        $newScore = $newTopic->trendingScore();
-        $oldScore = $oldTopic->trendingScore();
+        $newScore = $newTopic->getTrendingScore();
+        $oldScore = $oldTopic->getTrendingScore();
 
         expect($newScore)->toBeGreaterThan($oldScore);
     });
@@ -81,11 +78,11 @@ describe('trending score calculations', function (): void {
         ]);
 
         // Add same engagement to both
-        View::factory()->count(100)->create(['viewable' => $recentTopic, 'created_by' => $this->user->id]);
-        View::factory()->count(100)->create(['viewable' => $veryOldTopic, 'created_by' => $this->user->id]);
+        View::factory()->count(100)->create(['viewable_type' => Topic::class, 'viewable_id' => $recentTopic->id]);
+        View::factory()->count(100)->create(['viewable_type' => Topic::class, 'viewable_id' => $veryOldTopic->id]);
 
-        $recentScore = $recentTopic->trendingScore();
-        $oldScore = $veryOldTopic->trendingScore();
+        $recentScore = $recentTopic->getTrendingScore();
+        $oldScore = $veryOldTopic->getTrendingScore();
 
         expect($recentScore)->toBeGreaterThan($oldScore * 5); // Should be significantly higher
     });
@@ -104,20 +101,20 @@ describe('trending score calculations', function (): void {
             'created_by' => $this->user->id,
         ]);
 
-        View::factory()->count(10)->create(['viewable' => $viewHeavyTopic, 'created_by' => $this->user->id]);
+        View::factory()->count(10)->create(['viewable_type' => Topic::class, 'viewable_id' => $viewHeavyTopic->id]);
         Post::factory()->count(10)->create([
             'topic_id' => $postHeavyTopic->id,
             'created_by' => $this->user->id,
         ]);
 
-        $viewScore = $viewHeavyTopic->trendingScore();
-        $postScore = $postHeavyTopic->trendingScore();
+        $viewScore = $viewHeavyTopic->getTrendingScore();
+        $postScore = $postHeavyTopic->getTrendingScore();
 
         expect($viewScore)->toBeGreaterThan($postScore);
     });
 
     it('handles zero engagement gracefully', function (): void {
-        $score = $this->topic->trendingScore();
+        $score = $this->topic->getTrendingScore();
 
         expect($score)->toEqual(0.0);
     });
@@ -145,21 +142,21 @@ describe('trending query scopes', function (): void {
         ]);
 
         // Add high engagement to hot topic
-        View::factory()->count(50)->create(['viewable' => $this->hotTopic, 'created_by' => $this->user->id]);
+        View::factory()->count(50)->create(['viewable_type' => Topic::class, 'viewable_id' => $this->hotTopic->id]);
         Post::factory()->count(10)->create([
             'topic_id' => $this->hotTopic->id,
             'created_by' => $this->user->id,
         ]);
 
         // Medium engagement to moderate topic
-        View::factory()->count(20)->create(['viewable' => $this->moderateTopic, 'created_by' => $this->user->id]);
+        View::factory()->count(20)->create(['viewable_type' => Topic::class, 'viewable_id' => $this->moderateTopic->id]);
         Post::factory()->count(5)->create([
             'topic_id' => $this->moderateTopic->id,
             'created_by' => $this->user->id,
         ]);
 
         // Low engagement to cold topic
-        View::factory()->count(5)->create(['viewable' => $this->coldTopic, 'created_by' => $this->user->id]);
+        View::factory()->count(5)->create(['viewable_type' => Topic::class, 'viewable_id' => $this->coldTopic->id]);
     });
 
     it('orders topics by trending score correctly', function (): void {
@@ -225,10 +222,10 @@ describe('caching behavior', function (): void {
     it('caches trending scores when enabled', function (): void {
         Config::set('trending.cache.cache_scores', true);
 
-        View::factory()->count(10)->create(['viewable' => $this->topic, 'created_by' => $this->user->id]);
+        View::factory()->count(10)->create(['viewable_type' => Topic::class, 'viewable_id' => $this->topic->id]);
 
-        $score1 = $this->topic->trendingScore();
-        $score2 = $this->topic->trendingScore();
+        $score1 = $this->topic->getTrendingScore();
+        $score2 = $this->topic->getTrendingScore();
 
         expect($score1)->toEqual($score2);
     });
@@ -236,14 +233,14 @@ describe('caching behavior', function (): void {
     it('does not cache when disabled', function (): void {
         Config::set('trending.cache.cache_scores', false);
 
-        View::factory()->count(10)->create(['viewable' => $this->topic, 'created_by' => $this->user->id]);
+        View::factory()->count(10)->create(['viewable_type' => Topic::class, 'viewable_id' => $this->topic->id]);
 
-        $score1 = $this->topic->trendingScore();
+        $score1 = $this->topic->getTrendingScore();
 
         // Add more engagement
-        View::factory()->count(10)->create(['viewable' => $this->topic, 'created_by' => $this->user->id]);
+        View::factory()->count(10)->create(['viewable_type' => Topic::class, 'viewable_id' => $this->topic->id]);
 
-        $score2 = $this->topic->trendingScore();
+        $score2 = $this->topic->getTrendingScore();
 
         // Without caching, the second score should be higher
         expect($score2)->toBeGreaterThan($score1);
@@ -252,20 +249,20 @@ describe('caching behavior', function (): void {
     it('clears cache correctly', function (): void {
         Config::set('trending.cache.cache_scores', true);
 
-        View::factory()->count(10)->create(['viewable' => $this->topic, 'created_by' => $this->user->id]);
+        View::factory()->count(10)->create(['viewable_type' => Topic::class, 'viewable_id' => $this->topic->id]);
 
-        $initialScore = $this->topic->trendingScore();
+        $initialScore = $this->topic->getTrendingScore();
 
         // Add more engagement
-        View::factory()->count(10)->create(['viewable' => $this->topic, 'created_by' => $this->user->id]);
+        View::factory()->count(10)->create(['viewable_type' => Topic::class, 'viewable_id' => $this->topic->id]);
 
         // Should still return cached score
-        $cachedScore = $this->topic->trendingScore();
+        $cachedScore = $this->topic->getTrendingScore();
         expect($cachedScore)->toEqual($initialScore);
 
         // Clear cache and get updated score
         $this->topic->clearTrendingCache();
-        $updatedScore = $this->topic->trendingScore();
+        $updatedScore = $this->topic->getTrendingScore();
 
         expect($updatedScore)->toBeGreaterThan($initialScore);
     });
@@ -278,19 +275,19 @@ describe('edge cases', function (): void {
             'created_by' => $this->user->id,
         ]);
 
-        $score = $emptyTopic->trendingScore();
+        $score = $emptyTopic->getTrendingScore();
 
         expect($score)->toEqual(0.0);
     });
 
     it('works with different reference times', function (): void {
-        View::factory()->count(10)->create(['viewable' => $this->topic, 'created_by' => $this->user->id]);
+        View::factory()->count(10)->create(['viewable_type' => Topic::class, 'viewable_id' => $this->topic->id]);
 
         $pastTime = now()->subDays(1);
         $futureTime = now()->addDays(1);
 
-        $pastScore = $this->topic->trendingScore($pastTime);
-        $futureScore = $this->topic->trendingScore($futureTime);
+        $pastScore = $this->topic->getTrendingScore($pastTime);
+        $futureScore = $this->topic->getTrendingScore($futureTime);
 
         expect($pastScore)->toBeGreaterThan($futureScore);
     });
@@ -303,7 +300,7 @@ describe('edge cases', function (): void {
 
 describe('trending score attribute', function (): void {
     it('exposes trending score as model attribute', function (): void {
-        View::factory()->count(10)->create(['viewable' => $this->topic, 'created_by' => $this->user->id]);
+        View::factory()->count(10)->create(['viewable_type' => Topic::class, 'viewable_id' => $this->topic->id]);
 
         $topic = $this->topic->fresh();
 
