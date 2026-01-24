@@ -2,23 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Models\Group;
 use App\Models\User;
-use Illuminate\Support\Facades\Cache;
-
-beforeEach(function (): void {
-    Cache::flush();
-
-    $reflection = new ReflectionClass(Group::class);
-
-    $defaultMemberGroupProperty = $reflection->getProperty('defaultMemberGroup');
-    $defaultMemberGroupProperty->setValue(null, null);
-
-    $defaultGuestGroupProperty = $reflection->getProperty('defaultGuestGroup');
-    $defaultGuestGroupProperty->setValue(null, null);
-
-    Group::factory()->asDefaultMemberGroup()->create();
-});
 
 test('login page is displayed', function (): void {
     $response = $this->get('/login');

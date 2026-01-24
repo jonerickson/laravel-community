@@ -13,8 +13,17 @@ declare(strict_types=1);
 |
 */
 
+use App\Models\Group;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
+
 pest()->extend(Tests\TestCase::class)
-    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->use(RefreshDatabase::class)
+    ->beforeEach(function (): void {
+        Cache::flush();
+        Group::resetDefaultGroupCache();
+        Group::factory()->asDefaultMemberGroup()->create();
+    })
     ->in('Unit', 'Feature');
 
 /*

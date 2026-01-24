@@ -27,6 +27,14 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
             'onboarded_at' => now(),
             'stripe_id' => null,
+            'billing_address' => null,
+            'billing_address_line_2' => null,
+            'billing_city' => null,
+            'billing_state' => null,
+            'billing_postal_code' => null,
+            'billing_country' => null,
+            'vat_id' => null,
+            'extra_billing_information' => null,
         ];
     }
 

@@ -116,6 +116,12 @@ class Group extends Model
 
     protected static ?Group $defaultMemberGroup = null;
 
+    public static function resetDefaultGroupCache(): void
+    {
+        static::$defaultGuestGroup = null;
+        static::$defaultMemberGroup = null;
+    }
+
     public static function defaultGuestGroup(): ?Group
     {
         return static::$defaultGuestGroup ?? static::$defaultGuestGroup = Cache::memo()->remember('default_guest_group', now()->addHour(), fn () => Group::query()->with(['permissions', 'roles'])->defaultGuestGroups()->first());

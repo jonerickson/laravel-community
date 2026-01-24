@@ -8,6 +8,7 @@ use App\Events\FingerprintCreated;
 use App\Events\FingerprintUpdated;
 use App\Traits\Blacklistable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
@@ -29,6 +30,7 @@ use Illuminate\Support\Carbon;
  * @property-read bool $is_blacklisted
  * @property-read User|null $user
  *
+ * @method static \Database\Factories\FingerprintFactory factory($count = null, $state = [])
  * @method static Builder<static>|Fingerprint newModelQuery()
  * @method static Builder<static>|Fingerprint newQuery()
  * @method static Builder<static>|Fingerprint query()
@@ -50,6 +52,7 @@ use Illuminate\Support\Carbon;
 class Fingerprint extends Model
 {
     use Blacklistable;
+    use HasFactory;
 
     protected $attributes = [
         'suspect_score' => 0,
