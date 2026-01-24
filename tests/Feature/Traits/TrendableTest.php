@@ -24,7 +24,7 @@ describe('trending score calculations', function (): void {
     it('calculates trending score with default weights', function (): void {
         // Create engagement metrics
         View::factory()->count(10)->create(['viewable_type' => Topic::class, 'viewable_id' => $this->topic->id]);
-        Read::factory()->create(['readable_type' => Topic::class, 'readable_id' => $this->topic->id, 'created_by' => $this->user->id]);
+        Read::factory()->count(5)->create(['readable_type' => Topic::class, 'readable_id' => $this->topic->id, 'created_by' => $this->user->id]);
 
         $posts = Post::factory()->count(3)->create([
             'topic_id' => $this->topic->id,
@@ -224,8 +224,8 @@ describe('caching behavior', function (): void {
 
         View::factory()->count(10)->create(['viewable_type' => Topic::class, 'viewable_id' => $this->topic->id]);
 
-        $score1 = $this->topic->refresh()->getTrendingScore();
-        $score2 = $this->topic->refresh()->getTrendingScore();
+        $score1 = $this->topic->getTrendingScore();
+        $score2 = $this->topic->getTrendingScore();
 
         expect($score1)->toEqual($score2);
     });
@@ -235,12 +235,12 @@ describe('caching behavior', function (): void {
 
         View::factory()->count(10)->create(['viewable_type' => Topic::class, 'viewable_id' => $this->topic->id]);
 
-        $score1 = $this->topic->refresh()->getTrendingScore();
+        $score1 = $this->topic->getTrendingScore();
 
         // Add more engagement
         View::factory()->count(10)->create(['viewable_type' => Topic::class, 'viewable_id' => $this->topic->id]);
 
-        $score2 = $this->topic->refresh()->getTrendingScore();
+        $score2 = $this->topic->getTrendingScore();
 
         // Without caching, the second score should be higher
         expect($score2)->toBeGreaterThan($score1);
@@ -251,18 +251,18 @@ describe('caching behavior', function (): void {
 
         View::factory()->count(10)->create(['viewable_type' => Topic::class, 'viewable_id' => $this->topic->id]);
 
-        $initialScore = $this->topic->refresh()->getTrendingScore();
+        $initialScore = $this->topic->getTrendingScore();
 
         // Add more engagement
         View::factory()->count(10)->create(['viewable_type' => Topic::class, 'viewable_id' => $this->topic->id]);
 
         // Should still return cached score
-        $cachedScore = $this->topic->refresh()->getTrendingScore();
+        $cachedScore = $this->topic->getTrendingScore();
         expect($cachedScore)->toEqual($initialScore);
 
         // Clear cache and get updated score
         $this->topic->clearTrendingCache();
-        $updatedScore = $this->topic->refresh()->getTrendingScore();
+        $updatedScore = $this->topic->getTrendingScore();
 
         expect($updatedScore)->toBeGreaterThan($initialScore);
     });
