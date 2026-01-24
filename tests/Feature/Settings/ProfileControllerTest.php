@@ -62,6 +62,7 @@ test('profile can be updated with avatar', function (): void {
     ]);
 
     $response->assertRedirect();
+
     expect($user->fresh()->avatar)->not->toBeNull();
 });
 
@@ -167,6 +168,7 @@ test('account can be deleted', function (): void {
     $response = $this->actingAs($user)->delete('/settings/account');
 
     $response->assertRedirect(route('login', absolute: false));
+
     expect(User::find($user->id))->toBeNull();
 });
 
@@ -187,5 +189,6 @@ test('profile update clears signature when set to null', function (): void {
     ]);
 
     $response->assertRedirect();
+
     expect($user->fresh()->signature)->toBeNull();
 });

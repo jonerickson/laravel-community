@@ -73,6 +73,7 @@ test('password can be reset with valid token', function (): void {
     ]);
 
     $response->assertRedirect('/login');
+
     expect(Hash::check('new-password', $user->fresh()->password))->toBeTrue();
 });
 
@@ -90,9 +91,7 @@ test('password reset event is dispatched on successful reset', function (): void
         'password_confirmation' => 'new-password',
     ]);
 
-    Event::assertDispatched(PasswordReset::class, function (PasswordReset $event) use ($user) {
-        return $event->user->id === $user->id;
-    });
+    Event::assertDispatched(PasswordReset::class, fn (PasswordReset $event): bool => $event->user->id === $user->id);
 });
 
 test('password reset fails with invalid token', function (): void {
@@ -107,6 +106,7 @@ test('password reset fails with invalid token', function (): void {
     ]);
 
     $response->assertSessionHasErrors(['email']);
+
     expect($user->fresh()->password)->toBe($originalPassword);
 });
 

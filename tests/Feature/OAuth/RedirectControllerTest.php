@@ -22,6 +22,7 @@ test('redirect to discord provider returns redirect response', function (): void
     $response = $this->get('/oauth/redirect/discord');
 
     $response->assertRedirect();
+
     expect($response->headers->get('Location'))->toContain('discord.com');
 });
 
@@ -40,6 +41,7 @@ test('redirect to roblox provider returns redirect response', function (): void 
     $response = $this->get('/oauth/redirect/roblox');
 
     $response->assertRedirect();
+
     expect($response->headers->get('Location'))->toContain('roblox.com');
 });
 
@@ -70,6 +72,7 @@ test('redirect stores intended url when redirect query parameter is provided', f
     $response = $this->get('/oauth/redirect/discord?redirect='.urlencode($intendedUrl));
 
     $response->assertRedirect();
+
     expect(session('url.intended'))->toBe($intendedUrl);
 });
 
@@ -88,6 +91,7 @@ test('redirect does not store intended url when redirect query parameter is empt
     $response = $this->get('/oauth/redirect/discord?redirect=');
 
     $response->assertRedirect();
+
     expect(session('url.intended'))->toBeNull();
 });
 
@@ -106,6 +110,7 @@ test('redirect does not store intended url when no redirect query parameter', fu
     $response = $this->get('/oauth/redirect/discord');
 
     $response->assertRedirect();
+
     expect(session('url.intended'))->toBeNull();
 });
 
@@ -164,5 +169,6 @@ test('redirect decodes url-encoded redirect parameter', function (): void {
     $response = $this->get('/oauth/redirect/discord?redirect='.$encodedUrl);
 
     $response->assertRedirect();
+
     expect(session('url.intended'))->toBe($intendedUrl);
 });
