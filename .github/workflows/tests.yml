@@ -55,7 +55,7 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, bcmath, gd, intl
           ini-values: error_reporting=E_ALL
           tools: composer
-          coverage: pcov
+          coverage: none
         env:
           COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -81,25 +81,9 @@ jobs:
         run: |
           cp .env.example .env
           php artisan key:generate
-          php artisan passport:keys
 
       - name: Run Database Migrations
         run: php artisan migrate --force
 
       - name: Run Test Suite
-        run: php artisan test --parallel --coverage
-
-      - name: Upload Coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          files: coverage.xml
-          verbose: true
-          token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload Laravel Logs
-        if: failure()
-        uses: actions/upload-artifact@v6
-        with:
-          name: laravel-logs
-          path: storage/logs/
-          retention-days: 5
+        run: php artisan test --parallel
