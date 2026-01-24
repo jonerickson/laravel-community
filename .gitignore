@@ -34,3 +34,5 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+/tasks
+/ralph
