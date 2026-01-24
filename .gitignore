@@ -17,7 +17,6 @@
 .env
 .env.backup
 .env.production
-.env.testing
 .phpactor.json
 .phpunit.result.cache
 .phpstorm.meta.php
@@ -37,5 +36,3 @@ yarn-error.log
 /.zed
 /tasks
 /ralph
-coverage.xml
-.ai
