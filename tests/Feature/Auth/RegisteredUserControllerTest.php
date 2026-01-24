@@ -53,9 +53,7 @@ test('registered event is dispatched on registration', function (): void {
         'password_confirmation' => 'password123',
     ]);
 
-    Event::assertDispatched(Illuminate\Auth\Events\Registered::class, function ($event) {
-        return $event->user->email === 'test@example.com';
-    });
+    Event::assertDispatched(Illuminate\Auth\Events\Registered::class, fn ($event): bool => $event->user->email === 'test@example.com');
 });
 
 test('registration fails with missing name', function (): void {
@@ -174,14 +172,14 @@ test('password is hashed', function (): void {
 
     $user = User::where('email', 'test@example.com')->first();
     expect($user->password)->not->toBe('password123');
-    expect(password_verify('password123', $user->password))->toBeTrue();
+    expect(password_verify('password123', (string) $user->password))->toBeTrue();
 });
 
 test('registration is throttled after too many attempts', function (): void {
     for ($i = 0; $i < 10; $i++) {
         $this->post('/register', [
             'name' => 'TestUser',
-            'email' => "test{$i}@example.com",
+            'email' => sprintf('test%d@example.com', $i),
             'password' => 'password123',
             'password_confirmation' => 'password123',
         ]);
