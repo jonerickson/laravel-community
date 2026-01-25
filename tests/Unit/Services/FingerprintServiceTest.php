@@ -53,9 +53,11 @@ describe('getEventData', function (): void {
             ->toHaveKey('requestId', 'request-123')
             ->toHaveKey('visitorId', 'visitor-456');
 
-        Http::assertSent(fn ($request): bool => $request->url() === 'https://api.fpjs.io/v4/events/request-123'
-            && $request->hasHeader('Authorization', 'Bearer test-api-key')
-            && $request->hasHeader('Accept', 'application/json'));
+        Http::assertSent(function ($request): bool {
+            return $request->url() === 'https://api.fpjs.io/v4/events/request-123'
+                && $request->hasHeader('Authorization', 'Bearer test-api-key')
+                && $request->hasHeader('Accept', 'application/json');
+        });
     });
 
     test('throws RequestException on 4xx error', function (): void {
@@ -67,7 +69,7 @@ describe('getEventData', function (): void {
 
         $service = createFingerprintService();
 
-        expect(fn (): ?array => $service->getEventData('invalid-request'))
+        expect(fn () => $service->getEventData('invalid-request'))
             ->toThrow(RequestException::class);
     });
 
@@ -80,7 +82,7 @@ describe('getEventData', function (): void {
 
         $service = createFingerprintService();
 
-        expect(fn (): ?array => $service->getEventData('request-123'))
+        expect(fn () => $service->getEventData('request-123'))
             ->toThrow(RequestException::class);
     });
 
@@ -91,7 +93,7 @@ describe('getEventData', function (): void {
 
         $service = createFingerprintService();
 
-        expect(fn (): ?array => $service->getEventData('request-123'))
+        expect(fn () => $service->getEventData('request-123'))
             ->toThrow(ConnectionException::class);
     });
 
@@ -103,7 +105,9 @@ describe('getEventData', function (): void {
         $service = createFingerprintService();
         $service->getEventData('my-unique-request-id');
 
-        Http::assertSent(fn ($request): bool => str_contains((string) $request->url(), 'my-unique-request-id'));
+        Http::assertSent(function ($request): bool {
+            return str_contains($request->url(), 'my-unique-request-id');
+        });
     });
 
     test('uses bearer token authentication', function (): void {
@@ -114,6 +118,8 @@ describe('getEventData', function (): void {
         $service = createFingerprintService(apiKey: 'my-secret-api-key');
         $service->getEventData('request-123');
 
-        Http::assertSent(fn ($request): bool => $request->hasHeader('Authorization', 'Bearer my-secret-api-key'));
+        Http::assertSent(function ($request): bool {
+            return $request->hasHeader('Authorization', 'Bearer my-secret-api-key');
+        });
     });
 });
