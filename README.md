@@ -13,6 +13,8 @@ Laravel Community is an open-source platform that combines the power of an e-com
 See Laravel Community powering a real community in production
 
 ![GitHub Release](https://img.shields.io/github/v/release/jonerickson/laravel-community?display_name=release)
+![Tests](https://github.com/jonerickson/laravel-community/actions/workflows/tests.yml/badge.svg)
+[![codecov](https://codecov.io/gh/jonerickson/laravel-community/graph/badge.svg)](https://codecov.io/gh/jonerickson/laravel-community)
 ![PHPStan](https://img.shields.io/badge/CodeStyle-Laravel-green.svg)
 ![PHPStan](https://img.shields.io/badge/PHPStan-level%201-yellow.svg)
 
