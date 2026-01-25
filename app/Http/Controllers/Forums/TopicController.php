@@ -58,7 +58,6 @@ class TopicController extends Controller
         $this->authorize('view', $forum);
         $this->authorize('create', [Topic::class, $forum]);
 
-        /** @phpstan-ignore-next-line staticMethod.void */
         $topic = DB::transaction(fn () => Event::defer(function () use ($request, $forum): Topic {
             $topic = Topic::create([
                 'title' => $request->validated('title'),
