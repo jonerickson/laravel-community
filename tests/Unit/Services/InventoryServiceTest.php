@@ -44,7 +44,7 @@ function createInventoryItem(array $attributes = []): InventoryItem
  */
 function createOrderWithInventory(User $user, int $quantity = 2, ?InventoryItem $inventoryItem = null): Order
 {
-    $inventoryItem ??= createInventoryItem();
+    $inventoryItem = $inventoryItem ?? createInventoryItem();
 
     $price = Price::factory()->oneTime()->active()->create([
         'product_id' => $inventoryItem->product_id,
