@@ -59,7 +59,7 @@ function createProductWithPrice(float $priceAmount): array
 
 describe('getCart', function (): void {
     test('returns empty cart for guest user', function (): void {
-        $service = createShoppingCartService();
+        $service = createShoppingCartService(null);
 
         $cart = $service->getCart();
 
@@ -150,7 +150,7 @@ describe('getCart', function (): void {
 
 describe('getCartCount', function (): void {
     test('returns zero for guest user', function (): void {
-        $service = createShoppingCartService();
+        $service = createShoppingCartService(null);
 
         $count = $service->getCartCount();
 
@@ -179,7 +179,7 @@ describe('getCartCount', function (): void {
 
 describe('getOrCreatePendingOrder', function (): void {
     test('returns null for guest user', function (): void {
-        $service = createShoppingCartService();
+        $service = createShoppingCartService(null);
 
         $order = $service->getOrCreatePendingOrder();
 
@@ -258,7 +258,7 @@ describe('clearCart and clearPendingOrder', function (): void {
     });
 
     test('clearCart does nothing for guest user', function (): void {
-        $service = createShoppingCartService();
+        $service = createShoppingCartService(null);
 
         // Should not throw exception
         $service->clearCart();
@@ -314,7 +314,7 @@ describe('addItem', function (): void {
     test('returns empty cart for guest user', function (): void {
         [$product, $price] = createProductWithPrice(50.00);
 
-        $service = createShoppingCartService();
+        $service = createShoppingCartService(null);
         $cart = $service->addItem($price->id, 2);
 
         expect($cart)
@@ -329,7 +329,6 @@ describe('addItem', function (): void {
 
         $service = createShoppingCartService($user);
         $service->addItem($price1->id, 1);
-
         $cart = $service->addItem($price2->id, 2);
 
         expect($cart->cartCount)->toBe(2);
@@ -395,7 +394,7 @@ describe('updateItem', function (): void {
     test('returns empty cart for guest user', function (): void {
         [$product, $price] = createProductWithPrice(40.00);
 
-        $service = createShoppingCartService();
+        $service = createShoppingCartService(null);
         $cart = $service->updateItem($price->id, 2);
 
         expect($cart->cartCount)->toBe(0);
@@ -442,7 +441,7 @@ describe('removeItem', function (): void {
     test('returns empty cart for guest user', function (): void {
         [$product, $price] = createProductWithPrice(35.00);
 
-        $service = createShoppingCartService();
+        $service = createShoppingCartService(null);
         $cart = $service->removeItem($price->id);
 
         expect($cart->cartCount)->toBe(0);
