@@ -87,4 +87,12 @@ jobs:
         run: php artisan migrate --force
 
       - name: Run Test Suite
-        run: php artisan test
+        run: php artisan test --parallel
+
+      - name: Upload Laravel Logs
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: laravel-logs
+          path: storage/logs/
+          retention-days: 5
