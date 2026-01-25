@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\PayoutDriver;
 use App\Enums\PayoutStatus;
 use App\Models\Payout;
 use App\Models\User;
@@ -17,10 +18,10 @@ class PayoutFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
+            'seller_id' => User::factory(),
             'amount' => fake()->numberBetween(1000, 50000),
             'status' => fake()->randomElement(PayoutStatus::cases()),
-            'payout_method' => fake()->randomElement(['PayPal', 'Bank Transfer', 'Stripe', 'Check']),
+            'payout_method' => fake()->randomElement(PayoutDriver::cases()),
             'external_payout_id' => fake()->optional()->uuid(),
             'notes' => fake()->optional()->sentence(),
             'created_by' => fake()->optional(0.7)->randomElement(User::pluck('id')->toArray()),
