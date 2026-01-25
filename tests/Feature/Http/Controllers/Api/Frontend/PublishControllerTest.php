@@ -367,6 +367,7 @@ it('preserves existing published_at when publishing already published post', fun
 
     // Simulate unpublishing first
     $post->unpublish();
+
     expect($post->is_published)->toBeFalse();
     expect($post->published_at)->toBeNull();
 
