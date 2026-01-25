@@ -13,7 +13,9 @@ declare(strict_types=1);
 |
 */
 
+use App\Enums\Role as RoleEnum;
 use App\Models\Group;
+use App\Models\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 
@@ -23,6 +25,11 @@ pest()->extend(Tests\TestCase::class)
         Cache::flush();
         Group::resetDefaultGroupCache();
         Group::factory()->asDefaultMemberGroup()->create();
+
+        // Create required roles for user factory
+        foreach (RoleEnum::cases() as $role) {
+            Role::query()->firstOrCreate(['name' => $role->value, 'guard_name' => 'web']);
+        }
     })
     ->in('Unit', 'Feature');
 
