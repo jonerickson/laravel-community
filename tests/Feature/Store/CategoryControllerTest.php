@@ -95,7 +95,7 @@ test('category show page renders for guests', function (): void {
         ->visible()
         ->create();
 
-    $response = $this->get("/store/categories/{$category->slug}");
+    $response = $this->get('/store/categories/'.$category->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page->component('store/categories/show'));
@@ -108,7 +108,7 @@ test('category show page renders for authenticated users', function (): void {
         ->visible()
         ->create();
 
-    $response = $this->actingAs($user)->get("/store/categories/{$category->slug}");
+    $response = $this->actingAs($user)->get('/store/categories/'.$category->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page->component('store/categories/show'));
@@ -120,7 +120,7 @@ test('category show page displays category data', function (): void {
         ->visible()
         ->create(['name' => 'Test Category']);
 
-    $response = $this->get("/store/categories/{$category->slug}");
+    $response = $this->get('/store/categories/'.$category->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
@@ -149,7 +149,7 @@ test('category show page shows products in category', function (): void {
         ->for($product)
         ->create(['is_visible' => true]);
 
-    $response = $this->get("/store/categories/{$category->slug}");
+    $response = $this->get('/store/categories/'.$category->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
@@ -163,7 +163,7 @@ test('category show page handles empty categories', function (): void {
         ->visible()
         ->create();
 
-    $response = $this->get("/store/categories/{$category->slug}");
+    $response = $this->get('/store/categories/'.$category->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
@@ -186,7 +186,7 @@ test('category show page does not show unapproved products', function (): void {
 
     $product->categories()->attach($category);
 
-    $response = $this->get("/store/categories/{$category->slug}");
+    $response = $this->get('/store/categories/'.$category->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
@@ -209,7 +209,7 @@ test('category show page does not show inactive products', function (): void {
 
     $product->categories()->attach($category);
 
-    $response = $this->get("/store/categories/{$category->slug}");
+    $response = $this->get('/store/categories/'.$category->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
@@ -232,7 +232,7 @@ test('category show page does not show hidden products', function (): void {
 
     $product->categories()->attach($category);
 
-    $response = $this->get("/store/categories/{$category->slug}");
+    $response = $this->get('/store/categories/'.$category->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
@@ -255,7 +255,7 @@ test('category show page does not show subscription only products', function ():
 
     $product->categories()->attach($category);
 
-    $response = $this->get("/store/categories/{$category->slug}");
+    $response = $this->get('/store/categories/'.$category->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
@@ -269,7 +269,7 @@ test('category show page returns 403 for inactive category', function (): void {
         ->visible()
         ->create();
 
-    $response = $this->get("/store/categories/{$category->slug}");
+    $response = $this->get('/store/categories/'.$category->slug);
 
     $response->assertForbidden();
 });
@@ -294,7 +294,7 @@ test('category show page loads parent relationship', function (): void {
             'parent_id' => $parent->id,
         ]);
 
-    $response = $this->get("/store/categories/{$child->slug}");
+    $response = $this->get('/store/categories/'.$child->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
@@ -316,7 +316,7 @@ test('category show page loads children relationship', function (): void {
             'parent_id' => $parent->id,
         ]);
 
-    $response = $this->get("/store/categories/{$parent->slug}");
+    $response = $this->get('/store/categories/'.$parent->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
