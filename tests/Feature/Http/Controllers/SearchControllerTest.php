@@ -223,7 +223,7 @@ it('accepts page parameter for pagination', function (): void {
 
 it('paginates results correctly', function (): void {
     // Create many users to test pagination
-    User::factory()->count(25)->create(['name' => fn (): string => 'TestUser '.fake()->randomNumber(5)]);
+    User::factory()->count(25)->create(['name' => fn () => 'TestUser '.fake()->randomNumber(5)]);
 
     $response = $this->get(route('search', ['q' => 'TestUser', 'types' => ['user'], 'per_page' => 10]));
 
@@ -390,7 +390,7 @@ it('returns user groups as description in search results', function (): void {
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
         ->component('search')
-        ->where('results.data.0.description', fn ($desc): bool => str_contains((string) $desc, 'VIP Members'))
+        ->where('results.data.0.description', fn ($desc) => str_contains($desc, 'VIP Members'))
     );
 });
 
