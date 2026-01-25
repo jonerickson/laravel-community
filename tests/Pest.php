@@ -35,6 +35,7 @@ pest()->extend(Tests\TestCase::class)
             'discord.com/*' => Http::response(),
             'roblox.com/*' => Http::response(),
             'groups.roblox.com/*' => Http::response(),
+            'fonts.googleapis.com/*' => Http::response(),
         ]);
     })
     ->in('Unit', 'Feature');
