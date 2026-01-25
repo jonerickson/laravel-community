@@ -18,6 +18,7 @@ use Database\Seeders\PermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 pest()->extend(Tests\TestCase::class)
     ->use(RefreshDatabase::class)
@@ -29,6 +30,7 @@ pest()->extend(Tests\TestCase::class)
             '--class' => PermissionSeeder::class,
             '--force' => true,
         ]);
+        Http::preventStrayRequests();
     })
     ->in('Unit', 'Feature');
 
