@@ -91,18 +91,10 @@ it('can unassign ticket through driver', function (): void {
 it('can update status through driver', function (): void {
     $ticket = SupportTicket::factory()->new()->create();
 
-    $result = $this->driver->updateStatus($ticket, SupportTicketStatus::Open->value);
+    $result = $this->driver->updateStatus($ticket, SupportTicketStatus::Open);
 
     expect($result)->toBeTrue()
-        ->and($ticket->fresh()->statusEnum())->toBe(SupportTicketStatus::Open);
-});
-
-it('cannot update to invalid status through driver', function (): void {
-    $ticket = SupportTicket::factory()->create();
-
-    $result = $this->driver->updateStatus($ticket, 'invalid-status');
-
-    expect($result)->toBeFalse();
+        ->and($ticket->fresh()->status)->toBe(SupportTicketStatus::Open);
 });
 
 it('has database driver sync methods with default behavior', function (): void {
@@ -127,7 +119,7 @@ it('can resolve driver from container', function (): void {
 });
 
 it('can resolve driver manager from container', function (): void {
-    $manager = app('support-tickets');
+    $manager = app('support-ticket');
 
     expect($manager)->toBeInstanceOf(App\Managers\SupportTicketManager::class);
 

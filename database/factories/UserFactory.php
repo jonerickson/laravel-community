@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -15,6 +16,13 @@ use Illuminate\Support\Str;
 class UserFactory extends Factory
 {
     protected static ?string $password;
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->assignRole(Role::User);
+        });
+    }
 
     public function definition(): array
     {
@@ -50,5 +58,15 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'onboarded_at' => null,
         ]);
+    }
+
+    public function asAdmin(): static
+    {
+        return $this->afterCreating(fn (User $user) => $user->assignRole(Role::Administrator));
+    }
+
+    public function asSupportAgent(): static
+    {
+        return $this->afterCreating(fn (User $user) => $user->assignRole(Role::SupportAgent));
     }
 }
