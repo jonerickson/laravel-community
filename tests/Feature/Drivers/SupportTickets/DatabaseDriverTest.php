@@ -89,12 +89,12 @@ it('can unassign ticket through driver', function (): void {
 });
 
 it('can update status through driver', function (): void {
-    $ticket = SupportTicket::factory()->new()->create();
+    $ticket = SupportTicket::factory()->open()->create();
 
-    $result = $this->driver->updateStatus($ticket, SupportTicketStatus::Open);
+    $result = $this->driver->updateStatus($ticket, SupportTicketStatus::InProgress);
 
     expect($result)->toBeTrue()
-        ->and($ticket->fresh()->status)->toBe(SupportTicketStatus::Open);
+        ->and($ticket->fresh()->status)->toBe(SupportTicketStatus::InProgress);
 });
 
 it('has database driver sync methods with default behavior', function (): void {
