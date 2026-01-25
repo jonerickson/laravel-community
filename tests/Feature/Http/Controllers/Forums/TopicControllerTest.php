@@ -574,6 +574,7 @@ it('cannot create topic without create permission', function (): void {
     ]);
 
     $response->assertForbidden();
+
     expect(Topic::where('title', 'Test Topic Title')->exists())->toBeFalse();
 });
 
@@ -821,6 +822,7 @@ it('author can delete their own topic', function (): void {
 
     $response->assertRedirect(route('forums.show', ['forum' => $forum]));
     $response->assertSessionHas('message', 'The topic was successfully deleted.');
+
     expect(Topic::find($topic->id))->toBeNull();
 });
 
@@ -876,6 +878,7 @@ it('cannot delete locked topic as author', function (): void {
     $response = $this->actingAs($user)->delete(route('forums.topics.destroy', ['forum' => $forum->slug, 'topic' => $topic->slug]));
 
     $response->assertForbidden();
+
     expect(Topic::find($topic->id))->not->toBeNull();
 });
 
@@ -932,6 +935,7 @@ it('cannot delete topic without permission', function (): void {
     $response = $this->actingAs($otherUser)->delete(route('forums.topics.destroy', ['forum' => $forum->slug, 'topic' => $topic->slug]));
 
     $response->assertForbidden();
+
     expect(Topic::find($topic->id))->not->toBeNull();
 });
 
@@ -966,5 +970,6 @@ it('admin can delete any topic', function (): void {
     $response = $this->actingAs($admin)->delete(route('forums.topics.destroy', ['forum' => $forum->slug, 'topic' => $topic->slug]));
 
     $response->assertRedirect(route('forums.show', ['forum' => $forum]));
+
     expect(Topic::find($topic->id))->toBeNull();
 });
