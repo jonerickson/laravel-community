@@ -589,6 +589,7 @@ it('author can update their own post', function (): void {
 
     $response->assertRedirect(route('forums.topics.show', ['forum' => $forum, 'topic' => $topic]));
     $response->assertSessionHas('message', 'The post was successfully updated.');
+
     expect($post->refresh()->content)->toBe('Updated content');
 });
 
@@ -651,6 +652,7 @@ it('cannot update post as non-author without permission', function (): void {
     ]);
 
     $response->assertForbidden();
+
     expect($post->refresh()->content)->toBe('Original content');
 });
 
@@ -790,6 +792,7 @@ it('user with delete permission can update other users posts', function (): void
     ]);
 
     $response->assertRedirect();
+
     expect($post->refresh()->content)->toBe('Moderator updated content');
 });
 
@@ -863,6 +866,7 @@ it('author can delete their own post', function (): void {
 
     $response->assertRedirect();
     $response->assertSessionHas('message', 'The post was successfully deleted.');
+
     expect(Post::find($postToDelete->id))->toBeNull();
 });
 
@@ -923,6 +927,7 @@ it('cannot delete the last post in a topic', function (): void {
     $response->assertRedirect();
     $response->assertSessionHas('message', 'You cannot delete the last post in a topic. Delete the topic instead.');
     $response->assertSessionHas('messageVariant', 'error');
+
     expect(Post::find($onlyPost->id))->not->toBeNull();
 });
 
@@ -989,6 +994,7 @@ it('cannot delete post as non-author without permission', function (): void {
     ]));
 
     $response->assertForbidden();
+
     expect(Post::find($postToDelete->id))->not->toBeNull();
 });
 
@@ -1073,6 +1079,7 @@ it('user with delete permission can delete other users posts', function (): void
     ]));
 
     $response->assertRedirect();
+
     expect(Post::find($postToDelete->id))->toBeNull();
 });
 
@@ -1108,6 +1115,7 @@ it('admin can delete any post', function (): void {
     ]));
 
     $response->assertRedirect();
+
     expect(Post::find($postToDelete->id))->toBeNull();
 });
 
@@ -1139,6 +1147,7 @@ it('admin can update any post', function (): void {
     ]);
 
     $response->assertRedirect();
+
     expect($post->refresh()->content)->toBe('Admin updated content');
 });
 
