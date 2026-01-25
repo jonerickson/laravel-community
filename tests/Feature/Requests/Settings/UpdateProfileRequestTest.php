@@ -245,7 +245,7 @@ describe('UpdateProfileRequest custom fields validation', function (): void {
             ],
         ]);
 
-        $response->assertSessionHasErrors(["fields.{$field->id}"]);
+        $response->assertSessionHasErrors(['fields.'.$field->id]);
     });
 
     test('validation fails when required field is missing', function (): void {
@@ -265,7 +265,7 @@ describe('UpdateProfileRequest custom fields validation', function (): void {
             ],
         ]);
 
-        $response->assertSessionHasErrors(["fields.{$field->id}"]);
+        $response->assertSessionHasErrors(['fields.'.$field->id]);
     });
 
     test('validation passes when required field is provided', function (): void {
@@ -327,7 +327,7 @@ describe('UpdateProfileRequest custom fields validation', function (): void {
             ],
         ]);
 
-        $response->assertSessionHasErrors(["fields.{$field->id}"]);
+        $response->assertSessionHasErrors(['fields.'.$field->id]);
     });
 
     test('validation passes with valid datetime field', function (): void {
@@ -470,7 +470,7 @@ describe('UpdateProfileRequest custom attributes', function (): void {
 
         $request = new UpdateProfileRequest;
 
-        expect($request->attributes()["fields.{$field->id}"])->toBe('test field label');
+        expect($request->attributes()['fields.'.$field->id])->toBe('test field label');
     });
 });
 
