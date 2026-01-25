@@ -31,6 +31,11 @@ pest()->extend(Tests\TestCase::class)
             '--force' => true,
         ]);
         Http::preventStrayRequests();
+        Http::fake([
+            'discord.com/*' => Http::response(),
+            'roblox.com/*' => Http::response(),
+            'groups.roblox.com/*' => Http::response(),
+        ]);
     })
     ->in('Unit', 'Feature');
 
