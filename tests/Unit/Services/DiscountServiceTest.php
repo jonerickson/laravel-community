@@ -43,7 +43,6 @@ describe('validateDiscount', function (): void {
             'expires_at' => null,
             'user_id' => null,
             'product_id' => null,
-            'min_order_amount' => null,
         ]);
 
         $result = $this->service->validateDiscount('GIFTCARD');
@@ -170,7 +169,6 @@ describe('calculateDiscount', function (): void {
             'expires_at' => null,
             'user_id' => null,
             'product_id' => null,
-            'min_order_amount' => null,
         ]);
 
         // Refresh from database to ensure attributes are properly loaded
@@ -193,7 +191,6 @@ describe('calculateDiscount', function (): void {
             'expires_at' => null,
             'user_id' => null,
             'product_id' => null,
-            'min_order_amount' => null,
         ]);
 
         // Refresh from database to ensure attributes are properly loaded
@@ -281,7 +278,6 @@ describe('applyDiscountsToOrder', function (): void {
             'expires_at' => null,
             'user_id' => null,
             'product_id' => null,
-            'min_order_amount' => null,
         ]);
 
         // Refresh gift card from database to ensure attributes are properly loaded
@@ -314,7 +310,6 @@ describe('applyDiscountsToOrder', function (): void {
             'expires_at' => null,
             'user_id' => null,
             'product_id' => null,
-            'min_order_amount' => null,
         ]);
 
         // Refresh from database to ensure attributes are properly loaded
@@ -370,7 +365,6 @@ describe('applyDiscountsToOrder', function (): void {
             'expires_at' => null,
             'user_id' => null,
             'product_id' => null,
-            'min_order_amount' => null,
         ]);
         $discount2 = Discount::factory()->promoCode(25)->active()->create([
             'code' => 'EXTRA25',
@@ -507,7 +501,7 @@ describe('createPromoCode', function (): void {
     });
 
     test('creates promo code with expiration date', function (): void {
-        $expiresAt = Carbon\Carbon::now()->addDays(30);
+        $expiresAt = new DateTime('+30 days');
 
         $promoCode = $this->service->createPromoCode(
             value: 10,
@@ -560,7 +554,7 @@ describe('createCancellationOffer', function (): void {
 
     test('creates cancellation offer with expiration', function (): void {
         $user = User::factory()->create();
-        $expiresAt = Carbon\Carbon::now()->addDays(7);
+        $expiresAt = new DateTime('+7 days');
 
         $offer = $this->service->createCancellationOffer($user, $expiresAt);
 
