@@ -44,11 +44,11 @@ test('checkout returns error when customer creation fails', function (): void {
     $this->mock(PaymentManager::class, function (MockInterface $mock) use ($user): void {
         $mock->shouldReceive('getCustomer')
             ->once()
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->andReturn(null);
         $mock->shouldReceive('createCustomer')
             ->once()
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->andReturn(false);
     });
 
@@ -70,7 +70,7 @@ test('checkout returns error with empty cart', function (): void {
     $this->mock(PaymentManager::class, function (MockInterface $mock) use ($user): void {
         $mock->shouldReceive('getCustomer')
             ->once()
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->andReturn(CustomerData::from([
                 'id' => 'cus_test123',
                 'email' => $user->email,
@@ -117,7 +117,7 @@ test('checkout handles zero amount order by completing immediately', function ()
     $this->mock(PaymentManager::class, function (MockInterface $mock) use ($user): void {
         $mock->shouldIgnoreMissing();
         $mock->shouldReceive('getCustomer')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->andReturn(CustomerData::from([
                 'id' => 'cus_test123',
                 'email' => $user->email,
@@ -169,7 +169,7 @@ test('checkout returns error when price not configured', function (): void {
 
     $this->mock(PaymentManager::class, function (MockInterface $mock) use ($user): void {
         $mock->shouldReceive('getCustomer')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->andReturn(CustomerData::from([
                 'id' => 'cus_test123',
                 'email' => $user->email,
@@ -218,7 +218,7 @@ test('checkout returns error when checkout session creation fails', function ():
 
     $this->mock(PaymentManager::class, function (MockInterface $mock) use ($user): void {
         $mock->shouldReceive('getCustomer')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->andReturn(CustomerData::from([
                 'id' => 'cus_test123',
                 'email' => $user->email,
@@ -270,14 +270,14 @@ test('checkout creates stripe session and returns checkout url', function (): vo
 
     $this->mock(PaymentManager::class, function (MockInterface $mock) use ($user, $order, $expectedCheckoutUrl): void {
         $mock->shouldReceive('getCustomer')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->andReturn(CustomerData::from([
                 'id' => 'cus_test123',
                 'email' => $user->email,
             ]));
         $mock->shouldReceive('getCheckoutUrl')
             ->once()
-            ->with(Mockery::on(fn ($arg) => $arg->id === $order->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $order->id))
             ->andReturn($expectedCheckoutUrl);
     });
 
@@ -322,7 +322,7 @@ test('checkout with existing customer does not create new customer', function ()
     $this->mock(PaymentManager::class, function (MockInterface $mock) use ($user): void {
         $mock->shouldReceive('getCustomer')
             ->once()
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->andReturn(CustomerData::from([
                 'id' => 'cus_existing456',
                 'email' => $user->email,
@@ -371,11 +371,11 @@ test('checkout creates customer when not exists', function (): void {
     $this->mock(PaymentManager::class, function (MockInterface $mock) use ($user): void {
         $mock->shouldReceive('getCustomer')
             ->once()
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->andReturn(null);
         $mock->shouldReceive('createCustomer')
             ->once()
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->andReturn(true);
         $mock->shouldReceive('getCheckoutUrl')
             ->once()
@@ -439,7 +439,7 @@ test('checkout with multiple items processes all items', function (): void {
 
     $this->mock(PaymentManager::class, function (MockInterface $mock) use ($user, $expectedCheckoutUrl): void {
         $mock->shouldReceive('getCustomer')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->andReturn(CustomerData::from([
                 'id' => 'cus_test123',
                 'email' => $user->email,

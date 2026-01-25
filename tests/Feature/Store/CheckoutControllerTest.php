@@ -65,7 +65,7 @@ test('checkout success calls payment manager processCheckoutSuccess', function (
             ->once()
             ->with(
                 Mockery::type(Illuminate\Http\Request::class),
-                Mockery::on(fn ($arg) => $arg->id === $order->id)
+                Mockery::on(fn ($arg): bool => $arg->id === $order->id)
             )
             ->andReturn(true);
     });
@@ -169,7 +169,7 @@ test('checkout cancel calls payment manager processCheckoutCancel', function ():
             ->once()
             ->with(
                 Mockery::type(Illuminate\Http\Request::class),
-                Mockery::on(fn ($arg) => $arg->id === $order->id)
+                Mockery::on(fn ($arg): bool => $arg->id === $order->id)
             )
             ->andReturn(true);
     });
@@ -205,7 +205,7 @@ test('checkout cancel releases inventory reservations', function (): void {
     $this->mock(InventoryService::class, function ($mock) use ($order): void {
         $mock->shouldReceive('releaseReservations')
             ->once()
-            ->with(Mockery::on(fn ($arg) => $arg->id === $order->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $order->id))
             ->andReturn(null);
     });
 
