@@ -12,7 +12,7 @@ test('payment methods page is displayed for authenticated users', function (): v
 
     $this->mock(PaymentManager::class, function ($mock) use ($user): void {
         $mock->shouldReceive('listPaymentMethods')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(collect([]));
     });
@@ -42,7 +42,7 @@ test('payment methods page shows payment methods list', function (): void {
 
     $this->mock(PaymentManager::class, function ($mock) use ($user, $paymentMethod): void {
         $mock->shouldReceive('listPaymentMethods')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(collect([$paymentMethod]));
     });
@@ -64,11 +64,11 @@ test('payment method creation shows error when customer creation fails', functio
 
     $this->mock(PaymentManager::class, function ($mock) use ($user): void {
         $mock->shouldReceive('getCustomer')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(null);
         $mock->shouldReceive('createCustomer')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(false);
     });
@@ -87,7 +87,7 @@ test('payment method creation shows error when payment method creation fails', f
 
     $this->mock(PaymentManager::class, function ($mock) use ($user): void {
         $mock->shouldReceive('getCustomer')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(CustomerData::from([
                 'id' => 'cus_123',
@@ -95,7 +95,7 @@ test('payment method creation shows error when payment method creation fails', f
             ]));
         $mock->shouldReceive('createPaymentMethod')
             ->with(
-                Mockery::on(fn ($arg) => $arg->id === $user->id),
+                Mockery::on(fn ($arg): bool => $arg->id === $user->id),
                 'pm_invalid'
             )
             ->once()
@@ -127,7 +127,7 @@ test('payment method update shows error when payment method not found', function
     $this->mock(PaymentManager::class, function ($mock) use ($user): void {
         $mock->shouldReceive('updatePaymentMethod')
             ->with(
-                Mockery::on(fn ($arg) => $arg->id === $user->id),
+                Mockery::on(fn ($arg): bool => $arg->id === $user->id),
                 'pm_notfound',
                 true
             )

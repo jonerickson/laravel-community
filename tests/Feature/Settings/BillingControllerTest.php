@@ -48,14 +48,14 @@ test('billing can be updated with valid data', function (): void {
 
     $this->mock(PaymentManager::class, function ($mock) use ($user): void {
         $mock->shouldReceive('getCustomer')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(CustomerData::from([
                 'id' => 'cus_123',
                 'email' => $user->email,
             ]));
         $mock->shouldReceive('syncCustomerInformation')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(true);
     });
@@ -84,15 +84,15 @@ test('billing update creates customer if not exists', function (): void {
 
     $this->mock(PaymentManager::class, function ($mock) use ($user): void {
         $mock->shouldReceive('getCustomer')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(null);
         $mock->shouldReceive('createCustomer')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(true);
         $mock->shouldReceive('syncCustomerInformation')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(true);
     });
@@ -114,11 +114,11 @@ test('billing update shows error when customer creation fails', function (): voi
 
     $this->mock(PaymentManager::class, function ($mock) use ($user): void {
         $mock->shouldReceive('getCustomer')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(null);
         $mock->shouldReceive('createCustomer')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(false);
     });
@@ -225,14 +225,14 @@ test('billing update accepts optional address line 2', function (): void {
 
     $this->mock(PaymentManager::class, function ($mock) use ($user): void {
         $mock->shouldReceive('getCustomer')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(CustomerData::from([
                 'id' => 'cus_123',
                 'email' => $user->email,
             ]));
         $mock->shouldReceive('syncCustomerInformation')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(true);
     });
@@ -258,14 +258,14 @@ test('billing update accepts optional vat id', function (): void {
 
     $this->mock(PaymentManager::class, function ($mock) use ($user): void {
         $mock->shouldReceive('getCustomer')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(CustomerData::from([
                 'id' => 'cus_123',
                 'email' => $user->email,
             ]));
         $mock->shouldReceive('syncCustomerInformation')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(true);
     });
@@ -291,14 +291,14 @@ test('billing update accepts optional extra billing information', function (): v
 
     $this->mock(PaymentManager::class, function ($mock) use ($user): void {
         $mock->shouldReceive('getCustomer')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(CustomerData::from([
                 'id' => 'cus_123',
                 'email' => $user->email,
             ]));
         $mock->shouldReceive('syncCustomerInformation')
-            ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
             ->once()
             ->andReturn(true);
     });
