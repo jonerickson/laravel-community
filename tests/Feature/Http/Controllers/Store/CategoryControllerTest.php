@@ -70,13 +70,13 @@ test('categories index does not show child categories at top level', function ()
     $parent = ProductCategory::factory()
         ->active()
         ->visible()
-        ->create(['name' => 'Store Top Level Parent']);
+        ->create(['name' => 'Parent Category']);
 
     ProductCategory::factory()
         ->active()
         ->visible()
         ->create([
-            'name' => 'Store Top Level Child',
+            'name' => 'Child Category',
             'parent_id' => $parent->id,
         ]);
 
@@ -86,7 +86,7 @@ test('categories index does not show child categories at top level', function ()
     $response->assertInertia(fn ($page) => $page
         ->component('store/categories/index')
         ->has('categories', 1)
-        ->where('categories.0.name', 'Store Top Level Parent'));
+        ->where('categories.0.name', 'Parent Category'));
 });
 
 test('category show page renders for guests', function (): void {
@@ -284,42 +284,42 @@ test('category show page loads parent relationship', function (): void {
     $parent = ProductCategory::factory()
         ->active()
         ->visible()
-        ->create(['name' => 'Store Parent Rel']);
+        ->create(['name' => 'Parent Category']);
 
     $child = ProductCategory::factory()
         ->active()
         ->visible()
         ->create([
-            'name' => 'Store Child Rel',
+            'name' => 'Child Category',
             'parent_id' => $parent->id,
         ]);
 
-    $response = $this->get('/store/categories/'.$child->fresh()->slug);
+    $response = $this->get('/store/categories/'.$child->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
         ->component('store/categories/show')
-        ->where('category.name', 'Store Child Rel'));
+        ->where('category.name', 'Child Category'));
 });
 
 test('category show page loads children relationship', function (): void {
     $parent = ProductCategory::factory()
         ->active()
         ->visible()
-        ->create(['name' => 'Store Parent Children']);
+        ->create(['name' => 'Parent Category']);
 
     ProductCategory::factory()
         ->active()
         ->visible()
         ->create([
-            'name' => 'Store Child Children',
+            'name' => 'Child Category',
             'parent_id' => $parent->id,
         ]);
 
-    $response = $this->get('/store/categories/'.$parent->fresh()->slug);
+    $response = $this->get('/store/categories/'.$parent->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
         ->component('store/categories/show')
-        ->where('category.name', 'Store Parent Children'));
+        ->where('category.name', 'Parent Category'));
 });
