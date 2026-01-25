@@ -19,7 +19,7 @@ test('guest can view onboarding page', function (): void {
     $response = $this->get(route('onboarding'));
 
     $response->assertOk();
-    $response->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+    $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('onboarding/index')
         ->where('isAuthenticated', false)
         ->where('initialStep', 0)
@@ -32,7 +32,7 @@ test('authenticated user can view onboarding page', function (): void {
     $response = $this->actingAs($user)->get(route('onboarding'));
 
     $response->assertOk();
-    $response->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+    $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('onboarding/index')
         ->where('isAuthenticated', true)
     );
@@ -58,7 +58,7 @@ test('onboarding page displays custom fields', function (): void {
     $response = $this->get(route('onboarding'));
 
     $response->assertOk();
-    $response->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+    $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('onboarding/index')
         ->has('customFields', 1)
     );
@@ -84,7 +84,7 @@ test('onboarding page displays subscription products', function (): void {
     $response = $this->get(route('onboarding'));
 
     $response->assertOk();
-    $response->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+    $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('onboarding/index')
         ->has('subscriptions', 1)
     );
@@ -107,7 +107,7 @@ test('onboarding page filters out inactive subscription products', function (): 
     $response = $this->get(route('onboarding'));
 
     $response->assertOk();
-    $response->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+    $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('onboarding/index')
         ->has('subscriptions', 0)
     );
@@ -127,7 +127,7 @@ test('onboarding page displays required policies', function (): void {
     $response = $this->get(route('onboarding'));
 
     $response->assertOk();
-    $response->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+    $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('onboarding/index')
         ->has('policies', 1)
     );
@@ -137,7 +137,7 @@ test('initial step is 0 for guest', function (): void {
     $response = $this->get(route('onboarding'));
 
     $response->assertOk();
-    $response->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+    $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('onboarding/index')
         ->where('initialStep', 0)
     );
@@ -149,7 +149,7 @@ test('initial step is 1 for authenticated unverified user', function (): void {
     $response = $this->actingAs($user)->get(route('onboarding'));
 
     $response->assertOk();
-    $response->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+    $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('onboarding/index')
         ->where('initialStep', 1)
     );
@@ -161,7 +161,7 @@ test('initial step is 2 for authenticated verified user without integrations', f
     $response = $this->actingAs($user)->get(route('onboarding'));
 
     $response->assertOk();
-    $response->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+    $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('onboarding/index')
         ->where('initialStep', 2)
     );
@@ -178,7 +178,7 @@ test('initial step is 3 for authenticated verified user with integrations', func
     $response = $this->actingAs($user)->get(route('onboarding'));
 
     $response->assertOk();
-    $response->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+    $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('onboarding/index')
         ->where('initialStep', 3)
     );
@@ -196,7 +196,7 @@ test('onboarding page shows discord integration status', function (): void {
     $response = $this->actingAs($user)->get(route('onboarding'));
 
     $response->assertOk();
-    $response->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+    $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('onboarding/index')
         ->has('integrations.discord.connected')
     );
@@ -214,7 +214,7 @@ test('onboarding page shows roblox integration status', function (): void {
     $response = $this->actingAs($user)->get(route('onboarding'));
 
     $response->assertOk();
-    $response->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+    $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('onboarding/index')
         ->has('integrations.roblox.connected')
     );
@@ -226,7 +226,7 @@ test('onboarding page shows email verified status', function (): void {
     $response = $this->actingAs($user)->get(route('onboarding'));
 
     $response->assertOk();
-    $response->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+    $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('onboarding/index')
         ->where('emailVerified', true)
     );
@@ -238,7 +238,7 @@ test('onboarding page shows email not verified status', function (): void {
     $response = $this->actingAs($user)->get(route('onboarding'));
 
     $response->assertOk();
-    $response->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+    $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('onboarding/index')
         ->where('emailVerified', false)
     );
@@ -255,13 +255,13 @@ test('onboarding page shows subscription status', function (): void {
     $paymentManagerMock = $this->mock(PaymentManager::class);
     $paymentManagerMock
         ->shouldReceive('currentSubscription')
-        ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
+        ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
         ->andReturn($subscriptionData);
 
     $response = $this->actingAs($user)->get(route('onboarding'));
 
     $response->assertOk();
-    $response->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+    $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('onboarding/index')
         ->where('hasSubscription', true)
     );
@@ -273,13 +273,13 @@ test('onboarding page shows no subscription status', function (): void {
     $paymentManagerMock = $this->mock(PaymentManager::class);
     $paymentManagerMock
         ->shouldReceive('currentSubscription')
-        ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
+        ->with(Mockery::on(fn ($arg) => $arg->id === $user->id))
         ->andReturnNull();
 
     $response = $this->actingAs($user)->get(route('onboarding'));
 
     $response->assertOk();
-    $response->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+    $response->assertInertia(fn (AssertableInertia $page) => $page
         ->component('onboarding/index')
         ->where('hasSubscription', false)
     );
@@ -299,7 +299,6 @@ test('authenticated user can complete onboarding', function (): void {
 
     $response->assertRedirect(route('dashboard'));
     $response->assertSessionHas('message', 'Your onboarding has been successfully completed.');
-
     expect($user->fresh()->onboarded_at)->not->toBeNull();
 });
 

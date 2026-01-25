@@ -200,7 +200,7 @@ test('subscription creates order with item', function (): void {
     ]);
 
     // Verify an order with the correct item was created
-    $order = $user->orders()->whereHas('items', function ($query) use ($price): void {
+    $order = $user->orders()->whereHas('items', function ($query) use ($price) {
         $query->where('price_id', $price->id);
     })->first();
 
