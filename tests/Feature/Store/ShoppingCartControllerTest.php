@@ -235,7 +235,7 @@ test('cart destroy clears cart for authenticated user', function (): void {
     $this->mock(PaymentManager::class, function ($mock) use ($order): void {
         $mock->shouldReceive('cancelOrder')
             ->once()
-            ->with(Mockery::on(fn ($arg) => $arg->id === $order->id))
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $order->id))
             ->andReturn(true);
     });
 
