@@ -23,7 +23,7 @@ describe('ProcessPayoutAction', function (): void {
 
         $action = new ProcessPayoutAction(payout: $payout);
 
-        expect(fn (): bool => $action())->toThrow(
+        expect(fn () => $action())->toThrow(
             InvalidPayoutStatusException::class,
             'A payout must be in pending status to be processed. Current status: completed'
         );
@@ -37,7 +37,7 @@ describe('ProcessPayoutAction', function (): void {
 
         $action = new ProcessPayoutAction(payout: $payout);
 
-        expect(fn (): bool => $action())->toThrow(
+        expect(fn () => $action())->toThrow(
             InvalidPayoutStatusException::class,
             'A payout must be in pending status to be processed. Current status: failed'
         );
@@ -51,7 +51,7 @@ describe('ProcessPayoutAction', function (): void {
 
         $action = new ProcessPayoutAction(payout: $payout);
 
-        expect(fn (): bool => $action())->toThrow(
+        expect(fn () => $action())->toThrow(
             InvalidPayoutStatusException::class,
             'A payout must be in pending status to be processed. Current status: cancelled'
         );
@@ -95,7 +95,9 @@ describe('ProcessPayoutAction', function (): void {
         expect($result)->toBeTrue();
         expect($payout->refresh()->status)->toBe(PayoutStatus::Completed);
 
-        Event::assertDispatched(PayoutProcessed::class, fn ($event): bool => $event->payout->id === $payout->id);
+        Event::assertDispatched(PayoutProcessed::class, function ($event) use ($payout): bool {
+            return $event->payout->id === $payout->id;
+        });
     });
 
     test('dispatches PayoutProcessed event on success', function (): void {
@@ -129,7 +131,9 @@ describe('ProcessPayoutAction', function (): void {
         $action = new ProcessPayoutAction(payout: $payout);
         $action();
 
-        Event::assertDispatched(PayoutProcessed::class, fn ($event): bool => $event->payout->id === $payout->id);
+        Event::assertDispatched(PayoutProcessed::class, function ($event) use ($payout): bool {
+            return $event->payout->id === $payout->id;
+        });
     });
 
     test('returns false and sets status to Failed when transfer fails', function (): void {
@@ -152,7 +156,9 @@ describe('ProcessPayoutAction', function (): void {
         expect($payout->refresh()->status)->toBe(PayoutStatus::Failed);
         expect($payout->failure_reason)->toBe('Driver returned null - payout creation failed');
 
-        Event::assertDispatched(PayoutFailed::class, fn ($event): bool => $event->payout->id === $payout->id && $event->reason === 'Driver error');
+        Event::assertDispatched(PayoutFailed::class, function ($event) use ($payout): bool {
+            return $event->payout->id === $payout->id && $event->reason === 'Driver error';
+        });
     });
 
     test('returns false and sets status to Failed when payout creation fails', function (): void {
@@ -208,7 +214,9 @@ describe('ProcessPayoutAction', function (): void {
         expect($payout->refresh()->status)->toBe(PayoutStatus::Failed);
         expect($payout->failure_reason)->toBe('Stripe API error');
 
-        Event::assertDispatched(PayoutFailed::class, fn ($event): bool => $event->reason === 'Stripe API error');
+        Event::assertDispatched(PayoutFailed::class, function ($event): bool {
+            return $event->reason === 'Stripe API error';
+        });
     });
 
     test('dispatches PayoutFailed event with correct reason on failure', function (): void {
@@ -227,8 +235,10 @@ describe('ProcessPayoutAction', function (): void {
         $action = new ProcessPayoutAction(payout: $payout);
         $action();
 
-        Event::assertDispatched(PayoutFailed::class, fn ($event): bool => $event->payout->id === $payout->id
-            && $event->reason === 'Insufficient funds in connected account');
+        Event::assertDispatched(PayoutFailed::class, function ($event) use ($payout): bool {
+            return $event->payout->id === $payout->id
+                && $event->reason === 'Insufficient funds in connected account';
+        });
     });
 
     test('can be executed via static execute method', function (): void {
