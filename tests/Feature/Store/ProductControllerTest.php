@@ -23,7 +23,7 @@ test('product show page renders for guests', function (): void {
 
     $product->categories()->attach($category);
 
-    $response = $this->get("/store/products/{$product->slug}");
+    $response = $this->get('/store/products/'.$product->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page->component('store/products/show'));
@@ -46,7 +46,7 @@ test('product show page renders for authenticated users', function (): void {
 
     $product->categories()->attach($category);
 
-    $response = $this->actingAs($user)->get("/store/products/{$product->slug}");
+    $response = $this->actingAs($user)->get('/store/products/'.$product->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page->component('store/products/show'));
@@ -67,7 +67,7 @@ test('product show page displays product data', function (): void {
 
     $product->categories()->attach($category);
 
-    $response = $this->get("/store/products/{$product->slug}");
+    $response = $this->get('/store/products/'.$product->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
@@ -102,7 +102,7 @@ test('product show page shows approved reviews', function (): void {
             'created_by' => $reviewer->id,
         ]);
 
-    $response = $this->get("/store/products/{$product->slug}");
+    $response = $this->get('/store/products/'.$product->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
@@ -139,7 +139,7 @@ test('product show page does not show unapproved reviews', function (): void {
         ]);
     $review->update(['is_approved' => false]);
 
-    $response = $this->get("/store/products/{$product->slug}");
+    $response = $this->get('/store/products/'.$product->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
@@ -184,7 +184,7 @@ test('product show page shows reviews with replies', function (): void {
             'created_by' => $reviewer->id,
         ]);
 
-    $response = $this->get("/store/products/{$product->slug}");
+    $response = $this->get('/store/products/'.$product->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
@@ -213,7 +213,7 @@ test('product show page returns 403 for inactive product', function (): void {
 
     $product->categories()->attach($category);
 
-    $response = $this->get("/store/products/{$product->slug}");
+    $response = $this->get('/store/products/'.$product->slug);
 
     $response->assertForbidden();
 });
@@ -233,7 +233,7 @@ test('product show page returns 403 for unapproved product', function (): void {
 
     $product->categories()->attach($category);
 
-    $response = $this->get("/store/products/{$product->slug}");
+    $response = $this->get('/store/products/'.$product->slug);
 
     $response->assertForbidden();
 });
@@ -253,7 +253,7 @@ test('product show page returns 403 for product in inactive category', function 
 
     $product->categories()->attach($category);
 
-    $response = $this->get("/store/products/{$product->slug}");
+    $response = $this->get('/store/products/'.$product->slug);
 
     $response->assertForbidden();
 });
@@ -282,7 +282,7 @@ test('product show page loads prices for display', function (): void {
             'is_visible' => true,
         ]);
 
-    $response = $this->get("/store/products/{$product->slug}");
+    $response = $this->get('/store/products/'.$product->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
@@ -312,7 +312,7 @@ test('product show page does not show hidden prices', function (): void {
             'is_visible' => false,
         ]);
 
-    $response = $this->get("/store/products/{$product->slug}");
+    $response = $this->get('/store/products/'.$product->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
@@ -342,7 +342,7 @@ test('product show page does not show inactive prices', function (): void {
             'is_visible' => true,
         ]);
 
-    $response = $this->get("/store/products/{$product->slug}");
+    $response = $this->get('/store/products/'.$product->slug);
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
@@ -373,7 +373,7 @@ test('product store adds item to cart', function (): void {
         ->for($product)
         ->create(['is_visible' => true]);
 
-    $response = $this->actingAs($user)->post("/store/products/{$product->slug}", [
+    $response = $this->actingAs($user)->post('/store/products/'.$product->slug, [
         'price_id' => $price->id,
         'quantity' => 1,
     ]);
@@ -403,7 +403,7 @@ test('product store requires authentication', function (): void {
         ->for($product)
         ->create(['is_visible' => true]);
 
-    $response = $this->post("/store/products/{$product->slug}", [
+    $response = $this->post('/store/products/'.$product->slug, [
         'price_id' => $price->id,
         'quantity' => 1,
     ]);
@@ -428,7 +428,7 @@ test('product store validates price_id is required', function (): void {
 
     $product->categories()->attach($category);
 
-    $response = $this->actingAs($user)->post("/store/products/{$product->slug}", [
+    $response = $this->actingAs($user)->post('/store/products/'.$product->slug, [
         'quantity' => 1,
     ]);
 
@@ -452,7 +452,7 @@ test('product store validates price_id exists', function (): void {
 
     $product->categories()->attach($category);
 
-    $response = $this->actingAs($user)->post("/store/products/{$product->slug}", [
+    $response = $this->actingAs($user)->post('/store/products/'.$product->slug, [
         'price_id' => 99999,
         'quantity' => 1,
     ]);
@@ -483,7 +483,7 @@ test('product store validates quantity minimum', function (): void {
         ->for($product)
         ->create(['is_visible' => true]);
 
-    $response = $this->actingAs($user)->post("/store/products/{$product->slug}", [
+    $response = $this->actingAs($user)->post('/store/products/'.$product->slug, [
         'price_id' => $price->id,
         'quantity' => 0,
     ]);
@@ -514,7 +514,7 @@ test('product store validates quantity maximum', function (): void {
         ->for($product)
         ->create(['is_visible' => true]);
 
-    $response = $this->actingAs($user)->post("/store/products/{$product->slug}", [
+    $response = $this->actingAs($user)->post('/store/products/'.$product->slug, [
         'price_id' => $price->id,
         'quantity' => 100,
     ]);
@@ -545,7 +545,7 @@ test('product store returns 403 for inactive product', function (): void {
         ->for($product)
         ->create(['is_visible' => true]);
 
-    $response = $this->actingAs($user)->post("/store/products/{$product->slug}", [
+    $response = $this->actingAs($user)->post('/store/products/'.$product->slug, [
         'price_id' => $price->id,
         'quantity' => 1,
     ]);
