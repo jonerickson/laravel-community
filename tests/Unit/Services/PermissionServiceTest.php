@@ -234,7 +234,7 @@ describe('hasPermissionTo priority', function (): void {
         // User should not get guest group permission
         $resultWithUser = PermissionService::hasPermissionTo('guest-only-permission', $user);
         // Guest should get the permission
-        $resultWithoutUser = PermissionService::hasPermissionTo('guest-only-permission');
+        $resultWithoutUser = PermissionService::hasPermissionTo('guest-only-permission', null);
 
         expect($resultWithUser)->toBeFalse();
         expect($resultWithoutUser)->toBeTrue();
