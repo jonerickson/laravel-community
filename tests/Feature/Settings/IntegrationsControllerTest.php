@@ -59,7 +59,7 @@ test('integration can be deleted by owner', function (): void {
         'provider_name' => 'TestUser',
     ]);
 
-    $response = $this->actingAs($user)->delete("/settings/integrations/{$integration->id}");
+    $response = $this->actingAs($user)->delete('/settings/integrations/'.$integration->id);
 
     $response->assertRedirect();
     $response->assertSessionHas('message');
@@ -78,9 +78,10 @@ test('integration cannot be deleted by another user', function (): void {
         'provider_name' => 'TestUser',
     ]);
 
-    $response = $this->actingAs($user)->delete("/settings/integrations/{$integration->id}");
+    $response = $this->actingAs($user)->delete('/settings/integrations/'.$integration->id);
 
     $response->assertForbidden();
+
     expect(UserIntegration::find($integration->id))->not->toBeNull();
 });
 
@@ -94,9 +95,10 @@ test('integration deletion redirects guests to login', function (): void {
         'provider_name' => 'TestUser',
     ]);
 
-    $response = $this->delete("/settings/integrations/{$integration->id}");
+    $response = $this->delete('/settings/integrations/'.$integration->id);
 
     $response->assertRedirect('/login');
+
     expect(UserIntegration::find($integration->id))->not->toBeNull();
 });
 

@@ -98,7 +98,7 @@ test('orders settings page shows orders with correct statuses', function (): voi
         OrderItem::query()->create([
             'order_id' => $order->id,
             'price_id' => $price->id,
-            'name' => "Product {$status->value}",
+            'name' => 'Product '.$status->value,
             'amount' => 1000,
             'quantity' => 1,
         ]);
