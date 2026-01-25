@@ -37,3 +37,4 @@ yarn-error.log
 /.zed
 /tasks
 /ralph
+coverage.xml
