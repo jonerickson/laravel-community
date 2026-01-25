@@ -13,10 +13,10 @@ declare(strict_types=1);
 |
 */
 
-use App\Enums\Role as RoleEnum;
 use App\Models\Group;
-use App\Models\Role;
+use Database\Seeders\PermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 
 pest()->extend(Tests\TestCase::class)
@@ -25,11 +25,10 @@ pest()->extend(Tests\TestCase::class)
         Cache::flush();
         Group::resetDefaultGroupCache();
         Group::factory()->asDefaultMemberGroup()->create();
-
-        // Create required roles for user factory
-        foreach (RoleEnum::cases() as $role) {
-            Role::query()->firstOrCreate(['name' => $role->value, 'guard_name' => 'web']);
-        }
+        Artisan::call('db:seed', [
+            '--class' => PermissionSeeder::class,
+            '--force' => true,
+        ]);
     })
     ->in('Unit', 'Feature');
 
