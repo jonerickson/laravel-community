@@ -2,12 +2,12 @@ import HeadingSmall from '@/components/heading-small';
 import { StarRating } from '@/components/star-rating';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { UserInfo } from '@/components/user-info';
 import { useCartOperations } from '@/hooks/use-cart-operations';
 import { getPriceDisplay } from '@/utils/price-display';
 import { stripCharacters, truncate } from '@/utils/truncate';
 import { Link, router } from '@inertiajs/react';
 import { ImageIcon, LoaderCircle } from 'lucide-react';
-import { UserInfo } from '@/components/user-info';
 
 export default function StoreCategoriesProductItem({ product }: { product: App.Data.ProductData }) {
     const { addItem, loading } = useCartOperations();

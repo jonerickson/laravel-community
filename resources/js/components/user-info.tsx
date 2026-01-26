@@ -4,7 +4,17 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { Link, usePage } from '@inertiajs/react';
 
-export function UserInfo({ user, showEmail = false, showGroups = false, showAvatar = true }: { user: App.Data.UserData; showEmail?: boolean; showGroups?: boolean, showAvatar?: boolean }) {
+export function UserInfo({
+    user,
+    showEmail = false,
+    showGroups = false,
+    showAvatar = true,
+}: {
+    user: App.Data.UserData;
+    showEmail?: boolean;
+    showGroups?: boolean;
+    showAvatar?: boolean;
+}) {
     const getInitials = useInitials();
     const { isImpersonating } = usePage<App.Data.SharedData>().props.auth;
 
