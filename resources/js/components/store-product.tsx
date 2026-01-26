@@ -1,17 +1,20 @@
 import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';
+import { ProductImageGallery } from '@/components/product-image-gallery';
 import RichEditorContent from '@/components/rich-editor-content';
 import { StarRating } from '@/components/star-rating';
 import { StoreProductRatingDialog } from '@/components/store-product-rating-dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Kbd } from '@/components/ui/kbd';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UserInfo } from '@/components/user-info';
 import { currency } from '@/lib/utils';
 import { stripCharacters } from '@/utils/truncate';
 import { Deferred, useForm } from '@inertiajs/react';
-import { AlertTriangle, ImageIcon, LoaderCircle, Package } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { AlertTriangle, LoaderCircle, Package } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 interface ProductProps {
     product: App.Data.ProductData;
@@ -20,11 +23,16 @@ interface ProductProps {
 
 export default function Product({ product: productData, reviews }: ProductProps) {
     const [selectedPriceId, setSelectedPriceId] = useState<number | null>(productData?.defaultPrice?.id || null);
-
+    const [isMac, setIsMac] = useState(false);
+    const formRef = useRef<HTMLFormElement>(null);
     const { data, setData, post, processing, errors } = useForm({
         price_id: selectedPriceId,
         quantity: 1,
     });
+
+    useEffect(() => {
+        setIsMac(navigator.platform?.includes('Mac'));
+    }, []);
 
     useEffect(() => {
         let newPriceId = null;
@@ -40,6 +48,19 @@ export default function Product({ product: productData, reviews }: ProductProps)
             setData('price_id', newPriceId);
         }
     }, [productData?.defaultPrice, productData?.prices, selectedPriceId, setData]);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                e.preventDefault();
+                formRef.current?.requestSubmit();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     const handlePriceChange = (value: string) => {
         const priceId = value ? parseInt(value) : null;
@@ -85,7 +106,13 @@ export default function Product({ product: productData, reviews }: ProductProps)
                         }
                     />
 
-                    <div className="-mt-2 flex items-center gap-4">
+                    {productData.isMarketplaceProduct && productData.seller && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <UserInfo user={productData.seller} showGroups />
+                        </div>
+                    )}
+
+                    <div className="mt-2 flex items-center gap-4">
                         <StarRating rating={productData.averageRating || 0} showValue={true} />
                         <Deferred fallback={<div className="text-sm text-primary">Loading reviews...</div>} data="reviews">
                             <StoreProductRatingDialog product={productData} reviews={reviews} />
@@ -114,38 +141,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
 
                 <div className="mt-6 lg:col-span-7 lg:col-start-1 lg:row-span-3 lg:row-start-1 lg:mt-0 lg:flex lg:flex-col">
                     <h2 className="sr-only">Images</h2>
-
-                    <div className="relative grid grid-cols-1 lg:flex-1 lg:grid-cols-2 lg:gap-8">
-                        {productData?.featuredImageUrl ? (
-                            <img
-                                alt={productData.name}
-                                src={productData.featuredImageUrl}
-                                className="col-span-2 row-span-2 h-full w-full rounded-lg object-cover"
-                            />
-                        ) : (
-                            <div className="col-span-2 row-span-2 flex h-full w-full items-center justify-center rounded-lg bg-muted py-12">
-                                <ImageIcon className="h-24 w-24 text-muted-foreground" />
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="mt-4">
-                        <div className="flex gap-2 overflow-x-auto">
-                            <div className="relative aspect-square h-16 w-16 flex-shrink-0 rounded border border-border">
-                                {productData?.featuredImageUrl ? (
-                                    <img
-                                        alt={`${productData.name} thumbnail`}
-                                        src={productData.featuredImageUrl}
-                                        className="h-full w-full rounded object-cover"
-                                    />
-                                ) : (
-                                    <div className="flex h-full w-full items-center justify-center rounded bg-muted">
-                                        <ImageIcon className="h-6 w-6 text-muted-foreground" />
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+                    <ProductImageGallery product={productData} />
                 </div>
 
                 <div className="lg:col-span-5 lg:flex lg:h-full lg:flex-col">
@@ -239,7 +235,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit}>
+                    <form ref={formRef} onSubmit={handleSubmit}>
                         <Button
                             type="submit"
                             disabled={
@@ -260,6 +256,7 @@ export default function Product({ product: productData, reviews }: ProductProps)
                                     !productData.inventoryItem.allowBackorder
                                   ? 'Out of stock'
                                   : 'Add to cart'}
+                            {!processing && <Kbd className="bg-primary-foreground/10 text-primary-foreground">{isMac ? '⌘' : 'Ctrl'} ↵</Kbd>}
                         </Button>
                     </form>
 

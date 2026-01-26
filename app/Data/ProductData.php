@@ -40,6 +40,8 @@ class ProductData extends Data
 
     public bool $isMarketplaceProduct;
 
+    public ?UserData $seller = null;
+
     public ProductApprovalStatus $approvalStatus;
 
     public bool $isActive;
@@ -55,6 +57,9 @@ class ProductData extends Data
     public ?string $featuredImage = null;
 
     public ?string $featuredImageUrl = null;
+
+    /** @var ImageData[] */
+    public array $images = [];
 
     public ?string $externalProductId = null;
 

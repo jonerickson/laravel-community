@@ -2,6 +2,7 @@ import HeadingSmall from '@/components/heading-small';
 import { StarRating } from '@/components/star-rating';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { UserInfo } from '@/components/user-info';
 import { useCartOperations } from '@/hooks/use-cart-operations';
 import { getPriceDisplay } from '@/utils/price-display';
 import { stripCharacters, truncate } from '@/utils/truncate';
@@ -43,6 +44,11 @@ export default function StoreCategoriesProductItem({ product }: { product: App.D
                         </div>
                     )}
                     <HeadingSmall title={product.name} description={truncate(stripCharacters(product.description || ''))} />
+                    {product.isMarketplaceProduct && product.seller && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <UserInfo user={product.seller} showGroups={false} showAvatar={false} />
+                        </div>
+                    )}
                     <div className="mt-2">
                         <StarRating rating={product.averageRating || 0} size="sm" className="mb-1" />
                     </div>

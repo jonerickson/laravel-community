@@ -12,6 +12,7 @@ enum ProductApprovalStatus: string implements HasColor, HasLabel
     case Pending = 'pending';
     case Approved = 'approved';
     case Rejected = 'rejected';
+    case Withdrawn = 'withdrawn';
 
     public function getLabel(): string
     {
@@ -19,6 +20,7 @@ enum ProductApprovalStatus: string implements HasColor, HasLabel
             self::Pending => 'Pending',
             self::Approved => 'Approved',
             self::Rejected => 'Rejected',
+            self::Withdrawn => 'Withdrawn',
         };
     }
 
@@ -28,6 +30,7 @@ enum ProductApprovalStatus: string implements HasColor, HasLabel
             self::Pending => 'warning',
             self::Approved => 'success',
             self::Rejected => 'danger',
+            self::Withdrawn => 'gray',
         };
     }
 }

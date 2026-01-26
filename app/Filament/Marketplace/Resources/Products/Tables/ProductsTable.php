@@ -6,6 +6,8 @@ namespace App\Filament\Marketplace\Resources\Products\Tables;
 
 use App\Enums\ProductApprovalStatus;
 use App\Enums\ProductType;
+use App\Filament\Marketplace\Resources\Products\Actions\ResubmitProductAction;
+use App\Filament\Marketplace\Resources\Products\Actions\WithdrawProductAction;
 use App\Models\Product;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -71,7 +73,11 @@ class ProductsTable
             ->recordActions([
                 ViewAction::make()
                     ->url(fn (Product $record): string => route('store.products.show', $record->slug), shouldOpenInNewTab: true),
-                EditAction::make(),
+                EditAction::make()
+                    ->modalHeading('Edit Product')
+                    ->slideOver(),
+                WithdrawProductAction::make(),
+                ResubmitProductAction::make(),
             ]);
     }
 }

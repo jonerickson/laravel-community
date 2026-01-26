@@ -52,7 +52,7 @@ class StoreController extends Controller
                 ->visible()
                 ->active()
                 ->approved()
-                ->with('categories')
+                ->with(['categories', 'seller.groups'])
                 ->with(['prices' => function (Price|HasMany $query): void {
                     $query->active()->visible();
                 }])

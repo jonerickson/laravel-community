@@ -525,6 +525,7 @@ declare namespace App.Data {
         isFeatured: boolean;
         isSubscriptionOnly: boolean;
         isMarketplaceProduct: boolean;
+        seller: App.Data.UserData | null;
         approvalStatus: App.Enums.ProductApprovalStatus;
         isActive: boolean;
         isVisible: boolean;
@@ -533,6 +534,7 @@ declare namespace App.Data {
         allowDiscountCodes: boolean;
         featuredImage: string | null;
         featuredImageUrl: string | null;
+        images: Array<App.Data.ImageData>;
         externalProductId: string | null;
         metadata: Array<string, unknown> | null;
         prices: Array<App.Data.PriceData>;
@@ -770,7 +772,7 @@ declare namespace App.Enums {
     export type PayoutStatus = 'pending' | 'completed' | 'failed' | 'cancelled';
     export type PostType = 'blog' | 'forum';
     export type PriceType = 'one_time' | 'recurring';
-    export type ProductApprovalStatus = 'pending' | 'approved' | 'rejected';
+    export type ProductApprovalStatus = 'pending' | 'approved' | 'rejected' | 'withdrawn';
     export type ProductTaxCode =
         | 'general_tangible_goods'
         | 'general_electronically_supplied_services'
