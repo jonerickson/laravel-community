@@ -888,8 +888,8 @@
         "Typecheck passes"
       ],
       "priority": 54,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "68 tests covering TopicPolicy (25 tests: viewAny for guest/authenticated, view with guest/authenticated group read permission, inactive forum, no viewable posts, unapproved post author visibility, create for guest/authenticated with/without forum permission, update for guest/author/locked/forum permission/non-author, delete for guest/author/locked/forum permission/non-author, category-only forum, missing category read), PostPolicy (30 tests: viewAny, view for approved/unapproved/unpublished/reported posts with author/moderator overrides, future published_at, null published_at, create with warning consequences PostRestriction/Ban/None/ModerateContent, update/delete for guest/author/forum delete permission, author override without forum permission), ProductPolicy (13 tests: viewAny, view with approval status Approved/Pending/Rejected, active/inactive, no categories, mixed active/inactive categories, single category). Key learnings: is_reported is a computed Attribute from Reportable trait (not a DB column) - use Report::create() with pending status to make posts reported; forum_id is NOT NULL in topics table so blank forum scenarios are not testable; PostPolicy::view() does not check forum read permission - that's enforced at TopicPolicy level."
     },
     {
       "id": "US-055",
