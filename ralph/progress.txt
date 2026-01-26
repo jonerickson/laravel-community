@@ -25,6 +25,7 @@
 - AutoFollowCreatedTopic listener auto-follows topic creator - topics with `created_by` user will have 1 follower by default
 - HasAuthor withDefault() never returns null - returns Guest user with id=0
 - Readable trait needs `refresh()` after markAsRead to see updated reads collection (cached relation)
+- Factories (Product, Post, ProductCategory) pre-generate slug at definition time - pass `slug => null` to trigger HasSlug trait auto-generation when testing with custom names
 
 ## Completed Stories:
 
@@ -991,5 +992,24 @@
   - Forum groups pivot has boolean permission columns (create, read, update, delete, moderate, reply, report, pin, lock, move) stored as integers - cast with (bool) for assertions
   - Post comments_enabled is nullable in database - not initialized to true by Commentable trait's boot method (only comments_enabled column needs explicit value)
   - Post url for forum type includes anchor '#' + post id appended to topic route
+
+---
+
+## 2026-01-25 - US-053
+- What was implemented:
+  - Created tests/Unit/Traits/HasSlugTest.php with 31 tests for HasSlug trait
+  - Created tests/Unit/Traits/HasAuthorTest.php with 22 tests for HasAuthor trait
+  - Total: 53 tests covering both model traits
+  - HasSlugTest covers: auto-generation from name/title/content for Topic/Product/Forum/ForumCategory/ProductCategory/Page/Post (blog and forum types), blank slug handling (null and empty string), preserving explicitly provided slugs, duplicate slug collision with random suffix appended, unique suffix per duplicate, fillable initialization (slug in fillable), Sluggable contract implementation verification, generateSlug() method implementations for all model types, trait usage verification via class_uses_recursive
+  - HasAuthorTest covers: author relationship returning correct user, BelongsTo type, default Guest user with id=0 when no author, withDefault never returning null, creator alias returning same as author, isAuthoredBy method for correct/different/null author, cross-model isAuthoredBy, authorName attribute for existing and null authors, auto-fill created_by from Auth::id() on creation, explicit created_by preservation, null created_by when unauthenticated, fillable initialization (created_by in fillable), trait usage verification
+- Files changed:
+  - tests/Unit/Traits/HasSlugTest.php - New file (31 tests)
+  - tests/Unit/Traits/HasAuthorTest.php - New file (22 tests)
+- **Learnings for future iterations:**
+  - Factories (ProductFactory, PostFactory, ProductCategoryFactory) pre-generate slug from factory-defined name/title at definition time, not from state-overridden values. Must pass `slug => null` explicitly to trigger HasSlug trait auto-generation when testing with custom names
+  - HasSlug trait only generates slug in `creating` event when `blank($model->getAttribute('slug'))` is true - if factory pre-sets slug, the trait won't override it
+  - Post's generateSlug() for Forum type uses `Str::of($this->content)->stripTags()->limit(20)->slug()` - produces short slugs from stripped HTML content
+  - HasAuthor trait's bootHasAuthor sets created_by from Auth::id() only when created_by is blank - explicit values are preserved
+  - Both traits use `initializeHas*()` to merge fillable attributes, so `slug` and `created_by` are always in the model's fillable array
 
 ---
