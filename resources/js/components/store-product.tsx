@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Kbd } from '@/components/ui/kbd';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserInfo } from '@/components/user-info';
-import { currency } from '@/lib/utils';
+import { cn, currency } from '@/lib/utils';
 import { stripCharacters } from '@/utils/truncate';
 import { Deferred, useForm } from '@inertiajs/react';
 import { AlertTriangle, LoaderCircle, Package } from 'lucide-react';
@@ -24,6 +24,9 @@ interface ProductProps {
 export default function Product({ product: productData, reviews }: ProductProps) {
     const [selectedPriceId, setSelectedPriceId] = useState<number | null>(productData?.defaultPrice?.id || null);
     const [isMac, setIsMac] = useState(false);
+    const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+    const [descriptionOverflows, setDescriptionOverflows] = useState(false);
+    const descriptionRef = useRef<HTMLDivElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
     const { data, setData, post, processing, errors } = useForm({
         price_id: selectedPriceId,
@@ -33,6 +36,13 @@ export default function Product({ product: productData, reviews }: ProductProps)
     useEffect(() => {
         setIsMac(navigator.platform?.includes('Mac'));
     }, []);
+
+    useEffect(() => {
+        const el = descriptionRef.current;
+        if (el) {
+            setDescriptionOverflows(el.scrollHeight > el.clientHeight);
+        }
+    }, [productData.description]);
 
     useEffect(() => {
         let newPriceId = null;
@@ -52,6 +62,9 @@ export default function Product({ product: productData, reviews }: ProductProps)
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                const submitButton = formRef.current?.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+                if (submitButton?.disabled) return;
+
                 e.preventDefault();
                 formRef.current?.requestSubmit();
             }
@@ -148,7 +161,23 @@ export default function Product({ product: productData, reviews }: ProductProps)
                     {productData?.description && stripCharacters(productData.description).length > 0 && (
                         <div className="mt-6">
                             <HeadingSmall title="Description" />
-                            <RichEditorContent className="text-sm text-muted-foreground" content={productData.description} />
+                            <div className="relative">
+                                <div ref={descriptionRef} className={cn(!descriptionExpanded && 'max-h-40 overflow-hidden')}>
+                                    <RichEditorContent className="text-sm text-muted-foreground" content={productData.description} />
+                                </div>
+                                {descriptionOverflows && !descriptionExpanded && (
+                                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background to-transparent" />
+                                )}
+                            </div>
+                            {descriptionOverflows && (
+                                <button
+                                    type="button"
+                                    className="mt-2 text-sm font-medium text-primary hover:underline"
+                                    onClick={() => setDescriptionExpanded(!descriptionExpanded)}
+                                >
+                                    {descriptionExpanded ? 'See less' : 'See more'}
+                                </button>
+                            )}
                         </div>
                     )}
 
