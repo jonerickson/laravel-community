@@ -4,7 +4,7 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { Link, usePage } from '@inertiajs/react';
 
-export function UserInfo({ user, showEmail = false, showGroups = false }: { user: App.Data.UserData; showEmail?: boolean; showGroups?: boolean }) {
+export function UserInfo({ user, showEmail = false, showGroups = false, showAvatar = true }: { user: App.Data.UserData; showEmail?: boolean; showGroups?: boolean, showAvatar?: boolean }) {
     const getInitials = useInitials();
     const { isImpersonating } = usePage<App.Data.SharedData>().props.auth;
 
@@ -14,17 +14,19 @@ export function UserInfo({ user, showEmail = false, showGroups = false }: { user
 
     const content = (
         <>
-            <Avatar
-                className={cn(
-                    'size-8 overflow-hidden rounded-full',
-                    isImpersonating && 'mr-1 size-7 ring-2 ring-destructive ring-offset-2 ring-offset-background',
-                )}
-            >
-                {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name} />}
-                <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                    {getInitials(user.name)}
-                </AvatarFallback>
-            </Avatar>
+            {showAvatar && (
+                <Avatar
+                    className={cn(
+                        'size-8 overflow-hidden rounded-full',
+                        isImpersonating && 'mr-1 size-7 ring-2 ring-destructive ring-offset-2 ring-offset-background',
+                    )}
+                >
+                    {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name} />}
+                    <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                        {getInitials(user.name)}
+                    </AvatarFallback>
+                </Avatar>
+            )}
             <div className="flex flex-col">
                 <div className="grid flex-1 text-left text-sm leading-tight">
                     <StyledUserName user={user} className="truncate" />

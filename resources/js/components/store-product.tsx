@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Kbd } from '@/components/ui/kbd';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UserInfo } from '@/components/user-info';
 import { currency } from '@/lib/utils';
 import { stripCharacters } from '@/utils/truncate';
 import { Deferred, useForm } from '@inertiajs/react';
@@ -22,18 +23,16 @@ interface ProductProps {
 
 export default function Product({ product: productData, reviews }: ProductProps) {
     const [selectedPriceId, setSelectedPriceId] = useState<number | null>(productData?.defaultPrice?.id || null);
-
-    const formRef = useRef<HTMLFormElement>(null);
     const [isMac, setIsMac] = useState(false);
-
-    useEffect(() => {
-        setIsMac(navigator.platform?.includes('Mac'));
-    }, []);
-
+    const formRef = useRef<HTMLFormElement>(null);
     const { data, setData, post, processing, errors } = useForm({
         price_id: selectedPriceId,
         quantity: 1,
     });
+
+    useEffect(() => {
+        setIsMac(navigator.platform?.includes('Mac'));
+    }, []);
 
     useEffect(() => {
         let newPriceId = null;
@@ -107,7 +106,13 @@ export default function Product({ product: productData, reviews }: ProductProps)
                         }
                     />
 
-                    <div className="-mt-2 flex items-center gap-4">
+                    {productData.isMarketplaceProduct && productData.seller && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <UserInfo user={productData.seller} showGroups />
+                        </div>
+                    )}
+
+                    <div className="mt-2 flex items-center gap-4">
                         <StarRating rating={productData.averageRating || 0} showValue={true} />
                         <Deferred fallback={<div className="text-sm text-primary">Loading reviews...</div>} data="reviews">
                             <StoreProductRatingDialog product={productData} reviews={reviews} />

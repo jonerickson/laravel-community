@@ -7,6 +7,7 @@ import { getPriceDisplay } from '@/utils/price-display';
 import { stripCharacters, truncate } from '@/utils/truncate';
 import { Link, router } from '@inertiajs/react';
 import { ImageIcon, LoaderCircle } from 'lucide-react';
+import { UserInfo } from '@/components/user-info';
 
 export default function StoreCategoriesProductItem({ product }: { product: App.Data.ProductData }) {
     const { addItem, loading } = useCartOperations();
@@ -43,6 +44,11 @@ export default function StoreCategoriesProductItem({ product }: { product: App.D
                         </div>
                     )}
                     <HeadingSmall title={product.name} description={truncate(stripCharacters(product.description || ''))} />
+                    {product.isMarketplaceProduct && product.seller && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <UserInfo user={product.seller} showGroups={false} showAvatar={false} />
+                        </div>
+                    )}
                     <div className="mt-2">
                         <StarRating rating={product.averageRating || 0} size="sm" className="mb-1" />
                     </div>

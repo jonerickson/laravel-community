@@ -40,6 +40,8 @@ class ProductData extends Data
 
     public bool $isMarketplaceProduct;
 
+    public ?UserData $seller = null;
+
     public ProductApprovalStatus $approvalStatus;
 
     public bool $isActive;

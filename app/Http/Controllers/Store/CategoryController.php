@@ -51,7 +51,7 @@ class CategoryController extends Controller
             ->approved()
             ->visible()
             ->active()
-            ->with(['defaultPrice', 'inventoryItem'])
+            ->with(['defaultPrice', 'inventoryItem', 'seller.groups'])
             ->with(['prices' => function (Price|HasMany $query): void {
                 $query->active()->visible();
             }])

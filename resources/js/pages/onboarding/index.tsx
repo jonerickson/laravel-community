@@ -94,7 +94,7 @@ export default function Onboarding({
     });
 
     const updateRegisterField = (field: string, value: string | Record<number, boolean>) => {
-        setRegisterData(field as keyof OnboardingFormData, value as any);
+        setRegisterData((prev) => ({ ...prev, [field]: value }));
     };
 
     const updateProfileField = (fieldId: number, value: string) => {

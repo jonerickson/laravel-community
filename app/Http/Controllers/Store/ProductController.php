@@ -57,7 +57,7 @@ class ProductController extends Controller
     {
         $this->authorize('view', $product);
 
-        $product->loadMissing(['inventoryItem', 'defaultPrice', 'images']);
+        $product->loadMissing(['inventoryItem', 'defaultPrice', 'images', 'seller.groups']);
 
         $reviews = CommentData::collect($product
             ->reviews()
