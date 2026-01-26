@@ -148,12 +148,14 @@ trait Trendable
     {
         $limit ??= Config::get('trending.query.default_limit', 50);
 
-        $query->where('created_at', '>=', now()->subHours(48))
-            ->whereHas('posts', function (Builder $postQuery): void {
-                $postQuery->where('created_at', '>=', now()->subHours(24));
-            });
-
         $this->scopeTrending($query, $limit);
+
+        $query->where('created_at', '>=', now()->subHours(48))
+            ->whereIn('id', function ($subQuery): void {
+                $subQuery->select('topic_id')
+                    ->from('posts')
+                    ->where('created_at', '>=', now()->subHours(24));
+            });
     }
 
     public function trendingScore(): Attribute

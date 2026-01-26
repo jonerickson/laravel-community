@@ -32,7 +32,7 @@ class SupportTicketFactory extends Factory
     public function open(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => SupportTicketStatus::Open->value,
+            'status' => SupportTicketStatus::Open,
         ]);
     }
 
@@ -46,35 +46,35 @@ class SupportTicketFactory extends Factory
     public function resolved(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => SupportTicketStatus::Resolved->value,
+            'status' => SupportTicketStatus::Resolved,
         ]);
     }
 
     public function closed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => SupportTicketStatus::Closed->value,
+            'status' => SupportTicketStatus::Closed,
         ]);
     }
 
     public function lowPriority(): static
     {
         return $this->state(fn (array $attributes) => [
-            'priority' => SupportTicketPriority::Low->value,
+            'priority' => SupportTicketPriority::Low,
         ]);
     }
 
     public function highPriority(): static
     {
         return $this->state(fn (array $attributes) => [
-            'priority' => SupportTicketPriority::High->value,
+            'priority' => SupportTicketPriority::High,
         ]);
     }
 
     public function critical(): static
     {
         return $this->state(fn (array $attributes) => [
-            'priority' => SupportTicketPriority::Critical->value,
+            'priority' => SupportTicketPriority::Critical,
         ]);
     }
 

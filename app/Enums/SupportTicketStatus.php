@@ -41,7 +41,7 @@ enum SupportTicketStatus: string implements HasColor, HasLabel
     public function canTransitionTo(self $status): bool
     {
         return match ($this) {
-            self::New => in_array($status, [
+            self::New, self::WaitingOnCustomer => in_array($status, [
                 self::Open,
                 self::Resolved,
             ]),
@@ -54,11 +54,6 @@ enum SupportTicketStatus: string implements HasColor, HasLabel
 
             self::InProgress => in_array($status, [
                 self::WaitingOnCustomer,
-                self::Resolved,
-            ]),
-
-            self::WaitingOnCustomer => in_array($status, [
-                self::Open,
                 self::Resolved,
             ]),
 

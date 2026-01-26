@@ -23,6 +23,7 @@ use Illuminate\Support\Carbon;
  * @property-read Fingerprint|null $fingerprint
  * @property-read Model|Eloquent $viewable
  *
+ * @method static \Database\Factories\ViewFactory factory($count = null, $state = [])
  * @method static Builder<static>|View newModelQuery()
  * @method static Builder<static>|View newQuery()
  * @method static Builder<static>|View query()

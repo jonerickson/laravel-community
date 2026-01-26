@@ -17,7 +17,8 @@
       "Bash(kubectl logs:*)",
       "Bash(kubectl get:*)",
       "Bash(helm list:*)",
-      "Bash(helm get values:*)"
+      "Bash(helm get values:*)",
+      "Bash(php artisan route:list:*)"
     ],
     "deny": []
   },

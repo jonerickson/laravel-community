@@ -124,6 +124,7 @@ class DiscountFactory extends Factory
             DiscountType::GiftCard => 'GIFT',
             DiscountType::PromoCode => 'PROMO',
             DiscountType::Manual => 'MANUAL',
+            DiscountType::Cancellation => 'CANCELLATION-OFFER',
         };
 
         return Str::upper("{$prefix}-".Str::random(4).'-'.Str::random(4).'-'.Str::random(4));
