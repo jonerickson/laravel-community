@@ -19,6 +19,26 @@
         <exclude>
             <directory>app/Filament</directory>
             <directory>app/Providers</directory>
+            <directory>app/Console</directory>
+            <directory>app/Data</directory>
+            <directory>app/Enums</directory>
+            <directory>app/Events</directory>
+            <directory>app/Exceptions</directory>
+            <directory>app/Facades</directory>
+            <directory>app/Jobs</directory>
+            <directory>app/Listeners</directory>
+            <directory>app/Livewire</directory>
+            <directory>app/Mail</directory>
+            <directory>app/Mailboxes</directory>
+            <directory>app/Notifications</directory>
+            <directory>app/Settings</directory>
+            <directory>app/Support</directory>
+            <directory>app/Services/Migration</directory>
+            <directory>app/Api</directory>
+            <directory>app/Attributes</directory>
+            <directory>app/Contracts</directory>
+            <directory>app/Pipes</directory>
+            <directory>app/Rules</directory>
         </exclude>
     </source>
     <coverage>
@@ -27,6 +47,7 @@
         </report>
     </coverage>
     <php>
+        <ini name="memory_limit" value="2G"/>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>

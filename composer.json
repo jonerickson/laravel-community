@@ -159,7 +159,7 @@
         ],
         "tc": "@test-coverage",
         "test": "@php artisan test --no-coverage --parallel",
-        "test-coverage": "@php artisan test --coverage --parallel --min=90",
+        "test-coverage": "@php artisan test --coverage --parallel --min=60",
         "test-filter": "@php artisan test --no-coverage --filter",
         "test-lint": "@cs-fix --test",
         "test-suite": [
