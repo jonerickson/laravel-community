@@ -38,7 +38,7 @@ function createForumWithPostPermissions(Group $group, array $overrides = [], ?Fo
         'move' => false,
     ], $overrides);
 
-    if ($category instanceof ForumCategory) {
+    if ($category) {
         $category->groups()->attach($group, $permissions);
     }
 

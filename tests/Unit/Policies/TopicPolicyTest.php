@@ -30,7 +30,7 @@ function createForumWithPermissions(Group $group, array $overrides = [], ?ForumC
         'move' => false,
     ], $overrides);
 
-    if ($category instanceof ForumCategory) {
+    if ($category) {
         $category->groups()->attach($group, $permissions);
     }
 

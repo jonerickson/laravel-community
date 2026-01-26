@@ -26,6 +26,10 @@
 - HasAuthor withDefault() never returns null - returns Guest user with id=0
 - Readable trait needs `refresh()` after markAsRead to see updated reads collection (cached relation)
 - Factories (Product, Post, ProductCategory) pre-generate slug at definition time - pass `slug => null` to trigger HasSlug trait auto-generation when testing with custom names
+- `is_reported` on Post is a computed Attribute from Reportable trait (not a DB column) - create Report records with `status => ReportStatus::Pending` to make posts reported
+- `forum_id` on topics table is NOT NULL - cannot create topics without a forum in MySQL
+- PostPolicy::view() does not check forum read permission - forum access is enforced at TopicPolicy level via Gate delegation
+- Topic's `posts` relation may be stale after creating posts - call `->refresh()` on topic to ensure posts are loaded for policy checks
 
 ## Completed Stories:
 
@@ -1011,5 +1015,24 @@
   - Post's generateSlug() for Forum type uses `Str::of($this->content)->stripTags()->limit(20)->slug()` - produces short slugs from stripped HTML content
   - HasAuthor trait's bootHasAuthor sets created_by from Auth::id() only when created_by is blank - explicit values are preserved
   - Both traits use `initializeHas*()` to merge fillable attributes, so `slug` and `created_by` are always in the model's fillable array
+
+---
+
+## 2026-01-25 - US-054
+- What was implemented:
+  - Created `tests/Unit/Policies/TopicPolicyTest.php` with 25 tests covering viewAny, view, create, update, delete permissions with forum group permissions, locked topics, author overrides, category permission checks
+  - Created `tests/Unit/Policies/PostPolicyTest.php` with 30 tests covering viewAny, view (approved/unapproved/unpublished/reported/future published_at), create (with warning consequences: PostRestriction, Ban, None, ModerateContent), update/delete (guest, author, forum delete permission, author override)
+  - Created `tests/Unit/Policies/ProductPolicyTest.php` with 13 tests covering viewAny, view (approval status, active status, category visibility, mixed categories, no categories)
+- Files changed:
+  - `tests/Unit/Policies/TopicPolicyTest.php` - New test file (25 tests)
+  - `tests/Unit/Policies/PostPolicyTest.php` - New test file (30 tests)
+  - `tests/Unit/Policies/ProductPolicyTest.php` - New test file (13 tests)
+- **Learnings for future iterations:**
+  - `is_reported` on Post model is a computed Attribute from the Reportable trait, NOT a database column. To create a reported post, use `Report::create()` with `status => ReportStatus::Pending` instead of setting `is_reported` directly
+  - `forum_id` column in topics table is NOT NULL in MySQL - cannot create topics without a forum, so "blank forum" scenarios in TopicPolicy/PostPolicy are not directly testable via database
+  - PostPolicy::view() does NOT check forum read permission - it only checks post status flags (is_approved, is_published, is_reported, published_at). Forum access control is enforced at the TopicPolicy level via Gate delegation to ForumPolicy
+  - Topic's `posts` relationship may be stale after creating posts - must call `$topic->refresh()` to ensure posts are loaded when policy checks `$topic->posts->some()`
+  - PostPolicy::update() and ::delete() both delegate to forum `delete` permission (not `update`) for non-authors - this means forum moderators with delete permission can both update and delete posts
+  - To create reported posts for testing, use `Report::create()` with HasAuthor trait requiring `Auth::login()` or explicit `created_by`, plus `Auth::logout()` after to avoid test state leakage
 
 ---
