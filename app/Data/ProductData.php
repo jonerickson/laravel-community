@@ -56,6 +56,9 @@ class ProductData extends Data
 
     public ?string $featuredImageUrl = null;
 
+    /** @var ImageData[] */
+    public array $images = [];
+
     public ?string $externalProductId = null;
 
     #[LiteralTypeScriptType('Array<string, unknown> | null')]

@@ -533,6 +533,7 @@ declare namespace App.Data {
         allowDiscountCodes: boolean;
         featuredImage: string | null;
         featuredImageUrl: string | null;
+        images: Array<App.Data.ImageData>;
         externalProductId: string | null;
         metadata: Array<string, unknown> | null;
         prices: Array<App.Data.PriceData>;
