@@ -16,6 +16,7 @@ use App\Traits\Featureable;
 use App\Traits\HasFeaturedImage;
 use App\Traits\HasFiles;
 use App\Traits\HasGroups;
+use App\Traits\HasImages;
 use App\Traits\HasInventory;
 use App\Traits\HasLogging;
 use App\Traits\HasMetadata;
@@ -90,6 +91,9 @@ use Illuminate\Support\Str;
  * @property-read int|null $files_count
  * @property-read Collection<int, Group> $groups
  * @property-read int|null $groups_count
+ * @property-read Image|null $image
+ * @property-read Collection<int, Image> $images
+ * @property-read int|null $images_count
  * @property-read InventoryItem|null $inventoryItem
  * @property-read Collection<int, InventoryTransaction> $inventoryTransactions
  * @property-read int|null $inventory_transactions_count
@@ -165,6 +169,7 @@ class Product extends Model implements HasLabel, Sluggable
     use HasFeaturedImage;
     use HasFiles;
     use HasGroups;
+    use HasImages;
     use HasInventory;
     use HasLogging;
     use HasMetadata;

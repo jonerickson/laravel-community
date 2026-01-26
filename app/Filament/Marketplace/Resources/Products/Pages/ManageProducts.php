@@ -21,6 +21,11 @@ class ManageProducts extends ManageRecords
         return [
             CreateAction::make()
                 ->label('Submit product')
+                ->slideOver()
+                ->createAnother(false)
+                ->modalHeading('Submit Product')
+                ->modalDescription('Submit a new project to the marketplace store. Your product will need to be reviewed by staff before it can be purchased.')
+                ->modalSubmitActionLabel('Submit')
                 ->mutateDataUsing(function (array $data): array {
                     $data['seller_id'] = Auth::id();
                     $data['approval_status'] = ProductApprovalStatus::Pending;

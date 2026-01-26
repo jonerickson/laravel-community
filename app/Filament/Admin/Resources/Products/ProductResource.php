@@ -138,6 +138,29 @@ class ProductResource extends Resource
                                         '4:3',
                                         '1:1',
                                     ]),
+                                Repeater::make('images')
+                                    ->label('Gallery Images')
+                                    ->helperText('Additional product images shown in the gallery.')
+                                    ->relationship('images')
+                                    ->default([])
+                                    ->addActionLabel('Add image')
+                                    ->schema([
+                                        FileUpload::make('path')
+                                            ->label('Image')
+                                            ->directory('products/gallery')
+                                            ->visibility('public')
+                                            ->downloadable()
+                                            ->previewable()
+                                            ->openable()
+                                            ->image()
+                                            ->imageEditor()
+                                            ->imageEditorAspectRatios([
+                                                '16:9',
+                                                '4:3',
+                                                '1:1',
+                                            ])
+                                            ->required(),
+                                    ]),
                             ]),
                         Section::make('Files')
                             ->columnSpanFull()
