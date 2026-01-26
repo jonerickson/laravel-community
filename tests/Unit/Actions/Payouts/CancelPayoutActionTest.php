@@ -19,7 +19,7 @@ describe('CancelPayoutAction', function (): void {
 
         $action = new CancelPayoutAction(payout: $payout);
 
-        expect(fn () => $action())->toThrow(
+        expect(fn (): bool => $action())->toThrow(
             InvalidPayoutStatusException::class,
             'The payout cannot be cancelled. Only pending payouts can be cancelled. Current status: completed'
         );
@@ -33,7 +33,7 @@ describe('CancelPayoutAction', function (): void {
 
         $action = new CancelPayoutAction(payout: $payout);
 
-        expect(fn () => $action())->toThrow(
+        expect(fn (): bool => $action())->toThrow(
             InvalidPayoutStatusException::class,
             'The payout cannot be cancelled. Only pending payouts can be cancelled. Current status: failed'
         );
@@ -47,7 +47,7 @@ describe('CancelPayoutAction', function (): void {
 
         $action = new CancelPayoutAction(payout: $payout);
 
-        expect(fn () => $action())->toThrow(
+        expect(fn (): bool => $action())->toThrow(
             InvalidPayoutStatusException::class,
             'The payout cannot be cancelled. Only pending payouts can be cancelled. Current status: cancelled'
         );
@@ -67,9 +67,7 @@ describe('CancelPayoutAction', function (): void {
         expect($result)->toBeTrue();
         expect($payout->refresh()->status)->toBe(PayoutStatus::Cancelled);
 
-        Event::assertDispatched(PayoutCancelled::class, function ($event) use ($payout): bool {
-            return $event->payout->id === $payout->id;
-        });
+        Event::assertDispatched(PayoutCancelled::class, fn ($event): bool => $event->payout->id === $payout->id);
     });
 
     test('dispatches PayoutCancelled event on success', function (): void {
@@ -83,9 +81,7 @@ describe('CancelPayoutAction', function (): void {
         $action = new CancelPayoutAction(payout: $payout);
         $action();
 
-        Event::assertDispatched(PayoutCancelled::class, function ($event) use ($payout): bool {
-            return $event->payout->id === $payout->id;
-        });
+        Event::assertDispatched(PayoutCancelled::class, fn ($event): bool => $event->payout->id === $payout->id);
     });
 
     test('appends cancellation reason to notes when provided', function (): void {
@@ -136,7 +132,7 @@ describe('CancelPayoutAction', function (): void {
             'notes' => 'Existing notes',
         ]);
 
-        $action = new CancelPayoutAction(payout: $payout, reason: null);
+        $action = new CancelPayoutAction(payout: $payout);
         $result = $action();
 
         expect($result)->toBeTrue();
@@ -158,10 +154,8 @@ describe('CancelPayoutAction', function (): void {
         );
         $action();
 
-        Event::assertDispatched(PayoutCancelled::class, function ($event) use ($payout): bool {
-            return $event->payout->id === $payout->id
-                && $event->reason === 'Seller account closed';
-        });
+        Event::assertDispatched(PayoutCancelled::class, fn ($event): bool => $event->payout->id === $payout->id
+            && $event->reason === 'Seller account closed');
     });
 
     test('dispatches PayoutCancelled event with null reason when not provided', function (): void {
@@ -175,10 +169,8 @@ describe('CancelPayoutAction', function (): void {
         $action = new CancelPayoutAction(payout: $payout);
         $action();
 
-        Event::assertDispatched(PayoutCancelled::class, function ($event) use ($payout): bool {
-            return $event->payout->id === $payout->id
-                && $event->reason === null;
-        });
+        Event::assertDispatched(PayoutCancelled::class, fn ($event): bool => $event->payout->id === $payout->id
+            && $event->reason === null);
     });
 
     test('can be executed via static execute method', function (): void {

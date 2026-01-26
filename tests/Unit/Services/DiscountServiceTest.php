@@ -501,7 +501,7 @@ describe('createPromoCode', function (): void {
     });
 
     test('creates promo code with expiration date', function (): void {
-        $expiresAt = new DateTime('+30 days');
+        $expiresAt = Carbon\Carbon::now()->addDays(30);
 
         $promoCode = $this->service->createPromoCode(
             value: 10,
@@ -554,7 +554,7 @@ describe('createCancellationOffer', function (): void {
 
     test('creates cancellation offer with expiration', function (): void {
         $user = User::factory()->create();
-        $expiresAt = new DateTime('+7 days');
+        $expiresAt = Carbon\Carbon::now()->addDays(7);
 
         $offer = $this->service->createCancellationOffer($user, $expiresAt);
 

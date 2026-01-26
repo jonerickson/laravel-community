@@ -35,9 +35,9 @@ describe('MoveTopicAction', function (): void {
         try {
             $action();
             $this->fail('Expected HttpException to be thrown');
-        } catch (HttpException $e) {
-            expect($e->getStatusCode())->toBe(422);
-            expect($e->getMessage())->toBe('Topic is already in this forum.');
+        } catch (HttpException $httpException) {
+            expect($httpException->getStatusCode())->toBe(422);
+            expect($httpException->getMessage())->toBe('Topic is already in this forum.');
         }
     });
 
@@ -49,7 +49,7 @@ describe('MoveTopicAction', function (): void {
 
         $action = new MoveTopicAction($topic, $forum);
 
-        expect(fn () => $action())->toThrow(HttpException::class, 'Topic is already in this forum.');
+        expect(fn (): bool => $action())->toThrow(HttpException::class, 'Topic is already in this forum.');
     });
 
     test('preserves topic posts when moving', function (): void {
