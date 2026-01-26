@@ -112,7 +112,6 @@ describe('Post Publishable trait', function (): void {
         $post->publish();
 
         $post->refresh();
-
         expect($post->is_published)->toBeTrue();
         expect($post->published_at)->not->toBeNull();
     });
@@ -122,7 +121,6 @@ describe('Post Publishable trait', function (): void {
         $post->unpublish();
 
         $post->refresh();
-
         expect($post->is_published)->toBeFalse();
     });
 
