@@ -6,6 +6,7 @@ use App\Enums\ProductApprovalStatus;
 use App\Enums\ProductType;
 use App\Models\Comment;
 use App\Models\Group;
+use App\Models\Image;
 use App\Models\InventoryItem;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -523,6 +524,82 @@ describe('Product files relationship (from HasFiles trait)', function (): void {
 
         expect($product->file)->not->toBeNull();
         expect($product->file->name)->toBe('single-file.pdf');
+    });
+});
+
+describe('Product images relationship (from HasImages trait)', function (): void {
+    test('returns empty collection when product has no images', function (): void {
+        $product = Product::factory()->create();
+
+        expect($product->images)->toBeEmpty();
+    });
+
+    test('returns images attached to product', function (): void {
+        $product = Product::factory()->create();
+
+        $image = $product->images()->create([
+            'path' => 'products/gallery/test-image.jpg',
+        ]);
+
+        $images = $product->images;
+
+        expect($images)->toHaveCount(1);
+        expect($images->first()->id)->toBe($image->id);
+    });
+
+    test('returns multiple images', function (): void {
+        $product = Product::factory()->create();
+
+        $product->images()->create(['path' => 'products/gallery/image-1.jpg']);
+        $product->images()->create(['path' => 'products/gallery/image-2.jpg']);
+        $product->images()->create(['path' => 'products/gallery/image-3.jpg']);
+
+        expect($product->images)->toHaveCount(3);
+    });
+
+    test('image relationship returns latest image by id', function (): void {
+        $product = Product::factory()->create();
+
+        $product->images()->create(['path' => 'products/gallery/first.jpg']);
+        $latest = $product->images()->create(['path' => 'products/gallery/second.jpg']);
+
+        expect($product->image)->not->toBeNull();
+        expect($product->image->id)->toBe($latest->id);
+    });
+
+    test('does not return images from other products', function (): void {
+        $product = Product::factory()->create();
+        $otherProduct = Product::factory()->create();
+
+        $product->images()->create(['path' => 'products/gallery/mine.jpg']);
+        $otherProduct->images()->create(['path' => 'products/gallery/other.jpg']);
+
+        expect($product->images)->toHaveCount(1);
+    });
+
+    test('deleting product cascades to delete images', function (): void {
+        $product = Product::factory()->create();
+
+        $product->images()->create(['path' => 'products/gallery/image-1.jpg']);
+        $product->images()->create(['path' => 'products/gallery/image-2.jpg']);
+
+        expect(Image::query()->where('imageable_id', $product->id)->count())->toBe(2);
+
+        $product->delete();
+
+        expect(Image::query()->where('imageable_id', $product->id)->count())->toBe(0);
+    });
+
+    test('images relationship is MorphMany', function (): void {
+        $product = Product::factory()->create();
+
+        expect($product->images())->toBeInstanceOf(Illuminate\Database\Eloquent\Relations\MorphMany::class);
+    });
+
+    test('image relationship is MorphOne', function (): void {
+        $product = Product::factory()->create();
+
+        expect($product->image())->toBeInstanceOf(Illuminate\Database\Eloquent\Relations\MorphOne::class);
     });
 });
 
