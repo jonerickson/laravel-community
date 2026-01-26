@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 function bindUserToRequest(User $user): void
 {
     Auth::login($user);
-    app('request')->setUserResolver(fn () => $user);
+    app('request')->setUserResolver(fn (): User => $user);
 }
 
 describe('DeleteTopicAction', function (): void {
@@ -97,7 +97,7 @@ describe('DeleteTopicAction', function (): void {
 
         $action = new DeleteTopicAction($topic, $forum);
 
-        expect(fn () => $action())->toThrow(HttpException::class, 'You are not authorized to delete this topic.');
+        expect(fn (): ?bool => $action())->toThrow(HttpException::class, 'You are not authorized to delete this topic.');
     });
 
     test('returns 403 when user is not the author and not admin', function (): void {
@@ -116,8 +116,8 @@ describe('DeleteTopicAction', function (): void {
         try {
             $action();
             $this->fail('Expected HttpException to be thrown');
-        } catch (HttpException $e) {
-            expect($e->getStatusCode())->toBe(403);
+        } catch (HttpException $httpException) {
+            expect($httpException->getStatusCode())->toBe(403);
         }
     });
 
@@ -138,9 +138,9 @@ describe('DeleteTopicAction', function (): void {
         try {
             $action();
             $this->fail('Expected HttpException to be thrown');
-        } catch (HttpException $e) {
-            expect($e->getStatusCode())->toBe(404);
-            expect($e->getMessage())->toBe('Topic not found.');
+        } catch (HttpException $httpException) {
+            expect($httpException->getStatusCode())->toBe(404);
+            expect($httpException->getMessage())->toBe('Topic not found.');
         }
     });
 
@@ -156,7 +156,7 @@ describe('DeleteTopicAction', function (): void {
 
         $action = new DeleteTopicAction($topic, $forum);
 
-        expect(fn () => $action())->toThrow(HttpException::class);
+        expect(fn (): ?bool => $action())->toThrow(HttpException::class);
     });
 
     test('uses database transaction for deletion', function (): void {

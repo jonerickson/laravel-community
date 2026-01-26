@@ -110,10 +110,8 @@ describe('checkAllFilters', function (): void {
             ->toBeInstanceOf(Blacklist::class)
             ->id->toBe($blacklist->id);
 
-        Event::assertDispatched(BlacklistMatch::class, function (BlacklistMatch $event) use ($blacklist, $user): bool {
-            return $event->blacklist->id === $blacklist->id
-                && str_contains($event->content, (string) $user->id);
-        });
+        Event::assertDispatched(BlacklistMatch::class, fn (BlacklistMatch $event): bool => $event->blacklist->id === $blacklist->id
+            && str_contains($event->content, (string) $user->id));
     });
 
     test('checks fingerprint blacklist when user not blacklisted', function (): void {
@@ -136,10 +134,8 @@ describe('checkAllFilters', function (): void {
             ->toBeInstanceOf(Blacklist::class)
             ->id->toBe($blacklist->id);
 
-        Event::assertDispatched(BlacklistMatch::class, function (BlacklistMatch $event) use ($blacklist, $fingerprint): bool {
-            return $event->blacklist->id === $blacklist->id
-                && str_contains($event->content, (string) $fingerprint->id);
-        });
+        Event::assertDispatched(BlacklistMatch::class, fn (BlacklistMatch $event): bool => $event->blacklist->id === $blacklist->id
+            && str_contains($event->content, (string) $fingerprint->id));
     });
 
     test('checks IP blacklist when user and fingerprint not blacklisted', function (): void {
@@ -161,10 +157,8 @@ describe('checkAllFilters', function (): void {
             ->toBeInstanceOf(Blacklist::class)
             ->id->toBe($blacklist->id);
 
-        Event::assertDispatched(BlacklistMatch::class, function (BlacklistMatch $event) use ($blacklist, $ip): bool {
-            return $event->blacklist->id === $blacklist->id
-                && str_contains($event->content, $ip);
-        });
+        Event::assertDispatched(BlacklistMatch::class, fn (BlacklistMatch $event): bool => $event->blacklist->id === $blacklist->id
+            && str_contains($event->content, $ip));
     });
 
     test('returns false when guest with no blacklist', function (): void {
@@ -525,11 +519,9 @@ describe('BlacklistMatch event', function (): void {
         $service = createBlacklistService(user: $user);
         $service->isBlacklisted();
 
-        Event::assertDispatched(BlacklistMatch::class, function (BlacklistMatch $event) use ($blacklist, $user): bool {
-            return $event->blacklist->id === $blacklist->id
-                && $event->user?->id === $user->id
-                && $event->content === 'User ID: '.$user->id;
-        });
+        Event::assertDispatched(BlacklistMatch::class, fn (BlacklistMatch $event): bool => $event->blacklist->id === $blacklist->id
+            && $event->user?->id === $user->id
+            && $event->content === 'User ID: '.$user->id);
     });
 
     test('fires BlacklistMatch event with correct data for IP blacklist', function (): void {
@@ -544,10 +536,8 @@ describe('BlacklistMatch event', function (): void {
         $service = createBlacklistService(ip: $ip);
         $service->isBlacklisted();
 
-        Event::assertDispatched(BlacklistMatch::class, function (BlacklistMatch $event) use ($blacklist, $ip): bool {
-            return $event->blacklist->id === $blacklist->id
-                && $event->content === 'IP Address: '.$ip;
-        });
+        Event::assertDispatched(BlacklistMatch::class, fn (BlacklistMatch $event): bool => $event->blacklist->id === $blacklist->id
+            && $event->content === 'IP Address: '.$ip);
     });
 
     test('fires BlacklistMatch event with null user for guest', function (): void {
@@ -562,8 +552,6 @@ describe('BlacklistMatch event', function (): void {
         $service = createBlacklistService(ip: $ip);
         $service->isBlacklisted();
 
-        Event::assertDispatched(BlacklistMatch::class, function (BlacklistMatch $event): bool {
-            return is_null($event->user);
-        });
+        Event::assertDispatched(BlacklistMatch::class, fn (BlacklistMatch $event): bool => is_null($event->user));
     });
 });
