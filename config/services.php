@@ -36,6 +36,10 @@ return [
         'suspect_score_threshold' => env('FINGERPRINT_SUSPECT_THRESHOLD', 25),
     ],
 
+    'intercom' => [
+        'app_id' => env('INTERCOM_APP_ID'),
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],
