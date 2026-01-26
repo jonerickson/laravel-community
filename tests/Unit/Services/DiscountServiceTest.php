@@ -43,6 +43,7 @@ describe('validateDiscount', function (): void {
             'expires_at' => null,
             'user_id' => null,
             'product_id' => null,
+            'min_order_amount' => null,
         ]);
 
         $result = $this->service->validateDiscount('GIFTCARD');
@@ -169,6 +170,7 @@ describe('calculateDiscount', function (): void {
             'expires_at' => null,
             'user_id' => null,
             'product_id' => null,
+            'min_order_amount' => null,
         ]);
 
         // Refresh from database to ensure attributes are properly loaded
@@ -191,6 +193,7 @@ describe('calculateDiscount', function (): void {
             'expires_at' => null,
             'user_id' => null,
             'product_id' => null,
+            'min_order_amount' => null,
         ]);
 
         // Refresh from database to ensure attributes are properly loaded
@@ -278,6 +281,7 @@ describe('applyDiscountsToOrder', function (): void {
             'expires_at' => null,
             'user_id' => null,
             'product_id' => null,
+            'min_order_amount' => null,
         ]);
 
         // Refresh gift card from database to ensure attributes are properly loaded
@@ -310,6 +314,7 @@ describe('applyDiscountsToOrder', function (): void {
             'expires_at' => null,
             'user_id' => null,
             'product_id' => null,
+            'min_order_amount' => null,
         ]);
 
         // Refresh from database to ensure attributes are properly loaded
@@ -365,6 +370,7 @@ describe('applyDiscountsToOrder', function (): void {
             'expires_at' => null,
             'user_id' => null,
             'product_id' => null,
+            'min_order_amount' => null,
         ]);
         $discount2 = Discount::factory()->promoCode(25)->active()->create([
             'code' => 'EXTRA25',
