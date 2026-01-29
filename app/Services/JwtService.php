@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\UserIntegration;
 use Carbon\Carbon;
 use Illuminate\Container\Attributes\Config;
+use Illuminate\Support\Str;
 
 class JwtService
 {
@@ -37,6 +38,11 @@ class JwtService
         $user->loadMissing('integrations')->integrations->each(function (UserIntegration $integration) use (&$claims): void {
             $claims[$integration->provider] = $integration->provider_id;
         });
+
+        if ($subscription = $user->current_subscription) {
+            $claims['subscription_name'] = $subscription->product?->name;
+            $claims['subscription_status'] = Str::ucfirst($subscription->status?->value);
+        }
 
         return $this->encode($claims, $secret);
     }

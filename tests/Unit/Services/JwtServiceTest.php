@@ -2,10 +2,41 @@
 
 declare(strict_types=1);
 
+use App\Data\ProductData;
+use App\Data\SubscriptionData;
+use App\Enums\ProductApprovalStatus;
+use App\Enums\ProductType;
+use App\Enums\SubscriptionStatus;
+use App\Facades\PaymentProcessor;
 use App\Models\User;
 use App\Models\UserIntegration;
 use App\Services\JwtService;
 use Carbon\Carbon;
+
+function createTestProductData(string $name = 'Test Product'): ProductData
+{
+    return ProductData::from([
+        'id' => 1,
+        'reference_id' => 'ref-123',
+        'name' => $name,
+        'slug' => 'test-product',
+        'type' => ProductType::Product,
+        'order' => 1,
+        'is_featured' => false,
+        'is_subscription_only' => false,
+        'is_marketplace_product' => false,
+        'approval_status' => ProductApprovalStatus::Approved,
+        'is_active' => true,
+        'is_visible' => true,
+        'trial_days' => 0,
+        'allow_promotion_codes' => true,
+        'allow_discount_codes' => true,
+        'average_rating' => 0.0,
+        'reviews_count' => 0,
+        'prices' => [],
+        'categories' => [],
+    ]);
+}
 
 function createJwtService(string $appKey = 'test-app-key'): JwtService
 {
@@ -288,5 +319,123 @@ describe('generateForUser', function (): void {
         $decoded = decodeJwt($token);
 
         expect($decoded['payload'])->toHaveKey('discord', 'discord-123');
+    });
+
+    test('includes subscription name and status when user has subscription', function (): void {
+        $user = User::factory()->create();
+
+        $subscriptionData = SubscriptionData::from([
+            'name' => 'default',
+            'status' => SubscriptionStatus::Active,
+            'does_not_expire' => false,
+            'product' => createTestProductData('Premium Plan'),
+        ]);
+
+        PaymentProcessor::shouldReceive('currentSubscription')
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
+            ->andReturn($subscriptionData);
+
+        $service = createJwtService();
+
+        $token = $service->generateForUser($user);
+
+        $decoded = decodeJwt($token);
+
+        expect($decoded['payload'])
+            ->toHaveKey('subscription_name', 'Premium Plan')
+            ->toHaveKey('subscription_status', 'Active');
+    });
+
+    test('includes subscription with different statuses', function (): void {
+        $user = User::factory()->create();
+
+        $subscriptionData = SubscriptionData::from([
+            'name' => 'default',
+            'status' => SubscriptionStatus::Trialing,
+            'does_not_expire' => false,
+            'product' => createTestProductData('Enterprise'),
+        ]);
+
+        PaymentProcessor::shouldReceive('currentSubscription')
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
+            ->andReturn($subscriptionData);
+
+        $service = createJwtService();
+
+        $token = $service->generateForUser($user);
+
+        $decoded = decodeJwt($token);
+
+        expect($decoded['payload'])
+            ->toHaveKey('subscription_name', 'Enterprise')
+            ->toHaveKey('subscription_status', 'Trialing');
+    });
+
+    test('does not include subscription claims when user has no subscription', function (): void {
+        $user = User::factory()->create();
+
+        PaymentProcessor::shouldReceive('currentSubscription')
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
+            ->andReturnNull();
+
+        $service = createJwtService();
+
+        $token = $service->generateForUser($user);
+
+        $decoded = decodeJwt($token);
+
+        expect($decoded['payload'])
+            ->not->toHaveKey('subscription_name')
+            ->not->toHaveKey('subscription_status');
+    });
+
+    test('handles subscription with null status', function (): void {
+        $user = User::factory()->create();
+
+        $subscriptionData = SubscriptionData::from([
+            'name' => 'default',
+            'status' => null,
+            'does_not_expire' => true,
+            'product' => createTestProductData('Basic'),
+        ]);
+
+        PaymentProcessor::shouldReceive('currentSubscription')
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
+            ->andReturn($subscriptionData);
+
+        $service = createJwtService();
+
+        $token = $service->generateForUser($user);
+
+        $decoded = decodeJwt($token);
+
+        expect($decoded['payload'])
+            ->toHaveKey('subscription_name', 'Basic')
+            ->toHaveKey('subscription_status', null);
+    });
+
+    test('handles subscription with null product', function (): void {
+        $user = User::factory()->create();
+
+        $subscriptionData = SubscriptionData::from([
+            'name' => 'default',
+            'status' => SubscriptionStatus::Active,
+            'does_not_expire' => false,
+            'product' => null,
+        ]);
+
+        PaymentProcessor::shouldReceive('currentSubscription')
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
+            ->andReturn($subscriptionData);
+
+        $service = createJwtService();
+
+        $token = $service->generateForUser($user);
+
+        $decoded = decodeJwt($token);
+
+        expect($decoded['payload'])
+            ->toHaveKey('subscription_name', null)
+            ->toHaveKey('subscription_status', 'Active');
     });
 });
