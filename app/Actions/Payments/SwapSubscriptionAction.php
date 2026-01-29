@@ -33,13 +33,11 @@ class SwapSubscriptionAction extends Action
             return false;
         }
 
-        $paymentManager = app(PaymentManager::class);
-
-        if (! $paymentManager->currentSubscription($this->user)) {
+        if (! $this->user->current_subscription) {
             return false;
         }
 
-        return $paymentManager->swapSubscription(
+        return app(PaymentManager::class)->swapSubscription(
             user: $this->user,
             price: $this->price,
             prorationBehavior: $this->prorationBehavior,
