@@ -22,6 +22,7 @@ export function useIntercom(): void {
         window.intercomSettings = {
             api_base: 'https://api-iam.intercom.io',
             app_id: appId,
+            session_duration: 86400000,
             ...(intercom.userId && {
                 name: intercom.userName,
                 email: intercom.userEmail,

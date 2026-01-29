@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\User;
+use App\Models\UserIntegration;
+use Carbon\Carbon;
 use Illuminate\Container\Attributes\Config;
 
 class JwtService
@@ -27,10 +29,14 @@ class JwtService
             'sub' => (string) $user->id,
             'email' => $user->email,
             'name' => $user->name,
-            'iat' => \Carbon\Carbon::now()->getTimestamp(),
-            'exp' => \Carbon\Carbon::now()->getTimestamp() + $expiresIn,
+            'iat' => Carbon::now()->getTimestamp(),
+            'exp' => Carbon::now()->getTimestamp() + $expiresIn,
             ...$additionalClaims,
         ];
+
+        $user->loadMissing('integrations')->integrations->each(function (UserIntegration $integration) use (&$claims): void {
+            $claims[$integration->provider] = $integration->provider_id;
+        });
 
         return $this->encode($claims, $secret);
     }
@@ -45,8 +51,8 @@ class JwtService
         $secret = $secret ?: $this->appKey;
 
         $claims = [
-            'iat' => \Carbon\Carbon::now()->getTimestamp(),
-            'exp' => \Carbon\Carbon::now()->getTimestamp() + $expiresIn,
+            'iat' => Carbon::now()->getTimestamp(),
+            'exp' => Carbon::now()->getTimestamp() + $expiresIn,
             ...$claims,
         ];
 
