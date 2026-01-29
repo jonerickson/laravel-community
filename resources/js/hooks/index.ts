@@ -5,6 +5,7 @@ export { useCookie } from './use-cookie';
 export { useFingerprint } from './use-fingerprint';
 export { useFormLoading } from './use-form-loading';
 export { useInitials } from './use-initials';
+export { useIntercom } from './use-intercom';
 export { useLayout } from './use-layout';
 export { useMarkAsRead } from './use-mark-as-read';
 export { useIsMobile } from './use-mobile';

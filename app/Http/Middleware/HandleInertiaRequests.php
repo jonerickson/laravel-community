@@ -7,6 +7,7 @@ namespace App\Http\Middleware;
 use App\Data\AnnouncementData;
 use App\Data\AuthData;
 use App\Data\FlashData;
+use App\Data\IntercomData;
 use App\Data\NavigationPageData;
 use App\Data\SharedData;
 use App\Data\UserData;
@@ -18,6 +19,7 @@ use App\Models\User;
 use App\Services\Integrations\DiscordService;
 use App\Services\Integrations\RobloxService;
 use App\Services\ShoppingCartService;
+use App\Settings\IntegrationSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
@@ -102,6 +104,7 @@ class HandleInertiaRequests extends Middleware
             'address' => config('app.address'),
             'slogan' => config('app.slogan'),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'intercom' => $this->resolveIntercomData($user),
             'ziggy' => [],
         ]);
 
@@ -117,5 +120,34 @@ class HandleInertiaRequests extends Middleware
                 'location' => $request->url(),
             ],
         ];
+    }
+
+    private function resolveIntercomData(?User $user): ?IntercomData
+    {
+        $envAppId = config('services.intercom.app_id');
+
+        if ($envAppId) {
+            return IntercomData::from([
+                'app_id' => $envAppId,
+                'user_name' => $user?->name,
+                'user_email' => $user?->email,
+                'user_id' => $user?->id,
+                'created_at' => $user?->created_at?->timestamp,
+            ]);
+        }
+
+        $settings = app(IntegrationSettings::class);
+
+        if (! $settings->intercom_enabled || ! $settings->intercom_app_id) {
+            return null;
+        }
+
+        return IntercomData::from([
+            'app_id' => $settings->intercom_app_id,
+            'user_name' => $user?->name,
+            'user_email' => $user?->email,
+            'user_id' => $user?->id,
+            'created_at' => $user?->created_at?->timestamp,
+        ]);
     }
 }

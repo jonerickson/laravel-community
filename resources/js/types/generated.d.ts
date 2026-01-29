@@ -241,6 +241,13 @@ declare namespace App.Data {
         createdAt: string | null;
         updatedAt: string | null;
     };
+    export type IntercomData = {
+        appId: string | null;
+        userName: string | null;
+        userEmail: string | null;
+        userId: number | null;
+        createdAt: number | null;
+    };
     export type InventoryItemData = {
         id: number;
         productId: number;
@@ -598,6 +605,7 @@ declare namespace App.Data {
         robloxCount: number;
         flash: App.Data.FlashData | null;
         sidebarOpen: boolean;
+        intercom: App.Data.IntercomData | null;
         ziggy: Config & { location: string };
     };
     export type SubscriptionData = {

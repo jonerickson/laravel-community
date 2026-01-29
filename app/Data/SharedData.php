@@ -50,6 +50,8 @@ class SharedData extends Data
 
     public bool $sidebarOpen;
 
+    public ?IntercomData $intercom = null;
+
     #[LiteralTypeScriptType('Config & { location: string }')]
     public mixed $ziggy;
 }
