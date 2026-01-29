@@ -22,4 +22,6 @@ class IntercomData extends Data
     public ?int $userId = null;
 
     public ?int $createdAt = null;
+
+    public ?string $userJwt = null;
 }

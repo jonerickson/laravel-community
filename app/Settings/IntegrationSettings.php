@@ -12,6 +12,10 @@ class IntegrationSettings extends Settings
 
     public ?string $intercom_app_id = null;
 
+    public bool $intercom_auth_required = false;
+
+    public ?string $intercom_secret_key = null;
+
     public static function group(): string
     {
         return 'integrations';

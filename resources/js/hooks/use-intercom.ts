@@ -27,6 +27,7 @@ export function useIntercom(): void {
                 email: intercom.userEmail,
                 user_id: intercom.userId,
                 created_at: intercom.createdAt,
+                ...(intercom.userJwt && { intercom_user_jwt: intercom.userJwt }),
             }),
         };
 
@@ -48,5 +49,5 @@ export function useIntercom(): void {
                 window.Intercom('shutdown');
             }
         };
-    }, [intercom?.appId, intercom?.userId, intercom?.userName, intercom?.userEmail, intercom?.createdAt]);
+    }, [intercom?.appId, intercom?.userId, intercom?.userName, intercom?.userEmail, intercom?.createdAt, intercom?.userJwt]);
 }

@@ -247,6 +247,7 @@ declare namespace App.Data {
         userEmail: string | null;
         userId: number | null;
         createdAt: number | null;
+        userJwt: string | null;
     };
     export type InventoryItemData = {
         id: number;
@@ -383,7 +384,7 @@ declare namespace App.Data {
         createdAt: string | null;
         updatedAt: string | null;
     };
-    export type PaginatedData<T = unknown> = {
+    export type PaginatedData = {
         data: Array<T>;
         currentPage: number;
         lastPage: number;

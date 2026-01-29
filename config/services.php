@@ -38,6 +38,7 @@ return [
 
     'intercom' => [
         'app_id' => env('INTERCOM_APP_ID'),
+        'secret_key' => env('INTERCOM_SECRET_KEY'),
     ],
 
     'postmark' => [

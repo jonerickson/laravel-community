@@ -42,6 +42,9 @@ class ManageIntegrationSettings extends SettingsPage
     #[Override]
     public function form(Schema $schema): Schema
     {
+        $envAppId = config('services.intercom.app_id');
+        $envSecretKey = config('services.intercom.secret_key');
+
         return $schema
             ->components([
                 Section::make('Intercom')
@@ -50,11 +53,27 @@ class ManageIntegrationSettings extends SettingsPage
                     ->schema([
                         Toggle::make('intercom_enabled')
                             ->label('Enable Intercom')
-                            ->helperText('Show the Intercom chat widget on your site.'),
+                            ->helperText('Show the Intercom chat widget on your site.')
+                            ->disabled(filled($envAppId))
+                            ->formatStateUsing(fn ($state) => $envAppId ? true : $state),
                         TextInput::make('intercom_app_id')
                             ->label('App ID')
-                            ->helperText('Your Intercom app ID (found in Intercom settings).')
-                            ->placeholder('abc123xy'),
+                            ->helperText($envAppId ? 'Set via INTERCOM_APP_ID environment variable.' : 'Your Intercom app ID (found in Intercom settings).')
+                            ->placeholder('abc123xy')
+                            ->disabled(filled($envAppId))
+                            ->formatStateUsing(fn ($state) => $envAppId ?: $state),
+                        Toggle::make('intercom_auth_required')
+                            ->default(true)
+                            ->label('Require Authentication')
+                            ->helperText('Only show the chat widget to logged-in users.'),
+                        TextInput::make('intercom_secret_key')
+                            ->label('Identity Verification Secret')
+                            ->helperText($envSecretKey ? 'Set via INTERCOM_SECRET_KEY environment variable.' : 'Your Intercom identity verification secret key for secure user authentication. Found in Intercom Settings > Security.')
+                            ->password()
+                            ->revealable()
+                            ->placeholder('Enter secret key')
+                            ->disabled(filled($envSecretKey))
+                            ->formatStateUsing(fn ($state) => $envSecretKey ?: $state),
                     ]),
             ]);
     }
