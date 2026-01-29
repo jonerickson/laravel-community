@@ -31,6 +31,7 @@ return [
     'additional_directives' => [
         Directive::CONNECT->value => env('CSP_CONNECT_SRC'),
         Directive::IMG->value => env('CSP_IMG_SRC'),
+        Directive::SCRIPT->value => env('CSP_SCRIPT_SRC'),
     ],
 
     /*
