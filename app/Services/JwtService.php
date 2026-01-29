@@ -30,6 +30,7 @@ class JwtService
             'sub' => (string) $user->id,
             'email' => $user->email,
             'name' => $user->name,
+            'stripe_id' => $user->stripe_id,
             'iat' => Carbon::now()->getTimestamp(),
             'exp' => Carbon::now()->getTimestamp() + $expiresIn,
             ...$additionalClaims,

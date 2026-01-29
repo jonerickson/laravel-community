@@ -214,6 +214,30 @@ describe('generateForUser', function (): void {
         expect($decoded['payload']['name'])->toBe('John Doe');
     });
 
+    test('includes stripe_id when user has one', function (): void {
+        $user = User::factory()->create(['stripe_id' => 'cus_abc123']);
+
+        $service = createJwtService();
+
+        $token = $service->generateForUser($user);
+
+        $decoded = decodeJwt($token);
+
+        expect($decoded['payload']['stripe_id'])->toBe('cus_abc123');
+    });
+
+    test('includes null stripe_id when user has no stripe customer', function (): void {
+        $user = User::factory()->create(['stripe_id' => null]);
+
+        $service = createJwtService();
+
+        $token = $service->generateForUser($user);
+
+        $decoded = decodeJwt($token);
+
+        expect($decoded['payload'])->toHaveKey('stripe_id', null);
+    });
+
     test('includes additional claims when provided', function (): void {
         $user = User::factory()->create();
 
