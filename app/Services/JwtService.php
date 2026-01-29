@@ -44,6 +44,10 @@ class JwtService
             $claims['subscription_status'] = Str::ucfirst($subscription->status?->value);
         }
 
+        if ($fingerprint = $user->fingerprints()->latest()->first()) {
+            $claims['fingerprint'] = $fingerprint->fingerprint_id;
+        }
+
         return $this->encode($claims, $secret);
     }
 

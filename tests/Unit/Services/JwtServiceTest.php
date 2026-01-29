@@ -8,6 +8,7 @@ use App\Enums\ProductApprovalStatus;
 use App\Enums\ProductType;
 use App\Enums\SubscriptionStatus;
 use App\Facades\PaymentProcessor;
+use App\Models\Fingerprint;
 use App\Models\User;
 use App\Models\UserIntegration;
 use App\Services\JwtService;
@@ -437,5 +438,73 @@ describe('generateForUser', function (): void {
         expect($decoded['payload'])
             ->toHaveKey('subscription_name', null)
             ->toHaveKey('subscription_status', 'Active');
+    });
+
+    test('includes fingerprint when user has a fingerprint', function (): void {
+        $user = User::factory()->create();
+
+        Fingerprint::factory()->create([
+            'user_id' => $user->id,
+            'fingerprint_id' => 'fp_abc123xyz',
+        ]);
+
+        PaymentProcessor::shouldReceive('currentSubscription')
+            ->andReturnNull();
+
+        $service = createJwtService();
+
+        $token = $service->generateForUser($user);
+
+        $decoded = decodeJwt($token);
+
+        expect($decoded['payload'])->toHaveKey('fingerprint', 'fp_abc123xyz');
+    });
+
+    test('does not include fingerprint when user has no fingerprints', function (): void {
+        $user = User::factory()->create();
+
+        PaymentProcessor::shouldReceive('currentSubscription')
+            ->andReturnNull();
+
+        $service = createJwtService();
+
+        $token = $service->generateForUser($user);
+
+        $decoded = decodeJwt($token);
+
+        expect($decoded['payload'])->not->toHaveKey('fingerprint');
+    });
+
+    test('uses latest fingerprint when user has multiple fingerprints', function (): void {
+        $user = User::factory()->create();
+
+        Fingerprint::factory()->create([
+            'user_id' => $user->id,
+            'fingerprint_id' => 'fp_older_fingerprint',
+            'created_at' => now()->subDays(5),
+        ]);
+
+        Fingerprint::factory()->create([
+            'user_id' => $user->id,
+            'fingerprint_id' => 'fp_latest_fingerprint',
+            'created_at' => now(),
+        ]);
+
+        Fingerprint::factory()->create([
+            'user_id' => $user->id,
+            'fingerprint_id' => 'fp_middle_fingerprint',
+            'created_at' => now()->subDays(2),
+        ]);
+
+        PaymentProcessor::shouldReceive('currentSubscription')
+            ->andReturnNull();
+
+        $service = createJwtService();
+
+        $token = $service->generateForUser($user);
+
+        $decoded = decodeJwt($token);
+
+        expect($decoded['payload'])->toHaveKey('fingerprint', 'fp_latest_fingerprint');
     });
 });
