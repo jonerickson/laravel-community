@@ -6,6 +6,7 @@ use App\Actions\Payments\SwapSubscriptionAction;
 use App\Data\SubscriptionData;
 use App\Enums\PaymentBehavior;
 use App\Enums\ProrationBehavior;
+use App\Facades\PaymentProcessor;
 use App\Managers\PaymentManager;
 use App\Models\Price;
 use App\Models\Product;
@@ -45,12 +46,10 @@ describe('SwapSubscriptionAction', function (): void {
             'product_id' => $product->id,
         ]);
 
-        $this->mock(PaymentManager::class, function ($mock) use ($user): void {
-            $mock->shouldReceive('currentSubscription')
-                ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
-                ->once()
-                ->andReturn(null);
-        });
+        PaymentProcessor::shouldReceive('currentSubscription')
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
+            ->once()
+            ->andReturnNull();
 
         $action = new SwapSubscriptionAction(
             user: $user,
@@ -85,12 +84,12 @@ describe('SwapSubscriptionAction', function (): void {
             'externalPriceId' => $price->external_price_id,
         ]);
 
-        $this->mock(PaymentManager::class, function ($mock) use ($user, $price, $currentSubscription, $swappedSubscription): void {
-            $mock->shouldReceive('currentSubscription')
-                ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
-                ->once()
-                ->andReturn($currentSubscription);
+        PaymentProcessor::shouldReceive('currentSubscription')
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
+            ->once()
+            ->andReturn($currentSubscription);
 
+        $this->mock(PaymentManager::class, function ($mock) use ($user, $price, $swappedSubscription): void {
             $mock->shouldReceive('swapSubscription')
                 ->with(
                     Mockery::on(fn ($arg): bool => $arg->id === $user->id),
@@ -111,8 +110,9 @@ describe('SwapSubscriptionAction', function (): void {
 
         $result = $action();
 
-        expect($result)->toBeInstanceOf(SubscriptionData::class);
-        expect($result->externalPriceId)->toBe($price->external_price_id);
+        expect($result)
+            ->toBeInstanceOf(SubscriptionData::class)
+            ->and($result->externalPriceId)->toBe($price->external_price_id);
     });
 
     test('returns swapped subscription data on success', function (): void {
@@ -132,11 +132,11 @@ describe('SwapSubscriptionAction', function (): void {
             'quantity' => 1,
         ]);
 
-        $this->mock(PaymentManager::class, function ($mock) use ($swappedSubscription): void {
-            $mock->shouldReceive('currentSubscription')
-                ->once()
-                ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
+        PaymentProcessor::shouldReceive('currentSubscription')
+            ->once()
+            ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
 
+        $this->mock(PaymentManager::class, function ($mock) use ($swappedSubscription): void {
             $mock->shouldReceive('swapSubscription')
                 ->once()
                 ->andReturn($swappedSubscription);
@@ -151,9 +151,10 @@ describe('SwapSubscriptionAction', function (): void {
 
         $result = $action();
 
-        expect($result)->toBeInstanceOf(SubscriptionData::class);
-        expect($result->name)->toBe('default');
-        expect($result->quantity)->toBe(1);
+        expect($result)
+            ->toBeInstanceOf(SubscriptionData::class)
+            ->and($result->name)->toBe('default')
+            ->and($result->quantity)->toBe(1);
     });
 
     test('respects proration behavior parameter', function (): void {
@@ -166,11 +167,11 @@ describe('SwapSubscriptionAction', function (): void {
             'product_id' => $product->id,
         ]);
 
-        $this->mock(PaymentManager::class, function ($mock): void {
-            $mock->shouldReceive('currentSubscription')
-                ->once()
-                ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
+        PaymentProcessor::shouldReceive('currentSubscription')
+            ->once()
+            ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
 
+        $this->mock(PaymentManager::class, function ($mock): void {
             $mock->shouldReceive('swapSubscription')
                 ->with(
                     Mockery::any(),
@@ -204,11 +205,11 @@ describe('SwapSubscriptionAction', function (): void {
             'product_id' => $product->id,
         ]);
 
-        $this->mock(PaymentManager::class, function ($mock): void {
-            $mock->shouldReceive('currentSubscription')
-                ->once()
-                ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
+        PaymentProcessor::shouldReceive('currentSubscription')
+            ->once()
+            ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
 
+        $this->mock(PaymentManager::class, function ($mock): void {
             $mock->shouldReceive('swapSubscription')
                 ->with(
                     Mockery::any(),
@@ -242,11 +243,11 @@ describe('SwapSubscriptionAction', function (): void {
             'product_id' => $product->id,
         ]);
 
-        $this->mock(PaymentManager::class, function ($mock): void {
-            $mock->shouldReceive('currentSubscription')
-                ->once()
-                ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
+        PaymentProcessor::shouldReceive('currentSubscription')
+            ->once()
+            ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
 
+        $this->mock(PaymentManager::class, function ($mock): void {
             $mock->shouldReceive('swapSubscription')
                 ->once()
                 ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
@@ -272,11 +273,11 @@ describe('SwapSubscriptionAction', function (): void {
             'product_id' => $product->id,
         ]);
 
-        $this->mock(PaymentManager::class, function ($mock): void {
-            $mock->shouldReceive('currentSubscription')
-                ->once()
-                ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
+        PaymentProcessor::shouldReceive('currentSubscription')
+            ->once()
+            ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
 
+        $this->mock(PaymentManager::class, function ($mock): void {
             $mock->shouldReceive('swapSubscription')
                 ->once()
                 ->andReturn(false);
@@ -294,7 +295,7 @@ describe('SwapSubscriptionAction', function (): void {
         expect($result)->toBeFalse();
     });
 
-    test('supports all proration behavior types', function (): void {
+    test('supports proration behavior', function (ProrationBehavior $prorationBehavior): void {
         $user = User::factory()->create();
         $category = ProductCategory::factory()->active()->create();
         $product = Product::factory()->create();
@@ -304,37 +305,35 @@ describe('SwapSubscriptionAction', function (): void {
             'product_id' => $product->id,
         ]);
 
-        foreach (ProrationBehavior::cases() as $prorationBehavior) {
-            $this->mock(PaymentManager::class, function ($mock) use ($prorationBehavior): void {
-                $mock->shouldReceive('currentSubscription')
-                    ->once()
-                    ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
+        PaymentProcessor::shouldReceive('currentSubscription')
+            ->once()
+            ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
 
-                $mock->shouldReceive('swapSubscription')
-                    ->with(
-                        Mockery::any(),
-                        Mockery::any(),
-                        $prorationBehavior,
-                        Mockery::any()
-                    )
-                    ->once()
-                    ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
-            });
+        $this->mock(PaymentManager::class, function ($mock) use ($prorationBehavior): void {
+            $mock->shouldReceive('swapSubscription')
+                ->with(
+                    Mockery::any(),
+                    Mockery::any(),
+                    $prorationBehavior,
+                    Mockery::any()
+                )
+                ->once()
+                ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
+        });
 
-            $action = new SwapSubscriptionAction(
-                user: $user,
-                price: $price,
-                prorationBehavior: $prorationBehavior,
-                paymentBehavior: PaymentBehavior::DefaultIncomplete,
-            );
+        $action = new SwapSubscriptionAction(
+            user: $user,
+            price: $price,
+            prorationBehavior: $prorationBehavior,
+            paymentBehavior: PaymentBehavior::DefaultIncomplete,
+        );
 
-            $result = $action();
+        $result = $action();
 
-            expect($result)->toBeInstanceOf(SubscriptionData::class);
-        }
-    });
+        expect($result)->toBeInstanceOf(SubscriptionData::class);
+    })->with(ProrationBehavior::cases());
 
-    test('supports all payment behavior types', function (): void {
+    test('supports payment behavior', function (PaymentBehavior $paymentBehavior): void {
         $user = User::factory()->create();
         $category = ProductCategory::factory()->active()->create();
         $product = Product::factory()->create();
@@ -344,33 +343,31 @@ describe('SwapSubscriptionAction', function (): void {
             'product_id' => $product->id,
         ]);
 
-        foreach (PaymentBehavior::cases() as $paymentBehavior) {
-            $this->mock(PaymentManager::class, function ($mock) use ($paymentBehavior): void {
-                $mock->shouldReceive('currentSubscription')
-                    ->once()
-                    ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
+        PaymentProcessor::shouldReceive('currentSubscription')
+            ->once()
+            ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
 
-                $mock->shouldReceive('swapSubscription')
-                    ->with(
-                        Mockery::any(),
-                        Mockery::any(),
-                        Mockery::any(),
-                        $paymentBehavior
-                    )
-                    ->once()
-                    ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
-            });
+        $this->mock(PaymentManager::class, function ($mock) use ($paymentBehavior): void {
+            $mock->shouldReceive('swapSubscription')
+                ->with(
+                    Mockery::any(),
+                    Mockery::any(),
+                    Mockery::any(),
+                    $paymentBehavior
+                )
+                ->once()
+                ->andReturn(SubscriptionData::from(['name' => 'default', 'doesNotExpire' => true]));
+        });
 
-            $action = new SwapSubscriptionAction(
-                user: $user,
-                price: $price,
-                prorationBehavior: ProrationBehavior::CreateProrations,
-                paymentBehavior: $paymentBehavior,
-            );
+        $action = new SwapSubscriptionAction(
+            user: $user,
+            price: $price,
+            prorationBehavior: ProrationBehavior::CreateProrations,
+            paymentBehavior: $paymentBehavior,
+        );
 
-            $result = $action();
+        $result = $action();
 
-            expect($result)->toBeInstanceOf(SubscriptionData::class);
-        }
-    });
+        expect($result)->toBeInstanceOf(SubscriptionData::class);
+    })->with(PaymentBehavior::cases());
 });
