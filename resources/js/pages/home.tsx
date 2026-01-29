@@ -9,6 +9,7 @@ import { AbstractBackgroundPattern } from '@/components/ui/abstract-background-p
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useIntercom } from '@/hooks';
 import { abbreviateNumber, cn, currency } from '@/lib/utils';
 import { stripCharacters } from '@/utils/truncate';
 import { Deferred, Head, Link, usePage } from '@inertiajs/react';
@@ -79,6 +80,8 @@ const features = [
 export default function Home({ subscriptions = [] }: HomeProps) {
     const page = usePage<App.Data.SharedData>();
     const { name, auth, memberCount, postCount, discordCount, discordOnlineCount, robloxCount, slogan, logoUrl } = page.props;
+
+    useIntercom();
 
     return (
         <div className="min-h-screen bg-background text-foreground">

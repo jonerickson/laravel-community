@@ -1,5 +1,5 @@
-import Intercom, { shutdown, update } from '@intercom/messenger-js-sdk';
 import { usePage } from '@inertiajs/react';
+import Intercom, { shutdown, update } from '@intercom/messenger-js-sdk';
 import { useEffect, useRef } from 'react';
 
 export function useIntercom(): void {
@@ -20,7 +20,7 @@ export function useIntercom(): void {
                 email: intercom.userEmail ?? undefined,
                 user_id: String(intercom.userId),
                 created_at: intercom.createdAt ?? undefined,
-                ...(intercom.userJwt && { user_hash: intercom.userJwt }),
+                ...(intercom.userJwt && { intercom_user_jwt: intercom.userJwt }),
             }),
         };
 
@@ -34,12 +34,5 @@ export function useIntercom(): void {
         return () => {
             shutdown();
         };
-    }, [
-        intercom?.appId,
-        intercom?.userId,
-        intercom?.userName,
-        intercom?.userEmail,
-        intercom?.createdAt,
-        intercom?.userJwt,
-    ]);
+    }, [intercom?.appId, intercom?.userId, intercom?.userName, intercom?.userEmail, intercom?.createdAt, intercom?.userJwt]);
 }
