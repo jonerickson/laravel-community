@@ -1,7 +1,7 @@
 import AnnouncementsList from '@/components/announcements-list';
 import { EmailVerificationBanner } from '@/components/email-verification-banner';
 import { UserWarningBanner } from '@/components/user-warning-banner';
-import { useFingerprint } from '@/hooks';
+import { useFingerprint, useIntercom } from '@/hooks';
 import { useFlashMessages } from '@/hooks/use-flash-messages';
 import { useLayout } from '@/hooks/use-layout';
 import AppHeaderLayout from '@/layouts/app/app-header-layout';
@@ -22,6 +22,7 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
 
     useFlashMessages();
     useFingerprint();
+    useIntercom();
 
     const LayoutComponent = layout === 'header' || !auth?.user ? AppHeaderLayout : AppSidebarLayout;
 

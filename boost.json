@@ -8,8 +8,6 @@
         "claude_code",
         "phpstorm"
     ],
-    "guidelines": [
-        "filament/filament"
-    ],
+    "guidelines": true,
     "herd_mcp": true
 }

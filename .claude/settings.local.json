@@ -1,6 +1,7 @@
 {
   "permissions": {
     "allow": [
+      "Bash(find:*)",
       "Bash(helm get values:*)",
       "Bash(helm list:*)",
       "Bash(kubectl get:*)",

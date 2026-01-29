@@ -7,6 +7,7 @@ namespace App\Http\Middleware;
 use App\Data\AnnouncementData;
 use App\Data\AuthData;
 use App\Data\FlashData;
+use App\Data\IntercomData;
 use App\Data\NavigationPageData;
 use App\Data\SharedData;
 use App\Data\UserData;
@@ -17,7 +18,9 @@ use App\Models\Post;
 use App\Models\User;
 use App\Services\Integrations\DiscordService;
 use App\Services\Integrations\RobloxService;
+use App\Services\JwtService;
 use App\Services\ShoppingCartService;
+use App\Settings\IntegrationSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
@@ -28,10 +31,10 @@ class HandleInertiaRequests extends Middleware
 {
     protected $rootView = 'app';
 
-    public function __construct(private readonly ShoppingCartService $shoppingCartService)
-    {
-        //
-    }
+    public function __construct(
+        private readonly ShoppingCartService $shoppingCartService,
+        private readonly JwtService $jwtService,
+    ) {}
 
     /**
      * We have to override the parent function because when an asset URL is used,
@@ -102,6 +105,7 @@ class HandleInertiaRequests extends Middleware
             'address' => config('app.address'),
             'slogan' => config('app.slogan'),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'intercom' => $this->resolveIntercomData($user),
             'ziggy' => [],
         ]);
 
@@ -117,5 +121,46 @@ class HandleInertiaRequests extends Middleware
                 'location' => $request->url(),
             ],
         ];
+    }
+
+    private function resolveIntercomData(?User $user): ?IntercomData
+    {
+        $settings = app(IntegrationSettings::class);
+        $envAppId = config('services.intercom.app_id');
+        $envSecretKey = config('services.intercom.secret_key');
+
+        $appId = $envAppId ?: ($settings->intercom_enabled ? $settings->intercom_app_id : null);
+
+        if (! $appId) {
+            return null;
+        }
+
+        $authRequired = $settings->intercom_auth_required;
+
+        if ($authRequired && ! $user) {
+            return null;
+        }
+
+        $secretKey = $envSecretKey ?: $settings->intercom_secret_key;
+        $userJwt = null;
+
+        if ($user && $secretKey) {
+            $userJwt = $this->jwtService->generateForUser(
+                user: $user,
+                secret: $secretKey,
+                additionalClaims: [
+                    'user_id' => (string) $user->getKey(),
+                ]
+            );
+        }
+
+        return IntercomData::from([
+            'app_id' => $appId,
+            'user_name' => $user?->name,
+            'user_email' => $user?->email,
+            'user_id' => $user?->id,
+            'created_at' => $user?->created_at?->timestamp,
+            'user_jwt' => $userJwt,
+        ]);
     }
 }
