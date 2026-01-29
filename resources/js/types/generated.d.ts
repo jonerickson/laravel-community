@@ -607,7 +607,6 @@ declare namespace App.Data {
         flash: App.Data.FlashData | null;
         sidebarOpen: boolean;
         intercom: App.Data.IntercomData | null;
-        nonce: string | null;
         ziggy: Config & { location: string };
     };
     export type SubscriptionData = {

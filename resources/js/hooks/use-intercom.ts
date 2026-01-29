@@ -1,57 +1,45 @@
+import Intercom, { shutdown, update } from '@intercom/messenger-js-sdk';
 import { usePage } from '@inertiajs/react';
 import { useEffect, useRef } from 'react';
 
-declare global {
-    interface Window {
-        Intercom: (command: string, ...args: unknown[]) => void;
-        intercomSettings: Record<string, unknown>;
-    }
-}
-
 export function useIntercom(): void {
-    const { intercom, nonce } = usePage<App.Data.SharedData>().props;
-    const scriptLoadedRef = useRef(false);
+    const { intercom } = usePage<App.Data.SharedData>().props;
+    const bootedRef = useRef(false);
 
     useEffect(() => {
         if (!intercom?.appId) {
             return;
         }
 
-        const appId = intercom.appId;
-
-        window.intercomSettings = {
+        const settings = {
+            app_id: intercom.appId,
             api_base: 'https://api-iam.intercom.io',
-            app_id: appId,
             session_duration: 86400000,
             ...(intercom.userId && {
-                name: intercom.userName,
-                email: intercom.userEmail,
-                user_id: intercom.userId,
-                created_at: intercom.createdAt,
-                ...(intercom.userJwt && { intercom_user_jwt: intercom.userJwt }),
+                name: intercom.userName ?? undefined,
+                email: intercom.userEmail ?? undefined,
+                user_id: String(intercom.userId),
+                created_at: intercom.createdAt ?? undefined,
+                ...(intercom.userJwt && { user_hash: intercom.userJwt }),
             }),
         };
 
-        if (!scriptLoadedRef.current) {
-            const script = document.createElement('script');
-            script.async = true;
-            script.src = `https://widget.intercom.io/widget/${appId}`;
-            if (nonce) {
-                script.nonce = nonce;
-            }
-            script.onload = () => {
-                window.Intercom('boot', window.intercomSettings);
-            };
-            document.body.appendChild(script);
-            scriptLoadedRef.current = true;
-        } else if (window.Intercom) {
-            window.Intercom('update', window.intercomSettings);
+        if (!bootedRef.current) {
+            Intercom(settings);
+            bootedRef.current = true;
+        } else {
+            update(settings);
         }
 
         return () => {
-            if (window.Intercom) {
-                window.Intercom('shutdown');
-            }
+            shutdown();
         };
-    }, [intercom?.appId, intercom?.userId, intercom?.userName, intercom?.userEmail, intercom?.createdAt, intercom?.userJwt, nonce]);
+    }, [
+        intercom?.appId,
+        intercom?.userId,
+        intercom?.userName,
+        intercom?.userEmail,
+        intercom?.createdAt,
+        intercom?.userJwt,
+    ]);
 }

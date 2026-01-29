@@ -52,8 +52,6 @@ class SharedData extends Data
 
     public ?IntercomData $intercom = null;
 
-    public ?string $nonce = null;
-
     #[LiteralTypeScriptType('Config & { location: string }')]
     public mixed $ziggy;
 }
