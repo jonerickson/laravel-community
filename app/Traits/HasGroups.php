@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Traits;
 
 use App\Data\GroupStyleData;
-use App\Managers\PaymentManager;
 use App\Models\Forum;
 use App\Models\ForumCategory;
 use App\Models\ForumCategoryGroup;
@@ -60,13 +59,8 @@ trait HasGroups
     {
         $currentSubscriptionGroupId = null;
 
-        if ($this instanceof User) {
-            $paymentManager = app(PaymentManager::class);
-            $currentSubscription = $paymentManager->currentSubscription($this);
-
-            if ($currentSubscription) {
-                $currentSubscriptionGroupId = Product::with('groups')->find($currentSubscription->product->id)->groups->pluck('id');
-            }
+        if ($this instanceof User && ($currentSubscription = $this->current_subscription)) {
+            $currentSubscriptionGroupId = Product::with('groups')->find($currentSubscription->product->id)->groups->pluck('id');
         }
 
         // The resource's currently assigned groups

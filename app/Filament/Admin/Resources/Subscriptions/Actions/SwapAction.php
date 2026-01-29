@@ -8,7 +8,6 @@ use App\Actions\Payments\SwapSubscriptionAction;
 use App\Enums\PaymentBehavior;
 use App\Enums\ProductType;
 use App\Enums\ProrationBehavior;
-use App\Managers\PaymentManager;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
@@ -36,15 +35,7 @@ class SwapAction extends Action
         $this->modalHeading('Swap Subscription');
         $this->modalDescription('Select the new product to swap the current subscription to.');
         $this->modalSubmitActionLabel('Swap');
-
-        $this->visible(function () {
-            $paymentManager = app(PaymentManager::class);
-
-            return $paymentManager->currentSubscription(
-                user: $this->user,
-            );
-        });
-
+        $this->visible(fn (): bool => filled($this->user->current_subscription));
         $this->schema([
             Select::make('price_id')
                 ->label('Product')

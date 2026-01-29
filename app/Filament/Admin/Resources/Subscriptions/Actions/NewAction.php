@@ -34,15 +34,7 @@ class NewAction extends Action
         $this->modalHeading('New subscription');
         $this->modalDescription('Enter the required information to start the user on a new subscription.');
         $this->modalSubmitActionLabel('Start');
-
-        $this->hidden(function () {
-            $paymentManager = app(PaymentManager::class);
-
-            return $paymentManager->currentSubscription(
-                user: $this->user,
-            );
-        });
-
+        $this->hidden(fn (): bool => filled($this->user->current_subscription));
         $this->schema([
             Select::make('price_id')
                 ->label('Product')
