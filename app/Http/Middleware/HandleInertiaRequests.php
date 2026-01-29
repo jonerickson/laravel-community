@@ -23,6 +23,7 @@ use App\Services\ShoppingCartService;
 use App\Settings\IntegrationSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Vite;
 use Inertia\Middleware;
 use Override;
 use Tighten\Ziggy\Ziggy;
@@ -106,6 +107,7 @@ class HandleInertiaRequests extends Middleware
             'slogan' => config('app.slogan'),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'intercom' => $this->resolveIntercomData($user),
+            'nonce' => Vite::cspNonce(),
             'ziggy' => [],
         ]);
 

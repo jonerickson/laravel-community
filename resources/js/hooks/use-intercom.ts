@@ -9,7 +9,7 @@ declare global {
 }
 
 export function useIntercom(): void {
-    const { intercom } = usePage<App.Data.SharedData>().props;
+    const { intercom, nonce } = usePage<App.Data.SharedData>().props;
     const scriptLoadedRef = useRef(false);
 
     useEffect(() => {
@@ -36,6 +36,9 @@ export function useIntercom(): void {
             const script = document.createElement('script');
             script.async = true;
             script.src = `https://widget.intercom.io/widget/${appId}`;
+            if (nonce) {
+                script.nonce = nonce;
+            }
             script.onload = () => {
                 window.Intercom('boot', window.intercomSettings);
             };
@@ -50,5 +53,5 @@ export function useIntercom(): void {
                 window.Intercom('shutdown');
             }
         };
-    }, [intercom?.appId, intercom?.userId, intercom?.userName, intercom?.userEmail, intercom?.createdAt, intercom?.userJwt]);
+    }, [intercom?.appId, intercom?.userId, intercom?.userName, intercom?.userEmail, intercom?.createdAt, intercom?.userJwt, nonce]);
 }
