@@ -136,9 +136,7 @@ export default function Profile({ fields, nameLockedByDiscord = false }: Profile
                             />
                             <InputError message={errors.name} />
                             {nameLockedByDiscord && (
-                                <p className="text-sm text-muted-foreground">
-                                    Your username is synced from Discord and cannot be changed here.
-                                </p>
+                                <p className="text-sm text-muted-foreground">Your username is synced from Discord and cannot be changed here.</p>
                             )}
                         </div>
 
