@@ -21,6 +21,7 @@ use App\Models\UserIntegration;
 use App\Models\UserWarning;
 use App\Models\Warning;
 use App\Models\WarningConsequence;
+use Illuminate\Support\Facades\Event;
 
 describe('User orders relationship', function (): void {
     test('returns empty collection when user has no orders', function (): void {
@@ -494,6 +495,8 @@ describe('User groups relationship (from HasGroups trait)', function (): void {
     });
 
     test('returns groups user belongs to', function (): void {
+        Event::fake();
+
         $user = User::factory()->create();
         $user->groups()->detach(); // Remove default groups
 

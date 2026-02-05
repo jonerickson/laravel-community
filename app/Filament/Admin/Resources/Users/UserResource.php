@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Users;
 
+use App\Actions\Users\SyncProfileAndIntegrationsAction;
 use App\Enums\ProductType;
 use App\Enums\SubscriptionStatus;
 use App\Filament\Admin\Resources\Users\Actions\BlacklistAction;
@@ -25,7 +26,6 @@ use App\Filament\Admin\Resources\Users\RelationManagers\PayoutsRelationManager;
 use App\Filament\Admin\Resources\Users\Widgets\RegistrationsTable;
 use App\Filament\Admin\Resources\Users\Widgets\UserStatsOverview;
 use App\Filament\Exports\UserExporter;
-use App\Jobs\Discord\SyncRoles;
 use App\Livewire\PaymentMethods\ListPaymentMethods;
 use App\Livewire\Subscriptions\ListSubscriptions;
 use App\Models\Price;
@@ -270,7 +270,7 @@ class UserResource extends Resource
                                             ->successNotificationTitle("A background job has been dispatched to update the user's Discord roles.")
                                             ->requiresConfirmation(false)
                                             ->action(function (User $record): void {
-                                                SyncRoles::dispatch($record->id);
+                                                SyncProfileAndIntegrationsAction::execute($record, 'discord');
                                             }),
                                         Action::make('refresh_discord_roles')
                                             ->label('Refresh')

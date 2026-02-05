@@ -2,9 +2,14 @@
 
 declare(strict_types=1);
 
+use App\Enums\DiscordNameSyncDirection;
+use App\Jobs\Discord\SyncName;
 use App\Models\Field;
 use App\Models\User;
+use App\Models\UserIntegration;
+use App\Settings\IntegrationSettings;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 
 test('profile settings page is displayed for authenticated users', function (): void {
@@ -191,4 +196,106 @@ test('profile update clears signature when set to null', function (): void {
     $response->assertRedirect();
 
     expect($user->fresh()->signature)->toBeNull();
+});
+
+test('name change is blocked when discord sync is enforced and direction is discord to app', function (): void {
+    $settings = app(IntegrationSettings::class);
+    $settings->discord_name_sync_enabled = true;
+    $settings->discord_name_sync_direction = DiscordNameSyncDirection::DiscordToApp;
+    $settings->discord_name_sync_enforced = true;
+    $settings->save();
+
+    $user = User::factory()->create(['name' => 'Original Name']);
+    UserIntegration::factory()->create([
+        'user_id' => $user->id,
+        'provider' => 'discord',
+    ]);
+
+    $response = $this->actingAs($user)->post('/settings/account', [
+        'name' => 'New Name',
+    ]);
+
+    $response->assertRedirect();
+
+    expect($user->fresh()->name)->toBe('Original Name');
+});
+
+test('name change is allowed when discord sync is not enforced', function (): void {
+    $settings = app(IntegrationSettings::class);
+    $settings->discord_name_sync_enabled = true;
+    $settings->discord_name_sync_direction = DiscordNameSyncDirection::DiscordToApp;
+    $settings->discord_name_sync_enforced = false;
+    $settings->save();
+
+    $user = User::factory()->create(['name' => 'Original Name']);
+    UserIntegration::factory()->create([
+        'user_id' => $user->id,
+        'provider' => 'discord',
+    ]);
+
+    $response = $this->actingAs($user)->post('/settings/account', [
+        'name' => 'New Name',
+    ]);
+
+    $response->assertRedirect();
+
+    expect($user->fresh()->name)->toBe('New Name');
+});
+
+test('name change is allowed when user has no discord integration even with enforcement', function (): void {
+    $settings = app(IntegrationSettings::class);
+    $settings->discord_name_sync_enabled = true;
+    $settings->discord_name_sync_direction = DiscordNameSyncDirection::DiscordToApp;
+    $settings->discord_name_sync_enforced = true;
+    $settings->save();
+
+    $user = User::factory()->create(['name' => 'Original Name']);
+
+    $response = $this->actingAs($user)->post('/settings/account', [
+        'name' => 'New Name',
+    ]);
+
+    $response->assertRedirect();
+
+    expect($user->fresh()->name)->toBe('New Name');
+});
+
+test('name change dispatches sync job when direction is app to discord', function (): void {
+    Queue::fake();
+
+    $settings = app(IntegrationSettings::class);
+    $settings->discord_name_sync_enabled = true;
+    $settings->discord_name_sync_direction = DiscordNameSyncDirection::AppToDiscord;
+    $settings->save();
+
+    $user = User::factory()->create(['name' => 'Original Name']);
+    UserIntegration::factory()->create([
+        'user_id' => $user->id,
+        'provider' => 'discord',
+    ]);
+
+    $this->actingAs($user)->post('/settings/account', [
+        'name' => 'New Name',
+    ]);
+
+    Queue::assertPushed(SyncName::class);
+});
+
+test('profile page indicates when name is locked by discord', function (): void {
+    $settings = app(IntegrationSettings::class);
+    $settings->discord_name_sync_enabled = true;
+    $settings->discord_name_sync_direction = DiscordNameSyncDirection::DiscordToApp;
+    $settings->discord_name_sync_enforced = true;
+    $settings->save();
+
+    $user = User::factory()->create();
+    UserIntegration::factory()->create([
+        'user_id' => $user->id,
+        'provider' => 'discord',
+    ]);
+
+    $response = $this->actingAs($user)->get('/settings/account');
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page->where('nameLockedByDiscord', true));
 });

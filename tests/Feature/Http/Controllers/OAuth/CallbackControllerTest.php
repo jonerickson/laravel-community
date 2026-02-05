@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Events\UserIntegrationCreated;
 use App\Models\User;
 use App\Models\UserIntegration;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Support\Facades\Event;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
 
@@ -56,6 +59,8 @@ test('guest callback with no existing integration redirects to login with no acc
 });
 
 test('guest callback with existing integration logs in user and redirects to dashboard', function (): void {
+    Event::fake([UserIntegrationCreated::class, Login::class]);
+
     $user = User::factory()->create();
     $integration = UserIntegration::create([
         'user_id' => $user->id,
@@ -105,6 +110,8 @@ test('authenticated user callback with provider error redirects to integrations 
 });
 
 test('authenticated user callback with no existing integration creates new integration', function (): void {
+    Event::fake([UserIntegrationCreated::class]);
+
     $user = User::factory()->create();
 
     $socialiteUser = createMockSocialiteUser(
@@ -176,6 +183,8 @@ test('authenticated user callback with existing integration updates integration'
 });
 
 test('guest callback respects intended url from session', function (): void {
+    Event::fake([UserIntegrationCreated::class, Login::class]);
+
     $user = User::factory()->create();
     UserIntegration::create([
         'user_id' => $user->id,
@@ -202,6 +211,8 @@ test('guest callback respects intended url from session', function (): void {
 });
 
 test('authenticated user callback respects intended url from session', function (): void {
+    Event::fake([UserIntegrationCreated::class]);
+
     $user = User::factory()->create();
 
     $socialiteUser = createMockSocialiteUser(id: 'new-provider-id');
@@ -224,6 +235,8 @@ test('authenticated user callback respects intended url from session', function 
 });
 
 test('callback works with discord provider', function (): void {
+    Event::fake([UserIntegrationCreated::class]);
+
     $user = User::factory()->create();
 
     $socialiteUser = createMockSocialiteUser(id: 'discord-user-id');
@@ -249,6 +262,8 @@ test('callback works with discord provider', function (): void {
 });
 
 test('callback works with roblox provider', function (): void {
+    Event::fake([UserIntegrationCreated::class]);
+
     $user = User::factory()->create();
 
     $socialiteUser = createMockSocialiteUser(id: 'roblox-user-id');
@@ -286,6 +301,8 @@ test('callback with invalid provider redirects with error', function (): void {
 });
 
 test('new integration stores access and refresh tokens', function (): void {
+    Event::fake([UserIntegrationCreated::class]);
+
     $user = User::factory()->create();
 
     $socialiteUser = createMockSocialiteUser(id: 'new-user-id');
@@ -312,6 +329,8 @@ test('new integration stores access and refresh tokens', function (): void {
 });
 
 test('integration sets last synced at timestamp on creation', function (): void {
+    Event::fake([UserIntegrationCreated::class]);
+
     $user = User::factory()->create();
 
     $socialiteUser = createMockSocialiteUser(id: 'sync-test-user');

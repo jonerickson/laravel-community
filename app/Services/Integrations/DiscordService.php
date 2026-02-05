@@ -184,6 +184,34 @@ class DiscordService
     }
 
     /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
+    public function getMemberNickname(string $discordUserId): ?string
+    {
+        $response = $this->makeRequest('get', sprintf('/guilds/%s/members/%s', $this->guildId, $discordUserId));
+
+        if (is_null($response)) {
+            return null;
+        }
+
+        return $response->json('nick') ?? $response->json('user.global_name') ?? $response->json('user.username');
+    }
+
+    /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
+    public function setMemberNickname(string $discordUserId, string $nickname): bool
+    {
+        $response = $this->makeRequest('patch', sprintf('/guilds/%s/members/%s', $this->guildId, $discordUserId), [
+            'nick' => $nickname,
+        ]);
+
+        return ! is_null($response);
+    }
+
+    /**
      * Make a request to the Discord API with rate limit and error handling.
      *
      * @param  array<string, string>|array<string, non-empty-array>  $options

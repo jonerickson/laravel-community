@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Users;
 
 use App\Actions\Action;
+use App\Jobs\Discord\SyncName;
 use App\Jobs\Discord\SyncRoles;
 use App\Models\User;
 use Throwable;
@@ -13,6 +14,7 @@ class SyncProfileAndIntegrationsAction extends Action
 {
     public function __construct(
         protected User $user,
+        protected ?string $provider = null,
     ) {
         //
     }
@@ -24,8 +26,13 @@ class SyncProfileAndIntegrationsAction extends Action
     {
         $this->user->syncGroups();
 
-        $this->syncDiscord();
-        $this->syncRoblox();
+        if ($this->provider === null || $this->provider === 'discord') {
+            $this->syncDiscord();
+        }
+
+        if ($this->provider === null || $this->provider === 'roblox') {
+            $this->syncRoblox();
+        }
 
         return $this->user;
     }
@@ -43,6 +50,7 @@ class SyncProfileAndIntegrationsAction extends Action
 
         if (config('services.discord.enabled') && config('services.discord.guild_id')) {
             SyncRoles::dispatch($this->user->getKey());
+            SyncName::dispatch($this->user->getKey());
         }
     }
 
