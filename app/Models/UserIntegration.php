@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Serializer\AbstractItemNormalizer;
 use App\Events\UserIntegrationCreated;
 use App\Events\UserIntegrationDeleted;
 use App\Traits\HasLogging;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Override;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * @property int $id
@@ -34,6 +30,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
  * @property-read int|null $activities_count
  * @property-read User $user
  *
+ * @method static \Database\Factories\UserIntegrationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserIntegration query()
@@ -53,21 +50,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
  *
  * @mixin \Eloquent
  */
-#[ApiResource(
-    operations: [
-        new Get(uriTemplate: 'integrations/{id}', openapi: false),
-    ],
-    normalizationContext: [
-        AbstractItemNormalizer::GROUPS => ['integration'],
-    ]
-)]
-#[ApiProperty(property: 'provider', serialize: new Groups(['user', 'integration']))]
-#[ApiProperty(property: 'providerId', serialize: new Groups(['user', 'integration']))]
-#[ApiProperty(property: 'providerName', serialize: new Groups(['user', 'integration']))]
-#[ApiProperty(property: 'providerEmail', serialize: new Groups(['user', 'integration']))]
-#[ApiProperty(property: 'providerAvatar', serialize: new Groups(['user', 'integration']))]
 class UserIntegration extends Model
 {
+    use HasFactory;
     use HasLogging;
 
     protected $table = 'users_integrations';

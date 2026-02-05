@@ -21,6 +21,7 @@ import { route } from 'ziggy-js';
 
 interface ProfilePageProps {
     fields: App.Data.FieldData[];
+    nameLockedByDiscord?: boolean;
 }
 
 type ProfileForm = {
@@ -31,7 +32,7 @@ type ProfileForm = {
     fields: Record<number, string>;
 };
 
-export default function Profile({ fields }: ProfilePageProps) {
+export default function Profile({ fields, nameLockedByDiscord = false }: ProfilePageProps) {
     const { auth } = usePage<App.Data.SharedData>().props;
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -131,8 +132,14 @@ export default function Profile({ fields }: ProfilePageProps) {
                                 required
                                 autoComplete="name"
                                 placeholder="Username"
+                                disabled={nameLockedByDiscord}
                             />
                             <InputError message={errors.name} />
+                            {nameLockedByDiscord && (
+                                <p className="text-sm text-muted-foreground">
+                                    Your username is synced from Discord and cannot be changed here.
+                                </p>
+                            )}
                         </div>
 
                         <div className="grid gap-2">
