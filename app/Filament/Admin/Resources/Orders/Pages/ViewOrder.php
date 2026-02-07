@@ -27,7 +27,7 @@ class ViewOrder extends ViewRecord
             CheckoutAction::make(),
             RefundAction::make(),
             Action::make('generateDisputePackage')
-                ->label('Generate dispute package')
+                ->label('Generate Dispute Package')
                 ->icon(Heroicon::OutlinedDocumentArrowDown)
                 ->color('warning')
                 ->url(fn (Order $record): string => route('admin.dispute-evidence.download', $record))
