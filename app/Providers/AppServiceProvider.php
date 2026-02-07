@@ -62,7 +62,7 @@ class AppServiceProvider extends ServiceProvider
                 function (Browsershot $browserShot) {
                     $browserShot
                         ->setChromePath('/usr/bin/chromium-browser')
-                        ->addChromiumArguments([
+                        ->setOption('args', [
                             '--headless',
                             '--no-sandbox',
                             '--disable-setuid-sandbox',
