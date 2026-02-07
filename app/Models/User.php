@@ -321,6 +321,11 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
             ->orderBy('order');
     }
 
+    public function policyConsents(): HasMany
+    {
+        return $this->hasMany(PolicyConsent::class);
+    }
+
     public function tickets(): HasMany
     {
         return $this->hasMany(SupportTicket::class, 'created_by');

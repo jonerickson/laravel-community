@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
@@ -98,6 +99,11 @@ class Policy extends Model implements Sluggable
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'policies_products');
+    }
+
+    public function userConsents(): HasMany
+    {
+        return $this->hasMany(PolicyConsent::class);
     }
 
     public function scopeEffective(Builder $query): void
