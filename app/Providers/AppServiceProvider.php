@@ -44,6 +44,8 @@ use Laravel\Cashier\Cashier;
 use Laravel\Passport\Passport;
 use Laravel\Socialite\Facades\Socialite;
 use Override;
+use Spatie\Browsershot\Browsershot;
+use Spatie\LaravelPdf\PdfFactory;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -54,6 +56,22 @@ class AppServiceProvider extends ServiceProvider
         Passport::ignoreRoutes();
 
         $this->app->singleton('expression-language', fn (): ExpressionLanguageManager => new ExpressionLanguageManager);
+
+        $this->app->bind(PdfFactory::class, function () {
+            return new PdfFactory()->withBrowsershot(
+                function (Browsershot $browserShot) {
+                    $browserShot
+                        ->setChromePath('/usr/bin/chromium-browser')
+                        ->addChromiumArguments([
+                            '--headless',
+                            '--no-sandbox',
+                            '--disable-setuid-sandbox',
+                            '--disable-dev-shm-usage',
+                            '--disable-features=UseDBus',
+                        ]);
+                }
+            );
+        });
     }
 
     public function boot(): void
