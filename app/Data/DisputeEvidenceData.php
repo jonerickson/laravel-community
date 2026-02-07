@@ -19,7 +19,9 @@ class DisputeEvidenceData extends Data
      */
     public function __construct(
         public string $referenceId,
-        public ?string $externalPaymentId,
+        public ?string $externalOrderId,
+        public ?string $externalInvoiceId,
+        public ?string $externalEventId,
         public float|int $amountPaid,
         public string $status,
         public Carbon $orderCreatedAt,
@@ -70,7 +72,9 @@ class DisputeEvidenceData extends Data
 
         return new self(
             referenceId: $order->reference_id,
-            externalPaymentId: $order->external_payment_id,
+            externalOrderId: $order->external_order_id,
+            externalInvoiceId: $order->external_invoice_id,
+            externalEventId: $order->external_event_id,
             amountPaid: $order->amount,
             status: $order->status->getLabel(),
             orderCreatedAt: $order->created_at,
