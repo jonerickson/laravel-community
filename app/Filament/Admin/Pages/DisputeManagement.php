@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Pages;
 
 use App\Enums\Role;
+use App\Filament\Exports\TransactionAuditExporter;
 use App\Models\Order;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Actions\ExportAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
@@ -100,5 +103,30 @@ class DisputeManagement extends Page implements HasTable
             ->emptyStateHeading('No results found')
             ->emptyStateDescription('Try searching with a different transaction ID.')
             ->paginated(false);
+    }
+
+    /**
+     * @return array<Action|ExportAction>
+     */
+    protected function getHeaderActions(): array
+    {
+        return [
+            ExportAction::make('exportTransactionAudit')
+                ->label('Export transaction audit')
+                ->exporter(TransactionAuditExporter::class)
+                ->icon(Heroicon::OutlinedArrowDownTray)
+                ->fileName(fn (): string => 'transaction-audit-'.now()->format('Y-m-d'))
+                ->modalSchema(fn (Schema $schema): Schema => $schema->components([
+                    DatePicker::make('start_date')
+                        ->label('Start date'),
+                    DatePicker::make('end_date')
+                        ->label('End date'),
+                ]))
+                ->modifyQueryUsing(function (Builder $query, array $data): Builder {
+                    return $query
+                        ->when($data['start_date'] ?? null, fn (Builder $query, string $date): Builder => $query->where('created_at', '>=', $date))
+                        ->when($data['end_date'] ?? null, fn (Builder $query, string $date): Builder => $query->where('created_at', '<=', $date));
+                }),
+        ];
     }
 }
