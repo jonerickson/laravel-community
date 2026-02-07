@@ -61,13 +61,10 @@ class AppServiceProvider extends ServiceProvider
             return new PdfFactory()->withBrowsershot(
                 function (Browsershot $browserShot) {
                     $browserShot
-                        ->setChromePath('/usr/bin/chromium-browser')
+                        ->setChromePath('/usr/bin/chromium')
                         ->setOption('args', [
                             '--headless',
                             '--no-sandbox',
-                            '--disable-setuid-sandbox',
-                            '--disable-dev-shm-usage',
-                            '--disable-features=UseDBus',
                         ]);
                 }
             );
