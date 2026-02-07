@@ -80,13 +80,13 @@ class DisputeEvidenceData extends Data
             ->pluck('provider_id')
             ->prepend($user->id)
             ->filter()
-            ->map(fn (string|int $id): string => "/{$id}")
+            ->map(fn (string|int $id): string => '/'.$id)
             ->all();
 
         $accessLogs = Log::query()
             ->where(function ($query) use ($endpointIdentifiers): void {
                 foreach ($endpointIdentifiers as $suffix) {
-                    $query->orWhere('endpoint', 'like', "%{$suffix}");
+                    $query->orWhere('endpoint', 'like', '%'.$suffix);
                 }
             })
             ->latest()

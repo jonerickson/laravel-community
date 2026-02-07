@@ -128,7 +128,7 @@ describe('GenerateDisputeEvidenceAction', function (): void {
     test('includes access logs matching user ID in endpoint', function (): void {
         $user = User::factory()->create();
         Log::create([
-            'endpoint' => "https://api.example.com/users/{$user->id}",
+            'endpoint' => 'https://api.example.com/users/'.$user->id,
             'method' => HttpMethod::Get,
             'status' => HttpStatusCode::Okay,
         ]);
