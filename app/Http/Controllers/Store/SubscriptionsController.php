@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Store;
 
+use App\Actions\Policies\RecordPolicyConsentAction;
 use App\Data\CommentData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
 use App\Enums\PaymentBehavior;
+use App\Enums\PolicyConsentContext;
 use App\Enums\ProrationBehavior;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Store\SubscriptionCancelRequest;
@@ -30,6 +32,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Throwable;
 
 class SubscriptionsController extends Controller
 {
@@ -84,11 +87,27 @@ class SubscriptionsController extends Controller
         ]);
     }
 
+    /**
+     * @throws Throwable
+     */
     public function store(SubscriptionCheckoutRequest $request): SymfonyResponse
     {
         $price = $request->getPrice();
 
         $this->authorize('view', $price->product);
+
+        $policyIds = $price->product->policies()->pluck('policies.id')->all();
+
+        if (filled($policyIds)) {
+            RecordPolicyConsentAction::execute(
+                user: $this->user,
+                policies: $policyIds,
+                context: PolicyConsentContext::Subscription,
+                ipAddress: $request->ip(),
+                userAgent: $request->userAgent(),
+                fingerprintId: $request->fingerprintId(),
+            );
+        }
 
         $currentSubscription = $this->paymentManager->currentSubscription($this->user);
 

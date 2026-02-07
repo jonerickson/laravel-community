@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Enums\PolicyConsentContext;
+use App\Models\Policy;
 use App\Models\User;
+use App\Settings\RegistrationSettings;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Event;
 
@@ -127,6 +130,56 @@ test('onboarding registration fails when password confirmation does not match', 
 
     $response->assertSessionHasErrors(['password']);
     $this->assertGuest();
+});
+
+test('onboarding registration records policy consents when policies are required', function (): void {
+    $policies = Policy::factory()->count(2)->create(['is_active' => true, 'effective_at' => now()->subDay()]);
+
+    $settings = app(RegistrationSettings::class);
+    $settings->required_policy_ids = $policies->pluck('id')->all();
+    $settings->save();
+
+    $policyData = [];
+    foreach ($policies as $policy) {
+        $policyData[$policy->id] = true;
+    }
+
+    $this->post(route('onboarding.register'), [
+        'name' => 'TestUser',
+        'email' => 'consent@example.com',
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+        'policy' => $policyData,
+    ]);
+
+    $user = User::where('email', 'consent@example.com')->first();
+
+    foreach ($policies as $policy) {
+        $this->assertDatabaseHas('policy_consents', [
+            'user_id' => $user->id,
+            'policy_id' => $policy->id,
+            'context' => PolicyConsentContext::Onboarding->value,
+        ]);
+    }
+});
+
+test('onboarding registration does not record consents when no policies required', function (): void {
+    $settings = app(RegistrationSettings::class);
+    $settings->required_policy_ids = [];
+    $settings->save();
+
+    $this->post(route('onboarding.register'), [
+        'name' => 'TestUser',
+        'email' => 'noconsent@example.com',
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+    ]);
+
+    $user = User::where('email', 'noconsent@example.com')->first();
+
+    $this->assertDatabaseMissing('policy_consents', [
+        'user_id' => $user->id,
+    ]);
 });
 
 test('onboarding registration is throttled after too many attempts', function (): void {

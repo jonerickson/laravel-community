@@ -8,11 +8,16 @@ use App\Enums\Role;
 use App\Models\Group;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Cache;
 
 class GroupSeeder extends Seeder
 {
     public function run(): void
     {
+        Cache::forget('default_member_group');
+        Cache::forget('default_guest_group');
+        Group::resetDefaultGroupCache();
+
         Group::factory()
             ->state(new Sequence(
                 ['name' => 'Members', 'description' => 'The default member group that everyone is assigned.', 'is_default_member' => true],

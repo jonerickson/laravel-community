@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use App\Models\Log;
 use App\Models\Order;
 use App\Models\UserIntegration;
 use Illuminate\Support\Carbon;
@@ -14,8 +15,10 @@ class DisputeEvidenceData extends Data
 {
     /**
      * @param  array<int, array{name: string, amount: float|int}>  $orderItems
+     * @param  array<int, array{provider: string, provider_id: string, provider_name: string|null}>  $integrations
      * @param  array<int, array{title: string, version: string|null, consented_at: Carbon|null, ip_address: string|null, fingerprint_id: string|null, user_agent: string|null}>  $consents
      * @param  array<int, array{description: string, event: string, properties: array<string, mixed>, created_at: Carbon|null}>  $activityLogs
+     * @param  array<int, array{endpoint: string, method: string, status: int|null, created_at: Carbon|null}>  $accessLogs
      */
     public function __construct(
         public string $referenceId,
@@ -27,11 +30,11 @@ class DisputeEvidenceData extends Data
         public Carbon $orderCreatedAt,
         public array $orderItems,
         public string $userEmail,
-        public ?string $robloxId,
-        public ?string $robloxName,
         public Carbon $userCreatedAt,
+        public array $integrations,
         public array $consents,
         public array $activityLogs,
+        public array $accessLogs,
     ) {}
 
     public static function fromOrder(Order $order): self
@@ -40,8 +43,11 @@ class DisputeEvidenceData extends Data
 
         $user = $order->user;
 
-        $robloxIntegration = $user->integrations
-            ->first(fn (UserIntegration $integration): bool => $integration->provider === 'roblox');
+        $integrations = $user->integrations->map(fn (UserIntegration $integration): array => [
+            'provider' => $integration->provider,
+            'provider_id' => $integration->provider_id,
+            'provider_name' => $integration->provider_name,
+        ])->all();
 
         $consents = $user->policyConsents->map(fn ($consent): array => [
             'title' => $consent->policy->title,
@@ -70,6 +76,29 @@ class DisputeEvidenceData extends Data
             'amount' => $item->amount,
         ])->all();
 
+        $endpointIdentifiers = $user->integrations
+            ->pluck('provider_id')
+            ->prepend($user->id)
+            ->filter()
+            ->map(fn (string|int $id): string => "/{$id}")
+            ->all();
+
+        $accessLogs = Log::query()
+            ->where(function ($query) use ($endpointIdentifiers): void {
+                foreach ($endpointIdentifiers as $suffix) {
+                    $query->orWhere('endpoint', 'like', "%{$suffix}");
+                }
+            })
+            ->latest()
+            ->limit(10)
+            ->get()
+            ->map(fn (Log $log): array => [
+                'endpoint' => $log->endpoint,
+                'method' => $log->method->value,
+                'status' => $log->status?->value,
+                'created_at' => $log->created_at,
+            ])->all();
+
         return new self(
             referenceId: $order->reference_id,
             externalOrderId: $order->external_order_id,
@@ -80,11 +109,11 @@ class DisputeEvidenceData extends Data
             orderCreatedAt: $order->created_at,
             orderItems: $orderItems,
             userEmail: $user->email ?? '',
-            robloxId: $robloxIntegration?->provider_id,
-            robloxName: $robloxIntegration?->provider_name,
             userCreatedAt: $user->created_at,
+            integrations: $integrations,
             consents: $consents,
             activityLogs: $activityLogs,
+            accessLogs: $accessLogs,
         );
     }
 }

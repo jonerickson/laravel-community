@@ -42,6 +42,8 @@ use Illuminate\Support\Str;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Product> $products
  * @property-read int|null $products_count
  * @property-read string|null $url
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, PolicyConsent> $userConsents
+ * @property-read int|null $user_consents_count
  *
  * @method static Builder<static>|Policy active()
  * @method static Builder<static>|Policy effective()

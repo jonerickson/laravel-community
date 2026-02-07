@@ -75,9 +75,9 @@ class Log extends Model
 
     public function type(): Attribute
     {
-        return Attribute::get(fn (): ?string => match (true) {
-            $this->loggable instanceof User => 'API',
-            $this->loggable instanceof Webhook => 'Webhook',
+        return Attribute::get(fn (): ?string => match ($this->loggable_type) {
+            User::class => 'API',
+            Webhook::class => 'Webhook',
             default => null,
         });
     }
