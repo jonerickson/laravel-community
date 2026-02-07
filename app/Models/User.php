@@ -134,6 +134,8 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read int|null $pending_reports_count
  * @property-read Collection<int, Permission> $permissions
  * @property-read int|null $permissions_count
+ * @property-read Collection<int, PolicyConsent> $policyConsents
+ * @property-read int|null $policy_consents_count
  * @property-read Collection<int, Report> $rejectedReports
  * @property-read int|null $rejected_reports_count
  * @property-read Collection<int, Report> $reports
@@ -319,6 +321,11 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
             ->withPivot('value')
             ->withTimestamps()
             ->orderBy('order');
+    }
+
+    public function policyConsents(): HasMany
+    {
+        return $this->hasMany(PolicyConsent::class);
     }
 
     public function tickets(): HasMany

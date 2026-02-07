@@ -8,12 +8,9 @@ use App\Enums\HttpStatusCode;
 use App\Models\User;
 use App\Models\Webhook;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
 class LogsTable
 {
@@ -32,7 +29,7 @@ class LogsTable
                 TextColumn::make('endpoint')
                     ->sortable()
                     ->copyable()
-                    ->searchable(['endpoint', 'request_body', 'request_headers']),
+                    ->searchable(),
                 TextColumn::make('method')
                     ->sortable()
                     ->badge()
@@ -56,19 +53,12 @@ class LogsTable
                     ->preload()
                     ->multiple()
                     ->searchable(),
-                Filter::make('type')
-                    ->schema([
-                        Select::make('type')
-                            ->options([
-                                User::class => 'User',
-                                Webhook::class => 'Webhook',
-                            ]),
-                    ])
-                    ->query(fn (Builder $query, array $data): Builder => $query
-                        ->when(
-                            $data['type'],
-                            fn (Builder $query, $type): Builder => $query->whereHasMorph('loggable', $type),
-                        )),
+                SelectFilter::make('loggable_type')
+                    ->label('Type')
+                    ->options([
+                        User::class => 'User',
+                        Webhook::class => 'Webhook',
+                    ]),
             ])
             ->defaultSort('created_at', 'desc');
     }

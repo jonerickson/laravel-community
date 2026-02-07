@@ -43,6 +43,7 @@
         "spatie/laravel-csp": "^3.21",
         "spatie/laravel-data": "^4.18",
         "spatie/laravel-google-fonts": "^1.4.4",
+        "spatie/laravel-pdf": "^1.9",
         "spatie/laravel-permission": "^6.24",
         "spatie/laravel-settings": "^3.6.0",
         "spatie/laravel-typescript-transformer": "^2.5.2",

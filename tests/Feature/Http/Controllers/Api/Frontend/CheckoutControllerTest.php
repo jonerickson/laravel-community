@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 use App\Data\CustomerData;
 use App\Enums\OrderStatus;
+use App\Enums\PolicyConsentContext;
 use App\Managers\PaymentManager;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Policy;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\ProductCategory;
@@ -455,4 +457,104 @@ test('checkout with multiple items processes all items', function (): void {
 
     $response->assertOk();
     $response->assertJsonPath('data.checkoutUrl', $expectedCheckoutUrl);
+});
+
+test('checkout records policy consents when products have policies', function (): void {
+    $user = User::factory()->create();
+
+    Passport::actingAs($user);
+
+    $category = ProductCategory::factory()->active()->visible()->create();
+    $product = Product::factory()->product()->approved()->visible()->active()->create([
+        'external_product_id' => 'prod_test123',
+    ]);
+    $product->categories()->attach($category);
+    $policy = Policy::factory()->create(['is_active' => true, 'effective_at' => now()->subDay()]);
+    $product->policies()->attach($policy);
+    $price = Price::factory()->active()->default()->for($product)->create([
+        'is_visible' => true,
+        'amount' => 2500,
+        'external_price_id' => 'price_test123',
+    ]);
+
+    $order = Order::factory()->create([
+        'user_id' => $user->id,
+        'status' => OrderStatus::Pending,
+    ]);
+
+    OrderItem::create([
+        'order_id' => $order->id,
+        'price_id' => $price->id,
+        'quantity' => 1,
+    ]);
+
+    $this->mock(PaymentManager::class, function (MockInterface $mock) use ($user): void {
+        $mock->shouldReceive('getCustomer')
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
+            ->andReturn(CustomerData::from([
+                'id' => 'cus_test123',
+                'email' => $user->email,
+            ]));
+        $mock->shouldReceive('getCheckoutUrl')
+            ->once()
+            ->andReturn('https://checkout.stripe.com/pay/cs_test');
+    });
+
+    $this->withSession(['pending_order_id' => $order->id])
+        ->withHeader('referer', $this->appUrl)
+        ->postJson('/api/checkout');
+
+    $this->assertDatabaseHas('policy_consents', [
+        'user_id' => $user->id,
+        'policy_id' => $policy->id,
+        'context' => PolicyConsentContext::Checkout->value,
+    ]);
+});
+
+test('checkout does not record consents when products have no policies', function (): void {
+    $user = User::factory()->create();
+
+    Passport::actingAs($user);
+
+    $category = ProductCategory::factory()->active()->visible()->create();
+    $product = Product::factory()->product()->approved()->visible()->active()->create([
+        'external_product_id' => 'prod_test123',
+    ]);
+    $product->categories()->attach($category);
+    $price = Price::factory()->active()->default()->for($product)->create([
+        'is_visible' => true,
+        'amount' => 2500,
+        'external_price_id' => 'price_test123',
+    ]);
+
+    $order = Order::factory()->create([
+        'user_id' => $user->id,
+        'status' => OrderStatus::Pending,
+    ]);
+
+    OrderItem::create([
+        'order_id' => $order->id,
+        'price_id' => $price->id,
+        'quantity' => 1,
+    ]);
+
+    $this->mock(PaymentManager::class, function (MockInterface $mock) use ($user): void {
+        $mock->shouldReceive('getCustomer')
+            ->with(Mockery::on(fn ($arg): bool => $arg->id === $user->id))
+            ->andReturn(CustomerData::from([
+                'id' => 'cus_test123',
+                'email' => $user->email,
+            ]));
+        $mock->shouldReceive('getCheckoutUrl')
+            ->once()
+            ->andReturn('https://checkout.stripe.com/pay/cs_test');
+    });
+
+    $this->withSession(['pending_order_id' => $order->id])
+        ->withHeader('referer', $this->appUrl)
+        ->postJson('/api/checkout');
+
+    $this->assertDatabaseMissing('policy_consents', [
+        'user_id' => $user->id,
+    ]);
 });

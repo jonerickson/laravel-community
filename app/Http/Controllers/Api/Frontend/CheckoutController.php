@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\Frontend;
 
+use App\Actions\Policies\RecordPolicyConsentAction;
 use App\Data\CheckoutData;
 use App\Data\CustomerData;
 use App\Enums\OrderStatus;
+use App\Enums\PolicyConsentContext;
 use App\Http\Resources\ApiResource;
 use App\Managers\PaymentManager;
 use App\Models\Order;
@@ -27,6 +29,9 @@ class CheckoutController
         private readonly ?User $user = null,
     ) {}
 
+    /**
+     * @throws Throwable
+     */
     public function __invoke(Request $request): ApiResource
     {
         if (! $this->user instanceof User) {
@@ -89,6 +94,26 @@ class CheckoutController
                     );
                 }
             }
+        }
+
+        $policyIds = $order->items
+            ->load('price.product.policies')
+            ->pluck('price.product.policies')
+            ->flatten()
+            ->pluck('id')
+            ->unique()
+            ->values()
+            ->all();
+
+        if (filled($policyIds)) {
+            RecordPolicyConsentAction::execute(
+                user: $this->user,
+                policies: $policyIds,
+                context: PolicyConsentContext::Checkout,
+                ipAddress: $request->ip(),
+                userAgent: $request->userAgent(),
+                fingerprintId: $request->fingerprintId(),
+            );
         }
 
         if ($order->amount <= 0) {
