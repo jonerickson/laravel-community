@@ -327,7 +327,8 @@
                     </tbody>
                 </table>
                 <p style="font-size: 10px; color: #666; padding: 4px 10px">
-                    The above logs demonstrate that the service was accessed using identifiers associated with the customer's account.
+                    The above logs (limited to the 10 most recent) demonstrate that the service was accessed using identifiers associated with the
+                    customer's account.
                 </p>
             @else
                 <p class="no-data">No service access logs found for this user.</p>
