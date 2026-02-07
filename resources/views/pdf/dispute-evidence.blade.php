@@ -143,8 +143,16 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>Payment ID</td>
-                    <td>{{ $data->externalPaymentId ?? 'N/A' }}</td>
+                    <td>Order ID</td>
+                    <td>{{ $data->externalOrderId ?? 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <td>Invoice ID</td>
+                    <td>{{ $data->externalInvoiceId ?? 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <td>Event ID</td>
+                    <td>{{ $data->externalEventId ?? 'N/A' }}</td>
                 </tr>
                 <tr>
                     <td>Internal ID</td>
@@ -216,6 +224,8 @@
                         <th>Version</th>
                         <th>Agreed At</th>
                         <th>IP Address</th>
+                        <th>Fingerprint ID</th>
+                        <th>User Agent</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -225,6 +235,8 @@
                             <td>{{ $consent['version'] ?? 'N/A' }}</td>
                             <td>{{ $consent['consented_at']?->format('F j, Y g:i A T') ?? 'N/A' }}</td>
                             <td>{{ $consent['ip_address'] ?? 'N/A' }}</td>
+                            <td>{{ $consent['fingerprint_id'] ?? 'N/A' }}</td>
+                            <td>{{ $consent['user_agent'] ?? 'N/A' }}</td>
                         </tr>
                     @endforeach
                 </tbody>
