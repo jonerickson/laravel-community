@@ -7,6 +7,7 @@ namespace App\Filament\Admin\Pages;
 use App\Enums\Role;
 use App\Models\Order;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
@@ -87,6 +88,14 @@ class DisputeManagement extends Page implements HasTable
                 TextColumn::make('created_at')
                     ->label('Date')
                     ->dateTime(),
+            ])
+            ->recordActions([
+                Action::make('downloadDisputeEvidence')
+                    ->label('Download dispute evidence')
+                    ->icon(Heroicon::OutlinedDocumentArrowDown)
+                    ->color('primary')
+                    ->url(fn (Order $record): string => route('admin.dispute-evidence.download', $record))
+                    ->openUrlInNewTab(),
             ])
             ->emptyStateHeading('No results found')
             ->emptyStateDescription('Try searching with a different transaction ID.')
