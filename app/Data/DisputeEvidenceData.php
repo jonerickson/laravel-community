@@ -46,6 +46,8 @@ class DisputeEvidenceData extends Data
             'version' => $consent->policy->version,
             'consented_at' => $consent->consented_at,
             'ip_address' => $consent->ip_address,
+            'fingerprint_id' => $consent->fingerprint_id,
+            'user_agent' => $consent->user_agent,
         ])->all();
 
         $activityLogs = Activity::query()
