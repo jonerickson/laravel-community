@@ -14,7 +14,7 @@ class DisputeEvidenceData extends Data
 {
     /**
      * @param  array<int, array{name: string, amount: float|int}>  $orderItems
-     * @param  array<int, array{title: string, version: string|null, consented_at: Carbon|null, ip_address: string|null}>  $consents
+     * @param  array<int, array{title: string, version: string|null, consented_at: Carbon|null, ip_address: string|null, fingerprint_id: string|null, user_agent: string|null}>  $consents
      * @param  array<int, array{description: string, event: string, properties: array<string, mixed>, created_at: Carbon|null}>  $activityLogs
      */
     public function __construct(
