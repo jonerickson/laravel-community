@@ -6,6 +6,7 @@ namespace App\Drivers\Payments;
 
 use App\Data\CustomerData;
 use App\Data\DiscountData;
+use App\Data\DisputeData;
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\PriceData;
@@ -15,6 +16,7 @@ use App\Enums\OrderRefundReason;
 use App\Enums\PaymentBehavior;
 use App\Enums\ProrationBehavior;
 use App\Models\Discount;
+use App\Models\Dispute;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
@@ -94,4 +96,8 @@ interface PaymentProcessor
     public function syncCustomerInformation(User $user): bool;
 
     public function getBillingPortalUrl(User $user): ?string;
+
+    public function submitDisputeEvidence(Dispute $dispute, string $evidenceFilePath): bool;
+
+    public function getDispute(string $externalDisputeId): ?DisputeData;
 }

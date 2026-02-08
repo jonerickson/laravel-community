@@ -54,6 +54,8 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property-read OrderDiscount|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Discount> $discounts
  * @property-read int|null $discounts_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Dispute> $disputes
+ * @property-read int|null $disputes_count
  * @property-read bool $is_one_time
  * @property-read bool $is_recurring
  * @property-read \Illuminate\Database\Eloquent\Collection<int, OrderItem> $items
@@ -154,6 +156,11 @@ class Order extends Model implements HasLabel
     public function commissions(): HasMany
     {
         return $this->hasMany(Commission::class);
+    }
+
+    public function disputes(): HasMany
+    {
+        return $this->hasMany(Dispute::class);
     }
 
     public function prices(): HasManyThrough

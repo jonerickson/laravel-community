@@ -41,7 +41,6 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Override;
 
@@ -298,10 +297,5 @@ class ForumResource extends Resource
             'create' => CreateForum::route('/create'),
             'edit' => EditForum::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return Number::format(static::getModel()::count());
     }
 }

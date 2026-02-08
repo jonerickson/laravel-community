@@ -33,7 +33,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Override;
 
@@ -220,21 +219,5 @@ class AnnouncementResource extends Resource
             'create' => CreateAnnouncement::route('/create'),
             'edit' => EditAnnouncement::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return Number::format(static::getModel()::current()->count());
-    }
-
-    public static function getNavigationBadgeColor(): string|array|null
-    {
-        $count = static::getNavigationBadge();
-
-        return match (true) {
-            $count > 5 => 'warning',
-            $count > 0 => 'success',
-            default => 'gray',
-        };
     }
 }

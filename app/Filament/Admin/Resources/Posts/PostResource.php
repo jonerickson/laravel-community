@@ -311,20 +311,4 @@ class PostResource extends Resource
     {
         return parent::getEloquentQuery()->blog();
     }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return (string) static::getModel()::where('is_published', false)->count();
-    }
-
-    public static function getNavigationBadgeColor(): string|array|null
-    {
-        $count = static::getNavigationBadge();
-
-        return match (true) {
-            $count > 10 => 'warning',
-            $count > 0 => 'primary',
-            default => null,
-        };
-    }
 }

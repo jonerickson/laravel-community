@@ -109,6 +109,8 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  * @property float $current_balance
  * @property-read SubscriptionData|null $current_subscription
  * @property-read \App\Data\GroupStyleData|null $display_style
+ * @property-read Collection<int, Dispute> $disputes
+ * @property-read int|null $disputes_count
  * @property-read bool $external_payout_account_onboarding_complete
  * @property-read Collection<int, Field> $fields
  * @property-read int|null $fields_count
@@ -308,6 +310,11 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
             ->where('orders.status', OrderStatus::Succeeded)
             ->where('products.type', ProductType::Product)
             ->distinct();
+    }
+
+    public function disputes(): HasMany
+    {
+        return $this->hasMany(Dispute::class);
     }
 
     public function integrations(): HasMany

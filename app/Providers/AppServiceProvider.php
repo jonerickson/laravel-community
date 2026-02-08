@@ -57,18 +57,16 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton('expression-language', fn (): ExpressionLanguageManager => new ExpressionLanguageManager);
 
-        $this->app->bind(PdfFactory::class, function () {
-            return new PdfFactory()->withBrowsershot(
-                function (Browsershot $browserShot) {
-                    $browserShot
-                        ->setChromePath('/usr/bin/chromium')
-                        ->setOption('args', [
-                            '--headless',
-                            '--no-sandbox',
-                        ]);
-                }
-            );
-        });
+        $this->app->bind(fn (): PdfFactory => new PdfFactory()->withBrowsershot(
+            function (Browsershot $browserShot): void {
+                $browserShot
+                    ->setChromePath('/usr/bin/chromium')
+                    ->setOption('args', [
+                        '--headless',
+                        '--no-sandbox',
+                    ]);
+            }
+        ));
     }
 
     public function boot(): void
