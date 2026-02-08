@@ -137,7 +137,7 @@ CREATE TABLE `commissions` (
   `order_id` bigint unsigned DEFAULT NULL,
   `payout_id` bigint unsigned DEFAULT NULL,
   `amount` bigint NOT NULL DEFAULT '0',
-  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -185,6 +185,41 @@ CREATE TABLE `discounts` (
   CONSTRAINT `discounts_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `discounts_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE SET NULL,
   CONSTRAINT `discounts_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `exports`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `exports` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `completed_at` timestamp NULL DEFAULT NULL,
+  `file_disk` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `file_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `exporter` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `processed_rows` int unsigned NOT NULL DEFAULT '0',
+  `total_rows` int unsigned NOT NULL,
+  `successful_rows` int unsigned NOT NULL DEFAULT '0',
+  `user_id` bigint unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `exports_user_id_foreign` (`user_id`),
+  CONSTRAINT `exports_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `failed_import_rows`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `failed_import_rows` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `data` json NOT NULL,
+  `import_id` bigint unsigned NOT NULL,
+  `validation_error` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `failed_import_rows_import_id_foreign` (`import_id`),
+  CONSTRAINT `failed_import_rows_import_id_foreign` FOREIGN KEY (`import_id`) REFERENCES `imports` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `failed_jobs`;
@@ -330,9 +365,16 @@ DROP TABLE IF EXISTS `forums_categories_groups`;
 CREATE TABLE `forums_categories_groups` (
   `category_id` bigint unsigned NOT NULL,
   `group_id` bigint unsigned NOT NULL,
+  `create` tinyint(1) NOT NULL DEFAULT '1',
   `read` tinyint(1) NOT NULL DEFAULT '1',
-  `write` tinyint(1) NOT NULL DEFAULT '1',
+  `update` tinyint(1) NOT NULL DEFAULT '1',
   `delete` tinyint(1) NOT NULL DEFAULT '1',
+  `moderate` tinyint(1) NOT NULL DEFAULT '0',
+  `reply` tinyint(1) NOT NULL DEFAULT '1',
+  `report` tinyint(1) NOT NULL DEFAULT '1',
+  `pin` tinyint(1) NOT NULL DEFAULT '0',
+  `lock` tinyint(1) NOT NULL DEFAULT '0',
+  `move` tinyint(1) NOT NULL DEFAULT '0',
   KEY `forums_categories_groups_category_id_foreign` (`category_id`),
   KEY `forums_categories_groups_group_id_foreign` (`group_id`),
   CONSTRAINT `forums_categories_groups_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `forums_categories` (`id`) ON DELETE CASCADE,
@@ -345,9 +387,16 @@ DROP TABLE IF EXISTS `forums_groups`;
 CREATE TABLE `forums_groups` (
   `forum_id` bigint unsigned NOT NULL,
   `group_id` bigint unsigned NOT NULL,
+  `create` tinyint(1) NOT NULL DEFAULT '1',
   `read` tinyint(1) NOT NULL DEFAULT '1',
-  `write` tinyint(1) NOT NULL DEFAULT '1',
+  `update` tinyint(1) NOT NULL DEFAULT '1',
   `delete` tinyint(1) NOT NULL DEFAULT '1',
+  `moderate` tinyint(1) NOT NULL DEFAULT '0',
+  `reply` tinyint(1) NOT NULL DEFAULT '1',
+  `report` tinyint(1) NOT NULL DEFAULT '1',
+  `pin` tinyint(1) NOT NULL DEFAULT '0',
+  `lock` tinyint(1) NOT NULL DEFAULT '0',
+  `move` tinyint(1) NOT NULL DEFAULT '0',
   KEY `forums_groups_forum_id_foreign` (`forum_id`),
   KEY `forums_groups_group_id_foreign` (`group_id`),
   CONSTRAINT `forums_groups_forum_id_foreign` FOREIGN KEY (`forum_id`) REFERENCES `forums` (`id`) ON DELETE CASCADE,
@@ -402,6 +451,26 @@ CREATE TABLE `images` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `images_imageable_type_imageable_id_index` (`imageable_type`,`imageable_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `imports`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `imports` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `completed_at` timestamp NULL DEFAULT NULL,
+  `file_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `file_path` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `importer` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `processed_rows` int unsigned NOT NULL DEFAULT '0',
+  `total_rows` int unsigned NOT NULL,
+  `successful_rows` int unsigned NOT NULL DEFAULT '0',
+  `user_id` bigint unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `imports_user_id_foreign` (`user_id`),
+  CONSTRAINT `imports_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `inventory_alerts`;
@@ -625,7 +694,11 @@ CREATE TABLE `logs` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `logs_loggable_type_loggable_id_index` (`loggable_type`,`loggable_id`)
+  KEY `logs_loggable_type_loggable_id_index` (`loggable_type`,`loggable_id`),
+  KEY `logs_created_at_index` (`created_at`),
+  KEY `logs_status_index` (`status`),
+  KEY `logs_request_id_index` (`request_id`),
+  KEY `logs_method_index` (`method`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `mailbox_inbound_emails`;
@@ -633,8 +706,8 @@ DROP TABLE IF EXISTS `mailbox_inbound_emails`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mailbox_inbound_emails` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `message_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `message` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `message_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `message` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -900,14 +973,14 @@ DROP TABLE IF EXISTS `payouts`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `payouts` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `reference_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reference_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `seller_id` bigint unsigned NOT NULL,
   `amount` bigint NOT NULL,
   `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `payout_method` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `external_payout_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `failure_reason` text COLLATE utf8mb4_unicode_ci,
+  `failure_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_by` bigint unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1002,6 +1075,28 @@ CREATE TABLE `policies_products` (
   KEY `policies_products_product_id_foreign` (`product_id`),
   CONSTRAINT `policies_products_policy_id_foreign` FOREIGN KEY (`policy_id`) REFERENCES `policies` (`id`) ON DELETE CASCADE,
   CONSTRAINT `policies_products_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `policy_consents`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `policy_consents` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `policy_id` bigint unsigned NOT NULL,
+  `ip_address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
+  `fingerprint_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `context` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `consented_at` timestamp NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `policy_consents_user_id_policy_id_context_unique` (`user_id`,`policy_id`,`context`),
+  KEY `policy_consents_policy_id_foreign` (`policy_id`),
+  KEY `policy_consents_context_index` (`context`),
+  CONSTRAINT `policy_consents_policy_id_foreign` FOREIGN KEY (`policy_id`) REFERENCES `policies` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `policy_consents_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `posts`;
@@ -1446,7 +1541,7 @@ CREATE TABLE `users` (
   `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `stripe_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `payouts_enabled` tinyint(1) NOT NULL DEFAULT '0',
-  `external_payout_account_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `external_payout_account_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `external_payout_account_onboarded_at` timestamp NULL DEFAULT NULL,
   `external_payout_account_capabilities` json DEFAULT NULL,
   `pm_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -1788,9 +1883,6 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (204,'2025_12_06_23
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (205,'2025_12_06_232522_add_external_id_to_orders_discounts_table',69);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (206,'2025_12_16_231457_add_billing_reason_to_orders_table',69);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (207,'2025_12_20_050134_add_is_active_to_products_table',69);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (208,'2025_09_28_202015_create_email_settings',70);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (209,'2025_09_28_202053_create_general_settings',70);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (210,'2025_11_25_191628_registration_settings',70);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (211,'2025_12_22_220138_add_stripe_connect_to_users_table',70);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (212,'2025_12_22_220153_add_failure_reason_to_payouts_table',70);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (213,'2025_12_22_230216_create_commissions_table',70);
@@ -1799,3 +1891,16 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (215,'2025_12_23_00
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (216,'2025_12_23_054235_alter_processed_columns_on_payouts_table',70);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (217,'2025_12_23_185608_add_reference_id_to_payouts_table',70);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (218,'2025_12_25_213040_create_mailbox_inbound_emails_table',70);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (219,'2025_09_28_202015_create_email_settings',71);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (220,'2025_09_28_202053_create_general_settings',71);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (221,'2025_11_25_191628_registration_settings',71);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (222,'2025_12_31_211234_add_other_pivot_attributes_to_forum_groups_table',71);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (223,'2025_12_31_211235_add_other_pivot_attributes_to_forum_groups_table',71);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (224,'2026_01_02_213350_create_imports_table',71);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (225,'2026_01_02_213351_create_exports_table',71);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (226,'2026_01_02_213352_create_failed_import_rows_table',71);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (227,'2026_01_26_054505_create_integration_settings',71);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (228,'2026_01_29_012125_add_intercom_auth_settings',71);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (229,'2026_02_05_042616_add_discord_integration_settings',71);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (230,'2026_02_07_050256_create_policy_consents_table',71);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (231,'2026_02_07_054403_add_performance_indexes_to_logs_table',71);
