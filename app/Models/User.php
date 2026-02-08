@@ -310,6 +310,11 @@ class User extends Authenticatable implements EmailAuthenticationContract, Filam
             ->distinct();
     }
 
+    public function disputes(): HasMany
+    {
+        return $this->hasMany(Dispute::class);
+    }
+
     public function integrations(): HasMany
     {
         return $this->hasMany(UserIntegration::class);

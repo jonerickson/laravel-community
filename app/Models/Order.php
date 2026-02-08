@@ -156,6 +156,11 @@ class Order extends Model implements HasLabel
         return $this->hasMany(Commission::class);
     }
 
+    public function disputes(): HasMany
+    {
+        return $this->hasMany(Dispute::class);
+    }
+
     public function prices(): HasManyThrough
     {
         return $this->hasManyThrough(Price::class, OrderItem::class, 'order_id', 'id', 'id', 'price_id');
