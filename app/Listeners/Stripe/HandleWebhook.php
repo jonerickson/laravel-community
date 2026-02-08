@@ -73,6 +73,13 @@ class HandleWebhook implements ShouldQueue
             };
         }
 
+        match (data_get($event->payload, 'type')) {
+            'charge.dispute.created' => $this->handleDisputeCreated(),
+            'charge.dispute.updated', 'charge.dispute.funds_withdrawn', 'charge.dispute.funds_reinstated' => $this->handleDisputeUpdated(),
+            'charge.dispute.closed' => $this->handleDisputeClosed(),
+            default => null,
+        };
+
         $order = $this->resolveOrder();
 
         if (blank($order)) {
@@ -83,13 +90,6 @@ class HandleWebhook implements ShouldQueue
             'invoice.payment_succeeded' => event(new PaymentSucceeded($order, BillingReason::tryFrom(data_get($event->payload, 'data.object.billing_reason')))),
             'invoice.payment_action_required' => event(new PaymentActionRequired($order, $this->resolvePaymentConfirmationUrl($order))),
             'refund.created' => event(new RefundCreated($order, OrderRefundReason::tryFrom(data_get($event->payload, 'data.object.reason') ?? '') ?? OrderRefundReason::Other, data_get($event->payload, 'data.object.reason'))),
-            default => null,
-        };
-
-        match (data_get($event->payload, 'type')) {
-            'charge.dispute.created' => $this->handleDisputeCreated(),
-            'charge.dispute.updated', 'charge.dispute.funds_withdrawn', 'charge.dispute.funds_reinstated' => $this->handleDisputeUpdated(),
-            'charge.dispute.closed' => $this->handleDisputeClosed(),
             default => null,
         };
     }
