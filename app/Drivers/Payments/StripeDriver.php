@@ -6,6 +6,7 @@ namespace App\Drivers\Payments;
 
 use App\Data\CustomerData;
 use App\Data\DiscountData;
+use App\Data\DisputeData;
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\PriceData;
@@ -22,6 +23,7 @@ use App\Enums\ProrationBehavior;
 use App\Enums\SubscriptionInterval;
 use App\Jobs\Stripe\UpdateCustomerInformation;
 use App\Models\Discount;
+use App\Models\Dispute;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Price;
@@ -1002,6 +1004,46 @@ class StripeDriver implements PaymentProcessor
         return $this->executeWithErrorHandling('getBillingPortalUrl', fn (): string => $user->billingPortalUrl(
             returnUrl: route('settings.billing'),
         ));
+    }
+
+    public function submitDisputeEvidence(Dispute $dispute, string $evidenceFilePath): bool
+    {
+        return $this->executeWithErrorHandling('submitDisputeEvidence', function () use ($dispute, $evidenceFilePath): bool {
+            $fileUpload = $this->stripe->files->create([
+                'purpose' => 'dispute_evidence',
+                'file' => fopen($evidenceFilePath, 'r'),
+            ]);
+
+            $this->stripe->disputes->update($dispute->external_dispute_id, [
+                'evidence' => [
+                    'uncategorized_file' => $fileUpload->id,
+                ],
+            ]);
+
+            return true;
+        }, false);
+    }
+
+    public function getDispute(string $externalDisputeId): ?DisputeData
+    {
+        return $this->executeWithErrorHandling('getDispute', function () use ($externalDisputeId): DisputeData {
+            $stripeDispute = $this->stripe->disputes->retrieve($externalDisputeId);
+
+            return new DisputeData(
+                externalDisputeId: $stripeDispute->id,
+                externalChargeId: $stripeDispute->charge,
+                externalPaymentIntentId: $stripeDispute->payment_intent,
+                status: $stripeDispute->status,
+                reason: $stripeDispute->reason,
+                amount: $stripeDispute->amount,
+                currency: $stripeDispute->currency,
+                evidenceDueBy: $stripeDispute->evidence_details?->due_by
+                    ? \Illuminate\Support\Carbon::createFromTimestamp($stripeDispute->evidence_details->due_by)
+                    : null,
+                isChargeRefundable: $stripeDispute->is_charge_refundable,
+                networkReasonCode: $stripeDispute->network_reason_code,
+            );
+        });
     }
 
     private function executeWithErrorHandling(string $method, callable $callback, mixed $defaultValue = null): mixed

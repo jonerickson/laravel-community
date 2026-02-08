@@ -6,6 +6,7 @@ namespace App\Drivers\Payments;
 
 use App\Data\CustomerData;
 use App\Data\DiscountData;
+use App\Data\DisputeData;
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\PriceData;
@@ -15,6 +16,7 @@ use App\Enums\OrderRefundReason;
 use App\Enums\PaymentBehavior;
 use App\Enums\ProrationBehavior;
 use App\Models\Discount;
+use App\Models\Dispute;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
@@ -196,6 +198,16 @@ class NullDriver implements PaymentProcessor
     }
 
     public function getBillingPortalUrl(User $user): ?string
+    {
+        return null;
+    }
+
+    public function submitDisputeEvidence(Dispute $dispute, string $evidenceFilePath): bool
+    {
+        return false;
+    }
+
+    public function getDispute(string $externalDisputeId): ?DisputeData
     {
         return null;
     }

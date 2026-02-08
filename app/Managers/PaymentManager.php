@@ -6,6 +6,7 @@ namespace App\Managers;
 
 use App\Data\CustomerData;
 use App\Data\DiscountData;
+use App\Data\DisputeData;
 use App\Data\InvoiceData;
 use App\Data\PaymentMethodData;
 use App\Data\PriceData;
@@ -18,6 +19,7 @@ use App\Enums\OrderRefundReason;
 use App\Enums\PaymentBehavior;
 use App\Enums\ProrationBehavior;
 use App\Models\Discount;
+use App\Models\Dispute;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
@@ -208,6 +210,16 @@ class PaymentManager extends Manager implements PaymentProcessor
     public function getBillingPortalUrl(User $user): ?string
     {
         return $this->driver()->getBillingPortalUrl($user);
+    }
+
+    public function submitDisputeEvidence(Dispute $dispute, string $evidenceFilePath): bool
+    {
+        return $this->driver()->submitDisputeEvidence($dispute, $evidenceFilePath);
+    }
+
+    public function getDispute(string $externalDisputeId): ?DisputeData
+    {
+        return $this->driver()->getDispute($externalDisputeId);
     }
 
     protected function createStripeDriver(): PaymentProcessor
