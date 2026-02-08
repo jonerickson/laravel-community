@@ -6,10 +6,13 @@ namespace App\Filament\Admin\Resources\Disputes;
 
 use App\Enums\Role;
 use App\Filament\Admin\Resources\Disputes\Pages\ListDisputes;
+use App\Filament\Admin\Resources\Disputes\Pages\ViewDispute;
+use App\Filament\Admin\Resources\Disputes\Schemas\DisputeInfolist;
 use App\Filament\Admin\Resources\Disputes\Tables\DisputesTable;
 use App\Models\Dispute;
 use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +32,12 @@ class DisputeResource extends Resource
     }
 
     #[Override]
+    public static function infolist(Schema $schema): Schema
+    {
+        return DisputeInfolist::configure($schema);
+    }
+
+    #[Override]
     public static function table(Table $table): Table
     {
         return DisputesTable::configure($table);
@@ -38,6 +47,7 @@ class DisputeResource extends Resource
     {
         return [
             'index' => ListDisputes::route('/'),
+            'view' => ViewDispute::route('/{record}'),
         ];
     }
 
