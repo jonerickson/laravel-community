@@ -18,10 +18,23 @@ class ListDisputes extends ListRecords
     protected ?string $subheading = 'Manage payment disputes.';
 
     #[Override]
+    public function getHeaderWidgetsColumns(): int|array
+    {
+        return 2;
+    }
+
+    #[Override]
     protected function getHeaderWidgets(): array
     {
         return [
             DisputeStatsOverview::make(),
+        ];
+    }
+
+    #[Override]
+    protected function getFooterWidgets(): array
+    {
+        return [
             DisputeFrequencyChart::make(),
             DisputeOutcomeChart::make(),
         ];

@@ -49,7 +49,7 @@ class DisputesTable
                     ->formatStateUsing(fn (int $state): string => Number::currency($state / 100))
                     ->sortable(),
                 TextColumn::make('evidence_due_by')
-                    ->label('Evidence due')
+                    ->label('Evidence Due')
                     ->date()
                     ->dateTimeTooltip()
                     ->sortable(),

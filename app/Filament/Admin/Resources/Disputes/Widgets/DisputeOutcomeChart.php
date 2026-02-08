@@ -11,13 +11,15 @@ use Override;
 
 class DisputeOutcomeChart extends ChartWidget
 {
-    protected ?string $heading = 'Dispute outcomes';
+    protected ?string $heading = 'Dispute Outcomes';
 
     protected ?string $description = 'Breakdown of dispute results.';
 
     protected static ?int $sort = 3;
 
     protected ?string $maxHeight = '300px';
+
+    protected int|string|array $columnSpan = 'full';
 
     #[Override]
     protected function getData(): array

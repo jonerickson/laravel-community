@@ -14,6 +14,8 @@ use Override;
 
 class DisputeStatsOverview extends StatsOverviewWidget
 {
+    protected int|string|array $columnSpan = 'full';
+
     #[Override]
     protected function getStats(): array
     {
@@ -21,7 +23,6 @@ class DisputeStatsOverview extends StatsOverviewWidget
         $needingResponse = $this->calculateNeedingResponse();
         $totalAmount = $this->calculateTotalAmount();
         $winRate = $this->calculateWinRate();
-        $avgResolutionDays = $this->calculateAverageResolutionDays();
 
         return [
             Stat::make('Total Disputes', Number::format($totalDisputes))
@@ -43,11 +44,6 @@ class DisputeStatsOverview extends StatsOverviewWidget
                 ->description('Won vs lost disputes')
                 ->icon(Heroicon::OutlinedTrophy)
                 ->color($winRate >= 50 ? 'success' : 'danger'),
-
-            Stat::make('Avg. Resolution', $avgResolutionDays !== null ? Number::format($avgResolutionDays, 1).' days' : 'N/A')
-                ->description('Average days to resolve')
-                ->icon(Heroicon::OutlinedClock)
-                ->color('info'),
         ];
     }
 
@@ -74,14 +70,5 @@ class DisputeStatsOverview extends StatsOverviewWidget
         }
 
         return ($won / ($won + $lost)) * 100;
-    }
-
-    protected function calculateAverageResolutionDays(): ?float
-    {
-        $resolved = Dispute::whereIn('status', [DisputeStatus::Won, DisputeStatus::Lost])
-            ->selectRaw('AVG(TIMESTAMPDIFF(DAY, created_at, updated_at)) as avg_days')
-            ->value('avg_days');
-
-        return $resolved !== null ? round((float) $resolved, 1) : null;
     }
 }

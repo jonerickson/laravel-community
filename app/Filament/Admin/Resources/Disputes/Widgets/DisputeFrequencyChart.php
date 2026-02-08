@@ -12,13 +12,15 @@ use Override;
 
 class DisputeFrequencyChart extends ChartWidget
 {
-    protected ?string $heading = 'Dispute frequency';
+    protected ?string $heading = 'Dispute Frequency';
 
     protected ?string $description = 'Disputes opened per month over the past 12 months.';
 
     protected static ?int $sort = 2;
 
     protected ?string $maxHeight = '300px';
+
+    protected int|string|array $columnSpan = 'full';
 
     #[Override]
     protected function getData(): array
@@ -31,9 +33,7 @@ class DisputeFrequencyChart extends ChartWidget
                     'label' => 'Disputes',
                     'data' => $data->pluck('count')->toArray(),
                     'borderColor' => 'rgb(239, 68, 68)',
-                    'backgroundColor' => 'rgba(239, 68, 68, 0.1)',
-                    'fill' => true,
-                    'tension' => 0.3,
+                    'backgroundColor' => 'rgba(239, 68, 68, 0.8)',
                 ],
             ],
             'labels' => $data->pluck('month')->toArray(),
@@ -52,9 +52,8 @@ class DisputeFrequencyChart extends ChartWidget
             'scales' => [
                 'y' => [
                     'beginAtZero' => true,
-                    'title' => [
-                        'display' => true,
-                        'text' => 'Disputes',
+                    'ticks' => [
+                        'precision' => 0,
                     ],
                 ],
             ],

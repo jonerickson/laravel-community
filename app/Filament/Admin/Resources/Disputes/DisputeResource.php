@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Disputes;
 
+use App\Enums\DisputeStatus;
 use App\Enums\Role;
 use App\Filament\Admin\Resources\Disputes\Pages\ListDisputes;
 use App\Filament\Admin\Resources\Disputes\Pages\ViewDispute;
@@ -16,6 +17,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Number;
 use Override;
 
 class DisputeResource extends Resource
@@ -25,6 +27,21 @@ class DisputeResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShieldExclamation;
 
     protected static ?string $recordTitleAttribute = 'external_dispute_id';
+
+    public static function getNavigationBadge(): ?string
+    {
+        $count = Dispute::whereIn('status', [
+            DisputeStatus::NeedsResponse,
+            DisputeStatus::WarningNeedsResponse,
+        ])->count();
+
+        return Number::format($count);
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'danger';
+    }
 
     public static function canAccess(): bool
     {
