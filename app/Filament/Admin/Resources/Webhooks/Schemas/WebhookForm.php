@@ -6,6 +6,9 @@ namespace App\Filament\Admin\Resources\Webhooks\Schemas;
 
 use App\Enums\HttpMethod;
 use App\Enums\RenderEngine;
+use App\Events\DisputeClosed;
+use App\Events\DisputeCreated;
+use App\Events\DisputeUpdated;
 use App\Events\OrderCancelled;
 use App\Events\OrderCreated;
 use App\Events\OrderRefunded;
@@ -25,6 +28,7 @@ use App\Events\UserIntegrationCreated;
 use App\Events\UserIntegrationDeleted;
 use App\Events\UserUpdated;
 use App\Facades\ExpressionLanguage;
+use App\Models\Dispute;
 use App\Models\Order;
 use App\Models\Post;
 use App\Models\Product;
@@ -60,6 +64,7 @@ class WebhookForm
                     ->columnSpanFull()
                     ->schema([
                         Select::make('event')
+                            ->searchable()
                             ->helperText('The event that will trigger the webhook to be sent.')
                             ->options(self::events())
                             ->required()
@@ -77,7 +82,7 @@ class WebhookForm
                             ->required()
                             ->columnSpanFull(),
                         KeyValue::make('headers')
-                            ->helperText('Any additiional headers that should be added to the HTTP request.')
+                            ->helperText('Any additional headers that should be added to the HTTP request.')
                             ->keyLabel('Header'),
                         Radio::make('render')
                             ->live()
@@ -243,6 +248,7 @@ class WebhookForm
     protected static function generateStateForEvent(string $event, int $modelId): array
     {
         return match ($event) {
+            DisputeCreated::class, DisputeUpdated::class, DisputeClosed::class => ['dispute' => Dispute::query()->findOrFail($modelId)],
             OrderCreated::class, OrderCancelled::class, OrderRefunded::class, PaymentSucceeded::class => ['order' => Order::query()->with(['items.price.product', 'discounts', 'user.integrations'])->findOrFail($modelId)],
             PostCreated::class, PostUpdated::class, PostDeleted::class => ['post' => Post::query()->findOrFail($modelId)],
             SubscriptionCreated::class, SubscriptionUpdated::class, SubscriptionDeleted::class => ['user' => Auth::user(), 'product' => Product::query()->findOrFail($modelId)],
@@ -255,6 +261,7 @@ class WebhookForm
     protected static function getExampleOptionsForEvent(string $event): array
     {
         return match ($event) {
+            DisputeCreated::class, DisputeUpdated::class, DisputeClosed::class => Dispute::query()->orderBy('id')->limit(50)->get()->mapWithKeys(fn (Dispute $dispute): array => [$dispute->getKey() => $dispute->external_dispute_id])->toArray(),
             OrderCreated::class, PaymentSucceeded::class => Order::query()->completed()->latest()->limit(50)->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
             OrderCancelled::class => Order::query()->cancelled()->latest()->limit(50)->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
             OrderRefunded::class, => Order::query()->refunded()->latest()->limit(50)->get()->mapWithKeys(fn (Order $order): array => [$order->getKey() => $order->getLabel()])->toArray(),
@@ -269,6 +276,9 @@ class WebhookForm
     protected static function events(): array
     {
         return [
+            DisputeCreated::class => 'Dispute Created',
+            DisputeUpdated::class => 'Dispute Updated',
+            DisputeClosed::class => 'Dispute Closed',
             OrderCreated::class => 'Order Created',
             OrderCancelled::class => 'Order Cancelled',
             OrderRefunded::class => 'Order Refunded',

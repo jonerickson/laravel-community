@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Listeners\Webhooks;
 
 use App\Enums\RenderEngine;
+use App\Events\DisputeClosed;
+use App\Events\DisputeCreated;
+use App\Events\DisputeUpdated;
 use App\Events\OrderCancelled;
 use App\Events\OrderCreated;
 use App\Events\OrderRefunded;
@@ -28,7 +31,7 @@ class SendWebhooks implements ShouldQueue
     use Dispatchable;
     use InteractsWithQueue;
 
-    public function handle(OrderCreated|OrderCancelled|OrderRefunded|PaymentSucceeded|SubscriptionCreated|SubscriptionDeleted|UserCreated|UserUpdated|UserDeleted $event): void
+    public function handle(DisputeCreated|DisputeUpdated|DisputeClosed|OrderCreated|OrderCancelled|OrderRefunded|PaymentSucceeded|SubscriptionCreated|SubscriptionDeleted|UserCreated|UserUpdated|UserDeleted $event): void
     {
         Webhook::query()->whereEvent($event::class)->each(function (Webhook $webhook) use ($event): void {
             if (($webhook->render === RenderEngine::Blade && blank($webhook->payload_text)) || ($webhook->render === RenderEngine::ExpressionLanguage && blank($webhook->payload_json))) {
