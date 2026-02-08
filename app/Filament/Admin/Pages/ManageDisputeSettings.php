@@ -16,6 +16,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
 use Override;
+use UnitEnum;
 
 class ManageDisputeSettings extends SettingsPage
 {
@@ -25,9 +26,11 @@ class ManageDisputeSettings extends SettingsPage
 
     protected static ?string $cluster = SettingsCluster::class;
 
+    protected static string|UnitEnum|null $navigationGroup = 'Payments';
+
     protected static ?string $navigationLabel = 'Disputes';
 
-    protected static ?string $title = 'Dispute settings';
+    protected static ?string $title = 'Dispute Settings';
 
     protected ?string $subheading = 'Configure automated actions when a payment dispute is received.';
 
@@ -41,14 +44,15 @@ class ManageDisputeSettings extends SettingsPage
     {
         return $schema
             ->components([
-                Section::make('Automated actions')
+                Section::make('Automated Actions')
                     ->description('Select which actions should be automatically performed when a new dispute is received.')
                     ->columnSpanFull()
                     ->schema([
                         CheckboxList::make('dispute_actions')
-                            ->label('Dispute actions')
+                            ->hiddenLabel()
+                            ->helperText('Select which actions should be automatically performed when a new dispute is received.')
                             ->options(DisputeAction::class)
-                            ->columns(2),
+                            ->columns(),
                     ]),
             ]);
     }

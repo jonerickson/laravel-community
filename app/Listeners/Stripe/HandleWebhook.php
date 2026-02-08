@@ -30,6 +30,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -242,7 +243,7 @@ class HandleWebhook implements ShouldQueue
         }
 
         $dispute = Dispute::create([
-            'user_id' => $this->user->getKey(),
+            'user_id' => $order->user->getKey(),
             'order_id' => $order->getKey(),
             'external_dispute_id' => data_get($disputeData, 'id'),
             'external_charge_id' => data_get($disputeData, 'charge'),
@@ -252,7 +253,7 @@ class HandleWebhook implements ShouldQueue
             'amount' => (int) data_get($disputeData, 'amount'),
             'currency' => data_get($disputeData, 'currency', 'usd'),
             'evidence_due_by' => data_get($disputeData, 'evidence_details.due_by')
-                ? \Illuminate\Support\Carbon::createFromTimestamp(data_get($disputeData, 'evidence_details.due_by'))
+                ? Carbon::createFromTimestamp(data_get($disputeData, 'evidence_details.due_by'))
                 : null,
             'is_charge_refundable' => (bool) data_get($disputeData, 'is_charge_refundable', false),
             'network_reason_code' => data_get($disputeData, 'network_reason_code'),

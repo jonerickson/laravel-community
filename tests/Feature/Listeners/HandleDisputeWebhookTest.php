@@ -8,7 +8,7 @@ use App\Enums\DisputeStatus;
 use App\Events\DisputeClosed;
 use App\Events\DisputeCreated;
 use App\Events\DisputeUpdated;
-use App\Listeners\HandleDisputeCreated;
+use App\Listeners\Payments\HandleDisputeCreated;
 use App\Listeners\Stripe\HandleWebhook;
 use App\Models\Dispute;
 use App\Models\Order;
@@ -17,6 +17,9 @@ use App\Settings\DisputeSettings;
 use Illuminate\Support\Facades\Event;
 use Laravel\Cashier\Events\WebhookReceived;
 
+/**
+ * @return array<string, string|array<string, non-empty-array>>
+ */
 function createDisputePayload(string $type, array $disputeData, ?string $eventId = null): array
 {
     return [

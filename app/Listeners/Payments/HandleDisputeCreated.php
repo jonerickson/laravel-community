@@ -2,17 +2,20 @@
 
 declare(strict_types=1);
 
-namespace App\Listeners;
+namespace App\Listeners\Payments;
 
 use App\Actions\Users\BlacklistUserAction;
 use App\Enums\DisputeAction;
 use App\Events\DisputeCreated;
 use App\Facades\PaymentProcessor;
+use App\Models\Dispute;
+use App\Models\User;
 use App\Settings\DisputeSettings;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class HandleDisputeCreated implements ShouldQueue
 {
@@ -21,6 +24,9 @@ class HandleDisputeCreated implements ShouldQueue
 
     public function __construct(private readonly DisputeSettings $settings) {}
 
+    /**
+     * @throws Throwable
+     */
     public function handle(DisputeCreated $event): void
     {
         $actions = collect($this->settings->dispute_actions)
@@ -48,7 +54,10 @@ class HandleDisputeCreated implements ShouldQueue
         }
     }
 
-    private function blacklistUser(\App\Models\Dispute $dispute, \App\Models\User $user): void
+    /**
+     * @throws Throwable
+     */
+    private function blacklistUser(Dispute $dispute, User $user): void
     {
         if ($user->is_blacklisted) {
             Log::info('Dispute automated action: User already blacklisted, skipping', [
@@ -59,7 +68,7 @@ class HandleDisputeCreated implements ShouldQueue
             return;
         }
 
-        BlacklistUserAction::execute($user, "Automated: Dispute {$dispute->external_dispute_id} received");
+        BlacklistUserAction::execute($user, sprintf('Automated: Dispute %s received', $dispute->external_dispute_id));
 
         Log::info('Dispute automated action: User blacklisted', [
             'dispute_id' => $dispute->id,
@@ -67,9 +76,9 @@ class HandleDisputeCreated implements ShouldQueue
         ]);
     }
 
-    private function cancelSubscription(\App\Models\Dispute $dispute, \App\Models\User $user): void
+    private function cancelSubscription(Dispute $dispute, User $user): void
     {
-        $result = PaymentProcessor::cancelSubscription($user, true, "Automated: Dispute {$dispute->external_dispute_id} received");
+        $result = PaymentProcessor::cancelSubscription($user, true, sprintf('Automated: Dispute %s received', $dispute->external_dispute_id));
 
         Log::info('Dispute automated action: Cancel subscription', [
             'dispute_id' => $dispute->id,
@@ -78,7 +87,7 @@ class HandleDisputeCreated implements ShouldQueue
         ]);
     }
 
-    private function flagForReview(\App\Models\Dispute $dispute): void
+    private function flagForReview(Dispute $dispute): void
     {
         Log::info('Dispute automated action: Flagged for review', [
             'dispute_id' => $dispute->id,

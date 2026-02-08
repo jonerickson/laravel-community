@@ -81,7 +81,7 @@ class DisputeFrequencyChart extends ChartWidget
             ->orderBy('year')
             ->orderBy('month')
             ->get()
-            ->keyBy(fn ($row) => $row->year.'-'.str_pad((string) $row->month, 2, '0', STR_PAD_LEFT));
+            ->keyBy(fn ($row): string => $row->year.'-'.str_pad((string) $row->month, 2, '0', STR_PAD_LEFT));
 
         $result = collect();
 

@@ -21,7 +21,7 @@ class DisputeInfolist
     {
         return $schema
             ->components([
-                Section::make('Dispute information')
+                Section::make('Dispute Information')
                     ->columnSpanFull()
                     ->columns(4)
                     ->schema([
@@ -43,14 +43,14 @@ class DisputeInfolist
                         TextEntry::make('currency')
                             ->formatStateUsing(fn (string $state): string => strtoupper($state)),
                         TextEntry::make('evidence_due_by')
-                            ->label('Evidence due by')
+                            ->label('Evidence Due By')
                             ->dateTime()
                             ->default(new HtmlString('&mdash;')),
                         IconEntry::make('is_charge_refundable')
-                            ->label('Charge refundable')
+                            ->label('Charge Refundable')
                             ->boolean(),
                         TextEntry::make('network_reason_code')
-                            ->label('Network reason code')
+                            ->label('Network Reason Code')
                             ->default(new HtmlString('&mdash;')),
                         TextEntry::make('created_at')
                             ->label('Created')
@@ -61,21 +61,21 @@ class DisputeInfolist
                             ->since()
                             ->dateTimeTooltip(),
                     ]),
-                Section::make('Order information')
+                Section::make('Order Information')
                     ->columnSpanFull()
                     ->columns(3)
                     ->schema([
                         TextEntry::make('order.reference_id')
-                            ->label('Order number')
+                            ->label('Order Number')
                             ->url(fn (Dispute $record): string => OrderResource::getUrl('view', ['record' => $record->order_id]), shouldOpenInNewTab: true),
                         TextEntry::make('order.status')
-                            ->label('Order status')
+                            ->label('Order Status')
                             ->badge(),
                         TextEntry::make('order.amount_due')
-                            ->label('Order amount')
+                            ->label('Order Amount')
                             ->money(),
                     ]),
-                Section::make('User information')
+                Section::make('User Information')
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
@@ -85,11 +85,11 @@ class DisputeInfolist
                         TextEntry::make('user.email')
                             ->label('Email'),
                     ]),
-                Section::make('Raw metadata')
+                Section::make('Raw Metadata')
                     ->columnSpanFull()
                     ->schema([
                         KeyValueEntry::make('metadata')
-                            ->label(false)
+                            ->hiddenLabel()
                             ->default([]),
                     ]),
             ]);
