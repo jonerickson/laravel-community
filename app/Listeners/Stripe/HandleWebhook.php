@@ -10,6 +10,9 @@ use App\Enums\OrderRefundReason;
 use App\Enums\SubscriptionStatus;
 use App\Events\CustomerDeleted;
 use App\Events\CustomerUpdated;
+use App\Events\DisputeClosed;
+use App\Events\DisputeCreated;
+use App\Events\DisputeUpdated;
 use App\Events\PaymentActionRequired;
 use App\Events\PaymentSucceeded;
 use App\Events\RefundCreated;
@@ -18,6 +21,7 @@ use App\Events\SubscriptionDeleted;
 use App\Events\SubscriptionUpdated;
 use App\Managers\PaymentManager;
 use App\Models\Discount;
+use App\Models\Dispute;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
@@ -79,6 +83,13 @@ class HandleWebhook implements ShouldQueue
             'invoice.payment_succeeded' => event(new PaymentSucceeded($order, BillingReason::tryFrom(data_get($event->payload, 'data.object.billing_reason')))),
             'invoice.payment_action_required' => event(new PaymentActionRequired($order, $this->resolvePaymentConfirmationUrl($order))),
             'refund.created' => event(new RefundCreated($order, OrderRefundReason::tryFrom(data_get($event->payload, 'data.object.reason') ?? '') ?? OrderRefundReason::Other, data_get($event->payload, 'data.object.reason'))),
+            default => null,
+        };
+
+        match (data_get($event->payload, 'type')) {
+            'charge.dispute.created' => $this->handleDisputeCreated(),
+            'charge.dispute.updated', 'charge.dispute.funds_withdrawn', 'charge.dispute.funds_reinstated' => $this->handleDisputeUpdated(),
+            'charge.dispute.closed' => $this->handleDisputeClosed(),
             default => null,
         };
     }
@@ -215,6 +226,105 @@ class HandleWebhook implements ShouldQueue
             'user_id' => $this->user->getKey(),
             'external_event_id' => data_get($this->payload, 'id'),
         ]);
+    }
+
+    private function handleDisputeCreated(): void
+    {
+        $disputeData = data_get($this->payload, 'data.object');
+        $order = $this->resolveDispute();
+
+        if (blank($order)) {
+            Log::warning('Dispute created but order could not be resolved', [
+                'external_dispute_id' => data_get($disputeData, 'id'),
+            ]);
+
+            return;
+        }
+
+        $dispute = Dispute::create([
+            'user_id' => $this->user->getKey(),
+            'order_id' => $order->getKey(),
+            'external_dispute_id' => data_get($disputeData, 'id'),
+            'external_charge_id' => data_get($disputeData, 'charge'),
+            'external_payment_intent_id' => data_get($disputeData, 'payment_intent'),
+            'status' => data_get($disputeData, 'status'),
+            'reason' => data_get($disputeData, 'reason'),
+            'amount' => (int) data_get($disputeData, 'amount'),
+            'currency' => data_get($disputeData, 'currency', 'usd'),
+            'evidence_due_by' => data_get($disputeData, 'evidence_details.due_by')
+                ? \Illuminate\Support\Carbon::createFromTimestamp(data_get($disputeData, 'evidence_details.due_by'))
+                : null,
+            'is_charge_refundable' => (bool) data_get($disputeData, 'is_charge_refundable', false),
+            'network_reason_code' => data_get($disputeData, 'network_reason_code'),
+            'metadata' => data_get($disputeData, 'metadata'),
+        ]);
+
+        Log::debug('Dispute created', ['dispute_id' => $dispute->id, 'external_dispute_id' => $dispute->external_dispute_id]);
+
+        event(new DisputeCreated($dispute));
+    }
+
+    private function handleDisputeUpdated(): void
+    {
+        $disputeData = data_get($this->payload, 'data.object');
+        $dispute = Dispute::query()->where('external_dispute_id', data_get($disputeData, 'id'))->first();
+
+        if (blank($dispute)) {
+            return;
+        }
+
+        $dispute->update([
+            'status' => data_get($disputeData, 'status'),
+            'metadata' => data_get($disputeData, 'metadata'),
+        ]);
+
+        Log::debug('Dispute updated', ['dispute_id' => $dispute->id, 'external_dispute_id' => $dispute->external_dispute_id]);
+
+        event(new DisputeUpdated($dispute));
+    }
+
+    private function handleDisputeClosed(): void
+    {
+        $disputeData = data_get($this->payload, 'data.object');
+        $dispute = Dispute::query()->where('external_dispute_id', data_get($disputeData, 'id'))->first();
+
+        if (blank($dispute)) {
+            return;
+        }
+
+        $dispute->update([
+            'status' => data_get($disputeData, 'status'),
+        ]);
+
+        Log::debug('Dispute closed', ['dispute_id' => $dispute->id, 'status' => $dispute->status]);
+
+        event(new DisputeClosed($dispute));
+    }
+
+    private function resolveDispute(): ?Order
+    {
+        $paymentIntent = data_get($this->payload, 'data.object.payment_intent');
+
+        if (filled($paymentIntent)) {
+            $order = Order::query()->where('external_order_id', $paymentIntent)->first();
+
+            if ($order instanceof Order) {
+                return $order;
+            }
+        }
+
+        $metadata = data_get($this->payload, 'data.object.metadata', []);
+        $orderId = data_get($metadata, 'order_id');
+
+        if (filled($orderId)) {
+            $order = Order::query()->where('reference_id', $orderId)->first();
+
+            if ($order instanceof Order) {
+                return $order;
+            }
+        }
+
+        return null;
     }
 
     private function resolveOrder(): ?Order
