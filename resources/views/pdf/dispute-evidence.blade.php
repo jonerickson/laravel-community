@@ -60,6 +60,7 @@
 
             .section {
                 margin-bottom: 24px;
+                break-inside: avoid;
             }
 
             .section-title {
@@ -69,6 +70,7 @@
                 padding: 6px 10px;
                 margin-bottom: 12px;
                 border-left: 3px solid #1a1a1a;
+                break-after: avoid;
             }
 
             table {
