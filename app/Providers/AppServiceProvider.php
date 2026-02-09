@@ -45,6 +45,7 @@ use Laravel\Passport\Passport;
 use Laravel\Socialite\Facades\Socialite;
 use Override;
 use Spatie\Browsershot\Browsershot;
+use Spatie\LaravelPdf\PdfBuilder;
 use Spatie\LaravelPdf\PdfFactory;
 
 class AppServiceProvider extends ServiceProvider
@@ -57,7 +58,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton('expression-language', fn (): ExpressionLanguageManager => new ExpressionLanguageManager);
 
-        $this->app->bind(fn (): PdfFactory => new PdfFactory()->withBrowsershot(
+        $this->app->bind(fn (): PdfFactory|PdfBuilder => new PdfFactory()->withBrowsershot(
             function (Browsershot $browserShot): void {
                 $browserShot
                     ->setChromePath('/usr/bin/chromium')
