@@ -205,7 +205,7 @@ return [
         'production' => [
             'supervisor-1' => [
                 'minProcesses' => 3,
-                'maxProcesses' => 15,
+                'maxProcesses' => 25,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
                 'force' => true,
