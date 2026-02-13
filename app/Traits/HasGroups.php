@@ -109,7 +109,8 @@ trait HasGroups
             ->reject(fn (int $id): bool => $id === Group::defaultGuestGroup()?->id)
             ->values();
 
-        $this->groups()->sync($finalGroups, $detaching);
+        // Do not fire events when syncing groups because some listeners may call this function again
+        UserGroup::withoutEvents(fn () => $this->groups()->sync($finalGroups, $detaching));
     }
 
     public function hasGroup(Group $group): bool
