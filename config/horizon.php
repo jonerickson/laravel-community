@@ -188,7 +188,7 @@ return [
     'defaults' => [
         'supervisor-1' => [
             'connection' => 'redis',
-            'queue' => ['default', 'webhooks'],
+            'queue' => ['default', 'webhooks', 'scout'],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
             'maxProcesses' => 1,

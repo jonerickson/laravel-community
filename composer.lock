@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b993191c56f67fad2d82ee7428f9317d",
+    "content-hash": "862af78ac1b11a766ab3a303c9bb9e52",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -4378,28 +4378,28 @@
         },
         {
             "name": "laravel/scout",
-            "version": "v10.22.1",
+            "version": "v10.24.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/scout.git",
-                "reference": "13ed8e0eeaddd894bf360b85cb873980de19dbaf"
+                "reference": "f9864d9a727a0c0d6b95e08ed92df8c301ae6d2c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/scout/zipball/13ed8e0eeaddd894bf360b85cb873980de19dbaf",
-                "reference": "13ed8e0eeaddd894bf360b85cb873980de19dbaf",
+                "url": "https://api.github.com/repos/laravel/scout/zipball/f9864d9a727a0c0d6b95e08ed92df8c301ae6d2c",
+                "reference": "f9864d9a727a0c0d6b95e08ed92df8c301ae6d2c",
                 "shasum": ""
             },
             "require": {
-                "illuminate/bus": "^9.0|^10.0|^11.0|^12.0",
-                "illuminate/contracts": "^9.0|^10.0|^11.0|^12.0",
-                "illuminate/database": "^9.0|^10.0|^11.0|^12.0",
-                "illuminate/http": "^9.0|^10.0|^11.0|^12.0",
-                "illuminate/pagination": "^9.0|^10.0|^11.0|^12.0",
-                "illuminate/queue": "^9.0|^10.0|^11.0|^12.0",
-                "illuminate/support": "^9.0|^10.0|^11.0|^12.0",
+                "illuminate/bus": "^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/contracts": "^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/database": "^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/http": "^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/pagination": "^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/queue": "^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/support": "^9.0|^10.0|^11.0|^12.0|^13.0",
                 "php": "^8.0",
-                "symfony/console": "^6.0|^7.0"
+                "symfony/console": "^6.0|^7.0|^8.0"
             },
             "conflict": {
                 "algolia/algoliasearch-client-php": "<3.2.0|>=5.0.0"
@@ -4408,7 +4408,7 @@
                 "algolia/algoliasearch-client-php": "^3.2|^4.0",
                 "meilisearch/meilisearch-php": "^1.0",
                 "mockery/mockery": "^1.0",
-                "orchestra/testbench": "^7.31|^8.36|^9.15|^10.8",
+                "orchestra/testbench": "^7.31|^8.36|^9.15|^10.8|^11.0",
                 "php-http/guzzle7-adapter": "^1.0",
                 "phpstan/phpstan": "^1.10",
                 "typesense/typesense-php": "^4.9.3"
@@ -4454,7 +4454,7 @@
                 "issues": "https://github.com/laravel/scout/issues",
                 "source": "https://github.com/laravel/scout"
             },
-            "time": "2025-11-25T15:19:35+00:00"
+            "time": "2026-02-10T18:44:39+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -15399,16 +15399,16 @@
     "packages-dev": [
         {
             "name": "barryvdh/laravel-debugbar",
-            "version": "v4.0.3",
+            "version": "v4.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fruitcake/laravel-debugbar.git",
-                "reference": "9eec3770a304c52d1dd71577b44bbb9ab904f5d8"
+                "reference": "a9cc62c81cd0bda4ca7410229487638d7df786be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fruitcake/laravel-debugbar/zipball/9eec3770a304c52d1dd71577b44bbb9ab904f5d8",
-                "reference": "9eec3770a304c52d1dd71577b44bbb9ab904f5d8",
+                "url": "https://api.github.com/repos/fruitcake/laravel-debugbar/zipball/a9cc62c81cd0bda4ca7410229487638d7df786be",
+                "reference": "a9cc62c81cd0bda4ca7410229487638d7df786be",
                 "shasum": ""
             },
             "require": {
@@ -15482,7 +15482,7 @@
             ],
             "support": {
                 "issues": "https://github.com/fruitcake/laravel-debugbar/issues",
-                "source": "https://github.com/fruitcake/laravel-debugbar/tree/v4.0.3"
+                "source": "https://github.com/fruitcake/laravel-debugbar/tree/v4.0.7"
             },
             "funding": [
                 {
@@ -15494,7 +15494,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-01-26T18:25:58+00:00"
+            "time": "2026-02-06T20:53:50+00:00"
         },
         {
             "name": "barryvdh/laravel-ide-helper",
