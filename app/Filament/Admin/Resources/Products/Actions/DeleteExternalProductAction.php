@@ -16,12 +16,13 @@ class DeleteExternalProductAction extends Action
     {
         parent::setUp();
 
-        $this->label('Delete external product');
+        $this->label('Delete External Product');
         $this->visible(fn (Product $record): bool => filled($record->external_product_id) && config('payment.default'));
         $this->color('danger');
         $this->requiresConfirmation();
         $this->successNotificationTitle('The external product was successfully deleted.');
         $this->failureNotificationTitle('The external product was not deleted. Please try again. You may need to manually delete all prices from the product on the payment processor dashboard.');
+        $this->modalDescription('Are you sure you would like to do this? This may only archive the product if it is associated with any orders/transactions.');
         $this->action(function (Product $record, DeleteExternalProductAction $action): void {
             $paymentManger = app(PaymentManager::class);
 

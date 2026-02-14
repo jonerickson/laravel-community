@@ -386,14 +386,12 @@ class UserResource extends Resource
                 TextColumn::make('name')
                     ->weight(FontWeight::Bold)
                     ->sortable()
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        return $query
-                            ->where('name', 'like', "%$search%")
-                            ->orWhereHas('integrations', function (Builder $query) use ($search): void {
-                                $query->where('provider_id', 'like', "%$search%")
-                                    ->orWhere('provider_name', 'like', "%$search%");
-                            });
-                    }),
+                    ->searchable(query: fn (Builder $query, string $search): Builder => $query
+                        ->where('name', 'like', sprintf('%%%s%%', $search))
+                        ->orWhereHas('integrations', function (Builder $query) use ($search): void {
+                            $query->where('provider_id', 'like', sprintf('%%%s%%', $search))
+                                ->orWhere('provider_name', 'like', sprintf('%%%s%%', $search));
+                        })),
                 TextColumn::make('email')
                     ->sortable()
                     ->copyable()

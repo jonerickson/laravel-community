@@ -31,7 +31,7 @@ class UpdateExternalPriceAction extends Action
         parent::setUp();
 
         $this->color('gray');
-        $this->label('Update external price');
+        $this->label('Update External Price');
         $this->requiresConfirmation();
         $this->visible(fn (Price $record): bool => filled($record->external_price_id) && $record->product->type === ProductType::Subscription && config('payment.default'));
         $this->icon(Heroicon::OutlinedArrowPath);

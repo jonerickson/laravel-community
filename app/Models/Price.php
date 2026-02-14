@@ -26,6 +26,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
+use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
+use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 /**
  * @property int $id
@@ -52,6 +54,8 @@ use Illuminate\Support\Stringable;
  * @property-read Product $product
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Subscription> $subscriptions
  * @property-read int|null $subscriptions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Order> $orders
+ * @property-read int|null $orders_count
  *
  * @method static Builder<static>|Price active()
  * @method static Builder<static>|Price default()
@@ -92,6 +96,7 @@ class Price extends Model implements HasLabel
     use HasFactory;
     use HasMetadata;
     use HasReferenceId;
+    use HasRelationships;
     use Visible;
 
     protected $fillable = [
@@ -130,6 +135,14 @@ class Price extends Model implements HasLabel
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function orders(): HasManyDeep
+    {
+        return $this->hasManyDeepFromRelations(
+            $this->orderItems(),
+            (new OrderItem)->order()
+        );
     }
 
     public function product(): BelongsTo

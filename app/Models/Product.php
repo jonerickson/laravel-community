@@ -43,6 +43,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
+use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
+use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 /**
  * @property int $id
@@ -108,6 +110,8 @@ use Illuminate\Support\Str;
  * @property-read int|null $reviews_count
  * @property-read User|null $seller
  * @property-read float $trending_score
+ * @property-read Collection<int, Order> $orders
+ * @property-read int|null $orders_count
  *
  * @method static Builder<static>|Product active()
  * @method static Builder<static>|Product approved()
@@ -174,6 +178,7 @@ class Product extends Model implements HasLabel, Sluggable
     use HasLogging;
     use HasMetadata;
     use HasReferenceId;
+    use HasRelationships;
     use HasSlug;
     use LogsStoreActivity;
     use Orderable;
@@ -231,6 +236,15 @@ class Product extends Model implements HasLabel, Sluggable
     public function prices(): HasMany
     {
         return $this->hasMany(Price::class);
+    }
+
+    public function orders(): HasManyDeep
+    {
+        return $this->hasManyDeepFromRelations(
+            $this->prices(),
+            (new Price)->orderItems(),
+            (new OrderItem)->order()
+        );
     }
 
     public function activePrices(): HasMany

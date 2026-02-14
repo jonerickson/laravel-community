@@ -510,15 +510,18 @@ class ProductResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
-                DeleteAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+                DeleteAction::make()
+                    ->disabled(fn (Product $record): bool => $record->orders_count > 0)
+                    ->tooltip(fn (Product $record): ?string => $record->orders_count > 0 ? 'This product is associated with one or more orders and cannot be deleted.' : null),
             ])
             ->defaultSort('order')
             ->reorderable('order');
+    }
+
+    #[Override]
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withCount('orders');
     }
 
     #[Override]

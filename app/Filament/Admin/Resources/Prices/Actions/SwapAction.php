@@ -6,6 +6,7 @@ namespace App\Filament\Admin\Resources\Prices\Actions;
 
 use App\Actions\Payments\CreateSwapSubscriptionsBatchAction;
 use App\Enums\PaymentBehavior;
+use App\Enums\ProductType;
 use App\Enums\ProrationBehavior;
 use App\Managers\PaymentManager;
 use App\Models\Price;
@@ -26,7 +27,7 @@ class SwapAction extends Action
     {
         parent::setUp();
 
-        $this->label('Swap price');
+        $this->label('Swap Price');
         $this->icon(Heroicon::OutlinedArrowsRightLeft);
         $this->color('gray');
         $this->successNotificationTitle('The subscriptions have been successfully swapped.');
@@ -34,7 +35,11 @@ class SwapAction extends Action
         $this->modalHeading('Swap Subscription');
         $this->modalDescription('Use this action to bulk swap users from one subscription price to another.');
         $this->modalSubmitActionLabel('Swap');
-        $this->visible(fn (Price $record) => Price::query()->where('product_id', $record->product_id)->whereKeyNot($record)->exists());
+        $this->visible(fn (Price $record) => Price::query()
+            ->where('product_id', $record->product_id)
+            ->whereRelation('product', 'type', '=', ProductType::Subscription)
+            ->whereKeyNot($record)
+            ->exists());
 
         $this->schema([
             Select::make('price_id')

@@ -34,6 +34,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class PricesRelationManager extends RelationManager
@@ -62,6 +63,7 @@ class PricesRelationManager extends RelationManager
                     ->required(),
                 TextInput::make('amount')
                     ->disabled(fn ($operation, ?Price $record): bool => $operation === 'edit' && filled($record->external_price_id))
+                    ->helperText(fn ($operation): ?string => $operation === 'edit' ? 'You may not edit a price once it is connected to an external price.' : null)
                     ->required()
                     ->numeric()
                     ->mask(RawJs::make('$money($input)'))
@@ -117,6 +119,7 @@ class PricesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->withCount('orders'))
             ->description(fn (): string => $this->getOwnerRecord()->isSubscription()
                 ? 'Subscription pricing for this product.'
                 : 'One-time pricing for this product.')
@@ -193,12 +196,9 @@ class PricesRelationManager extends RelationManager
                 SwapAction::make(),
                 EditAction::make()
                     ->modalDescription('Use the update external price tool to update the product price.'),
-                DeleteAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+                DeleteAction::make()
+                    ->disabled(fn (Price $record): bool => $record->orders_count > 0)
+                    ->tooltip(fn (Price $record): ?string => $record->orders_count > 0 ? 'This price is associated with one or more orders and cannot be deleted.' : null),
             ])
             ->defaultSort('created_at', 'desc');
     }

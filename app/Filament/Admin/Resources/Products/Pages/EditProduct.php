@@ -31,7 +31,7 @@ class EditProduct extends EditRecord
         return [
             Action::make('link')
                 ->color('gray')
-                ->label('Link existing external product')
+                ->label('Link Existing External Product')
                 ->visible(fn (Product $record): bool => blank($record->external_product_id) && config('payment.default'))
                 ->modalDescription('Provide an external product ID to link this product with a product you have already created in your payment processor.')
                 ->schema([
@@ -47,7 +47,7 @@ class EditProduct extends EditRecord
                     $action->success();
                 }),
             Action::make('unlink')
-                ->label('Unlink external ID')
+                ->label('Unlink External Product')
                 ->color('gray')
                 ->visible(fn (Product $record): bool => filled($record->external_product_id) && config('payment.default'))
                 ->requiresConfirmation()
@@ -61,7 +61,9 @@ class EditProduct extends EditRecord
                 }),
             CreateExternalProductAction::make(),
             DeleteExternalProductAction::make(),
-            DeleteAction::make(),
+            DeleteAction::make()
+                ->disabled(fn (Product $record): bool => $record->orders_count > 0)
+                ->tooltip(fn (Product $record): ?string => $record->orders_count > 0 ? 'This product is associated with one or more orders and cannot be deleted.' : null),
         ];
     }
 }
