@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Drivers\Payouts\Contracts\PayoutProcessor;
 use App\Drivers\Payouts\NullDriver;
-use App\Drivers\Payouts\PayoutProcessor;
 use App\Models\Payout;
 use App\Models\User;
 

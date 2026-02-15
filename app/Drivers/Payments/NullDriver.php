@@ -12,6 +12,8 @@ use App\Data\PaymentMethodData;
 use App\Data\PriceData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
+use App\Drivers\Payments\Concerns\TracksErrors;
+use App\Drivers\Payments\Contracts\PaymentProcessor;
 use App\Enums\OrderRefundReason;
 use App\Enums\PaymentBehavior;
 use App\Enums\ProrationBehavior;
@@ -27,6 +29,8 @@ use Illuminate\Support\Collection;
 
 class NullDriver implements PaymentProcessor
 {
+    use TracksErrors;
+
     public function createProduct(Product $product): ?ProductData
     {
         return null;

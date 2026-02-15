@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Drivers\SupportTickets\Contracts\SupportTicketProvider;
 use App\Drivers\SupportTickets\DatabaseDriver;
-use App\Drivers\SupportTickets\SupportTicketProvider;
 use App\Enums\SupportTicketStatus;
 use App\Models\Comment;
 use App\Models\SupportTicket;

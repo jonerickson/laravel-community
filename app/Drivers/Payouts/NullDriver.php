@@ -8,6 +8,7 @@ use App\Data\BalanceData;
 use App\Data\ConnectedAccountData;
 use App\Data\PayoutData;
 use App\Data\TransferData;
+use App\Drivers\Payouts\Contracts\PayoutProcessor;
 use App\Models\Payout;
 use App\Models\User;
 use Illuminate\Support\Collection;

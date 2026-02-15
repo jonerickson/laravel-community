@@ -8,10 +8,13 @@ use App\Data\CustomerData;
 use App\Data\DiscountData;
 use App\Data\DisputeData;
 use App\Data\InvoiceData;
+use App\Data\PaymentErrorData;
 use App\Data\PaymentMethodData;
 use App\Data\PriceData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
+use App\Drivers\Payments\Concerns\TracksErrors;
+use App\Drivers\Payments\Contracts\PaymentProcessor;
 use App\Enums\DiscountType;
 use App\Enums\DiscountValueType;
 use App\Enums\OrderRefundReason;
@@ -55,6 +58,8 @@ use Stripe\StripeClient;
 
 class StripeDriver implements PaymentProcessor
 {
+    use TracksErrors;
+
     protected StripeClient $stripe;
 
     public function __construct(private readonly string $stripeSecret)
@@ -1048,6 +1053,8 @@ class StripeDriver implements PaymentProcessor
 
     private function executeWithErrorHandling(string $method, callable $callback, mixed $defaultValue = null): mixed
     {
+        $this->lastError = null;
+
         if (Http::preventingStrayRequests()) {
             return $defaultValue;
         }
@@ -1069,6 +1076,13 @@ class StripeDriver implements PaymentProcessor
                         'retry_after' => $retryAfter,
                     ]);
 
+                    $this->lastError = new PaymentErrorData(
+                        method: $method,
+                        message: $exception->getMessage(),
+                        exceptionClass: $exception::class,
+                        code: $exception->getStripeCode(),
+                    );
+
                     return $defaultValue;
                 }
 
@@ -1082,9 +1096,22 @@ class StripeDriver implements PaymentProcessor
             } catch (ApiErrorException $exception) {
                 Log::error('Stripe payment processor API error in '.$method, ['method' => $method, 'exception' => $exception]);
 
+                $this->lastError = new PaymentErrorData(
+                    method: $method,
+                    message: $exception->getMessage(),
+                    exceptionClass: $exception::class,
+                    code: $exception->getStripeCode(),
+                );
+
                 return $defaultValue;
             } catch (Exception $exception) {
                 Log::error('Stripe payment processor exception in '.$method, ['method' => $method, 'exception' => $exception]);
+
+                $this->lastError = new PaymentErrorData(
+                    method: $method,
+                    message: $exception->getMessage(),
+                    exceptionClass: $exception::class,
+                );
 
                 return $defaultValue;
             }

@@ -8,6 +8,7 @@ use App\Actions\Payments\SwapSubscriptionAction;
 use App\Enums\PaymentBehavior;
 use App\Enums\ProductType;
 use App\Enums\ProrationBehavior;
+use App\Managers\PaymentManager;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
@@ -57,13 +58,20 @@ class SwapAction extends Action
         ]);
 
         $this->action(function (SwapAction $action, array $data): void {
+            $paymentManager = app(PaymentManager::class);
             $result = SwapSubscriptionAction::execute($this->getUser(), Price::findOrFail($data['price_id']), $data['proration_behavior'], PaymentBehavior::DefaultIncomplete);
 
             if ($result) {
                 $action->success();
-            } else {
-                $action->failure();
+
+                return;
             }
+
+            if ($paymentManager->lastError !== null) {
+                $action->failureNotificationTitle($paymentManager->lastError->message);
+            }
+
+            $action->failure();
         });
     }
 

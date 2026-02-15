@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Drivers\SupportTickets\SupportTicketProvider;
+use App\Drivers\SupportTickets\Contracts\SupportTicketProvider;
 use App\Managers\SupportTicketManager;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
