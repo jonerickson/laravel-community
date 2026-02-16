@@ -7,17 +7,19 @@ export default function OnboardingLayout({
     children,
     title,
     description,
+    sidebarImageUrl,
     ...props
 }: {
     children: React.ReactNode;
     title: string;
     description: string;
+    sidebarImageUrl?: string | null;
 }) {
     useFlashMessages();
     useFingerprint();
 
     return (
-        <AuthLayoutTemplate title={title} description={description} {...props}>
+        <AuthLayoutTemplate title={title} description={description} sidebarImageUrl={sidebarImageUrl} {...props}>
             {children}
             <Toaster />
         </AuthLayoutTemplate>

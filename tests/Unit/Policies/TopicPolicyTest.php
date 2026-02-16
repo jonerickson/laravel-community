@@ -48,6 +48,7 @@ function createViewableTopic(Forum $forum, ?User $author = null): Topic
     $topic = Topic::factory()->create([
         'forum_id' => $forum->id,
         'created_by' => $author?->id ?? User::factory()->create()->id,
+        'is_locked' => false,
     ]);
 
     Post::factory()->published()->create([

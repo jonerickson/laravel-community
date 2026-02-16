@@ -6,15 +6,21 @@ import { type PropsWithChildren } from 'react';
 interface AuthLayoutProps {
     title?: string;
     description?: string;
+    sidebarImageUrl?: string | null;
 }
 
-export default function AuthSplitLayout({ children, title, description }: PropsWithChildren<AuthLayoutProps>) {
+export default function AuthSplitLayout({ children, title, description, sidebarImageUrl }: PropsWithChildren<AuthLayoutProps>) {
     const { name } = usePage<App.Data.SharedData>().props;
 
     return (
         <div className="relative grid h-dvh lg:grid-cols-3">
             <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
-                <div className="absolute inset-0 bg-zinc-900" />
+                {sidebarImageUrl ? (
+                    <img src={sidebarImageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                ) : (
+                    <div className="absolute inset-0 bg-zinc-900" />
+                )}
+                <div className="absolute inset-0 bg-black/40" />
                 <Link href={route('home')} className="relative z-20 flex items-center text-lg font-medium">
                     <AppLogoIcon className="mr-2 size-12 fill-current text-white" />
                     {name}

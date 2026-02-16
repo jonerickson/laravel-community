@@ -26,6 +26,7 @@ type OnboardingProps = {
     hasSubscription: boolean;
     emailVerified: boolean;
     policies: App.Data.PolicyData[];
+    onboardingImageUrl?: string | null;
 };
 
 type OnboardingFormData = {
@@ -53,6 +54,7 @@ export default function Onboarding({
     hasSubscription,
     emailVerified,
     policies,
+    onboardingImageUrl,
 }: OnboardingProps) {
     const { name: siteName, logoUrl } = usePage<App.Data.SharedData>().props;
     const [currentStep, setCurrentStep] = useState(initialStep);
@@ -156,7 +158,7 @@ export default function Onboarding({
     ];
 
     return (
-        <OnboardingLayout title="Welcome" description="Let's get your account set up in just a few steps.">
+        <OnboardingLayout title="Welcome" description="Let's get your account set up in just a few steps." sidebarImageUrl={onboardingImageUrl}>
             <Head title="Onboarding">
                 <meta name="description" content="Let's get your account set up in just a few steps." />
                 <meta property="og:title" content={`Onboarding - ${siteName}`} />

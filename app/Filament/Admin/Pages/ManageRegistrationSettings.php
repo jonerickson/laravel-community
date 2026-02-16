@@ -9,6 +9,7 @@ use App\Filament\Admin\Clusters\Settings\SettingsCluster;
 use App\Models\Policy;
 use App\Settings\RegistrationSettings;
 use BackedEnum;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Pages\SettingsPage;
 use Filament\Schemas\Components\Section;
@@ -44,6 +45,18 @@ class ManageRegistrationSettings extends SettingsPage
     {
         return $schema
             ->components([
+                Section::make('Appearance')
+                    ->columnSpanFull()
+                    ->schema([
+                        FileUpload::make('onboarding_image')
+                            ->label('Onboarding Image')
+                            ->helperText('Displayed in the sidebar during onboarding. Recommended size: 800x1200px.')
+                            ->directory('onboarding')
+                            ->visibility('public')
+                            ->image()
+                            ->imageEditor()
+                            ->maxSize(5120),
+                    ]),
                 Section::make('Compliance')
                     ->columnSpanFull()
                     ->schema([
