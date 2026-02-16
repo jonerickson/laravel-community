@@ -222,7 +222,7 @@ class ShoppingCartService
                         $query->active()->visible()->orderBy('is_default', 'desc');
                     }])
                     ->with(['policies' => function (Policy|BelongsToMany $query): void {
-                        $query->active()->effective()->orderBy('title');
+                        $query->with('category')->active()->effective()->orderBy('title');
                     }]);
             },
         ])->get();

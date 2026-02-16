@@ -412,7 +412,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                                         ) : (
                                                             <>
                                                                 I agree to the{' '}
-                                                                <Link
+                                                                <a
                                                                     href={
                                                                         policy.category?.slug && policy.slug
                                                                             ? route('policies.show', [policy.category.slug, policy.slug])
@@ -423,7 +423,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                                                     rel="noopener noreferrer"
                                                                 >
                                                                     {policy.title}
-                                                                </Link>
+                                                                </a>
                                                             </>
                                                         )}
                                                     </label>
