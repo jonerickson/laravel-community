@@ -12,7 +12,7 @@
         "types:version": "tsc --version"
     },
     "dependencies": {
-        "react": "^19.0.0",
+        "react": "^19.2.4",
         "react-dom": "^19.0.0"
     },
     "devDependencies": {
@@ -55,7 +55,7 @@
         "@tiptap/react": "3.0.7",
         "@tiptap/starter-kit": "3.0.7",
         "@types/node": "^22.13.5",
-        "@types/react": "^19.0.3",
+        "@types/react": "^19.2.14",
         "@types/react-dom": "^19.0.2",
         "@vitejs/plugin-react": "^5.0.0",
         "axios": "1.11.0",
