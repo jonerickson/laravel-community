@@ -16,7 +16,7 @@ class EnsureEmailIsVerified extends BaseEnsureEmailIsVerified
     #[Override]
     public function handle($request, Closure $next, $redirectToRoute = null)
     {
-        if ($this->isForcedActionRoute($request)) {
+        if (! $request->user() || $this->isForcedActionRoute($request)) {
             return $next($request);
         }
 
