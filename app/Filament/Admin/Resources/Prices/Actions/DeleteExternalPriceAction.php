@@ -24,6 +24,7 @@ class DeleteExternalPriceAction extends Action
         $this->requiresConfirmation();
         $this->successNotificationTitle('The external price was successfully deleted.');
         $this->failureNotificationTitle('The external price was not deleted. Please try again.');
+        $this->modalHeading('Delete external price');
         $this->modalDescription('Are you sure you would like to do this? This may only archive the price if it is associated with any orders/transactions.');
         $this->action(function (Price $record, DeleteExternalPriceAction $action): void {
             $paymentManger = app(PaymentManager::class);

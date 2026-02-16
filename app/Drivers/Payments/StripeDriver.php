@@ -538,6 +538,7 @@ class StripeDriver implements PaymentProcessor
                 ->when($paymentBehavior === PaymentBehavior::DefaultIncomplete, fn (SubscriptionBuilder $builder) => $builder->defaultIncomplete())
                 ->when($paymentBehavior === PaymentBehavior::AllowIncomplete, fn (SubscriptionBuilder $builder) => $builder->allowPaymentFailures())
                 ->when($paymentBehavior === PaymentBehavior::PendingIfIncomplete, fn (SubscriptionBuilder $builder) => $builder->pendingIfPaymentFails())
+                ->when($paymentBehavior === PaymentBehavior::ErrorIfIncomplete, fn (SubscriptionBuilder $builder) => $builder->errorIfPaymentFails())
                 ->withMetadata($metadata)
                 ->when(! $chargeNow, fn (SubscriptionBuilder $builder) => $builder->createAndSendInvoice($customerOptions, $subscriptionOptions))
                 ->when(! $firstParty, fn (SubscriptionBuilder $builder): Subscription => $builder->create(
@@ -595,6 +596,10 @@ class StripeDriver implements PaymentProcessor
                 ]);
 
                 return $result->url;
+            }
+
+            if ($result instanceof Builder) {
+                $result = $result->getModel();
             }
 
             return SubscriptionData::from($result);
@@ -725,6 +730,10 @@ class StripeDriver implements PaymentProcessor
         return $this->executeWithErrorHandling('currentSubscription', function () use ($user): ?SubscriptionData {
             if (! ($subscription = $user->subscription()) instanceof Subscription) {
                 return null;
+            }
+
+            if ($subscription->incomplete()) {
+                return SubscriptionData::from($subscription);
             }
 
             if (! $subscription->active()) {
