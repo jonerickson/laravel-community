@@ -57,7 +57,7 @@ class StoreController extends Controller
                     $query->active()->visible();
                 }])
                 ->latest()
-                ->take(5)
+                ->take(4)
                 ->get()
                 ->filter(fn (Product $product) => Gate::check('view', $product))
                 ->values()), 'community'),
