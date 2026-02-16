@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "862af78ac1b11a766ab3a303c9bb9e52",
+    "content-hash": "9bd8232ef6f925cba56f07c4f304ea0e",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -6635,27 +6635,29 @@
         },
         {
             "name": "nexxai/laravel-cfcache",
-            "version": "v0.3.0",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nexxai/laravel-cfcache.git",
-                "reference": "c242da3a04cc6f3e1c62b8c31e5c87bd3ec64f37"
+                "reference": "107144d7a6217576030ca2deca0aad20e36f5db2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nexxai/laravel-cfcache/zipball/c242da3a04cc6f3e1c62b8c31e5c87bd3ec64f37",
-                "reference": "c242da3a04cc6f3e1c62b8c31e5c87bd3ec64f37",
+                "url": "https://api.github.com/repos/nexxai/laravel-cfcache/zipball/107144d7a6217576030ca2deca0aad20e36f5db2",
+                "reference": "107144d7a6217576030ca2deca0aad20e36f5db2",
                 "shasum": ""
             },
             "require": {
                 "illuminate/console": "^12.0",
                 "illuminate/support": "^12.0",
-                "php": "^8.2"
+                "php": "^8.3"
             },
             "require-dev": {
                 "laravel/pint": "~1.25.0",
                 "mockery/mockery": "^1.4.4",
                 "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^4.1",
+                "pestphp/pest-plugin-laravel": "^4.0",
                 "phpunit/phpunit": "^11.0|^12.0"
             },
             "type": "library",
@@ -6677,15 +6679,18 @@
             ],
             "description": "A handful of Cloudflare cache helpers for Laravel",
             "keywords": [
+                "Cf",
                 "cache",
+                "cdn",
                 "cloudflare",
-                "laravel"
+                "laravel",
+                "waf"
             ],
             "support": {
                 "issues": "https://github.com/nexxai/laravel-cfcache/issues",
-                "source": "https://github.com/nexxai/laravel-cfcache/tree/v0.3.0"
+                "source": "https://github.com/nexxai/laravel-cfcache/tree/v1.0.0"
             },
-            "time": "2025-10-26T21:26:13+00:00"
+            "time": "2025-12-16T19:56:34+00:00"
         },
         {
             "name": "nikic/php-parser",

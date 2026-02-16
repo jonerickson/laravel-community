@@ -34,7 +34,7 @@
         "laravel/telescope": "^5.16",
         "league/flysystem-aws-s3-v3": "^3.30.1",
         "meilisearch/meilisearch-php": "^1.16.1",
-        "nexxai/laravel-cfcache": "^0.3.0",
+        "nexxai/laravel-cfcache": "^1.0.0",
         "phiki/phiki": "^1.1.6",
         "sendgrid/sendgrid": "^8.1.11",
         "sentry/sentry-laravel": "^4.20",
