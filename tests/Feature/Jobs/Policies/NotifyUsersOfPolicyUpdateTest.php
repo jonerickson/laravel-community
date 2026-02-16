@@ -14,11 +14,9 @@ test('job queues email to verified users with email', function (): void {
     $policy = Policy::factory()->create(['is_active' => true]);
     $user = User::factory()->create();
 
-    (new NotifyUsersOfPolicyUpdate($policy))->handle();
+    new NotifyUsersOfPolicyUpdate($policy)->handle();
 
-    Mail::assertQueued(PolicyUpdatedMail::class, function (PolicyUpdatedMail $mail) use ($user): bool {
-        return $mail->hasTo($user->email);
-    });
+    Mail::assertQueued(PolicyUpdatedMail::class, fn (PolicyUpdatedMail $mail): bool => $mail->hasTo($user->email));
 });
 
 test('job does not queue email to unverified users', function (): void {
@@ -27,7 +25,7 @@ test('job does not queue email to unverified users', function (): void {
     $policy = Policy::factory()->create(['is_active' => true]);
     User::factory()->unverified()->create();
 
-    (new NotifyUsersOfPolicyUpdate($policy))->handle();
+    new NotifyUsersOfPolicyUpdate($policy)->handle();
 
     Mail::assertNothingQueued();
 });
@@ -38,7 +36,7 @@ test('job does not queue email to users without email', function (): void {
     $policy = Policy::factory()->create(['is_active' => true]);
     User::factory()->create(['email' => null]);
 
-    (new NotifyUsersOfPolicyUpdate($policy))->handle();
+    new NotifyUsersOfPolicyUpdate($policy)->handle();
 
     Mail::assertNothingQueued();
 });
@@ -51,7 +49,7 @@ test('job queues email for each eligible user', function (): void {
     User::factory()->unverified()->create();
     User::factory()->create(['email' => null]);
 
-    (new NotifyUsersOfPolicyUpdate($policy))->handle();
+    new NotifyUsersOfPolicyUpdate($policy)->handle();
 
     Mail::assertQueued(PolicyUpdatedMail::class, 3);
 });
