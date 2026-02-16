@@ -29,10 +29,10 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                         <DropdownMenuItem asChild>
-                            <a className="block w-full" href={route('impersonate.leave')}>
+                            <Link className="block w-full" href={route('impersonate.leave')} as="a">
                                 <EyeOff className="mr-2" />
                                 Stop Impersonating
-                            </a>
+                            </Link>
                         </DropdownMenuItem>
                     </DropdownMenuGroup>
                 </>
