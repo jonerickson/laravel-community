@@ -186,6 +186,7 @@
                             <td>{{ $data->customerId }}</td>
                         </tr>
                     @endif
+
                     @foreach ($data->integrations as $integration)
                         <tr>
                             <td>{{ ucfirst($integration['provider']) }} ID</td>
@@ -254,7 +255,8 @@
                             @if ($consent['url'])
                                 <tr>
                                     <td colspan="6" style="font-size: 10px; color: #666; border-bottom: 2px solid #e0e0e0">
-                                        View policy: <a href="{{ $consent['url'] }}" style="color: #2563eb; text-decoration: underline">{{ $consent['url'] }}</a>
+                                        View policy:
+                                        <a href="{{ $consent['url'] }}" style="color: #2563eb; text-decoration: underline">{{ $consent['url'] }}</a>
                                     </td>
                                 </tr>
                             @endif
