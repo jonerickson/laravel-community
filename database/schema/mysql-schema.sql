@@ -187,15 +187,44 @@ CREATE TABLE `discounts` (
   CONSTRAINT `discounts_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `disputes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `disputes` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `order_id` bigint unsigned NOT NULL,
+  `external_dispute_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `external_charge_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `external_payment_intent_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reason` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `amount` bigint NOT NULL,
+  `currency` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'usd',
+  `evidence_due_by` datetime DEFAULT NULL,
+  `is_charge_refundable` tinyint(1) NOT NULL DEFAULT '0',
+  `network_reason_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `metadata` json DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `disputes_external_dispute_id_unique` (`external_dispute_id`),
+  KEY `disputes_user_id_foreign` (`user_id`),
+  KEY `disputes_order_id_foreign` (`order_id`),
+  KEY `disputes_status_index` (`status`),
+  CONSTRAINT `disputes_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `disputes_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `exports`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `exports` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `completed_at` timestamp NULL DEFAULT NULL,
-  `file_disk` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `file_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `exporter` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `file_disk` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `file_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `exporter` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `processed_rows` int unsigned NOT NULL DEFAULT '0',
   `total_rows` int unsigned NOT NULL,
   `successful_rows` int unsigned NOT NULL DEFAULT '0',
@@ -214,7 +243,7 @@ CREATE TABLE `failed_import_rows` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `data` json NOT NULL,
   `import_id` bigint unsigned NOT NULL,
-  `validation_error` text COLLATE utf8mb4_unicode_ci,
+  `validation_error` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -459,9 +488,9 @@ DROP TABLE IF EXISTS `imports`;
 CREATE TABLE `imports` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `completed_at` timestamp NULL DEFAULT NULL,
-  `file_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `file_path` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `importer` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `file_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `file_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `importer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `processed_rows` int unsigned NOT NULL DEFAULT '0',
   `total_rows` int unsigned NOT NULL,
   `successful_rows` int unsigned NOT NULL DEFAULT '0',
@@ -1034,6 +1063,8 @@ CREATE TABLE `policies` (
   `version` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `consent_label` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `requires_acceptance` tinyint(1) NOT NULL DEFAULT '0',
   `policy_category_id` bigint unsigned NOT NULL,
   `order` int NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
@@ -1084,10 +1115,11 @@ CREATE TABLE `policy_consents` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
   `policy_id` bigint unsigned NOT NULL,
-  `ip_address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` text COLLATE utf8mb4_unicode_ci,
-  `fingerprint_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `context` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ip_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `fingerprint_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `context` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `version` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `consented_at` timestamp NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1563,7 +1595,9 @@ CREATE TABLE `users` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`),
-  KEY `users_stripe_id_index` (`stripe_id`)
+  KEY `users_stripe_id_index` (`stripe_id`),
+  KEY `users_name_index` (`name`),
+  KEY `users_email_index` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `users_fields`;
@@ -1615,6 +1649,9 @@ CREATE TABLE `users_integrations` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_socials_provider_id_unique` (`provider_id`),
   KEY `users_socials_user_id_foreign` (`user_id`),
+  KEY `users_integrations_provider_provider_id_index` (`provider`,`provider_id`),
+  KEY `users_integrations_provider_provider_email_index` (`provider`,`provider_email`),
+  KEY `users_integrations_provider_provider_name_index` (`provider`,`provider_name`),
   CONSTRAINT `users_socials_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1891,16 +1928,23 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (215,'2025_12_23_00
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (216,'2025_12_23_054235_alter_processed_columns_on_payouts_table',70);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (217,'2025_12_23_185608_add_reference_id_to_payouts_table',70);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (218,'2025_12_25_213040_create_mailbox_inbound_emails_table',70);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (219,'2025_09_28_202015_create_email_settings',71);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (220,'2025_09_28_202053_create_general_settings',71);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (221,'2025_11_25_191628_registration_settings',71);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (222,'2025_12_31_211234_add_other_pivot_attributes_to_forum_groups_table',71);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (223,'2025_12_31_211235_add_other_pivot_attributes_to_forum_groups_table',71);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (224,'2026_01_02_213350_create_imports_table',71);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (225,'2026_01_02_213351_create_exports_table',71);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (226,'2026_01_02_213352_create_failed_import_rows_table',71);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (227,'2026_01_26_054505_create_integration_settings',71);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (228,'2026_01_29_012125_add_intercom_auth_settings',71);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (229,'2026_02_05_042616_add_discord_integration_settings',71);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (230,'2026_02_07_050256_create_policy_consents_table',71);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (231,'2026_02_07_054403_add_performance_indexes_to_logs_table',71);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (232,'2025_09_28_202015_create_email_settings',72);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (233,'2025_09_28_202053_create_general_settings',72);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (234,'2025_11_25_191628_registration_settings',72);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (235,'2026_01_26_054505_create_integration_settings',72);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (236,'2026_01_29_012125_add_intercom_auth_settings',72);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (237,'2026_02_05_042616_add_discord_integration_settings',72);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (238,'2026_02_08_031549_create_disputes_table',72);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (239,'2026_02_08_031600_create_dispute_settings',72);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (240,'2026_02_13_043140_add_indexes_to_users_tables',72);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (241,'2026_02_13_043407_add_indexes_to_users_integrations_tables',72);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (242,'2026_02_16_181551_add_consent_label_and_requires_acceptance_to_policies_table',73);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (243,'2026_02_16_181619_add_version_to_policy_consents_table',73);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (244,'2026_02_16_194252_add_onboarding_image_to_registration_settings',74);
