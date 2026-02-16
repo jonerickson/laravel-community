@@ -38,8 +38,9 @@ return [
     ],
 
     'formats' => [
+        'json' => ['application/json'],
         'jsonld' => ['application/ld+json'],
-        // 'jsonapi' => ['application/vnd.api+json'],
+        'jsonapi' => ['application/vnd.api+json'],
         // 'csv' => ['text/csv'],
     ],
 
