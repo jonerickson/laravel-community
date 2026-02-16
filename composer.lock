@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "862af78ac1b11a766ab3a303c9bb9e52",
+    "content-hash": "71ed733c4d100b75e3f87287265a4a2c",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -6476,16 +6476,16 @@
         },
         {
             "name": "nette/schema",
-            "version": "v1.3.3",
+            "version": "v1.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/schema.git",
-                "reference": "2befc2f42d7c715fd9d95efc31b1081e5d765004"
+                "reference": "086497a2f34b82fede9b5a41cc8e131d087cd8f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/schema/zipball/2befc2f42d7c715fd9d95efc31b1081e5d765004",
-                "reference": "2befc2f42d7c715fd9d95efc31b1081e5d765004",
+                "url": "https://api.github.com/repos/nette/schema/zipball/086497a2f34b82fede9b5a41cc8e131d087cd8f7",
+                "reference": "086497a2f34b82fede9b5a41cc8e131d087cd8f7",
                 "shasum": ""
             },
             "require": {
@@ -6493,8 +6493,8 @@
                 "php": "8.1 - 8.5"
             },
             "require-dev": {
-                "nette/tester": "^2.5.2",
-                "phpstan/phpstan-nette": "^2.0@stable",
+                "nette/tester": "^2.6",
+                "phpstan/phpstan": "^2.0@stable",
                 "tracy/tracy": "^2.8"
             },
             "type": "library",
@@ -6535,22 +6535,22 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/schema/issues",
-                "source": "https://github.com/nette/schema/tree/v1.3.3"
+                "source": "https://github.com/nette/schema/tree/v1.3.4"
             },
-            "time": "2025-10-30T22:57:59+00:00"
+            "time": "2026-02-08T02:54:00+00:00"
         },
         {
             "name": "nette/utils",
-            "version": "v4.1.1",
+            "version": "v4.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/utils.git",
-                "reference": "c99059c0315591f1a0db7ad6002000288ab8dc72"
+                "reference": "bb3ea637e3d131d72acc033cfc2746ee893349fe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/utils/zipball/c99059c0315591f1a0db7ad6002000288ab8dc72",
-                "reference": "c99059c0315591f1a0db7ad6002000288ab8dc72",
+                "url": "https://api.github.com/repos/nette/utils/zipball/bb3ea637e3d131d72acc033cfc2746ee893349fe",
+                "reference": "bb3ea637e3d131d72acc033cfc2746ee893349fe",
                 "shasum": ""
             },
             "require": {
@@ -6562,8 +6562,10 @@
             },
             "require-dev": {
                 "jetbrains/phpstorm-attributes": "^1.2",
+                "nette/phpstan-rules": "^1.0",
                 "nette/tester": "^2.5",
-                "phpstan/phpstan-nette": "^2.0@stable",
+                "phpstan/extension-installer": "^1.4@stable",
+                "phpstan/phpstan": "^2.1@stable",
                 "tracy/tracy": "^2.9"
             },
             "suggest": {
@@ -6624,9 +6626,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/utils/issues",
-                "source": "https://github.com/nette/utils/tree/v4.1.1"
+                "source": "https://github.com/nette/utils/tree/v4.1.3"
             },
-            "time": "2025-12-22T12:14:32+00:00"
+            "time": "2026-02-13T03:05:33+00:00"
         },
         {
             "name": "nexxai/laravel-cfcache",
@@ -7119,34 +7121,41 @@
         },
         {
             "name": "phiki/phiki",
-            "version": "v1.1.6",
+            "version": "v2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phikiphp/phiki.git",
-                "reference": "3174d8cb309bdccc32b7a33500379de76148256b"
+                "reference": "b16020573e9f4ad3c9d230c17ed4c84c15356e28"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phikiphp/phiki/zipball/3174d8cb309bdccc32b7a33500379de76148256b",
-                "reference": "3174d8cb309bdccc32b7a33500379de76148256b",
+                "url": "https://api.github.com/repos/phikiphp/phiki/zipball/b16020573e9f4ad3c9d230c17ed4c84c15356e28",
+                "reference": "b16020573e9f4ad3c9d230c17ed4c84c15356e28",
                 "shasum": ""
             },
             "require": {
+                "ext-mbstring": "*",
                 "league/commonmark": "^2.5.3",
-                "php": "^8.2"
+                "php": "^8.2",
+                "psr/simple-cache": "^3.0"
             },
             "require-dev": {
-                "illuminate/support": "^11.30",
+                "illuminate/support": "^11.45",
                 "laravel/pint": "^1.18.1",
+                "orchestra/testbench": "^9.15",
                 "pestphp/pest": "^3.5.1",
                 "phpstan/extension-installer": "^1.4.3",
                 "phpstan/phpstan": "^2.0",
                 "symfony/var-dumper": "^7.1.6"
             },
-            "bin": [
-                "bin/phiki"
-            ],
             "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Phiki\\Adapters\\Laravel\\PhikiServiceProvider"
+                    ]
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Phiki\\": "src/"
@@ -7167,9 +7176,19 @@
             "description": "Syntax highlighting using TextMate grammars in PHP.",
             "support": {
                 "issues": "https://github.com/phikiphp/phiki/issues",
-                "source": "https://github.com/phikiphp/phiki/tree/v1.1.6"
+                "source": "https://github.com/phikiphp/phiki/tree/v2.1.0"
             },
-            "time": "2025-06-06T20:18:29+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/sponsors/ryangjchandler",
+                    "type": "github"
+                },
+                {
+                    "url": "https://buymeacoffee.com/ryangjchandler",
+                    "type": "other"
+                }
+            ],
+            "time": "2026-01-20T21:26:48+00:00"
         },
         {
             "name": "php-di/invoker",
@@ -19573,5 +19592,5 @@
         "ext-pcntl": "*"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
