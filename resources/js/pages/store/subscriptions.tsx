@@ -53,7 +53,7 @@ interface PricingCardProps {
     isCancelling: boolean;
     isContinuing: boolean;
     policiesAgreed: Record<number, boolean>;
-    onPolicyAgreementChange: (planId: number, agreed: boolean) => void;
+    onPolicyAgreementChange: (policyId: number, agreed: boolean) => void;
     currentSubscription: App.Data.SubscriptionData | null;
     isExpanded: boolean;
     onToggleExpanded: () => void;
@@ -184,28 +184,39 @@ function PricingCard({
                         <h4 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Policies</h4>
                         <div className="space-y-2">
                             {plan.policies.map((policy) => (
-                                <a
-                                    key={policy.id}
-                                    href={policy.category?.slug && policy.slug ? route('policies.show', [policy.category.slug, policy.slug]) : '#'}
-                                    className="block text-xs text-blue-600 underline hover:text-blue-800"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    {policy.title}
-                                    {policy.version && ` (v${policy.version})`}
-                                </a>
+                                <div key={policy.id} className="flex items-center gap-3">
+                                    <Checkbox
+                                        id={`policy-${plan.id}-${policy.id}`}
+                                        checked={policiesAgreed[policy.id] ?? false}
+                                        onCheckedChange={(checked) => onPolicyAgreementChange(policy.id, checked === true)}
+                                        className="mt-0.5"
+                                    />
+                                    <label
+                                        htmlFor={`policy-${plan.id}-${policy.id}`}
+                                        className="cursor-pointer text-xs leading-relaxed text-muted-foreground"
+                                    >
+                                        {policy.consentLabel ? (
+                                            policy.consentLabel
+                                        ) : (
+                                            <>
+                                                I agree to the{' '}
+                                                <a
+                                                    href={
+                                                        policy.category?.slug && policy.slug
+                                                            ? route('policies.show', [policy.category.slug, policy.slug])
+                                                            : '#'
+                                                    }
+                                                    className="font-bold text-primary hover:underline"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    {policy.title}
+                                                </a>
+                                            </>
+                                        )}
+                                    </label>
+                                </div>
                             ))}
-                        </div>
-                        <div className="flex items-start space-x-2">
-                            <Checkbox
-                                id={`policies-agreement-${plan.id}`}
-                                checked={policiesAgreed[plan.id] || false}
-                                onCheckedChange={(checked) => onPolicyAgreementChange(plan.id, checked === true)}
-                                className="mt-0.5"
-                            />
-                            <label htmlFor={`policies-agreement-${plan.id}`} className="cursor-pointer text-xs leading-relaxed text-muted-foreground">
-                                I agree to the above policies and understand that I must comply with them.
-                            </label>
                         </div>
                     </div>
                 )}
@@ -319,14 +330,18 @@ function PricingCard({
                         <Button
                             className="w-full"
                             onClick={() => onSubscribe(plan.id, priceId)}
-                            disabled={isSubscribing || !priceId || (plan.policies && plan.policies.length > 0 && !policiesAgreed[plan.id])}
+                            disabled={
+                                isSubscribing ||
+                                !priceId ||
+                                (plan.policies && plan.policies.length > 0 && !plan.policies.every((p) => policiesAgreed[p.id]))
+                            }
                         >
                             {isSubscribing ? (
                                 <>
                                     <LoaderCircle className="animate-spin" />
                                     Processing...
                                 </>
-                            ) : plan.policies && plan.policies.length > 0 && !policiesAgreed[plan.id] ? (
+                            ) : plan.policies && plan.policies.length > 0 && !plan.policies.every((p) => policiesAgreed[p.id]) ? (
                                 'Agree to policies to subscribe'
                             ) : !priceId ? (
                                 'Not available'
@@ -416,10 +431,10 @@ export default function Subscriptions({
         return subscriptionProducts.some((plan) => plan.prices.some((price: App.Data.PriceData) => price.interval === cycle));
     });
 
-    const handlePolicyAgreementChange = (planId: number, agreed: boolean) => {
+    const handlePolicyAgreementChange = (policyId: number, agreed: boolean) => {
         setPoliciesAgreed((prev) => ({
             ...prev,
-            [planId]: agreed,
+            [policyId]: agreed,
         }));
     };
 

@@ -32,7 +32,7 @@ Route::group(['domain' => config('app.url'), 'middleware' => [EnsureFrontendRequ
     Route::post('/fingerprint', FingerprintController::class)->name('fingerprint');
     Route::get('/search', SearchController::class)->name('search');
 
-    Route::group(['middleware' => ['auth:api', 'verified']], function (): void {
+    Route::group(['middleware' => ['auth:api', 'verified', 'policies']], function (): void {
         Route::post('/approve', [ApproveController::class, 'store'])->name('approve.store');
         Route::delete('/approve', [ApproveController::class, 'destroy'])->name('approve.destroy');
         Route::post('/checkout', CheckoutController::class)->name('checkout');

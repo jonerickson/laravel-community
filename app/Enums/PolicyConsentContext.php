@@ -9,6 +9,7 @@ enum PolicyConsentContext: string
     case Onboarding = 'onboarding';
     case Checkout = 'checkout';
     case Subscription = 'subscription';
+    case Acceptance = 'acceptance';
 
     public function label(): string
     {
@@ -16,6 +17,7 @@ enum PolicyConsentContext: string
             self::Onboarding => 'Onboarding',
             self::Checkout => 'Checkout',
             self::Subscription => 'Subscription',
+            self::Acceptance => 'Acceptance',
         };
     }
 }

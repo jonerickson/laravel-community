@@ -9,6 +9,8 @@ use App\Http\Middleware\AttachTraceAndRequestId;
 use App\Http\Middleware\AuthorizeRequestAgainstBlacklist;
 use App\Http\Middleware\EnsureAccountHasEmail;
 use App\Http\Middleware\EnsureAccountHasPassword;
+use App\Http\Middleware\EnsureEmailIsVerified;
+use App\Http\Middleware\EnsurePoliciesAccepted;
 use App\Http\Middleware\ForceOnboarding;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -20,7 +22,6 @@ use App\Jobs\Store\ClearPendingOrders;
 use App\Jobs\Store\ReleaseExpiredInventoryReservations;
 use App\Jobs\Users\RemoveInactiveUsers;
 use App\Models\Fingerprint;
-use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Foundation\Application;
@@ -86,7 +87,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'password' => EnsureAccountHasPassword::class,
             'email' => EnsureAccountHasEmail::class,
+            'verified' => EnsureEmailIsVerified::class,
             'onboarded' => ForceOnboarding::class,
+            'policies' => EnsurePoliciesAccepted::class,
         ]);
 
         $middleware->web(append: [
@@ -97,7 +100,10 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        $middleware->appendToPriorityList(EnsureEmailIsVerified::class, EnsureAccountHasEmail::class);
+        $middleware->appendToPriorityList(EnsureAccountHasEmail::class, EnsureAccountHasPassword::class);
+        $middleware->appendToPriorityList(EnsureAccountHasPassword::class, EnsureEmailIsVerified::class);
+        $middleware->appendToPriorityList(EnsureEmailIsVerified::class, EnsurePoliciesAccepted::class);
+        $middleware->appendToPriorityList(EnsurePoliciesAccepted::class, ForceOnboarding::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         Integration::handles($exceptions);

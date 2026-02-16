@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $user_agent
  * @property string|null $fingerprint_id
  * @property PolicyConsentContext $context
+ * @property string|null $version
  * @property \Illuminate\Support\Carbon $consented_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -53,6 +54,7 @@ class PolicyConsent extends Model
         'user_agent',
         'fingerprint_id',
         'context',
+        'version',
         'consented_at',
     ];
 
