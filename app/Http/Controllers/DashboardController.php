@@ -23,6 +23,9 @@ use Inertia\Response;
 
 class DashboardController
 {
+    /** @var list<int> */
+    private array $excludedProductIds = [];
+
     public function __construct(
         #[CurrentUser]
         private readonly User $user,
@@ -76,7 +79,7 @@ class DashboardController
 
     private function getNewestProduct(): ?ProductData
     {
-        $product = Product::query()
+        $products = Product::query()
             ->products()
             ->approved()
             ->visible()
@@ -87,19 +90,23 @@ class DashboardController
             }])
             ->latest()
             ->get()
-            ->filter(fn (Product $product) => Gate::check('view', $product))
-            ->first();
+            ->filter(fn (Product $product) => Gate::check('view', $product));
+
+        $product = $products->whereNotIn('id', $this->excludedProductIds)->first()
+            ?? $products->first();
 
         if (! $product) {
             return null;
         }
+
+        $this->excludedProductIds[] = $product->id;
 
         return ProductData::from($product);
     }
 
     private function getPopularProduct(): ?ProductData
     {
-        $product = Product::query()
+        $products = Product::query()
             ->products()
             ->approved()
             ->visible()
@@ -110,19 +117,23 @@ class DashboardController
             }])
             ->trending()
             ->get()
-            ->filter(fn (Product $product) => Gate::check('view', $product))
-            ->first();
+            ->filter(fn (Product $product) => Gate::check('view', $product));
+
+        $product = $products->whereNotIn('id', $this->excludedProductIds)->first()
+            ?? $products->first();
 
         if (! $product) {
             return null;
         }
+
+        $this->excludedProductIds[] = $product->id;
 
         return ProductData::from($product);
     }
 
     private function getFeaturedProduct(): ?ProductData
     {
-        $product = Product::query()
+        $products = Product::query()
             ->products()
             ->approved()
             ->visible()
@@ -134,12 +145,16 @@ class DashboardController
             }])
             ->inRandomOrder()
             ->get()
-            ->filter(fn (Product $product) => Gate::check('view', $product))
-            ->first();
+            ->filter(fn (Product $product) => Gate::check('view', $product));
+
+        $product = $products->whereNotIn('id', $this->excludedProductIds)->first()
+            ?? $products->first();
 
         if (! $product) {
             return null;
         }
+
+        $this->excludedProductIds[] = $product->id;
 
         return ProductData::from($product);
     }
