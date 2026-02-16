@@ -8,12 +8,13 @@ use App\Data\CustomerData;
 use App\Data\DiscountData;
 use App\Data\DisputeData;
 use App\Data\InvoiceData;
+use App\Data\PaymentErrorData;
 use App\Data\PaymentMethodData;
 use App\Data\PriceData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
+use App\Drivers\Payments\Contracts\PaymentProcessor;
 use App\Drivers\Payments\NullDriver;
-use App\Drivers\Payments\PaymentProcessor;
 use App\Drivers\Payments\StripeDriver;
 use App\Enums\OrderRefundReason;
 use App\Enums\PaymentBehavior;
@@ -32,6 +33,10 @@ use InvalidArgumentException;
 
 class PaymentManager extends Manager implements PaymentProcessor
 {
+    public ?PaymentErrorData $lastError {
+        get => $this->driver()->lastError;
+    }
+
     public function getDefaultDriver(): string
     {
         return $this->config->get('payment.default') ?? 'null';

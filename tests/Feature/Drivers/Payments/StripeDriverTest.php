@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Drivers\Payments\PaymentProcessor;
+use App\Drivers\Payments\Contracts\PaymentProcessor;
 use App\Drivers\Payments\StripeDriver;
 use App\Enums\DiscountValueType;
 use App\Enums\OrderRefundReason;

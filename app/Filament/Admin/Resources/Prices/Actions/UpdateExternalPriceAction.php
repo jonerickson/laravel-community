@@ -35,7 +35,7 @@ class UpdateExternalPriceAction extends Action
         $this->requiresConfirmation();
         $this->visible(fn (Price $record): bool => filled($record->external_price_id) && $record->product->type === ProductType::Subscription && config('payment.default'));
         $this->icon(Heroicon::OutlinedArrowPath);
-        $this->modalHeading('Update Product Price');
+        $this->modalHeading('Update product price');
         $this->modalIcon(Heroicon::OutlinedArrowPath);
         $this->modalDescription('This will create a new price for the product and all subscriptions will be automatically transitioned to the new price.');
         $this->modalSubmitActionLabel('Start Update');

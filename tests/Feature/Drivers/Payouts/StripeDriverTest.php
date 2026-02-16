@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Drivers\Payouts\PayoutProcessor;
+use App\Drivers\Payouts\Contracts\PayoutProcessor;
 use App\Drivers\Payouts\StripeDriver;
 use App\Enums\PayoutStatus;
 use App\Models\Payout;

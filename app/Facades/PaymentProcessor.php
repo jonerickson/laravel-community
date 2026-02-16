@@ -43,6 +43,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool cancelOrder(\App\Models\Order $order)
  * @method static bool syncCustomerInformation(\App\Models\User $user)
  * @method static string|null getBillingPortalUrl(\App\Models\User $user)
+ * @method static bool submitDisputeEvidence(\App\Models\Dispute $dispute, string $evidenceFilePath)
+ * @method static \App\Data\DisputeData|null getDispute(string $externalDisputeId)
  * @method static mixed driver(string|null $driver = null)
  * @method static \App\Managers\PaymentManager extend(string $driver, \Closure $callback)
  * @method static array getDrivers()

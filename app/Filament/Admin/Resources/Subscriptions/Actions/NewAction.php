@@ -5,14 +5,19 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Subscriptions\Actions;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentBehavior;
 use App\Enums\ProductType;
+use App\Enums\ProrationBehavior;
 use App\Managers\PaymentManager;
 use App\Models\Order;
 use App\Models\Price;
 use App\Models\Product;
 use App\Models\User;
+use Carbon\Carbon;
 use Closure;
 use Filament\Actions\Action;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Database\Eloquent\Builder;
@@ -48,6 +53,28 @@ class NewAction extends Action
                     ->whereHas('product', fn (Builder|Product $query) => $query->active())
                     ->get()
                     ->mapWithKeys(fn (Price $price): array => [$price->id => sprintf('%s: %s', $price->product->getLabel(), $price->getLabel())])),
+            DateTimePicker::make('backdate_start_date')
+                ->label('Start Date')
+                ->helperText('Set a past date to backdate when the subscription started.')
+                ->native(false)
+                ->seconds(false)
+                ->maxDate(now())
+                ->before(now()->format('Y-m-d')),
+            DateTimePicker::make('first_billing_date')
+                ->label('First Billing Date')
+                ->helperText("The customer will not be charged until this date. The customer's subscription will be in the trialing state until the first billing date. Leave blank to charge immediately.")
+                ->native(false)
+                ->seconds(false)
+                ->minDate(now())
+                ->after(now()->format('Y-m-d')),
+            Radio::make('proration_behavior')
+                ->label('Proration Behavior')
+                ->default(ProrationBehavior::AlwaysInvoice)
+                ->options(ProrationBehavior::class),
+            Radio::make('payment_behavior')
+                ->label('Payment Behavior')
+                ->default(PaymentBehavior::ErrorIfIncomplete)
+                ->options(PaymentBehavior::class),
         ]);
 
         $this->action(function (NewAction $action, array $data): void {
@@ -64,14 +91,24 @@ class NewAction extends Action
             $paymentManager = app(PaymentManager::class);
             $result = $paymentManager->startSubscription(
                 order: $order,
-                firstParty: false
+                firstParty: false,
+                prorationBehavior: $data['proration_behavior'],
+                paymentBehavior: $data['payment_behavior'],
+                backdateStartDate: filled($data['backdate_start_date']) ? Carbon::parse($data['backdate_start_date']) : null,
+                billingCycleAnchor: filled($data['first_billing_date']) ? Carbon::parse($data['first_billing_date']) : null,
             );
 
             if ($result) {
                 $action->success();
-            } else {
-                $action->failure();
+
+                return;
             }
+
+            if ($paymentManager->lastError !== null) {
+                $action->failureNotificationTitle($paymentManager->lastError->message);
+            }
+
+            $action->failure();
         });
     }
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Drivers\Payouts\PayoutProcessor;
+use App\Drivers\Payouts\Contracts\PayoutProcessor;
 use App\Managers\PayoutManager;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;

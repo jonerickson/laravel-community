@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Drivers\Payouts;
+namespace App\Drivers\Payouts\Contracts;
 
 use App\Data\BalanceData;
 use App\Data\ConnectedAccountData;

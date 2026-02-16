@@ -32,7 +32,7 @@ class SwapAction extends Action
         $this->color('gray');
         $this->successNotificationTitle('The subscriptions have been successfully swapped.');
         $this->failureNotificationTitle('The subscriptions could not be swapped. Please try again.');
-        $this->modalHeading('Swap Subscription');
+        $this->modalHeading('Swap subscription');
         $this->modalDescription('Use this action to bulk swap users from one subscription price to another.');
         $this->modalSubmitActionLabel('Swap');
         $this->visible(fn (Price $record) => Price::query()

@@ -48,9 +48,15 @@ class CancelAction extends Action
 
             if ($result) {
                 $action->success();
-            } else {
-                $action->failure();
+
+                return;
             }
+
+            if ($paymentManager->lastError !== null) {
+                $action->failureNotificationTitle($paymentManager->lastError->message);
+            }
+
+            $action->failure();
         });
     }
 

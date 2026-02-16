@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Drivers\Payments\PaymentProcessor;
+use App\Drivers\Payments\NullDriver;
 use App\Enums\DisputeAction;
 use App\Enums\DisputeStatus;
 use App\Events\DisputeClosed;
@@ -207,7 +207,7 @@ describe('HandleDisputeCreated automated actions', function (): void {
     });
 
     test('calls PaymentProcessor cancelSubscription when configured', function (): void {
-        $mock = Mockery::mock(PaymentProcessor::class)->shouldIgnoreMissing();
+        $mock = Mockery::mock(NullDriver::class)->shouldIgnoreMissing();
         $mock->shouldReceive('cancelSubscription')->once()->andReturnTrue();
         app()->instance('payment-processor', $mock);
 
@@ -248,7 +248,7 @@ describe('HandleDisputeCreated automated actions', function (): void {
     });
 
     test('multiple actions can run together', function (): void {
-        $mock = Mockery::mock(PaymentProcessor::class)->shouldIgnoreMissing();
+        $mock = Mockery::mock(NullDriver::class)->shouldIgnoreMissing();
         $mock->shouldReceive('cancelSubscription')->once()->andReturnTrue();
         app()->instance('payment-processor', $mock);
 

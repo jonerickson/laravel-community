@@ -23,6 +23,7 @@ class CreateExternalPriceAction extends Action
         $this->icon(Heroicon::OutlinedPlus);
         $this->successNotificationTitle('The external price was successfully created.');
         $this->failureNotificationTitle('The external price was not created. Please try again.');
+        $this->modalHeading('Create external price');
         $this->action(function (Price $record, CreateExternalPriceAction $action): void {
             $paymentManger = app(PaymentManager::class);
 

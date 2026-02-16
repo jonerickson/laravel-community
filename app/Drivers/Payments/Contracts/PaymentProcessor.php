@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Drivers\Payments;
+namespace App\Drivers\Payments\Contracts;
 
 use App\Data\CustomerData;
 use App\Data\DiscountData;
 use App\Data\DisputeData;
 use App\Data\InvoiceData;
+use App\Data\PaymentErrorData;
 use App\Data\PaymentMethodData;
 use App\Data\PriceData;
 use App\Data\ProductData;
@@ -27,6 +28,10 @@ use Illuminate\Support\Collection;
 
 interface PaymentProcessor
 {
+    public ?PaymentErrorData $lastError {
+        get;
+    }
+
     public function createProduct(Product $product): ?ProductData;
 
     public function getProduct(Product $product): ?ProductData;

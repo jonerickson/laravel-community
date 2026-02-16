@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Drivers\Payments\Contracts\PaymentProcessor;
 use App\Drivers\Payments\NullDriver;
-use App\Drivers\Payments\PaymentProcessor;
 use App\Enums\OrderRefundReason;
 use App\Enums\PaymentBehavior;
 use App\Enums\ProrationBehavior;

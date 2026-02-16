@@ -8,10 +8,13 @@ use App\Data\CustomerData;
 use App\Data\DiscountData;
 use App\Data\DisputeData;
 use App\Data\InvoiceData;
+use App\Data\PaymentErrorData;
 use App\Data\PaymentMethodData;
 use App\Data\PriceData;
 use App\Data\ProductData;
 use App\Data\SubscriptionData;
+use App\Drivers\Payments\Concerns\TracksErrors;
+use App\Drivers\Payments\Contracts\PaymentProcessor;
 use App\Enums\DiscountType;
 use App\Enums\DiscountValueType;
 use App\Enums\OrderRefundReason;
@@ -55,6 +58,8 @@ use Stripe\StripeClient;
 
 class StripeDriver implements PaymentProcessor
 {
+    use TracksErrors;
+
     protected StripeClient $stripe;
 
     public function __construct(private readonly string $stripeSecret)
@@ -533,6 +538,7 @@ class StripeDriver implements PaymentProcessor
                 ->when($paymentBehavior === PaymentBehavior::DefaultIncomplete, fn (SubscriptionBuilder $builder) => $builder->defaultIncomplete())
                 ->when($paymentBehavior === PaymentBehavior::AllowIncomplete, fn (SubscriptionBuilder $builder) => $builder->allowPaymentFailures())
                 ->when($paymentBehavior === PaymentBehavior::PendingIfIncomplete, fn (SubscriptionBuilder $builder) => $builder->pendingIfPaymentFails())
+                ->when($paymentBehavior === PaymentBehavior::ErrorIfIncomplete, fn (SubscriptionBuilder $builder) => $builder->errorIfPaymentFails())
                 ->withMetadata($metadata)
                 ->when(! $chargeNow, fn (SubscriptionBuilder $builder) => $builder->createAndSendInvoice($customerOptions, $subscriptionOptions))
                 ->when(! $firstParty, fn (SubscriptionBuilder $builder): Subscription => $builder->create(
@@ -590,6 +596,10 @@ class StripeDriver implements PaymentProcessor
                 ]);
 
                 return $result->url;
+            }
+
+            if ($result instanceof Builder) {
+                $result = $result->getModel();
             }
 
             return SubscriptionData::from($result);
@@ -720,6 +730,10 @@ class StripeDriver implements PaymentProcessor
         return $this->executeWithErrorHandling('currentSubscription', function () use ($user): ?SubscriptionData {
             if (! ($subscription = $user->subscription()) instanceof Subscription) {
                 return null;
+            }
+
+            if ($subscription->incomplete()) {
+                return SubscriptionData::from($subscription);
             }
 
             if (! $subscription->active()) {
@@ -1048,6 +1062,8 @@ class StripeDriver implements PaymentProcessor
 
     private function executeWithErrorHandling(string $method, callable $callback, mixed $defaultValue = null): mixed
     {
+        $this->lastError = null;
+
         if (Http::preventingStrayRequests()) {
             return $defaultValue;
         }
@@ -1069,6 +1085,13 @@ class StripeDriver implements PaymentProcessor
                         'retry_after' => $retryAfter,
                     ]);
 
+                    $this->lastError = new PaymentErrorData(
+                        method: $method,
+                        message: $exception->getMessage(),
+                        exceptionClass: $exception::class,
+                        code: $exception->getStripeCode(),
+                    );
+
                     return $defaultValue;
                 }
 
@@ -1082,9 +1105,22 @@ class StripeDriver implements PaymentProcessor
             } catch (ApiErrorException $exception) {
                 Log::error('Stripe payment processor API error in '.$method, ['method' => $method, 'exception' => $exception]);
 
+                $this->lastError = new PaymentErrorData(
+                    method: $method,
+                    message: $exception->getMessage(),
+                    exceptionClass: $exception::class,
+                    code: $exception->getStripeCode(),
+                );
+
                 return $defaultValue;
             } catch (Exception $exception) {
                 Log::error('Stripe payment processor exception in '.$method, ['method' => $method, 'exception' => $exception]);
+
+                $this->lastError = new PaymentErrorData(
+                    method: $method,
+                    message: $exception->getMessage(),
+                    exceptionClass: $exception::class,
+                );
 
                 return $defaultValue;
             }

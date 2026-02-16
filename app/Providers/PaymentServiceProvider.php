@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Drivers\Payments\PaymentProcessor;
+use App\Drivers\Payments\Contracts\PaymentProcessor;
 use App\Managers\PaymentManager;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
