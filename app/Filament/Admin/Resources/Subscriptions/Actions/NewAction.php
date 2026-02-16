@@ -62,7 +62,7 @@ class NewAction extends Action
                 ->before(now()->format('Y-m-d')),
             DateTimePicker::make('first_billing_date')
                 ->label('First Billing Date')
-                ->helperText('The customer will not be charged until this date. The customer\'s subscription will be in the trialing state until the first billing date. Leave blank to charge immediately.')
+                ->helperText("The customer will not be charged until this date. The customer's subscription will be in the trialing state until the first billing date. Leave blank to charge immediately.")
                 ->native(false)
                 ->seconds(false)
                 ->minDate(now())
