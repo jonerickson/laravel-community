@@ -16,7 +16,7 @@ interface DashboardProductCardProps {
 const cardConfig = {
     newest: {
         icon: NewspaperIcon,
-        title: 'Newest Arrival',
+        title: 'Newest Arrivals',
         titleCss: 'text-info',
         borderCss: 'border-info/20',
         badgeVariant: 'info' as const,
@@ -34,7 +34,7 @@ const cardConfig = {
     },
     featured: {
         icon: SparklesIcon,
-        title: 'Featured Product',
+        title: 'Featured Products',
         titleCss: 'text-destructive',
         borderCss: 'border-destructive/20',
         badgeVariant: 'destructive' as const,

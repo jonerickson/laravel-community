@@ -26,7 +26,7 @@ export default function DashboardProductGrid({ newestProduct, popularProduct, fe
                         <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                         <div className="absolute inset-0 flex items-center justify-center">
                             <div className="space-y-3 text-center">
-                                <HeadingSmall title="Newest arrival" description="No products available" />
+                                <HeadingSmall title="Newest arrivals" description="No products available" />
                                 <Button asChild variant="outline" size="sm">
                                     <Link href={route('store.index')}>
                                         <Store className="size-4" />
@@ -68,7 +68,7 @@ export default function DashboardProductGrid({ newestProduct, popularProduct, fe
                         <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                         <div className="absolute inset-0 flex items-center justify-center">
                             <div className="space-y-3 text-center">
-                                <HeadingSmall title="Featured product" description="No products available" />
+                                <HeadingSmall title="Featured products" description="No products available" />
                                 <Button asChild variant="outline" size="sm">
                                     <Link href={route('store.index')}>
                                         <Store className="size-4" />
