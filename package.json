@@ -84,7 +84,7 @@
         "tailwindcss": "4.1.12",
         "tailwindcss-animate": "^1.0.7",
         "tiptap-extension-resizable-image": "2.0.0",
-        "typescript": "^5.7.2",
+        "typescript": "^5.9.3",
         "typescript-eslint": "^8.23.0",
         "vite": "^7.2.4",
         "vite-plugin-image-optimizer": "2.0.2"
