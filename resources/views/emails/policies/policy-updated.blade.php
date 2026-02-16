@@ -1,5 +1,5 @@
 <x-mail::message>
-# Policy updated
+# Policy Updated
 
 The following policy has been updated on {{ config('app.name') }}.
 
