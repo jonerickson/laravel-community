@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Store\CategoryController;
 use App\Http\Controllers\Store\CheckoutCancelController;
 use App\Http\Controllers\Store\CheckoutSuccessController;
+use App\Http\Controllers\Store\MarketplaceController;
 use App\Http\Controllers\Store\ProductController;
 use App\Http\Controllers\Store\ReviewController;
 use App\Http\Controllers\Store\ShoppingCartController;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['as' => 'store.', 'prefix' => 'store'], function (): void {
     Route::get('/', StoreController::class)->name('index');
     Route::get('cart', [ShoppingCartController::class, 'index'])->name('cart.index');
+    Route::get('marketplace', MarketplaceController::class)->name('marketplace');
     Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
     Route::get('categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
     Route::get('products/{product:slug}', [ProductController::class, 'show'])->name('products.show');

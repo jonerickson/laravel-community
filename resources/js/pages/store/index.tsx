@@ -118,7 +118,7 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
                 <div>
                     <div className="sm:flex sm:items-baseline sm:justify-between">
                         <Heading title="Community provided" description="Browse community-submitted products" />
-                        <Link href={route('store.categories.index')} className="hidden text-sm font-semibold sm:block">
+                        <Link href={route('store.marketplace')} className="hidden text-sm font-semibold sm:block">
                             Browse all community products
                             <span aria-hidden="true"> &rarr;</span>
                         </Link>
@@ -141,7 +141,7 @@ export default function StoreIndex({ categories, featuredProducts, userProvidedP
                     </Deferred>
 
                     <div className="mt-6 sm:hidden">
-                        <Link href={route('store.categories.index')} className="block text-sm font-semibold">
+                        <Link href={route('store.marketplace')} className="block text-sm font-semibold">
                             Browse all community products
                             <span aria-hidden="true"> &rarr;</span>
                         </Link>
