@@ -5,6 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Dispute Defense Package</title>
         <style>
+            @page {
+                margin: 40px;
+            }
+
             * {
                 margin: 0;
                 padding: 0;
@@ -16,7 +20,6 @@
                 font-size: 12px;
                 line-height: 1.5;
                 color: #1a1a1a;
-                padding: 40px;
             }
 
             .header {
@@ -92,6 +95,7 @@
                 background-color: #fafafa;
                 font-size: 10px;
                 text-transform: uppercase;
+                text-wrap: nowrap;
                 letter-spacing: 0.5px;
                 color: #666;
             }
@@ -104,6 +108,7 @@
                 font-size: 10px;
                 color: #444;
                 line-height: 1.6;
+                break-inside: avoid;
             }
 
             .disclaimer-title {
@@ -175,6 +180,12 @@
                         <td>Customer Email</td>
                         <td>{{ $data->userEmail }}</td>
                     </tr>
+                    @if ($data->customerId)
+                        <tr>
+                            <td>Customer ID</td>
+                            <td>{{ $data->customerId }}</td>
+                        </tr>
+                    @endif
                     @foreach ($data->integrations as $integration)
                         <tr>
                             <td>{{ ucfirst($integration['provider']) }} ID</td>
@@ -240,6 +251,13 @@
                                 <td>{{ $consent['fingerprint_id'] ?? 'N/A' }}</td>
                                 <td>{{ $consent['user_agent'] ?? 'N/A' }}</td>
                             </tr>
+                            @if ($consent['url'])
+                                <tr>
+                                    <td colspan="6" style="font-size: 10px; color: #666; border-bottom: 2px solid #e0e0e0">
+                                        View policy: <a href="{{ $consent['url'] }}" style="color: #2563eb; text-decoration: underline">{{ $consent['url'] }}</a>
+                                    </td>
+                                </tr>
+                            @endif
                         @endforeach
                     </tbody>
                 </table>

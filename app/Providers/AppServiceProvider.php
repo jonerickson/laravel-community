@@ -61,11 +61,19 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(fn (): PdfFactory|PdfBuilder => new PdfFactory()->withBrowsershot(
             function (Browsershot $browserShot): void {
                 $browserShot
-                    ->setChromePath('/usr/bin/chromium')
+                    ->setChromePath(config('services.browsershot.chrome_path', '/usr/bin/chromium'))
                     ->setOption('args', [
                         '--headless',
                         '--no-sandbox',
                     ]);
+
+                if ($nodePath = config('services.browsershot.node_path')) {
+                    $browserShot->setNodeBinary($nodePath);
+                }
+
+                if ($npmPath = config('services.browsershot.npm_path')) {
+                    $browserShot->setNpmBinary($npmPath);
+                }
             }
         ));
     }

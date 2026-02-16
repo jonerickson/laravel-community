@@ -16,6 +16,12 @@ return [
     |
     */
 
+    'browsershot' => [
+        'chrome_path' => env('BROWSERSHOT_CHROME_PATH', '/usr/bin/chromium'),
+        'node_path' => env('BROWSERSHOT_NODE_PATH'),
+        'npm_path' => env('BROWSERSHOT_NPM_PATH'),
+    ],
+
     'cloudflare' => [
         'api_key' => getenv('CF_CACHE_API_TOKEN'),
         'zone_id' => getenv('CF_CACHE_ZONE_ID'),

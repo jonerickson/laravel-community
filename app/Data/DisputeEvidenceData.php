@@ -16,7 +16,7 @@ class DisputeEvidenceData extends Data
     /**
      * @param  array<int, array{name: string, amount: float|int}>  $orderItems
      * @param  array<int, array{provider: string, provider_id: string, provider_name: string|null}>  $integrations
-     * @param  array<int, array{title: string, version: string|null, consented_at: Carbon|null, ip_address: string|null, fingerprint_id: string|null, user_agent: string|null}>  $consents
+     * @param  array<int, array{title: string, version: string|null, url: string|null, consented_at: Carbon|null, ip_address: string|null, fingerprint_id: string|null, user_agent: string|null}>  $consents
      * @param  array<int, array{description: string, event: string, properties: array<string, mixed>, created_at: Carbon|null}>  $activityLogs
      * @param  array<int, array{endpoint: string, method: string, status: int|null, created_at: Carbon|null}>  $accessLogs
      */
@@ -30,6 +30,7 @@ class DisputeEvidenceData extends Data
         public Carbon $orderCreatedAt,
         public array $orderItems,
         public string $userEmail,
+        public ?string $customerId,
         public Carbon $userCreatedAt,
         public array $integrations,
         public array $consents,
@@ -39,7 +40,7 @@ class DisputeEvidenceData extends Data
 
     public static function fromOrder(Order $order): self
     {
-        $order->loadMissing(['items.price.product', 'user.integrations', 'user.policyConsents.policy']);
+        $order->loadMissing(['items.price.product', 'user.integrations', 'user.policyConsents.policy.category']);
 
         $user = $order->user;
 
@@ -52,6 +53,9 @@ class DisputeEvidenceData extends Data
         $consents = $user->policyConsents->map(fn ($consent): array => [
             'title' => $consent->policy->title,
             'version' => $consent->version ?? $consent->policy->version,
+            'url' => $consent->policy->category
+                ? route('policies.show', [$consent->policy->category->slug, $consent->policy->slug])
+                : null,
             'consented_at' => $consent->consented_at,
             'ip_address' => $consent->ip_address,
             'fingerprint_id' => $consent->fingerprint_id,
@@ -109,6 +113,7 @@ class DisputeEvidenceData extends Data
             orderCreatedAt: $order->created_at,
             orderItems: $orderItems,
             userEmail: $user->email ?? '',
+            customerId: $user->stripe_id,
             userCreatedAt: $user->created_at,
             integrations: $integrations,
             consents: $consents,
