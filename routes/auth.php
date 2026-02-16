@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Auth\AcceptPoliciesController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
@@ -85,6 +86,12 @@ Route::middleware('auth')->group(function (): void {
 
     Route::post('set-password', [SetPasswordPromptController::class, 'store'])
         ->name('set-password.verify');
+
+    Route::get('accept-policies', [AcceptPoliciesController::class, 'create'])
+        ->name('policies.accept.notice');
+
+    Route::post('accept-policies', [AcceptPoliciesController::class, 'store'])
+        ->name('policies.accept.store');
 
     Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
         ->name('password.confirm');

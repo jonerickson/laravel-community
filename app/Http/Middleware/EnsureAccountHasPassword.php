@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Http\Middleware\Concerns\BypassesForcedActionRoutes;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -12,9 +13,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureAccountHasPassword
 {
+    use BypassesForcedActionRoutes;
+
     public function handle(Request $request, Closure $next): Response
     {
-        if (($user = $request->user()) && blank($user->password) && ! $request->routeIs('set-password.notice')) {
+        if (($user = $request->user()) && blank($user->password) && ! $this->isForcedActionRoute($request)) {
             return $request->expectsJson()
                 ? abort(403, 'Your account must have a password set.')
                 : ($request->inertia()

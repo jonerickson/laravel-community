@@ -32,6 +32,10 @@ class RecordPolicyConsentAction extends Action
             ? $this->policies->pluck('id')->all()
             : $this->policies;
 
+        $policyVersions = $this->context === PolicyConsentContext::Acceptance
+            ? Policy::query()->whereIn('id', $policyIds)->pluck('version', 'id')->all()
+            : [];
+
         foreach ($policyIds as $policyId) {
             PolicyConsent::updateOrCreate(
                 [
@@ -44,6 +48,7 @@ class RecordPolicyConsentAction extends Action
                     'user_agent' => $this->userAgent,
                     'fingerprint_id' => $this->fingerprintId,
                     'consented_at' => Carbon::now(),
+                    'version' => $policyVersions[$policyId] ?? null,
                 ],
             );
         }

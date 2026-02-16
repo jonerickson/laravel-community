@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/support/tickets', [SupportTicketController::class, 'index'])->name('support.index');
 
-Route::group(['middleware' => ['auth', 'verified']], function (): void {
+Route::group(['middleware' => ['auth']], function (): void {
     Route::get('/support/tickets/create', [SupportTicketController::class, 'create'])->name('support.create');
     Route::post('/support/tickets', [SupportTicketController::class, 'store'])->middleware('throttle:support-ticket')->name('support.store');
     Route::get('/support/tickets/{ticket:reference_id}', [SupportTicketController::class, 'show'])->name('support.show');

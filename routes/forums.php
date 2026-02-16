@@ -13,7 +13,7 @@ Route::group(['prefix' => 'forums', 'as' => 'forums.'], function (): void {
     Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
     Route::get('/{forum:slug}', [ForumController::class, 'show'])->name('show');
 
-    Route::group(['middleware' => ['auth', 'verified']], function (): void {
+    Route::group(['middleware' => ['auth']], function (): void {
         Route::post('/{forum:slug}/topics', [TopicController::class, 'store'])->middleware('throttle:post')->name('topics.store');
         Route::get('/{forum:slug}/topics/create', [TopicController::class, 'create'])->name('topics.create');
         Route::delete('/{forum:slug}/topics/{topic:slug}', [TopicController::class, 'destroy'])->name('topics.destroy');

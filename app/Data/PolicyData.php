@@ -26,6 +26,8 @@ class PolicyData extends Data
 
     public string $content;
 
+    public ?string $consentLabel = null;
+
     public bool $isActive;
 
     public UserData $author;

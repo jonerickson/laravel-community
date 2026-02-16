@@ -21,6 +21,7 @@ use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -97,6 +98,9 @@ class OnboardingController extends Controller
             ],
             'emailVerified' => $this->user && $this->user->hasVerifiedEmail(),
             'policies' => PolicyData::collect($policies),
+            'onboardingImageUrl' => $this->registrationSettings->onboarding_image
+                ? Storage::url($this->registrationSettings->onboarding_image)
+                : null,
         ]);
     }
 

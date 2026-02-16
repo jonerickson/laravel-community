@@ -116,6 +116,19 @@ class PolicyResource extends Resource
                                     ->label('Effective Date')
                                     ->helperText('Leave empty for immediate effect'),
                             ]),
+                        Section::make('Consent')
+                            ->schema([
+                                Toggle::make('requires_acceptance')
+                                    ->label('Requires Acceptance')
+                                    ->helperText('When enabled, users must re-accept this policy when the version changes before continuing on the site.')
+                                    ->default(false),
+                                Textarea::make('consent_label')
+                                    ->label('Consent Label')
+                                    ->columnSpanFull()
+                                    ->nullable()
+                                    ->maxLength(500)
+                                    ->helperText('Custom text for consent checkboxes. Leave empty for default: "I agree to the {policy title}"'),
+                            ]),
                         Section::make('Author')
                             ->columnSpanFull()
                             ->collapsed()
@@ -159,6 +172,11 @@ class PolicyResource extends Resource
                     ->label('Active')
                     ->boolean()
                     ->sortable(),
+                IconColumn::make('requires_acceptance')
+                    ->label('Requires Acceptance')
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('author.name')
                     ->label('Created By')
                     ->sortable(),

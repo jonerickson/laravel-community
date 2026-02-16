@@ -30,7 +30,7 @@ Route::group(['as' => 'store.', 'prefix' => 'store'], function (): void {
         Route::post('subscriptions/{subscription:reference_id}/reviews', [ReviewController::class, 'store'])->middleware('throttle:comment')->name('subscriptions.reviews.store');
     });
 
-    Route::group(['middleware' => ['auth', 'verified', 'signed']], function (): void {
+    Route::group(['middleware' => ['auth', 'signed']], function (): void {
         Route::get('checkout/success/{order:reference_id}', CheckoutSuccessController::class)->name('checkout.success');
         Route::get('checkout/cancel/{order:reference_id}', CheckoutCancelController::class)->name('checkout.cancel');
     });

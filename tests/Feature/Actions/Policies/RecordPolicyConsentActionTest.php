@@ -132,6 +132,43 @@ describe('RecordPolicyConsentAction', function (): void {
         }
     });
 
+    test('acceptance context automatically captures policy version', function (): void {
+        $user = User::factory()->create();
+        $policy = Policy::factory()->create(['version' => 'v2.0.0']);
+
+        RecordPolicyConsentAction::execute(
+            $user,
+            [$policy->id],
+            PolicyConsentContext::Acceptance,
+        );
+
+        $consent = PolicyConsent::where('user_id', $user->id)
+            ->where('policy_id', $policy->id)
+            ->where('context', PolicyConsentContext::Acceptance)
+            ->first();
+
+        expect($consent)->not->toBeNull()
+            ->and($consent->version)->toBe('v2.0.0');
+    });
+
+    test('non-acceptance contexts do not auto-capture version', function (): void {
+        $user = User::factory()->create();
+        $policy = Policy::factory()->create(['version' => 'v1.0.0']);
+
+        RecordPolicyConsentAction::execute(
+            $user,
+            [$policy->id],
+            PolicyConsentContext::Checkout,
+        );
+
+        $consent = PolicyConsent::where('user_id', $user->id)
+            ->where('policy_id', $policy->id)
+            ->where('context', PolicyConsentContext::Checkout)
+            ->first();
+
+        expect($consent->version)->toBeNull();
+    });
+
     test('can be executed via static execute method', function (): void {
         $user = User::factory()->create();
         $policy = Policy::factory()->create();

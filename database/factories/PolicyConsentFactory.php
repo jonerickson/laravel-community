@@ -24,6 +24,7 @@ class PolicyConsentFactory extends Factory
             'user_agent' => $this->faker->userAgent(),
             'fingerprint_id' => $this->faker->uuid(),
             'context' => $this->faker->randomElement(PolicyConsentContext::cases()),
+            'version' => null,
             'consented_at' => $this->faker->dateTimeBetween('-30 days'),
         ];
     }

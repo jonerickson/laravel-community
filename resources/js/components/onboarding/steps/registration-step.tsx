@@ -107,15 +107,21 @@ export function RegistrationStep({ data, errors, processing, onChange, onNext, p
                                     disabled={processing}
                                 />
                                 <Label htmlFor={`policy-${policy.id}`} className="cursor-pointer text-sm leading-normal font-normal">
-                                    I agree to the{' '}
-                                    <a
-                                        href={route('policies.show', { category: policy.category?.slug, policy: policy.slug })}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-primary hover:underline"
-                                    >
-                                        <span className="font-bold">{policy.title}</span>
-                                    </a>
+                                    {policy.consentLabel ? (
+                                        policy.consentLabel
+                                    ) : (
+                                        <>
+                                            I agree to the{' '}
+                                            <a
+                                                href={route('policies.show', { category: policy.category?.slug, policy: policy.slug })}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-primary hover:underline"
+                                            >
+                                                <span className="font-bold">{policy.title}</span>
+                                            </a>
+                                        </>
+                                    )}
                                 </Label>
                             </div>
                         ))}

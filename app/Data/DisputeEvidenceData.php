@@ -51,7 +51,7 @@ class DisputeEvidenceData extends Data
 
         $consents = $user->policyConsents->map(fn ($consent): array => [
             'title' => $consent->policy->title,
-            'version' => $consent->policy->version,
+            'version' => $consent->version ?? $consent->policy->version,
             'consented_at' => $consent->consented_at,
             'ip_address' => $consent->ip_address,
             'fingerprint_id' => $consent->fingerprint_id,

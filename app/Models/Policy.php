@@ -28,6 +28,8 @@ use Illuminate\Support\Str;
  * @property string|null $version
  * @property string|null $description
  * @property string $content
+ * @property string|null $consent_label
+ * @property bool $requires_acceptance
  * @property int $policy_category_id
  * @property int $order
  * @property bool $is_active
@@ -47,6 +49,7 @@ use Illuminate\Support\Str;
  *
  * @method static Builder<static>|Policy active()
  * @method static Builder<static>|Policy effective()
+ * @method static Builder<static>|Policy requiresAcceptance()
  * @method static \Database\Factories\PolicyFactory factory($count = null, $state = [])
  * @method static Builder<static>|Policy inactive()
  * @method static Builder<static>|Policy newModelQuery()
@@ -83,6 +86,8 @@ class Policy extends Model implements Sluggable
         'title',
         'description',
         'content',
+        'consent_label',
+        'requires_acceptance',
         'version',
         'policy_category_id',
         'effective_at',
@@ -106,6 +111,11 @@ class Policy extends Model implements Sluggable
     public function userConsents(): HasMany
     {
         return $this->hasMany(PolicyConsent::class);
+    }
+
+    public function scopeRequiresAcceptance(Builder $query): void
+    {
+        $query->where('requires_acceptance', true);
     }
 
     public function scopeEffective(Builder $query): void
@@ -149,6 +159,7 @@ class Policy extends Model implements Sluggable
     {
         return [
             'effective_at' => 'datetime',
+            'requires_acceptance' => 'boolean',
         ];
     }
 }

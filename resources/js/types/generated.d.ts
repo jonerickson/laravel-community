@@ -449,6 +449,7 @@ declare namespace App.Data {
         version: string | null;
         description: string | null;
         content: string;
+        consentLabel: string | null;
         isActive: boolean;
         author: App.Data.UserData;
         category: App.Data.PolicyCategoryData | null;
@@ -733,8 +734,33 @@ declare namespace App.Enums {
     export type AnnouncementType = 'info' | 'success' | 'warning' | 'error';
     export type BillingReason = 'manual' | 'subscription_create' | 'subscription_cycle' | 'subscription_threshold' | 'subscription_update';
     export type CommissionStatus = 'paid' | 'pending' | 'rejected' | 'cancelled' | 'returned';
+    export type DiscordNameSyncDirection = 'discord_to_app' | 'app_to_discord';
     export type DiscountType = 'cancellation' | 'gift_card' | 'promo_code' | 'manual';
     export type DiscountValueType = 'fixed' | 'percentage';
+    export type DisputeAction = 'blacklist_user' | 'cancel_subscription' | 'flag_for_review' | 'nothing';
+    export type DisputeReason =
+        | 'bank_cannot_process'
+        | 'credit_not_processed'
+        | 'customer_initiated'
+        | 'debit_not_authorized'
+        | 'duplicate'
+        | 'fraudulent'
+        | 'general'
+        | 'incorrect_account_details'
+        | 'insufficient_funds'
+        | 'product_not_received'
+        | 'product_unacceptable'
+        | 'subscription_canceled'
+        | 'unrecognized';
+    export type DisputeStatus =
+        | 'warning_needs_response'
+        | 'warning_under_review'
+        | 'warning_closed'
+        | 'needs_response'
+        | 'under_review'
+        | 'won'
+        | 'lost'
+        | 'charge_refunded';
     export type FieldType = 'checkbox' | 'date' | 'datetime' | 'number' | 'radio' | 'rich_text' | 'select' | 'text' | 'textarea';
     export type FileVisibility = 'public' | 'private';
     export type FilterType = 'fingerprint' | 'ip_address' | 'user' | 'string';
@@ -779,6 +805,7 @@ declare namespace App.Enums {
     export type PaymentBehavior = 'allow_incomplete' | 'default_incomplete' | 'error_if_incomplete' | 'pending_if_incomplete';
     export type PayoutDriver = 'stripe';
     export type PayoutStatus = 'pending' | 'completed' | 'failed' | 'cancelled';
+    export type PolicyConsentContext = 'onboarding' | 'checkout' | 'subscription' | 'acceptance';
     export type PostType = 'blog' | 'forum';
     export type PriceType = 'one_time' | 'recurring';
     export type ProductApprovalStatus = 'pending' | 'approved' | 'rejected' | 'withdrawn';

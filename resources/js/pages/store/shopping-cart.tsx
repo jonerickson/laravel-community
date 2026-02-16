@@ -26,7 +26,7 @@ interface ShoppingCartProps {
 export default function ShoppingCart({ cartItems = [], order = null }: ShoppingCartProps) {
     const { auth } = usePage<App.Data.SharedData>().props;
     const { items, setItems, updateQuantity, removeItem, proceedToCheckout, calculateTotals, loading } = useCartOperations(cartItems);
-    const [policiesAgreed, setPoliciesAgreed] = useState(false);
+    const [policiesAgreed, setPoliciesAgreed] = useState<Record<number, boolean>>({});
     const [discountCode, setDiscountCode] = useState('');
     const [appliedDiscount, setAppliedDiscount] = useState<App.Data.DiscountData | null>(
         order?.discounts && order.discounts.length > 0 ? order.discounts[0] : null,
@@ -99,6 +99,7 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
     };
 
     const policies = getAllPolicies();
+    const allPoliciesAgreed = policies.length === 0 || policies.every((policy) => policiesAgreed[policy.id]);
 
     const handleUpdateQuantity = (productId: number, quantity: number, priceId?: number | null) => {
         updateQuantity(productId, quantity, priceId);
@@ -389,60 +390,54 @@ export default function ShoppingCart({ cartItems = [], order = null }: ShoppingC
                                 {policies.length > 0 && (
                                     <div className="py-3">
                                         <dt className="mb-3 flex items-center gap-2">
-                                            <h4 className="sidebar-primary text-sm font-medium">Required Policies</h4>
+                                            <h4 className="sidebar-primary text-sm font-medium">Required policies</h4>
                                         </dt>
-                                        <dd className="mb-3 text-xs text-sidebar-accent-foreground">
-                                            By proceeding with checkout, you agree to the following policies:
-                                        </dd>
-                                        <ul className="mb-4 space-y-2">
+                                        <dd className="space-y-2">
                                             {policies.map((policy) => (
-                                                <li key={policy.id}>
-                                                    <Link
-                                                        href={
-                                                            policy.category?.slug && policy.slug
-                                                                ? route('policies.show', [policy.category.slug, policy.slug])
-                                                                : '#'
+                                                <div key={policy.id} className="flex items-center gap-3">
+                                                    <Checkbox
+                                                        id={`policy-${policy.id}`}
+                                                        checked={policiesAgreed[policy.id] ?? false}
+                                                        onCheckedChange={(checked) =>
+                                                            setPoliciesAgreed((prev) => ({ ...prev, [policy.id]: checked === true }))
                                                         }
-                                                        className="text-xs text-blue-600 underline hover:text-blue-800"
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
+                                                        className="mt-0.5"
+                                                    />
+                                                    <label
+                                                        htmlFor={`policy-${policy.id}`}
+                                                        className="cursor-pointer text-xs leading-relaxed text-muted-foreground"
                                                     >
-                                                        {policy.title}
-                                                        {policy.version && ` (v${policy.version})`}
-                                                    </Link>
-                                                </li>
+                                                        {policy.consentLabel ? (
+                                                            policy.consentLabel
+                                                        ) : (
+                                                            <>
+                                                                I agree to the{' '}
+                                                                <a
+                                                                    href={
+                                                                        policy.category?.slug && policy.slug
+                                                                            ? route('policies.show', [policy.category.slug, policy.slug])
+                                                                            : '#'
+                                                                    }
+                                                                    className="font-bold text-primary hover:underline"
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                >
+                                                                    {policy.title}
+                                                                </a>
+                                                            </>
+                                                        )}
+                                                    </label>
+                                                </div>
                                             ))}
-                                        </ul>
-                                        <div className="flex items-start space-x-2">
-                                            <Checkbox
-                                                id="policies-agreement"
-                                                checked={policiesAgreed}
-                                                onCheckedChange={(checked) => setPoliciesAgreed(checked === true)}
-                                                className="mt-0.5"
-                                            />
-                                            <label
-                                                htmlFor="policies-agreement"
-                                                className="cursor-pointer text-xs leading-relaxed text-muted-foreground"
-                                            >
-                                                I agree to the above policies and understand that I must comply with them.
-                                            </label>
-                                        </div>
+                                        </dd>
                                     </div>
                                 )}
                             </dl>
 
                             <div className="mt-2">
-                                <Button
-                                    className="w-full"
-                                    onClick={proceedToCheckout}
-                                    disabled={loading !== null || (policies.length > 0 && !policiesAgreed)}
-                                >
+                                <Button className="w-full" onClick={proceedToCheckout} disabled={loading !== null || !allPoliciesAgreed}>
                                     {loading && <LoaderCircle className="animate-spin" />}
-                                    {loading
-                                        ? 'Processing...'
-                                        : policies.length > 0 && !policiesAgreed
-                                          ? 'Agree to policies to checkout'
-                                          : 'Checkout'}
+                                    {loading ? 'Processing...' : !allPoliciesAgreed ? 'Agree to policies to checkout' : 'Checkout'}
                                 </Button>
                             </div>
                         </section>

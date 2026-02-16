@@ -19,10 +19,17 @@ class PolicyFactory extends Factory
             'title' => $this->faker->words(2, true),
             'description' => $this->faker->paragraph(),
             'content' => $this->faker->paragraphs(3, asText: true),
+            'consent_label' => null,
+            'requires_acceptance' => false,
             'version' => $this->faker->numerify('v#.#.#'),
             'policy_category_id' => PolicyCategory::factory(),
             'is_active' => $this->faker->boolean(),
             'effective_at' => now(),
         ];
+    }
+
+    public function requiresAcceptance(): static
+    {
+        return $this->state(fn (): array => ['requires_acceptance' => true]);
     }
 }
