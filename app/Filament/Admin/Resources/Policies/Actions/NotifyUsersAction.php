@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Policies\Actions;
 
-use App\Mail\Policies\PolicyUpdatedMail;
+use App\Jobs\Policies\NotifyUsersOfPolicyUpdate;
 use App\Models\Policy;
-use App\Models\User;
 use Filament\Actions\Action;
-use Illuminate\Support\Facades\Mail;
 use Override;
 
 class NotifyUsersAction extends Action
@@ -26,13 +24,7 @@ class NotifyUsersAction extends Action
         $this->modalSubmitActionLabel('Send notifications');
         $this->successNotificationTitle('Policy update notifications have been queued for all users.');
         $this->action(function (NotifyUsersAction $action, Policy $record): void {
-            User::query()
-                ->whereNotNull('email')
-                ->whereNotNull('email_verified_at')
-                ->cursor()
-                ->each(function (User $user) use ($record): void {
-                    Mail::to($user)->queue(new PolicyUpdatedMail($record));
-                });
+            NotifyUsersOfPolicyUpdate::dispatch($record);
 
             $action->success();
         });
